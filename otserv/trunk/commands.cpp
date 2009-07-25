@@ -411,6 +411,9 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Player* player = creature->getPlayer();
+	if(!player->hasFlag(PlayerFlag_CanReloadContent)){
+		return false;
+	}
 
 	if(param == "actions" || param == "action"){
 		g_actions->reload();
