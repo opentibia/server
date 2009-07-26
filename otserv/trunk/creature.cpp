@@ -894,7 +894,7 @@ DeathList Creature::getKillers(int32_t assist_count)
 
 	if(list.size() > (uint32_t)assist_count + 1)
 		// Shrink list to assist_count
-		list.resize(assist_count + 1, DeathEntry(NULL, -1));
+		list.resize(assist_count + 1, DeathEntry("", -1));
 
 	return list;
 }
