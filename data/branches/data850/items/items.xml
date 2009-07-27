@@ -74,7 +74,9 @@
 	<item id="390" name="stalagmites"/>
 	<item id="391" name="stalagmites"/>
 	<item id="392" article="a" name="hole" editorsuffix=" (Pickhole)">
-		<attribute key="decayTo" value="354"/>		<attribute key="duration" value="300"/>		<attribute key="floorchange" value="down"/>
+		<attribute key="decayTo" value="354"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="405" name="wooden floor"/>
 	<item id="406" name="white marble floor"/>
@@ -176,7 +178,7 @@
 	</item>
 	<item id="463" article="a" name="pedestal"/>
 	<item id="464" article="a" name="sandstone wall" editorsuffix=" (Walkable)"/>
-	<item id="465" article="a" name="stone tile">
+	<item id="465" article="a" name="stone tile"/>
 	<item id="466" article="a" name="sandstone wall"/>
 	<item id="467" name="stone flooring"/>
 	<item id="468" article="a" name="stone pile"/>
@@ -7417,7 +7419,7 @@
 	<item id="3730" article="a" name="dried well"/>
 	<item id="3731" article="a" name="dried well"/>
 	<item id="3732" article="a" name="dried well"/>
-	<item id="3733" article="a" name="poison well"/>
+	<item id="3733" article="a" name="poison well">
 		<attribute key="fluidSource" value="slime"/>
 	</item>
 	<item id="3734" article="a" name="poison well">
@@ -12562,7 +12564,7 @@
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
-	<item id="6082" article="a" name="dead human" editorsuffix=" (Creature)">
+	<item id="6082" article="a" name="dead human" editorsuffix=" (Creature)"/>
 	<item id="6083" article="a" name="dead human">
 		<attribute key="containerSize" value="10"/>
 	</item>
@@ -18363,7 +18365,7 @@
 	<item id="8201" name="broken pottery">
 		<attribute key="weight" value="180"/>
 	</item>
-	<item id="8202" article="a" name="cave entrance"/>
+	<item id="8202" article="a" name="cave entrance">
 		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="8203" article="a" name="cave entrance">
@@ -22166,10 +22168,10 @@
 	<item id="10117" article="a" name="stone pile"/>
 	<item id="10118" article="a" name="stone pile"/>
 	<item id="10124" article="a" name="champion's cup">
-			<attribute key="weight" value="1800"/>
+		<attribute key="weight" value="1800"/>
 	</item>
 	<item id="10125" article="a" name="silver cup of honour">
-			<attribute key="weight" value="1600"/>
+		<attribute key="weight" value="1600"/>
 	</item>
 	<item id="10126" article="a" name="bronze cup of Honour">
 		<attribute key="weight" value="1600"/>
@@ -22758,7 +22760,7 @@
 	<item id="10496" name="pavement"/>
 	<item id="10497" name="pavement"/>
 	<item id="10498" name="pavement"/>
-	<item id="10502" article="a" name="engravered wedding Ring">
+	<item id="10502" article="a" name="engraved wedding Ring">
 		<attribute key="weight" value="40"/>
 	</item>
 	<item id="10503" article="a" name="wedding outfit box">
@@ -22820,6 +22822,7 @@
 	<item id="10523" article="an" name="egg of the Many">
 		<attribute key="weight" value="1700"/>
 	</item>
+	<!-- 10524~10527 (medusa corpse) -->
 	<item id="10529" article="a" name="sea serpent trophy">
 		<attribute key="weight" value="500"/>
 	</item>
@@ -22842,6 +22845,13 @@
 	</item>
 	<item id="10535" article="a" name="telescope">
 		<attribute key="rotateTo" value="10534"/>
+	</item>
+	<item id="10541" article="a" name="statue of Fafnar"/>
+	<item id="10542" article="a" name="golden lightbearer's trophy">
+		<attribute key="weight" value="900"/>
+	</item>
+	<item id="10543" article="a" name="silver lightbearer's trophy">
+		<attribute key="weight" value="900"/>
 	</item>
 	<item id="20001" name="water"/>
 	<item id="20002" name="blood"/>
