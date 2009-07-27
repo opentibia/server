@@ -1090,7 +1090,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 
 		int size0 = lua_gettop(L);
 		if(lua_pcall(L, parameters, 2 /*nReturnValues*/, 0) != 0){
-			LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
+			LuaScriptInterface::reportError(NULL, LuaScriptInterface::popString(L));
 		}
 		else{
 			max = LuaScriptInterface::popNumber(L);
@@ -1181,7 +1181,7 @@ void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const
 
 		int size0 = lua_gettop(L);
 		if(lua_pcall(L, 2, 0 /*nReturnValues*/, 0) != 0){
-			LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
+			LuaScriptInterface::reportError(NULL, LuaScriptInterface::popString(L));
 		}
 
 		if((lua_gettop(L) + 2 /*nParams*/  + 1) != size0){
