@@ -303,7 +303,7 @@ public:
 	static void popPosition(lua_State *L, Position& position, uint32_t& stackpos);
 	static uint32_t popNumber(lua_State *L);
 	static double popFloatNumber(lua_State *L);
-	static const char* popString(lua_State *L);
+	static std::string popString(lua_State *L);
 	static int32_t popCallback(lua_State *L);
 
 	static int32_t getField(lua_State *L, const char *key);

@@ -28,9 +28,18 @@
 #define OTSERV_CLIENT_VERSION "8.50"
 #define CURRENT_SCHEMA_VERSION 19
 
+#ifdef _WIN32
+#  ifndef WIN32
+#    define WIN32
+#  endif
+#endif
 
 #if defined(WIN32) && !defined(__WINDOWS__)
 #define __WINDOWS__
+#endif
+
+#ifdef __MINGW32__
+	#define XML_GCC_FREE
 #endif
 
 #ifdef XML_GCC_FREE
@@ -97,16 +106,10 @@ enum passwordType_t{
 	PASSWORD_TYPE_SHA1
 };
 
-#ifdef _WIN32
-#  ifndef WIN32
-#    define WIN32
-#  endif
-#endif
-
 // Boost won't complain about non-working function
 #define BOOST_ASIO_ENABLE_CANCELIO 1
 
-#if defined __WINDOWS__ || defined WIN32
+#if defined __WINDOWS__
 
 #if defined _MSC_VER && defined NDEBUG
 #define _SECURE_SCL 0
