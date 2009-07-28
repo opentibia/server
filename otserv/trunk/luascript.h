@@ -615,6 +615,8 @@ protected:
 	static int luaRegisterCreatureEvent(lua_State *L);
 	static int luaGetDataDirectory(lua_State *L);
 	static int luaDoPlayerSetRate(lua_State *L);
+	static int luaDoPlayerSetVipLimit(lua_State *L);
+	static int luaDoPlayerSetDepotLimit(lua_State *L);
 	static int luaIsPzLocked(lua_State *L);
 	static int luaDoSaveServer(lua_State *L);
 	//

@@ -4888,7 +4888,7 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 		return false;
 	}
 
-	std::ofstream of("player reports.txt", std::ios_base::out | std::ios_base::app);
+	std::ofstream of("player_reports.txt", std::ios_base::out | std::ios_base::app);
 
 	if(of){
 		const Position& pos = player->getPosition();

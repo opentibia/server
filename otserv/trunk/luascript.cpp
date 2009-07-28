@@ -1792,6 +1792,12 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerSetRate(cid, type, value)
 	lua_register(m_luaState, "doPlayerSetRate", LuaScriptInterface::luaDoPlayerSetRate);
 
+	//doPlayerSetVipLimit(cid, quantity)
+	lua_register(m_luaState, "doPlayerSetVipLimit", LuaScriptInterface::luaDoPlayerSetVipLimit);
+
+	//doPlayerSetDepotLimit(cid, quantity)
+	lua_register(m_luaState, "doPlayerSetDepotLimit", LuaScriptInterface::luaDoPlayerSetDepotLimit);
+
 	//isPzLocked(cid)
 	lua_register(m_luaState, "isPzLocked", LuaScriptInterface::luaIsPzLocked);
 
@@ -7198,6 +7204,49 @@ int LuaScriptInterface::luaDoPlayerSetRate(lua_State *L)
 			reportErrorFunc("No valid rate type.");
 			lua_pushnumber(L, LUA_ERROR);
 		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSetVipLimit(lua_State *L)
+{
+	//doPlayerSetVipLimit(cid, quantity)
+	uint32_t quantity = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->maxVipLimit = quantity;
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSetDepotLimit(lua_State *L)
+{
+	//doPlayerSetDepotLimit(cid, quantity)
+	uint32_t quantity = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->maxDepotLimit = quantity;
+		for(DepotMap::iterator it = player->depots.begin(); it != player->depots.end(); ++it){
+			it->second->setMaxDepotLimit(player->maxDepotLimit);
+		}
+		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
