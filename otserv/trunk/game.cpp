@@ -89,9 +89,6 @@ Game::~Game()
 	if(map){
 		delete map;
 	}
-	g_scheduler.stopEvent(checkLightEvent);
-	g_scheduler.stopEvent(checkCreatureEvent);
-	g_scheduler.stopEvent(checkDecayEvent);
 }
 
 void Game::start(ServiceManager* servicer)
