@@ -532,7 +532,12 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						trim_left(strValue, "\n");
 						trim_left(strValue, " ");
 
-						m_scriptInterface->loadBuffer(strValue, this);
+						if(m_scriptInterface->reserveScriptEnv()){
+							m_scriptInterface->getScriptEnv()->setRealPos(getPosition());
+							m_scriptInterface->getScriptEnv()->setNpc(this);
+							m_scriptInterface->loadBuffer(strValue, false);
+							m_scriptInterface->releaseScriptEnv();
+						}
 					}
 				}
 				scriptNode = scriptNode->next;
@@ -1835,6 +1840,8 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 				{
 					if(m_scriptInterface->reserveScriptEnv()){
 						ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+						env->setRealPos(getPosition());
+						env->setNpc(this);
 
 						std::stringstream scriptstream;
 						//attach various variables that could be interesting
@@ -1886,8 +1893,7 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << (*it).strValue;
 
 						//std::cout << scriptstream.str() << std::endl;
-
-						if(m_scriptInterface->loadBuffer(scriptstream.str(), this) != -1){
+						if(m_scriptInterface->loadBuffer(scriptstream.str(), false) != -1){
 							lua_State* L = m_scriptInterface->getLuaState();
 							lua_getglobal(L, "_state");
 							NpcScriptInterface::popState(L, npcState);
@@ -1959,7 +1965,6 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 				lua_State* L = m_scriptInterface->getLuaState();
 
 				env->setScriptId(functionId, m_scriptInterface);
-				Npc* prevNpc = env->getNpc();
 				env->setRealPos(getPosition());
 				env->setNpc(this);
 
@@ -1988,10 +1993,6 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 				m_scriptInterface->callFunction(paramCount);
 				lua_getglobal(L, "_state");
 				NpcScriptInterface::popState(L, npcState);
-				if(prevNpc){
-					env->setRealPos(prevNpc->getPosition());
-					env->setNpc(prevNpc);
-				}
 				m_scriptInterface->releaseScriptEnv();
 			}
 			else{
@@ -3518,11 +3519,18 @@ NpcEventsHandler(npc)
 {
 	m_scriptInterface = npc->getScriptInterface();
 
-	if(m_scriptInterface->loadFile(file, npc) == -1){
-		std::cout << "Warning: [NpcScript::NpcScript] Can not load script. " << file << std::endl;
-		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
-		m_loaded = false;
-		return;
+	if(m_scriptInterface->reserveScriptEnv()){
+		m_scriptInterface->getScriptEnv()->setRealPos(npc->getPosition());
+		m_scriptInterface->getScriptEnv()->setNpc(npc);
+		if(m_scriptInterface->loadFile(file, false) == -1){
+			std::cout << "Warning: [NpcScript::NpcScript] Can not load script. " << file << std::endl;
+			std::cout << m_scriptInterface->getLastLuaError() << std::endl;
+			m_loaded = false;
+			m_scriptInterface->releaseScriptEnv();
+			return;
+		}
+
+		m_scriptInterface->releaseScriptEnv();
 	}
 
 	m_onCreatureSay = m_scriptInterface->getEvent("onCreatureSay");

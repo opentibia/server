@@ -67,6 +67,7 @@ uint32_t ScriptEnviroment::m_lastConditionId = 0;
 ScriptEnviroment::StorageMap ScriptEnviroment::m_globalStorageMap;
 
 ScriptEnviroment::ScriptEnviroment()
+: m_curNpc(NULL), m_curSpell(NULL)
 {
 	resetEnv();
 	m_lastUID = 70000;
@@ -107,6 +108,8 @@ void ScriptEnviroment::resetEnv()
 	m_realPos.x = 0;
 	m_realPos.y = 0;
 	m_realPos.z = 0;
+	m_curNpc = NULL;
+	m_curSpell = NULL;
 }
 
 bool ScriptEnviroment::saveGameState()
@@ -512,7 +515,7 @@ void LuaScriptInterface::dumpLuaStack()
 	}
 }
 
-int32_t LuaScriptInterface::loadFile(const std::string& file, Npc* npc /* = NULL*/)
+int32_t LuaScriptInterface::loadFile(const std::string& file, bool reserveEnviroment /*= true*/)
 {
 	//loads file as a chunk at stack top
 	int ret = luaL_loadfile(m_luaState, file.c_str());
@@ -526,24 +529,30 @@ int32_t LuaScriptInterface::loadFile(const std::string& file, Npc* npc /* = NULL
 	}
 
 	m_loadingFile = file;
-	this->reserveScriptEnv();
-	ScriptEnviroment* env = this->getScriptEnv();
+	if(reserveEnviroment){
+		reserveScriptEnv();
+	}
+
+	ScriptEnviroment* env = getScriptEnv();
 	env->setScriptId(EVENT_ID_LOADING, this);
-	env->setNpc(npc);
 
 	//execute it
 	ret = lua_pcall(m_luaState, 0, 0, 0);
 	if(ret != 0){
 		reportError(NULL, popString(m_luaState));
-		this->releaseScriptEnv();
+		if(reserveEnviroment){
+			releaseScriptEnv();
+		}
 		return -1;
 	}
 
-	this->releaseScriptEnv();
+	if(reserveEnviroment){
+		releaseScriptEnv();
+	}
 	return 0;
 }
 
-int32_t LuaScriptInterface::loadBuffer(const std::string& text, Npc* npc /* = NULL*/)
+int32_t LuaScriptInterface::loadBuffer(const std::string& text, bool reserveEnviroment /*= true*/)
 {
 	//loads file as a chunk at stack top
 	const char* buffer = text.c_str();
@@ -559,20 +568,26 @@ int32_t LuaScriptInterface::loadBuffer(const std::string& text, Npc* npc /* = NU
 	}
 
 	m_loadingFile = "loadBuffer";
-	this->reserveScriptEnv();
-	ScriptEnviroment* env = this->getScriptEnv();
+	if(reserveEnviroment){
+		reserveScriptEnv();
+	}
+
+	ScriptEnviroment* env = getScriptEnv();
 	env->setScriptId(EVENT_ID_LOADING, this);
-	env->setNpc(npc);
 
 	//execute it
 	ret = lua_pcall(m_luaState, 0, 0, 0);
 	if(ret != 0){
 		reportError(NULL, popString(m_luaState));
-		this->releaseScriptEnv();
+		if(reserveEnviroment){
+			releaseScriptEnv();
+		}
 		return -1;
 	}
 
-	this->releaseScriptEnv();
+	if(reserveEnviroment){
+		releaseScriptEnv();
+	}
 	return 0;
 }
 
@@ -4980,6 +4995,10 @@ int LuaScriptInterface::luaSetCombatArea(lua_State *L)
 	}
 
 	combat->setArea(new AreaCombat(*area));
+
+	if(env->getSpell()){
+		env->getSpell()->setArea(true);
+	}
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;

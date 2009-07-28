@@ -124,7 +124,8 @@ public:
 	int32_t getMana() const { return mana;}
 	int32_t getManaPercent() const { return manaPercent;}
 	const bool isPremium() const {return premium;}
-
+	bool hasArea() const {return areaSpell;}
+	void setArea(bool b) {areaSpell = b;}
 	virtual bool isInstant() const = 0;
 	bool isLearnable() const { return learnable;}
 
@@ -155,6 +156,7 @@ protected:
 	bool blockingSolid;
 	bool blockingCreature;
 	bool isAggressive;
+	bool areaSpell;
 
 	typedef std::map<int32_t, bool> VocSpellMap;
 	VocSpellMap vocSpellMap;
@@ -178,6 +180,7 @@ public:
 	virtual bool castSpell(Creature* creature, Creature* target);
 
 	//scripting
+	virtual bool loadScript(const std::string& scriptFile, bool reserveEnviroment = true);
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
 	virtual bool isInstant() const { return true;}
@@ -264,6 +267,7 @@ public:
 	virtual bool castSpell(Creature* creature, Creature* target);
 
 	//scripting
+	virtual bool loadScript(const std::string& scriptFile, bool reserveEnviroment = true);
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
 	virtual bool isInstant() const { return false;}

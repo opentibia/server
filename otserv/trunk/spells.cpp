@@ -470,6 +470,7 @@ Spell::Spell()
 	enabled = true;
 	isAggressive = true;
 	learnable = false;
+	areaSpell = false;
 }
 
 bool Spell::configureSpell(xmlNodePtr p)
@@ -734,7 +735,7 @@ bool Spell::playerInstantSpellCheck(Player* player, const Creature* target)
 
 #ifdef __SKULLSYSTEM__
 		if(player->getSkull() == SKULL_BLACK && isAggressive){
-			if(needTarget){
+			if(!hasArea()){
 				if(const Player* targetPlayer = target->getPlayer()){
 					if(targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(player)){
 						player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
@@ -783,7 +784,7 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 
 #ifdef __SKULLSYSTEM__
 			if(player->getSkull() == SKULL_BLACK && isAggressive){
-				if(needTarget){
+				if(!hasArea()){
 					Creature* targetCreature = tile->getTopVisibleCreature(player);
 					if(targetCreature && targetCreature->getPlayer()){
 						Player* targetPlayer = targetCreature->getPlayer();
@@ -885,7 +886,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 
 #ifdef __SKULLSYSTEM__
 			if(player->getSkull() == SKULL_BLACK && isAggressive){
-				if(needTarget){
+				if(!hasArea()){
 					Creature* targetCreature = tile->getTopVisibleCreature(player);
 					if(targetCreature){
 						Player* targetPlayer = targetCreature->getPlayer();
@@ -1057,6 +1058,18 @@ TalkAction(_interface)
 InstantSpell::~InstantSpell()
 {
 	//
+}
+
+bool InstantSpell::loadScript(const std::string& scriptFile, bool reserveEnviroment /*= true*/)
+{
+	if(m_scriptInterface->reserveScriptEnv()){
+		m_scriptInterface->getScriptEnv()->setSpell(this);
+		bool result = TalkAction::loadScript(scriptFile, false);
+		m_scriptInterface->releaseScriptEnv();
+		return result;
+	}
+
+	return false;
 }
 
 std::string InstantSpell::getScriptEventName()
@@ -1802,6 +1815,7 @@ bool InstantSpell::canCast(const Player* player) const
 }
 
 
+
 ConjureSpell::ConjureSpell(LuaScriptInterface* _interface) :
 InstantSpell(_interface)
 {
@@ -2066,6 +2080,18 @@ Action(_interface)
 RuneSpell::~RuneSpell()
 {
 	//
+}
+
+bool RuneSpell::loadScript(const std::string& scriptFile, bool reserveEnviroment /*= true*/)
+{
+	if(m_scriptInterface->reserveScriptEnv()){
+		m_scriptInterface->getScriptEnv()->setSpell(this);
+		bool result = Action::loadScript(scriptFile, false);
+		m_scriptInterface->releaseScriptEnv();
+		return result;
+	}
+
+	return false;
 }
 
 std::string RuneSpell::getScriptEventName()

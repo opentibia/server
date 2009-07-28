@@ -169,14 +169,14 @@ bool Event::checkScript(const std::string& datadir, const std::string& scriptsNa
 	return true;
 }
 
-bool Event::loadScript(const std::string& scriptFile)
+bool Event::loadScript(const std::string& scriptFile, bool reserveEnviroment /*= true*/)
 {
 	if(!m_scriptInterface || m_scriptId != 0){
 		std::cout << "Failure: [Event::loadScript] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
 		return false;
 	}
 	
-	if(m_scriptInterface->loadFile(scriptFile) == -1){
+	if(m_scriptInterface->loadFile(scriptFile, reserveEnviroment) == -1){
 		std::cout << "Warning: [Event::loadScript] Can not load script. " << scriptFile << std::endl;
 		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
 		return false;

@@ -46,6 +46,7 @@ class AreaCombat;
 class Combat;
 class Condition;
 class Npc;
+class Spell;
 
 enum LUA_RET_CODE{
 	LUA_NO_ERROR = 0,
@@ -125,6 +126,9 @@ public:
 	void setNpc(Npc* npc) {m_curNpc = npc;}
 	Npc* getNpc() const {return m_curNpc;}
 
+	void setSpell(Spell* spell) {m_curSpell = spell;}
+	Spell* getSpell() const {return m_curSpell;}
+
 	Thing* getThingByUID(uint32_t uid);
 	Item* getItemByUID(uint32_t uid);
 	Container* getContainerByUID(uint32_t uid);
@@ -190,6 +194,9 @@ private:
 
 	//for npc scripts
 	Npc* m_curNpc;
+
+	//for spell initialization
+	Spell* m_curSpell;
 };
 
 class Position;
@@ -249,8 +256,8 @@ public:
 	virtual bool initState();
 	bool reInitState();
 
-	int32_t loadFile(const std::string& file, Npc* npc = NULL);
-	int32_t loadBuffer(const std::string& text, Npc* npc /* = NULL*/);
+	int32_t loadFile(const std::string& file, bool reserveEnviroment = true);
+	int32_t loadBuffer(const std::string& text, bool reserveEnviroment = true);
 	const std::string& getFileById(int32_t scriptId);
 
 	int32_t getEvent(const std::string& eventName);
