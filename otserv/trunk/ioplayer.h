@@ -34,6 +34,12 @@ struct PlayerGroup
 	uint32_t maxDepotItems, maxVip;
 };
 
+enum UnjustKillPeriod_t{
+	UNJUST_KILL_PERIOD_DAY,
+	UNJUST_KILL_PERIOD_WEEK,
+	UNJUST_KILL_PERIOD_MONTH,
+};
+
 typedef std::pair<int32_t, Item*> itemBlock;
 typedef std::list<itemBlock> ItemBlockList;
 
@@ -64,7 +70,7 @@ public:
 	bool savePlayer(Player* player, bool shallow = false);
 
 	bool addPlayerDeath(Player* dying_player, const DeathList& dl);
-	int32_t getPlayerUnjustKillCount(Player* player, int64_t date);
+	int32_t getPlayerUnjustKillCount(Player* player, UnjustKillPeriod_t period);
 
 	bool getGuidByName(uint32_t& guid, std::string& name);
 	bool getAccountByName(uint32_t& acc, std::string& name);
@@ -103,9 +109,42 @@ protected:
 	typedef std::map<std::string, uint32_t, StringCompareCase> GuidCacheMap;
 	typedef std::map<uint32_t, PlayerGroup> PlayerGroupMap;
 
+	struct UnjustKillBlock{
+		uint32_t dayUnjustCount;
+		int64_t dayQueryTime;	//the time which was used to query the database
+		int64_t dayExpireTime;	//the time when the cached value expires (lowest date that the query returned)
+
+		uint32_t weekUnjustCount;
+		int64_t weekQueryTime;
+		int64_t weekExpireTime;
+
+		uint32_t monthUnjustCount;
+		int64_t monthQueryTime;
+		int64_t monthExpireTime;
+
+		UnjustKillBlock()
+		{
+			dayUnjustCount = 0;
+			dayQueryTime = 0;
+			dayExpireTime = 0;
+
+			weekUnjustCount = 0;
+			weekQueryTime = 0;
+			weekExpireTime = 0;
+
+			monthUnjustCount = 0;
+			monthQueryTime = 0;
+			monthExpireTime = 0;
+		}
+	};
+
+	typedef std::map<uint32_t, UnjustKillBlock > UnjustCacheMap;
+
 	PlayerGroupMap playerGroupMap;
 	NameCacheMap nameCacheMap;
 	GuidCacheMap guidCacheMap;
+	UnjustCacheMap unjustKillCacheMap;
+	
 };
 
 #endif

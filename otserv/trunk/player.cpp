@@ -4149,7 +4149,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 
 	//day
-	int32_t unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, std::time(NULL) - 24 * 60 * 60 );
+	int32_t unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, UNJUST_KILL_PERIOD_DAY);
 	if(g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) > 0 &&
 		g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);
@@ -4161,7 +4161,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 
 	//week
-	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, std::time(NULL) - 7 * 24 * 60 * 60 );
+	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, UNJUST_KILL_PERIOD_WEEK);
 	if(g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) > 0 &&
 		g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);
@@ -4173,7 +4173,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 
 	//month
-	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, std::time(NULL) - 30 * 24 * 60 * 60 );
+	unjustKills = IOPlayer::instance()->getPlayerUnjustKillCount(this, UNJUST_KILL_PERIOD_MONTH);
 	if(g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) > 0 &&
 		g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);

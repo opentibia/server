@@ -667,7 +667,6 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 	transaction.begin();
 	std::ostringstream query;
 	
-	
 	// First insert the actual death
 	{
 		DBInsert death_stmt(db);
@@ -711,6 +710,12 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 			}
 
 			if(player){
+				//reset unjust kill cache
+				UnjustCacheMap::iterator it = unjustKillCacheMap.find(player->getGUID());
+				if(it != unjustKillCacheMap.end()){
+					unjustKillCacheMap.erase(it);
+				}
+
 				DBInsert player_killers_stmt(db);
 				player_killers_stmt.setQuery("INSERT INTO `player_killers` (`kill_id`, `player_id`, `unjustified`) VALUES ");
 
@@ -745,14 +750,61 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 	return transaction.commit();
 }
 
-int32_t IOPlayer::getPlayerUnjustKillCount(Player* player, int64_t date)
+int32_t IOPlayer::getPlayerUnjustKillCount(Player* player, UnjustKillPeriod_t period)
 {
+	time_t currentTime = std::time(NULL);
+
+	int64_t date = 0;
+	switch(period){
+		case UNJUST_KILL_PERIOD_DAY:
+			date = currentTime - 24 * 60 * 60;
+			break;
+
+		case UNJUST_KILL_PERIOD_WEEK:
+			date = currentTime - 7 * 24 * 60 * 60;
+			break;
+
+		case UNJUST_KILL_PERIOD_MONTH:
+			date = currentTime - 30 * 24 * 60 * 60;
+			break;
+
+		default:
+			return 0;
+			break;
+	}
+
+	UnjustKillBlock uk;
+
+	UnjustCacheMap::iterator it = unjustKillCacheMap.find(player->getGUID());
+	if(it != unjustKillCacheMap.end()){
+		uk = it->second;
+
+		switch(period){
+			case UNJUST_KILL_PERIOD_DAY:
+				if(it->second.dayExpireTime < currentTime && it->second.dayQueryTime > 0 && date >= it->second.dayQueryTime){
+					return it->second.dayUnjustCount;
+				}
+				break;
+
+			case UNJUST_KILL_PERIOD_WEEK:
+				if(it->second.weekExpireTime < currentTime && it->second.weekQueryTime > 0 && date >= it->second.weekQueryTime){
+					return it->second.weekUnjustCount;
+				}
+				break;
+
+			case UNJUST_KILL_PERIOD_MONTH:
+				if(it->second.monthExpireTime < currentTime && it->second.monthQueryTime > 0 && date >= it->second.monthQueryTime){
+					return it->second.monthUnjustCount;
+				}
+				break;
+		}
+	}
+
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
 
-	query << "";
-	query << "SELECT COUNT(*) as `unjustified_count` ";
+	query << "SELECT *";
 	query << "FROM ";
 	query << "`player_killers` ";
 	query << "LEFT JOIN ";
@@ -764,12 +816,47 @@ int32_t IOPlayer::getPlayerUnjustKillCount(Player* player, int64_t date)
 	query << "WHERE ";
 	query << "`player_killers`.`player_id` = " << player->getGUID() << " "
 		<< "AND " << "`player_killers`.`unjustified` = " << " 1 "
-		<< "AND " << date  << " < `player_deaths`.`date`";
+		<< "AND " << date  << " < `player_deaths`.`date` "
+		<< "ORDER BY `player_deaths`.`date` ASC";
 
 	if(!(result = db->storeQuery(query.str())))
 		return 0;
 
-	int32_t count = result->getDataInt("unjustified_count");
+	int64_t expireTime = 0;
+	uint32_t count = 0;
+	do{
+		if(count == 0){
+			expireTime = result->getDataLong("date");
+		}
+		++count;
+	}while(result->next());
+
+	switch(period){
+		case UNJUST_KILL_PERIOD_DAY:
+			uk.dayQueryTime = date;
+			uk.dayExpireTime = expireTime;
+			uk.dayUnjustCount = count;
+			break;
+
+		case UNJUST_KILL_PERIOD_WEEK:
+			uk.weekQueryTime = date;
+			uk.weekExpireTime = expireTime;
+			uk.weekUnjustCount = count;
+			break;
+
+		case UNJUST_KILL_PERIOD_MONTH:
+			uk.monthQueryTime = date;
+			uk.monthExpireTime = expireTime;
+			uk.monthUnjustCount = count;
+			break;
+
+		default:
+			return 0;
+			break;
+	}
+
+	unjustKillCacheMap[player->getGUID()] = uk;
+
 	db->freeResult(result);
 	return count;
 }
