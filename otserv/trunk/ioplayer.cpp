@@ -1075,7 +1075,7 @@ bool IOPlayer::getLastIP(uint32_t& ip, uint32_t guid)
 	DBResult* result;
 
 	DBQuery query;
-	query << "SELECT `lastip` FROM `players` WHERE `id` = " << guid << " AND `deleted` = 0;";
+	query << "SELECT `lastip` FROM `players` WHERE `id` = " << guid << ";";
 	if(!(result = db->storeQuery(query.str())))
 		return false;
 
