@@ -70,7 +70,7 @@ public:
 	bool savePlayer(Player* player, bool shallow = false);
 
 	bool addPlayerDeath(Player* dying_player, const DeathList& dl);
-	int32_t getPlayerUnjustKillCount(Player* player, UnjustKillPeriod_t period);
+	int32_t getPlayerUnjustKillCount(const Player* player, UnjustKillPeriod_t period);
 
 	bool getGuidByName(uint32_t& guid, std::string& name);
 	bool getAccountByName(uint32_t& acc, std::string& name);

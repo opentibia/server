@@ -750,7 +750,7 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 	return transaction.commit();
 }
 
-int32_t IOPlayer::getPlayerUnjustKillCount(Player* player, UnjustKillPeriod_t period)
+int32_t IOPlayer::getPlayerUnjustKillCount(const Player* player, UnjustKillPeriod_t period)
 {
 	time_t currentTime = std::time(NULL);
 

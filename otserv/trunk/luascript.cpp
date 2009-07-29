@@ -1142,10 +1142,11 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerSkullType(cid)
 	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
 
-	//getPlayerRedSkullTicks(cid)
-	//getPlayerSkullTicks(cid)
-	lua_register(m_luaState, "getPlayerRedSkullTicks", LuaScriptInterface::luaGetPlayerSkullTicks);
-	lua_register(m_luaState, "getPlayerSkullTicks", LuaScriptInterface::luaGetPlayerSkullTicks);
+	//getPlayerSkullEndTime(cid)
+	lua_register(m_luaState, "getPlayerSkullEndTime", LuaScriptInterface::luaGetPlayerSkullEndTime);
+
+	//getPlayerUnjustKills(cid)
+	lua_register(m_luaState, "getPlayerSkullUnjustKills", LuaScriptInterface::luaGetPlayerUnjustKills);
 
 	//getPlayerAccountBalance(cid)
 	lua_register(m_luaState, "getPlayerBalance", LuaScriptInterface::luaGetPlayerBalance);
@@ -1900,9 +1901,43 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			value = 0;
 			#endif
 			break;
-		case PlayerInfoSkullTicks:
-			value = 0;
+
+		case PlayerInfoSkullEndTime:
+		{
+			switch(player->getSkull()){
+				case SKULL_RED:
+					value = player->lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
+					break;
+				case SKULL_BLACK:
+					value = player->lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
+					break;
+
+				default:
+					value = 0;
+					break;
+			}
 			break;
+		}
+
+		case PlayerInfoUnjustKills:
+		{
+			lua_newtable(L);
+			setField(L, "day", IOPlayer::instance()->getPlayerUnjustKillCount(player, UNJUST_KILL_PERIOD_DAY) );
+			setField(L, "dayRedSkull", g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL) );
+			setField(L, "dayBlackSkull", g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) );
+
+			setField(L, "week", IOPlayer::instance()->getPlayerUnjustKillCount(player, UNJUST_KILL_PERIOD_WEEK));
+			setField(L, "weekRedSkull", g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL) );
+			setField(L, "weekBlackSkull", g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) );
+
+			setField(L, "month", IOPlayer::instance()->getPlayerUnjustKillCount(player, UNJUST_KILL_PERIOD_MONTH));
+			setField(L, "monthRedSkull", g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) );
+			setField(L, "monthBlackSkull", g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) );
+			return 1;
+
+			break;
+		}
+
 		case PlayerInfoBalance:
 		{
 			if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE)){
@@ -1943,77 +1978,129 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 	return 1;
 }
 //getPlayer[Info](uid)
-int LuaScriptInterface::luaGetPlayerFood(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoFood);}
+int LuaScriptInterface::luaGetPlayerFood(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoFood);
+}
 
-int LuaScriptInterface::luaGetPlayerAccess(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoAccess);}
+int LuaScriptInterface::luaGetPlayerAccess(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoAccess);
+}
 
-int LuaScriptInterface::luaGetPlayerLevel(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoLevel);}
+int LuaScriptInterface::luaGetPlayerLevel(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoLevel);
+}
 
-int LuaScriptInterface::luaGetPlayerMagLevel(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoMagLevel);}
+int LuaScriptInterface::luaGetPlayerMagLevel(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoMagLevel);
+}
 
-int LuaScriptInterface::luaGetPlayerMana(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoMana);}
+int LuaScriptInterface::luaGetPlayerMana(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoMana);
+}
 
-int LuaScriptInterface::luaGetPlayerMaxMana(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoMaxMana);}
+int LuaScriptInterface::luaGetPlayerMaxMana(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoMaxMana);
+}
 
-int LuaScriptInterface::luaGetPlayerVocation(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoVocation);}
+int LuaScriptInterface::luaGetPlayerVocation(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoVocation);
+}
 
-int LuaScriptInterface::luaGetPlayerMasterPos(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoMasterPos);}
+int LuaScriptInterface::luaGetPlayerMasterPos(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoMasterPos);
+}
 
-int LuaScriptInterface::luaGetPlayerSoul(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoSoul);}
+int LuaScriptInterface::luaGetPlayerSoul(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoSoul);
+}
 
-int LuaScriptInterface::luaGetPlayerFreeCap(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoFreeCap);}
+int LuaScriptInterface::luaGetPlayerFreeCap(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoFreeCap);
+}
 
-int LuaScriptInterface::luaGetPlayerGuildId(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoGuildId);}
+int LuaScriptInterface::luaGetPlayerGuildId(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoGuildId);
+}
 
-int LuaScriptInterface::luaGetPlayerGuildName(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoGuildName);}
+int LuaScriptInterface::luaGetPlayerGuildName(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoGuildName);
+}
 
-int LuaScriptInterface::luaGetPlayerGuildRank(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoGuildRank);}
+int LuaScriptInterface::luaGetPlayerGuildRank(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoGuildRank);
+}
 
-int LuaScriptInterface::luaGetPlayerGuildNick(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoGuildNick);}
+int LuaScriptInterface::luaGetPlayerGuildNick(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoGuildNick);
+}
 
-int LuaScriptInterface::luaGetPlayerSex(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoSex);}
+int LuaScriptInterface::luaGetPlayerSex(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoSex);
+}
 
-int LuaScriptInterface::luaGetPlayerTown(lua_State *L){
+int LuaScriptInterface::luaGetPlayerTown(lua_State *L)
+{
 	return internalGetPlayerInfo(L, PlayerInfoTown);}
 
-int LuaScriptInterface::luaGetPlayerGUID(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoGUID);}
+int LuaScriptInterface::luaGetPlayerGUID(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoGUID);
+}
 
-int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoPremiumDays);}
+int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoPremiumDays);
+}
 
-int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoSkullType);}
+int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoSkullType);
+}
 
-int LuaScriptInterface::luaGetPlayerSkullTicks(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoSkullTicks);}
+int LuaScriptInterface::luaGetPlayerSkullEndTime(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoSkullEndTime);
+}
 
-int LuaScriptInterface::luaGetPlayerBalance(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoBalance);}
+int LuaScriptInterface::luaGetPlayerUnjustKills(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoUnjustKills);
+}
 
-int LuaScriptInterface::luaIsPzLocked(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoPzLock);}
+int LuaScriptInterface::luaGetPlayerBalance(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoBalance);
+}
 
-int LuaScriptInterface::luaIsPremium(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoPremium);}
+int LuaScriptInterface::luaIsPzLocked(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoPzLock);
+}
 
-int LuaScriptInterface::luaGetPlayerLastLogin(lua_State *L){
-	return internalGetPlayerInfo(L, PlayerInfoLastLogin);}
+int LuaScriptInterface::luaIsPremium(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoPremium);
+}
+
+int LuaScriptInterface::luaGetPlayerLastLogin(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoLastLogin);
+}
 //
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
