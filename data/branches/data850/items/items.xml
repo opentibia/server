@@ -6521,7 +6521,8 @@
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="3030"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3030" article="a" name="slain crypt shambler">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="0"/>
@@ -18348,7 +18349,6 @@
 	<item id="8190" article="a" name="nature magic spellbook" editorsuffix=" (Secret Service Quest)">
 		<attribute key="description" value="It contains the arcane secrets of nature magic."/>
 		<attribute key="weight" value="5800"/>
-		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="8191" editorsuffix=" (Blank)"/>
 	<item id="8192" editorsuffix=" (Blank)"/>
@@ -18366,10 +18366,10 @@
 		<attribute key="weight" value="180"/>
 	</item>
 	<item id="8202" article="a" name="cave entrance">
-		<attribute key="floorchange" value="north"/>
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="8203" article="a" name="cave entrance">
-		<attribute key="floorchange" value="north"/>
+		<attribute key="floorchange" value="down"/>
 	</item>
 	<item id="8204" editorsuffix=" (Double)"/>
 	<item id="8205" article="a" name="special flask">
@@ -22364,7 +22364,6 @@
 	<item id="10268" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
-		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="10269" article="a" name="closed door">
 		<attribute key="type" value="door"/>
@@ -22376,7 +22375,6 @@
 	<item id="10271" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
-		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="10272" article="a" name="closed door">
 		<attribute key="type" value="door"/>

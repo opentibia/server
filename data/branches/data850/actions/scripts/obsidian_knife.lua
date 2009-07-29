@@ -15,7 +15,7 @@ local SUPRISE_BAG		= 6570
 local BAT_DECORATION		= 6492
 local SKELETON_DECORATION	= 6526
 local BAR_OF_CHOCOLATE		= 6574
---local YUMMY_GUMMY_WORM	= ????
+local YUMMY_GUMMY_WORM	= 9005
 
 
 local knife = {
@@ -52,7 +52,7 @@ local knife = {
 	[9009] = NEUTRAL_MATTER,
 
 	-- The Mutated Pumpkin
-	[THE_MUTATED_PUMPKIN] = {PUMPKINHEAD, PUMPKIN, CANDY_CANE, SUPRISE_BAG, BAT_DECORATION, SKELETON_DECORATION, BAR_OF_CHOCOLATE}
+	[THE_MUTATED_PUMPKIN] = {PUMPKINHEAD, PUMPKIN, CANDY_CANE, SUPRISE_BAG, BAT_DECORATION, SKELETON_DECORATION, BAR_OF_CHOCOLATE, YUMMY_GUMMY_WORM}
 }
 
 function onUse(cid, item, frompos, item2, topos)
@@ -62,7 +62,7 @@ function onUse(cid, item, frompos, item2, topos)
 
 	if (math.random(1, 15) == 1) then
 		if (item2.itemid == THE_MUTATED_PUMPKIN) then
-			doPlayerAddItem(cid, knife[THE_MUTATED_PUMPKIN][math.random(1, 7)], 1)
+			doPlayerAddItem(cid, knife[THE_MUTATED_PUMPKIN][math.random(1, 8)], 1)
 		else
 			doPlayerAddItem(cid, knife[item2.itemid], 1)
 		end
