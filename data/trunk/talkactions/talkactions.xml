@@ -4,6 +4,7 @@
 	<talkaction words="!leavehouse" script="leavehouse.lua"/>
 	<talkaction words="!houseinfo" script="houseinfo.lua"/>
 	<talkaction words="!online" script="onlinelist.lua"/>
+	<talkaction words="!unjustkills" script="unjustkills.lua"/>
 	<talkaction words="/cleanhouses" filter="first word" script="housecleaning.lua"/>
 	<talkaction words="/checkconfig" filter="first word" script="configval.lua"/>
 	<talkaction words="/up" filter="first word" script="floorchange.lua"/>
