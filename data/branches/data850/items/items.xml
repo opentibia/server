@@ -22,7 +22,9 @@
 	<item id="352" name="dirt floor"/>
 	<item id="353" name="dirt floor"/>
 	<item id="354" name="muddy floor"/>
-	<item id="355" name="muddy floor"/>
+	<item id="355" name="muddy floor">
+		<attribute key="fluidSource" value="mud"/>
+	</item>
 	<item id="356" article="a" name="dirt wall"/>
 	<item id="357" article="a" name="dirt wall"/>
 	<item id="358" article="a" name="dirt wall"/>
@@ -22068,11 +22070,8 @@
 		<attribute key="fluidSource" value="slime"/>
 	</item>
 	<item id="10006" article="a" name="cookbook">
-		<attribute key="containerSize" value="7"/>
-		<attribute key="decayTo" value="10008"/>
-		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>
-		<attribute key="fluidSource" value="blood"/>
+		<attribute key="weight" value="1500"/>
+		<attribute key="description" value="It contains several exotic recipes."/>
 	</item>
 	<item id="10008" article="a" name="dead mutated human">
 		<attribute key="containerSize" value="7"/>
@@ -22209,7 +22208,7 @@
 		<attribute key="description" value="It looks suspiciously similar to a crowbar."/>
 		<attribute key="weight" value="15000"/>
 	</item>
-	<item id="10157" article="a" name="Worm Queen Tooth">
+	<item id="10157" article="a" name="Worm queen Tooth">
 		<attribute key="weight" value="850"/> 
 	</item>
 	<item id="10158" article="a" name="deep crystal">
@@ -22464,7 +22463,7 @@
 		<attribute key="defense" value="8"/>
 		<attribute key="weaponType" value="shield"/>
 	</item>
-		<item id="10295" article="a" name="musician's bow">
+	<item id="10295" article="a" name="musician's bow">
 		<attribute key="description" value="If you could only figure out how you are supposed to fire more arrows at once."/>
 		<attribute key="weight" value="1250"/>
 		<attribute key="weaponType" value="distance"/>
@@ -22572,6 +22571,41 @@
 		<attribute key="defense" value="25"/>
 		<attribute key="weaponType" value="shield"/>
 	</item> 
+	<item id="10319" article="a" name="dead human">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="3058"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="10320" article="a" name="dead human">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="3058"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="10321" article="a" name="dead braindeath">
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="7260"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="fluidSource" value="blood"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="10322" article="a" name="dead juggernaut">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="6337"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="10323" article="a" name="slain diabolic imp">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="6365"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="10325" article="a" name="roof"/>
 	<item id="10326" article="a" name="roof"/>
 	<item id="10327" article="a" name="roof"/>
@@ -22671,6 +22705,18 @@
 		<attribute key="description" value="It's a symbol of peace handed out by Tibia ML."/>
 		<attribute key="weight" value="400"/>
 	</item>
+	<item id="10456" name="sand"/>
+	<item id="10457" name="sand"/>
+	<item id="10458" name="sand"/>
+	<item id="10459" name="sand"/>
+	<item id="10460" name="sand"/>
+	<item id="10461" name="sand"/>
+	<item id="10462" name="sand"/>
+	<item id="10463" name="sand"/>
+	<item id="10464" name="sand"/>
+	<item id="10465" name="sand"/>
+	<item id="10466" name="sand"/>
+	<item id="10467" name="sand"/>
 	<item id="10468" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
@@ -22819,6 +22865,28 @@
 	</item>
 	<item id="10523" article="an" name="egg of the Many">
 		<attribute key="weight" value="1700"/>
+	</item>
+	<item id="10524" article="a" name="slain medusa">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="10525"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="10525" article="a" name="slain medusa">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="10525"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="10526" article="a" name="slain medusa">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="10527"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="10527" article="a" name="slain medusa">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
 	</item>
 	<!-- 10524~10527 (medusa corpse) -->
 	<item id="10529" article="a" name="sea serpent trophy">
