@@ -3520,7 +3520,6 @@ NpcEventsHandler(npc)
 	m_scriptInterface = npc->getScriptInterface();
 
 	if(m_scriptInterface->reserveScriptEnv()){
-		m_scriptInterface->getScriptEnv()->setRealPos(npc->getPosition());
 		m_scriptInterface->getScriptEnv()->setNpc(npc);
 		if(m_scriptInterface->loadFile(file, false) == -1){
 			std::cout << "Warning: [NpcScript::NpcScript] Can not load script. " << file << std::endl;
