@@ -14871,7 +14871,7 @@
 	</item>
 	<item id="7184" article="a" name="baby seal doll">
 		<attribute key="decayTo" value="7183"/>
-		<attribute key="duration" value="3"/>
+		<attribute key="duration" value="2"/>
 		<attribute key="weight" value="850"/>
 	</item>
 	<item id="7185" article="a" name="small crack in the ice">
@@ -18633,7 +18633,6 @@
 	</item>
 	<item id="8309" article="a" name="nail" plural="nails">
 		<attribute key="weight" value="5"/>
-		<attribute key="showcount" value="0"/>
 	</item>
 	<item id="8310" name="neutral matter" plural="neutral matter">
 		<attribute key="weight" value="250"/>
@@ -20185,6 +20184,11 @@
 	<item id="8974" article="an" name="oracle figurine">
 		<attribute key="weight" value="800"/>
 	</item>
+	<item id="8974" article="an" name="oracle figurine">
+		<attribute key="weight" value="800"/>
+		<attribute key="decayTo" value="8974"/>
+		<attribute key="duration" value="3"/>
+	</item>
 	<item id="8976" article="a" name="golden falcon">
 		<attribute key="description" value="It is a token of honour granted only by TibiaBR."/>
 		<attribute key="weight" value="2000"/>
@@ -20217,6 +20221,12 @@
 		<attribute key="description" value="It contains the scribings of many knowledgeable Tibians."/>
 		<attribute key="weight" value="7800"/>
 	</item>
+	<item id="8985" article="a" name="norseman doll">
+		<attribute key="weight" value="1000"/>
+		<attribute key="description" value="It is given to the winners of TibiaNordic competitions."/>
+		<attribute key="decayTo" value="8982"/>
+		<attribute key="duration" value="3"/>
+	</item>
 	<item id="8984" article="an" name="abacus">
 		<attribute key="weight" value="1200"/>
 		<attribute key="description" value="If you use it wisely, you may write yourself into the history books."/>
@@ -20237,11 +20247,28 @@
 	<item id="8999" article="a" name="tree"/>
 	<item id="9000" article="a" name="tree"/>
 	<item id="9001" article="a" name="tree"/>
+	<item id="9002" article="a" name="Tibiacity encyclopedia">
+		<attribute key="weight" value="1337"/>
+		<attribute key="description" value="It contains all the knowledge of Tibia."/>
+		<attribute key="decayTo" value="8977"/>
+		<attribute key="duration" value="5"/>
+	</item>
+	<item id="9004" article="a" name="golden newspaper">
+		<attribute key="weight" value="2400"/>
+		<attribute key="description" value="Tibia's most amazing news can be read in it. It was awarded for winning a TibiaNews contest."/>
+		<attribute key="decayTo" value="8981"/>
+		<attribute key="duration" value="5"/>
+	</item>
 	<item id="9005" article="a" name="yummy gummy worm" plural="yummy gummy worms">
 		<attribute key="weight" value="20"/>
 	</item>
 	<item id="9006" article="a" name="toy spider">
 		<attribute key="weight" value="20"/>
+	</item>
+	<item id="9007" article="a" name="toy spider">
+		<attribute key="weight" value="20"/>
+		<attribute key="duration" value="3"/>
+		<attribute key="decayTo" value="9006"/>
 	</item>
 	<item id="9013" article="a" name ="fallen tree"/>
 	<item id="9014" article="a" name ="fallen tree"/>

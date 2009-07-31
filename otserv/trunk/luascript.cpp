@@ -1282,7 +1282,7 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerAddManaSpent(cid, mana, <optional: default: 0> useMultiplier)
 	lua_register(m_luaState, "doPlayerAddManaSpent", LuaScriptInterface::luaDoPlayerAddManaSpent);
 
-	//doCreatureAddHealth(cid, health)
+	//doCreatureAddHealth(cid, health, <optional: default: 1> filter))
 	lua_register(m_luaState, "doCreatureAddHealth", LuaScriptInterface::luaDoCreatureAddHealth);
 
 	//doPlayerAddMana(cid, mana, <optional: default: 1> filter)
@@ -2679,19 +2679,25 @@ int LuaScriptInterface::luaDoPlayerAddManaSpent(lua_State *L)
 
 int LuaScriptInterface::luaDoCreatureAddHealth(lua_State *L)
 {
-	//doCreatureAddHealth(cid, health)
+	//doCreatureAddHealth(cid, health, <optional: default: 1> filter)
+	bool filter = true;
+	if(lua_gettop(L) >= 3)
+		filter = popNumber(L) == LUA_TRUE;
+
 	int32_t healthChange = (int32_t)popNumber(L);
 	uint32_t cid = popNumber(L);
-
 	ScriptEnviroment* env = getScriptEnv();
-
-	Creature* creature = env->getCreatureByUID(cid);
-	if(creature){
+	if(Creature* creature = env->getCreatureByUID(cid)){
 		if(healthChange >= 0){
-			g_game.combatChangeHealth(COMBAT_HEALING, NULL, creature, healthChange);
+			creature->changeHealth(healthChange);
 		}
 		else{
-			g_game.combatChangeHealth(COMBAT_UNDEFINEDDAMAGE, NULL, creature, healthChange);
+			if(filter){
+				creature->drainHealth(NULL, COMBAT_LIFEDRAIN, -healthChange);
+			}
+			else{
+				g_game.combatChangeHealth(COMBAT_UNDEFINEDDAMAGE, NULL, creature, healthChange);
+			}
 		}
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
@@ -2712,7 +2718,7 @@ int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 	int32_t manaChange = (int32_t)popNumber(L);
 	ScriptEnviroment* env = getScriptEnv();
 	if(Player* player = env->getPlayerByUID(popNumber(L))){
-		if(manaChange > 0){
+		if(manaChange >= 0){
 			player->changeMana(manaChange);
 		}
 		else{
@@ -3637,7 +3643,7 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 	int32_t subType = 1;
 
 	if(it.hasSubType()){
-		
+
 		if(it.stackable){
 			itemCount = (int32_t)std::ceil((float)count / 100);
 		}
@@ -4525,7 +4531,7 @@ int LuaScriptInterface::luaGetHouseList(lua_State *L)
 	uint32_t n = 1;
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++n, ++it){
 		House* house = it->second;
-		
+
 		if(townid != 0 && house->getTownId() != townid)
 			continue;
 		lua_pushnumber(L, n);
@@ -4545,7 +4551,7 @@ int LuaScriptInterface::luaCleanHouse(lua_State *L)
 	if(house){
 		house->cleanHouse();
 		lua_pushnumber(L, LUA_TRUE);
-	} 
+	}
 	else{
 		lua_pushnumber(L, LUA_FALSE);
 	}
@@ -6014,12 +6020,16 @@ int LuaScriptInterface::luaDoAddCondition(lua_State *L)
 	Condition* condition = env->getConditionObject(conditionId);
 	if(!condition){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+
 		return 1;
 	}
 
-	creature->addCondition(condition->clone());
-	lua_pushnumber(L, LUA_NO_ERROR);
+	if(creature->addCondition(condition->clone())){
+		lua_pushnumber(L, LUA_NO_ERROR);
+		return 1;
+	}
+
+	lua_pushnumber(L, LUA_ERROR);
 	return 1;
 }
 
@@ -6721,7 +6731,7 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 	int32_t subType = 1;
 
 	if(it.hasSubType()){
-		
+
 		if(it.stackable){
 			itemCount = (int32_t)std::ceil((float)count / 100);
 		}

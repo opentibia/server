@@ -17,9 +17,9 @@ function setSkillRate(cid, skillid, value)
 	return doPlayerSetRate(cid, skillid, value)
 end
 
-function doPlayerAddHealth(cid, health)
+function doPlayerAddHealth(cid, health, filter)
 	if isPlayer(cid) == TRUE then
-		if doCreatureAddHealth(cid, health) ~= LUA_ERROR then
+		if doCreatureAddHealth(cid, health, filter) ~= LUA_ERROR then
 			return LUA_NO_ERROR
 		end
 	end

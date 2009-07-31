@@ -22,7 +22,7 @@ FALSE = 0
 -- Error consts
 LUA_ERROR = -1
 LUA_NO_ERROR = 0
-LUA_NULL = nil
+LUA_NULL = 0
 
 CONTAINER_POSITION = 65535
 
