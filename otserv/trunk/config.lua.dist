@@ -104,11 +104,11 @@ premonlybeds = false
 -- Should the server use account balance system or depot system for paying houses?
 useaccbalance = true
 
--- How long time the red skull will last
-red_skull_duration = 30*24*60*60*1000
+-- How long time the red skull will last in seconds (default 30 days)
+red_skull_duration = 30*24*60*60
 
--- How long time the black skull will last
-black_skull_duration = 45*24*60*60*1000
+-- How long time the black skull will last in seconds (default 45 days)
+black_skull_duration = 45*24*60*60
 
 -- White skull duration, how long a player will get pz locked/white skull
 unjust_skull_duration = 15*60*1000

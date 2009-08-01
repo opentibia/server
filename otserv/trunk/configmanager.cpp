@@ -158,8 +158,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[KILLS_PER_DAY_BLACK_SKULL] = getGlobalNumber(L, "kills_per_day_black_skull", 6);
 	m_confInteger[KILLS_PER_WEEK_BLACK_SKULL] = getGlobalNumber(L, "kills_per_week_black_skull", 10);
 	m_confInteger[KILLS_PER_MONTH_BLACK_SKULL] = getGlobalNumber(L, "kills_per_month_black_skull", 20);
-	m_confInteger[RED_SKULL_DURATION] = getGlobalNumber(L, "red_skull_duration", 30*24*60*60*1000ULL);
-	m_confInteger[BLACK_SKULL_DURATION] = getGlobalNumber(L, "black_skull_duration", 45*24*60*60*1000ULL);
+	m_confInteger[RED_SKULL_DURATION] = getGlobalNumber(L, "red_skull_duration", 30*24*60*60);
+	m_confInteger[BLACK_SKULL_DURATION] = getGlobalNumber(L, "black_skull_duration", 45*24*60*60);
 	m_confInteger[REMOVE_AMMUNITION] = getGlobalBoolean(L, "remove_ammunition", true);
 	m_confInteger[REMOVE_RUNE_CHARGES] = getGlobalBoolean(L, "remove_rune_charges", true);
 	m_confInteger[REMOVE_WEAPON_CHARGES] = getGlobalBoolean(L, "remove_weapon_charges", true);
