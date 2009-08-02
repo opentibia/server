@@ -93,14 +93,14 @@
 	<action itemid="7439" script="liquids/berserk_potion.lua"/>
 	<action itemid="7440" script="liquids/mastermind_potion.lua"/>
 	<action itemid="7443" script="liquids/bullseye_potion.lua"/>
-	<action itemid="7588" script="liquids/strong_health.lua" allowfaruse="1"/>
-	<action itemid="7589" script="liquids/strong_mana.lua" allowfaruse="1"/>
-	<action itemid="7590" script="liquids/great_mana.lua" allowfaruse="1"/>
-	<action itemid="7591" script="liquids/great_health.lua" allowfaruse="1"/>
-	<action itemid="7618" script="liquids/health_potion.lua" allowfaruse="1"/>
-	<action itemid="7620" script="liquids/mana_potion.lua" allowfaruse="1"/>
-	<action itemid="8472" script="liquids/great_spirit.lua" allowfaruse="1"/>
-	<action itemid="8473" script="liquids/ultimate_health.lua" allowfaruse="1"/>
+	<action itemid="7588" script="liquids/strong_health.lua"/>
+	<action itemid="7589" script="liquids/strong_mana.lua"/>
+	<action itemid="7590" script="liquids/great_mana.lua"/>
+	<action itemid="7591" script="liquids/great_health.lua"/>
+	<action itemid="7618" script="liquids/health_potion.lua"/>
+	<action itemid="7620" script="liquids/mana_potion.lua"/>
+	<action itemid="8472" script="liquids/great_spirit.lua"/>
+	<action itemid="8473" script="liquids/ultimate_health.lua"/>
 	
 	<!-- Make Bread -->
 	<action itemid="2692" script="flour.lua"/>

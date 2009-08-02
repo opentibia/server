@@ -14,7 +14,7 @@ local exhaust = createConditionObject(CONDITION_EXHAUSTED)
 setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))
 
 function onUse(cid, item, frompos, item2, topos)
-	if(isPlayer(item2.uid) == FALSE) or getDistanceBetween(getPlayerPosition(cid), topos) > 1 then
+	if(isPlayer(item2.uid) == FALSE)then
 		return FALSE
 	end
 

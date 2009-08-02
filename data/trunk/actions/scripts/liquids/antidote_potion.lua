@@ -8,7 +8,7 @@ setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
 setCombatParam(combat, COMBAT_PARAM_DISPEL, CONDITION_POISON)
 
 function onUse(cid, item, frompos, item2, topos)
-	if(isPlayer(item2.uid) == FALSE) or getDistanceBetween(getPlayerPosition(cid), topos) > 1 then
+	if(isPlayer(item2.uid) == FALSE) then
 		return FALSE
 	end
 
