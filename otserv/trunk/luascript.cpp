@@ -1149,7 +1149,10 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerSkullUnjustKills", LuaScriptInterface::luaGetPlayerUnjustKills);
 
 	//getPlayerAccountBalance(cid)
-	lua_register(m_luaState, "getPlayerBalance", LuaScriptInterface::luaGetPlayerBalance);
+	lua_register(m_luaState, "getPlayerAccountBalance", LuaScriptInterface::luaGetPlayerAccountBalance);
+
+	//getPlayerByNameWildcard(name)
+	lua_register(m_luaState, "getPlayerByNameWildcard", LuaScriptInterface::luaGetPlayerByNameWildcard);
 
 	//playerLearnInstantSpell(cid, name)
 	lua_register(m_luaState, "playerLearnInstantSpell", LuaScriptInterface::luaPlayerLearnInstantSpell);
@@ -1364,10 +1367,10 @@ void LuaScriptInterface::registerFunctions()
 	//doCreateTeleport(teleportID, positionToGo, createPosition)
 	lua_register(m_luaState, "doCreateTeleport", LuaScriptInterface::luaDoCreateTeleport);
 
-	//doSummonCreature(name, pos)
+	//doSummonCreature(name, pos, <optional> extendedPosition, <optional> forceSpawn)
 	lua_register(m_luaState, "doSummonCreature", LuaScriptInterface::luaDoSummonCreature);
 
-	//doPlayerSummonCreature(cid, name, pos)
+	//doPlayerSummonCreature(cid, name, pos, <optional> extendedPosition, <optional> forceSpawn)
 	lua_register(m_luaState, "doPlayerSummonCreature", LuaScriptInterface::luaDoPlayerSummonCreature);
 
 	//doRemoveCreature(cid)
@@ -2082,7 +2085,7 @@ int LuaScriptInterface::luaGetPlayerUnjustKills(lua_State *L)
 	return internalGetPlayerInfo(L, PlayerInfoUnjustKills);
 }
 
-int LuaScriptInterface::luaGetPlayerBalance(lua_State *L)
+int LuaScriptInterface::luaGetPlayerAccountBalance(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoBalance);
 }
@@ -2120,6 +2123,25 @@ int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
 			reportErrorFunc("No valid flag index.");
 			lua_pushnumber(L, LUA_ERROR);
 		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+
+int LuaScriptInterface::luaGetPlayerByNameWildcard(lua_State *L)
+{
+	//getPlayerByNameWildcard(name)
+	std::string name = popString(L);
+	Player* player = NULL;
+
+	ScriptEnviroment* env = getScriptEnv();
+	if(g_game.getPlayerByNameWildcard(name, player) == RET_NOERROR){
+		uint32_t cid = env->addThing(player);
+		lua_pushnumber(L, cid);
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
@@ -3968,7 +3990,17 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 
 int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 {
-	//doSummonCreature(name, pos)
+	//doSummonCreature(name, pos, <optional> extendedPosition, <optional> forceSpawn)
+	bool extentedPosition = false;
+	bool forceSpawn = false;
+	int32_t parameters = lua_gettop(L);
+	if(parameters > 2){
+		extentedPosition = popNumber(L) == LUA_TRUE;
+	}
+	if(parameters > 3){
+		forceSpawn = popNumber(L) == LUA_TRUE;
+	}
+
 	PositionEx pos;
 	popPosition(L, pos);
 	std::string name = popString(L);
@@ -3984,7 +4016,7 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 		return 1;
 	}
 
-	if(!g_game.placeCreature(monster, pos)){
+	if(!g_game.placeCreature(monster, pos, extentedPosition, forceSpawn)){
 		delete monster;
 		std::string error_str = (std::string)"Can not summon monster: " + name;
 		reportErrorFunc(error_str);
@@ -4000,7 +4032,17 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
 {
-	//doPlayerSummonCreature(cid, name, pos)
+	//doPlayerSummonCreature(cid, name, pos, <optional> extendedPosition, <optional> forceSpawn)
+	bool extentedPosition = false;
+	bool forceSpawn = false;
+	int32_t parameters = lua_gettop(L);
+	if(parameters > 3){
+		extentedPosition = popNumber(L) == LUA_TRUE;
+	}
+	if(parameters > 4){
+		forceSpawn = popNumber(L) == LUA_TRUE;
+	}
+
 	PositionEx pos;
 	popPosition(L, pos);
 	std::string name = popString(L);
@@ -4018,7 +4060,7 @@ int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
 		}
 
 		player->addSummon(monster);
-		if(!g_game.placeCreature(monster, pos)){
+		if(!g_game.placeCreature(monster, pos, extentedPosition, forceSpawn)){
 			player->removeSummon(monster);
 			lua_pushnumber(L, LUA_ERROR);
 			return 1;

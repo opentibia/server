@@ -3,7 +3,9 @@ setConditionParam(drown, CONDITION_PARAM_TICKS, -1)
 setConditionParam(drown, CONDITION_PARAM_PERIODICDAMAGE, 50) -- 50 damage each 2 seconds
 
 function onStepIn(cid, item, pos)
-	doSendMagicEffect(pos, CONST_ME_BUBBLES)
+	if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
+		doSendMagicEffect(pos, CONST_ME_BUBBLES)
+	end
 
 	if(hasCondition(cid, CONDITION_DROWN) == FALSE) then
 		doAddCondition(cid, drown)

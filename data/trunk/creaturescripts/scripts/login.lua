@@ -1,6 +1,5 @@
 function onLogin(cid)
 	--Register the kill/die event
-	registerCreatureEvent(cid, "AutoBan")
 	registerCreatureEvent(cid, "RemoveBlesses")
 
 	--Remove blesses if necessary
@@ -30,7 +29,7 @@ function onLogin(cid)
 		lookType = 136
 	end
 	doCreatureChangeOutfit(cid, {lookType = lookType, lookHead = 78, lookBody = 69, lookLegs = 97, lookFeet = 95, lookAddons = 0})
-	
+
 	--Remove house
 	local house = House.getHouseByOwner(cid)
 	if(house) then

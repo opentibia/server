@@ -17,9 +17,9 @@ SWAMP = {602, 603, 604, 605, 4691, 4692, 4693, 4694, 4695, 4696, 4697, 4698, 469
 
 OVEN_ON = {1786, 1788, 1790, 1792, 6356, 6358, 6360, 6362}
 LADDER = {1386, 3678, 5543, 8599}
-DECAYTO_ITEM_INCREMENT = {2041, 2044, 2047, 2050, 2052, 2054, 5812}
+DECAYTO_ITEM_INCREMENT = {2041, 2044, 2047, 2050, 2052, 2054, 5812, 7183, 9006}
 
-LOCKED_DOORS = {1209, 1212, 1231, 1234, 1249, 1252, 3535, 3544, 4913, 4916, 5098, 5107, 5116, 5125, 5134, 5137, 5140, 5143, 5278, 5281, 5732, 5735, 6192, 6195, 6249, 6252, 6891, 6900, 7033, 7042, 8445, 8448}
+LOCKED_DOORS = {1209, 1212, 1231, 1234, 1249, 1252, 3535, 3544, 4913, 4916, 5098, 5107, 5116, 5125, 5134, 5137, 5140, 5143, 5278, 5281, 5732, 5735, 6192, 6195, 6249, 6252, 6891, 6900, 7033, 7042, 8541, 8544, 9165, 9168, 9267, 9270, 10268, 10271, 10468, 10477}
 
 CONSTRUCTIONS = {
 	[3901] = 1650, [3902] = 1658, [3903] = 1666, [3904] = 1670, [3905] = 3813, [3906] = 3817, [3907] = 2093, [3908] = 2603, [3909] = 1614, [3910] = 1615,
@@ -45,7 +45,16 @@ FOODS = {
 	[6501] = {240, "Mmmm."}, [6541] = {72, "Gulp."}, [6542] = {72, "Gulp."}, [6543] = {72, "Gulp."},
 	[6544] = {72, "Gulp."}, [6545] = {72, "Gulp."}, [6569] = {12, "Mmmm."}, [6574] = {60, "Mmmm."},
 	[7158] = {300, "Munch."}, [7159] = {180, "Munch."}, [7372] = {0, "Yummy."}, [7373] = {0, "Yummy."},
-	[7374] = {0, "Yummy."},	[7375] = {0, "Yummy."}, [7376] = {0, "Yummy."}, [7377] = {0, "Yummy."}
+	[7374] = {0, "Yummy."},	[7375] = {0, "Yummy."}, [7376] = {0, "Yummy."}, [7377] = {0, "Yummy."},
+	[7963] = {720, "Munch."},  [8838] = {120, "Gulp."}, [8839] = {60, "Yum."}, [8840] = {12, "Yum."},
+	[8841] = {12, "Urgh."}, [8842] = {84, "Munch."}, [8843] = {60, "Crunch."}, [8844] = {12, "Gulp."},
+	[8868] = {108, "Smack."}, [9005] = {88, "Slurp."}, [9996] = {0, "Slurp."}, [10454] = {0, "Your head begins to feel better."}
+}
+
+SPECIAL_FOODS = {
+	[9992] = {"Gulp."}, [9993] = {"Chomp."}, [9994] = {"Chomp."}, [9995] = {"Chomp."}, [9997] = {"Yum."},
+	[9998] = {"Munch."}, [9999] = {"Chomp."}, [10000] = {"Mmmm."}, [10001] = {"Smack."}
+
 }
 
 DISTILLERY = {5469, 5470, 5513, 5514}
@@ -67,7 +76,7 @@ ENCHANTABLE_WEAPONS = {
 	[2430] = {7750, 7769, 7875, 7860, 1000}, [7389] = {7751, 7770, 7876, 7861, 1000}, [7380] = {7752, 7771, 7877, 7862, 1000},
  	[2454] = {7753, 7772, 7878, 7863, 1000}, [2423] = {7754, 7773, 7879, 7864, 1000}, [2445] = {7755, 7774, 7880, 7865, 1000},
 	[7415] = {7756, 7775, 7881, 7866, 1000}, [7392] = {7757, 7776, 7882, 7867, 1000}, [2391] = {7758, 7777, 7883, 7868, 1000},
-	[8905] = {8906, 8907, 8908, 8909, 1}
+	[8905] = {8906, 8907, 8908, 8909, 1}, [9949] = {}, [9954] = {}
 }
 
 MUSICAL_INSTRUMENTS = {2070, 2071, 2072, 2073, 2074, 2075, 2076, 2077, 2078, 2079, 2080, 2081, 2082, 2083, 2084, 2085, 2332, 2364, 2367, 2368, 2370, 2371, 2372, 2373, 2374, 3951, 3953, 3957}
@@ -76,3 +85,41 @@ NORTH_BEDS = {1754, 1758, 1762, 1766, 3836, 3840, 5496, 5500, 7778, 7781, 7785, 
 SOUTH_BEDS = {1755, 1759, 1763, 1767, 3837, 3841, 5497, 5501, 7782, 7788, 7790, 7792, 7796, 7800, 7804, 7808, 7812, 7816, 7820, 7842, 8075, 8077}
 WEST_BEDS = {1756, 1760, 1764, 1768, 3838, 3842, 5498, 5502, 7779, 7783, 7786, 7789, 7793, 7797, 7801, 7805, 7809, 7813, 7817, 7821, 7843}
 EAST_BEDS = {1757, 1761, 1765, 1769, 3839, 3843, 5499, 5503, 7780, 7784, 7794, 7798, 7802, 7806, 7810, 7814, 7818, 7822, 8076, 8078}
+
+
+DOLLS = {
+	[5080] = {"Hug me."},
+	[5669] = {
+	"It's not winning that matters, but winning in style.",
+	"Today's your lucky day. Probably.",
+	"Do not meddle in the affairs of dragons, for you are crunchy and taste good with ketchup.",
+	"That is one stupid question.",
+	"You'll need more rum for that.",
+	"Do or do not. There is no try.",
+	"You should do something you always wanted to.",
+	"If you walk under a ladder and it falls down on you it probably means bad luck.",
+	"Never say 'oops'. Always say 'Ah, interesting!'",
+	"Five steps east, fourteen steps south, two steps north and seventeen steps west!"},
+	[5791] = {"Fchhhhhh!", "Zchhhhhh!", "Grooaaaaar*cough*", "Aaa... CHOO!", "You... will.... burn!!"},
+	[6388] = {"Merry Christmas "},
+	[6512] = {
+	"Ho ho ho",
+	"Jingle bells, jingle bells...",
+	"Have you been naughty?",
+	"Have you been nice?",
+	"Merry Christmas!",
+	"Can you stop squeezing me now... I'm starting to feel a little sick."},
+	[8974] = {"ARE YOU PREPARED TO FACE YOUR DESTINY?"},
+	[8977] = {
+	"Weirdo, you're a weirdo! Actually all of you are!",
+	"Pie for breakfast, pie for lunch and pie for dinner!",
+	"All hail the control panel!",
+	"I own, Tibiacity owns, perfect match!",
+	"Hug me! Feed me! Hail me!"},
+	[8981] = {
+	"It's news to me.",
+	"News, updated as infrequently as possible!",
+	"Extra! Extra! Read all about it!",
+	"Fresh off the press!"},
+	[8982] = {"Hail TibiaNordic!", "So cold..", "Run, mammoth!"},
+}

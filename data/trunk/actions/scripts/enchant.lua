@@ -1,3 +1,5 @@
+local DRACOYLE = {9949, 9954}
+
 function onUse(cid, item, frompos, item2, topos)
 
 	if ENCHANTABLE_WEAPONS[item2.itemid] == nil then
@@ -18,7 +20,11 @@ function onUse(cid, item, frompos, item2, topos)
 
 	-- Earth weapons
 	elseif (item.itemid == ENCHANTED_SMALL_EMERALD) then
-		doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][4], count)
+		if isInArray(DRACOYLE, item2.itemid) == TRUE then
+			doTransformItem(item2.uid, item2.itemid -1)
+		else
+			doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][4], count)
+		end
 		doRemoveItem(item.uid, 1)
 
 	-- Energy weapons
