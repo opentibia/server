@@ -1,4 +1,4 @@
--- This file is part of Jiddo's advanced NpcSystem v3.0x. This npcsystem is free to use by anyone, for any purpuse. 
+-- This file is part of Jiddo's advanced NpcSystem v3.0x. This npcsystem is free to use by anyone, for any purpuse.
 -- Initial release date: 2007-02-21
 -- Credits: Jiddo, honux(I'm using a modified version of his Find function).
 -- Please include full credits whereever you use this system, or parts of it.
@@ -6,12 +6,12 @@
 -- http://otfans.net/showthread.php?t=67810
 
 if(NpcHandler == nil) then
-	
+
 	-- Constant talkdelay behaviors.
 	TALKDELAY_NONE = 0 -- No talkdelay. Npc will reply immedeatly.
 	TALKDELAY_ONTHINK = 1 -- Talkdelay handled through the onThink callback function. (Default)
 	TALKDELAY_EVENT = 2 -- Not yet implemented
-	
+
 	-- Currently applied talkdelay behavior. TALKDELAY_ONTHINK is default.
 	NPCHANDLER_TALKDELAY = TALKDELAY_ONTHINK
 
@@ -22,10 +22,10 @@ if(NpcHandler == nil) then
 
 	-- Currently applied conversation behavior. CONVERSATION_DEFAULT is default.
 	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_DEFAULT
-	
+
 	-- max amount of none stackable items that a NPC will sell to a player at the same time
 	MAX_NONESTACKABLE_SELL_AMOUNT = 100
-	
+
 	-- Constant indexes for defining default messages.
 	MESSAGE_GREET 		= 1 -- When the player greets the npc.
 	MESSAGE_FAREWELL 	= 2 -- When the player unGreets the npc.
@@ -42,10 +42,10 @@ if(NpcHandler == nil) then
 	MESSAGE_NOSHOP		= 13 -- When the npc's shop is requested but he doesn't have any
 	MESSAGE_ONCLOSESHOP	= 14 -- When the player closes the npc's shop window
 	MESSAGE_ALREADYFOCUSED = 15 -- When the player already has the focus of this npc.
-	MESSAGE_PLACEDINQUEUE = 16 -- When the player has been placed in the costumer queue. 
+	MESSAGE_PLACEDINQUEUE = 16 -- When the player has been placed in the costumer queue.
 	MESSAGE_BUY 		= 17 -- When the npc asks the player if he wants to buy something.
 	MESSAGE_SELL 		= 18 -- When the npc asks the player if he wants to sell something.
-	
+
 	-- Constant indexes for callback functions. These are also used for module callback ids.
 	CALLBACK_CREATURE_APPEAR 	= 1
 	CALLBACK_CREATURE_DISAPPEAR = 2
@@ -58,20 +58,20 @@ if(NpcHandler == nil) then
 	CALLBACK_PLAYER_CLOSECHANNEL= 9
 	CALLBACK_ONBUY				= 10
 	CALLBACK_ONSELL				= 11
-	
+
 	-- Addidional module callback ids
 	CALLBACK_MODULE_INIT		= 12
 	CALLBACK_MODULE_RESET		= 13
-	
-	
+
+
 	-- Constant strings defining the keywords to replace in the default messages.
 	TAG_PLAYERNAME = '|PLAYERNAME|'
 	TAG_ITEMCOUNT = '|ITEMCOUNT|'
 	TAG_TOTALCOST = '|TOTALCOST|'
 	TAG_ITEMNAME = '|ITEMNAME|'
 	TAG_QUEUESIZE = '|QUEUESIZE|'
-	
-	
+
+
 	NpcHandler = {
 		keywordHandler = nil,
 		focuses = nil,
@@ -106,9 +106,9 @@ if(NpcHandler == nil) then
 			[MESSAGE_SELL] 			= 'Do you want to sell |ITEMCOUNT| |ITEMNAME| for |TOTALCOST| gold coins?'
 		}
 	}
-	
-	
-	-- Creates a new NpcHandler with an empty callbackFunction stack. 
+
+
+	-- Creates a new NpcHandler with an empty callbackFunction stack.
 	function NpcHandler:new(keywordHandler)
 		local obj = {}
 		obj.callbackFunctions = {}
@@ -127,23 +127,23 @@ if(NpcHandler == nil) then
 		obj.shopItems = {}
 		setmetatable(obj.messages, self.messages)
 		self.messages.__index = self.messages
-		
+
 		setmetatable(obj, self)
 		self.__index = self
 		return obj
 	end
-	
+
 	-- Re-defines the maximum idle time allowed for a player when talking to this npc.
 	function NpcHandler:setMaxIdleTime(newTime)
 		self.idleTime = newTime
 	end
-	
+
 	-- Attackes a new keyword handler to this npchandler
 	function NpcHandler:setKeywordHandler(newHandler)
 		self.keywordHandler = newHandler
 	end
-	
-	-- Function used to change the focus of this npc. 
+
+	-- Function used to change the focus of this npc.
 	function NpcHandler:addFocus(newFocus)
 		if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 			if(self:isFocused(newFocus)) then
@@ -157,7 +157,7 @@ if(NpcHandler == nil) then
 		self:updateFocus()
 	end
 	NpcHandler.changeFocus = NpcHandler.addFocus --"changeFocus" looks better for CONVERSATION_DEFAULT
-	
+
 	-- Function used to verify if npc is focused to certain player
 	function NpcHandler:isFocused(focus)
 		if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
@@ -166,13 +166,13 @@ if(NpcHandler == nil) then
 					return true
 				end
 			end
-			
+
 			return false
 		end
 
 		return (self.focuses == focus)
 	end
-	
+
 	-- This function should be called on each onThink and makes sure the npc faces the player it is talking to.
 	--	Should also be called whenever a new player is focused.
 	function NpcHandler:updateFocus()
@@ -188,8 +188,8 @@ if(NpcHandler == nil) then
 			doNpcSetCreatureFocus(self.focuses)
 		end
 	end
-	
-	-- Used when the npc should un-focus the player. 
+
+	-- Used when the npc should un-focus the player.
 	function NpcHandler:releaseFocus(focus)
 		if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 			if(not self:isFocused(focus)) then
@@ -202,7 +202,7 @@ if(NpcHandler == nil) then
 					pos = k
 				end
 			end
-			
+
 			table.remove(self.focuses, pos)
 			self.talkStart[focus] = nil
 			closeShopWindow(focus) --Even if it can not exist, we need to prevent it.
@@ -211,7 +211,7 @@ if(NpcHandler == nil) then
 			self:changeFocus(0)
 		end
 	end
-	
+
 	-- Returns the callback function with the specified id or nil if no such callback function exists.
 	function NpcHandler:getCallback(id)
 		local ret = nil
@@ -220,14 +220,14 @@ if(NpcHandler == nil) then
 		end
 		return ret
 	end
-	
+
 	-- Changes the callback function for the given id to callback.
 	function NpcHandler:setCallback(id, callback)
 		if(self.callbackFunctions ~= nil) then
 			self.callbackFunctions[id] = callback
 		end
 	end
-	
+
 	-- Adds a module to this npchandler and inits it.
 	function NpcHandler:addModule(module)
 		if(self.modules ~= nil) then
@@ -235,7 +235,7 @@ if(NpcHandler == nil) then
 			module:init(self)
 		end
 	end
-	
+
 	-- Calls the callback function represented by id for all modules added to this npchandler with the given arguments.
 	function NpcHandler:processModuleCallback(id, ...)
 		local ret = true
@@ -243,37 +243,37 @@ if(NpcHandler == nil) then
 			local tmpRet = true
 			if(id == CALLBACK_CREATURE_APPEAR and module.callbackOnCreatureAppear ~= nil) then
 				tmpRet = module:callbackOnCreatureAppear(unpack(arg))
-				
+
 			elseif(id == CALLBACK_CREATURE_DISAPPEAR and module.callbackOnCreatureDisappear ~= nil) then
 				tmpRet = module:callbackOnCreatureDisappear(unpack(arg))
-				
+
 			elseif(id == CALLBACK_CREATURE_SAY and module.callbackOnCreatureSay ~= nil) then
 				tmpRet = module:callbackOnCreatureSay(unpack(arg))
-				
+
 			elseif(id == CALLBACK_PLAYER_ENDTRADE and module.callbackOnPlayerEndTrade ~= nil) then
 				tmpRet = module:callbackOnPlayerEndTrade(unpack(arg))
-				
+
 			elseif(id == CALLBACK_PLAYER_CLOSECHANNEL and module.callbackOnPlayerCloseChannel ~= nil) then
 				tmpRet = module:callbackOnPlayerCloseChannel(unpack(arg))
-			
+
 			elseif(id == CALLBACK_ONBUY and module.callbackOnBuy ~= nil) then
 				tmpRet = module:callbackOnBuy(unpack(arg))
-				
+
 			elseif(id == CALLBACK_ONSELL and module.callbackOnSell ~= nil) then
 				tmpRet = module:callbackOnSell(unpack(arg))
-				
+
 			elseif(id == CALLBACK_ONTHINK and module.callbackOnThink ~= nil) then
 				tmpRet = module:callbackOnThink(unpack(arg))
-				
+
 			elseif(id == CALLBACK_GREET and module.callbackOnGreet ~= nil) then
 				tmpRet = module:callbackOnGreet(unpack(arg))
-				
+
 			elseif(id == CALLBACK_FAREWELL and module.callbackOnFarewell ~= nil) then
 				tmpRet = module:callbackOnFarewell(unpack(arg))
-				
+
 			elseif(id == CALLBACK_MESSAGE_DEFAULT and module.callbackOnMessageDefault ~= nil) then
 				tmpRet = module:callbackOnMessageDefault(unpack(arg))
-				
+
 			elseif(id == CALLBACK_MODULE_RESET and module.callbackOnModuleReset ~= nil) then
 				tmpRet = module:callbackOnModuleReset(unpack(arg))
 			end
@@ -284,7 +284,7 @@ if(NpcHandler == nil) then
 		end
 		return ret
 	end
-	
+
 	-- Returns the message represented by id.
 	function NpcHandler:getMessage(id)
 		local ret = nil
@@ -293,14 +293,14 @@ if(NpcHandler == nil) then
 		end
 		return ret
 	end
-	
+
 	-- Changes the default response message with the specified id to newMessage.
 	function NpcHandler:setMessage(id, newMessage)
 		if(self.messages ~= nil) then
 			self.messages[id] = newMessage
 		end
 	end
-	
+
 	-- Translates all message tags found in msg using parseInfo
 	function NpcHandler:parseMessage(msg, parseInfo)
 		local ret = msg
@@ -309,7 +309,7 @@ if(NpcHandler == nil) then
 		end
 		return ret
 	end
-	
+
 	-- Makes sure the npc un-focuses the currently focused player
 	function NpcHandler:unGreet(cid)
 		if(not self:isFocused(cid)) then
@@ -329,8 +329,8 @@ if(NpcHandler == nil) then
 			end
 		end
 	end
-	
-	-- Greets a new player. 
+
+	-- Greets a new player.
 	function NpcHandler:greet(cid)
 		if(cid ~= 0) then
 			local callback = self:getCallback(CALLBACK_GREET)
@@ -349,17 +349,17 @@ if(NpcHandler == nil) then
 		end
 		self:addFocus(cid)
 	end
-	
+
 	-- Handles onCreatureAppear events. If you with to handle this yourself, please use the CALLBACK_CREATURE_APPEAR callback.
 	function NpcHandler:onCreatureAppear(cid)
 		local callback = self:getCallback(CALLBACK_CREATURE_APPEAR)
 		if(callback == nil or callback(cid)) then
 			if(self:processModuleCallback(CALLBACK_CREATURE_APPEAR, cid)) then
-				
+
 			end
 		end
 	end
-	
+
 	-- Handles onCreatureDisappear events. If you with to handle this yourself, please use the CALLBACK_CREATURE_DISAPPEAR callback.
 	function NpcHandler:onCreatureDisappear(cid)
 		local callback = self:getCallback(CALLBACK_CREATURE_DISAPPEAR)
@@ -371,7 +371,7 @@ if(NpcHandler == nil) then
 			end
 		end
 	end
-	
+
 	-- Handles onCreatureSay events. If you with to handle this yourself, please use the CALLBACK_CREATURE_SAY callback.
 	function NpcHandler:onCreatureSay(cid, msgtype, msg)
 		local callback = self:getCallback(CALLBACK_CREATURE_SAY)
@@ -381,7 +381,7 @@ if(NpcHandler == nil) then
 					return
 				end
 				if(self.keywordHandler ~= nil) then
-					if(self:isFocused(cid) and 
+					if(self:isFocused(cid) and
 						(msgtype == TALKTYPE_PRIVATE_TO_NPC or NPCHANDLER_CONVBEHAVIOR == CONVERSATION_DEFAULT)
 						or (not self:isFocused(cid))) then
 
@@ -436,10 +436,10 @@ if(NpcHandler == nil) then
 	end
 
 	-- Handles onBuy events. If you wish to handle this yourself, use the CALLBACK_ONBUY callback.
-	function NpcHandler:onBuy(cid, itemid, subType, amount)
+	function NpcHandler:onBuy(cid, itemid, subType, amount, ignoreCapacity, buyWithBackpacks)
 		local callback = self:getCallback(CALLBACK_ONBUY)
-		if(callback == nil or callback(cid, itemid, subType, amount)) then
-			if(self:processModuleCallback(CALLBACK_ONBUY, cid, itemid, subType, amount)) then
+		if(callback == nil or callback(cid, itemid, subType, amount, ignoreCapacity, buyWithBackpacks)) then
+			if(self:processModuleCallback(CALLBACK_ONBUY, cid, itemid, subType, amount, ignoreCapacity, buyWithBackpacks)) then
 				--
 			end
 		end
@@ -454,12 +454,12 @@ if(NpcHandler == nil) then
 			end
 		end
 	end
-	
+
 	-- Handles onThink events. If you wish to handle this yourself, please use the CALLBACK_ONTHINK callback.
 	function NpcHandler:onThink()
 		local callback = self:getCallback(CALLBACK_ONTHINK)
 		if(callback == nil or callback()) then
-			
+
 			if(NPCHANDLER_TALKDELAY == TALKDELAY_ONTHINK) then
 				if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 					for cid, talkDelay in pairs(self.talkDelay) do
@@ -474,7 +474,7 @@ if(NpcHandler == nil) then
 					self.talkDelay.message = nil
 				end
 			end
-			
+
 			if(self:processModuleCallback(CALLBACK_ONTHINK)) then
 				if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 					for pos, focus in pairs(self.focuses) do
@@ -502,7 +502,7 @@ if(NpcHandler == nil) then
 			end
 		end
 	end
-	
+
 	-- Tries to greet the player with the given cid.
 	function NpcHandler:onGreet(cid)
 		if(self:isInRange(cid)) then
@@ -529,12 +529,12 @@ if(NpcHandler == nil) then
 			end
 		end
 	end
-	
-	-- Simply calls the underlying unGreet function. 
+
+	-- Simply calls the underlying unGreet function.
 	function NpcHandler:onFarewell(cid)
 		self:unGreet(cid)
 	end
-	
+
 	-- Should be called on this npc's focus if the distance to focus is greater then talkRadius.
 	function NpcHandler:onWalkAway(cid)
 		if(self:isFocused(cid)) then
@@ -552,27 +552,27 @@ if(NpcHandler == nil) then
 			end
 		end
 	end
-	
+
 	-- Returns true if cid is within the talkRadius of this npc.
 	function NpcHandler:isInRange(cid)
 		local distance = getDistanceTo(cid) or -1
 		if distance == -1 then
 			return false
 		end
-		
+
 		return (distance <= self.talkRadius)
 	end
-	
-	-- Resets the npc into it's initial state (in regard of the keyrodhandler). 
+
+	-- Resets the npc into it's initial state (in regard of the keyrodhandler).
 	--	All modules are also receiving a reset call through their callbackOnModuleReset function.
 	function NpcHandler:resetNpc()
 		if(self:processModuleCallback(CALLBACK_MODULE_RESET)) then
 			self.keywordHandler:reset()
 		end
 	end
-	
-	
-	-- Makes the npc represented by this instance of NpcHandler say something. 
+
+
+	-- Makes the npc represented by this instance of NpcHandler say something.
 	--	This implements the currently set type of talkdelay.
 	--	shallDelay is a boolean value. If it is false, the message is not delayed. Default value is true.
 	function NpcHandler:say(message, focus, publicize, shallDelay)
@@ -601,6 +601,6 @@ if(NpcHandler == nil) then
 			}
 		end
 	end
-	
-	
+
+
 end

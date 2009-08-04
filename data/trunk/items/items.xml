@@ -237,37 +237,45 @@
 	<item id="598" name="lava">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="fire"/>
-		<attribute key="allowpickupable" value="1"/>	</item>
+		<attribute key="allowpickupable" value="1"/>
+	</item>
 	<item id="599" name="lava">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="fire"/>
-		<attribute key="allowpickupable" value="1"/>	</item>
+		<attribute key="allowpickupable" value="1"/>
+	</item>
 	<item id="600" name="lava">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="fire"/>
-		<attribute key="allowpickupable" value="1"/>	</item>
+		<attribute key="allowpickupable" value="1"/>
+	</item>
 	<item id="601" name="lava">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="fire"/>
-		<attribute key="allowpickupable" value="1"/>	</item>
+		<attribute key="allowpickupable" value="1"/>
+	</item>
 	<item id="670" name="snow"/>
 	<item id="671" name="ice"/>
 	<item id="708" name="tar">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="poff"/>
-		<attribute key="allowpickupable" value="1"/>	</item>
+		<attribute key="allowpickupable" value="1"/>
+	</item>
 	<item id="709" name="tar">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="poff"/>
-		<attribute key="allowpickupable" value="1"/>	</item>
+		<attribute key="allowpickupable" value="1"/>
+	</item>
 	<item id="710" name="tar">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="poff"/>
-		<attribute key="allowpickupable" value="1"/>	</item>
+		<attribute key="allowpickupable" value="1"/>
+	</item>
 	<item id="711" name="tar">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="poff"/>
-		<attribute key="allowpickupable" value="1"/>	</item>
+		<attribute key="allowpickupable" value="1"/>
+	</item>
 	<item id="724" name="cobbled pavement"/>
 	<item id="777" name="sandstone"/>
 	<item id="778" name="sandstone"/>
@@ -286,7 +294,8 @@
 	<item id="791" name="grass"/>
 	<item id="804" name="dirt"/>
 	<item id="806" name="dirt"/>
-	<item id="836" name="sand"/>	<item id="873" article="a" name="mountain"/>
+	<item id="836" name="sand"/>
+	<item id="873" article="a" name="mountain"/>
 	<item id="874" article="a" name="mountain"/>
 	<item id="875" article="a" name="mountain"/>
 	<item id="876" article="a" name="mountain"/>
@@ -492,7 +501,12 @@
 	<item id="1086" article="a" name="sandstone wall"/>
 	<item id="1087" article="a" name="sandstone wall"/>
 	<item id="1088" article="a" name="sandstone wall"/>
-	<item id="1090" article="a" name="metal wall"/>	<item id="1091" article="a" name="metal wall"/>	<item id="1092" article="a" name="metal wall"/>	<item id="1093" article="a" name="metal wall"/>	<item id="1095" article="a" name="metal wall"/>	<item id="1094" editorsuffix=" (Blank)"/>
+	<item id="1090" article="a" name="metal wall"/>
+	<item id="1091" article="a" name="metal wall"/>
+	<item id="1092" article="a" name="metal wall"/>
+	<item id="1093" article="a" name="metal wall"/>
+	<item id="1095" article="a" name="metal wall"/>
+	<item id="1094" editorsuffix=" (Blank)"/>
 	<item id="1096" article="a" name="metal wall"/>
 	<item id="1097" article="a" name="metal wall"/>
 	<item id="1098" article="a" name="metal wall"/>
@@ -504,7 +518,11 @@
 	<item id="1104" article="a" name="sandstone wall"/>
 	<item id="1105" article="a" name="sandstone wall"/>
 	<item id="1106" article="a" name="sandstone wall"/>
-	<item id="1107" article="a" name="sandstone wall"/>	<item id="1108" article="a" name="sandstone wall"/>	<item id="1109" article="a" name="sandstone wall"/>	<item id="1110" article="a" name="sandstone wall"/>	<item id="1111" article="a" name="white stone wall"/>
+	<item id="1107" article="a" name="sandstone wall"/>
+	<item id="1108" article="a" name="sandstone wall"/>
+	<item id="1109" article="a" name="sandstone wall"/>
+	<item id="1110" article="a" name="sandstone wall"/>
+	<item id="1111" article="a" name="white stone wall"/>
 	<item id="1112" article="a" name="white stone wall"/>
 	<item id="1113" article="a" name="white stone wall"/>
 	<item id="1114" article="a" name="white stone wall"/>
@@ -551,7 +569,15 @@
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="1155" article="a" name="wall fountain">
-		<attribute key="fluidSource" value="water"/>	</item>	<item id="1156" article="a" name="wall fountain">		<attribute key="fluidSource" value="water"/>	</item>	<item id="1157" article="a" name="wall fountain">		<attribute key="fluidSource" value="water"/>	</item>	<item id="1158" article="an" name="archway"/>
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1156" article="a" name="wall fountain">
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1157" article="a" name="wall fountain">
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1158" article="an" name="archway"/>
 	<item id="1159" article="an" name="archway"/>
 	<item id="1160" article="an" name="archway"/>
 	<item id="1161" article="an" name="archway"/>
@@ -589,7 +615,11 @@
 	<item id="1193" article="an" name="ornamented wall"/>
 	<item id="1194" article="a" name="wall fountain">
 		<attribute key="fluidSource" value="water"/>
-	</item>	<item id="1195" article="a" name="wall fountain">		<attribute key="fluidSource" value="water"/>	</item>	<item id="1196" article="a" name="lava wall"/>
+	</item>
+	<item id="1195" article="a" name="wall fountain">
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1196" article="a" name="lava wall"/>
 	<item id="1197" article="a" name="lava wall"/>
 	<item id="1198" article="a" name="lava wall"/>
 	<item id="1199" article="a" name="lava wall"/>
@@ -610,7 +640,8 @@
 	<item id="1210" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
-		<attribute key="description" value="It is locked."/>	</item>
+		<attribute key="description" value="It is locked."/>
+	</item>
 	<item id="1211" article="an" name="open door">
 		<attribute key="type" value="door"/>
 	</item>
@@ -808,7 +839,10 @@
 	<item id="1278" article="a" name="sail"/>
 	<item id="1279" article="a" name="sail"/>
 	<item id="1280" article="a" name="rudder of the boat"/>
-	<item id="1281" article="a" name="rudder of the boat"/>	<item id="1282" article="a" name="rudder of the boat"/>	<item id="1283" article="a" name="rudder of the boat"/>	<item id="1284" article="a" name="drawbridge"/>
+	<item id="1281" article="a" name="rudder of the boat"/>
+	<item id="1282" article="a" name="rudder of the boat"/>
+	<item id="1283" article="a" name="rudder of the boat"/>
+	<item id="1284" article="a" name="drawbridge"/>
 	<item id="1285" article="a" name="stone"/>
 	<item id="1286" article="a" name="stone"/>
 	<item id="1287" article="a" name="stone"/>
@@ -904,7 +938,23 @@
 	</item>
 	<item id="1362" article="a" name="fountain">
 		<attribute key="fluidSource" value="water"/>
-	</item>	<item id="1363" article="a" name="fountain">		<attribute key="fluidSource" value="water"/>	</item>	<item id="1364" article="a" name="water basin">		<attribute key="fluidSource" value="water"/>	</item>	<item id="1365" article="a" name="water basin">		<attribute key="fluidSource" value="water"/>	</item>	<item id="1366" article="a" name="water basin">		<attribute key="fluidSource" value="water"/>	</item>	<item id="1367" article="a" name="water basin">		<attribute key="fluidSource" value="water"/>	</item>	<item id="1368" article="a" name="draw well"/>
+	</item>
+	<item id="1363" article="a" name="fountain">
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1364" article="a" name="water basin">
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1365" article="a" name="water basin">
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1366" article="a" name="water basin">
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1367" article="a" name="water basin">
+		<attribute key="fluidSource" value="water"/>
+	</item>
+	<item id="1368" article="a" name="draw well"/>
 	<item id="1369" article="a" name="draw well"/>
 	<item id="1370" article="a" name="marble well"/>
 	<item id="1371" article="a" name="marble well"/>
@@ -1276,7 +1326,8 @@
 	</item>
 	<item id="1508" name="ashes">
 		<attribute key="type" value="magicfield"/>
-		<attribute key="decayTo" value="1506"/>		<attribute key="duration" value="5"/>
+		<attribute key="decayTo" value="1506"/>
+		<attribute key="duration" value="5"/>
 		<attribute key="replaceable" value="0"/>
 	</item>
 	<item id="1509" name="lava">
@@ -1456,7 +1507,8 @@
 	</item>
 	<item id="1639" article="a" name="table">
 		<attribute key="type" value="door"/>
-		<attribute key="blockprojectile" value="1"/>	</item>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
 	<item id="1640" article="a" name="table">
 		<attribute key="type" value="door"/>
 	</item>
@@ -1872,7 +1924,8 @@
 		<attribute key="allowpickupable" value="1"/>
 	</item>
 	<item id="1778" article="a" name="big wine cask">
-		<attribute key="fluidSource" value="wine"/>	</item>
+		<attribute key="fluidSource" value="wine"/>
+	</item>
 	<item id="1779" article="a" name="big wine cask">
 		<attribute key="fluidSource" value="wine"/>
 	</item>
@@ -2425,7 +2478,19 @@
 	</item>
 	<item id="2018" article="a" name="pool">
 		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="600"/>	</item>	<item id="2019" article="a" name="pool">		<attribute key="decayTo" value="2020"/>		<attribute key="duration" value="45"/>	</item>	<item id="2020" article="a" name="pool">		<attribute key="decayTo" value="2021"/>		<attribute key="duration" value="45"/>	</item>	<item id="2021" article="a" name="pool">		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="60"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="2019" article="a" name="pool">
+		<attribute key="decayTo" value="2020"/>
+		<attribute key="duration" value="45"/>
+	</item>
+	<item id="2020" article="a" name="pool">
+		<attribute key="decayTo" value="2021"/>
+		<attribute key="duration" value="45"/>
+	</item>
+	<item id="2021" article="a" name="pool">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="60"/>
 	</item>
 	<item id="2022" article="a" name="broken bottle">
 		<attribute key="weight" value="80"/>
@@ -3243,7 +3308,10 @@
 		<attribute key="manaTicks" value="1000"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2217" article="a" name="book">		<attribute key="weight" value="1500"/>	</item>	<item id="2218" article="a" name="paw amulet">
+	<item id="2217" article="a" name="book">
+		<attribute key="weight" value="1500"/>
+	</item>
+	<item id="2218" article="a" name="paw amulet">
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="weight" value="1000"/>
 	</item>
@@ -3379,7 +3447,13 @@
 		<attribute key="charges" value="2"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
-	<item id="2263" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2264" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2265" article="an" name="intense healing rune">
+	<item id="2263" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2264" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2265" article="an" name="intense healing rune">
 		<attribute key="runeSpellName" value="adura gran"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="1"/>
@@ -3389,7 +3463,10 @@
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="1"/>
 	</item>
-	<item id="2267" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2268" article="a" name="sudden death rune">
+	<item id="2267" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2268" article="a" name="sudden death rune">
 		<attribute key="runeSpellName" value="adori gran mort"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
@@ -3401,12 +3478,18 @@
 		<attribute key="charges" value="2"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
-	<item id="2270" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2271" article="an" name="icicle rune">
+	<item id="2270" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2271" article="an" name="icicle rune">
 		<attribute key="runeSpellName" value="adori frigo"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="5"/>
 	</item>
-	<item id="2272" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2273" article="an" name="ultimate healing rune">
+	<item id="2272" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2273" article="an" name="ultimate healing rune">
 		<attribute key="runeSpellName" value="adura vita"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="1"/>
@@ -3417,7 +3500,13 @@
 		<attribute key="charges" value="4"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
-	<item id="2275" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2276" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2277" article="an" name="energy field rune">
+	<item id="2275" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2276" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2277" article="an" name="energy field rune">
 		<attribute key="runeSpellName" value="adevo grav vis"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
@@ -3434,7 +3523,22 @@
 		<attribute key="charges" value="4"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
-	<item id="2280" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2281" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2282" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2283" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2284" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2285" article="a" name="poison field rune">
+	<item id="2280" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2281" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2282" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2283" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2284" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2285" article="a" name="poison field rune">
 		<attribute key="runeSpellName" value="adevo grav pox"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
@@ -3486,13 +3590,31 @@
 		<attribute key="charges" value="3"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
-	<item id="2294" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2295" article="a" name="holy missile rune">
+	<item id="2294" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2295" article="a" name="holy missile rune">
 		<attribute key="runeSpellName" value="adori san"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="5"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
-	<item id="2296" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2297" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2298" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2299" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2300" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2301" article="a" name="fire field rune">
+	<item id="2296" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2297" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2298" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2299" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2300" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2301" article="a" name="fire field rune">
 		<attribute key="runeSpellName" value="adevo grav flam"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
@@ -3522,13 +3644,22 @@
 		<attribute key="charges" value="2"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
-	<item id="2306" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2307" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2308" article="a" name="soulfire rune">
+	<item id="2306" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2307" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2308" article="a" name="soulfire rune">
 		<attribute key="runeSpellName" value="adevo res flam"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
-	<item id="2309" article="a" name="spell rune">		<attribute key="weight" value="120"/>	</item>	<item id="2310" article="a" name="desintegrate rune">
+	<item id="2309" article="a" name="spell rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2310" article="a" name="desintegrate rune">
 		<attribute key="runeSpellName" value="adito tera"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="3"/>
@@ -3541,14 +3672,18 @@
 		<attribute key="showcharges" value="1"/>
 	</item>
 	<item id="2312" article="a" name="spell rune">
-		<attribute key="weight" value="120"/>	</item>	<item id="2313" article="an" name="explosion rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2313" article="an" name="explosion rune">
 		<attribute key="runeSpellName" value="adevo mas hur"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="6"/>
 		<attribute key="showcharges" value="1"/>
 	</item>
 	<item id="2314" article="a" name="spell rune">
-		<attribute key="weight" value="120"/>	</item>	<item id="2315" article="a" name="thunderstorm rune">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="2315" article="a" name="thunderstorm rune">
 		<attribute key="runeSpellName" value="adori mas vis"/>
 		<attribute key="weight" value="120"/>
 		<attribute key="charges" value="4"/>
@@ -3585,7 +3720,8 @@
 		<attribute key="description" value="You have a vague feeling that it looks somewhat silly."/>
 		<attribute key="weight" value="700"/>
 		<attribute key="armor" value="3"/>
-		<attribute key="magicpoints" value="1"/>		<attribute key="slotType" value="head"/>
+		<attribute key="magicpoints" value="1"/>
+		<attribute key="slotType" value="head"/>
 	</item>
 	<item id="2324" article="a" name="broom">
 		<attribute key="weight" value="1100"/>
@@ -3935,7 +4071,8 @@
 		<attribute key="attack" value="60"/>
 		<attribute key="defense" value="1"/>
 		<attribute key="weaponType" value="sword"/>
-		<attribute key="elementIce" value="18"/>		<attribute key="charges" value="1"/>
+		<attribute key="elementIce" value="18"/>
+		<attribute key="charges" value="1"/>
 	</item>
 	<item id="2397" article="a" name="longsword">
 		<attribute key="weight" value="4200"/>
@@ -4576,7 +4713,8 @@
 	<item id="2500" article="an" name="amazon armor">
 		<attribute key="weight" value="9900"/>
 		<attribute key="armor" value="13"/>
-		<attribute key="skillDist" value="3"/>		<attribute key="slotType" value="body"/>
+		<attribute key="skillDist" value="3"/>
+		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="2501" article="a" name="ceremonial mask">
 		<attribute key="weight" value="1200"/>
@@ -4790,31 +4928,38 @@
 	</item>
 	<item id="2543" article="a" name="bolt" plural="bolts">
 		<attribute key="weight" value="80"/>
-		<attribute key="slotType" value="ammo"/>		<attribute key="attack" value="30"/>
-		<attribute key="hitChance" value="80"/>		<attribute key="weaponType" value="ammunition"/>
+		<attribute key="slotType" value="ammo"/>
+		<attribute key="attack" value="30"/>
+		<attribute key="hitChance" value="80"/>
+		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="bolt"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2544" article="an" name="arrow" plural="arrows">
 		<attribute key="weight" value="70"/>
-		<attribute key="slotType" value="ammo"/>		<attribute key="attack" value="25"/>
-		<attribute key="hitChance" value="90"/>		<attribute key="weaponType" value="ammunition"/>
+		<attribute key="slotType" value="ammo"/>
+		<attribute key="attack" value="25"/>
+		<attribute key="hitChance" value="90"/>
+		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="arrow"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2545" article="a" name="poison arrow" plural="poison arrows">
 		<attribute key="weight" value="80"/>
-		<attribute key="slotType" value="ammo"/>		<attribute key="attack" value="22"/>
-		<attribute key="hitChance" value="80"/>		<attribute key="weaponType" value="ammunition"/>
+		<attribute key="slotType" value="ammo"/>
+		<attribute key="attack" value="22"/>
+		<attribute key="hitChance" value="80"/>
+		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="poisonarrow"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2546" article="a" name="burst arrow" plural="burst arrows">
 		<attribute key="weight" value="90"/>
-		<attribute key="slotType" value="ammo"/>		<attribute key="attack" value="28"/>
+		<attribute key="slotType" value="ammo"/>
+		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="burstarrow"/>
@@ -4823,7 +4968,8 @@
 	</item>
 	<item id="2547" article="a" name="power bolt" plural="power bolts">
 		<attribute key="weight" value="80"/>
-		<attribute key="slotType" value="ammo"/>		<attribute key="attack" value="40"/>
+		<attribute key="slotType" value="ammo"/>
+		<attribute key="attack" value="40"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="powerbolt"/>
@@ -4909,7 +5055,19 @@
 	<item id="2573" article="a" name="bowl">
 		<attribute key="weight" value="1850"/>
 	</item>
-	<item id="2574" article="a" name="white vase">		<attribute key="weight" value="1500"/>	</item>	<item id="2575" article="a" name="yellow vase">		<attribute key="weight" value="1500"/>	</item>	<item id="2576" article="a" name="blue vase">		<attribute key="weight" value="1500"/>	</item>	<item id="2577" article="a" name="green vase">		<attribute key="weight" value="1500"/>	</item>	<item id="2578" article="a" name="closed trap">
+	<item id="2574" article="a" name="white vase">
+		<attribute key="weight" value="1500"/>
+	</item>
+	<item id="2575" article="a" name="yellow vase">
+		<attribute key="weight" value="1500"/>
+	</item>
+	<item id="2576" article="a" name="blue vase">
+		<attribute key="weight" value="1500"/>
+	</item>
+	<item id="2577" article="a" name="green vase">
+		<attribute key="weight" value="1500"/>
+	</item>
+	<item id="2578" article="a" name="closed trap">
 		<attribute key="weight" value="2100"/>
 	</item>
 	<item id="2579" article="an" name="open trap">
@@ -4965,7 +5123,8 @@
 		<attribute key="containerSize" value="30"/>
 	</item>
 	<item id="2595" article="a" name="parcel">
-		<attribute key="type" value="container"/>		<attribute key="weight" value="1800"/>
+		<attribute key="type" value="container"/>
+		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="10"/>
 	</item>
 	<item id="2596" article="a" name="stamped parcel">
@@ -4978,7 +5137,8 @@
 		<attribute key="maxTextLen" value="512"/>
 	</item>
 	<item id="2598" article="a" name="stamped letter">
-		<attribute key="readable" value="1"/>		<attribute key="weight" value="30"/>
+		<attribute key="readable" value="1"/>
+		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2599" article="a" name="label">
 		<attribute key="weight" value="10"/>
@@ -5175,7 +5335,9 @@
 	</item>
 	<item id="2662" article="a" name="magician hat">
 		<attribute key="weight" value="750"/>
-		<attribute key="armor" value="1"/>		<attribute key="slotType" value="head"/>	</item>
+		<attribute key="armor" value="1"/>
+		<attribute key="slotType" value="head"/>
+	</item>
 	<item id="2663" article="a" name="mystic turban">
 		<attribute key="description" value="Something is strange about this turban."/>
 		<attribute key="weight" value="850"/>
@@ -5469,175 +5631,245 @@
 		<attribute key="containerSize" value="7"/>
 		<attribute key="decayTo" value="2810"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2807" article="a" name="dead spider">
 		<attribute key="weight" value="4600"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3068"/>
 		<attribute key="duration" value="10"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="2808" article="a" name="dead cyclops">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3117"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2809" article="a" name="slain skeleton">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2922"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2810" article="a" name="dead troll">
 		<attribute key="weight" value="50000"/>
-		<attribute key="containerSize" value="10"/>		<attribute key="decayTo" value="2811"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="2811"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2811" article="a" name="dead troll">
 		<attribute key="weight" value="30000"/>
-		<attribute key="containerSize" value="10"/>		<attribute key="decayTo" value="0"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2812" editorsuffix=" (Blank)"/>
 	<item id="2813" article="a" name="dead rat">
 		<attribute key="weight" value="6300"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2814"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2814" article="a" name="dead rat">
 		<attribute key="weight" value="4400"/>
-		<attribute key="containerSize" value="5"/>		<attribute key="decayTo" value="2815"/>
+		<attribute key="containerSize" value="5"/>
+		<attribute key="decayTo" value="2815"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2815" article="a" name="dead rat">
 		<attribute key="weight" value="3000"/>
-		<attribute key="decayTo" value="2816"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2816" article="a" name="dead rat">		<attribute key="weight" value="2000"/>		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2816"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2816" article="a" name="dead rat">
+		<attribute key="weight" value="2000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2817" article="a" name="dead snake">
 		<attribute key="weight" value="1200"/>
 		<attribute key="decayTo" value="2818"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2818" article="a" name="dead snake">
 		<attribute key="weight" value="840"/>
 		<attribute key="decayTo" value="2819"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2819" article="a" name="dead snake">
 		<attribute key="weight" value="620"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2820" article="a" name="dead orc">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3080"/>
 		<attribute key="duration" value="10"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2821" article="a" name="dead orc">
 		<attribute key="decayTo" value="2966"/>
 		<attribute key="duration" value="60"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2822" article="a" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2823"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2823" article="a" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2824" article="a" name="dead rotworm">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3085"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2825" article="a" name="dead rotworm">
 		<attribute key="decayTo" value="2964"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2826" article="a" name="dead wolf">
 		<attribute key="weight" value="26000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2827"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2827" article="a" name="dead wolf">
 		<attribute key="weight" value="20000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2828"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2828" article="a" name="dead wolf">
 		<attribute key="weight" value="8000"/>
-		<attribute key="decayTo" value="2829"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2829" article="a" name="dead wolf">		<attribute key="weight" value="4000"/>		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2829"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2829" article="a" name="dead wolf">
+		<attribute key="weight" value="4000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2830" article="a" name="dead minotaur">
 		<attribute key="weight" value="130000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2831"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2831" article="a" name="dead minotaur">
 		<attribute key="weight" value="105000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2832"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2832" article="a" name="dead minotaur">
 		<attribute key="weight" value="85000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2833"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2833" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="2834"/>
-		<attribute key="duration" value="900"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="duration" value="900"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2834" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
-		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="900"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="900"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2835" article="a" name="dead deer">
 		<attribute key="weight" value="68000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2836"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2836" article="a" name="dead deer">
 		<attribute key="weight" value="68000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2837"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2837" article="a" name="dead deer">
 		<attribute key="weight" value="5000"/>
 		<attribute key="containerSize" value="5"/>
-		<attribute key="decayTo" value="2838"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2838" article="a" name="dead deer">		<attribute key="weight" value="5000"/>		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2838"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2838" article="a" name="dead deer">
+		<attribute key="weight" value="5000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2839" article="a" name="dead dog">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2840"/>
 		<attribute key="duration" value="10"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2840" article="a" name="dead dog">
 		<attribute key="weight" value="21000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2841"/>
 		<attribute key="duration" value="60"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2841" article="a" name="dead dog">
 		<attribute key="weight" value="1000"/>
-		<attribute key="decayTo" value="2842"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2842" article="a" name="dead dog">		<attribute key="weight" value="700"/>		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2843" article="a" name="slain skeleton">
+		<attribute key="decayTo" value="2842"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2842" article="a" name="dead dog">
+		<attribute key="weight" value="700"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2843" article="a" name="slain skeleton">
 		<attribute key="weight" value="40000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2975"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2844" article="a" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3104"/>
@@ -5657,20 +5889,30 @@
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2885"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2849" article="a" name="dead bear">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2850"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2850" article="a" name="dead bear">
 		<attribute key="decayTo" value="2851"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2851" article="a" name="dead bear">
-		<attribute key="decayTo" value="2852"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2852" article="a" name="dead bear">		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2852"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2852" article="a" name="dead bear">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2853" article="a" name="slain ghoul">
 		<attribute key="weight" value="60200"/>
 		<attribute key="containerSize" value="10"/>
@@ -5686,66 +5928,83 @@
 	</item>
 	<item id="2856" article="a" name="slain ghoul" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60200"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2857" article="a" name="dead giant spider">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2858"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="2858" article="a" name="dead giant spider">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2859"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2859" article="a" name="dead giant spider">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2860" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2861"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2861" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="decayTo" value="2966"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2862" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2863"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2863" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="decayTo" value="2966"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2864" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2865"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2865" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="decayTo" value="2966"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2866" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2867"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2867" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2878"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2868" article="a" name="dead minotaur">
 		<attribute key="weight" value="67520"/>
 		<attribute key="containerSize" value="10"/>
@@ -5757,192 +6016,247 @@
 	</item>
 	<item id="2870" article="a" name="dead minotaur" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2871" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2872"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2872" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2878"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2873" article="a" name="dead minotaur">
 		<attribute key="weight" value="67520"/>
 		<attribute key="containerSize" value="10"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2874" article="a" name="dead minotaur" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="2875" article="a" name="dead minotaur" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2876" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2877"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2877" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2878"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2878" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2879" article="a" name="dead minotaur" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
 	<item id="2880" article="a" name="dead minotaur" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2881" article="a" name="dead dragon lord">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2882"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2882" article="a" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2883"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2883" article="a" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2884" article="a" name="dead dragon" editorsuffix=" (Not decaying)"/>
 	<item id="2885" article="a" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2944"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2886" article="a" name="dead fire devil">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2887"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="fire"/>	</item>
+		<attribute key="corpseType" value="fire"/>
+	</item>
 	<item id="2887" article="a" name="dead fire devil">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="2888"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="fire"/>	</item>
+		<attribute key="corpseType" value="fire"/>
+	</item>
 	<item id="2888" article="a" name="dead fire devil">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="fire"/>	</item>
+		<attribute key="corpseType" value="fire"/>
+	</item>
 	<item id="2889" article="a" name="dead lion">
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2890"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2890" article="a" name="dead lion">
 		<attribute key="decayTo" value="2891"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2891" article="a" name="dead lion">
-		<attribute key="decayTo" value="2892"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2892" article="a" name="dead lion">		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2892"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2892" article="a" name="dead lion">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2893" article="a" name="dead bear">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2894"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2894" article="a" name="dead bear">
 		<attribute key="decayTo" value="2895"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2895" article="a" name="dead bear">
-		<attribute key="decayTo" value="2896"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2896" article="a" name="dead bear">		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2896"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2896" article="a" name="dead bear">
+		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2897" article="a" name="dead scorpion">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2898"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="2898" article="a" name="dead scorpion">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2965"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2899" article="a" name="dead wasp">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2900"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="2900" article="a" name="dead wasp">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2901"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2901" article="a" name="dead wasp">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2902" article="a" name="dead bug">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2903"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2903" article="a" name="dead bug">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2904"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2904" article="a" name="dead bug">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2905" article="a" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2906"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2906" article="a" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2907"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2907" article="a" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2908" article="a" name="dead beholder">
 		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="2909"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="2909" article="a" name="dead beholder">
 		<attribute key="containerSize" value="15"/>
 		<attribute key="decayTo" value="2910"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2910" article="a" name="dead beholder">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2911" article="a" name="dead cyclops" editorsuffix=" (Not decaying)"/>
 	<item id="2912" article="a" name="dead cyclops" editorsuffix=" (Not decaying)"/>
 	<item id="2913" name="remains of a ghost">
@@ -5950,150 +6264,194 @@
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2977"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2914" article="a" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2915"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2915" article="a" name="dead sheep">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="2907"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2916" article="a" name="slain demon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2917"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2917" article="a" name="slain demon">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2918"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2918" article="a" name="slain demon">
-		<attribute key="decayTo" value="2919"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2919" article="a" name="slain demon">		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2919"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2919" article="a" name="slain demon">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2920" article="a" name="dead orc">
 		<attribute key="weight" value="90000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2921"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2921" article="a" name="dead orc">
 		<attribute key="weight" value="90000"/>
 		<attribute key="decayTo" value="2966"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2922" article="a" name="slain skeleton">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="2923"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2923" article="a" name="slain skeleton">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2924" article="a" name="dead wolf">
 		<attribute key="weight" value="8000"/>
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2925"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2925" article="a" name="dead wolf">
 		<attribute key="weight" value="8000"/>
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="2926"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2926" article="a" name="dead wolf">
 		<attribute key="weight" value="8000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2927" article="a" name="dead wolf" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="4000"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2928" article="a" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2929"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2929" article="a" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2930"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2930" article="a" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2931" article="a" name="dead behemoth">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2932"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2932" article="a" name="dead behemoth">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2933"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2933" article="a" name="dead behemoth">
-		<attribute key="decayTo" value="2934"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="2934" article="a" name="dead behemoth">		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2934"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="2934" article="a" name="dead behemoth">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2935" article="a" name="dead pig">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2936"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2936" article="a" name="dead pig">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2937"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2937" article="a" name="dead pig">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2938" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2939"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2939" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="decayTo" value="2966"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2940" article="a" name="dead goblin">
 		<attribute key="weight" value="4000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2941"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2941" article="a" name="dead goblin">
 		<attribute key="weight" value="4000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2942"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2942" article="a" name="dead goblin">
 		<attribute key="weight" value="4000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2943" article="a" name="dead goblin" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="4000"/>
 	</item>
@@ -6101,24 +6459,29 @@
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2945" article="a" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2946"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2946" article="a" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2947"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2947" article="a" name="dead elf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2948" article="a" name="dead elf" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="50000"/>
 	</item>
@@ -6127,48 +6490,62 @@
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2950"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2950" name="remains of a mummy">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="2951"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2951" name="remains of a mummy">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2952" article="a" name="split stone golem">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2953"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2953" article="a" name="split stone golem">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2954"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2954" article="a" name="split stone golem">
-		<attribute key="decayTo" value="2955"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="undead"/>	</item>	<item id="2955" article="a" name="split stone golem">		<attribute key="decayTo" value="0"/>
+		<attribute key="decayTo" value="2955"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
+	<item id="2955" article="a" name="split stone golem">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2956" article="a" name="slain vampire">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2957"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2957" article="a" name="slain vampire">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2958"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2958" article="a" name="slain vampire">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2959" article="a" name="slain vampire" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
 	</item>
@@ -6177,103 +6554,128 @@
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2961"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2961" article="a" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2962"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2962" article="a" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2963" article="a" name="dead dwarf" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
 	</item>
 	<item id="2964" article="a" name="dead rotworm">
-		<attribute key="weight" value="10000"/>		<attribute key="decayTo" value="0"/>
+		<attribute key="weight" value="10000"/>
+		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2965" article="a" name="dead scorpion">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="2966" article="a" name="dead orc">
 		<attribute key="weight" value="10000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2967" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2968"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2968" article="a" name="dead orc">
 		<attribute key="weight" value="120000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2966"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2969" article="a" name="dead wolf">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2970"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2970" article="a" name="dead wolf">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2971"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2971" article="a" name="dead wolf">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2972" article="a" name="dead orc">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2973"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2973" article="a" name="dead orc">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2974"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2974" article="a" name="dead orc">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2975" article="a" name="slain skeleton">
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2976"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2976" article="a" name="slain skeleton">
 		<attribute key="weight" value="10000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2977" name="remains of a ghost">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2978"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2978" name="remains of a ghost">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2979" article="a" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2980"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2980" article="a" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
@@ -6285,63 +6687,79 @@
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2982"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2982" article="a" name="dead elf">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2947"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2983" article="a" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2984"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2984" article="a" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2962"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2985" article="a" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2986"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2986" article="a" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2962"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2987" article="a" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2988"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2988" article="a" name="dead dwarf">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2962"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2989" article="a" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2990"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="2990" article="a" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2991"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2991" article="a" name="dead djinn">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2992" article="a" name="dead rabbit">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
@@ -6358,33 +6776,39 @@
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2996"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2996" article="a" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="2997"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2997" article="a" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="2998" article="a" name="slain banshee">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="2999"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="2999" article="a" name="slain banshee">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3000"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3000" article="a" name="slain banshee">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3001" article="a" name="dead djinn">
 		<attribute key="containerSize" value="8"/>
 		<attribute key="decayTo" value="3002"/>
@@ -6400,125 +6824,156 @@
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3005"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="3005" article="a" name="dead ancient scarab">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3006"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3006" article="a" name="dead ancient scarab">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3007" article="a" name="dead cobra">
 		<attribute key="weight" value="6000"/>
 		<attribute key="decayTo" value="3008"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3008" article="a" name="dead cobra">
 		<attribute key="weight" value="6000"/>
 		<attribute key="decayTo" value="3009"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3009" article="a" name="dead cobra">
 		<attribute key="weight" value="6000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3010" article="a" name="dead larva">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="3011"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="3011" article="a" name="dead larva">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3012"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3012" article="a" name="dead larva">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3013" article="a" name="dead scarab">
 		<attribute key="weight" value="2000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3014"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="3014" article="a" name="dead scarab">
 		<attribute key="weight" value="2000"/>
 		<attribute key="decayTo" value="3015"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3015" article="a" name="dead scarab">
 		<attribute key="weight" value="2000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3016" article="a" name="dead pharaoh">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3017"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3017" article="a" name="dead pharaoh">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3018"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3018" article="a" name="dead pharaoh">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3019" article="a" name="dead hyaena">
 		<attribute key="weight" value="8000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="3020"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3020" article="a" name="dead hyaena">
 		<attribute key="weight" value="8000"/>
 		<attribute key="decayTo" value="3021"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3021" article="a" name="dead hyaena">
 		<attribute key="weight" value="8000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3022" article="a" name="dead gargoyle">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3023"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3023" article="a" name="dead gargoyle">
 		<attribute key="decayTo" value="3024"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3024" article="a" name="dead gargoyle">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3025" article="a" name="slain lich">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3026"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3026" article="a" name="slain lich">
 		<attribute key="decayTo" value="3027"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3027" article="a" name="slain lich">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3028" article="a" name="slain crypt shambler">
 		<attribute key="weight" value="100000"/>
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3029"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3029" article="a" name="slain crypt shambler">
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="3030"/>
@@ -6529,152 +6984,194 @@
 		<attribute key="weight" value="100000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3031" article="a" name="slain bonebeast">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3032"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3032" article="a" name="slain bonebeast">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3033"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3033" article="a" name="slain bonebeast">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3034" article="a" name="dead pharaoh">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3035"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3035" article="a" name="dead pharaoh">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3036"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3036" article="a" name="dead pharaoh">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3037" article="an" name="dead efreet">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3038"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3038" article="an" name="dead efreet">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3039"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3039" article="an" name="dead efreet">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3040" article="a" name="dead marid">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3041"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3041" article="a" name="dead djinn">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3042"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3042" article="a" name="dead marid">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3043" article="a" name="dead badger">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3044"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3044" article="a" name="dead badger">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3045"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3045" article="a" name="dead badger">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3046" article="a" name="dead skunk">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
 		<attribute key="decayTo" value="3047"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3047" article="a" name="dead skunk">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3048"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3048" article="a" name="dead skunk">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3049" article="a" name="dead gazer">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="3050"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3050" article="a" name="dead gazer">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="3051"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3051" article="a" name="dead gazer">
 		<attribute key="weight" value="1000"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3052" article="a" name="dead beholder">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3053"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>		<attribute key="fluidSource" value="slime"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
 	<item id="3053" article="a" name="dead beholder">
 		<attribute key="decayTo" value="3054"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3054" article="a" name="dead elder beholder">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3055" article="a" name="dead yeti">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3056"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3056" article="a" name="dead yeti">
 		<attribute key="decayTo" value="3057"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3057" article="a" name="dead yeti">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3058" article="a" name="dead human" editorsuffix=" (Creature)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3059"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3059" article="a" name="dead human" editorsuffix=" (Creature)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3060"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3060" article="a" name="dead human" editorsuffix=" (Player)">
-		<attribute key="weight" value="50000"/>		<attribute key="decayTo" value="0"/>
+		<attribute key="weight" value="50000"/>
+		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>	<item id="3061" article="a" name="dead human">		<attribute key="weight" value="60000"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3061" article="a" name="dead human">
+		<attribute key="weight" value="60000"/>
+	</item>
 	<item id="3062" article="a" name="dead human">
 		<attribute key="weight" value="60000"/>
 	</item>
@@ -6683,55 +7180,111 @@
 	</item>
 	<item id="3064" article="a" name="dead human">
 		<attribute key="weight" value="50000"/>
-		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="900"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="900"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3065" article="a" name="dead human" editorsuffix=" (Player)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3066"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3066" article="a" name="dead human" editorsuffix=" (Player)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3064"/>
 		<attribute key="duration" value="900"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3067" article="a" name="dead troll">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="2806"/>		<attribute key="duration" value="10"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="decayTo" value="2806"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3068" article="a" name="dead spider">
 		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="6"/>
-		<attribute key="decayTo" value="2822"/>		<attribute key="duration" value="900"/>		<attribute key="corpseType" value="venom"/>	</item>
+		<attribute key="decayTo" value="2822"/>
+		<attribute key="duration" value="900"/>
+		<attribute key="corpseType" value="venom"/>
+	</item>
 	<item id="3069" article="a" name="dead cyclops">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="2808"/>		<attribute key="duration" value="10"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="decayTo" value="2808"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3070" article="a" name="dead troll">
 		<attribute key="weight" value="25040"/>
-		<attribute key="decayTo" value="3071"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="decayTo" value="3071"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3071" article="a" name="dead troll">
 		<attribute key="weight" value="20040"/>
-		<attribute key="decayTo" value="3072"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="decayTo" value="3072"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3072" article="a" name="dead troll">
 		<attribute key="weight" value="20040"/>
-		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3073" article="a" name="dead rat">
 		<attribute key="weight" value="6800"/>
-		<attribute key="containerSize" value="5"/>		<attribute key="decayTo" value="2813"/>		<attribute key="duration" value="10"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="containerSize" value="5"/>
+		<attribute key="decayTo" value="2813"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3074" article="a" name="dead rat">
 		<attribute key="weight" value="6800"/>
-		<attribute key="decayTo" value="3075"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>
-	<item id="3075" article="a" name="dead rat">		<attribute key="weight" value="6000"/>		<attribute key="decayTo" value="3076"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3076" article="a" name="dead rat">		<attribute key="weight" value="5400"/>		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3077" article="a" name="dead snake">		<attribute key="weight" value="1200"/>
-		<attribute key="decayTo" value="3078"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="3075"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3075" article="a" name="dead rat">
+		<attribute key="weight" value="6000"/>
+		<attribute key="decayTo" value="3076"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3076" article="a" name="dead rat">
+		<attribute key="weight" value="5400"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3077" article="a" name="dead snake">
+		<attribute key="weight" value="1200"/>
+		<attribute key="decayTo" value="3078"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3078" article="a" name="dead snake">
 		<attribute key="weight" value="800"/>
-		<attribute key="decayTo" value="3079"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="3079"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3079" article="a" name="dead snake">
 		<attribute key="weight" value="500"/>
-		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3080" article="a" name="dead orc">
 		<attribute key="weight" value="16740"/>
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="2821"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="decayTo" value="2821"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3081" article="a" name="dead orc" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="70000"/>
 	</item>
@@ -6743,32 +7296,113 @@
 		<attribute key="weight" value="4000"/>
 	</item>
 	<item id="3084" article="a" name="dead rotworm">
-		<attribute key="weight" value="8500"/>		<attribute key="containerSize" value="10"/>		<attribute key="decayTo" value="2824"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>	<item id="3085" article="a" name="dead rotworm">		<attribute key="weight" value="8000"/>		<attribute key="containerSize" value="10"/>		<attribute key="decayTo" value="2825"/>		<attribute key="duration" value="600"/>	</item>	<item id="3086" article="a" name="dead wolf">		<attribute key="weight" value="11950"/>		<attribute key="containerSize" value="6"/>		<attribute key="decayTo" value="3087"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>	<item id="3087" article="a" name="dead wolf">		<attribute key="weight" value="11500"/>		<attribute key="containerSize" value="6"/>		<attribute key="decayTo" value="3088"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3088" article="a" name="dead wolf">		<attribute key="weight" value="8000"/>		<attribute key="decayTo" value="3089"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3089" article="a" name="dead wolf">		<attribute key="weight" value="8000"/>		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3090" article="a" name="dead minotaur">		<attribute key="weight" value="67520"/>		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3091"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="weight" value="8500"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="2824"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="3085" article="a" name="dead rotworm">
+		<attribute key="weight" value="8000"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="2825"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="3086" article="a" name="dead wolf">
+		<attribute key="weight" value="11950"/>
+		<attribute key="containerSize" value="6"/>
+		<attribute key="decayTo" value="3087"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="3087" article="a" name="dead wolf">
+		<attribute key="weight" value="11500"/>
+		<attribute key="containerSize" value="6"/>
+		<attribute key="decayTo" value="3088"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3088" article="a" name="dead wolf">
+		<attribute key="weight" value="8000"/>
+		<attribute key="decayTo" value="3089"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3089" article="a" name="dead wolf">
+		<attribute key="weight" value="8000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3090" article="a" name="dead minotaur">
+		<attribute key="weight" value="67520"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="3091"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3091" article="a" name="dead minotaur">
 		<attribute key="weight" value="67520"/>
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3092"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="3092"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3092" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3093"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="3093"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3093" article="a" name="dead minotaur">
 		<attribute key="weight" value="60000"/>
-		<attribute key="decayTo" value="3094"/>		<attribute key="duration" value="600"/>	</item>	<item id="3094" article="a" name="dead minotaur">		<attribute key="weight" value="60000"/>		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>	</item>	<item id="3095" article="a" name="dead deer">		<attribute key="weight" value="25000"/>		<attribute key="containerSize" value="5"/>
-		<attribute key="decayTo" value="3096"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="decayTo" value="3094"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="3094" article="a" name="dead minotaur">
+		<attribute key="weight" value="60000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="3095" article="a" name="dead deer">
+		<attribute key="weight" value="25000"/>
+		<attribute key="containerSize" value="5"/>
+		<attribute key="decayTo" value="3096"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3096" article="a" name="dead deer">
 		<attribute key="weight" value="24000"/>
 		<attribute key="containerSize" value="5"/>
-		<attribute key="decayTo" value="3097"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="3097"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3097" article="a" name="dead deer">
 		<attribute key="weight" value="21000"/>
 		<attribute key="containerSize" value="5"/>
-		<attribute key="decayTo" value="3098"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="3098"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3098" article="a" name="dead deer">
-		<attribute key="weight" value="18000"/>		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>	</item>	<item id="3099" article="a" name="dead dog">		<attribute key="weight" value="1000"/>
+		<attribute key="weight" value="18000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="3099" article="a" name="dead dog">
+		<attribute key="weight" value="1000"/>
 		<attribute key="containerSize" value="5"/>
-		<attribute key="decayTo" value="2840"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>	<item id="3100" article="a" name="dead dog">		<attribute key="weight" value="1000"/>		<attribute key="containerSize" value="5"/>	</item>
+		<attribute key="decayTo" value="2840"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="3100" article="a" name="dead dog">
+		<attribute key="weight" value="1000"/>
+		<attribute key="containerSize" value="5"/>
+	</item>
 	<item id="3101" article="a" name="dead dog">
 		<attribute key="weight" value="700"/>
 	</item>
@@ -6778,36 +7412,164 @@
 	<item id="3103" article="a" name="dead skeleton">
 		<attribute key="weight" value="10000"/>
 		<attribute key="containerSize" value="5"/>
-		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3104" article="a" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3105"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="decayTo" value="3105"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3105" article="a" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3106"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="decayTo" value="3106"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3106" article="a" name="dead dragon">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3107"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="decayTo" value="3107"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="3107" article="a" name="dead dragon">
-		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>	</item>	<item id="3108" name="remains of a ghost">		<attribute key="weight" value="1000"/>		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="2977"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="undead"/>	</item>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="3108" name="remains of a ghost">
+		<attribute key="weight" value="1000"/>
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="2977"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
 	<item id="3109" article="a" name="dead bear">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3110"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>		<attribute key="fluidSource" value="blood"/>	</item>
+		<attribute key="decayTo" value="3110"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
 	<item id="3110" article="a" name="dead bear">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3111"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="3111"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3111" article="a" name="dead bear">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="3112"/>		<attribute key="duration" value="600"/>	</item>
+		<attribute key="decayTo" value="3112"/>
+		<attribute key="duration" value="600"/>
+	</item>
 	<item id="3112" article="a" name="dead bear">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>	</item>
-	<item id="3113" article="a" name="slain ghoul">		<attribute key="weight" value="60000"/>		<attribute key="containerSize" value="8"/>		<attribute key="decayTo" value="3114"/>		<attribute key="duration" value="900"/>		<attribute key="corpseType" value="undead"/>	</item>	<item id="3114" article="a" name="slain ghoul">		<attribute key="weight" value="60000"/>		<attribute key="decayTo" value="3115"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="undead"/>	</item>	<item id="3115" article="a" name="slain ghoul">		<attribute key="weight" value="60000"/>		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="undead"/>	</item>	<item id="3116" article="a" name="slain ghoul">		<attribute key="weight" value="60200"/>	</item>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+	</item>
+	<item id="3113" article="a" name="slain ghoul">
+		<attribute key="weight" value="60000"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="3114"/>
+		<attribute key="duration" value="900"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
+	<item id="3114" article="a" name="slain ghoul">
+		<attribute key="weight" value="60000"/>
+		<attribute key="decayTo" value="3115"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
+	<item id="3115" article="a" name="slain ghoul">
+		<attribute key="weight" value="60000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
+	<item id="3116" article="a" name="slain ghoul">
+		<attribute key="weight" value="60200"/>
+	</item>
 	<item id="3117" article="a" name="dead cyclops">
 		<attribute key="decayTo" value="3118"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>	<item id="3118" article="a" name="dead cyclops">		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3119" article="a" name="dead rabbit">		<attribute key="weight" value="1000"/>		<attribute key="containerSize" value="5"/>		<attribute key="decayTo" value="3120"/>		<attribute key="duration" value="900"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3120" article="a" name="dead rabbit">		<attribute key="weight" value="1000"/>		<attribute key="decayTo" value="3121"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3121" article="a" name="dead rabbit">		<attribute key="weight" value="1000"/>		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3122" article="a" name="dead dragon"/>	<item id="3123" article="a" name="dead dragon"/>	<item id="3124" article="a" name="dead dragon"/>	<item id="3125" article="a" name="dead dragon"/>	<item id="3126" article="a" name="dead dragon"/>	<item id="3127" article="a" name="dead dragon"/>	<item id="3128" article="a" name="dead human">		<attribute key="containerSize" value="10"/>		<attribute key="decayTo" value="3129"/>		<attribute key="duration" value="300"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3129" article="a" name="dead human">		<attribute key="containerSize" value="8"/>		<attribute key="decayTo" value="3130"/>		<attribute key="duration" value="900"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3130" article="a" name="dead human">		<attribute key="weight" value="120000"/>		<attribute key="decayTo" value="3131"/>		<attribute key="duration" value="30"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3131" article="a" name="dead human">		<attribute key="weight" value="120000"/>		<attribute key="decayTo" value="3132"/>		<attribute key="duration" value="30"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3132" article="a" name="dead human">		<attribute key="weight" value="120000"/>		<attribute key="decayTo" value="3133"/>		<attribute key="duration" value="30"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3133" article="a" name="dead human">		<attribute key="weight" value="60000"/>		<attribute key="decayTo" value="3134"/>		<attribute key="duration" value="30"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3134" article="a" name="dead human">		<attribute key="weight" value="60000"/>		<attribute key="decayTo" value="0"/>		<attribute key="duration" value="600"/>		<attribute key="corpseType" value="blood"/>	</item>	<item id="3135" article="a" name="ladder">		<attribute key="floorchange" value="down"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3118" article="a" name="dead cyclops">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3119" article="a" name="dead rabbit">
+		<attribute key="weight" value="1000"/>
+		<attribute key="containerSize" value="5"/>
+		<attribute key="decayTo" value="3120"/>
+		<attribute key="duration" value="900"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3120" article="a" name="dead rabbit">
+		<attribute key="weight" value="1000"/>
+		<attribute key="decayTo" value="3121"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3121" article="a" name="dead rabbit">
+		<attribute key="weight" value="1000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3122" article="a" name="dead dragon"/>
+	<item id="3123" article="a" name="dead dragon"/>
+	<item id="3124" article="a" name="dead dragon"/>
+	<item id="3125" article="a" name="dead dragon"/>
+	<item id="3126" article="a" name="dead dragon"/>
+	<item id="3127" article="a" name="dead dragon"/>
+	<item id="3128" article="a" name="dead human">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="3129"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3129" article="a" name="dead human">
+		<attribute key="containerSize" value="8"/>
+		<attribute key="decayTo" value="3130"/>
+		<attribute key="duration" value="900"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3130" article="a" name="dead human">
+		<attribute key="weight" value="120000"/>
+		<attribute key="decayTo" value="3131"/>
+		<attribute key="duration" value="30"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3131" article="a" name="dead human">
+		<attribute key="weight" value="120000"/>
+		<attribute key="decayTo" value="3132"/>
+		<attribute key="duration" value="30"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3132" article="a" name="dead human">
+		<attribute key="weight" value="120000"/>
+		<attribute key="decayTo" value="3133"/>
+		<attribute key="duration" value="30"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3133" article="a" name="dead human">
+		<attribute key="weight" value="60000"/>
+		<attribute key="decayTo" value="3134"/>
+		<attribute key="duration" value="30"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3134" article="a" name="dead human">
+		<attribute key="weight" value="60000"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="3135" article="a" name="ladder">
+		<attribute key="floorchange" value="down"/>
+	</item>
 	<item id="3136" article="a" name="ladder">
 		<attribute key="floorchange" value="down"/>
 	</item>
@@ -6949,7 +7711,9 @@
 	<item id="3307" name="jungle grass"/>
 	<item id="3308" name="jungle grass"/>
 	<item id="3309" name="jungle grass"/>
-	<item id="3310" article="a" name="pitfall"/>
+	<item id="3310" article="a" name="pitfall">
+		<attribute key="floorchange" value="down"/>
+	</item>
 	<item id="3311" article="a" name="pitfall">
 		<attribute key="floorchange" value="down"/>
 		<attribute key="decayTo" value="3310"/>
@@ -7043,7 +7807,107 @@
 	<item id="3395" article="an" name="archway"/>
 	<item id="3396" article="an" name="archway"/>
 	<item id="3397" article="a" name="stone wall window"/>
-	<item id="3298" name="jungle grass"/>	<item id="3299" name="jungle grass"/>	<item id="3300" name="jungle grass"/>	<item id="3301" name="jungle grass"/>	<item id="3302" name="jungle grass"/>	<item id="3303" name="jungle grass"/>	<item id="3304" name="jungle grass"/>	<item id="3305" name="jungle grass"/>	<item id="3306" name="jungle grass"/>	<item id="3307" name="jungle grass"/>	<item id="3308" name="jungle grass"/>	<item id="3309" name="jungle grass"/>	<item id="3310" article="a" name="mud stain"/>	<item id="3311" article="a" name="pitfall"/>	<item id="3312" article="an" name="ant trail"/>	<item id="3313" article="an" name="ant trail"/>	<item id="3314" article="an" name="ant trail"/>	<item id="3315" article="an" name="ant trail"/>	<item id="3316" article="an" name="ant trail"/>	<item id="3317" article="an" name="ant trail"/>	<item id="3318" article="an" name="ant trail"/>	<item id="3319" article="an" name="ant trail"/>	<item id="3320" article="an" name="ant trail"/>	<item id="3321" article="an" name="ant trail"/>	<item id="3322" article="an" name="ant trail"/>	<item id="3323" article="an" name="anthill"/>	<item id="3324" article="a" name="pitfall"/>	<item id="3325" article="a" name="rock"/>	<item id="3326" article="a" name="rock"/>	<item id="3327" article="a" name="rock"/>	<item id="3328" article="a" name="rock"/>	<item id="3329" article="a" name="rock"/>	<item id="3330" article="a" name="rock"/>	<item id="3331" article="a" name="rock"/>	<item id="3332" article="a" name="rock"/>	<item id="3333" article="a" name="rock"/>	<item id="3334" article="a" name="rock"/>	<item id="3335" article="a" name="rock"/>	<item id="3336" article="a" name="rock"/>	<item id="3337" article="a" name="rock"/>	<item id="3338" article="a" name="rock"/>	<item id="3339" article="a" name="rock"/>	<item id="3340" article="a" name="rock"/>	<item id="3341" article="a" name="rock"/>	<item id="3342" article="a" name="rock"/>	<item id="3343" article="a" name="rock"/>	<item id="3344" article="a" name="rock"/>	<item id="3345" article="a" name="rock"/>	<item id="3346" article="a" name="rock"/>	<item id="3347" article="a" name="rock"/>	<item id="3348" article="a" name="dried grass roof"/>	<item id="3349" article="a" name="wooden roof"/>	<item id="3350" article="a" name="wooden roof"/>	<item id="3351" article="a" name="wooden roof"/>	<item id="3352" article="a" name="wooden roof"/>	<item id="3353" article="a" name="wooden roof"/>	<item id="3354" article="a" name="wooden roof"/>	<item id="3355" article="a" name="wooden roof"/>	<item id="3356" article="a" name="wooden roof"/>	<item id="3357" article="a" name="wooden roof"/>	<item id="3358" article="a" name="wooden roof"/>	<item id="3359" article="a" name="wooden roof"/>	<item id="3360" article="a" name="wooden roof"/>	<item id="3361" article="a" name="stone wall"/>	<item id="3362" article="a" name="stone wall"/>	<item id="3363" article="a" name="stone wall"/>	<item id="3364" article="a" name="stone wall"/>	<item id="3365" article="a" name="stone wall"/>	<item id="3366" article="a" name="stone wall"/>	<item id="3367" article="a" name="stone wall"/>	<item id="3368" article="a" name="stone wall"/>	<item id="3369" article="a" name="stone wall"/>	<item id="3370" article="a" name="stone wall"/>	<item id="3371" article="a" name="stone wall"/>	<item id="3372" article="a" name="stone wall"/>	<item id="3373" article="a" name="stone wall"/>	<item id="3374" article="a" name="stone wall"/>	<item id="3375" article="a" name="stone wall"/>	<item id="3376" article="a" name="stone wall"/>	<item id="3377" article="a" name="stone wall"/>	<item id="3378" article="a" name="stone wall"/>	<item id="3379" article="a" name="stone wall"/>	<item id="3380" article="a" name="stone wall"/>	<item id="3381" article="a" name="stone wall"/>	<item id="3382" article="a" name="stone wall"/>	<item id="3383" article="a" name="stone wall"/>	<item id="3384" article="a" name="stone wall"/>	<item id="3385" article="a" name="stone wall"/>	<item id="3386" article="a" name="stone wall"/>	<item id="3387" article="a" name="stone wall"/>	<item id="3388" article="a" name="stone wall"/>	<item id="3389" article="a" name="stone wall"/>	<item id="3390" article="a" name="stone wall"/>	<item id="3391" article="a" name="stone wall"/>	<item id="3392" article="a" name="stone wall"/>	<item id="3393" article="a" name="stone wall"/>	<item id="3394" article="a" name="stone wall"/>	<item id="3395" article="a" name="stone wall"/>	<item id="3396" article="a" name="stone wall"/>	<item id="3397" article="a" name="stone wall"/>	<item id="3398" article="a" name="stone wall"/>
+	<item id="3298" name="jungle grass"/>
+	<item id="3299" name="jungle grass"/>
+	<item id="3300" name="jungle grass"/>
+	<item id="3301" name="jungle grass"/>
+	<item id="3302" name="jungle grass"/>
+	<item id="3303" name="jungle grass"/>
+	<item id="3304" name="jungle grass"/>
+	<item id="3305" name="jungle grass"/>
+	<item id="3306" name="jungle grass"/>
+	<item id="3307" name="jungle grass"/>
+	<item id="3308" name="jungle grass"/>
+	<item id="3309" name="jungle grass"/>
+	<item id="3310" article="a" name="mud stain"/>
+	<item id="3311" article="a" name="pitfall"/>
+	<item id="3312" article="an" name="ant trail"/>
+	<item id="3313" article="an" name="ant trail"/>
+	<item id="3314" article="an" name="ant trail"/>
+	<item id="3315" article="an" name="ant trail"/>
+	<item id="3316" article="an" name="ant trail"/>
+	<item id="3317" article="an" name="ant trail"/>
+	<item id="3318" article="an" name="ant trail"/>
+	<item id="3319" article="an" name="ant trail"/>
+	<item id="3320" article="an" name="ant trail"/>
+	<item id="3321" article="an" name="ant trail"/>
+	<item id="3322" article="an" name="ant trail"/>
+	<item id="3323" article="an" name="anthill"/>
+	<item id="3324" article="a" name="pitfall"/>
+	<item id="3325" article="a" name="rock"/>
+	<item id="3326" article="a" name="rock"/>
+	<item id="3327" article="a" name="rock"/>
+	<item id="3328" article="a" name="rock"/>
+	<item id="3329" article="a" name="rock"/>
+	<item id="3330" article="a" name="rock"/>
+	<item id="3331" article="a" name="rock"/>
+	<item id="3332" article="a" name="rock"/>
+	<item id="3333" article="a" name="rock"/>
+	<item id="3334" article="a" name="rock"/>
+	<item id="3335" article="a" name="rock"/>
+	<item id="3336" article="a" name="rock"/>
+	<item id="3337" article="a" name="rock"/>
+	<item id="3338" article="a" name="rock"/>
+	<item id="3339" article="a" name="rock"/>
+	<item id="3340" article="a" name="rock"/>
+	<item id="3341" article="a" name="rock"/>
+	<item id="3342" article="a" name="rock"/>
+	<item id="3343" article="a" name="rock"/>
+	<item id="3344" article="a" name="rock"/>
+	<item id="3345" article="a" name="rock"/>
+	<item id="3346" article="a" name="rock"/>
+	<item id="3347" article="a" name="rock"/>
+	<item id="3348" article="a" name="dried grass roof"/>
+	<item id="3349" article="a" name="wooden roof"/>
+	<item id="3350" article="a" name="wooden roof"/>
+	<item id="3351" article="a" name="wooden roof"/>
+	<item id="3352" article="a" name="wooden roof"/>
+	<item id="3353" article="a" name="wooden roof"/>
+	<item id="3354" article="a" name="wooden roof"/>
+	<item id="3355" article="a" name="wooden roof"/>
+	<item id="3356" article="a" name="wooden roof"/>
+	<item id="3357" article="a" name="wooden roof"/>
+	<item id="3358" article="a" name="wooden roof"/>
+	<item id="3359" article="a" name="wooden roof"/>
+	<item id="3360" article="a" name="wooden roof"/>
+	<item id="3361" article="a" name="stone wall"/>
+	<item id="3362" article="a" name="stone wall"/>
+	<item id="3363" article="a" name="stone wall"/>
+	<item id="3364" article="a" name="stone wall"/>
+	<item id="3365" article="a" name="stone wall"/>
+	<item id="3366" article="a" name="stone wall"/>
+	<item id="3367" article="a" name="stone wall"/>
+	<item id="3368" article="a" name="stone wall"/>
+	<item id="3369" article="a" name="stone wall"/>
+	<item id="3370" article="a" name="stone wall"/>
+	<item id="3371" article="a" name="stone wall"/>
+	<item id="3372" article="a" name="stone wall"/>
+	<item id="3373" article="a" name="stone wall"/>
+	<item id="3374" article="a" name="stone wall"/>
+	<item id="3375" article="a" name="stone wall"/>
+	<item id="3376" article="a" name="stone wall"/>
+	<item id="3377" article="a" name="stone wall"/>
+	<item id="3378" article="a" name="stone wall"/>
+	<item id="3379" article="a" name="stone wall"/>
+	<item id="3380" article="a" name="stone wall"/>
+	<item id="3381" article="a" name="stone wall"/>
+	<item id="3382" article="a" name="stone wall"/>
+	<item id="3383" article="a" name="stone wall"/>
+	<item id="3384" article="a" name="stone wall"/>
+	<item id="3385" article="a" name="stone wall"/>
+	<item id="3386" article="a" name="stone wall"/>
+	<item id="3387" article="a" name="stone wall"/>
+	<item id="3388" article="a" name="stone wall"/>
+	<item id="3389" article="a" name="stone wall"/>
+	<item id="3390" article="a" name="stone wall"/>
+	<item id="3391" article="a" name="stone wall"/>
+	<item id="3392" article="a" name="stone wall"/>
+	<item id="3393" article="a" name="stone wall"/>
+	<item id="3394" article="a" name="stone wall"/>
+	<item id="3395" article="a" name="stone wall"/>
+	<item id="3396" article="a" name="stone wall"/>
+	<item id="3397" article="a" name="stone wall"/>
+	<item id="3398" article="a" name="stone wall"/>
 	<item id="3399" article="a" name="stone wall"/>
 	<item id="3400" article="a" name="stone wall"/>
 	<item id="3401" article="a" name="stone wall"/>
@@ -7426,7 +8290,15 @@
 		<attribute key="fluidSource" value="slime"/>
 	</item>
 	<item id="3734" article="a" name="poison well">
-		<attribute key="fluidSource" value="slime"/>	</item>	<item id="3735" article="a" name="poison well">		<attribute key="fluidSource" value="slime"/>	</item>	<item id="3736" article="a" name="poison well">		<attribute key="fluidSource" value="slime"/>	</item>	<item id="3737" article="a" name="pagoda"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
+	<item id="3735" article="a" name="poison well">
+		<attribute key="fluidSource" value="slime"/>
+	</item>
+	<item id="3736" article="a" name="poison well">
+		<attribute key="fluidSource" value="slime"/>
+	</item>
+	<item id="3737" article="a" name="pagoda"/>
 	<item id="3738" article="a" name="pagoda"/>
 	<item id="3739" article="a" name="huntress statue"/>
 	<item id="3740" article="a" name="huntress statue"/>
@@ -7504,7 +8376,78 @@
 		<attribute key="rotateTo" value="3806"/>
 	</item>
 	<item id="3737" article="a" name="statue"/>
-	<item id="3738" article="a" name="statue"/>	<item id="3739" article="a" name="statue"/>	<item id="3740" article="a" name="statue"/>	<item id="3741" article="a" name="statue"/>	<item id="3742" article="a" name="statue"/>	<item id="3743" article="a" name="lantern"/>	<item id="3744" article="a" name="lantern"/>	<item id="3745" article="a" name="bamboo fence"/>	<item id="3746" article="a" name="bamboo fence"/>	<item id="3747" article="a" name="bamboo fence"/>	<item id="3748" article="a" name="bamboo fence"/>	<item id="3749" article="a" name="bamboo fence"/>	<item id="3750" article="a" name="bamboo fence"/>	<item id="3751" article="a" name="bamboo fence"/>	<item id="3752" article="a" name="bamboo fence"/>	<item id="3753" article="a" name="bamboo fence"/>	<item id="3754" article="a" name="bamboo fence"/>	<item id="3755" article="a" name="bamboo fence"/>	<item id="3756" article="a" name="bridge"/>	<item id="3757" article="a" name="bridge"/>	<item id="3758" article="a" name="bridge"/>	<item id="3759" article="a" name="bridge"/>	<item id="3760" article="a" name="bridge"/>	<item id="3761" article="a" name="bridge"/>	<item id="3762" article="a" name="bridge"/>	<item id="3763" article="a" name="bridge"/>	<item id="3764" article="a" name="bridge"/>	<item id="3765" article="a" name="bridge"/>	<item id="3766" article="a" name="pillar"/>	<item id="3767" article="a" name="broken pillar"/>	<item id="3768" article="a" name="bridge"/>	<item id="3769" article="a" name="bridge"/>	<item id="3770" article="a" name="bridge"/>	<item id="3771" article="a" name="bridge"/>	<item id="3772" article="a" name="bridge"/>	<item id="3773" article="a" name="bridge"/>	<item id="3774" article="a" name="bridge"/>	<item id="3775" article="a" name="bridge"/>	<item id="3776" article="a" name="bridge"/>	<item id="3777" article="a" name="bridge"/>	<item id="3778" article="a" name="bridge"/>	<item id="3779" article="a" name="bridge"/>	<item id="3780" article="a" name="bridge"/>	<item id="3781" article="a" name="bridge"/>	<item id="3782" article="a" name="bridge"/>	<item id="3783" article="a" name="bridge"/>	<item id="3784" article="a" name="bridge"/>	<item id="3785" article="a" name="bridge"/>	<item id="3786" article="a" name="bridge"/>	<item id="3787" article="a" name="bridge"/>	<item id="3788" article="a" name="bridge"/>	<item id="3789" article="a" name="bridge"/>	<item id="3790" article="a" name="bridge"/>	<item id="3791" article="a" name="bridge"/>	<item id="3792" article="a" name="stone wall"/>	<item id="3793" article="a" name="stone wall"/>	<item id="3794" article="a" name="bamboo wall"/>	<item id="3795" article="a" name="bamboo wall"/>	<item id="3796" article="a" name="bamboo wall"/>	<item id="3797" article="a" name="bamboo wall"/>	<item id="3798" article="a" name="bamboo wall"/>	<item id="3799" article="a" name="bamboo wall"/>	<item id="3800" article="a" name="bamboo wall"/>	<item id="3801" article="a" name="bamboo wall"/>	<item id="3802" article="a" name="statue"/>	<item id="3803" article="a" name="statue"/>	<item id="3804" article="a" name="statue"/>	<item id="3805" article="a" name="stone table">		<attribute key="rotateTo" value="3806"/>	</item>	<item id="3806" article="a" name="stone table">		<attribute key="rotateTo" value="3805"/>
+	<item id="3738" article="a" name="statue"/>
+	<item id="3739" article="a" name="statue"/>
+	<item id="3740" article="a" name="statue"/>
+	<item id="3741" article="a" name="statue"/>
+	<item id="3742" article="a" name="statue"/>
+	<item id="3743" article="a" name="lantern"/>
+	<item id="3744" article="a" name="lantern"/>
+	<item id="3745" article="a" name="bamboo fence"/>
+	<item id="3746" article="a" name="bamboo fence"/>
+	<item id="3747" article="a" name="bamboo fence"/>
+	<item id="3748" article="a" name="bamboo fence"/>
+	<item id="3749" article="a" name="bamboo fence"/>
+	<item id="3750" article="a" name="bamboo fence"/>
+	<item id="3751" article="a" name="bamboo fence"/>
+	<item id="3752" article="a" name="bamboo fence"/>
+	<item id="3753" article="a" name="bamboo fence"/>
+	<item id="3754" article="a" name="bamboo fence"/>
+	<item id="3755" article="a" name="bamboo fence"/>
+	<item id="3756" article="a" name="bridge"/>
+	<item id="3757" article="a" name="bridge"/>
+	<item id="3758" article="a" name="bridge"/>
+	<item id="3759" article="a" name="bridge"/>
+	<item id="3760" article="a" name="bridge"/>
+	<item id="3761" article="a" name="bridge"/>
+	<item id="3762" article="a" name="bridge"/>
+	<item id="3763" article="a" name="bridge"/>
+	<item id="3764" article="a" name="bridge"/>
+	<item id="3765" article="a" name="bridge"/>
+	<item id="3766" article="a" name="pillar"/>
+	<item id="3767" article="a" name="broken pillar"/>
+	<item id="3768" article="a" name="bridge"/>
+	<item id="3769" article="a" name="bridge"/>
+	<item id="3770" article="a" name="bridge"/>
+	<item id="3771" article="a" name="bridge"/>
+	<item id="3772" article="a" name="bridge"/>
+	<item id="3773" article="a" name="bridge"/>
+	<item id="3774" article="a" name="bridge"/>
+	<item id="3775" article="a" name="bridge"/>
+	<item id="3776" article="a" name="bridge"/>
+	<item id="3777" article="a" name="bridge"/>
+	<item id="3778" article="a" name="bridge"/>
+	<item id="3779" article="a" name="bridge"/>
+	<item id="3780" article="a" name="bridge"/>
+	<item id="3781" article="a" name="bridge"/>
+	<item id="3782" article="a" name="bridge"/>
+	<item id="3783" article="a" name="bridge"/>
+	<item id="3784" article="a" name="bridge"/>
+	<item id="3785" article="a" name="bridge"/>
+	<item id="3786" article="a" name="bridge"/>
+	<item id="3787" article="a" name="bridge"/>
+	<item id="3788" article="a" name="bridge"/>
+	<item id="3789" article="a" name="bridge"/>
+	<item id="3790" article="a" name="bridge"/>
+	<item id="3791" article="a" name="bridge"/>
+	<item id="3792" article="a" name="stone wall"/>
+	<item id="3793" article="a" name="stone wall"/>
+	<item id="3794" article="a" name="bamboo wall"/>
+	<item id="3795" article="a" name="bamboo wall"/>
+	<item id="3796" article="a" name="bamboo wall"/>
+	<item id="3797" article="a" name="bamboo wall"/>
+	<item id="3798" article="a" name="bamboo wall"/>
+	<item id="3799" article="a" name="bamboo wall"/>
+	<item id="3800" article="a" name="bamboo wall"/>
+	<item id="3801" article="a" name="bamboo wall"/>
+	<item id="3802" article="a" name="statue"/>
+	<item id="3803" article="a" name="statue"/>
+	<item id="3804" article="a" name="statue"/>
+	<item id="3805" article="a" name="stone table">
+		<attribute key="rotateTo" value="3806"/>
+	</item>
+	<item id="3806" article="a" name="stone table">
+		<attribute key="rotateTo" value="3805"/>
 	</item>
 	<item id="3807" article="a" name="tusk table">
 		<attribute key="rotateTo" value="3808"/>
@@ -7614,19 +8557,23 @@
 	<item id="3840" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="south" />
-		<attribute key="maleSleeper" value="3836" />	</item>
+		<attribute key="maleSleeper" value="3836" />
+	</item>
 	<item id="3841" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="north" />
-		<attribute key="maleSleeper" value="3837" />	</item>
+		<attribute key="maleSleeper" value="3837" />
+	</item>
 	<item id="3842" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="east" />
-		<attribute key="maleSleeper" value="3838" />	</item>
+		<attribute key="maleSleeper" value="3838" />
+	</item>
 	<item id="3843" article="a" name="hammock">
 		<attribute key="type" value="bed"/>
 		<attribute key="partnerDirection" value="west" />
-		<attribute key="maleSleeper" value="3839" />	</item>
+		<attribute key="maleSleeper" value="3839" />
+	</item>
 	<item id="3844" article="a" name="grass mat"/>
 	<item id="3845" article="a" name="grass mat"/>
 	<item id="3846" article="a" name="grass mat"/>
@@ -8969,13 +9916,15 @@
 	<item id="4606" name="sand"/>
 	<item id="4607" name="sand"/>
 	<item id="4608" name="shallow water">
-		<attribute key="description" value="You see the silvery movement of fish."/>		<attribute key="type" value="trashholder"/>
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4609" name="shallow water">
-		<attribute key="description" value="You see the silvery movement of fish."/>		<attribute key="type" value="trashholder"/>
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
@@ -8988,37 +9937,43 @@
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4611" name="shallow water">
-		<attribute key="description" value="You see the silvery movement of fish."/>		<attribute key="type" value="trashholder"/>
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4612" name="shallow water">
-		<attribute key="description" value="You see the silvery movement of fish."/>		<attribute key="type" value="trashholder"/>
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4613" name="shallow water">
-		<attribute key="description" value="You see the silvery movement of fish."/>		<attribute key="type" value="trashholder"/>
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4614" name="shallow water">
-		<attribute key="description" value="You see the silvery movement of fish."/>		<attribute key="type" value="trashholder"/>
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4615" name="shallow water">
-		<attribute key="description" value="You see the silvery movement of fish."/>		<attribute key="type" value="trashholder"/>
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4616" name="shallow water">
-		<attribute key="description" value="You see the silvery movement of fish."/>		<attribute key="type" value="trashholder"/>
+		<attribute key="description" value="You see the silvery movement of fish."/>
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
@@ -9082,7 +10037,11 @@
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
-	</item>	<!-- Items from ID 4626 to ID 4631 are blank -->	<item id="4632" name="shallow water">		<attribute key="fluidSource" value="water"/>	</item>
+	</item>
+	<!-- Items from ID 4626 to ID 4631 are blank -->
+	<item id="4632" name="shallow water">
+		<attribute key="fluidSource" value="water"/>
+	</item>
 	<item id="4633" name="shallow water">
 		<attribute key="fluidSource" value="water"/>
 	</item>
@@ -9482,7 +10441,8 @@
 	<item id="4821" name="shallow water" editorsuffix=" (Walkable)">
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
-		<attribute key="fluidSource" value="water"/>	</item>
+		<attribute key="fluidSource" value="water"/>
+	</item>
 	<item id="4822" name="shallow water" editorsuffix=" (walkable)">
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
@@ -9502,7 +10462,8 @@
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
-	</item>	<item id="4826" article="a" name="mountain"/>
+	</item>
+	<item id="4826" article="a" name="mountain"/>
 	<item id="4827" article="a" name="mountain"/>
 	<item id="4828" name="shallow water">
 		<attribute key="type" value="trashholder"/>
@@ -9520,12 +10481,14 @@
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
-		<attribute key="fluidSource" value="water"/>	</item>
+		<attribute key="fluidSource" value="water"/>
+	</item>
 	<item id="4831" name="shallow water">
 		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
-		<attribute key="fluidSource" value="water"/>	</item>
+		<attribute key="fluidSource" value="water"/>
+	</item>
 	<item id="4832" name="dirt"/>
 	<item id="4833" name="dirt"/>
 	<item id="4834" name="stairs">
@@ -10943,7 +11906,8 @@
 	<item id="5629" article="a" name="dead thornback tortoise">
 		<attribute key="decayTo" value="5630"/>
 		<attribute key="duration" value="600"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="5630" article="a" name="dead thornback tortoise">
 		<attribute key="weight" value="6000"/>
 		<attribute key="decayTo" value="0"/>
@@ -11002,7 +11966,8 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 		<attribute key="corpseType" value="blood"/>
-	</item>	<item id="5669" article="a" name="voodoo skull">
+	</item>
+	<item id="5669" article="a" name="voodoo skull">
 		<attribute key="weight" value="1000"/>
 	</item>
 	<item id="5669" article="a" name="mysterious voodoo skull">
@@ -13556,7 +14521,8 @@
 	</item>
 	<item id="6446" article="a" name="stone window">
 		<attribute key="type" value="door"/>
-	</item>	<item id="6447" article="a" name="stone window">
+	</item>
+	<item id="6447" article="a" name="stone window">
 		<attribute key="type" value="door"/>
 	</item>
 	<item id="6448" article="a" name="marble window"/>
@@ -13578,7 +14544,8 @@
 	<item id="6454" article="a" name="sandstone window">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
-	</item>	<item id="6455" article="a" name="sandstone window">
+	</item>
+	<item id="6455" article="a" name="sandstone window">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
@@ -15166,7 +16133,8 @@
 		<attribute key="decayTo" value="7325"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="fluidSource" value="blood"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="7325" article="a" name="dead chakoya">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="7326"/>
@@ -15256,7 +16224,8 @@
 		<attribute key="decayTo" value="7339"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="fluidSource" value="blood"/>
-		<attribute key="corpseType" value="blood"/>	</item>
+		<attribute key="corpseType" value="blood"/>
+	</item>
 	<item id="7339" article="a" name="dead silver rabbit">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="7340"/>

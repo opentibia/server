@@ -654,7 +654,8 @@ if(Modules == nil) then
 			local backpack = doCreateItemEx(backpackId, 1)
 			local backpackCapacity = getContainerCap(backpack)
 			local backpackCount = math.ceil(amount / backpackCapacity)
-			local count = amount
+			local itemCount = amount
+			local boughtBackpacks = 0
 			doRemoveItem(backpack)
 
 			local items = {}
@@ -666,13 +667,14 @@ if(Modules == nil) then
 				end
 				for j = 1, k do
 					doAddContainerItem(items[i], itemid, subType)
-					count = count - 1
+					itemCount = itemCount - 1
 				end
 				if(doPlayerAddItemEx(cid, items[i], ignoreCap) ~= RETURNVALUE_NOERROR) then
 					break
 				end
+				boughtBackpacks = boughtBackpacks + 1
 			end
-			return items, (amount + backpackCount)
+			return items, ((amount - itemCount) + boughtBackpacks)
 		end
 
 		local items = {}
@@ -709,9 +711,9 @@ if(Modules == nil) then
 
 		if(buyWithBackpacks) then
 			cost = cost + (math.max(1, math.floor(amount / getContainerCap(backpack))) * 20)
-			doRemoveItem(backpack)
 		end
 
+		doRemoveItem(backpack)
 
 		if(getPlayerMoney(cid) < cost) then
 			local msg = self.npcHandler:getMessage(MESSAGE_NEEDMOREMONEY)
@@ -745,7 +747,7 @@ if(Modules == nil) then
 			local msg = self.npcHandler:getMessage(MESSAGE_ONBUY)
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)
-			doPlayerRemoveMoney(cid, cost * self.npcHandler.shopItems[itemid].buyPrice)
+			doPlayerRemoveMoney(cid, cost)
 			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 				self.npcHandler.talkStart[cid] = os.time()
 			else
@@ -822,7 +824,7 @@ if(Modules == nil) then
 		local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
 		local msg = module.npcHandler:parseMessage(module.npcHandler:getMessage(MESSAGE_SENDTRADE), parseInfo)
 		openShopWindow(cid, itemWindow,
-						function(cid, itemid, subType, amount) module.npcHandler:onBuy(cid, itemid, subType, amount) end,
+						function(cid, itemid, subType, amount, ignoreCapacity, buyWithBackpacks) module.npcHandler:onBuy(cid, itemid, subType, amount, ignoreCapacity, buyWithBackpacks) end,
 						function(cid, itemid, subType, amount) module.npcHandler:onSell(cid, itemid, subType, amount) end)
 		module.npcHandler:say(msg, cid)
 		return true
