@@ -661,8 +661,8 @@ if(Modules == nil) then
 			local items = {}
 			for i = 1, backpackCount do
 				items[i] = doCreateItemEx(backpackId, 1)
-				local k = count
-				if count > backpackCapacity then
+				local k = itemCount
+				if itemCount > backpackCapacity then
 					k = backpackCapacity
 				end
 				for j = 1, k do
