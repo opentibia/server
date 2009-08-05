@@ -653,10 +653,12 @@ if(Modules == nil) then
 		if(buyWithBackpacks) then
 			local backpack = doCreateItemEx(backpackId, 1)
 			local backpackCapacity = getContainerCap(backpack)
+
+			doRemoveItem(backpack)
+
 			local backpackCount = math.ceil(amount / backpackCapacity)
 			local itemCount = amount
 			local boughtBackpacks = 0
-			doRemoveItem(backpack)
 
 			local items = {}
 			for i = 1, backpackCount do
@@ -669,7 +671,7 @@ if(Modules == nil) then
 					doAddContainerItem(items[i], itemid, subType)
 					itemCount = itemCount - 1
 				end
-				if(doPlayerAddItemEx(cid, items[i], ignoreCap) ~= RETURNVALUE_NOERROR) then
+				if(doPlayerAddItemEx(cid, items[i], ignoreCapacity) ~= RETURNVALUE_NOERROR) then
 					break
 				end
 				boughtBackpacks = boughtBackpacks + 1
@@ -705,15 +707,14 @@ if(Modules == nil) then
 			[TAG_ITEMNAME] = self.npcHandler.shopItems[itemid].realName
 		}
 
-		local backpackId = 1988
-		local backpack = doCreateItemEx(backpackId, 1)
 		local cost = amount*self.npcHandler.shopItems[itemid].buyPrice
+		local backpackId = 1988
 
 		if(buyWithBackpacks) then
-			cost = cost + (math.max(1, math.floor(amount / getContainerCap(backpack))) * 20)
+			local backpack = doCreateItemEx(backpackId, 1)
+			cost = cost + (math.ceil(amount / getContainerCap(backpack)) * 20)
+			doRemoveItem(backpack)
 		end
-
-		doRemoveItem(backpack)
 
 		if(getPlayerMoney(cid) < cost) then
 			local msg = self.npcHandler:getMessage(MESSAGE_NEEDMOREMONEY)

@@ -16,9 +16,9 @@ if(NpcHandler == nil) then
 	NPCHANDLER_TALKDELAY = TALKDELAY_ONTHINK
 
 	-- Constant conversation behaviors.
-	CONVERSATION_DEFAULT = 0 -- Conversation through default window, like it was before 8.2 update.
-	CONVERSATION_PRIVATE = 1 -- Conversation through NPCs chat window, as of 8.2 update. (Default)
-		--Small Note: Private conversations also means the NPC will use multi-focus system.
+	CONVERSATION_DEFAULT = 0 -- Conversation through default window, like it was before 8.2 update. (Default)
+	CONVERSATION_PRIVATE = 1 -- Conversation through NPCs chat window, as of 8.2 update.
+	--Small Note: Private conversations also means the NPC will use multi-focus system.
 
 	-- Currently applied conversation behavior. CONVERSATION_DEFAULT is default.
 	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_DEFAULT
