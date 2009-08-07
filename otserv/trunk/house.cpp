@@ -107,7 +107,7 @@ void House::updateDoorDescription()
 	houseDescription << "It belongs to house '" << houseName << "'. " << std::endl;
 
 	if(houseOwner != 0){
-		houseDescription << houseOwnerName << " owns this house." << std::endl;
+		houseDescription << houseOwnerName << " owns this house.";
 	}
 	else{
 		houseDescription << "Nobody owns this house.";

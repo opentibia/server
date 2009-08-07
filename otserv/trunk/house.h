@@ -217,7 +217,8 @@ public:
 
 	HouseBedItemList::iterator getBedsBegin() {return bedsList.begin();}
 	HouseBedItemList::iterator getBedsEnd() {return bedsList.end();}
-	size_t getBedCount() {return bedsList.size();}
+	size_t getBedTiles() {return bedsList.size();}
+	uint32_t getBedCount() {return (uint32_t)std::ceil(getBedTiles() / 2);} //each bed takes 2 sqms of space, ceil is just for bad maps
 
 	// Transfers all items to depot and clicks all players (useful for map updates, for example)
 	void cleanHouse();
