@@ -958,24 +958,23 @@ void LuaScriptInterface::popPosition(lua_State *L, Position& position, uint32_t&
 
 uint32_t LuaScriptInterface::popNumber(lua_State *L)
 {
-	lua_pop(L,1);
+	lua_pop(L, 1);
 	return (uint32_t)lua_tonumber(L, 0);
 }
 
 double LuaScriptInterface::popFloatNumber(lua_State *L)
 {
-	lua_pop(L,1);
+	lua_pop(L, 1);
 	return (double)lua_tonumber(L, 0);
 }
 
 std::string LuaScriptInterface::popString(lua_State *L)
 {
-	lua_pop(L,1);
-	const char* str = lua_tostring(L, 0);
-	if(!str || strlen(str) == 0){
-		return "";
+	lua_pop(L, 1);
+	const char* str = "";
+	if(lua_isstring(L, 0) != LUA_FALSE){
+		str = lua_tostring(L, 0);
 	}
-
 	return str;
 }
 
@@ -3994,11 +3993,11 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L)
 	bool extentedPosition = false;
 	bool forceSpawn = false;
 	int32_t parameters = lua_gettop(L);
-	if(parameters > 2){
-		extentedPosition = popNumber(L) == LUA_TRUE;
-	}
 	if(parameters > 3){
 		forceSpawn = popNumber(L) == LUA_TRUE;
+	}
+	if(parameters > 2){
+		extentedPosition = popNumber(L) == LUA_TRUE;
 	}
 
 	PositionEx pos;
@@ -4036,11 +4035,11 @@ int LuaScriptInterface::luaDoPlayerSummonCreature(lua_State *L)
 	bool extentedPosition = false;
 	bool forceSpawn = false;
 	int32_t parameters = lua_gettop(L);
-	if(parameters > 3){
-		extentedPosition = popNumber(L) == LUA_TRUE;
-	}
 	if(parameters > 4){
 		forceSpawn = popNumber(L) == LUA_TRUE;
+	}
+	if(parameters > 3){
+		extentedPosition = popNumber(L) == LUA_TRUE;
 	}
 
 	PositionEx pos;

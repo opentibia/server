@@ -37,7 +37,7 @@ struct PlayerGroup
 enum UnjustKillPeriod_t{
 	UNJUST_KILL_PERIOD_DAY,
 	UNJUST_KILL_PERIOD_WEEK,
-	UNJUST_KILL_PERIOD_MONTH,
+	UNJUST_KILL_PERIOD_MONTH
 };
 
 typedef std::pair<int32_t, Item*> itemBlock;
@@ -144,7 +144,7 @@ protected:
 	NameCacheMap nameCacheMap;
 	GuidCacheMap guidCacheMap;
 	UnjustCacheMap unjustKillCacheMap;
-	
+
 };
 
 #endif
