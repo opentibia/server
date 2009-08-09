@@ -1554,6 +1554,8 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 					addStamina(gain);
 				}
 			}
+
+			sendStats();
 		}
 	}
 }
