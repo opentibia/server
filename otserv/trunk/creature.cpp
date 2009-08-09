@@ -817,35 +817,27 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 
 		for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
 			const CountBlock_t& cb = it->second;
-
 			if(cb.total > mostDamage && (now - cb.ticks <= g_game.getInFightTicks())){
 				Creature* tmpDamageCreature = g_game.getCreatureByID(it->first);
 				if(tmpDamageCreature){
-					// Player who made last hit is not included in assist list
-					if(tmpDamageCreature != lhc){
-						// Don't count summons as assist
-						if(lhc && (lhc->getMaster() == tmpDamageCreature || tmpDamageCreature->getMaster() == lhc)){
-							continue;
-						}
-						mdc = tmpDamageCreature;
-						mostDamage = cb.total;
-					}
+					mdc = tmpDamageCreature;
+					mostDamage = cb.total;
 				}
 			}
 		}
 
-		if(mdc){
-			list.push_back(DeathEntry(mdc, mostDamage, Combat::isUnjustKill(mdc, this)));
+		if(mdc && mdc != lhc){
+			if(!lhc || (lhc && lhc->getMaster() != mdc && mdc->getMaster() != lhc && mdc->getMaster() != lhc->getMaster())){
+				list.push_back(DeathEntry(mdc, mostDamage, Combat::isUnjustKill(mdc, this)));
+			}
 		}
 	}
 	else{
 		int64_t now = OTSYS_TIME();
 
 		// Add all (recent) damagers to the list
-
 		for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
 			const CountBlock_t& cb = it->second;
-
 			if(now - cb.ticks <= g_game.getInFightTicks()){
 				Creature* mdc = g_game.getCreatureByID(it->first);
 				// Player who made last hit is not included in assist list
