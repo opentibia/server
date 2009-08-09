@@ -2263,8 +2263,6 @@ void Player::onDie()
 		IOPlayer::instance()->addPlayerDeath(this, killers);
 
 #ifdef __SKULLSYSTEM__
-		PlayerVector playerKillersList;
-		PlayerVector::iterator playerKillersIterator;
 		for(DeathList::const_iterator it = killers.begin(); it != killers.end(); ++it){
 			if(it->isCreatureKill() && it->isUnjustKill()){
 				Creature* attacker = it->getKillerCreature();
@@ -2274,10 +2272,8 @@ void Player::onDie()
 					attackerPlayer = attacker->getPlayerMaster();
 				}
 
-				playerKillersIterator = std::find(playerKillersList.begin(), playerKillersList.end(), attackerPlayer);
-				if(attackerPlayer && playerKillersIterator == playerKillersList.end()){
+				if(attackerPlayer){
 					attackerPlayer->addUnjustifiedDead(this);
-					playerKillersList.push_back(attackerPlayer);
 				}
 			}
 		}
@@ -2418,7 +2414,7 @@ Item* Player::createCorpse()
 		ss << "You recognize " << getNameDescription() << ".";
 
 		DeathList killers = getKillers(0);
-		if(!killers.empty() && (*killers.begin()).isCreatureKill() ){
+		if(!killers.empty() && (*killers.begin()).isCreatureKill()){
 			ss << " " << playerSexSubjectString(getSex()) << " was killed by "
 				<< ((*killers.begin()).getKillerCreature())->getNameDescription() << ".";
 		}
