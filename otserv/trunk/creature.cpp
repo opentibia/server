@@ -827,7 +827,10 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		}
 
 		if(mdc && mdc != lhc){
-			if(!lhc || (lhc && lhc->getMaster() != mdc && mdc->getMaster() != lhc && mdc->getMaster() != lhc->getMaster())){
+			if(lhc && (mdc->getMaster() == lhc || lhc->getMaster() == mdc || lhc->getMaster() == mdc->getMaster())){
+				return list;
+			}
+			else{
 				list.push_back(DeathEntry(mdc, mostDamage, Combat::isUnjustKill(mdc, this)));
 			}
 		}
