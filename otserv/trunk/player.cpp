@@ -2261,6 +2261,8 @@ void Player::onDie()
 		IOPlayer::instance()->addPlayerDeath(this, killers);
 
 #ifdef __SKULLSYSTEM__
+		PlayerVector playerKillersList;
+		PlayerVector::iterator playerKillersIterator;
 		for(DeathList::const_iterator it = killers.begin(); it != killers.end(); ++it){
 			if(it->isCreatureKill() && it->isUnjustKill()){
 				Creature* attacker = it->getKillerCreature();
@@ -2270,8 +2272,10 @@ void Player::onDie()
 					attackerPlayer = attacker->getPlayerMaster();
 				}
 
-				if(attackerPlayer){
+				playerKillersIterator = std::find(playerKillersList.begin(), playerKillersList.end(), attackerPlayer);
+				if(attackerPlayer && playerKillersIterator == playerKillersList.end()){
 					attackerPlayer->addUnjustifiedDead(this);
+					playerKillersList.push_back(attackerPlayer);
 				}
 			}
 		}
