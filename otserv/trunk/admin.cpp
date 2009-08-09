@@ -458,25 +458,15 @@ void ProtocolAdmin::adminCommandShutdownServer()
 
 void ProtocolAdmin::adminCommandPayHouses()
 {
+	Houses::getInstance().payHouses();
+
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
-
-		if(Houses::getInstance().payHouses()){
-			addLogLine(this, LOGTYPE_EVENT, 1, "pay houses ok");
-
-			output->AddByte(AP_MSG_COMMAND_OK);
-		}
-		else{
-			addLogLine(this, LOGTYPE_WARNING, 1, "pay houses fail");
-
-			output->AddByte(AP_MSG_COMMAND_FAILED);
-			output->AddString(" ");
-		}
+		addLogLine(this, LOGTYPE_EVENT, 1, "pay houses ok");
+		output->AddByte(AP_MSG_COMMAND_OK);
 		OutputMessagePool::getInstance()->send(output);
 	}
-
-	return ;
 }
 
 Item* ProtocolAdmin::createMail(const std::string xmlData, std::string& name, uint32_t& depotId)
