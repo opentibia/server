@@ -13,7 +13,7 @@ if(Modules == nil) then
 	FOCUS_FAREWELLWORDS = {'bye', 'farewell', 'cya'}
 
 	-- The words for requesting trade window.
-	SHOP_TRADEREQUEST = {'offer', 'trade'}
+	SHOP_TRADEREQUEST = {'offer', 'trade', 'wares'}
 
 	-- The word for accepting/declining an offer. CAN ONLY CONTAIN ONE FIELD! Should be a teble with a single string value.
 	-- Mainly used for travel module
@@ -658,7 +658,6 @@ if(Modules == nil) then
 
 			local backpackCount = math.ceil(amount / backpackCapacity)
 			local itemCount = amount
-			local boughtBackpacks = 0
 
 			local items = {}
 			for i = 1, backpackCount do
@@ -672,11 +671,13 @@ if(Modules == nil) then
 					itemCount = itemCount - 1
 				end
 				if(doPlayerAddItemEx(cid, items[i], ignoreCapacity) ~= RETURNVALUE_NOERROR) then
+					itemCount = itemCount + k
+					doRemoveItem(items[i])
+					table.remove(items)
 					break
 				end
-				boughtBackpacks = boughtBackpacks + 1
 			end
-			return items, ((amount - itemCount) + boughtBackpacks)
+			return items, (amount - itemCount)
 		end
 
 		local items = {}
@@ -740,7 +741,10 @@ if(Modules == nil) then
 				self.npcHandler.talkStart = os.time()
 			end
 			if(i > 0) then
-				doPlayerRemoveMoney(cid, i*self.npcHandler.shopItems[itemid].buyPrice)
+				cost = i * self.npcHandler.shopItems[itemid].buyPrice
+				if(buyWithBackpacks) then cost = cost + table.maxn(boughtItems) * 20 end
+				doPlayerRemoveMoney(cid, cost)
+				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Bought " .. i .. "x " .. self.npcHandler.shopItems[itemid].realName .. " for " .. cost .. " gold.")
 				return true
 			end
 			return false
@@ -749,6 +753,7 @@ if(Modules == nil) then
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)
 			doPlayerRemoveMoney(cid, cost)
+			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Bought " .. amount .. "x " .. self.npcHandler.shopItems[itemid].realName .. " for " .. cost .. " gold.")
 			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 				self.npcHandler.talkStart[cid] = os.time()
 			else
@@ -783,6 +788,7 @@ if(Modules == nil) then
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)
 			doPlayerAddMoney(cid, amount*self.npcHandler.shopItems[itemid].sellPrice)
+			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Sold " .. amount .. "x " .. self.npcHandler.shopItems[itemid].realName .. " for " .. amount*self.npcHandler.shopItems[itemid].sellPrice .. " gold.")
 			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 				self.npcHandler.talkStart[cid] = os.time()
 			else

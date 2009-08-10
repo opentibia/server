@@ -1,4 +1,4 @@
--- This file is part of Jiddo's advanced NpcSystem v3.0x. This npcsystem is free to use by anyone, for any purpuse. 
+-- This file is part of Jiddo's advanced NpcSystem v3.0x. This npcsystem is free to use by anyone, for any purpuse.
 -- Initial release date: 2007-02-21
 -- Credits: Jiddo, honux(I'm using a modified version of his Find function).
 -- Please include full credits whereever you use this system, or parts of it.
@@ -6,39 +6,39 @@
 -- http://otfans.net/showthread.php?t=67810
 
 if(NpcSystem == nil) then
-	
+
 	-- Loads the underlying classes of the npcsystem.
 	dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/keywordhandler.lua')
 	dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/queue.lua')
 	dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/npchandler.lua')
 	dofile(getDataDir() .. 'npc/scripts/lib/npcsystem/modules.lua')
-	
-	
+
+
 	-- Global npc constants:
-	
+
 	-- Keyword nestling behavior. For more information look at the top of keywordhandler.lua
 	KEYWORD_BEHAVIOR = BEHAVIOR_NORMAL_EXTENDED
-	
+
 	-- Gerrting and unGreeting keywords. For more information look at the top of modules.lua
 	FOCUS_GREETWORDS = {'hi', 'hello'}
 	FOCUS_FAREWELLWORDS = {'bye', 'farewell', 'cya'}
-	
+
 	-- The word for requesting trade window. For more information look at the top of modules.lua
-	SHOP_TRADEREQUEST = {'offer', 'trade'}
+	SHOP_TRADEREQUEST = {'offer', 'trade', 'wares'}
 
 	-- The word for accepting/declining an offer. CAN ONLY CONTAIN ONE FIELD! For more information look at the top of modules.lua
 	SHOP_YESWORD = {'yes'}
 	SHOP_NOWORD = {'no'}
-	
+
 	-- Pattern used to get the amount of an item a player wants to buy/sell.
 	PATTERN_COUNT = '%d+'
-	
+
 	-- Talkdelay behavior. For more information, look at the top of npchandler.lua.
-	NPCHANDLER_TALKDELAY = TALKDELAY_ONTHINK
+	NPCHANDLER_TALKDELAY = TALKDELAY_NONE
 
 	-- Conversation behavior. For more information, look at the top of npchandler.lua.
-	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_DEFAULT
-	
+	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_PRIVATE
+
 	-- Constant strings defining the keywords to replace in the default messages.
 	--	For more information, look at the top of npchandler.lua...
 	TAG_PLAYERNAME = '|PLAYERNAME|'
@@ -46,15 +46,15 @@ if(NpcSystem == nil) then
 	TAG_TOTALCOST = '|TOTALCOST|'
 	TAG_ITEMNAME = '|ITEMNAME|'
 	TAG_QUEUESIZE = '|QUEUESIZE|'
-	
-	
-	
-	
-	
+
+
+
+
+
 	NpcSystem = {
 			--
 		}
-	
+
 	-- Gets an npcparameter with the specified key. Returns nil if no such parameter is found.
 	function NpcSystem.getParameter(key)
 		local ret = getNpcParameter(tostring(key))
@@ -64,25 +64,25 @@ if(NpcSystem == nil) then
 			return ret
 		end
 	end
-	
+
 	-- Parses all known parameters for the npc. Also parses parseable modules.
 	function NpcSystem.parseParameters(npcHandler)
-		
+
 		local ret = NpcSystem.getParameter('idletime')
 		if(ret ~= nil) then
 			npcHandler.idleTime = tonumber(ret)
 		end
-		
+
 		local ret = NpcSystem.getParameter('talkradius')
 		if(ret ~= nil) then
 			npcHandler.talkRadius = tonumber(ret)
 		end
-		
+
 		local ret = NpcSystem.getParameter('talkdelaytime')
 		if(ret ~= nil) then
 			npcHandler.talkDelayTime = tonumber(ret)
 		end
-		
+
 		local ret = NpcSystem.getParameter('message_greet')
 		if(ret ~= nil) then
 			npcHandler:setMessage(MESSAGE_GREET, ret)
@@ -155,7 +155,7 @@ if(NpcSystem == nil) then
 		if(ret ~= nil) then
 			npcHandler:setMessage(MESSAGE_SELL, ret)
 		end
-		
+
 		-- Parse modules.
 		for parameter, module in pairs(Modules.parseableModules) do
 			local ret = NpcSystem.getParameter(parameter)
@@ -168,6 +168,6 @@ if(NpcSystem == nil) then
 				end
 			end
 		end
-		
+
 	end
 end

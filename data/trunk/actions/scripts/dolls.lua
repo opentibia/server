@@ -21,7 +21,6 @@ local USED_DOLLS = {
 	[TIBIACITY_ENCICLOPEDIA] = 9002,
 	[NORSEMAN_DOLL] = 8985,
 	[TOY_SPIDER] = 9007
-
 }
 
 function onUse(cid, item, frompos, item2, topos)
@@ -35,14 +34,14 @@ function onUse(cid, item, frompos, item2, topos)
 
 	if item.itemid == STUFFED_DRAGON then
 		if random == 3 then
-			doSendMagicEffect(getPlayerPosition(cid), 2)
+			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_POFF)
 		elseif random == 4 then
-			doSendMagicEffect(getPlayerPosition(cid), 6)
+			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_FIREAREA)
 		elseif(random == 5) then
 			doTargetCombatHealth(0, cid, COMBAT_PHYSICALDAMAGE, -1, -1, CONST_ME_EXPLOSIONHIT)
 		end
 	elseif item.itemid == MYSTERIOUS_VOODOO_SKULL then
-		doSendMagicEffect(frompos, 13)
+		doSendMagicEffect(frompos, CONST_ME_MAGIC_RED)
 	elseif item.itemid == CHRISTMAS_CARD then
 		doSendMagicEffect(topos, CONST_ME_SOUND_YELLOW)
 		sound = sound .. getPlayerName(cid) .. "."

@@ -23,7 +23,7 @@ local ENCHANTED_GEMS = {
 }
 
 function onUse(cid, item, frompos, item2, topos)
-	if(item2.itemid == HOTA_WEAK) then
+	if(item2.itemid == HOTA_WEAK and item.itemid == SMALL_RUBY) then
 		doRemoveItem(item.uid, 1)
 		doTransformItem(item2.uid, HOTA_FULL)
 		doSendMagicEffect(topos, CONST_ME_MAGIC_RED)
@@ -34,12 +34,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	local count = item.type
-
-	if (count == 0) then
-		count = 1
-	end
-
+	local count = item.type ~= 0 and item.type or 1
 	local manaCost = 300 * count
 	local soulCost = 2 * count
 	local requiredLevel = 30

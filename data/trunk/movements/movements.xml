@@ -9,9 +9,22 @@
 	<moveevent event="StepIn" itemid="1749" script="quest_chest_walk.lua"/>
 
 	<!-- Footprint -->
-	<moveevent event="StepIn" itemid="6594" script="footprint.lua" />
 	<moveevent event="StepIn" itemid="670" script="footprint.lua" />
-
+	<moveevent event="StepIn" itemid="6580" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6581" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6582" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6583" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6584" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6585" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6586" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6587" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6588" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6589" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6590" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6591" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6592" script="footprint.lua" />
+	<moveevent event="StepIn" itemid="6593" script="footprint.lua" />
+	
 	<!-- Pitfalls -->
 	<moveevent event="StepIn" itemid="293" script="increment.lua" />
 	<moveevent event="StepIn" itemid="3310" script="increment.lua" />

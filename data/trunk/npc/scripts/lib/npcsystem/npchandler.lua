@@ -323,7 +323,7 @@ if(NpcHandler == nil) then
 					local msg = self:getMessage(MESSAGE_FAREWELL)
 					local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
 					msg = self:parseMessage(msg, parseInfo)
-					self:say(msg, cid, true)
+					self:say(msg, cid)
 					self:releaseFocus(cid)
 				end
 			end
@@ -339,7 +339,7 @@ if(NpcHandler == nil) then
 					local msg = self:getMessage(MESSAGE_GREET)
 					local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
 					msg = self:parseMessage(msg, parseInfo)
-					self:say(msg, cid, true)
+					self:say(msg, cid)
 				else
 					return
 				end
@@ -464,12 +464,12 @@ if(NpcHandler == nil) then
 				if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 					for cid, talkDelay in pairs(self.talkDelay) do
 						if(talkDelay.time ~= nil and talkDelay.message ~= nil and os.time() >= talkDelay.time) then
-							selfSay(talkDelay.message, cid, talkDelay.publicize and TRUE or FALSE)
+							self:say(talkDelay.message, cid)
 							self.talkDelay[cid] = nil
 						end
 					end
 				elseif(self.talkDelay.time ~= nil and self.talkDelay.message ~= nil and os.time() >= self.talkDelay.time) then
-					selfSay(self.talkDelay.message)
+					self:say(self.talkDelay.message)
 					self.talkDelay.time = nil
 					self.talkDelay.message = nil
 				end
@@ -515,7 +515,7 @@ if(NpcHandler == nil) then
 					local msg = self:getMessage(MESSAGE_ALREADYFOCUSED)
 					local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
 					msg = self:parseMessage(msg, parseInfo)
-					self:say(msg)
+					self:say(msg, cid)
 				else
 					if(not self.queue:isInQueue(cid)) then
 						self.queue:push(cid)
@@ -524,7 +524,7 @@ if(NpcHandler == nil) then
 					local msg = self:getMessage(MESSAGE_PLACEDINQUEUE)
 					local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid), [TAG_QUEUESIZE] = self.queue:getSize() }
 					msg = self:parseMessage(msg, parseInfo)
-					self:say(msg)
+					self:say(msg, cid)
 				end
 			end
 		end
@@ -545,7 +545,7 @@ if(NpcHandler == nil) then
 						local msg = self:getMessage(MESSAGE_WALKAWAY)
 						local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
 						msg = self:parseMessage(msg, parseInfo)
-						self:say(msg, cid, true)
+						self:say(msg, cid)
 						self:releaseFocus(cid)
 					end
 				end
@@ -574,7 +574,7 @@ if(NpcHandler == nil) then
 
 	-- Makes the npc represented by this instance of NpcHandler say something.
 	--	This implements the currently set type of talkdelay.
-	--	shallDelay is a boolean value. If it is false, the message is not delayed. Default value is true.
+	--	shallDelay is a boolean value. If it is false, the message is not delayed. Default value is false.
 	function NpcHandler:say(message, focus, publicize, shallDelay)
 		if(shallDelay == nil) then
 			shallDelay = true

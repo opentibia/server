@@ -22,10 +22,8 @@ function onUse(cid, item, frompos, item2, topos)
 		doSendMagicEffect(frompos, CONST_ME_SOUND_BLUE)
 		doDecayItem(item.uid)
 	elseif (item.itemid == CORNUCOPIA) then
-		local i = 1
-		while i <= 10 do
+		for i = 1, 11 do
 			doPlayerAddItem(cid, 2681)
-			i = i + 1
 		end
 		doRemoveItem(item.uid, 1)
 		doSendMagicEffect(frompos, CONST_ME_SOUND_YELLOW)
