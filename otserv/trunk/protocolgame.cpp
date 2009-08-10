@@ -2106,8 +2106,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 			if(creature == player){
 				msg->AddByte(0x0A);
 				msg->AddU32(player->getID());
-				msg->AddByte(0x32);
-				msg->AddByte(0x00);
+				msg->AddU16(0x0032); // Related to client-side drawing speed
 				msg->AddByte(player->hasFlag(PlayerFlag_CanReportBugs));
 
 				uint16_t violation = player->getViolationLevel();
