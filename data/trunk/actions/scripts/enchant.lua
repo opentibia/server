@@ -8,9 +8,10 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	local count = ENCHANTABLE_WEAPONS[item2.itemid][5] ~= nil or 1
+	local count = ENCHANTABLE_WEAPONS[item2.itemid][5]
+		count = count ~= nil and count or 1
 
-	-- Ice weapons
+		-- Ice weapons
 	if (item.itemid == ENCHANTED_SMALL_SAPPHIRE) then
 		doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][2], count)
 		doRemoveItem(item.uid, 1)
