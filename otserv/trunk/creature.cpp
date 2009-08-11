@@ -746,12 +746,12 @@ void Creature::onDie()
 		}
 	}
 
-	dropCorpse();
-	die();
-
 	if(getMaster()){
 		getMaster()->removeSummon(this);
 	}
+
+	dropCorpse();
+	die();
 }
 
 void Creature::die()
@@ -830,7 +830,7 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		}
 
 		if(mdc && mdc != lhc){
-			if(lhc && (mdc->getMaster() == lhc || lhc->getMaster() == mdc || lhc->getMaster() == mdc->getMaster())){
+			if(lhc && (mdc->getMaster() == lhc || lhc->getMaster() == mdc || (lhc->getMaster() && lhc->getMaster() == mdc->getMaster()))){
 				return list;
 			}
 			else{
