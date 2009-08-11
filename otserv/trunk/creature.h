@@ -299,7 +299,6 @@ public:
 	virtual bool convinceCreature(Creature* creature) {return false;};
 
 	virtual void onDie();
-	virtual void die();
 
 	virtual uint64_t getGainedExperience(Creature* attacker) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
@@ -474,7 +473,7 @@ protected:
 	virtual void dropLoot(Container* corpse) {};
 	virtual uint16_t getLookCorpse() const { return 0; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
-	virtual void die() {};
+	virtual void die();
 	virtual Item* dropCorpse();
 	virtual Item* createCorpse();
 
