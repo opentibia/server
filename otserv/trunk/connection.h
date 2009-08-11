@@ -83,6 +83,9 @@ public:
 	static uint32_t connectionCount;
 #endif
 
+	enum { write_timeout = 30 };
+	enum { read_timeout = 30 };
+
 	enum ConnectionState_t {
 		CONNECTION_STATE_OPEN = 0,
 		CONNECTION_STATE_REQUEST_CLOSE = 1,
