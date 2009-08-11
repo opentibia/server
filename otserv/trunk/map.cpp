@@ -599,7 +599,7 @@ bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 	y = start.y;
 	z = start.z;
 
-	int32_t lastrx = x, lastry = y, lastrz = z;
+	int32_t lastrx = 0, lastry = 0, lastrz = 0;
 
 	for( ; x != end.x + sx; x += sx){
 		int32_t rx, ry, rz;
@@ -613,6 +613,11 @@ bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 		default: //0
 			rx = x; ry = y; rz = z;
 			break;
+		}
+
+		if(lastrx == 0 && lastry == 0 && lastrz == 0){
+			//first time initialization
+			lastrx = rx; lastry = ry; lastrz = rz;
 		}
 
 		if(	lastrz != rz ||
