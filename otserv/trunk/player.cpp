@@ -2386,6 +2386,8 @@ void Player::die()
 		//and if player died out of a pvp zone
 		sendReLoginWindow();
 	}
+
+	Creature::die();
 }
 
 Item* Player::dropCorpse()

@@ -746,12 +746,17 @@ void Creature::onDie()
 		}
 	}
 
-	die();
 	dropCorpse();
+	die();
 
 	if(getMaster()){
 		getMaster()->removeSummon(this);
 	}
+}
+
+void Creature::die()
+{
+	g_game.removeCreature(this, false);
 }
 
 Item* Creature::dropCorpse()
@@ -789,8 +794,6 @@ Item* Creature::dropCorpse()
 	{
 		(*it)->executeOnDie(this, corpse);
 	}
-
-	g_game.removeCreature(this, false);
 
 	return corpse;
 }

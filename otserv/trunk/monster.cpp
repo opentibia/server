@@ -1199,6 +1199,7 @@ void Monster::die()
 	clearTargetList();
 	clearFriendList();
 	setIdle(true);
+	Creature::die();
 }
 
 Item* Monster::createCorpse()

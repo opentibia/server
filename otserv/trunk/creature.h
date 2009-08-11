@@ -299,6 +299,7 @@ public:
 	virtual bool convinceCreature(Creature* creature) {return false;};
 
 	virtual void onDie();
+	virtual void die();
 
 	virtual uint64_t getGainedExperience(Creature* attacker) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
