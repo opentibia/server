@@ -227,6 +227,9 @@ bool Mailbox::getRepicient(Item* item, std::string& name, uint32_t& depotId)
 		return false;
 	}
 
+	trim(name);
+	trim(strTown);
+
 	return getDepotId(strTown, depotId);
 }
 

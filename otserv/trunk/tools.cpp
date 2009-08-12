@@ -65,6 +65,12 @@ void trim_left(std::string& source, const std::string& t)
 	source.erase(0, source.find_first_not_of(t));
 }
 
+void trim(std::string& source, const std::string& t)
+{
+	trim_left(source, t);
+	trim_right(source, t);
+}
+
 void toLowerCaseString(std::string& source)
 {
 	std::transform(source.begin(), source.end(), source.begin(), tolower);
