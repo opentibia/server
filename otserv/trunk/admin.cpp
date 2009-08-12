@@ -390,9 +390,14 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			};
 			break;
 		}
+
 		case AP_MSG_PING:
 			output->AddByte(AP_MSG_PING_OK);
 			break;
+
+		case AP_MSG_KEEP_ALIVE:
+			break;
+
 		default:
 			output->AddByte(AP_MSG_ERROR);
 			output->AddString("not known command byte");

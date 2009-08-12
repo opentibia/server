@@ -514,7 +514,7 @@ void Connection::handleReadTimeout(boost::weak_ptr<Connection> weak_conn, const 
 			return;
 		}
 
-		if(shared_ptr<Connection> connection = weak_conn.lock()){		
+		if(shared_ptr<Connection> connection = weak_conn.lock()){
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Connection::handleReadTimeout" << std::endl;
 			#endif
@@ -556,7 +556,7 @@ void Connection::handleWriteTimeout(boost::weak_ptr<Connection> weak_conn, const
 			return;
 		}
 
-		if(shared_ptr<Connection> connection = weak_conn.lock()){		
+		if(shared_ptr<Connection> connection = weak_conn.lock()){
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Connection::handleWriteTimeout" << std::endl;
 			#endif
