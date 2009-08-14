@@ -23,6 +23,7 @@
 #include "definitions.h"
 #include <libxml/parser.h>
 #include <vector>
+#include <iostream>
 
 #include "enums.h"
 #include "const.h"

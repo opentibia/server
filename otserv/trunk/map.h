@@ -194,7 +194,7 @@ public:
 	* Set a single tile.
 	* \param a tile to set for the position
 	*/
-	void setTile(uint16_t _x, uint16_t _y, uint16_t _z, Tile* newtile);
+	void setTile(int32_t _x, int32_t _y, int32_t _z, Tile* newtile);
 	void setTile(const Position& pos, Tile* newtile) {
 		setTile(pos.x, pos.y, pos.z, newtile);
 	}
