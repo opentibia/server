@@ -167,13 +167,21 @@ public:
 		return &instance;
 	}
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t OutputMessagePoolCount;
+#endif
+
 	void send(OutputMessage_ptr msg);
 	void sendAll();
 	void stop() {m_isOpen = false;}
 	OutputMessage_ptr getOutputMessage(Protocol* protocol, bool autosend = true);
 	void startExecutionFrame();
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	size_t getTotalMessageCount() const {return OutputMessagePoolCount;}
+#else
 	size_t getTotalMessageCount() const {return m_allOutputMessages.size();}
+#endif
 	size_t getAvailableMessageCount() const {return m_outputMessages.size();}
 	size_t getAutoMessageCount() const {return m_autoSendOutputMessages.size();}
 	void addToAutoSend(OutputMessage_ptr msg);

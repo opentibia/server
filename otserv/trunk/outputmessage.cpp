@@ -25,6 +25,10 @@
 
 extern Dispatcher g_dispatcher;
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+uint32_t OutputMessagePool::OutputMessagePoolCount = OUTPUT_POOL_SIZE;
+#endif
+
 OutputMessage::OutputMessage()
 {
 	freeMessage();
@@ -204,6 +208,10 @@ OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool a
 	if(m_outputMessages.empty()){
 		OutputMessage* msg = new OutputMessage();
 		m_outputMessages.push_back(msg);
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	OutputMessagePoolCount++;
+#endif
 
 #ifdef __TRACK_NETWORK__
 		m_allOutputMessages.push_back(msg);
