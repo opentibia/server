@@ -117,11 +117,13 @@ unjust_skull_duration = 15*60*1000
 defensive_pz_lock = false
 
 -- How many players you need to kill to gain a red skull per day/week/month
+-- Set 0 to disable
 kills_per_day_red_skull = 3
 kills_per_week_red_skull = 5
 kills_per_month_red_skull = 10
 
 -- How many players you need to kill to gain a black skull per day/week/month
+-- Set 0 to disable
 kills_per_day_black_skull = 6
 kills_per_week_black_skull = 10
 kills_per_month_black_skull = 20

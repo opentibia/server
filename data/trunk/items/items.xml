@@ -2958,7 +2958,7 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="charges" value="20"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentAll" value="20"/>
+		<attribute key="absorbPercentAllElements" value="20"/>
 	</item>
 	<item id="2165" article="a" name="stealth ring">
 		<attribute key="weight" value="100"/>

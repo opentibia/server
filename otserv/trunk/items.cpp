@@ -973,7 +973,27 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentall"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_NONE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ENERGYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_FIREDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_EARTHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ICEDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_HOLYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DEATHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_LIFEDRAIN)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_MANADRAIN)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DROWNDAMAGE)] = intValue;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "absorbpercentallelements"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ENERGYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_FIREDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_EARTHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ICEDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_HOLYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DEATHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentenergy"){
@@ -1415,18 +1435,18 @@ Abilities::Abilities()
 
 bool Abilities::Absorb::any() const
 {
-	for(int c = 0; c != COMBAT_COUNT; ++c){
+	for(int32_t c = 0; c != COMBAT_COUNT; ++c){
 		if(resistances[c] != 0)
 			return true;
 	}
 	return false;
 }
 
-std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, unsigned int type) const
+std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, int32_t type) const
 {
 	if(resistances[type] == 0)
 		return os;
-	os << (first? " " : ", ") << CombatTypeName(type == 0? COMBAT_NONE: (CombatType_t)(1 << (type-1))) << " " << std::noshowpos << resistances[type] << "%";
+	os << (first? " " : ", ") << CombatTypeName(type == COMBAT_NONE? COMBAT_NONE: (CombatType_t)(1 << (type-1))) << " " << std::noshowpos << resistances[type] << "%";
 	first = false;
 	return os;
 }
@@ -1434,7 +1454,7 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, u
 std::ostream& Abilities::Absorb::getDescription(std::ostream& os) const
 {
 	bool first = true;
-	for(int c = 0; c != COMBAT_COUNT; ++c){
+	for(int32_t c = 0; c != COMBAT_COUNT; ++c){
 		getDescription(os, first, c);
 	}
 	return os;
@@ -1443,15 +1463,10 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os) const
 bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 {
 	bool r = false;
-	if(resistances[0] > 0) {
-		r = true;
-		dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[0]) / 100.);
-	}
-
 	if(ctype == COMBAT_NONE)
 		return r;
 
-	for(int c = 0;  c < COMBAT_COUNT; ++c) {
+	for(int32_t c = 0;  c < COMBAT_COUNT; ++c) {
 		if(ctype & (1 << c)) {
 			// Correct type!
 			if(resistances[c+1] > 0)
@@ -1459,6 +1474,7 @@ bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 			dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[c+1]) / 100.);
 		}
 	}
+	
 	return r;
 }
 

@@ -379,9 +379,9 @@ inline std::string CombatTypeName(CombatType_t combat) {
 	return "none";
 }
 
-inline int CombatTypeToIndex(CombatType_t combat) {
+inline int32_t CombatTypeToIndex(CombatType_t combat) {
 	if(combat == COMBAT_NONE) return 0;
-	for(int c = 0; c < COMBAT_COUNT; ++c){
+	for(int32_t c = 0; c < COMBAT_COUNT; ++c){
 		if(combat & (1 << c))
 			return c+1;
 	}

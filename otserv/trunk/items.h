@@ -70,7 +70,7 @@ struct Abilities{
 			bool reduce(CombatType_t type, int32_t& dmg) const;
 			std::ostream& getDescription(std::ostream& os) const;
 	protected:
-			std::ostream& getDescription(std::ostream& os, bool& first, unsigned int combat_type) const;
+			std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
 	} absorb;
 
 
