@@ -154,9 +154,12 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	if(area){
 		area->getList(centerPos, targetPos, list);
 	}
-	else if(targetPos.z < MAP_MAX_LAYERS){
+	else if(targetPos.x >= 0 && targetPos.x < 0xFFFF &&
+			targetPos.y >= 0 && targetPos.y < 0xFFFF &&
+			targetPos.z >= 0 && targetPos.z < MAP_MAX_LAYERS)
+	{
 		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
-		if(!tile) {
+		if(!tile){
 			// These tiles will never have anything on them
 			tile = new StaticTile(targetPos.x, targetPos.y, targetPos.z);
 			g_game.setTile(tile);
@@ -1243,8 +1246,9 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 		for(size_t x = 0; x < cols; ++x){
 
 			if(area->getValue(y, x) != 0){
-				if(tmpPosX >= 0 && tmpPosY >= 0 && tmpPosZ >= 0 &&
-					tmpPosX < 0xFFFF && tmpPosY < 0xFFFF && tmpPosZ < MAP_MAX_LAYERS)
+				if(	tmpPosX >= 0 && tmpPosX < 0xFFFF &&
+					tmpPosY >= 0 && tmpPosY < 0xFFFF &&
+					tmpPosZ  >= 0 && tmpPosZ < MAP_MAX_LAYERS)
 				{
 					if(g_game.isSightClear(targetPos, Position(tmpPosX, tmpPosY, tmpPosZ), true)){
 						tile = g_game.getTile(tmpPosX, tmpPosY, tmpPosZ);
