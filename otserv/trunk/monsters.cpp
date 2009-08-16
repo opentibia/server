@@ -650,7 +650,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
 			combat->setCondition(condition);
 		}
-		else if(asLowerCaseString(name) == "strength"){
+		else if(asLowerCaseString(name) == "strength" || asLowerCaseString(name) == "effect"){
 			//
 		}
 		else{

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Bloodpaw" nameDescription="bloodpaw" race="blood" experience="50" speed="156">
+	<health now="100" max="100"/>
+	<look type="42" corpse="7349"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag staticattack="78"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-3" max="-40"/>
+	</attacks>
+	<defenses armor="3" defense="8"/>
+	<elements>
+		<element firePercent="20"/>
+		<element energyPercent="-10"/>
+	</elements>
+</monster>

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Carrion Worm" nameDescription="a carrion worm" race="blood" experience="70" speed="200" manacost="380">
+	<health now="145" max="145"/>
+	<look type="192" corpse="6069"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-0" max="-45"/>
+	</attacks>
+	<defenses armor="8" defense="11"/>
+	<elements>
+		<element earthPercent="5"/>
+		<element energyPercent="5"/>
+		<element firePercent="-5"/>
+		<element icePercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="0"/>
+		<immunity paralyze="0"/>
+		<immunity outfit="0"/>
+		<immunity drunk="0"/>
+		<immunity invisible="0"/>
+	</immunities>
+	<loot>
+		<item id="2148" countmax="49" chance="100000"/><!-- gold coin -->
+		<item id="3976" countmax="5" chance="20000"/><!-- worm -->
+		<item id="2530" chance="2000"/><!-- copper shield -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2398" chance="3333"/><!-- mace -->
+				<item id="2666" countmax="2" chance="20000"/><!-- meat -->
+				<item id="2671" chance="20000"/><!-- ham -->
+				<item id="2376" chance="10000"/><!-- sword -->
+				<item id="2412" chance="8000"/><!-- katana -->
+				<item id="2463" chance="1000"/><!-- plate armor -->
+			</inside>
+		</item>
+	</loot>
+</monster>

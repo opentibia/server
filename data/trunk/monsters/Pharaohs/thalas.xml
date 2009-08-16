@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Thalas" nameDescription="a thalas" race="undead" experience="2950" speed="320" manacost="0">
+	<health now="4100" max="4100"/>
+	<look type="90" corpse="6025"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-10" max="-650" poison="70"/>
+		<attack name="poison" interval="2000" chance="25" range="7" min="-150" max="-650">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="melee" interval="3000" chance="20" range="7" radius="1" target="1" min="-150" max="-650">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="speed" interval="1000" chance="6" range="7" speedchange="-800" duration="20000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="poisoncondition" interval="1000" chance="15" radius="5" target="0" min="-34" max="-35">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="poison" interval="3000" chance="17" length="8" spread="3" min="-55" max="-550">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+	</attacks>
+	<defenses armor="20" defense="30">
+		<defense name="healing" interval="1000" chance="20" min="150" max="450">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="100"/>
+		<element firePercent="-23"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="8">
+		<summon name="Slime2" interval="2000" chance="30000000" max="8"/>
+	</summons>
+	<voices interval="5000" chance="10">
+		<voice sentence="You will become a feast for my maggots."/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+		<item id="2176" chance="2000"/><!-- orb -->
+		<item id="2176" chance="2000"/><!-- orb -->
+		<item id="2444" chance="450"/><!-- hammer of wrath -->
+		<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+		<item id="2351" chance="100000"/><!-- cobrafang dagger -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2148" countmax="70" chance="100000"/><!-- gold coin -->
+				<item id="2550" chance="10000"/><!-- scythe -->
+				<item id="2688" countmax="5" chance="4000"/><!-- candy cane -->
+				<item id="2540" chance="900"/><!-- scarab shield -->
+				<item id="2539" chance="200"/><!-- phoenix shield -->
+				<item id="2445" chance="400"/><!-- crystal mace -->
+				<item id="2486" chance="300"/><!-- noble armor -->
+				<item id="2658" chance="100"/><!-- white dress -->
+				<item id="2187" chance="800"/><!-- wand of inferno -->
+				<item id="2147" countmax="2" chance="4000"/><!-- small ruby -->
+				<item id="2678" countmax="4" chance="4000"/><!-- coconut -->
+				<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+				<item id="2690" countmax="4" chance="4000"/><!-- roll -->
+				<item id="2002" chance="2857"><!-- blue backpack -->
+					<inside>
+						<item id="2148" countmax="100" chance="2857"/><!-- gold coin -->
+					</inside>
+				</item>
+			</inside>
+		</item>
+	</loot>
+</monster>

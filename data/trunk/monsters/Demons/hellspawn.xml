@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Hellspawn" nameDescription="a hellspawn" experience="2550" speed="360" race="blood" manacost="0">
+	<health now="3500" max="3500"/>
+	<strategy attack="100" defense="0"/>
+	<targetchange speed="0" chance="8"/>
+	<look type="322" corpse="9923"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" chance="100" min="-0" max="-360" range="1"/>
+		<attack name="fireball" interval="2000" chance="24" min="-60" max="-160"/>
+		<attack name="soulfire" interval="2000" chance="14"/> 
+	</attacks>	
+	<defenses armor="50" defense="55">
+		<defense name="healing" interval="1000" chance="15" min="60" max="230">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element physicalPercent="15"/>
+		<element energyPercent="15"/>
+		<element firePercent="20"/>
+		<element deathPercent="-5"/>
+		<element icePercent="-10"/>
+		<element holyPercent="10"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/> 
+	</immunities> 
+	<voices speed="5000" chance="10">		
+		<voice sentence="Your fragile bones are like toothpicks to me." yell="1"/>		
+		<voice sentence="You little weasel will not live to see another day." yell="1"/>		
+		<voice sentence="I'm just a messenger of what's yet to come." yell="1"/>		
+	</voices>	 
+	<loot>
+		<item id="2666" countmax="6" chance="50000"/><!-- meat -->
+		<item id="7368" countmax="2" chance="5000"/><!-- assassin stars -->
+		<item id="6500" countmax="1" chance="3000"/><!-- demonic essence -->
+		<item id="2475" chance="200"/><!-- warrior helmet -->
+		<item id="2148" countmax="180" chance="100000"/><!-- gold coin -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2394" chance="5000"/><!-- morning star -->
+				<item id="9970" countmax="4" chance="1500"/><!-- small topaz -->
+				<item id="2476" chance="200"/><!-- knight armor -->
+				<item id="2477" chance="200"/><!-- knight legs -->
+				<item id="7421" chance="200"/><!-- onyx fail -->
+				<item id="9948" chance="200"/><!-- dracoyle statue -->
+				<item id="9969" chance="300"/><!-- black skull -->
+			</inside>
+		</item>
+	</loot>
+</monster>

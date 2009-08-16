@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Plaguesmith" nameDescription="a plaguesmith" race="blood" experience="3350" speed="260" manacost="0">
+	<health now="8250" max="8250"/>
+	<look type="247" corpse="6516"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="500"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="1500" min="-50" max="-500"/>
+		<attack name="melee" interval="2000" chance="20" range="7" radius="4" target="0" min="-60" max="-150">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="poison" interval="3000" chance="17" length="4" spread="3" min="-200" max="-350">
+			<attribute key="areaEffect" value="yellowbubble"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="20" range="1" target="0" speedchange="-800" duration="30000">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="25">
+		<defense name="healing" interval="1000" chance="50" min="75" max="125">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="1000" chance="19" speedchange="400" duration="6000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="100"/>
+		<element firePercent="40"/>
+		<element icePercent="30"/>
+		<element deathPercent="20"/>
+		<element energyPercent="-10"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="3000" chance="30">
+		<voice sentence="You are looking a bit feverish today!"/>
+		<voice sentence="Hachoo!"/>
+		<voice sentence="Cough Cough!"/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+		<item id="2235" chance="20000"/><!-- moldy cheese -->
+		<item id="2237" chance="10000"/><!-- dirty cape -->
+		<item id="2416" chance="3333"/><!-- crowbar -->
+		<item id="2444" chance="666"/><!-- hammer of wrath -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2492" chance="2333"/><!-- dragon scale mail -->
+				<item id="2645" chance="788"/><!-- steel boots -->
+				<item id="2417" chance="6667"/><!-- battle hammer -->
+				<item id="2509" chance="10000"/><!-- steel shield -->
+				<item id="5944" countmax="1" chance="1538"/><!-- soul orb -->
+				<item id="2079" chance="2000"/><!-- horn -->
+				<item id="2209" chance="2222"/><!-- club ring -->
+			</inside>
+		</item>
+	</loot>
+</monster>
