@@ -557,6 +557,8 @@ void Monster::setIdle(bool _idle)
 	}
 	else{
 		onIdleStatus();
+		clearTargetList();
+		clearFriendList();
 		g_game.removeCreatureCheck(this);
 	}
 }
