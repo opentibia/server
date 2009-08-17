@@ -2421,7 +2421,12 @@ void ProtocolGame::sendOutfitWindow()
  			for(it = outfitList.begin(); it != outfitList.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
  				msg->AddU16(it->lookType);
 				msg->AddString(it->name);
- 				msg->AddByte(it->addons);
+				if(g_config.getNumber(ConfigManager::ADDONS_ONLY_FOR_PREMIUM) && !player->isPremium()){
+ 					msg->AddByte(0);
+				}
+				else{
+					msg->AddByte(it->addons);
+				}
  			}
 		}
 		else{

@@ -549,7 +549,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	// load monster data
 	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "monsters/monsters.xml";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "monster/monsters.xml";
 	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(!g_monsters.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
