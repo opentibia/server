@@ -157,6 +157,8 @@ private:
 	void deleteConnectionTask();
 	void releaseConnection();
 	void closeSocket();
+	void onReadTimeout();
+	void onWriteTimeout();
 
 	void internalSend(OutputMessage_ptr msg);
 

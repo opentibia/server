@@ -487,6 +487,9 @@ void Connection::handleReadError(const boost::system::error_code& error)
 	#ifdef __DEBUG_NET_DETAIL__
 	PRINT_ASIO_ERROR("Reading - detail");
 	#endif
+
+	boost::recursive_mutex::scoped_lock lockClass(m_connectionLock);
+
 	if(error == boost::asio::error::operation_aborted){
 		//Operation aborted because connection will be closed
 		//Do NOT call closeConnection() from here
@@ -507,9 +510,29 @@ void Connection::handleReadError(const boost::system::error_code& error)
 	m_readError = true;
 }
 
+void Connection::onReadTimeout()
+{
+	boost::recursive_mutex::scoped_lock lockClass(m_connectionLock);
+
+	if(m_pendingRead > 0 || m_readError){
+		closeSocket();
+		closeConnection();
+	}
+}
+
+void Connection::onWriteTimeout()
+{
+	boost::recursive_mutex::scoped_lock lockClass(m_connectionLock);
+
+	if(m_pendingWrite > 0 || m_writeError){
+		closeSocket();
+		closeConnection();
+	}
+}
+
 void Connection::handleReadTimeout(boost::weak_ptr<Connection> weak_conn, const boost::system::error_code& error)
 {
-	if(!error){
+	if(error != boost::asio::error::operation_aborted){
 		if(weak_conn.expired()){
 			return;
 		}
@@ -518,8 +541,8 @@ void Connection::handleReadTimeout(boost::weak_ptr<Connection> weak_conn, const 
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Connection::handleReadTimeout" << std::endl;
 			#endif
-			connection->closeSocket();
-			connection->closeConnection();
+
+			connection->onReadTimeout();
 		}
 	}
 }
@@ -529,6 +552,9 @@ void Connection::handleWriteError(const boost::system::error_code& error)
 	#ifdef __DEBUG_NET_DETAIL__
 	PRINT_ASIO_ERROR("Writing - detail");
 	#endif
+
+	boost::recursive_mutex::scoped_lock lockClass(m_connectionLock);
+
 	if(error == boost::asio::error::operation_aborted){
 		//Operation aborted because connection will be closed
 		//Do NOT call closeConnection() from here
@@ -551,7 +577,7 @@ void Connection::handleWriteError(const boost::system::error_code& error)
 
 void Connection::handleWriteTimeout(boost::weak_ptr<Connection> weak_conn, const boost::system::error_code& error)
 {
-	if(!error){
+	if(error != boost::asio::error::operation_aborted){
 		if(weak_conn.expired()){
 			return;
 		}
@@ -560,8 +586,9 @@ void Connection::handleWriteTimeout(boost::weak_ptr<Connection> weak_conn, const
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Connection::handleWriteTimeout" << std::endl;
 			#endif
-			connection->closeSocket();
-			connection->closeConnection();
+
+			connection->onWriteTimeout();
 		}
 	}
 }
+
