@@ -230,9 +230,10 @@ void Monster::onCreatureMove(const Creature* creature, const Tile* newTile, cons
 			if(canSeeNewPos){
 				//Turn the summon on again
 				isMasterInRange = true;
-				updateIdleStatus();
 			}
 		}
+
+		updateIdleStatus();
 
 		if(!followCreature && !isSummon()){
 			//we have no target lets try pick this one
@@ -308,10 +309,10 @@ void Monster::onCreatureFound(Creature* creature, bool pushFront /*= false*/)
 			else{
 				targetList.push_back(creature);
 			}
-
-			updateIdleStatus();
 		}
 	}
+
+	updateIdleStatus();
 }
 
 void Monster::onCreatureEnter(Creature* creature)

@@ -517,14 +517,22 @@ void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 	internalCreatureDisappear(creature, true);
 
 	if(creature == this){
-		if(getMaster() && !getMaster()->isRemoved()){
-			getMaster()->removeSummon(this);
-		}
+		//
 	}
 	else if(isMapLoaded){
 		if(creature->getPosition().z == getPosition().z){
 			updateTileCache(creature->getTile(), creature->getPosition());
 		}
+	}
+}
+
+void Creature::onRemoved()
+{
+	removeList();
+	setRemoved();
+
+	if(getMaster() && !getMaster()->isRemoved()){
+		getMaster()->removeSummon(this);
 	}
 }
 
@@ -746,12 +754,12 @@ void Creature::onDie()
 		}
 	}
 
+	dropCorpse();
+	die();
+
 	if(getMaster()){
 		getMaster()->removeSummon(this);
 	}
-
-	dropCorpse();
-	die();
 }
 
 void Creature::die()

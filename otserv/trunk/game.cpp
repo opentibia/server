@@ -777,8 +777,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	creature->getParent()->postRemoveNotification(creature, NULL, oldIndex, true);
 
 	listCreature.removeList(creature->getID());
-	creature->removeList();
-	creature->setRemoved();
+	creature->onRemoved();
 	FreeThing(creature);
 
 	removeCreatureCheck(creature);
