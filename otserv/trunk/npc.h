@@ -319,43 +319,51 @@ public:
 		ResponseProperties()
 		{
 			topic = -1;
-			amount = -1;
 			focusStatus = -1;
+			eventType = EVENT_NONE;
+			params = 0;
+			publicize = true;
+			inputList.clear();
 			haveItemId = 0;
 			dontHaveItemId = 0;
-			output = "";
-			eventType = EVENT_NONE;
-			responseType = RESPONSE_DEFAULT;
-			params = 0;
 			level = 0;
-			knowSpell = "";
-			health = -1;
-			condition = CONDITION_NONE;
-			publicize = true;
+			storageConditions.clear();
+			itemList.clear();
 			time = 0;
 			singleEvent = false;
+
+			responseType = RESPONSE_DEFAULT;
+			output = "";
+			knowSpell = "";
+			actionList.clear();
+			condition = CONDITION_NONE;
+			health = -1;
+			amount = -1;
 		}
 
+		//interact specific
 		int32_t topic;
-		int32_t amount;
 		int32_t focusStatus;
+		NpcEvent_t eventType;
+		uint32_t params;
+		bool publicize;
+		std::list<std::string> inputList;
 		uint16_t haveItemId;
 		uint16_t dontHaveItemId;
-		std::list<std::string> inputList;
-		std::string output;
-		NpcEvent_t eventType;
-		ResponseType_t responseType;
-		uint32_t params;
 		uint32_t level;
 		StorageConditions storageConditions;
-		std::string knowSpell;
-		ActionList actionList;
 		std::list<ListItem> itemList;
-		int32_t health;
-		ConditionType_t condition;
-		bool publicize;
 		uint32_t time;
 		bool singleEvent;
+
+		//response specific
+		ResponseType_t responseType;
+		std::string output;
+		std::string knowSpell;
+		ActionList actionList;
+		ConditionType_t condition;
+		int32_t health;
+		int32_t amount;
 	};
 
 	NpcResponse(const ResponseProperties& _prop,
