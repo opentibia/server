@@ -566,7 +566,6 @@ public:
 	void sendIcons() const;
 	void sendMagicEffect(const Position& pos, unsigned char type) const
 		{if(client) client->sendMagicEffect(pos,type);}
-	void sendPing(uint32_t interval);
 	void sendStats();
 	void sendSkills() const
 		{if(client) client->sendSkills();}
@@ -619,7 +618,7 @@ public:
 	void sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc)
 		{if (client) client->sendAddMarker(pos, markType, desc);}
 
-	void receivePing() {if(npings > 0) npings--;}
+	void receivePing() {last_pong = OTSYS_TIME();}
 
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t interval);
@@ -747,8 +746,8 @@ protected:
 	double inventoryWeight;
 	double capacity;
 
-	uint32_t internal_ping;
-	uint32_t npings;
+	int64_t last_ping;
+	int64_t last_pong;
 	int64_t nextAction;
 
 	bool pzLocked;

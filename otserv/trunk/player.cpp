@@ -94,8 +94,8 @@ Creature()
 	lastLoginSaved = 0;
 	lastLogout = 0;
 	lastLoginMs = 0;
-	npings = 0;
-	internal_ping = 0;
+	last_ping = OTSYS_TIME();
+	last_pong = OTSYS_TIME();
 	MessageBufferTicks = 0;
 	MessageBufferCount = 0;
 	nextAction = 0;
@@ -1322,29 +1322,6 @@ void Player::sendStats()
 	}
 }
 
-void Player::sendPing(uint32_t interval)
-{
-	internal_ping += interval;
-	if(internal_ping >= 5000){ //1 ping each 5 seconds
-		internal_ping = 0;
-		npings++;
-		if(client){
-			client->sendPing();
-		}
-	}
-
-	if(canLogout()){
-		if(!client){
-			//Occurs when the player closes the game without logging out (x-logging).
-			if(g_creatureEvents->playerLogOut(this))
-				g_game.removeCreature(this, true);
-		}
-		else if(npings > 24){
-			client->logout(true);
-		}
-	}
-}
-
 bool Player::hasShopItemForSale(uint32_t itemId)
 {
 	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
@@ -1910,7 +1887,26 @@ uint32_t Player::getNextActionTime() const
 void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
-	sendPing(interval);
+
+	int64_t timeNow = OTSYS_TIME();
+	if(timeNow - last_ping >= 5000){
+		last_ping = timeNow;
+
+		if(client){
+			client->sendPing();
+		}
+	}
+
+	if(canLogout()){
+		if(!client){
+			//Occurs when the player closes the game without logging out (x-logging).
+			if(g_creatureEvents->playerLogOut(this))
+				g_game.removeCreature(this, true);
+		}
+		else if(timeNow - last_pong >= 60000){
+			client->logout(true);
+		}
+	}
 
 	MessageBufferTicks += interval;
 	if(MessageBufferTicks >= 1500){
@@ -4484,18 +4480,20 @@ int32_t Player::getStaminaMinutes()
 
 void Player::checkIdleTime(uint32_t ticks)
 {
-	if(!getTile()->hasFlag(TILESTATE_NOLOGOUT) && !hasFlag(PlayerFlag_CanAlwaysLogin)){
-		idleTime += ticks;
-		if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME)){
-			kickPlayer();
-		}
-		else if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) && !idleWarned){
-			int32_t alreadyIdleTime = g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) / 60000;
-			int32_t remainingTime = (g_config.getNumber(ConfigManager::IDLE_TIME) - g_config.getNumber(ConfigManager::IDLE_TIME_WARNING)) / 60000;
-			std::stringstream message;
-			message << "You have been idle for " << alreadyIdleTime << " " << (alreadyIdleTime > 1 ? "minutes" : "minute") << ", you will be disconnected in " << remainingTime << " " << (remainingTime > 1 ? "minutes" : "minute") << " if you are still idle then.";
-			sendTextMessage(MSG_STATUS_WARNING, message.str());
-			idleWarned = true;
+	if(g_config.getNumber(ConfigManager::IDLE_TIME) > 0){
+		if(!getTile()->hasFlag(TILESTATE_NOLOGOUT) && !hasFlag(PlayerFlag_CanAlwaysLogin)){
+			idleTime += ticks;
+			if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME)){
+				kickPlayer();
+			}
+			else if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) && !idleWarned){
+				int32_t alreadyIdleTime = g_config.getNumber(ConfigManager::IDLE_TIME_WARNING) / 60000;
+				int32_t remainingTime = (g_config.getNumber(ConfigManager::IDLE_TIME) - g_config.getNumber(ConfigManager::IDLE_TIME_WARNING)) / 60000;
+				std::stringstream message;
+				message << "You have been idle for " << alreadyIdleTime << " " << (alreadyIdleTime > 1 ? "minutes" : "minute") << ", you will be disconnected in " << remainingTime << " " << (remainingTime > 1 ? "minutes" : "minute") << " if you are still idle then.";
+				sendTextMessage(MSG_STATUS_WARNING, message.str());
+				idleWarned = true;
+			}
 		}
 	}
 }
