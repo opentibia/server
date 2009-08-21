@@ -651,7 +651,7 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 		}
 
 		if(!Houses::getInstance().payRent(player, house)){
-			player->sendCancel("You have to pay the rent first.");
+			player->sendCancel("You have to pay the rent before selling your house and you do not have enough money.");
 			return false;
 		}
 
@@ -695,6 +695,7 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 			house->resetTransferItem();
 		}
 	}
+
 	return false;
 }
 
