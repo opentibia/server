@@ -2471,14 +2471,6 @@ Item* Player::createCorpse()
 void Player::preSave()
 {
 	if(health <= 0){
-		experience -= getLostExperience();
-
-		while(level > 1 && experience < Player::getExpForLevel(level)){
-			--level;
-			healthMax = std::max((int32_t)0, (healthMax - (int32_t)vocation->getHPGain()));
-			manaMax = std::max((int32_t)0, (manaMax - (int32_t)vocation->getManaGain()));
-			capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
-		}
 		#ifdef __SKULLSYSTEM__
 		if(getSkull() != SKULL_BLACK){
 		#endif
