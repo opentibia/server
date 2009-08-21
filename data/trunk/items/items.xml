@@ -2966,7 +2966,7 @@
 		<attribute key="slotType" value="ring"/>
 		<attribute key="charges" value="20"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentAll" value="20"/>
+		<attribute key="absorbPercentAllElements" value="20"/>
 	</item>
 	<item id="2165" article="a" name="stealth ring">
 		<attribute key="weight" value="100"/>
@@ -22860,7 +22860,6 @@
 		<attribute key="speed" value="25" />
 		<attribute key="weight" value="1500"/>
 		<attribute key="showduration" value="1"/>
-		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="9958" article="a" name="royal tapestry">
 		<attribute key="weight" value="1000"/>
@@ -23701,7 +23700,7 @@
 	<item id="10454" article="a" name="headache pill" plural="headache pills">
 		<attribute key="weight" value="20"/>
 	</item>
-	<item id="10455" article="an" name="pigeon trophy">
+	<item id="10455" article="a" name="pigeon trophy">
 		<attribute key="description" value="It's a symbol of peace handed out by Tibia ML."/>
 		<attribute key="weight" value="400"/>
 	</item>
