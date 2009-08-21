@@ -1206,7 +1206,7 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 
 			var.type = VARIANT_NUMBER;
 			var.number = target->getID();
-			
+
 			if(!playerInstantSpellCheck(player, target)){
 				return false;
 			}
@@ -1673,11 +1673,13 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 
 	int32_t manaCost = mType->manaCost;
 	if(!player->hasFlag(PlayerFlag_CanSummonAll)){
+		#ifdef __SKULLSYSTEM__
 		if(player->getSkull() == SKULL_BLACK){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
+		#endif
 
 		if(!mType->isSummonable){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -2196,11 +2198,13 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 	}
 
 	if(!player->hasFlag(PlayerFlag_CanConvinceAll)){
+		#ifdef __SKULLSYSTEM__
 		if(player->getSkull() == SKULL_BLACK){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
+		#endif
 
 		if(player->getSummonCount() >= 2){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);

@@ -19,7 +19,7 @@ function setSkillRate(cid, skillid, value)
 end
 
 function doPlayerAddHealth(cid, health, filter)
-	filter = filter or TRUE
+	filter = filter == FALSE and FALSE or TRUE
 	if isPlayer(cid) == TRUE then
 		if doCreatureAddHealth(cid, health, filter) ~= LUA_ERROR then
 			return LUA_NO_ERROR
@@ -383,7 +383,7 @@ table.getCombinations = function (table, num)
 	return newlist
 end
 
-
+string.gfind = string.gmatch
 string.split = function (str)
 	local t = {}
 	local function helper(word) table.insert(t, word) return "" end
@@ -628,8 +628,16 @@ end
 function getPlayerRequiredExperience(cid, level)
 	if isPlayer(cid) == TRUE and level >= 1 then
 		local playerLevel = getPlayerLevel(cid)
-		local levelExp = Calculator:getLevelExp(playerLevel+level)
-		local experienceLeft = levelExp - getPlayerExperience(cid)
+		local experienceLeft = 0
+		local levelExp = 0
+
+		if playerLevel > level then
+			levelExp = Calculator:getLevelExp(level)
+			experienceLeft = getPlayerExperience(cid) - levelExp
+		elseif playerLevel < level then
+			levelExp = Calculator:getLevelExp(level)
+			experienceLeft = levelExp - getPlayerExperience(cid)
+		end
 		return experienceLeft
 	end
 
@@ -638,12 +646,20 @@ end
 
 function doPlayerAddLevel(cid, level)
 	if isPlayer(cid) == TRUE and level >= 1 then
-		local experience = getPlayerRequiredExperience(cid, level)
-		doPlayerAddExp(cid, experience)
-		return LUA_NO_ERROR
+		local experience = getPlayerRequiredExperience(cid, getPlayerLevel(cid)+level)
+		return doPlayerAddExp(cid, experience)
 	end
 
-	return LUA_ERROR
+	return LUA_FALSE
+end
+
+function doPlayerRemoveLevel(cid, level)
+	if isPlayer(cid) == TRUE and level >= 1 then
+		local experience = getPlayerRequiredExperience(cid, getPlayerLevel(cid)-level)
+		return doPlayerRemoveExp(cid, experience)
+	end
+
+	return LUA_FALSE
 end
 
 -- Functions made by Jiddo

@@ -28,18 +28,33 @@
 #define OTSERV_CLIENT_VERSION "8.50"
 #define CURRENT_SCHEMA_VERSION 19
 
-#ifdef _WIN32
-#  ifndef WIN32
-#    define WIN32
-#  endif
+#if defined(_WIN32) && !defined(WIN32)
+	#define WIN32
 #endif
 
 #if defined(WIN32) && !defined(__WINDOWS__)
-#define __WINDOWS__
+	#define __WINDOWS__
+#endif
+
+#if defined(__WINDOWS__) && !defined(_WIN32)
+	#define _WIN32
 #endif
 
 #ifdef __MINGW32__
 	#define XML_GCC_FREE
+	//Cross-compiling
+	#ifndef __WINDOWS__
+		#define __WINDOWS__
+	#endif
+#endif
+
+//Cross-compiling
+#ifdef __CYGWIN__
+	#undef WIN32
+	#undef _WIN32
+	#undef WINDOWS
+	#undef __WINDOWS__
+	#define HAVE_ERRNO_AS_DEFINE
 #endif
 
 #ifdef XML_GCC_FREE
@@ -52,7 +67,6 @@
 	#ifndef __EXCEPTION_TRACER__
 		#define __EXCEPTION_TRACER__
 	#endif
-
 #endif
 
 #ifdef __DEBUG_EXCEPTION_REPORT__
@@ -112,8 +126,8 @@ enum passwordType_t{
 #if defined __WINDOWS__
 
 #if defined _MSC_VER && defined NDEBUG
-#define _SECURE_SCL 0
-#define HAS_ITERATOR_DEBUGGING 0
+	#define _SECURE_SCL 0
+	#define HAS_ITERATOR_DEBUGGING 0
 #endif
 
 #ifndef __FUNCTION__
@@ -121,16 +135,17 @@ enum passwordType_t{
 #endif
 
 #ifndef EWOULDBLOCK
-#	define EWOULDBLOCK WSAEWOULDBLOCK
+	#define EWOULDBLOCK WSAEWOULDBLOCK
 #endif
 
 #ifdef _WIN32_WINNT
-#undef _WIN32_WINNT
+	#undef _WIN32_WINNT
 #endif
 //Windows 2000	0x0500
 //Windows Xp	0x0501
 //Windows 2003	0x0502
 //Windows Vista	0x0600
+//Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
@@ -228,10 +243,8 @@ enum passwordType_t{
 #endif
 
 // OpenTibia configuration
-#ifndef __SKULLSYSTEM__
-#   ifndef __NO_SKULLSYSTEM__
-#       define __SKULLSYSTEM__
-#   endif
+#if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)
+	#define __SKULLSYSTEM__
 #endif
 
 #endif

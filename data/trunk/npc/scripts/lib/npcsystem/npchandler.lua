@@ -458,7 +458,7 @@ if(NpcHandler == nil) then
 	-- Handles onThink events. If you wish to handle this yourself, please use the CALLBACK_ONTHINK callback.
 	function NpcHandler:onThink()
 		local callback = self:getCallback(CALLBACK_ONTHINK)
-		if(callback == nil or callback()) then
+		if(callback == nil or callback(cid)) then
 
 			if(NPCHANDLER_TALKDELAY == TALKDELAY_ONTHINK) then
 				if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then

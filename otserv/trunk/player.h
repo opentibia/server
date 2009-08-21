@@ -671,6 +671,7 @@ protected:
 	std::string getSkillName(int skillid);
 	void gainExperience(uint64_t& gainExp, bool fromMonster);
 	void addExperience(uint64_t exp);
+	void removeExperience(uint64_t exp, bool updateStats = true);
 
 	void updateInventoryWeight();
 

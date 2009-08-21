@@ -1393,6 +1393,9 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerAddExp(cid, exp, <optional: default: 0> useRate, <optional: default: 0> useMultiplier)
 	lua_register(m_luaState, "doPlayerAddExp", LuaScriptInterface::luaDoPlayerAddExp);
 
+	//doPlayerRemoveExp(cid, exp, <optional: default: 0> useRate, <optional: default: 0> useMultiplier)
+	lua_register(m_luaState, "doPlayerRemoveExp", LuaScriptInterface::luaDoPlayerRemoveExp);
+
 	//getPlayerExperience(cid)
 	lua_register(m_luaState, "getPlayerExperience", LuaScriptInterface::luaGetPlayerExperience);
 
@@ -1906,6 +1909,7 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 
 		case PlayerInfoSkullEndTime:
 		{
+			#ifdef __SKULLSYSTEM__
 			switch(player->getSkull()){
 				case SKULL_RED:
 					value = player->lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
@@ -1918,6 +1922,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 					value = 0;
 					break;
 			}
+			#else
+			value = 0;
+			#endif
 			break;
 		}
 
@@ -4798,15 +4805,51 @@ int LuaScriptInterface::luaDoPlayerAddExp(lua_State *L)
 		useRate = (popNumber(L) >= 1);
 	}
 
-	int64_t exp = (int64_t)popNumber(L);
+	uint64_t exp = (uint64_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
 		if(exp > 0){
-			exp = int64_t(exp * (useMultiplier? player->getRateValue(LEVEL_EXPERIENCE) : 1.0) * (useRate? g_config.getNumber(ConfigManager::RATE_EXPERIENCE) : 1.0));
+			exp = uint64_t(exp * (useMultiplier? player->getRateValue(LEVEL_EXPERIENCE) : 1.0) * (useRate? g_config.getNumber(ConfigManager::RATE_EXPERIENCE) : 1.0));
 			player->addExperience(exp);
+			lua_pushnumber(L, LUA_TRUE);
+		}
+		else{
+			lua_pushnumber(L, LUA_FALSE);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerRemoveExp(lua_State *L)
+{
+	//doPlayerRemoveExp(cid, exp, <optional: default: 0> useRate, <optional: default: 0> useMultiplier)
+	int32_t parameters = lua_gettop(L);
+
+	bool useMultiplier = false;
+	bool useRate = false;
+	if(parameters > 3){
+		useMultiplier = (popNumber(L) >= 1);
+	}
+	if(parameters > 2){
+		useRate = (popNumber(L) >= 1);
+	}
+
+	uint64_t exp = (uint64_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(exp > 0){
+			exp = uint64_t(exp * (useMultiplier? player->getRateValue(LEVEL_EXPERIENCE) : 1.0) * (useRate? g_config.getNumber(ConfigManager::RATE_EXPERIENCE) : 1.0));
+			player->removeExperience(exp);
 			lua_pushnumber(L, LUA_TRUE);
 		}
 		else{

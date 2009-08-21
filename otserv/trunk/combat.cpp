@@ -376,10 +376,10 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 		attackerPlayer = attacker->getPlayerMaster();
 	}
 
-	if(	attackerPlayer == NULL || 
+	if(	attackerPlayer == NULL ||
 		targetPlayer == NULL ||
 		attackerPlayer->isPartner(targetPlayer) ||
-		Combat::isInPvpZone(attackerPlayer, targetPlayer) || 
+		Combat::isInPvpZone(attackerPlayer, targetPlayer) ||
 		targetPlayer->hasAttacked(attackerPlayer) ||
 		targetPlayer->getSkull() != SKULL_NONE){
 		return false;
@@ -410,7 +410,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					if(targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(attackerPlayer)){
 						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
-				}	
+				}
 #endif
 			}
 
@@ -620,7 +620,11 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 	}
 
 	if(healthChange < 0){
+		#ifdef __SKULLSYSTEM__
 		if(caster && caster->getPlayer() && target->getPlayer() && target->getPlayer()->getSkull() != SKULL_BLACK){
+		#else
+		if(caster && caster->getPlayer() && target->getPlayer()){
+		#endif
 			healthChange = healthChange/2;
 		}
 	}
@@ -1098,7 +1102,7 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 		else{
 			max = LuaScriptInterface::popNumber(L);
 			min = LuaScriptInterface::popNumber(L);
-			
+
 			Vocation* vocation = player->getVocation();
 			if(isMagicFormula && vocation){
 				if(max > 0 && min > 0 && vocation->getHealingBaseDamage() != 1.0){

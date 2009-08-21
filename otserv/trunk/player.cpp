@@ -2045,8 +2045,8 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 void Player::addExperience(uint64_t exp)
 {
 	experience += exp;
-	int prevLevel = getLevel();
-	int newLevel = getLevel();
+	uint32_t prevLevel = getLevel();
+	uint32_t newLevel = getLevel();
 
 	uint64_t currLevelExp = Player::getExpForLevel(newLevel);
 	uint64_t nextLevelExp = Player::getExpForLevel(newLevel + 1);
@@ -2096,11 +2096,61 @@ void Player::addExperience(uint64_t exp)
 	if(nextLevelExp > currLevelExp) {
 		uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
 		levelPercent = newPercent;
-	} else {
+	}
+	else {
 		levelPercent = 0;
 	}
 
 	sendStats();
+}
+
+void Player::removeExperience(uint64_t exp, bool updateStats/* = true*/)
+{
+	experience -= std::min(exp, experience);
+	uint32_t prevLevel = getLevel();
+	uint32_t newLevel = getLevel();
+
+	while(newLevel > 1 && experience < Player::getExpForLevel(newLevel)){
+		newLevel--;
+		healthMax = std::max((int32_t)0, (healthMax - (int32_t)vocation->getHPGain()));
+		health = health > healthMax ? healthMax : health;
+		manaMax = std::max((int32_t)0, (manaMax - (int32_t)vocation->getManaGain()));
+		mana = mana > manaMax ? manaMax : mana;
+		capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
+	}
+
+	if(prevLevel != newLevel){
+		level = newLevel;
+		if(updateStats){
+			int32_t newSpeed = getBaseSpeed();
+			setBaseSpeed(newSpeed);
+
+			g_game.changeSpeed(this, 0);
+			g_game.addCreatureHealth(this);
+
+			if(getParty()){
+				getParty()->updateSharedExperience();
+			}
+		}
+
+		std::stringstream levelMsg;
+		levelMsg << "You were downgraded from Level " << prevLevel << " to Level " << newLevel << ".";
+		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
+	}
+
+	uint64_t currLevelExp = Player::getExpForLevel(level);
+	uint64_t nextLevelExp = Player::getExpForLevel(level + 1);
+	if(nextLevelExp > currLevelExp){
+		uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
+		levelPercent = newPercent;
+	}
+	else{
+		levelPercent = 0;
+	}
+
+	if(updateStats){
+		sendStats();
+	}
 }
 
 uint32_t Player::getPercentLevel(uint64_t count, uint32_t nextLevelCount)
@@ -2252,7 +2302,11 @@ void Player::onDie()
 			}
 		}
 
+		#ifdef __SKULLSYSTEM__
 		if(isLootPrevented && getSkull() != SKULL_RED && getSkull() != SKULL_BLACK){
+		#else
+		if(isLootPrevented){
+		#endif
 			setDropLoot(false);
 		}
 		if(isSkillPrevented){
@@ -2262,7 +2316,7 @@ void Player::onDie()
 		DeathList killers = getKillers(g_config.getNumber(ConfigManager::DEATH_ASSIST_COUNT));
 		IOPlayer::instance()->addPlayerDeath(this, killers);
 
-#ifdef __SKULLSYSTEM__
+		#ifdef __SKULLSYSTEM__
 		for(DeathList::const_iterator it = killers.begin(); it != killers.end(); ++it){
 			if(it->isCreatureKill() && it->isUnjustKill()){
 				Creature* attacker = it->getKillerCreature();
@@ -2277,8 +2331,8 @@ void Player::onDie()
 				}
 			}
 		}
+		#endif
 	}
-#endif
 
 	Creature::onDie();
 }
@@ -2305,23 +2359,10 @@ void Player::die()
 
 	if(skillLoss){
 		uint64_t expLost = getLostExperience();
+
 		//Level loss
-		uint32_t newLevel = level;
-		while((uint64_t)(experience - expLost) < Player::getExpForLevel(newLevel)){
-			if(newLevel > 1)
-				newLevel--;
-			else
-				break;
-		}
-
+		removeExperience(expLost, false);
 		double lostPercent = 1. - (double(experience - expLost) / double(experience)); // 0.1 if 10% was lost
-
-		if(newLevel != level){
-			std::stringstream lvMsg;
-			lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-			sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
-		}
-
 
 		//Magic level loss
 		uint32_t sumMana = 0;
@@ -2438,18 +2479,23 @@ void Player::preSave()
 			manaMax = std::max((int32_t)0, (manaMax - (int32_t)vocation->getManaGain()));
 			capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
 		}
-
+		#ifdef __SKULLSYSTEM__
 		if(getSkull() != SKULL_BLACK){
+		#endif
 			health = healthMax;
 			mana = manaMax;
+		#ifdef __SKULLSYSTEM__
 		}
 		else{
-			if(healthMax >= 40)
+			if(healthMax >= 40){
 				health = 40;
-			else
+			}
+			else{
 				health = healthMax;
-			mana = 0;
+				mana = 0;
+			}
 		}
+		#endif
 	}
 }
 
@@ -3843,7 +3889,7 @@ void Player::gainExperience(uint64_t& gainExp, bool fromMonster)
 				condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
 				addCondition(condition);
 			}
-			
+
 			//check stamina, player rate and other values
 			getGainExperience(gainExp, fromMonster);
 
@@ -4158,7 +4204,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 		g_config.getNumber(ConfigManager::KILLS_PER_DAY_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);
 	}
-	else if(getSkull() != SKULL_BLACK && 
+	else if(getSkull() != SKULL_BLACK &&
 			g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL) > 0 &&
 			g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL) <= unjustKills){
 		setSkull(SKULL_RED);
@@ -4170,7 +4216,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 		g_config.getNumber(ConfigManager::KILLS_PER_WEEK_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);
 	}
-	else if(getSkull() != SKULL_BLACK && 
+	else if(getSkull() != SKULL_BLACK &&
 			g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL) > 0 &&
 			g_config.getNumber(ConfigManager::KILLS_PER_WEEK_RED_SKULL) <= unjustKills){
 		setSkull(SKULL_RED);
@@ -4182,7 +4228,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 		g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) <= unjustKills){
 		setSkull(SKULL_BLACK);
 	}
-	else if(getSkull() != SKULL_BLACK && 
+	else if(getSkull() != SKULL_BLACK &&
 			g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) > 0 &&
 			g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) <= unjustKills){
 		setSkull(SKULL_RED);
@@ -4476,9 +4522,11 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 
 bool Player::checkPzBlockOnCombat(Player* targetPlayer)
 {
+	#ifdef __SKULLSYSTEM__
 	if(targetPlayer->hasAttacked(this) && !g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK)){
 		return false;
 	}
+	#endif
 
 	if(isPartner(targetPlayer)){
 		return false;
