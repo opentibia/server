@@ -434,7 +434,7 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0x1E: // keep alive / ping response
-		parseRecievePing(msg);
+		parseReceivePing(msg);
 		break;
 
 	case 0x64: // move with steps
@@ -1003,7 +1003,7 @@ void ProtocolGame::parseDebug(NetworkMessage& msg)
 	}
 }
 
-void ProtocolGame::parseRecievePing(NetworkMessage& msg)
+void ProtocolGame::parseReceivePing(NetworkMessage& msg)
 {
 	g_dispatcher.addTask(
 		createTask(boost::bind(&Game::playerReceivePing, &g_game, player->getID())));
