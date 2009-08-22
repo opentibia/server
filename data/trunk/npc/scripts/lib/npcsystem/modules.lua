@@ -642,12 +642,20 @@ if(Modules == nil) then
 		local ignoreCapacity = ignoreCapacity and TRUE or FALSE
 
 		if(isItemStackable(itemid) == TRUE) then
+			if(buyWithBackpacks) then
+				local backpack = doCreateItemEx(backpackId, 1)
+				doAddContainerItem(backpack, itemid, amount)
+				if(doPlayerAddItemEx(cid, backpack, ignoreCapacity) ~= RETURNVALUE_NOERROR) then
+					return {}, 0
+				end
+				return backpack, amount
+			end
+			
 			local item = doCreateItemEx(itemid, amount)
-			local ret = doPlayerAddItemEx(cid, item, ignoreCapacity)
-			if(ret ~= RETURNVALUE_NOERROR) then
+			if(doPlayerAddItemEx(cid, item, ignoreCapacity) ~= RETURNVALUE_NOERROR) then
 				return {}, 0
 			end
-			return {item}, amount
+			return item, amount
 		end
 
 		if(buyWithBackpacks) then
