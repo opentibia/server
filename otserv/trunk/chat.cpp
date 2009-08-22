@@ -241,6 +241,14 @@ uint16_t Chat::getFreePrivateChannelId() {
 	return 0;
 }
 
+bool Chat::isPrivateChannel(uint16_t channelId) {
+	if(m_privateChannels.find(channelId) == m_privateChannels.end()){
+		return false;
+	}
+
+	return true;
+}
+
 ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 {
 	if(getChannel(player, channelId))

@@ -3536,7 +3536,7 @@ bool Game::checkPlayerMute(uint16_t channelId, SpeakClasses type)
 	//Others
 	if(type == SPEAK_CHANNEL_Y){
 		//Party, Guild and Private channels
-		if(channelId == CHANNEL_GUILD || channelId == CHANNEL_PARTY || channelId == CHANNEL_PRIVATE){
+		if(channelId == CHANNEL_GUILD || channelId == CHANNEL_PARTY || g_chat.isPrivateChannel(channelId)){
 			return false;
 		}
 	}
