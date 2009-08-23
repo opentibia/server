@@ -3451,9 +3451,8 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	if(!player || player->isRemoved())
 		return false;
 
-	bool checkMute = checkPlayerMute(channelId, type);
-	uint32_t muteTime = player->getMuteTime();
-	if(checkMute && muteTime > 0){
+	uint32_t muteTime = 0;
+	if(player->isMuted(channelId, type, muteTime)){
 		std::stringstream ss;
 		ss << "You are still muted for " << muteTime << " seconds.";
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
@@ -3469,7 +3468,7 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return true;
 	}
 
-	if((checkMute || muteTime == 0) && playerSaySpell(player, type, text)){
+	if(playerSaySpell(player, type, text)){
 		return true;
 	}
 
@@ -3521,27 +3520,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	}
 
 	return false;
-}
-
-bool Game::checkPlayerMute(uint16_t channelId, SpeakClasses type)
-{
-	//Players should be able to speak in Party, Private, Guild and Npc channels even if they are muted
-	//They also don't get muted if they spam on these channels
-
-	//Npc channel
-	if(type == SPEAK_PRIVATE_PN){
-		return false;
-	}
-
-	//Others
-	if(type == SPEAK_CHANNEL_Y){
-		//Guild and Private channels
-		if(channelId == CHANNEL_GUILD || g_chat.isPrivateChannel(channelId)){
-			return false;
-		}
-	}
-
-	return true;
 }
 
 bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string& text)
