@@ -3891,18 +3891,9 @@ void Game::checkCreatures()
 	std::vector<Creature*>::iterator it;
 
 	//add any new creatures
-	for(it = toAddCheckCreatureVector.begin(); it != toAddCheckCreatureVector.end();){
+	for(it = toAddCheckCreatureVector.begin(); it != toAddCheckCreatureVector.end(); ++it){
 		creature = (*it);
-
-		if(creature->creatureCheck){
-			checkCreatureVectors[creature->checkCreatureVectorIndex].push_back(creature);
-			++it;
-		}
-		else{
-			FreeThing(creature);
-			creature->checkCreatureVectorIndex = -1;
-			it = toAddCheckCreatureVector.erase(it);
-		}
+		checkCreatureVectors[creature->checkCreatureVectorIndex].push_back(creature);
 	}
 	toAddCheckCreatureVector.clear();
 
@@ -3915,6 +3906,7 @@ void Game::checkCreatures()
 
 	for(it = checkCreatureVector.begin(); it != checkCreatureVector.end();){
 		creature = (*it);
+
 		if(creature->creatureCheck){
 			if(creature->getHealth() > 0){
 				creature->onThink(EVENT_CREATURE_THINK_INTERVAL);
@@ -3922,13 +3914,16 @@ void Game::checkCreatures()
 			else{
 				creature->onDie();
 			}
-
 			++it;
 		}
 		else{
-			FreeThing(creature);
 			creature->checkCreatureVectorIndex = -1;
 			it = checkCreatureVector.erase(it);
+			FreeThing(creature);
+
+			if(creature->getHealth() <= 0){
+				creature->onDie();
+			}
 		}
 	}
 
