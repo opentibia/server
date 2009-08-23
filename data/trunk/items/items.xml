@@ -4941,7 +4941,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="bolt"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2544" article="an" name="arrow" plural="arrows">
@@ -4951,7 +4951,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="arrow"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2545" article="a" name="poison arrow" plural="poison arrows">
@@ -4961,7 +4961,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="poisonarrow"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2546" article="a" name="burst arrow" plural="burst arrows">
@@ -4981,7 +4981,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="powerbolt"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="2548" article="a" name="pitch fork">
@@ -14765,7 +14765,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="infernalbolt"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="6530" name="worn soft boots">
@@ -16312,7 +16312,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="bolt"/>
 		<attribute key="shootType" value="piercingbolt"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7364" article="a" name="sniper arrow" plural="sniper arrows">
@@ -16332,7 +16332,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="onyxarrow"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7366" article="a" name="viper star" plural="viper stars">
@@ -18266,7 +18266,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="flasharrow"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7839" article="a" name="shiver arrow" plural="shiver arrows">
@@ -18276,7 +18276,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="shiverarrow"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7840" article="a" name="flaming arrow" plural="flaming arrows">
@@ -18286,7 +18286,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
 		<attribute key="shootType" value="flammingarrow"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7841" article="a" name="straw mat">
@@ -18335,7 +18335,7 @@
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="shootType" value="eartharrow"/>
 		<attribute key="ammoType" value="arrow"/>
-		<attribute key="maxHitChance" value="100"/>
+		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
 	<item id="7851" article="an" name="archway"/>
