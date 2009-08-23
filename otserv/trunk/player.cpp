@@ -2100,7 +2100,7 @@ void Player::addExperience(uint64_t exp)
 	sendStats();
 }
 
-void Player::removeExperience(uint64_t exp, bool updateStats/* = true*/)
+void Player::removeExperience(uint64_t exp, bool updateStats /*= true*/)
 {
 	experience -= std::min(exp, experience);
 	uint32_t prevLevel = getLevel();
@@ -2109,43 +2109,42 @@ void Player::removeExperience(uint64_t exp, bool updateStats/* = true*/)
 	while(newLevel > 1 && experience < Player::getExpForLevel(newLevel)){
 		newLevel--;
 		healthMax = std::max((int32_t)0, (healthMax - (int32_t)vocation->getHPGain()));
-		health = health > healthMax ? healthMax : health;
 		manaMax = std::max((int32_t)0, (manaMax - (int32_t)vocation->getManaGain()));
-		mana = mana > manaMax ? manaMax : mana;
 		capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
 	}
 
 	if(prevLevel != newLevel){
 		level = newLevel;
-		if(updateStats){
-			int32_t newSpeed = getBaseSpeed();
-			setBaseSpeed(newSpeed);
-
-			g_game.changeSpeed(this, 0);
-			g_game.addCreatureHealth(this);
-
-			if(getParty()){
-				getParty()->updateSharedExperience();
-			}
-		}
-
 		std::stringstream levelMsg;
 		levelMsg << "You were downgraded from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 	}
 
-	uint64_t currLevelExp = Player::getExpForLevel(level);
-	uint64_t nextLevelExp = Player::getExpForLevel(level + 1);
-	if(nextLevelExp > currLevelExp){
-		uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
-		levelPercent = newPercent;
-	}
-	else{
-		levelPercent = 0;
-	}
-
+	//Only if player is not going to be removed (usually when dying)
 	if(updateStats){
-		sendStats();
+		bool sentStats = false;
+
+		uint64_t currLevelExp = Player::getExpForLevel(level);
+		uint64_t nextLevelExp = Player::getExpForLevel(level + 1);
+		if(nextLevelExp > currLevelExp){
+			uint32_t newPercent = Player::getPercentLevel(getExperience() - currLevelExp, Player::getExpForLevel(level + 1) - currLevelExp);
+			levelPercent = newPercent;
+		}
+		else{
+			levelPercent = 0;
+		}
+
+		if(prevLevel != newLevel){
+			int32_t healthChange = health > healthMax ? (health - healthMax) : 0;
+			int32_t manaChange = mana > manaMax ? (mana - manaMax) : 0;
+			changeMana(-manaChange);
+			changeHealth(-healthChange);
+			sentStats = true;
+		}
+
+		if(!sentStats){
+			sendStats();
+		}
 	}
 }
 
