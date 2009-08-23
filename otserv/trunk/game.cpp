@@ -3451,16 +3451,16 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	if(!player || player->isRemoved())
 		return false;
 
-	uint32_t muteTime = player->isMuted();
-	if(muteTime > 0 && checkPlayerMute(channelId, type)){
+	bool checkMute = checkPlayerMute(channelId, type);
+	uint32_t muteTime = player->getMuteTime();
+	if(checkMute && muteTime > 0){
 		std::stringstream ss;
 		ss << "You are still muted for " << muteTime << " seconds.";
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 		return false;
 	}
 
-	TalkActionResult_t result;
-	result = g_talkactions->onPlayerSpeak(player, type, text);
+	TalkActionResult_t result = g_talkactions->onPlayerSpeak(player, type, text);
 	if(result == TALKACTION_BREAK){
 		return true;
 	}
@@ -3469,11 +3469,11 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return true;
 	}
 
-	if(playerSaySpell(player, type, text)){
+	if((checkMute || muteTime == 0) && playerSaySpell(player, type, text)){
 		return true;
 	}
 
-	if(checkPlayerMute(channelId, type)){
+	if(checkMute){
 		player->removeMessageBuffer();
 	}
 
@@ -3535,8 +3535,8 @@ bool Game::checkPlayerMute(uint16_t channelId, SpeakClasses type)
 
 	//Others
 	if(type == SPEAK_CHANNEL_Y){
-		//Party, Guild and Private channels
-		if(channelId == CHANNEL_GUILD || channelId == CHANNEL_PARTY || g_chat.isPrivateChannel(channelId)){
+		//Guild and Private channels
+		if(channelId == CHANNEL_GUILD || g_chat.isPrivateChannel(channelId)){
 			return false;
 		}
 	}
@@ -3560,8 +3560,7 @@ bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string
 
 bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
 {
-	TalkActionResult_t result;
-	result = g_spells->playerSaySpell(player, type, text);
+	TalkActionResult_t result = g_spells->playerSaySpell(player, type, text);
 	if(result == TALKACTION_BREAK){
 		return internalCreatureSay(player, SPEAK_SAY, text);
 	}

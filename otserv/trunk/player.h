@@ -206,7 +206,7 @@ public:
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
 	virtual bool canSeeInvisibility() const;
-	uint32_t isMuted();
+	uint32_t getMuteTime();
 	void addMessageBuffer();
 	void removeMessageBuffer();
 
