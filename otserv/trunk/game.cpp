@@ -3452,7 +3452,8 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return false;
 
 	uint32_t muteTime = 0;
-	if(player->isMuted(channelId, type, muteTime)){
+	bool isMuted = player->isMuted(channelId, type, muteTime);
+	if(isMuted){
 		std::stringstream ss;
 		ss << "You are still muted for " << muteTime << " seconds.";
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
@@ -3468,11 +3469,11 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return true;
 	}
 
-	if(playerSaySpell(player, type, text)){
+	if(isMuted && playerSaySpell(player, type, text)){
 		return true;
 	}
 
-	if(checkMute){
+	if(isMuted){
 		player->removeMessageBuffer();
 	}
 
