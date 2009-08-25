@@ -531,9 +531,11 @@ std::string MoveEvent::getScriptEventName()
 		return "onDeEquip";
 		break;
 	case MOVE_EVENT_ADD_ITEM:
+	case MOVE_EVENT_ADD_ITEM_ITEMTILE:
 		return "onAddItem";
 		break;
 	case MOVE_EVENT_REMOVE_ITEM:
+	case MOVE_EVENT_REMOVE_ITEM_ITEMTILE:
 		return "onRemoveItem";
 		break;
 	default:
