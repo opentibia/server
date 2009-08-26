@@ -892,7 +892,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map)
 	}
 
 	query.str("DELETE FROM `house_lists`");
-	if(!db->executeQuery(query.str()) {
+	if(!db->executeQuery(query.str())) {
 		return false;
 	}
 
