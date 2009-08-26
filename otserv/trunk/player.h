@@ -206,9 +206,7 @@ public:
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
 	virtual bool canSeeInvisibility() const;
-	int32_t getMuteTicks();
-	int32_t getMuteTime(){return (int32_t)std::ceil(getMuteTicks() / 1000);}
-	bool isMuted(uint16_t channelId, SpeakClasses type, bool& muteChannel);
+	int32_t getMutedTime();
 	void addMessageBuffer();
 	void removeMessageBuffer();
 

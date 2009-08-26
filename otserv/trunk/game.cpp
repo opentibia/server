@@ -3451,12 +3451,12 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	if(!player || player->isRemoved())
 		return false;
 
-	int32_t realMuteTime = player->getMuteTime();
-	bool muteChannel = false;
-	bool isMuted = player->isMuted(channelId, type, muteChannel);
-	if(isMuted){
+	bool isMuteableChannel = g_chat.isMuteableChannel(player, channelId, type);
+	int32_t muteTime = player->getMutedTime();
+
+	if(isMuteableChannel && muteTime > 0){
 		std::stringstream ss;
-		ss << "You are still muted for " << realMuteTime << " seconds.";
+		ss << "You are still muted for " << muteTime << " seconds.";
 		player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 		return false;
 	}
@@ -3470,13 +3470,13 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return true;
 	}
 
-	if(muteChannel || realMuteTime == 0){
+	if(isMuteableChannel || muteTime == 0){
 		if(playerSaySpell(player, type, text)){
 			return true;
 		}
 	}
 
-	if(muteChannel){
+	if(isMuteableChannel){
 		player->removeMessageBuffer();
 	}
 
