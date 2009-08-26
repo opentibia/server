@@ -1920,10 +1920,28 @@ void Player::onThink(uint32_t interval)
 #endif
 }
 
-bool Player::isMuted(uint16_t channelId, SpeakClasses type, uint32_t& time)
+int32_t Player::getMuteTicks()
 {
-	time = 0;
+	if(hasFlag(PlayerFlag_CannotBeMuted)){
+		return 0;
+	}
+	
+	int32_t muteTicks = 0;
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == CONDITION_MUTED && (*it)->getTicks() > muteTicks){
+			muteTicks = (*it)->getTicks();
+		}
+	}
+	
+	return muteTicks;
+}
 
+bool Player::isMuted(uint16_t channelId, SpeakClasses type, bool& muteChannel)
+{
+	//Checking channels that there's no mute "settings"
+	muteChannel = false;
+
+	//Flag
 	if(hasFlag(PlayerFlag_CannotBeMuted)){
 		return false;
 	}
@@ -1935,21 +1953,20 @@ bool Player::isMuted(uint16_t channelId, SpeakClasses type, uint32_t& time)
 
 	//Others
 	if(type == SPEAK_CHANNEL_Y){
-		//Guild and Private channels
+		//Guild and private channels
 		if(channelId == CHANNEL_GUILD || g_chat.isPrivateChannel(channelId)){
 			return false;
 		}
 	}
 
-	int32_t muteTicks = 0;
-	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == CONDITION_MUTED && (*it)->getTicks() > muteTicks){
-			muteTicks = (*it)->getTicks();
-		}
+	//Not checking channels anymore
+	muteChannel = true;
+	
+	if(getMuteTime() > 0){
+		return true
 	}
-
-	time = ((uint32_t)muteTicks / 1000);
-	return (time > 0);
+	
+	return false;
 }
 
 void Player::addMessageBuffer()
