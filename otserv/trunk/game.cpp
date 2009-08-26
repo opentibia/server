@@ -3902,10 +3902,6 @@ void Game::checkCreatures()
 			creature->checkCreatureVectorIndex = -1;
 			it = checkCreatureVector.erase(it);
 			FreeThing(creature);
-
-			if(creature->getHealth() <= 0){
-				creature->onDie();
-			}
 		}
 	}
 
