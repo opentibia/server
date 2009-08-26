@@ -3451,8 +3451,8 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	if(!player || player->isRemoved())
 		return false;
 
-	bool isMuteableChannel = g_chat.isMuteableChannel(player, channelId, type);
-	int32_t muteTime = player->getMutedTime();
+	bool isMuteableChannel = g_chat.isMuteableChannel(channelId, type);
+	uint32_t muteTime = player->getMuteTime();
 
 	if(isMuteableChannel && muteTime > 0){
 		std::stringstream ss;

@@ -112,6 +112,7 @@ public:
 
 	uint16_t getFreePrivateChannelId();
 	bool isPrivateChannel(uint16_t channelId);
+	bool isMuteableChannel(uint16_t channelId, SpeakClasses type);
 
 	bool talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 

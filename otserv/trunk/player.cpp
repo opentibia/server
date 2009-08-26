@@ -1920,7 +1920,7 @@ void Player::onThink(uint32_t interval)
 #endif
 }
 
-int32_t Player::getMutedTime()
+uint32_t Player::getMuteTime()
 {
 	if(hasFlag(PlayerFlag_CannotBeMuted)){
 		return 0;

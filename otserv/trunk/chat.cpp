@@ -232,7 +232,8 @@ Chat::~Chat()
 	m_privateChannels.clear();
 }
 
-uint16_t Chat::getFreePrivateChannelId() {
+uint16_t Chat::getFreePrivateChannelId()
+{
 	for(uint16_t i = 100; i < 10000; ++i){
 		if(m_privateChannels.find(i) == m_privateChannels.end()){
 			return i;
@@ -241,9 +242,28 @@ uint16_t Chat::getFreePrivateChannelId() {
 	return 0;
 }
 
-bool Chat::isPrivateChannel(uint16_t channelId) {
+bool Chat::isPrivateChannel(uint16_t channelId)
+{
 	if(m_privateChannels.find(channelId) == m_privateChannels.end()){
 		return false;
+	}
+
+	return true;
+}
+
+bool Chat::isMuteableChannel(uint16_t channelId, SpeakClasses type)
+{
+	//Npc channel
+	if(type == SPEAK_PRIVATE_PN){
+		return false;
+	}
+
+	//Others
+	if(type == SPEAK_CHANNEL_Y){
+		//Guild and private channels
+		if(channelId == CHANNEL_GUILD || isPrivateChannel(channelId)){
+			return false;
+		}
 	}
 
 	return true;
