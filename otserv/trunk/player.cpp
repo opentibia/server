@@ -1925,14 +1925,14 @@ int32_t Player::getMuteTicks()
 	if(hasFlag(PlayerFlag_CannotBeMuted)){
 		return 0;
 	}
-	
+
 	int32_t muteTicks = 0;
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
 		if((*it)->getType() == CONDITION_MUTED && (*it)->getTicks() > muteTicks){
 			muteTicks = (*it)->getTicks();
 		}
 	}
-	
+
 	return muteTicks;
 }
 
@@ -1961,11 +1961,11 @@ bool Player::isMuted(uint16_t channelId, SpeakClasses type, bool& muteChannel)
 
 	//Not checking channels anymore
 	muteChannel = true;
-	
+
 	if(getMuteTime() > 0){
-		return true
+		return true;
 	}
-	
+
 	return false;
 }
 
