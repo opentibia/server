@@ -1898,13 +1898,15 @@ void Player::onThink(uint32_t interval)
 	}
 
 	if(canLogout()){
-		if(client){
-			client->logout(true);
-		}
-		else{
-			//Occurs when the player closes the game without logging out (x-logging).
-			if(g_creatureEvents->playerLogOut(this))
-				g_game.removeCreature(this, true);
+		if(OTSYS_TIME() - last_pong >= 60000){
+			if(client){
+				client->logout(true);
+			}
+			else{
+				//Occurs when the player closes the game without logging out (x-logging).
+				if(g_creatureEvents->playerLogOut(this))
+					g_game.removeCreature(this, true);
+			}
 		}
 	}
 
@@ -4352,7 +4354,7 @@ bool Player::canLogout()
 		return false;
 	}
 
-	if(isPzLocked() || (hasCondition(CONDITION_INFIGHT) && (OTSYS_TIME() - last_pong < 60000) ) ){
+	if(isPzLocked()){
 		return false;
 	}
 
