@@ -375,31 +375,11 @@ void Spawn::checkSpawn()
 #endif
 	checkSpawnEvent = 0;
 
-	Monster* monster;
-	uint32_t spawnId;
 
-	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end();){
-		spawnId = it->first;
-		monster = it->second;
-
-		if(monster->isRemoved()) {
-			if(spawnId != 0) {
-				spawnMap[spawnId].lastSpawn = OTSYS_TIME();
-			}
-
-			monster->releaseThing2();
-			spawnedMap.erase(it++);
-		}
-		else if(!isInSpawnZone(monster->getPosition()) && spawnId != 0) {
-			spawnedMap.insert(spawned_pair(0, monster));
-			spawnedMap.erase(it++);
-		}
-		else{
-			++it;
-		}
-	}
+	cleanup();
 
 	uint32_t spawnCount = 0;
+	uint32_t spawnId;
 	for(SpawnMap::iterator it = spawnMap.begin(); it != spawnMap.end(); ++it) {
 		spawnId = it->first;
 		spawnBlock_t& sb = it->second;
@@ -430,6 +410,32 @@ void Spawn::checkSpawn()
 		std::cout << "[Notice] Spawn::checkSpawn stopped " << this << std::endl;
 	}
 #endif
+}
+
+void Spawn::cleanup()
+{
+	Monster* monster;
+	uint32_t spawnId;
+	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end();){
+		spawnId = it->first;
+		monster = it->second;
+
+		if(monster->isRemoved()) {
+			if(spawnId != 0) {
+				spawnMap[spawnId].lastSpawn = OTSYS_TIME();
+			}
+
+			monster->releaseThing2();
+			spawnedMap.erase(it++);
+		}
+		else if(!isInSpawnZone(monster->getPosition()) && spawnId != 0) {
+			spawnedMap.insert(spawned_pair(0, monster));
+			spawnedMap.erase(it++);
+		}
+		else{
+			++it;
+		}
+	}
 }
 
 bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval)
