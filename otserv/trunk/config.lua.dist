@@ -8,10 +8,10 @@ datadir = "data/"
 -- map location
 map = "data/world/map.otbm"
 
--- Type of map storage, 
+-- Type of map storage,
 -- 'relational' - Slower, but possible to run database queries to change all items to another id for example.
 -- 'binary' - Faster, but you cannot run DB queries.
--- To switch, load server with the current type, change the type in config.lua 
+-- To switch, load server with the current type, change the type in config.lua
 -- type /reload config and the save the server with /closeserver serversave
 map_store_type = "binary"
 
@@ -64,16 +64,22 @@ worldtype = "pvp"
 -- does player rate (from lua functions) count on experience gained from killings players on pvp-e worlds?
 rates_for_player_killing = false
 
--- exhausted time in ms (1000 = 1 second) for none-aggressive spells
+-- exhausted time in ms (1000 = 1 second) for "yell" speak type
 exhausted = 1000
 
 -- exhausted time in ms (1000 = 1 second) for aggressive spells/weapons
 fightexhausted = 2000
 
--- attack speed using melee (1000 = 1 second) 
+-- exhausted time in ms (1000 = 1 second) for none-aggressive spells
+healexhausted = 1000
+
+-- exhausted time in ms (1000 = 1 second) for floor changing
+stairhop_exhausted = 1000
+
+-- attack speed using melee (1000 = 1 second)
 attackspeed = 2000
 
--- how many ms to add if the player is already exhausted and tries to cast a spell (1000 = 1 second)
+-- how many ms to add if the player is already exhausted and tries to cast a spell/yells (1000 = 1 second)
 exhaustedadd = 200
 
 -- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1 second)
@@ -99,7 +105,7 @@ minactionexinterval = 1000
 houserentperiod = "monthly"
 
 -- whether or not to check for premium accounts when using beds
-premonlybeds = false
+premonlybeds = true
 
 -- Should the server use account balance system or depot system for paying houses?
 useaccbalance = true
@@ -190,7 +196,7 @@ hunting_kill_duration = pzlocked
 remove_ammunition = true
 
 -- Remove rune charges
--- This only applies to runes done using the default functions. 
+-- This only applies to runes done using the default functions.
 -- Custom runes made using actions will not be affected.
 remove_rune_charges = true
 
@@ -224,7 +230,7 @@ motdnum = "1"
 -- login message
 loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otfans.net."
 
--- how many logins attempts until ip is temporary disabled 
+-- how many logins attempts until ip is temporary disabled
 -- set to 0 to disable
 logintries = 5
 

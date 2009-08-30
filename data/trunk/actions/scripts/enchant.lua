@@ -42,6 +42,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
+	doDecayItem(item2.uid)
 	return TRUE
 
 end

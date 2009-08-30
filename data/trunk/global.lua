@@ -10,6 +10,7 @@ dofile(getDataDir() .. "game_classes/calculator.lua")
 -- Storages consts
 STORAGE_RUM_MACHINE = 100000
 STORAGE_PROMOTION = 15000
+STORAGE_PREMIUM_ACCOUNT = 25000
 -- Storage for blesses - 500000 + blessID
 STORAGE_BLESSES = 500000
 -- Storage will be set to know we will remove blesses in onLogin

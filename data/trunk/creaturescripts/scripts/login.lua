@@ -19,16 +19,22 @@ function onLogin(cid)
 			doPlayerRemoveSkillLossPercent(cid, 30)
 			setPlayerStorageValue(cid, STORAGE_PROMOTION, -1)
 		end
+		if(getPlayerStorageValue(cid, STORAGE_PREMIUM_ACCOUNT) == 1) then
+			setPlayerStorageValue(cid, STORAGE_PREMIUM_ACCOUNT, -1)
+		end
 		return TRUE
 	end
 
 	--Player is not premium - remove premium privileges
 	--Change outfit
-	local lookType = 128
-	if(getPlayerSex(cid) == 0) then
-		lookType = 136
+	if(getPlayerStorageValue(cid, STORAGE_PREMIUM_ACCOUNT) == -1) then
+		local lookType = 128
+		if(getPlayerSex(cid) == 0) then
+			lookType = 136
+		end
+		doCreatureChangeOutfit(cid, {lookType = lookType, lookHead = 78, lookBody = 69, lookLegs = 97, lookFeet = 95, lookAddons = 0})
+		setPlayerStorageValue(cid, STORAGE_PREMIUM_ACCOUNT, 1)
 	end
-	doCreatureChangeOutfit(cid, {lookType = lookType, lookHead = 78, lookBody = 69, lookLegs = 97, lookFeet = 95, lookAddons = 0})
 
 	--Remove house
 	local house = House.getHouseByOwner(cid)

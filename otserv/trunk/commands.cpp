@@ -755,7 +755,7 @@ bool Commands::serverDiag(Creature* creature, const std::string& cmd, const std:
 	text << "--------------------\n";
 	text << "asio: " << BOOST_ASIO_VERSION << "\n";
 	text << "libxml: " << XML_DEFAULT_VERSION << "\n";
-	text << "lua: " << LUA_VERSION << "\n";
+	text << "lua: " << LUA_RELEASE << "\n";
 
 	//TODO: more information that could be useful
 

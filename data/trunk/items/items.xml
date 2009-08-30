@@ -12725,7 +12725,7 @@
 	<item id="5962" article="a" name="dead cyclops" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="3069"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
@@ -13567,11 +13567,14 @@
 		<attribute key="description" value="It contains the fourth verse of a hymn."/>
 		<attribute key="weight" value="50"/>
 	</item>
-	<item id="6091" article="a" name="watch">
+	<item id="6091" article="a" name="very noble-looking watch">
+		<attribute key="description" value="Unfortunately it seems to be broken."/>
 		<attribute key="weight" value="50"/>
 	</item>
-	<item id="6092" article="a" name="watch">
+	<item id="6092" article="a" name="very noble-looking watch">
 		<attribute key="weight" value="50"/>
+		<attribute key="duration" value="259200"/>
+		<attribute key="decayTo" value="6091"/>
 	</item>
 	<item id="6093" article="a" name="crystal ring">
 		<attribute key="description" value="The initials E.S. are engraved on it."/>
@@ -23878,7 +23881,7 @@
 	</item>
 	<item id="10525" article="a" name="slain medusa">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="10525"/>
+		<attribute key="decayTo" value="10526"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>

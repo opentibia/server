@@ -58,6 +58,9 @@
 	<action itemid="1877" script="watch_clock.lua"/>
 	<action itemid="1881" script="watch_clock.lua"/>
 	<action itemid="2036" script="watch_clock.lua"/>
+	<action itemid="6091" script="watch_clock.lua"/>
+	<action itemid="6092" script="watch_clock.lua"/>
+	<action itemid="8187" script="watch_clock.lua"/>
 	
 	<!-- Liquids -->
 	<action itemid="1775" script="liquids/containers.lua"/>

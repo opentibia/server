@@ -136,9 +136,11 @@ public:
 	WorldType_t getWorldType() const {return worldType;}
 	// These functions confuse me.. Why not use the config values?
 	uint32_t getInFightTicks() {return inFightTicks;}
-	int32_t getExhaustionTicks() {return exhaustionTicks;}
-	int32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
-	int32_t getHealExhaustionTicks() {return healExhaustionTicks;}
+	uint32_t getExhaustionTicks() {return exhaustionTicks;}
+	uint32_t getAddExhaustionTicks() {return addExhaustionTicks;}
+	uint32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
+	uint32_t getHealExhaustionTicks() {return healExhaustionTicks;}
+	uint32_t getStairhopExhaustion() {return stairhopExhaustion;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
@@ -604,8 +606,10 @@ protected:
 	uint32_t maxPlayers;
 	uint32_t inFightTicks;
 	uint32_t exhaustionTicks;
+	uint32_t addExhaustionTicks;
 	uint32_t fightExhaustionTicks;
 	uint32_t healExhaustionTicks;
+	uint32_t stairhopExhaustion;
 
 	GameState_t gameState;
 	WorldType_t worldType;

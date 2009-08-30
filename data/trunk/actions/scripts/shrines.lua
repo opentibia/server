@@ -49,12 +49,12 @@ function onUse(cid, item, frompos, item2, topos)
 		return TRUE
 	end
 
-	if (getPlayerMana(cid) >= manaCost) then
+	if (getPlayerMana(cid) < manaCost) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHMANA)
 		return TRUE
 	end
 
-	if (getPlayerSoul(cid) >= soulCost) then
+	if (getPlayerSoul(cid) < soulCost) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHSOUL)
 		return TRUE
 	end
