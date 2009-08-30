@@ -64,7 +64,7 @@ char upchar(char c);
 std::string urlEncode(const char* str);
 std::string urlEncode(const std::string& str);
 
-bool passwordTest(const std::string &plain, std::string &hash);
+bool passwordTest(std::string plain, std::string &hash);
 
 std::string convertIPToString(uint32_t ip);
 //buffer should have at least 21 bytes. dd/mm/yyyy  hh:mm:ss

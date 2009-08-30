@@ -616,20 +616,24 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::string passwordType = g_config.getString(ConfigManager::PASSWORD_TYPE_STR);
 	if(passwordType.empty() || asLowerCaseString(passwordType) == "plain"){
 		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_PLAIN);
-		std::cout << ":: Use plain passwords" << std::endl;
+		std::cout << ":: Use plain passwords";
 	}
 	else if(asLowerCaseString(passwordType) == "md5"){
 		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_MD5);
-		std::cout << ":: Use MD5 passwords" << std::endl;
+		std::cout << ":: Use MD5 passwords";
 	}
 	else if(asLowerCaseString(passwordType) == "sha1"){
 		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_SHA1);
-		std::cout << ":: Use SHA1 passwords" << std::endl;
+		std::cout << ":: Use SHA1 passwords";
 	}
 	else{
 		ErrorMessage("Unknown password type!");
 		exit(-1);
 	}
+
+	if(g_config.getString(ConfigManager::PASSWORD_SALT) != "")
+		std::cout << " [salted]";
+	std::cout << std::endl;
 
 	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE),
 		g_config.getString(ConfigManager::MAP_KIND))){

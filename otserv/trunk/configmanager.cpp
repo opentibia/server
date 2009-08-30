@@ -97,6 +97,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 			std::cout << "Warning: [ConfigManager] md5passwords is deprecated. Use passwordtype instead." << std::endl;
 		}
 		m_confString[PASSWORD_TYPE_STR] = getGlobalString(L, "passwordtype");
+		m_confString[PASSWORD_SALT] = getGlobalString(L, "passwordsalt", "");
 		m_confString[WORLD_TYPE] = getGlobalString(L, "worldtype");
 		m_confString[SQL_HOST] = getGlobalString(L, "sql_host");
 		m_confString[SQL_USER] = getGlobalString(L, "sql_user");

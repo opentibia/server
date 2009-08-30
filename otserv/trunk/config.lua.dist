@@ -261,6 +261,10 @@ statustimeout = 30 * 1000
 -- options: plain, md5, sha1
 passwordtype = "plain"
 
+-- Password salt
+-- Offers better security against rainbow table attacks etc.
+passwordsalt = ""
+
 -- House configuration (game_class)
 -- House tile price
 house_tile_price = 100

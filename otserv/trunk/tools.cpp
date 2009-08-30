@@ -348,8 +348,11 @@ std::string urlEncode(const char* str)
 	return out;
 }
 
-bool passwordTest(const std::string &plain, std::string &hash)
+bool passwordTest(std::string plain, std::string &hash)
 {
+	// Salt it beforehand
+	plain += g_config.getString(ConfigManager::PASSWORD_SALT);
+
 	switch(g_config.getNumber(ConfigManager::PASSWORD_TYPE)){
 	case PASSWORD_TYPE_PLAIN:
 	{
