@@ -74,7 +74,7 @@ fightexhausted = 2000
 healexhausted = 1000
 
 -- exhausted time in ms (1000 = 1 second) for floor changing
-stairhop_exhausted = 1000
+stairhop_exhausted = 2000
 
 -- attack speed using melee (1000 = 1 second)
 attackspeed = 2000

@@ -3301,7 +3301,7 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2213"/>
 		<attribute key="suppressDrunk" value="1"/>
-		<attribute key="duration" value="300"/>
+		<attribute key="duration" value="600"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2216" article="a" name="ring of healing (faster regeneration)">
