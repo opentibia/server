@@ -2370,7 +2370,6 @@ void Player::die()
 			uint32_t sumMana = 0;
 			int32_t lostMana = 0;
 
-			//sum up all the mana
 			for(uint32_t i = 1; i <= magLevel; ++i){
 				sumMana += vocation->getReqMana(i);
 			}
@@ -2392,11 +2391,11 @@ void Player::die()
 			//Skill loss
 			uint32_t lostSkillTries;
 			uint32_t sumSkillTries;
-			for(uint32_t i = 0; i <= 6; ++i){	//for each skill
-				lostSkillTries = 0;				//reset to 0
+			for(uint32_t i = 0; i <= 6; ++i){
+				lostSkillTries = 0;
 				sumSkillTries = 0;
 
-				for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels
+				for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) {
 					sumSkillTries += vocation->getReqSkillTries(i, c);
 				}
 
@@ -2439,7 +2438,7 @@ void Player::die()
 Item* Player::dropCorpse()
 {
 	if(getZone() != ZONE_PVP){
-		Creature::dropCorpse();
+		return Creature::dropCorpse();
 	}
 
 	return NULL;

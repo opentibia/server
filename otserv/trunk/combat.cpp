@@ -381,7 +381,8 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 		attackerPlayer->isPartner(targetPlayer) ||
 		Combat::isInPvpZone(attackerPlayer, targetPlayer) ||
 		targetPlayer->hasAttacked(attackerPlayer) ||
-		targetPlayer->getSkull() != SKULL_NONE){
+		targetPlayer->getSkull() != SKULL_NONE ||
+		targetPlayer == attackerPlayer){
 		return false;
 	}
 
