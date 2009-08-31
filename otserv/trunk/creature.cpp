@@ -754,9 +754,8 @@ void Creature::onDie()
 		}
 	}
 
-	if(dropCorpse() != NULL){
-		die();
-	}
+	dropCorpse();
+	die();
 
 	if(getMaster()){
 		getMaster()->removeSummon(this);

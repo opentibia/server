@@ -2335,12 +2335,17 @@ void Player::onDie()
 
 void Player::die()
 {
+	ConditionEnd_t conditionEndReason = CONDITIONEND_DIE;
+	if(getZone() == ZONE_PVP){
+		conditionEndReason = CONDITIONEND_ABORT;
+	}
+
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		if((*it)->isPersistent()){
 			Condition* condition = *it;
 			it = conditions.erase(it);
 
-			condition->endCondition(this, CONDITIONEND_DIE);
+			condition->endCondition(this, conditionEndReason);
 
 			bool lastCondition = !hasCondition(condition->getType(), false);
 			onEndCondition(condition->getType(), lastCondition);
@@ -2351,78 +2356,76 @@ void Player::die()
 		}
 	}
 
-	loginPosition = masterPos;
+	if(getZone() != ZONE_PVP){
+		loginPosition = masterPos;
 
-	if(skillLoss){
-		uint64_t expLost = getLostExperience();
+		if(skillLoss){
+			uint64_t expLost = getLostExperience();
 
-		//Level loss
-		removeExperience(expLost, false);
-		double lostPercent = 1. - (double(experience - expLost) / double(experience)); // 0.1 if 10% was lost
+			//Level loss
+			removeExperience(expLost, false);
+			double lostPercent = 1. - (double(experience - expLost) / double(experience)); // 0.1 if 10% was lost
 
-		//Magic level loss
-		uint32_t sumMana = 0;
-		int32_t lostMana = 0;
+			//Magic level loss
+			uint32_t sumMana = 0;
+			int32_t lostMana = 0;
 
-		//sum up all the mana
-		for(uint32_t i = 1; i <= magLevel; ++i){
-			sumMana += vocation->getReqMana(i);
-		}
-
-		sumMana += manaSpent;
-
-		double lostPercentMana = lostPercent * lossPercent[LOSS_MANASPENT] / 100;
-		lostMana = (int32_t)std::ceil(sumMana * lostPercentMana);
-
-		while((uint32_t)lostMana > manaSpent && magLevel > 0){
-			lostMana -= manaSpent;
-			manaSpent = vocation->getReqMana(magLevel);
-			magLevel--;
-		}
-
-		manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
-		magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
-
-		//Skill loss
-		uint32_t lostSkillTries;
-		uint32_t sumSkillTries;
-		for(uint32_t i = 0; i <= 6; ++i){	//for each skill
-			lostSkillTries = 0;				//reset to 0
-			sumSkillTries = 0;
-
-			for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels
-				sumSkillTries += vocation->getReqSkillTries(i, c);
+			//sum up all the mana
+			for(uint32_t i = 1; i <= magLevel; ++i){
+				sumMana += vocation->getReqMana(i);
 			}
 
-			sumSkillTries += skills[i][SKILL_TRIES];
-			double lossPercentSkill = lostPercent * lossPercent[LOSS_SKILLTRIES] / 100;
-			lostSkillTries = (uint32_t)std::ceil(sumSkillTries * lossPercentSkill);
+			sumMana += manaSpent;
 
-			while(lostSkillTries > skills[i][SKILL_TRIES]){
-				lostSkillTries -= skills[i][SKILL_TRIES];
-				skills[i][SKILL_TRIES] = vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]);
-				if(skills[i][SKILL_LEVEL] > 10){
-					skills[i][SKILL_LEVEL]--;
-				}
-				else{
-					skills[i][SKILL_LEVEL] = 10;
-					skills[i][SKILL_TRIES] = 0;
-					lostSkillTries = 0;
-					break;
-				}
+			double lostPercentMana = lostPercent * lossPercent[LOSS_MANASPENT] / 100;
+			lostMana = (int32_t)std::ceil(sumMana * lostPercentMana);
+
+			while((uint32_t)lostMana > manaSpent && magLevel > 0){
+				lostMana -= manaSpent;
+				manaSpent = vocation->getReqMana(magLevel);
+				magLevel--;
 			}
 
-			skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
-		}
+			manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
+			magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
+
+			//Skill loss
+			uint32_t lostSkillTries;
+			uint32_t sumSkillTries;
+			for(uint32_t i = 0; i <= 6; ++i){	//for each skill
+				lostSkillTries = 0;				//reset to 0
+				sumSkillTries = 0;
+
+				for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels
+					sumSkillTries += vocation->getReqSkillTries(i, c);
+				}
+
+				sumSkillTries += skills[i][SKILL_TRIES];
+				double lossPercentSkill = lostPercent * lossPercent[LOSS_SKILLTRIES] / 100;
+				lostSkillTries = (uint32_t)std::ceil(sumSkillTries * lossPercentSkill);
+
+				while(lostSkillTries > skills[i][SKILL_TRIES]){
+					lostSkillTries -= skills[i][SKILL_TRIES];
+					skills[i][SKILL_TRIES] = vocation->getReqSkillTries(i, skills[i][SKILL_LEVEL]);
+					if(skills[i][SKILL_LEVEL] > 10){
+						skills[i][SKILL_LEVEL]--;
+					}
+					else{
+						skills[i][SKILL_LEVEL] = 10;
+						skills[i][SKILL_TRIES] = 0;
+						lostSkillTries = 0;
+						break;
+					}
+				}
+
+				skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
+			}
+  		}
+
+		Creature::die();
+		sendReLoginWindow();
 	}
-
-	sendReLoginWindow();
-	Creature::die();
-}
-
-Item* Player::dropCorpse()
-{
-	if(getZone() == ZONE_PVP){
+	else{
 		preSave();
 		setDropLoot(true);
 		setLossSkill(true);
@@ -2430,11 +2433,16 @@ Item* Player::dropCorpse()
 		g_game.internalTeleport(this, getTemplePosition());
 		g_game.addCreatureHealth(this);
 		onThink(EVENT_CREATURE_THINK_INTERVAL);
-		return NULL;
 	}
-	else{
-		return Creature::dropCorpse();
+}
+
+Item* Player::dropCorpse()
+{
+	if(getZone() != ZONE_PVP){
+		Creature::dropCorpse();
 	}
+
+	return NULL;
 }
 
 Item* Player::createCorpse()
