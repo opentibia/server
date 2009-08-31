@@ -484,6 +484,8 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 								continue;
 							}
 
+							const ItemType& it = Item::items[li.itemId];
+
 							if(readXMLInteger(tmpNode, "sellprice", intValue)){
 								li.sellPrice = intValue;
 							}
@@ -504,6 +506,14 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 							//optional
 							if(readXMLInteger(tmpNode, "subtype", intValue)){
 								li.subType = intValue;
+							}
+							else{
+								if(it.isRune()){
+									li.subType = it.charges;
+								}
+								else if(it.stackable){
+									li.subType = 1;
+								}
 							}
 
 							if(readXMLString(tmpNode, "name", strValue)){

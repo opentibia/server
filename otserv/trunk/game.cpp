@@ -3015,10 +3015,6 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 		return false;
 	}
 
-	if(!player->hasShopItemForSale(it.id)){
-		return false;
-	}
-
 	uint8_t subType = 0;
 	if(it.isFluidContainer()){
 		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
@@ -3028,6 +3024,10 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 	}
 	else{
 		subType = count;
+	}
+
+	if(!player->hasShopItemForSale(it.id, subType)){
+		return false;
 	}
 
 	merchant->onPlayerTrade(player, SHOPEVENT_BUY, onBuy, it.id, subType, amount, ignoreCapacity, buyWithBackpack);

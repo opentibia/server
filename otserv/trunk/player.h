@@ -643,7 +643,7 @@ public:
 	void openShopWindow(const std::list<ShopInfo>& shop);
 	void closeShopWindow();
 	void updateSaleShopList(uint32_t itemId);
-	bool hasShopItemForSale(uint32_t itemId);
+	bool hasShopItemForSale(uint32_t itemId, uint8_t subType);
 
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;
