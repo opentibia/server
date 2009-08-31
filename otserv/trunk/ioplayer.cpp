@@ -949,7 +949,7 @@ bool IOPlayer::getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& na
 	DBQuery query;
 
 	if(!(result = db->storeQuery(
-		"SELECT `name`, `id`, `groups`.`flags` AS `flags` \
+		"SELECT `players`.`name`, `players`.`id`, `groups`.`flags` AS `flags` \
 		FROM `players` LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` \
 		WHERE `players`.`name`= " + db->escapeString(name))))
 		return false;
