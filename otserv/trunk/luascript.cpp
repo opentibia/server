@@ -2815,7 +2815,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 			subType = count;
 		}
 		else{
-			itemCount = count;
+			itemCount = std::max((int32_t)1, (int32_t)count);
 		}
 	}
 
@@ -3679,7 +3679,7 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 		subType = count;
 	}
 	else{
-		itemCount = count;
+		itemCount = std::max((int32_t)1, (int32_t)count);
 	}
 
 	while(itemCount > 0){
@@ -6823,7 +6823,7 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 		subType = count;
 	}
 	else{
-		itemCount = count;
+		itemCount = std::max((int32_t)1, (int32_t)count);
 	}
 
 	while(itemCount > 0){
