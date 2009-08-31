@@ -354,7 +354,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	std::string acc_pass;
-	if(!(IOAccount::instance()->getPassword(accname, name, acc_pass) && passwordTest(password,acc_pass))){
+	if(!(IOAccount::instance()->getPassword(accname, name, acc_pass) && passwordTest(password, acc_pass))){
 		g_bans.addLoginAttempt(getIP(), false);
 		getConnection()->closeConnection();
 		return false;

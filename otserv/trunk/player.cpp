@@ -2414,16 +2414,9 @@ void Player::die()
 
 			skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
 		}
-
-		//Send that death window
-		sendReLoginWindow();
-	}
-	else if(getZone() != ZONE_PVP){
-		//Send death window if skillLoss = false
-		//and if player died out of a pvp zone
-		sendReLoginWindow();
 	}
 
+	sendReLoginWindow();
 	Creature::die();
 }
 
