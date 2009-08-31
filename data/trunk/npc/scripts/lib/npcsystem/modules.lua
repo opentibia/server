@@ -825,7 +825,7 @@ if(Modules == nil) then
 
 		local itemWindow = {}
 		for itemid, attr in pairs(module.npcHandler.shopItems) do
-			local item = {id = itemid, buy = attr.buyPrice, sell = attr.sellPrice, charges = attr.subType}
+			local item = {id = itemid, buy = attr.buyPrice, sell = attr.sellPrice, subtype = attr.subType}
 			table.insert(itemWindow, item)
 		end
 
