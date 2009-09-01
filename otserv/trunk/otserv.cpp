@@ -254,9 +254,6 @@ int main(int argc, char *argv[])
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 
-	while(true)
-		new int[100000];
-
 	ServiceManager servicer;
 
 	// Start scheduler and dispatcher threads
