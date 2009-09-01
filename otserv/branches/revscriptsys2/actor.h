@@ -83,23 +83,27 @@ public:
 	bool canPushItems() const {return cType.canPushItems();}
 	bool canPushCreatures() const {return cType.canPushCreatures();}
 	bool isHostile() const { return cType.isHostile();}
-	virtual bool canSeeInvisibility() const { return isImmune(CONDITION_INVISIBLE);}
+	virtual bool canSeeInvisibility() const { return Creature::isImmune(CONDITION_INVISIBLE);}
 	uint32_t getManaCost() const {return cType.manaCost();}	
 	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
 
+	virtual void onAttackedCreature(Creature* target);
+	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
+
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
-	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+		const Tile* oldTile, const Position& oldPos, bool teleport);
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showeffect);
 	virtual void changeHealth(int32_t healthChange);
 
 	virtual void onWalk();
-	virtual bool getNextStep(Direction& dir);
+	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 	virtual void onFollowCreatureComplete(const Creature* creature);
 
 	virtual void onThink(uint32_t interval);
@@ -122,6 +126,7 @@ public:
 	bool isTarget(Creature* creature);
 	bool isFleeing() const {return getHealth() <= cType.runAwayHealth();}
 
+	bool isImmune(CombatType_t type) const;
 	BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 
@@ -140,7 +145,7 @@ private:
 	uint32_t yellTicks;
 	int32_t targetChangeCooldown;
 	bool resetTicks;
-	bool isActivated;
+	bool isIdle;
 	bool extraMeleeAttack;
 	bool isMasterInRange;
 
@@ -162,15 +167,16 @@ private:
 	void clearFriendList();
 
 	void die();
-	Item* getCorpse();
+	Item* createCorpse();
 	bool despawn();
 	bool inDespawnRange(const Position& pos);
 
-	bool activate(bool forced = false);
-	bool deactivate(bool forced = false);
+	void setIdle(bool _idle);
+	void updateIdleStatus();
+	bool getIdleStatus() const {return isIdle;}
 
-	virtual void onAddCondition(ConditionType_t type);
-	virtual void onEndCondition(ConditionType_t type);
+	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
+	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature);
 
 	bool canUseAttack(const Position& pos, const Creature* target) const;

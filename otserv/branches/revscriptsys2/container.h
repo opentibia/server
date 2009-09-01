@@ -67,11 +67,12 @@ public:
 	virtual Depot* getDepot() {return NULL;};
 	virtual const Depot* getDepot() const {return NULL;};
 
-	//serialization
+	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
+	std::string getContentDescription() const;
 
-	uint32_t size() const {return (uint32_t)itemlist.size();};
-	uint32_t capacity() const {return maxSize;};
+	uint32_t size() const {return (uint32_t)itemlist.size();}
+	bool empty() const {return itemlist.empty();}
 
 	ContainerIterator begin();
 	ContainerIterator end();
@@ -87,9 +88,9 @@ public:
 	Item* getItem(uint32_t index);
 	bool isHoldingItem(const Item* item) const;
 
+	uint32_t capacity() const {return maxSize;}
 	uint32_t getItemHoldingCount() const;
 	virtual double getWeight() const;
-	std::string getContentDescription() const;
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -112,10 +113,11 @@ public:
 	virtual int32_t __getFirstIndex() const;
 	virtual int32_t __getLastIndex() const;
 	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
+	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap, bool itemCount = true) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
-	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
@@ -135,8 +137,10 @@ protected:
 	uint32_t maxSize;
 	double total_weight;
 	ItemList itemlist;
+	uint32_t serializationCount;
 
 	friend class ContainerIterator;
+	friend class IOMapSerialize;
 };
 
 #endif

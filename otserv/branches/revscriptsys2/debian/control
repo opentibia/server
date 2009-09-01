@@ -1,0 +1,18 @@
+Source: otserv
+Section: games
+Priority: extra
+Maintainer: Ivan Vucica <ivucica@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev
+Standards-Version: 3.8.0
+Homepage: http://opentibia.sf.net/
+
+Package: otserv
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Server for 2D MMORPG
+ OpenTibia Server, abbreviated OTServ or just OT is the main project 
+ of the OpenTibia. OpenTibia Server is a server designed for use 
+ primarily with the Tibia client designed by CipSoft GmbH but 
+ alternative clients are in development, most notably Yet Another 
+ Tibia Client.
+

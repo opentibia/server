@@ -23,28 +23,30 @@
 
 #include <stdio.h>
 #include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
 class NetworkMessage;
 class OutputMessage;
 class Connection;
+typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
+typedef boost::shared_ptr<Connection> Connection_ptr;
 class RSA;
 
-#define CLIENT_VERSION_MIN 840
-#define CLIENT_VERSION_MAX 840
+#define CLIENT_VERSION_MIN 850
+#define CLIENT_VERSION_MAX 850
 
-#define STRING_CLIENT_VERSION "This server requires client version 8.40."
+#define STRING_CLIENT_VERSION "This server requires client version " OTSERV_CLIENT_VERSION "."
 
 class Protocol : boost::noncopyable
 {
 public:
-	Protocol(Connection* connection)
+	Protocol(Connection_ptr connection)
 	{
 		m_connection = connection;
 		m_encryptionEnabled = false;
-		m_checksumEnabled = true;
+		m_checksumEnabled = false;
 		m_rawMessages = false;
 		m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
-		m_outputBuffer = NULL;
 		m_refCount = 0;
 	}
 
@@ -52,13 +54,14 @@ public:
 
 	virtual void parsePacket(NetworkMessage& msg){};
 
-	void onSendMessage(OutputMessage* msg);
+	void onSendMessage(OutputMessage_ptr msg);
 	void onRecvMessage(NetworkMessage& msg);
 	virtual void onRecvFirstMessage(NetworkMessage& msg) = 0;
+	virtual void onConnect() {} // Used by new gameworld to send first packet to client
 
-	Connection* getConnection() { return m_connection;}
-	const Connection* getConnection() const { return m_connection;}
-	void setConnection(Connection* connection) { m_connection = connection; }
+	Connection_ptr getConnection() { return m_connection;}
+	const Connection_ptr getConnection() const { return m_connection;}
+	void setConnection(Connection_ptr connection) { m_connection = connection; }
 
 	uint32_t getIP() const;
 	int32_t addRef() {return ++m_refCount;}
@@ -66,7 +69,7 @@ public:
 
 protected:
 	//Use this function for autosend messages only
-	OutputMessage* getOutputBuffer();
+	OutputMessage_ptr getOutputBuffer();
 
 	void enableXTEAEncryption() { m_encryptionEnabled = true; }
 	void disableXTEAEncryption() { m_encryptionEnabled = false; }
@@ -78,6 +81,7 @@ protected:
 
 	void XTEA_encrypt(OutputMessage& msg);
 	bool XTEA_decrypt(NetworkMessage& msg);
+	bool RSA_decrypt(NetworkMessage& msg);
 	bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
 
 	void setRawMessages(bool value) { m_rawMessages = value; }
@@ -85,11 +89,10 @@ protected:
 	virtual void releaseProtocol();
 	virtual void deleteProtocolTask();
 	friend class Connection;
-
 private:
 
-	OutputMessage* m_outputBuffer;
-	Connection* m_connection;
+	OutputMessage_ptr m_outputBuffer;
+	Connection_ptr m_connection;
 	bool m_encryptionEnabled;
 	bool m_checksumEnabled;
 	bool m_rawMessages;

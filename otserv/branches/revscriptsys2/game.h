@@ -17,8 +17,6 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
-
 #ifndef __OTSERV_GAME_H__
 #define __OTSERV_GAME_H__
 
@@ -30,12 +28,15 @@
 #include "enums.h"
 #include "position.h"
 #include "templates.h"
+#include "enums.h"
 #include "scheduler.h"
 
 namespace Script {
 	class Manager;
 	class Environment;
 }
+class ServiceManager;
+class Player;
 class Creature;
 class Actor;
 class CombatInfo;
@@ -47,7 +48,7 @@ enum stackPosType_t{
 	STACKPOS_MOVE,
 	STACKPOS_LOOK,
 	STACKPOS_USE,
-	STACKPOS_USEITEM,
+	STACKPOS_USEITEM
 };
 
 enum WorldType_t {
@@ -69,7 +70,7 @@ enum LightState_t {
 	LIGHT_STATE_DAY,
 	LIGHT_STATE_NIGHT,
 	LIGHT_STATE_SUNSET,
-	LIGHT_STATE_SUNRISE,
+	LIGHT_STATE_SUNRISE
 };
 
 struct RuleViolation {
@@ -121,6 +122,8 @@ public:
   Game();
 	~Game();
 
+	void start(ServiceManager* servicer);
+
 	/**
 	  * Load a map.
 	  * \param filename Mapfile to load
@@ -161,10 +164,13 @@ public:
 
 	void setWorldType(WorldType_t type);
 	WorldType_t getWorldType() const {return worldType;}
+	// These functions confuse me.. Why not use the config values?
 	uint32_t getInFightTicks() {return inFightTicks;}
-	int32_t getExhaustionTicks() {return exhaustionTicks;}
-	int32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
-	int32_t getHealExhaustionTicks() {return healExhaustionTicks;}
+	uint32_t getExhaustionTicks() {return exhaustionTicks;}
+	uint32_t getAddExhaustionTicks() {return addExhaustionTicks;}
+	uint32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
+	uint32_t getHealExhaustionTicks() {return healExhaustionTicks;}
+	uint32_t getStairhopExhaustion() {return stairhopExhaustion;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
@@ -175,7 +181,8 @@ public:
 	  * Get a single tile of the map.
 	  * \return A pointer to the tile
 		*/
-	Tile* getTile(uint32_t x, uint32_t y, uint32_t z);
+	Tile* getTile(int32_t x, int32_t y, int32_t z);
+	Tile* getTile(const Position& pos);
 
 	/**
 	  * Set a single tile of the map, position is read from this tile
@@ -230,6 +237,35 @@ public:
 	  * \return A vector of all the players
 	  */
 	std::vector<Player*> getPlayersByName(const std::string& s);
+
+	/**
+	  * Returns a player based on a string name identifier
+	  * this function returns a pointer even if the player is offline,
+	  * it is up to the caller of the function to delete the pointer - if the player is offline
+	  * use isOffline() to determine if the player was offline
+	  * \param s is the name identifier
+	  * \return A Pointer to the player
+	  */
+	Player* getPlayerByNameEx(const std::string& s);
+
+	/**
+	  * Returns a player based on a guid identifier
+	  * this function returns a pointer even if the player is offline,
+	  * it is up to the caller of the function to delete the pointer - if the player is offline
+	  * use isOffline() to determine if the player was offline
+	  * \param guid is the identifier
+	  * \return A Pointer to the player
+	  */
+	Player* getPlayerByGuid(uint32_t guid);
+
+	/**
+	  * Returns a player based on a guid identifier
+	  * this function returns a pointer even if the player is offline,
+	  * it is up to the caller of the function to delete the pointer - if the player is offline
+	  * use isOffline() to determine if the player was offline
+	  * \param guid is the identifier
+	  */
+	Player* getPlayerByGuidEx(uint32_t guid);
 
 	/**
 	  * Returns a player based on a string name identifier, with support for the "~" wildcard.
@@ -325,7 +361,6 @@ public:
 
 	ReturnValue internalAddItem(Creature* actor, Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
 		uint32_t flags = 0, bool test = false);
-	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
 	ReturnValue internalRemoveItem(Creature* actor, Item* item, int32_t count = -1,  bool test = false, uint32_t flags = 0);
 
 	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true);
@@ -368,7 +403,7 @@ public:
 	  * \param flags optional flags to modifiy the default behaviour
 	  * \return true if the removal was successful
 	  */
-	bool removeMoney(Creature* actor, Cylinder* cylinder, int32_t money, uint32_t flags = 0);
+	bool removeMoney(Creature* actor, Cylinder* cylinder, uint32_t money, uint32_t flags = 0);
 
 	/**
 	  * Add item(s) with monetary value
@@ -378,7 +413,7 @@ public:
 	  * \param flags optional flags to modify default behavior
 	  * \return true
 	  */
-	bool addMoney(Creature* actor, Cylinder* cylinder, int32_t money, uint32_t flags = 0);
+	bool addMoney(Creature* actor, Cylinder* cylinder, uint32_t money, uint32_t flags = 0);
 
 	/**
 	  * Transform one item to another type/count
@@ -428,7 +463,7 @@ public:
 		const Position& movingCreatureOrigPos, const Position& toPos);
 	bool playerMoveItem(uint32_t playerId, const Position& fromPos,
 		uint16_t spriteId, uint8_t fromStackPos, const Position& toPos, uint8_t count);
-	bool playerMove(uint32_t playerId, Direction direction);
+	bool playerMove(uint32_t playerId, Direction dir);
 	bool playerCreatePrivateChannel(uint32_t playerId);
 	bool playerChannelInvite(uint32_t playerId, const std::string& name);
 	bool playerChannelExclude(uint32_t playerId, const std::string& name);
@@ -463,7 +498,7 @@ public:
 	bool playerCloseTrade(uint32_t playerId);
 
 	bool playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
-		uint8_t amount, bool ignoreCapacity, bool buyWithBackpack);
+		uint8_t amount, bool ignoreCapacity = false, bool buyWithBackpack = false);
 	bool playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		uint8_t amount);
 	bool playerCloseShop(uint32_t playerId);
@@ -480,6 +515,7 @@ public:
 	bool playerRequestOutfit(uint32_t playerId);
 	bool playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 		std::string receiver, std::string text);
+	bool checkPlayerMute(uint16_t channelId, SpeakClass type);
 	bool playerChangeOutfit(uint32_t playerId, Outfit_t outfit);
 	bool playerInviteToParty(uint32_t playerId, uint32_t invitedId);
 	bool playerJoinParty(uint32_t playerId, uint32_t leaderId);
@@ -489,6 +525,9 @@ public:
 	bool playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown);
 	bool playerShowQuestLog(uint32_t playerId);
 	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
+	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
+		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
+	bool playerReportBug(uint32_t playerId, std::string comment);
 
 	// Script event callbacks, all are in the game class so we don't have to include the script files
 	bool playerLogout(Player* player, bool forced, bool timeout);
@@ -533,6 +572,7 @@ public:
 
 	GameState_t getGameState();
 	void setGameState(GameState_t newState);
+	bool saveServer(bool payHouses, bool shallowSave = false);
 	void saveGameState();
 	void loadGameState();
 	void refreshMap(Map::TileMap::iterator* begin = NULL, int clean_max = 0);
@@ -601,10 +641,11 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
-	bool npcSpeakToPlayer(Creature* npc, Player* player, const std::string& text, bool publicize);
 	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
 	bool closeRuleViolation(Player* player);
+
+	void showUseHotkeyMessage(Player* player, Item* item);
 
 protected:
 
@@ -620,6 +661,10 @@ protected:
 
 	std::vector<Thing*> ToReleaseThings;
 
+	uint32_t checkLightEvent;
+	uint32_t checkCreatureEvent;
+	uint32_t checkDecayEvent;
+
 	//list of items that are in trading state, mapped to the player
 	std::map<Item*, uint32_t> tradeItems;
 
@@ -629,11 +674,12 @@ protected:
 	AutoList<Creature> listCreature;
 	size_t checkCreatureLastIndex;
 	std::vector<Creature*> checkCreatureVectors[EVENT_CREATURECOUNT];
+	std::vector<Creature*> toAddCheckCreatureVector;
 
 	// Script handling
 	Script::Environment* script_environment;
 	Script::Manager* script_system;
-	uint32_t waiting_script_task;
+	uint32_t waitingScriptEvent;
 
 #ifdef __DEBUG_CRITICALSECTION__
 	static OTSYS_THREAD_RETURN monitorThread(void *p);
@@ -666,12 +712,15 @@ protected:
 	uint32_t maxPlayers;
 	uint32_t inFightTicks;
 	uint32_t exhaustionTicks;
+	uint32_t addExhaustionTicks;
 	uint32_t fightExhaustionTicks;
 	uint32_t healExhaustionTicks;
+	uint32_t stairhopExhaustion;
 
 	GameState_t gameState;
 	WorldType_t worldType;
 
+	ServiceManager* service_manager;
 	Map* map;
 
 	std::vector<std::string> commandTags;

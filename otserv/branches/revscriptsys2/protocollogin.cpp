@@ -31,7 +31,6 @@
 #include <iomanip>
 #include "game.h"
 
-extern RSA* g_otservRSA;
 extern ConfigManager g_config;
 extern IPList serverIPs;
 extern BanManager g_bans;
@@ -51,7 +50,7 @@ void ProtocolLogin::deleteProtocolTask()
 
 void ProtocolLogin::disconnectClient(uint8_t error, const char* message)
 {
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 		output->AddByte(error);
@@ -78,7 +77,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
 	}
 
-	if(!RSA_decrypt(g_otservRSA, msg)){
+	if(!RSA_decrypt(msg)){
 		getConnection()->closeConnection();
 		return false;
 	}
@@ -95,9 +94,9 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	std::string password = msg.GetString();
 
 	if(!accname.length()){
-        //Tibia sends this message if the account name length is < 5
-        //We will send it only if account name is BLANK
-        disconnectClient(0x0A, "Invalid Account Name.");
+		//Tibia sends this message if the account name length is < 5
+		//We will send it only if account name is BLANK
+		disconnectClient(0x0A, "Invalid Account Name.");
 		return false;
 	}
 
@@ -108,11 +107,6 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 
 	if(g_game.getGameState() == GAME_STATE_STARTUP){
 		disconnectClient(0x0A, "Gameworld is starting up. Please wait.");
-		return false;
-	}
-
-	if(g_bans.isAccountDeleted(accname)){
-		disconnectClient(0x0A, "Your account has been deleted!");
 		return false;
 	}
 
@@ -139,14 +133,14 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			passwordTest(password, account.password))){
 
 		g_bans.addLoginAttempt(clientip, false);
-        disconnectClient(0x0A, "Account name or password is not correct.");
+		disconnectClient(0x0A, "Account name or password is not correct.");
 		return false;
 	}
 
 	g_bans.addLoginAttempt(clientip, true);
 
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 		//Add MOTD
@@ -163,10 +157,10 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			output->AddString((*it));
 			output->AddString(g_config.getString(ConfigManager::WORLD_NAME));
 			output->AddU32(serverip);
-			output->AddU16(g_config.getNumber(ConfigManager::PORT));
+			output->AddU16(g_config.getNumber(ConfigManager::GAME_PORT));
 		}
 		//Add premium days
-		output->AddU16(account.getPremiumDaysLeft());//output->AddU16(0);
+		output->AddU16(Account::getPremiumDaysLeft(account.premEnd));//output->AddU16(0);
 
 		OutputMessagePool::getInstance()->send(output);
 	}

@@ -21,6 +21,7 @@
 #ifndef __OTSERV_NETWORK_MESSAGE_H__
 #define __OTSERV_NETWORK_MESSAGE_H__
 
+#include <boost/shared_ptr.hpp>
 
 #include "definitions.h"
 #include "otsystem.h"
@@ -36,7 +37,9 @@ class NetworkMessage
 {
 public:
 	enum { header_length = 2 };
-	enum { max_body_length = NETWORKMESSAGE_MAXSIZE - header_length };
+	enum { crypto_length = 4 };
+	enum { xtea_multiple = 8 };
+	enum { max_body_length = NETWORKMESSAGE_MAXSIZE - header_length - crypto_length - xtea_multiple };
 
 	// constructor/destructor
 	NetworkMessage(){
@@ -51,6 +54,7 @@ protected:
 		m_ReadPos = 8;
 	}
 public:
+
 	// simply read functions for incoming message
 	uint8_t  GetByte(){return m_MsgBuf[m_ReadPos++];}
 	uint16_t GetU16(){
@@ -121,11 +125,16 @@ public:
 	char* getBuffer() { return (char*)&m_MsgBuf[0]; }
 	char* getBodyBuffer() { m_ReadPos = 2; return (char*)&m_MsgBuf[header_length]; }
 
+#ifdef __TRACK_NETWORK__
+	virtual void Track(std::string file, long line, std::string func) {};
+	virtual void clearTrack() {};
+#endif
+
 
 protected:
-	inline bool canAdd(int size)
+	inline bool canAdd(uint32_t size)
 	{
-		return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
+		return (size + m_ReadPos < max_body_length);
 	};
 
 	int32_t m_MsgSize;
@@ -134,5 +143,6 @@ protected:
 	uint8_t m_MsgBuf[NETWORKMESSAGE_MAXSIZE];
 };
 
+typedef boost::shared_ptr<NetworkMessage> NetworkMessage_ptr;
 
 #endif // #ifndef __NETWORK_MESSAGE_H__

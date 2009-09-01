@@ -71,15 +71,15 @@ bool RSA::decrypt(char* msg, int32_t size)
 
 	Big c = from_binary(size, msg);
 	//chinese remainder theorem
-	Big v1 = pow( c % m_p, m_dp, m_p );
-  	Big v2 = pow( c % m_q, m_dq, m_q );
+	Big v1 = std::pow( c % m_p, m_dp, m_p );
+  	Big v2 = std::pow( c % m_q, m_dq, m_q );
   	Big u2 = ((v2 - v1)*m_u % m_q);
   	if(u2 < 0){
 		u2 = u2 + m_q;
 	}
   	Big z = v1 + u2*m_p;
 
-	//Big z = pow(c, m_d, m_p*m_q);
+	//Big z = std::pow(c, m_d, m_p*m_q);
 
 	int len = to_binary(z, size, msg, TRUE);
 
@@ -98,9 +98,10 @@ bool RSA::setKey(const std::string& file)
 	char p[512];
 	char q[512];
 	char d[512];
-	fgets(p, 512, f);
-	fgets(q, 512, f);
-	fgets(d, 512, f);
+	delete fgets(p, 512, f);
+	delete fgets(q, 512, f);
+	delete fgets(d, 512, f);
+
 	setKey(p, q, d);
 	return true;
 }
@@ -127,6 +128,34 @@ void RSA::setKey(const char* p, const char* q, const char* d)
 
 	mpz_clear(pm1);
 	mpz_clear(qm1);
+}
+
+bool RSA::encrypt(char* msg, int32_t size, const char* key)
+{
+	mpz_t plain, c;
+	mpz_init2(plain, 1024);
+	mpz_init2(c, 1024);
+
+	mpz_t e;
+    mpz_init(e);
+	mpz_set_ui(e,65537);
+
+	mpz_t mod;
+	mpz_init2(mod, 1024);
+	mpz_set_str(mod, key, 10);
+
+	mpz_import(plain, 128, 1, 1, 0, 0, msg);
+	mpz_powm(c, plain, e, mod);
+
+	size_t count = (mpz_sizeinbase(c, 2) + 7)/8;
+	memset(msg, 0, 128 - count);
+	mpz_export(&msg[128 - count], NULL, 1, 1, 0, 0, c);
+
+	mpz_clear(c);
+	mpz_clear(plain);
+	mpz_clear(e);
+	mpz_clear(mod);
+	return true;
 }
 
 bool RSA::decrypt(char* msg, int32_t size)

@@ -76,7 +76,7 @@ public:
 	int32_t getMapWalkCost(const Creature* creature, AStarNode* node,
 		const Tile* neighbourTile, const Position& neighbourPos);
 	static int32_t getTileWalkCost(const Creature* creature, const Tile* tile);
-	int getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal);
+	int32_t getEstimatedDistance(int32_t x, int32_t y, int32_t xGoal, int32_t yGoal);
 
 private:
 	AStarNode nodes[MAX_NODES];
@@ -91,10 +91,6 @@ public:
 		return *t1 < *t2;
 	}
 };
-
-typedef std::list<Creature*> SpectatorVec;
-typedef std::list<Player*> PlayerList;
-typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
 
 #define FLOOR_BITS 3
 #define FLOOR_SIZE (1 << FLOOR_BITS)
@@ -132,7 +128,7 @@ public:
 	virtual ~QTreeLeafNode();
 
 	Floor* createFloor(uint32_t z);
-	Floor* getFloor(uint32_t z){return m_array[z];}
+	Floor* getFloor(uint16_t z){return m_array[z];}
 
 	QTreeLeafNode* stepSouth(){return m_leafS;}
 	QTreeLeafNode* stepEast(){return m_leafE;}
@@ -188,7 +184,7 @@ public:
 	* Get a single tile.
 	* \return A pointer to that tile.
 	*/
-	Tile* getTile(uint16_t x, uint16_t y, uint8_t z);
+	Tile* getTile(int32_t x, int32_t y, int32_t z);
 	Tile* getTile(const Position& pos);
 
 	QTreeLeafNode* getLeaf(uint16_t x, uint16_t y){ return root.getLeaf(x, y);}
@@ -197,7 +193,7 @@ public:
 	* Set a single tile.
 	* \param a tile to set for the position
 	*/
-	void setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile);
+	void setTile(int32_t _x, int32_t _y, int32_t _z, Tile* newtile);
 	void setTile(const Position& pos, Tile* newtile) {
 		setTile(pos.x, pos.y, pos.z, newtile);
 	}
@@ -289,7 +285,7 @@ protected:
 	QTreeNode root;
 
 	struct RefreshBlock_t{
-		ItemVector list;
+		TileItemVector list;
 		uint64_t lastRefresh;
 	};
 
@@ -299,7 +295,6 @@ protected:
 	friend class Game;
 
 	friend class IOMapOTBM;
-	friend class IOMapXML;
 	friend class IOMap;
 	friend class IOMapSerialize;
 };

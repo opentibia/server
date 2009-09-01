@@ -25,18 +25,48 @@
 
 #define OTSERV_VERSION "0.7.0_SVN"
 #define OTSERV_NAME "OTServ (branch revscriptsys)"
-#define OTSERV_CLIENT_VERSION "8.40"
-#define CURRENT_SCHEMA_VERSION 2
+#define OTSERV_CLIENT_VERSION "8.50"
+#define CURRENT_SCHEMA_VERSION 19
 
+#if defined(_WIN32) && !defined(WIN32)
+	#define WIN32
+#endif
 
 #if defined(WIN32) && !defined(__WINDOWS__)
-#define __WINDOWS__
+	#define __WINDOWS__
+#endif
+
+#if defined(__WINDOWS__) && !defined(_WIN32)
+	#define _WIN32
+#endif
+
+#ifdef __MINGW32__
+	#define XML_GCC_FREE
+	//Cross-compiling
+	#ifndef __WINDOWS__
+		#define __WINDOWS__
+	#endif
+#endif
+
+//Cross-compiling
+#ifdef __CYGWIN__
+	#undef WIN32
+	#undef _WIN32
+	#undef WINDOWS
+	#undef __WINDOWS__
+	#define HAVE_ERRNO_AS_DEFINE
 #endif
 
 #ifdef XML_GCC_FREE
 	#define xmlFreeOTSERV(s)	free(s)
 #else
 	#define xmlFreeOTSERV(s)	xmlFree(s)
+#endif
+
+#ifdef __USE_MINIDUMP__
+	#ifndef __EXCEPTION_TRACER__
+		#define __EXCEPTION_TRACER__
+	#endif
 #endif
 
 #ifdef __DEBUG_EXCEPTION_REPORT__
@@ -87,9 +117,11 @@
 enum passwordType_t{
 	PASSWORD_TYPE_PLAIN = 0,
 	PASSWORD_TYPE_MD5,
-	PASSWORD_TYPE_SHA1,
+	PASSWORD_TYPE_SHA1
 };
 
+// Boost won't complain about non-working function
+#define BOOST_ASIO_ENABLE_CANCELIO 1
 #if defined _WIN32 || defined __WINDOWS__ || defined WIN32
 #  ifndef WIN32
 #    define WIN32
@@ -102,11 +134,11 @@ enum passwordType_t{
 #  endif
 #endif
 
-#if defined WIN32
+#if defined __WINDOWS__
 
 #if defined _MSC_VER && defined NDEBUG
-#define _SECURE_SCL 0
-#define HAS_ITERATOR_DEBUGGING 0
+	#define _SECURE_SCL 0
+	#define HAS_ITERATOR_DEBUGGING 0
 #endif
 
 #ifndef __FUNCTION__
@@ -114,16 +146,17 @@ enum passwordType_t{
 #endif
 
 #ifndef EWOULDBLOCK
-#define EWOULDBLOCK WSAEWOULDBLOCK
+	#define EWOULDBLOCK WSAEWOULDBLOCK
 #endif
 
 #ifdef _WIN32_WINNT
-#undef _WIN32_WINNT
+	#undef _WIN32_WINNT
 #endif
 //Windows 2000	0x0500
 //Windows Xp	0x0501
 //Windows 2003	0x0502
 //Windows Vista	0x0600
+//Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
@@ -142,8 +175,8 @@ enum passwordType_t{
 			#include <unordered_set>
 		#endif
 
-		#define OTSERV_HASH_MAP std::tr1::unordered_map;
-		#define OTSERV_HASH_SET std::tr1::unordered_set;
+		#define OTSERV_HASH_MAP std::tr1::unordered_map
+		#define OTSERV_HASH_SET std::tr1::unordered_set
 	#endif
 	#include <assert.h>
 	#define ATOI64 atoll
@@ -187,9 +220,8 @@ enum passwordType_t{
 
 	#pragma warning(disable:4786) // msvc too long debug names in stl
 	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
-	#pragma warning(disable:4244)
-	#pragma warning(disable:4267)
-	#pragma warning(disable:4018)
+	#pragma warning(disable:4244) //'argument' : conversion from 'type1' to 'type2', possible loss of data
+	#pragma warning(disable:4267) //'var' : conversion from 'size_t' to 'type', possible loss of data
 
 #endif
 
@@ -214,18 +246,16 @@ enum passwordType_t{
 			#include <unordered_set>
 		#endif
 
-		#define OTSERV_HASH_MAP std::tr1::unordered_map;
-		#define OTSERV_HASH_SET std::tr1::unordered_set;
+		#define OTSERV_HASH_MAP std::tr1::unordered_map
+		#define OTSERV_HASH_SET std::tr1::unordered_set
 	#endif
 	#define ATOI64 atoll
 
 #endif
 
 // OpenTibia configuration
-#ifndef __SKULLSYSTEM__
-#   ifndef __NO_SKULLSYSTEM__
-#       define __SKULLSYSTEM__
-#   endif
+#if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)
+	#define __SKULLSYSTEM__
 #endif
 
 #endif

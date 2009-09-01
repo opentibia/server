@@ -29,17 +29,21 @@ extern Game g_game;
 #include "exception.h"
 #endif
 
-Dispatcher::DispatcherState Dispatcher::m_threadState = Dispatcher::STATE_TERMINATED;
-
 Dispatcher::Dispatcher()
 {
 	m_taskList.clear();
-	Dispatcher::m_threadState = Dispatcher::STATE_RUNNING;
-	boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)NULL));
+	m_threadState = STATE_TERMINATED;
+}
+
+void Dispatcher::start()
+{
+	m_threadState = STATE_RUNNING;
+	boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)this));
 }
 
 void Dispatcher::dispatcherThread(void* p)
 {
+	Dispatcher* dispatcher = (Dispatcher*)p;
 	#if defined __EXCEPTION_TRACER__
 	ExceptionHandler dispatcherExceptionHandler;
 	dispatcherExceptionHandler.InstallHandler();
@@ -49,42 +53,52 @@ void Dispatcher::dispatcherThread(void* p)
 	std::cout << "Starting Dispatcher" << std::endl;
 	#endif
 
-	// NOTE: second argument defer_lock is to prevent from immediate locking
-	boost::unique_lock<boost::mutex> taskLockUnique(getDispatcher().m_taskLock, boost::defer_lock);
+	OutputMessagePool* outputPool;
 
-	while(Dispatcher::m_threadState != Dispatcher::STATE_TERMINATED){
+	// NOTE: second argument defer_lock is to prevent from immediate locking
+	boost::unique_lock<boost::mutex> taskLockUnique(dispatcher->m_taskLock, boost::defer_lock);
+
+	while(dispatcher->m_threadState != STATE_TERMINATED){
 		Task* task = NULL;
 
 		// check if there are tasks waiting
 		taskLockUnique.lock(); //getDispatcher().m_taskLock.lock();
 
-		if(getDispatcher().m_taskList.empty()){
+		if(dispatcher->m_taskList.empty()){
 			//if the list is empty wait for signal
 			#ifdef __DEBUG_SCHEDULER__
 			std::cout << "Dispatcher: Waiting for task" << std::endl;
 			#endif
-			getDispatcher().m_taskSignal.wait(taskLockUnique);
+			dispatcher->m_taskSignal.wait(taskLockUnique);
 		}
 
 		#ifdef __DEBUG_SCHEDULER__
 		std::cout << "Dispatcher: Signalled" << std::endl;
 		#endif
 
-		if(!getDispatcher().m_taskList.empty() && (Dispatcher::m_threadState != Dispatcher::STATE_TERMINATED)){
+		if(!dispatcher->m_taskList.empty() && (dispatcher->m_threadState != STATE_TERMINATED)){
 			// take the first task
-			task = getDispatcher().m_taskList.front();
-			getDispatcher().m_taskList.pop_front();
+			task = dispatcher->m_taskList.front();
+			dispatcher->m_taskList.pop_front();
 		}
 
 		taskLockUnique.unlock();
 
 		// finally execute the task...
 		if(task){
-			OutputMessagePool::getInstance()->startExecutionFrame();
-			(*task)();
+			if(!task->hasExpired()){
+				OutputMessagePool::getInstance()->startExecutionFrame();
+				(*task)();
+
+				outputPool = OutputMessagePool::getInstance();
+				if(outputPool)
+					outputPool->sendAll();
+
+				g_game.clearSpectatorCache();
+			}
+
 			delete task;
-			OutputMessagePool::getInstance()->sendAll();
-			g_game.clearSpectatorCache();
+
 			#ifdef __DEBUG_SCHEDULER__
 			std::cout << "Dispatcher: Executing task" << std::endl;
 			#endif
@@ -95,26 +109,31 @@ void Dispatcher::dispatcherThread(void* p)
 #endif
 }
 
-void Dispatcher::addTask(Task* task)
+void Dispatcher::addTask(Task* task, bool push_front /*= false*/)
 {
 	bool do_signal = false;
-	if(Dispatcher::m_threadState == Dispatcher::STATE_RUNNING){
-		m_taskLock.lock();
+	m_taskLock.lock();
+	if(m_threadState == STATE_RUNNING){
 
 		do_signal = m_taskList.empty();
-		m_taskList.push_back(task);
+		if(push_front){
+			m_taskList.push_front(task);
+		}
+		else{
+			m_taskList.push_back(task);
+		}
 
 		#ifdef __DEBUG_SCHEDULER__
 		std::cout << "Dispatcher: Added task" << std::endl;
 		#endif
-
-		m_taskLock.unlock();
 	}
 #ifdef __DEBUG_SCHEDULER__
 	else{
 		std::cout << "Error: [Dispatcher::addTask] Dispatcher thread is terminated." << std::endl;
 	}
 #endif
+
+	m_taskLock.unlock();
 
 	// send a signal if the list was empty
 	if(do_signal){
@@ -126,11 +145,13 @@ void Dispatcher::flush()
 {
 	Task* task = NULL;
 	while(!m_taskList.empty()){
-		task = getDispatcher().m_taskList.front();
+		task = m_taskList.front();
 		m_taskList.pop_front();
 		(*task)();
 		delete task;
-		OutputMessagePool::getInstance()->sendAll();
+		OutputMessagePool* outputPool = OutputMessagePool::getInstance();
+		if(outputPool)
+			outputPool->sendAll();
 		g_game.clearSpectatorCache();
 	}
 	#ifdef __DEBUG_SCHEDULER__
@@ -141,7 +162,7 @@ void Dispatcher::flush()
 void Dispatcher::stop()
 {
 	m_taskLock.lock();
-	m_threadState = Dispatcher::STATE_CLOSING;
+	m_threadState = STATE_CLOSING;
 	m_taskLock.unlock();
 	#ifdef __DEBUG_SCHEDULER__
 	std::cout << "Stopping Dispatcher" << std::endl;
@@ -151,7 +172,7 @@ void Dispatcher::stop()
 void Dispatcher::shutdown()
 {
 	m_taskLock.lock();
-	m_threadState = Dispatcher::STATE_TERMINATED;
+	m_threadState = STATE_TERMINATED;
 	flush();
 	m_taskLock.unlock();
 	#ifdef __DEBUG_SCHEDULER__

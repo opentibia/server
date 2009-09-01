@@ -50,7 +50,7 @@ ItemType::ItemType()
 	rotateTo         = 0;
 	hasHeight        = false;
 
-	floorChangeDown = true;
+	floorChangeDown = false;
 	floorChangeNorth = false;
 	floorChangeSouth = false;
 	floorChangeEast = false;
@@ -77,6 +77,7 @@ ItemType::ItemType()
 	weaponType    = WEAPON_NONE;
 	weaponInstance= NULL;
 	slotPosition  = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
+	wieldPosition = SLOT_HAND;
 	ammoType      = AMMO_NONE;
 	ammoAction    = AMMOACTION_NONE;
 	shootType     = (ShootType_t)0;
@@ -123,6 +124,8 @@ ItemType::ItemType()
 	maleSleeperID = 0;
 	femaleSleeperID = 0;
 	noSleeperID = 0;
+
+	currency = 0;
 }
 
 ItemType::~ItemType()
@@ -134,6 +137,7 @@ Items::Items() :
 items(8000)
 {
 	//
+	currencyMap.clear();
 }
 
 Items::~Items()
@@ -143,6 +147,7 @@ Items::~Items()
 
 void Items::clear()
 {
+	currencyMap.clear();
 	//TODO. clear items?
 }
 
@@ -210,7 +215,7 @@ int Items::loadFromOtb(std::string file)
 		std::cout << "New version of items.otb detected, a newer version of the server is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
-	else if(Items::dwMinorVersion != CLIENT_VERSION_840){
+	else if(Items::dwMinorVersion != CLIENT_VERSION_850){
 		std::cout << "Another (client) version of items.otb is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -268,14 +273,6 @@ int Items::loadFromOtb(std::string file)
 		iType->pickupable = hasBitSet(FLAG_PICKUPABLE, flags);
 		iType->moveable = hasBitSet(FLAG_MOVEABLE, flags);
 		iType->stackable = hasBitSet(FLAG_STACKABLE, flags);
-
-		//not longer saved in otb_version >= 3
-		iType->floorChangeDown = hasBitSet(FLAG_FLOORCHANGEDOWN, flags);
-		iType->floorChangeNorth = hasBitSet(FLAG_FLOORCHANGENORTH, flags);
-		iType->floorChangeEast = hasBitSet(FLAG_FLOORCHANGEEAST, flags);
-		iType->floorChangeSouth = hasBitSet(FLAG_FLOORCHANGESOUTH, flags);
-		iType->floorChangeWest = hasBitSet(FLAG_FLOORCHANGEWEST, flags);
-
 		iType->alwaysOnTop = hasBitSet(FLAG_ALWAYSONTOP, flags);
 		iType->isVertical = hasBitSet(FLAG_VERTICAL, flags);
 		iType->isHorizontal = hasBitSet(FLAG_HORIZONTAL, flags);
@@ -284,6 +281,7 @@ int Items::loadFromOtb(std::string file)
 		iType->rotateable = hasBitSet(FLAG_ROTABLE, flags);
 		iType->canReadText = hasBitSet(FLAG_READABLE, flags);
 		iType->clientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
+		iType->lookThrough = hasBitSet(FLAG_LOOKTHROUGH, flags);
 
 		attribute_t attrib;
 		datasize_t datalen = 0;
@@ -429,7 +427,11 @@ bool Items::loadFromXml(const std::string& datadir)
 						if(readXMLString(itemAttributesNode, "key", strValue)){
 							if(asLowerCaseString(strValue) == "type"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(asLowerCaseString(strValue) == "key"){
+									if(asLowerCaseString(strValue) == "container"){
+										it.group = ITEM_GROUP_CONTAINER;
+										it.type = ITEM_TYPE_CONTAINER;
+									}
+									else if(asLowerCaseString(strValue) == "key"){
 										it.type = ITEM_TYPE_KEY;
 									}
 									else if(asLowerCaseString(strValue) == "magicfield"){
@@ -568,6 +570,9 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(asLowerCaseString(strValue) == "fire"){
 										it.corpseType = RACE_FIRE;
 									}
+									else if(asLowerCaseString(strValue) == "energy"){
+										it.corpseType = RACE_ENERGY;
+									}
 								}
 							}
 							else if(asLowerCaseString(strValue) == "containersize"){
@@ -633,13 +638,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
-							/*
 							else if(asLowerCaseString(strValue) == "readable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.canReadText = true;
 								}
 							}
-							*/
 							else if(asLowerCaseString(strValue) == "writeable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.canWriteText = (intValue != 0);
@@ -688,27 +691,41 @@ bool Items::loadFromXml(const std::string& datadir)
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "head"){
 										it.slotPosition |= SLOTP_HEAD;
+										it.wieldPosition = SLOT_HEAD;
 									}
 									else if(asLowerCaseString(strValue) == "body"){
 										it.slotPosition |= SLOTP_ARMOR;
+										it.wieldPosition = SLOT_ARMOR;
 									}
 									else if(asLowerCaseString(strValue) == "legs"){
 										it.slotPosition |= SLOTP_LEGS;
+										it.wieldPosition = SLOT_LEGS;
 									}
 									else if(asLowerCaseString(strValue) == "feet"){
 										it.slotPosition |= SLOTP_FEET;
+										it.wieldPosition = SLOT_FEET;
 									}
 									else if(asLowerCaseString(strValue) == "backpack"){
 										it.slotPosition |= SLOTP_BACKPACK;
+										it.wieldPosition = SLOT_BACKPACK;
 									}
 									else if(strcasecmp(strValue.c_str(), "two-handed") == 0){
 										it.slotPosition |= SLOTP_TWO_HAND;
+										it.wieldPosition = SLOT_HAND;
 									}
 									else if(asLowerCaseString(strValue) == "necklace"){
 										it.slotPosition |= SLOTP_NECKLACE;
+										it.wieldPosition = SLOT_NECKLACE;
 									}
 									else if(asLowerCaseString(strValue) == "ring"){
 										it.slotPosition |= SLOTP_RING;
+										it.wieldPosition = SLOT_RING;
+									}
+									else if(asLowerCaseString(strValue) == "hand"){
+										it.wieldPosition = SLOT_HAND;
+									}
+									else if(asLowerCaseString(strValue) == "ammo"){
+										it.wieldPosition = SLOT_AMMO;
 									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown slotType " << strValue  << std::endl;
@@ -954,7 +971,27 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentall"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_NONE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ENERGYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_FIREDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_EARTHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ICEDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_HOLYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DEATHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_LIFEDRAIN)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_MANADRAIN)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DROWNDAMAGE)] = intValue;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "absorbpercentallelements"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ENERGYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_FIREDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_EARTHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ICEDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_HOLYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DEATHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentenergy"){
@@ -1043,16 +1080,24 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.conditionSuppressions |= CONDITION_FREEZING;
 								}
 							}
-
 							else if(asLowerCaseString(strValue) == "suppressdazzle"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_DAZZLED;
 								}
 							}
-
 							else if(asLowerCaseString(strValue) == "suppresscurse"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 									it.abilities.conditionSuppressions |= CONDITION_CURSED;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "preventitemloss"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.preventItemLoss = (intValue != 0);
+								}
+							}
+							else if(asLowerCaseString(strValue) == "preventskillloss"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.preventSkillLoss = (intValue != 0);
 								}
 							}
 							/*else if(asLowerCaseString(strValue) == "suppressmanadrain"){
@@ -1235,6 +1280,12 @@ bool Items::loadFromXml(const std::string& datadir)
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.elementDamage = intValue;
 									it.abilities.elementType = COMBAT_ENERGYDAMAGE;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "currency"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.currency = intValue;
+									currencyMap[it.currency] = &it;
 								}
 							}
 							else{
@@ -1420,22 +1471,25 @@ Abilities::Abilities()
 
 	manaGain = 0;
 	manaTicks = 0;
-};
+
+	preventItemLoss = false;
+	preventSkillLoss = false;
+}
 
 bool Abilities::Absorb::any() const
 {
-	for(int c = 0; c != COMBAT_COUNT; ++c){
+	for(int32_t c = 0; c != COMBAT_COUNT; ++c){
 		if(resistances[c] != 0)
 			return true;
 	}
 	return false;
 }
 
-std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, unsigned int type) const
+std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, int32_t type) const
 {
 	if(resistances[type] == 0)
 		return os;
-	os << (first? " " : ", ") << CombatTypeName(type == 0? COMBAT_NONE: (CombatType_t)(1 << (type-1))) << " " << std::noshowpos << resistances[type] << "%";
+	os << (first? " " : ", ") << CombatTypeName(type == COMBAT_NONE? COMBAT_NONE: (CombatType_t)(1 << (type-1))) << " " << std::noshowpos << resistances[type] << "%";
 	first = false;
 	return os;
 }
@@ -1443,7 +1497,7 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, u
 std::ostream& Abilities::Absorb::getDescription(std::ostream& os) const
 {
 	bool first = true;
-	for(int c = 0; c != COMBAT_COUNT; ++c){
+	for(int32_t c = 0; c != COMBAT_COUNT; ++c){
 		getDescription(os, first, c);
 	}
 	return os;
@@ -1452,15 +1506,10 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os) const
 bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 {
 	bool r = false;
-	if(resistances[0] > 0) {
-		r = true;
-		dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[0]) / 100.);
-	}
-
 	if(ctype == COMBAT_NONE)
 		return r;
 
-	for(int c = 0;  c < COMBAT_COUNT; ++c) {
+	for(int32_t c = 0;  c < COMBAT_COUNT; ++c) {
 		if(ctype & (1 << c)) {
 			// Correct type!
 			if(resistances[c+1] > 0)
@@ -1468,6 +1517,7 @@ bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 			dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[c+1]) / 100.);
 		}
 	}
+	
 	return r;
 }
 

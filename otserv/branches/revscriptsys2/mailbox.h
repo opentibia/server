@@ -50,12 +50,14 @@ public:
 	virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing);
 	virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count);
 
-	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
-	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 	
-	bool getReceiver(Item* item, std::string& name, uint32_t& dpnum);
-	bool sendItem(Creature* actor, Item* item);
-	bool canSend(const Item* item) const;
+	static bool getDepotId(const std::string& strTown, uint32_t& depotId);
+	static bool getRepicient(Item* item, std::string& name, uint32_t& depotId);
+	static bool sendItemTo(Creature* actor, const std::string name, uint32_t depotId, Item* item);
+	static bool sendItem(Creature* actor, Item* item);
+	static bool canSend(const Item* item);
 };
 
 #endif

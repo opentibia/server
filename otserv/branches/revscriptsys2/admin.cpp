@@ -22,6 +22,7 @@
 #include "admin.h"
 #include "game.h"
 #include "connection.h"
+#include "ioplayer.h"
 #include "outputmessage.h"
 #include "networkmessage.h"
 #include "configmanager.h"
@@ -29,6 +30,7 @@
 #include "ban.h"
 #include "tools.h"
 #include "rsa.h"
+#include "mailbox.h"
 
 #include "logger.h"
 
@@ -37,7 +39,6 @@ static void addLogLine(ProtocolAdmin* conn, eLogType type, int level, std::strin
 extern Game g_game;
 extern ConfigManager g_config;
 extern BanManager g_bans;
-extern RSA* g_otservRSA;
 
 AdminProtocolConfig* g_adminConfig = NULL;
 
@@ -45,7 +46,7 @@ AdminProtocolConfig* g_adminConfig = NULL;
 uint32_t ProtocolAdmin::protocolAdminCount = 0;
 #endif
 
-ProtocolAdmin::ProtocolAdmin(Connection* connection) :
+ProtocolAdmin::ProtocolAdmin(Connection_ptr connection) :
 Protocol(connection)
 {
 	m_state = NO_CONNECTED;
@@ -90,7 +91,7 @@ void ProtocolAdmin::onRecvFirstMessage(NetworkMessage& msg)
 
 	addLogLine(this, LOGTYPE_EVENT, 1, "sending HELLO");
 	//send hello
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 		output->AddByte(AP_MSG_HELLO);
@@ -114,11 +115,16 @@ void ProtocolAdmin::deleteProtocolTask()
 
 void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 {
+	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+		getConnection()->closeConnection();
+		return;
+	}
+
 	uint8_t recvbyte = msg.GetByte();
 
 	OutputMessagePool* outputPool = OutputMessagePool::getInstance();
 
-	OutputMessage* output = outputPool->getOutputMessage(this, false);
+	OutputMessage_ptr output = outputPool->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
@@ -127,7 +133,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		{
 			if(g_adminConfig->requireEncryption()){
 				if((time(NULL) - m_startTime) > 30000){
-					outputPool->releaseMessage(output);
 					getConnection()->closeConnection();
 					addLogLine(this, LOGTYPE_WARNING, 1, "encryption timeout");
 					return;
@@ -152,7 +157,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			if(g_adminConfig->requireLogin()){
 				if((time(NULL) - m_startTime) > 30000){
 					//login timeout
-					outputPool->releaseMessage(output);
 					getConnection()->closeConnection();
 					addLogLine(this, LOGTYPE_WARNING, 1, "login timeout");
 					return;
@@ -187,8 +191,6 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			break;
 		}
 		default:
-			addLogLine(this, LOGTYPE_ERROR, 1, "no valid connection state!!!");
-			outputPool->releaseMessage(output);
 			getConnection()->closeConnection();
 			return;
 		}
@@ -316,40 +318,67 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			{
 				const std::string message = msg.GetString();
 				addLogLine(this, LOGTYPE_EVENT, 1, "broadcast: " + message);
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&Game::anonymousBroadcastMessage, &g_game, MSG_STATUS_WARNING, message)));
 
 				output->AddByte(AP_MSG_COMMAND_OK);
 				break;
 			}
+			case CMD_OPEN_SERVER:
+			{
+				g_dispatcher.addTask(
+					createTask(boost::bind(&ProtocolAdmin::adminCommandOpenServer, this)));
+
+				break;
+			}
 			case CMD_CLOSE_SERVER:
 			{
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandCloseServer, this)));
 
 				break;
 			}
 			case CMD_PAY_HOUSES:
 			{
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandPayHouses, this)));
 
 				break;
 			}
 			case CMD_SHUTDOWN_SERVER:
 			{
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandShutdownServer, this)));
-				outputPool->releaseMessage(output);
-				getConnection()->closeConnection();
 				return;
+				break;
+			}
+			case CMD_SEND_MAIL:
+			{
+				const std::string xmlData = msg.GetString();
+				g_dispatcher.addTask(
+					createTask(boost::bind(&ProtocolAdmin::adminCommandSendMail, this, xmlData)));
 				break;
 			}
 			case CMD_KICK:
 			{
 				const std::string name = msg.GetString();
-				Dispatcher::getDispatcher().addTask(
+				g_dispatcher.addTask(
 					createTask(boost::bind(&ProtocolAdmin::adminCommandKickPlayer, this, name)));
+				break;
+			}
+			case CMD_SHALLOW_SAVE_SERVER:
+			case CMD_SAVE_SERVER:
+			{
+				g_dispatcher.addTask(
+					createTask(boost::bind(&ProtocolAdmin::adminCommandSaveServer, this, command == CMD_SHALLOW_SAVE_SERVER)));
+
+				break;
+			}
+			case CMD_RELATIONAL_SAVE_SERVER:
+			{
+				g_dispatcher.addTask(
+					createTask(boost::bind(&ProtocolAdmin::adminCommandRelationalSaveServer, this)));
+
 				break;
 			}
 			default:
@@ -361,9 +390,14 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			};
 			break;
 		}
+
 		case AP_MSG_PING:
 			output->AddByte(AP_MSG_PING_OK);
 			break;
+
+		case AP_MSG_KEEP_ALIVE:
+			break;
+
 		default:
 			output->AddByte(AP_MSG_ERROR);
 			output->AddString("not known command byte");
@@ -373,15 +407,27 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 		if(output->getMessageLength() > 0){
 			outputPool->send(output);
 		}
-		else{
-			outputPool->releaseMessage(output);
-		}
+	}
+}
+
+void ProtocolAdmin::adminCommandOpenServer()
+{
+	g_game.setGameState(GAME_STATE_NORMAL);
+	addLogLine(this, LOGTYPE_EVENT, 1, "open server ok");
+
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+		output->AddByte(AP_MSG_COMMAND_OK);
+		OutputMessagePool::getInstance()->send(output);
 	}
 }
 
 void ProtocolAdmin::adminCommandCloseServer()
 {
 	g_game.setGameState(GAME_STATE_CLOSED);
+	addLogLine(this, LOGTYPE_EVENT, 1, "close server ok");
+
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end()){
 		if(!(*it).second->hasFlag(PlayerFlag_CanAlwaysLogin)){
@@ -393,21 +439,9 @@ void ProtocolAdmin::adminCommandCloseServer()
 		}
 	}
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
-
-		if(!g_game.getMap()->saveMap()){
-			addLogLine(this, LOGTYPE_WARNING, 1, "close server fail - Map");
-
-			output->AddByte(AP_MSG_COMMAND_FAILED);
-			output->AddString("Map");
-			OutputMessagePool::getInstance()->send(output);
-			return;
-		}
-
-		addLogLine(this, LOGTYPE_EVENT, 1, "close server ok");
-
 		output->AddByte(AP_MSG_COMMAND_OK);
 		OutputMessagePool::getInstance()->send(output);
 	}
@@ -416,10 +450,9 @@ void ProtocolAdmin::adminCommandCloseServer()
 void ProtocolAdmin::adminCommandShutdownServer()
 {
 	g_game.setGameState(GAME_STATE_SHUTDOWN);
-
 	addLogLine(this, LOGTYPE_EVENT, 1, "start server shutdown");
 
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 		output->AddByte(AP_MSG_COMMAND_OK);
@@ -429,30 +462,109 @@ void ProtocolAdmin::adminCommandShutdownServer()
 
 void ProtocolAdmin::adminCommandPayHouses()
 {
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	Houses::getInstance().payHouses();
+	addLogLine(this, LOGTYPE_EVENT, 1, "pay houses ok");
+
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+		output->AddByte(AP_MSG_COMMAND_OK);
+		OutputMessagePool::getInstance()->send(output);
+	}
+}
+
+Item* ProtocolAdmin::createMail(const std::string xmlData, std::string& name, uint32_t& depotId)
+{
+	xmlDocPtr doc = xmlParseMemory(xmlData.c_str(), strlen(xmlData.c_str()));
+	if(!doc){
+		return NULL;
+	}
+
+	xmlNodePtr root = xmlDocGetRootElement(doc);
+
+	if(xmlStrcmp(root->name,(const xmlChar*)"mail") != 0){
+		return NULL;
+	}
+
+	int32_t itemId = ITEM_PARCEL;
+
+	int32_t intValue;
+	std::string strValue;
+
+	if(readXMLString(root, "to", strValue)){
+		name = strValue;
+	}
+
+	if(readXMLString(root, "town", strValue)){
+		if(!Mailbox::getDepotId(strValue, depotId)){
+			return false;
+		}
+	}
+	else{
+		//use the players default town
+		if(!IOPlayer::instance()->getDefaultTown(name, depotId)){
+			return false;
+		}
+	}
+
+	if(readXMLInteger(root, "id", intValue)){
+		itemId = intValue;
+	}
+
+	Item* mailItem = Item::CreateItem(itemId);
+	mailItem->setParent(VirtualCylinder::virtualCylinder);
+
+	if(Container* mailContainer = mailItem->getContainer()){
+		xmlNodePtr node = root->children;
+		while(node){
+			if(node->type != XML_ELEMENT_NODE){
+				node = node->next;
+				continue;
+			}
+
+			if(!Item::loadItem(node, mailContainer)){
+				delete mailContainer;
+				return NULL;
+			}
+
+			node = node->next;
+		}
+	}
+
+	return mailItem;
+}
+
+void ProtocolAdmin::adminCommandSendMail(const std::string& xmlData)
+{
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
-		if(Houses::getInstance().payHouses()){
-			addLogLine(this, LOGTYPE_EVENT, 1, "pay houses ok");
+		std::string name;
+		uint32_t depotId;
+		Item* mailItem = createMail(xmlData, name, depotId);
 
-			output->AddByte(AP_MSG_COMMAND_OK);
+		if(mailItem){
+			if(Mailbox::sendItemTo(NULL, name, depotId, mailItem)){
+				output->AddByte(AP_MSG_COMMAND_OK);
+			}
+			else{
+				output->AddByte(AP_MSG_COMMAND_FAILED);
+				output->AddString("Could not mail item");
+			}
 		}
 		else{
-			addLogLine(this, LOGTYPE_WARNING, 1, "pay houses fail");
-
 			output->AddByte(AP_MSG_COMMAND_FAILED);
-			output->AddString(" ");
+			output->AddString("Could not mail item");
 		}
+
 		OutputMessagePool::getInstance()->send(output);
 	}
-
-	return ;
 }
 
 void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 {
-	OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
 
@@ -469,6 +581,35 @@ void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 			output->AddByte(AP_MSG_COMMAND_FAILED);
 			output->AddString("player is not online");
 		}
+		OutputMessagePool::getInstance()->send(output);
+	}
+}
+
+void ProtocolAdmin::adminCommandSaveServer(bool shallow)
+{
+	g_game.saveServer(false, shallow);
+	addLogLine(this, LOGTYPE_EVENT, 1, "save server ok");
+
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+		output->AddByte(AP_MSG_COMMAND_OK);
+		OutputMessagePool::getInstance()->send(output);
+	}
+}
+
+void ProtocolAdmin::adminCommandRelationalSaveServer()
+{
+	std::string old_type = g_config.getString(ConfigManager::MAP_STORAGE_TYPE);
+	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, "relational");
+	g_game.saveServer(false);
+	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, old_type);
+	addLogLine(this, LOGTYPE_EVENT, 1, "relational save server ok");
+
+	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+	if(output){
+		TRACK_MESSAGE(output);
+		output->AddByte(AP_MSG_COMMAND_OK);
 		OutputMessagePool::getInstance()->send(output);
 	}
 }
@@ -643,9 +784,7 @@ bool AdminProtocolConfig::allowIP(uint32_t ip)
 			return true;
 		}
 		else{
-			char str_ip[32];
-			formatIP(ip, str_ip);
-			addLogLine(NULL, LOGTYPE_WARNING, 1, std::string("forbidden connection try from ") + str_ip);
+			addLogLine(NULL, LOGTYPE_WARNING, 1, std::string("forbidden connection try from ") + convertIPToString(ip));
 			return false;
 		}
 	}
@@ -710,10 +849,7 @@ static void addLogLine(ProtocolAdmin* conn, eLogType type, int level, std::strin
 	std::string logMsg;
 	if(conn){
 		uint32_t ip = conn->getIP();
-		char buffer[32];
-		formatIP(ip, buffer);
-		logMsg = buffer;
-		logMsg = "[" + logMsg + "] - ";
+		logMsg = convertIPToString(ip) +  "[" + logMsg + "] - ";
 	}
 	logMsg = logMsg + message;
 	LOG_MESSAGE("OTADMIN", type, level, logMsg);

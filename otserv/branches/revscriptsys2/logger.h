@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,7 +27,7 @@
 #ifdef __GNUC__
 #define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
 #endif
-#ifdef _MSC_VER 
+#ifdef _MSC_VER
 #define __OTSERV_PRETTY_FUNCTION__ __FUNCDNAME__
 #endif
 
@@ -45,7 +45,7 @@
 enum eLogType {
 	LOGTYPE_EVENT,
 	LOGTYPE_WARNING,
-	LOGTYPE_ERROR,
+	LOGTYPE_ERROR
 };
 
 class Logger {

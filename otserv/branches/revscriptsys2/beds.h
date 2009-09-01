@@ -42,51 +42,34 @@ public:
 	virtual const BedItem* getBed() const { return this; }
 
 	//serialization
-    virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	//override
 	virtual bool canRemove() const {return (house == NULL); }
 
-
-	// mutator / accessor for sleeperGUID
 	uint32_t getSleeper() const { return sleeperGUID; }
 	void setSleeper(uint32_t guid){ sleeperGUID = guid; }
 
-	// mutator / accessor for sleepStart
 	time_t getSleepStart() const { return sleepStart; }
 	void setSleepStart(time_t now){ sleepStart = now; }
 
-	// mutator / accessor for house
 	House* getHouse() const { return house; }
 	void setHouse(House* h){ house = h; }
 
-	// can a player even use the bed? :o
 	bool canUse(Player* player);
-
-	// player is sleeping in the bed
 	void sleep(Player* player);
-	// player is waking up or being kicked because the house is sold.
-	void wakeUp(Player* player);
-
-	// find the adjoin bed item
+	void wakeUp();
 	BedItem* getNextBedItem();
 
 protected:
-	// change itemid when a player sleeps in this bed
 	void updateAppearance(const Player* player);
-	// regenerate player
 	void regeneratePlayer(Player* player) const;
-	// set all sleeper information
 	void internalSetSleeper(const Player* player);
-	// remove all sleeper information
 	void internalRemoveSleeper();
 
-	// GUID of the player sleeping in bed
 	uint32_t sleeperGUID;
-	// when he fell asleep
 	time_t sleepStart;
-	// House the bed belongs to
 	House* house;
 };
 

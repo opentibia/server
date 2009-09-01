@@ -29,12 +29,20 @@ class OutputMessage;
 class ProtocolLogin : public Protocol
 {
 public:
+	// static protocol information
+	enum {server_sends_first = false};
+	enum {protocol_identifier = 0x01};
+	enum {use_checksum = true};
+	static const char* protocol_name() {return "login protocol";}
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolLoginCount;
 #endif
 
-	ProtocolLogin(Connection* connection) : Protocol(connection)
+	ProtocolLogin(Connection_ptr connection) : Protocol(connection)
 	{
+		enableChecksum();
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		protocolLoginCount++;
 #endif

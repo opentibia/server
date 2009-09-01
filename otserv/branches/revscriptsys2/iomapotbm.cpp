@@ -62,6 +62,30 @@ extern Game g_game;
 	|--- OTBM_ITEM_DEF (not implemented)
 */
 
+Tile* IOMapOTBM::createTile(Item*& ground, Item* item, int px, int py, int pz)
+{
+	Tile* tile;
+	if(ground){
+		if((item && item->isBlocking()) || ground->isBlocking()){
+			// Tile is blocking with possibly some decoration, should be static
+			tile = new StaticTile(px, py, pz);
+		}
+		else{
+			// Tile is not blocking with possibly multiple items, use dynamic
+			tile = new DynamicTile(px, py, pz);
+		}
+		
+		tile->__internalAddThing(ground);
+		g_game.startDecay(ground);
+		ground = NULL;
+	}
+	else{
+		// No ground on this tile, so it will always block
+		tile = new StaticTile(px, py, pz);
+	}
+	return tile;
+}
+
 bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 {
 	int64_t start = OTSYS_TIME();
@@ -91,22 +115,21 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	}
 
 	int header_version = root_header->version;
-
-	if(root_header->version <= 0){
+	if(header_version <= 0){
 		//In otbm version 1 the count variable after splashes/fluidcontainers and stackables
 		//are saved as attributes instead, this solves alot of problems with items
 		//that is changed (stackable/charges/fluidcontainer/splash) during an update.
-		setLastErrorString("This map need to be upgraded by using the latest map editor version to be able to load correctly.");
+		setLastErrorString("This map needs to be upgraded by using the latest map editor version to be able to load correctly.");
 		return false;
 	}
 
-	if(root_header->version > 2){
+	if(header_version > 2){
 		setLastErrorString("Unknown OTBM version detected, please update your server.");
 		return false;
 	}
 
 	if(root_header->majorVersionItems < 3){
-		setLastErrorString("This map need to be upgraded by using the latest map editor version to be able to load correctly.");
+		setLastErrorString("This map needs to be upgraded by using the latest map editor version to be able to load correctly.");
 		return false;
 	}
 
@@ -183,8 +206,6 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		}
 	}
 
-	Tile* tile = NULL;
-
 	NODE nodeMapData = f.getChildNode(nodeMap, type);
 	while(nodeMapData != NO_NODE){
 		if(f.getError() != ERROR_NONE){
@@ -235,11 +256,11 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 
 					bool isHouseTile = false;
 					House* house = NULL;
+					Tile* tile = NULL;
+					Item* ground_item = NULL;
+					uint32_t tileflags = TILESTATE_NONE;
 
-					if(type == OTBM_TILE){
-						tile = new Tile(px, py, pz);
-					}
-					else if(type == OTBM_HOUSETILE){
+					if(type == OTBM_HOUSETILE){
 						uint32_t _houseid;
 						if(!propStream.GET_ULONG(_houseid)){
 							std::stringstream ss;
@@ -276,24 +297,24 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 							}
 
 							if((flags & TILESTATE_PROTECTIONZONE) == TILESTATE_PROTECTIONZONE){
-								tile->setFlag(TILESTATE_PROTECTIONZONE);
+								tileflags |= TILESTATE_PROTECTIONZONE;
 							}
 							else if((flags & TILESTATE_NOPVPZONE) == TILESTATE_NOPVPZONE){
-								tile->setFlag(TILESTATE_NOPVPZONE);
+								tileflags |= TILESTATE_NOPVPZONE;
 							}
 							else if((flags & TILESTATE_PVPZONE) == TILESTATE_PVPZONE){
-								tile->setFlag(TILESTATE_PVPZONE);
+								tileflags |= TILESTATE_PVPZONE;
 							}
 
 							if((flags & TILESTATE_NOLOGOUT) == TILESTATE_NOLOGOUT){
-								tile->setFlag(TILESTATE_NOLOGOUT);
+								tileflags |= TILESTATE_NOLOGOUT;
 							}
 
 							if((flags & TILESTATE_REFRESH) == TILESTATE_REFRESH){
 								if(house){
 									std::cout << "Warning [x:" << px << ", y:" << py << ", z:" << pz << "] " << " House tile flagged as refreshing!";
 								}
-								tile->setFlag(TILESTATE_REFRESH);
+								tileflags |= TILESTATE_REFRESH;
 							}
 
 							break;
@@ -315,8 +336,20 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								item = NULL;
 							}
 							else{
-								tile->__internalAddThing(item);
-								g_game.startDecay(item);
+								if(tile){
+									tile->__internalAddThing(item);
+									g_game.startDecay(item);
+								}
+								else if(item->isGroundTile()){
+									if(ground_item)
+										delete ground_item;
+									ground_item = item;
+								}
+								else{ // !tile
+									tile = createTile(ground_item, item, px, py, pz);
+									tile->__internalAddThing(item);
+									g_game.startDecay(item);
+								}
 							}
 
 							break;
@@ -352,8 +385,20 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 									delete item;
 								}
 								else{
-									tile->__internalAddThing(item);
-									g_game.startDecay(item);
+									if(tile){
+										tile->__internalAddThing(item);
+										g_game.startDecay(item);
+									}
+									else if(item->isGroundTile()){
+										if(ground_item)
+											delete ground_item;
+										ground_item = item;
+									}
+									else{ // !tile
+										tile = createTile(ground_item, item, px, py, pz);
+										tile->__internalAddThing(item);
+										g_game.startDecay(item);
+									}
 								}
 							}
 							else{
@@ -372,6 +417,11 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 
 						nodeItem = f.getNextNode(nodeItem, type);
 					}
+
+					if(!tile)
+						tile = createTile(ground_item, NULL, px, py, pz);
+
+					tile->setFlag((tileflags_t)tileflags);
 
 					map->setTile(px, py, pz, tile);
 				}

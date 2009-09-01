@@ -204,7 +204,7 @@ protected:
 		MATRIXOPERATION_FLIP,
 		MATRIXOPERATION_ROTATE90,
 		MATRIXOPERATION_ROTATE180,
-		MATRIXOPERATION_ROTATE270,
+		MATRIXOPERATION_ROTATE270
 	};
 
 	MatrixArea* createArea(const std::list<uint32_t>& list, uint32_t rows);
@@ -283,6 +283,7 @@ public:
 
 	static Position getCasterPosition(const Creature* creature, Direction dir);
 	static bool isInPvpZone(const Creature* attacker, const Creature* target);
+	static bool isUnjustKill(const Creature* attacker, const Creature* target);
 	static bool isPlayerCombat(const Creature* target);
 	static CombatType_t ConditionToDamageType(ConditionType_t type);
 	static ConditionType_t DamageToConditionType(CombatType_t type);
@@ -360,7 +361,7 @@ private:
 
 inline std::string CombatTypeName(CombatType_t combat) {
 	switch(combat){
-		case COMBAT_NONE: return "all";
+		case COMBAT_NONE: return "unknown";
 		case COMBAT_PHYSICALDAMAGE: return "physical";
 		case COMBAT_ENERGYDAMAGE: return "energy";
 		case COMBAT_EARTHDAMAGE: return "earth";
@@ -377,18 +378,18 @@ inline std::string CombatTypeName(CombatType_t combat) {
 	return "none";
 }
 
-inline int CombatTypeToIndex(CombatType_t combat) {
+inline int32_t CombatTypeToIndex(CombatType_t combat) {
 	if(combat == COMBAT_NONE) return 0;
-	for(int c = 0; c < COMBAT_COUNT; ++c){
+	for(int32_t c = 0; c < COMBAT_COUNT; ++c){
 		if(combat & (1 << c))
 			return c+1;
 	}
 	return 0;
-};
+}
 
 inline CombatType_t CombatIndexToType(int combatindex) {
 	if(combatindex == 0) return COMBAT_NONE;
 	return (CombatType_t)(1 << (combatindex-1));
-};
+}
 
 #endif

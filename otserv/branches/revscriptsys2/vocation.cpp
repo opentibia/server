@@ -114,6 +114,9 @@ bool Vocations::loadFromXml(const std::string& datadir)
 
 								}
 								else{
+									if(readXMLInteger(skillNode, "base", intVal)){
+										voc->skillBases[skill_id] = intVal;
+									}
 									if(readXMLFloat(skillNode, "multiplier", floatVal)){
 										voc->skillMultipliers[skill_id] = floatVal;
 									}
@@ -121,6 +124,42 @@ bool Vocations::loadFromXml(const std::string& datadir)
 							}
 							else{
 								std::cout << "Missing skill id." << std::endl;
+							}
+						}
+						else if(xmlStrcmp(skillNode->name, (const xmlChar*)"damage") == 0){
+							if(readXMLFloat(skillNode, "magicDamage", floatVal)){
+								voc->magicBaseDamage = floatVal;
+							}
+							if(readXMLFloat(skillNode, "wandDamage", floatVal)){
+								voc->wandBaseDamage = floatVal;
+							}
+							if(readXMLFloat(skillNode, "healingDamage", floatVal)){
+								voc->healingBaseDamage = floatVal;
+							}
+						}
+						else if(xmlStrcmp(skillNode->name, (const xmlChar*)"meleeDamage") == 0){
+							if(readXMLFloat(skillNode, "sword", floatVal)){
+								voc->swordBaseDamage = floatVal;
+							}
+							if(readXMLFloat(skillNode, "axe", floatVal)){
+								voc->axeBaseDamage = floatVal;
+							}
+							if(readXMLFloat(skillNode, "club", floatVal)){
+								voc->clubBaseDamage = floatVal;
+							}
+							if(readXMLFloat(skillNode, "dist", floatVal)){
+								voc->distBaseDamage = floatVal;
+							}
+							if(readXMLFloat(skillNode, "fist", floatVal)){
+								voc->fistBaseDamage = floatVal;
+							}
+						}
+						else if(xmlStrcmp(skillNode->name, (const xmlChar*)"defense") == 0){
+							if(readXMLFloat(skillNode, "baseDefense", floatVal)){
+								voc->baseDefense = floatVal;
+							}
+							if(readXMLFloat(skillNode, "armorDefense", floatVal)){
+								voc->armorDefense = floatVal;
 							}
 						}
 						skillNode = skillNode->next;
@@ -165,8 +204,6 @@ int32_t Vocations::getVocationId(const std::string& name)
 	return -1;
 }
 
-uint32_t Vocation::skillBase[SKILL_LAST + 1] = { 50, 50, 50, 50, 30, 100, 20 };
-
 Vocation::Vocation()
 {
 	name = "none";
@@ -187,17 +224,38 @@ Vocation::Vocation()
 	skillMultipliers[4] = 2.0f;
 	skillMultipliers[5] = 1.5f;
 	skillMultipliers[6] = 1.1f;
+
+	skillBases[0] = 50;
+	skillBases[1] = 50;
+	skillBases[2] = 50;
+	skillBases[3] = 50;
+	skillBases[4] = 30;
+	skillBases[5] = 100;
+	skillBases[6] = 20;
+
+	swordBaseDamage = 1.;
+	axeBaseDamage = 1.;
+	clubBaseDamage = 1.;
+	distBaseDamage = 1.;
+	fistBaseDamage = 1.;
+
+	magicBaseDamage = 1.;
+	wandBaseDamage = 1.;
+	healingBaseDamage = 1.;
+
+	baseDefense = 1.;
+	armorDefense = 1.;
 }
 
 Vocation::~Vocation()
 {
 	cacheMana.clear();
-	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){
+	for(uint32_t i = SKILL_FIRST; i < SKILL_LAST; ++i){
 		cacheSkill[i].clear();
 	}
 }
 
-uint32_t Vocation::getReqSkillTries(int skill, int level)
+uint32_t Vocation::getReqSkillTries(int32_t skill, int32_t level)
 {
 	if(skill < SKILL_FIRST || skill > SKILL_LAST){
 		return 0;
@@ -207,25 +265,19 @@ uint32_t Vocation::getReqSkillTries(int skill, int level)
 	if(it != cacheSkill[skill].end()){
 		return it->second;
 	}
-	uint32_t tries = (unsigned int)(skillBase[skill] * pow((float)skillMultipliers[skill], (float)(level - 11)));
+	uint32_t tries = (uint32_t)(skillBases[skill] * std::pow((float)skillMultipliers[skill], (float)(level - 11)));
 	skillMap[level] = tries;
 	return tries;
 }
 
-uint32_t Vocation::getReqMana(int magLevel)
+uint32_t Vocation::getReqMana(int32_t magLevel)
 {
 	cacheMap::iterator it = cacheMana.find(magLevel);
 	if(it != cacheMana.end()){
 		return it->second;
 	}
-	uint32_t reqMana = (uint32_t)(1600*pow(manaMultiplier, magLevel-1));
-	/*if(reqMana % 20 < 10){
-		reqMana = reqMana - (reqMana % 20);
-	}
-	else{
-		reqMana = reqMana - (reqMana % 20) + 20;
-	}*/
 
+	uint32_t reqMana = (uint32_t)(1600*std::pow(manaMultiplier, magLevel-1));
 	cacheMana[magLevel] = reqMana;
 
 	return reqMana;

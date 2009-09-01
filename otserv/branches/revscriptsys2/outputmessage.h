@@ -22,14 +22,16 @@
 #define __OTSERV_OUTPUT_MESSAGE_H__
 
 #include "networkmessage.h"
+#include "connection.h"
 #include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
 #include "tools.h"
 #include <list>
 
 #include <boost/utility.hpp>
 
 class Protocol;
-class Connection;
 
 #define OUTPUT_POOL_SIZE 100
 
@@ -64,13 +66,14 @@ public:
 	};
 
 	Protocol* getProtocol() { return m_protocol;}
-	Connection* getConnection() { return m_connection;}
+	Connection_ptr getConnection() { return m_connection;}
+	uint64_t getFrame() const { return m_frame;}
 
 	//void setOutputBufferStart(uint32_t pos) {m_outputBufferStart = pos;}
 	//uint32_t getOutputBufferStart() const {return m_outputBufferStart;}
 
 #ifdef __TRACK_NETWORK__
-	void Track(std::string file, long line, std::string func)
+	virtual void Track(std::string file, long line, std::string func)
 	{
 		if(last_uses.size() >= 25) {
 			last_uses.pop_front();
@@ -79,6 +82,12 @@ public:
 		os << /*file << ":"*/ "line " << line << " " << func;
 		last_uses.push_back(os.str());
 	}
+
+	virtual void clearTrack()
+	{
+		last_uses.clear();
+	}
+
 	void PrintTrace()
 	{
 		int n = 1;
@@ -87,7 +96,9 @@ public:
 		}
 	}
 #endif
+
 protected:
+
 #ifdef __TRACK_NETWORK__
 	std::list<std::string> last_uses;
 #endif
@@ -108,7 +119,7 @@ protected:
 
 	void freeMessage()
 	{
-		setConnection(NULL);
+		setConnection(Connection_ptr());
 		setProtocol(NULL);
 		m_frame = 0;
 		//allocate enough size for headers
@@ -124,22 +135,23 @@ protected:
 	friend class OutputMessagePool;
 
 	void setProtocol(Protocol* protocol){ m_protocol = protocol;}
-	void setConnection(Connection* connection){ m_connection = connection;}
+	void setConnection(Connection_ptr connection){ m_connection = connection;}
 
 	void setState(OutputMessageState state) { m_state = state;}
 	OutputMessageState getState() const { return m_state;}
 
 	void setFrame(uint64_t frame) { m_frame = frame;}
-	uint64_t getFrame() const { return m_frame;}
 
 	Protocol* m_protocol;
-	Connection* m_connection;
+	Connection_ptr m_connection;
 
 	uint32_t m_outputBufferStart;
 	uint64_t m_frame;
 
 	OutputMessageState m_state;
 };
+
+typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 
 class OutputMessagePool
 {
@@ -155,36 +167,45 @@ public:
 		return &instance;
 	}
 
-	void send(OutputMessage* msg);
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t OutputMessagePoolCount;
+#endif
+
+	void send(OutputMessage_ptr msg);
 	void sendAll();
 	void stop() {m_isOpen = false;}
-	OutputMessage* getOutputMessage(Protocol* protocol, bool autosend = true);
+	OutputMessage_ptr getOutputMessage(Protocol* protocol, bool autosend = true);
 	void startExecutionFrame();
 
-	void releaseMessage(OutputMessage* msg, bool sent = false);
-
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	size_t getTotalMessageCount() const {return OutputMessagePoolCount;}
+#else
 	size_t getTotalMessageCount() const {return m_allOutputMessages.size();}
+#endif
 	size_t getAvailableMessageCount() const {return m_outputMessages.size();}
 	size_t getAutoMessageCount() const {return m_autoSendOutputMessages.size();}
+	void addToAutoSend(OutputMessage_ptr msg);
 
 protected:
 
-	void configureOutputMessage(OutputMessage* msg, Protocol* protocol, bool autosend);
-
+	void configureOutputMessage(OutputMessage_ptr msg, Protocol* protocol, bool autosend);
+	void releaseMessage(OutputMessage* msg);
 	void internalReleaseMessage(OutputMessage* msg);
 
-	typedef std::list<OutputMessage*> OutputMessageVector;
+	typedef std::list<OutputMessage*> InternalOutputMessageList;
+	typedef std::list<OutputMessage_ptr> OutputMessageMessageList;
 
-	OutputMessageVector m_outputMessages;
-	OutputMessageVector m_autoSendOutputMessages;
-	OutputMessageVector m_allOutputMessages;
+	InternalOutputMessageList m_outputMessages;
+	InternalOutputMessageList m_allOutputMessages;
+	OutputMessageMessageList m_autoSendOutputMessages;
+	OutputMessageMessageList m_toAddQueue;
 	boost::recursive_mutex m_outputPoolLock;
 	uint64_t m_frameTime;
 	bool m_isOpen;
 };
 
 #ifdef __TRACK_NETWORK__
-#define TRACK_MESSAGE(omsg) if(dynamic_cast<OutputMessage*>(omsg)) dynamic_cast<OutputMessage*>(omsg)->Track(__FILE__, __LINE__, __FUNCTION__)
+#define TRACK_MESSAGE(omsg) (omsg)->Track(__FILE__, __LINE__, __FUNCTION__)
 #else
 #define TRACK_MESSAGE(omsg)
 #endif

@@ -39,10 +39,6 @@
 extern ConfigManager g_config;
 extern Game g_game;
 
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-uint32_t ProtocolStatus::protocolStatusCount = 0;
-#endif
-
 enum RequestedInfo_t{
 	REQUEST_BASIC_SERVER_INFO  = 0x01,
 	REQUEST_OWNER_SERVER_INFO  = 0x02,
@@ -51,9 +47,12 @@ enum RequestedInfo_t{
 	REQUEST_MAP_INFO           = 0x10,
 	REQUEST_EXT_PLAYERS_INFO   = 0x20,
 	REQUEST_PLAYER_STATUS_INFO = 0x40,
-	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80,
+	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80
 };
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+uint32_t ProtocolStatus::protocolStatusCount = 0;
+#endif
 std::map<uint32_t, int64_t> ProtocolStatus::ipConnectMap;
 
 void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
@@ -73,7 +72,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	case 0xFF:
 	{
 		if(msg.GetRaw() == "info"){
-			OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+			OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 			if(output){
 				TRACK_MESSAGE(output);
 				Status* status = Status::instance();
@@ -90,7 +89,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	{
 		uint32_t requestedInfo = msg.GetU16(); //Only a Byte is necessary, though we could add new infos here
 
-		OutputMessage* output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+		OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 		if(output){
 			TRACK_MESSAGE(output);
 			Status* status = Status::instance();
@@ -156,7 +155,7 @@ std::string Status::getStatusString() const
 	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getString(ConfigManager::IP).c_str());
 	xmlSetProp(p, (const xmlChar*) "servername", (const xmlChar*)g_config.getString(ConfigManager::SERVER_NAME).c_str());
 
-	ss << g_config.getNumber(ConfigManager::PORT);
+	ss << g_config.getNumber(ConfigManager::LOGIN_PORT);
 	xmlSetProp(p, (const xmlChar*) "port", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 
@@ -225,7 +224,7 @@ std::string Status::getStatusString() const
 	return xml;
 }
 
-void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessage& msg) const
+void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const
 {
 	// the client selects which information may be
 	// sent back, so we'll save some bandwidth and
@@ -241,7 +240,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 		output->AddByte(0x10); // server info
 		output->AddString(g_config.getString(ConfigManager::SERVER_NAME).c_str());
 		output->AddString(g_config.getString(ConfigManager::IP).c_str());
-		ss << g_config.getNumber(ConfigManager::PORT);
+		ss << g_config.getNumber(ConfigManager::LOGIN_PORT);
 		output->AddString(ss.str().c_str());
 		ss.str("");
 	}
@@ -259,7 +258,6 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessa
 		output->AddString(g_config.getString(ConfigManager::URL).c_str());
 		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
 		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
-		output->AddString(OTSERV_VERSION);
 	}
 
 	if(requestedInfo & REQUEST_PLAYERS_INFO){

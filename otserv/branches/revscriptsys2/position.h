@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,10 +20,10 @@
 
 #ifndef __OTSERV_POS_H
 #define __OTSERV_POS_H
-//////////////////////////////////////////////////
-// represents a map position
-// for now just a 3d point
+
+#include "definitions.h"
 #include <stdlib.h>
+#include <cstdlib>
 #include <cmath>
 #include <iostream>
 
@@ -36,40 +36,40 @@ enum Direction {
 	SOUTHWEST = 4,
 	SOUTHEAST = 5,
 	NORTHWEST = 6,
-	NORTHEAST = 7,
+	NORTHEAST = 7
 };
 
 class Position{
 public:
 
-	// for now we just initialise the position to a startpoint
-	//Position() : x(247), y(218), z(7) { };
-  	Position() : x(31), y(31), z(7) { };
+  	Position() : x(0), y(0), z(0) { };
 	~Position() {};
 
-	template<int deltax, int deltay, int deltaz>
+	template<int32_t deltax, int32_t deltay, int32_t deltaz>
 	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(float(p1.x - p2.x)) > deltax ||
-			std::abs(float(p1.y - p2.y)) > deltay ||
-			std::abs(float(p1.z - p2.z)) > deltaz){
+		if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
+			std::abs(int32_t(p1.y - p2.y)) > deltay ||
+			std::abs(int32_t(p1.z - p2.z)) > deltaz){
 			return false;
 		}
 		return true;
 	}
-	
-	template<int deltax, int deltay>
+
+	template<int32_t deltax, int32_t deltay>
 	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(float(p1.x - p2.x)) > deltax ||
-			std::abs(float(p1.y - p2.y)) > deltay){
+		if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
+			std::abs(int32_t(p1.y - p2.y)) > deltay){
 			return false;
 		}
 		return true;
 	}
-	
-	Position(int _x, int _y, int _z)
+
+	Position(int32_t _x, int32_t _y, int32_t _z)
 	: x(_x), y(_y), z(_z) {};
 
-	int x,y,z;
+	int32_t x;
+	int32_t y;
+	int32_t z;
 
 	bool operator<(const Position& p) const {
 		if(z < p.z)
@@ -111,19 +111,6 @@ public:
 	Position operator-(const Position p1){
 		return Position(x-p1.x, y-p1.y,z-p1.z);
 	}
-
-	/*
-	void dist(){
-		x=abs(x);
-		y=abs(y);
-		z=abs(z);
-	}
-		
-	bool operator==(const position p){
-		return (x==p.x && y== p.x && z==p.z);
-	}
-	*/
-
 };
 
 std::ostream& operator<<(std::ostream&, const Position&);
@@ -131,23 +118,26 @@ std::ostream& operator<<(std::ostream&, const Direction&);
 
 
 class PositionEx : public Position{
-public:  
+public:
 	PositionEx(){ };
 	~PositionEx(){};
 
-	PositionEx(int _x, int _y, int _z, int _stackpos)
+	PositionEx(int32_t _x, int32_t _y, int32_t _z, int32_t _stackpos)
 	: Position(_x,_y,_z), stackpos(_stackpos) {};
-	
-	PositionEx(int _x, int _y, int _z)
+
+	PositionEx(int32_t _x, int32_t _y, int32_t _z)
 	: Position(_x,_y,_z), stackpos(0) {};
 
-	PositionEx(Position p)
+	PositionEx(const Position& p)
 	: Position(p.x,p.y,p.z), stackpos(0) {};
-	
-	PositionEx(Position p,int _stackpos)
+
+	PositionEx(const PositionEx& p)
+	: Position(p.x,p.y,p.z), stackpos(p.stackpos) {};
+
+	PositionEx(const Position& p, int32_t _stackpos)
 	: Position(p.x,p.y,p.z), stackpos(_stackpos) {};
 
-	int stackpos;
+	int32_t stackpos;
 
 	bool operator==(const PositionEx p)  const {
 		if(p.x==x && p.y==y && p.z ==z && p.stackpos == stackpos)

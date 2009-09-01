@@ -23,6 +23,7 @@
 #include "player.h"
 #include "game.h"
 #include "chat.h"
+#include "tools.h"
 #include "configmanager.h"
 
 #include <sstream>
@@ -92,7 +93,7 @@ bool Party::invitePlayer(Player* player)
 	if(!(inviteList.empty() && memberList.empty())) {
 		ss << player->getName() << " has been invited.";
 	} else {
-		ss << player->getName() << " has been invited. Open the party channel to communicate with other members.";
+		ss << player->getName() << " has been invited. Open the party channel to communicate with your members.";
 	}
 	getLeader()->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
@@ -102,8 +103,7 @@ bool Party::invitePlayer(Player* player)
 	player->addPartyInvitation(this);
 
 	ss.str("");
-	ss << getLeader()->getName() << " has invited you to " <<
-		(getLeader()->getSex() == PLAYERSEX_FEMALE ? "her" : "his") << " party.";
+	ss << getLeader()->getName() << " has invited you to " << playerSexAdjectiveString(player->getSex()) << " party.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 	return true;
 }
@@ -131,7 +131,7 @@ bool Party::joinParty(Player* player)
 	updatePartyIcons(player);
 
 	ss.str("");
-	ss << "You have joined " << getLeader()->getName() << "'s party.";
+	ss << "You have joined " << getLeader()->getName() << "'s party. Open the party channel to communicate with your companions.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 	return true;
 }
@@ -161,8 +161,7 @@ bool Party::removeInvite(Player* player)
 bool Party::revokeInvitation(Player* player)
 {
 	std::stringstream ss;
-	ss << getLeader()->getName() << " has revoked " <<
-		(getLeader()->getSex() == PLAYERSEX_FEMALE ? "her" : "his") << " invitation.";
+	ss << getLeader()->getName() << " has revoked " << playerSexAdjectiveString(getLeader()->getSex()) << " invitation.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
 	ss.str("");
@@ -338,17 +337,6 @@ void Party::broadcastPartyMessage(MessageClasses msgClass, const std::string& ms
 	}
 }
 
-void Party::broadcastLoot(Creature* creature, Container* corpse)
-{
-	std::ostringstream os;
-
-	os << "Loot of " << creature->getName() << ": " << corpse->getContentDescription();
-
-	ChatChannel* channel = g_chat.getChannel(this);
-	if(channel)
-		channel->sendInfo(SPEAK_CHANNEL_W, os.str(), std::time(NULL));
-}
-
 void Party::updateSharedExperience()
 {
 	if(sharedExpActive){
@@ -390,7 +378,7 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 	return true;
 }
 
-void Party::shareExperience(uint64_t experience)
+void Party::shareExperience(uint64_t experience, bool fromMonster)
 {
 	double member_factor = g_config.getNumber(ConfigManager::PARTY_MEMBER_EXP_BONUS);
 	double xpgained = experience / (memberList.size() + 1) + experience * (member_factor / 100.);
@@ -400,10 +388,10 @@ void Party::shareExperience(uint64_t experience)
 	uint64_t shareExp = (uint64_t)std::ceil(xpgained);
 	
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
-		(*it)->onGainSharedExperience(shareExp);
+		(*it)->onGainSharedExperience(shareExp, fromMonster);
 	}
 
-	getLeader()->onGainSharedExperience(shareExp);
+	getLeader()->onGainSharedExperience(shareExp, fromMonster);
 }
 
 bool Party::canUseSharedExperience(const Player* player) const

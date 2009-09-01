@@ -15,9 +15,12 @@ energyWave.area       =
 		{1, 1, 1},
 		{1, 1, 1},
 		{0, 1, 0},
-		{0, 3, 0}
+		{0, 3, 0},
 	}
 
-energyWave.formula = ???
+energyWave.formula = 
+	function(player)
+		return math.random(player:getLevel() + player:getMagicLevel(), 2*(player:getLevel() + player:getMagicLevel()))
+	end
 
 energyWave:register()

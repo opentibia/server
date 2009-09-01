@@ -33,6 +33,7 @@ public:
 	void setKey(const char* p, const char* q, const char* d);
 	bool setKey(const std::string& file);
 	bool decrypt(char* msg, int32_t size);
+	bool encrypt(char* msg, int32_t size, const char* key);
 
 	int32_t getKeySize();
 	void getPublicKey(char* buffer);

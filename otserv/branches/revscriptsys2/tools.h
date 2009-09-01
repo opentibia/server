@@ -20,19 +20,16 @@
 
 #ifndef __OTSERV_TOOLS_H__
 #define __OTSERV_TOOLS_H__
+#include "definitions.h"
+#include <libxml/parser.h>
+#include <vector>
+#include <iostream>
 
+#include "enums.h"
 #include "const.h"
 
-#include <string>
-#include <algorithm>
-#include <stdio.h>
-#include <stdlib.h>
-#include <cmath>
 
-#include <libxml/parser.h>
-
-
-enum DistributionType_t{
+enum DistributionType_t {
 	DISTRO_UNIFORM,
 	DISTRO_SQUARE,
 	DISTRO_NORMAL
@@ -40,8 +37,9 @@ enum DistributionType_t{
 
 bool fileExists(const char* filename);
 void replaceString(std::string& str, const std::string sought, const std::string replacement);
-void trim_right(std::string& source, const std::string& t);
-void trim_left(std::string& source, const std::string& t);
+void trim_right(std::string& source, const std::string& t = "\n\t ");
+void trim_left(std::string& source, const std::string& t = "\n\t ");
+void trim(std::string& source, const std::string& t = "\n\t ");
 void toLowerCaseString(std::string& source);
 void toUpperCaseString(std::string& source);
 std::string asLowerCaseString(const std::string& source);
@@ -66,19 +64,23 @@ char upchar(char c);
 std::string urlEncode(const char* str);
 std::string urlEncode(const std::string& str);
 
-bool passwordTest(const std::string &plain, std::string &hash);
+bool passwordTest(std::string plain, std::string &hash);
 
-//buffer should be at least 17 bytes
-void formatIP(uint32_t ip, char* buffer);
+std::string convertIPToString(uint32_t ip);
 //buffer should have at least 21 bytes. dd/mm/yyyy  hh:mm:ss
 void formatDate(time_t time, char* buffer);
 //buffer should have at least 16 bytes
-void formatDate2(time_t time, char* buffer);
+void formatDateShort(time_t time, char* buffer);
 
 MagicEffectClasses getMagicEffect(const std::string& strValue);
 ShootType_t getShootType(const std::string& strValue);
 Ammo_t getAmmoType(const std::string& strValue);
 AmmoAction_t getAmmoAction(const std::string& strValue);
+
+std::string getViolationReasonString(int32_t reasonId);
+std::string getViolationActionString(violationAction_t actionId, bool ipBanishment);
+std::string playerSexAdjectiveString(playersex_t sex);
+std::string playerSexSubjectString(playersex_t sex);
 
 uint32_t adlerChecksum(uint8_t *data, int32_t len);
 

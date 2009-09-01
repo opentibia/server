@@ -90,6 +90,7 @@ enum{
 	AP_MSG_KEY_EXCHANGE = 3,
 	AP_MSG_COMMAND = 4,
 	AP_MSG_PING = 5,
+	AP_MSG_KEEP_ALIVE = 6,
 	//
 	AP_MSG_HELLO = 1,
 	AP_MSG_KEY_EXCHANGE_OK = 2,
@@ -102,14 +103,14 @@ enum{
 	AP_MSG_ENCRYPTION_FAILED = 9,
 	AP_MSG_PING_OK = 10,
 	AP_MSG_MESSAGE = 11,
-	AP_MSG_ERROR = 12,
+	AP_MSG_ERROR = 12
 };
 
 enum{
 	CMD_BROADCAST = 1,
 	CMD_CLOSE_SERVER = 2,
 	CMD_PAY_HOUSES = 3,
-	//CMD_OPEN_SERVER = 4,
+	CMD_OPEN_SERVER = 4,
 	CMD_SHUTDOWN_SERVER = 5,
 	//CMD_RELOAD_SCRIPTS = 6,
 	//CMD_PLAYER_INFO = 7,
@@ -118,16 +119,20 @@ enum{
 	//CMD_BAN_MANAGER = 10,
 	//CMD_SERVER_INFO = 11,
 	//CMD_GETHOUSE = 12,
+	CMD_SAVE_SERVER = 13,
+	CMD_SEND_MAIL = 14,
+	CMD_SHALLOW_SAVE_SERVER = 15,
+	CMD_RELATIONAL_SAVE_SERVER = 16
 };
 
 
 enum{
 	REQUIRE_LOGIN = 1,
-	REQUIRE_ENCRYPTION = 2,
+	REQUIRE_ENCRYPTION = 2
 };
 
 enum{
-	ENCRYPTION_RSA1024XTEA = 1,
+	ENCRYPTION_RSA1024XTEA = 1
 };
 
 class AdminProtocolConfig{
@@ -173,12 +178,17 @@ protected:
 class ProtocolAdmin : public Protocol
 {
 public:
+	// static protocol information
+	enum {server_sends_first = false};
+	enum {protocol_identifier = 0xFE}; // Not required as we send first
+	enum {use_checksum = false};
+	static const char* protocol_name() {return "admin protocol";}
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolAdminCount;
 #endif
 
-	ProtocolAdmin(Connection* connection);
+	ProtocolAdmin(Connection_ptr connection);
 	virtual ~ProtocolAdmin();
 
 	virtual void parsePacket(NetworkMessage& msg);
@@ -189,27 +199,30 @@ protected:
 
 	virtual void deleteProtocolTask();
 
+	void adminCommandOpenServer();
+	void adminCommandSaveServer(bool shallow);
+	void adminCommandRelationalSaveServer();
 	void adminCommandCloseServer();
 	void adminCommandPayHouses();
 	void adminCommandShutdownServer();
+	void adminCommandSendMail(const std::string& xmlData);
 	void adminCommandKickPlayer(const std::string& name);
+
+	Item* createMail(const std::string xmlData, std::string& name, uint32_t& depotId);
 
 	enum ConnectionState_t{
 		NO_CONNECTED,
 		ENCRYPTION_NO_SET,
 		ENCRYPTION_OK,
 		NO_LOGGED_IN,
-		LOGGED_IN,
+		LOGGED_IN
 	};
 
-
-
 private:
-
 	int32_t m_loginTries;
 	ConnectionState_t m_state;
-	uint32_t m_lastCommand;
-	uint32_t m_startTime;
+	time_t m_lastCommand;
+	time_t m_startTime;
 };
 
 #endif

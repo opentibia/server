@@ -35,6 +35,7 @@ enum connectResult_t{
 };
 
 class NetworkMessage;
+typedef boost::shared_ptr<NetworkMessage> NetworkMessage_ptr;
 class Player;
 class Game;
 class House;
@@ -46,14 +47,20 @@ class Quest;
 class ProtocolGame : public Protocol
 {
 public:
+	// static protocol information
+	enum {server_sends_first = true};
+	enum {protocol_identifier = 0}; // Not required as we send first
+	enum {use_checksum = true};
+	static const char* protocol_name() {return "gameworld protocol";}
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolGameCount;
 #endif
 
-	ProtocolGame(Connection* connection);
+	ProtocolGame(Connection_ptr connection);
 	virtual ~ProtocolGame();
 
-	bool login(const std::string& name);
+	bool login(const std::string& name, bool isSetGM);
 	bool logout(bool forced);
 
 	void setPlayer(Player* p);
@@ -77,13 +84,14 @@ private:
 	// we have all the parse methods
 	virtual void parsePacket(NetworkMessage& msg);
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
+	virtual void onConnect();
 	bool parseFirstPacket(NetworkMessage& msg);
 
 	//Parse methods
 	void parseLogout(NetworkMessage& msg);
 	void parseCancelMove(NetworkMessage& msg);
 
-	void parseRecievePing(NetworkMessage& msg);
+	void parseReceivePing(NetworkMessage& msg);
 	void parseAutoWalk(NetworkMessage& msg);
 	void parseStopAutoWalk(NetworkMessage& msg);
 	void parseMove(NetworkMessage& msg, Direction dir);
@@ -150,8 +158,10 @@ private:
 	void parseCloseRuleViolation(NetworkMessage& msg);
 	void parseCancelRuleViolation(NetworkMessage& msg);
 
+	//etc
+	void parseViolationWindow(NetworkMessage& msg);
+	void parseBugReport(NetworkMessage& msg);
 	void parseDebugAssert(NetworkMessage& msg);
-
 	void parseDebug(NetworkMessage& msg);
 
 	//Send functions
@@ -166,7 +176,7 @@ private:
 	void sendRemoveReport(const std::string& name);
 	void sendLockRuleViolation();
 	void sendRuleViolationCancel(const std::string& name);
-	void sendIcons(int icons);
+	void sendIcons(uint16_t icons);
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
 	void sendMagicEffect(const Position& pos, unsigned char type);
@@ -174,16 +184,14 @@ private:
 	void sendCreatureHealth(const Creature* creature);
 	void sendSkills();
 	void sendPing();
-	void sendCreatureTurn(const Creature* creature, unsigned char stackpos);
+	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
 	void sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text);
 
 	void sendCancel(const std::string& message);
 	void sendCancelWalk();
 	void sendChangeSpeed(const Creature* creature, uint32_t speed);
 	void sendCancelTarget();
-	void sendCreatureVisible(const Creature* creature, bool visible);
 	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
-	void sendCreatureInvisible(const Creature* creature);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
 
@@ -217,14 +225,14 @@ private:
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 
 	//tiles
-	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item);
+	void sendAddTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
 	void sendUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
 	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos);
 	void sendUpdateTile(const Tile* tile, const Position& pos);
 
-	void sendAddCreature(const Creature* creature, bool isLogin);
+	void sendAddCreature(const Creature* creature, const Position& pos, uint32_t stackpos);
 	void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
-	void sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos,
+	void sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos, uint32_t newStackPos,
 		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	//containers
@@ -243,100 +251,67 @@ private:
 	//Help functions
 
 	// translate a tile to clientreadable format
-	void GetTileDescription(const Tile* tile, NetworkMessage* msg);
+	void GetTileDescription(const Tile* tile, NetworkMessage_ptr msg);
 
 	// translate a floor to clientreadable format
-	void GetFloorDescription(NetworkMessage* msg, int x, int y, int z,
-		int width, int height, int offset, int& skip);
+	void GetFloorDescription(NetworkMessage_ptr msg, int32_t x, int32_t y, int32_t z,
+		int32_t width, int32_t height, int32_t offset, int32_t& skip);
 
 	// translate a map area to clientreadable format
-	void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
-		unsigned short width, unsigned short height, NetworkMessage* msg);
+	void GetMapDescription(int32_t x, int32_t y, int32_t z,
+		int32_t width, int32_t height, NetworkMessage_ptr msg);
 
-	void AddMapDescription(NetworkMessage* msg, const Position& pos);
-	void AddTextMessage(NetworkMessage* msg,MessageClasses mclass, const std::string& message);
-	void AddAnimatedText(NetworkMessage* msg,const Position& pos, unsigned char color, const std::string& text);
-	void AddMagicEffect(NetworkMessage* msg,const Position& pos, unsigned char type);
-	void AddDistanceShoot(NetworkMessage* msg,const Position& from, const Position& to, uint8_t type);
-	void AddCreature(NetworkMessage* msg,const Creature* creature, bool known, uint32_t remove);
-	void AddPlayerStats(NetworkMessage* msg);
-	void AddCreatureSpeak(NetworkMessage* msg, const Creature* creature, SpeakClass type, std::string text, uint16_t channelId, uint32_t time = 0);
-	void AddCreatureHealth(NetworkMessage* msg,const Creature* creature);
-	void AddCreatureOutfit(NetworkMessage* msg, const Creature* creature, const Outfit_t& outfit);
-	void AddCreatureInvisible(NetworkMessage* msg, const Creature* creature);
-	void AddPlayerSkills(NetworkMessage* msg);
-	void AddWorldLight(NetworkMessage* msg, const LightInfo& lightInfo);
-	void AddCreatureLight(NetworkMessage* msg, const Creature* creature);
+	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
+	void AddTextMessage(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message);
+	void AddAnimatedText(NetworkMessage_ptr msg,const Position& pos, unsigned char color, const std::string& text);
+	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, unsigned char type);
+	void AddDistanceShoot(NetworkMessage_ptr msg,const Position& from, const Position& to, uint8_t type);
+	void AddCreature(NetworkMessage_ptr msg,const Creature* creature, bool known, uint32_t remove);
+	void AddPlayerStats(NetworkMessage_ptr msg);
+	void AddCreatureSpeak(NetworkMessage_ptr msg, const Creature* creature, SpeakClass type, std::string text, uint16_t channelId, uint32_t time = 0);
+	void AddCreatureHealth(NetworkMessage_ptr msg,const Creature* creature);
+	void AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const Outfit_t& outfit);
+	void AddCreatureInvisible(NetworkMessage_ptr msg, const Creature* creature);
+	void AddPlayerSkills(NetworkMessage_ptr msg);
+	void AddWorldLight(NetworkMessage_ptr msg, const LightInfo& lightInfo);
+	void AddCreatureLight(NetworkMessage_ptr msg, const Creature* creature);
 
 	//tiles
-	void AddTileItem(NetworkMessage* msg, const Position& pos, const Item* item);
-	void AddTileCreature(NetworkMessage* msg, const Position& pos, const Creature* creature);
-	void UpdateTileItem(NetworkMessage* msg, const Position& pos, uint32_t stackpos, const Item* item);
-	void RemoveTileItem(NetworkMessage* msg, const Position& pos, uint32_t stackpos);
+	void AddTileItem(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos, const Item* item);
+	void AddTileCreature(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos, const Creature* creature);
+	void UpdateTileItem(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos, const Item* item);
+	void RemoveTileItem(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos);
 
-	void MoveUpCreature(NetworkMessage* msg, const Creature* creature,
+	void MoveUpCreature(NetworkMessage_ptr msg, const Creature* creature,
 		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
-	void MoveDownCreature(NetworkMessage* msg, const Creature* creature,
+	void MoveDownCreature(NetworkMessage_ptr msg, const Creature* creature,
 		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
 
 	//container
-	void AddContainerItem(NetworkMessage* msg, uint8_t cid, const Item* item);
-	void UpdateContainerItem(NetworkMessage* msg, uint8_t cid, uint8_t slot, const Item* item);
-	void RemoveContainerItem(NetworkMessage* msg, uint8_t cid, uint8_t slot);
+	void AddContainerItem(NetworkMessage_ptr msg, uint8_t cid, const Item* item);
+	void UpdateContainerItem(NetworkMessage_ptr msg, uint8_t cid, uint8_t slot, const Item* item);
+	void RemoveContainerItem(NetworkMessage_ptr msg, uint8_t cid, uint8_t slot);
 
 	//inventory
-	void AddInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
-	void UpdateInventoryItem(NetworkMessage* msg, slots_t slot, const Item* item);
-	void RemoveInventoryItem(NetworkMessage* msg, slots_t slot);
+	void AddInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item);
+	void UpdateInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item);
+	void RemoveInventoryItem(NetworkMessage_ptr msg, slots_t slot);
 
 	//shop
-	void AddShopItem(NetworkMessage* msg, const ShopInfo item);
+	void AddShopItem(NetworkMessage_ptr msg, const ShopInfo item);
 
 	friend class Player;
 
-	template<class T1, class f1, class r>
-	void addGameTask(r (Game::*f)(f1), T1 p1);
+	// Helper so we don't need to bind every time
+#define addGameTask(f, ...) addGameTaskInternal(false, 0, boost::bind(f, &g_game, __VA_ARGS__))
+#define addGameTaskTimed(delay, f, ...) addGameTaskInternal(true, delay, boost::bind(f, &g_game, __VA_ARGS__))
 
-	template<class T1, class T2, class f1, class f2, class r>
-	void addGameTask(r (Game::*f)(f1, f2), T1 p1, T2 p2);
-
-	template<class T1, class T2, class T3, class f1, class f2, class f3,
-	class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3), T1 p1, T2 p2, T3 p3);
-
-	template<class T1, class T2, class T3, class T4, class f1, class f2,
-	class f3, class f4, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4), T1 p1, T2 p2, T3 p3, T4 p4);
-
-	template<class T1, class T2, class T3, class T4, class T5, class f1,
-	class f2, class f3, class f4, class f5, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5);
-
-	template<class T1, class T2, class T3, class T4, class T5, class T6,
-	class f1, class f2, class f3, class f4, class f5, class f6, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6);
-
-	template<class T1, class T2, class T3, class T4, class T5, class T6,
-	class T7, class f1, class f2, class f3, class f4, class f5, class f6,
-	class f7, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7);
-
-	template<class T1, class T2, class T3, class T4, class T5, class T6,
-	class T7, class T8, class f1, class f2, class f3, class f4, class f5,
-	class f6, class f7, class f8, class r>
-	void addGameTask(r (Game::*f)(f1, f2, f3, f4, f5, f6, f7, f8), T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8);
+	template<class FunctionType>
+	void addGameTaskInternal(bool droppable, uint32_t delay, const FunctionType&);
 
 	Player* player;
 
-	int64_t m_now;
-	int64_t m_nextTask;
-	int64_t m_nextPing;
-
-	int64_t m_lastTaskCheck;
-	int32_t m_messageCount;
-	int32_t m_rejectCount;
 	uint32_t eventConnect;
-
 	bool m_debugAssertSent;
 	bool m_acceptPackets;
 };

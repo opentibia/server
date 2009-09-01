@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,6 +21,8 @@
 #include "otpch.h"
 
 #include "fileloader.h"
+
+#include <cmath>
 
 FileLoader::FileLoader()
 {
@@ -72,8 +74,7 @@ bool FileLoader::openFile(const char* filename, bool write, bool caching /*= fal
 		m_file = fopen(filename, "rb");
 		if(m_file){
 			uint32_t version;
-			fread(&version, sizeof(version), 1, m_file);
-			if(version > 0){
+			if(fread(&version, sizeof(version), 1, m_file) && version > 0){
 				fclose(m_file);
 				m_file = NULL;
 				m_lastError = ERROR_INVALID_FILE_VERSION;
@@ -86,7 +87,7 @@ bool FileLoader::openFile(const char* filename, bool write, bool caching /*= fal
 					int file_size = ftell(m_file);
 					m_cache_size = std::min(32768, std::max(file_size/20, 8192)) & ~0x1FFF;
 				}
-				
+
 				//parse nodes
 				if(safeSeek(4)){
 					delete m_root;
@@ -345,7 +346,7 @@ inline bool FileLoader::readByte(int &value)
 	}
 }
 
-inline bool FileLoader::readBytes(unsigned char* buffer, int size, long pos)
+inline bool FileLoader::readBytes(unsigned char* buffer, unsigned int size, long pos)
 {
 	if(m_use_cache){
 		//seek at pos
@@ -358,7 +359,7 @@ inline bool FileLoader::readBytes(unsigned char* buffer, int size, long pos)
 
 			m_cache_index = i;
 			m_cache_offset = pos - m_cached_data[i].base;
-			
+
 			//get maximun read block size and calculate remaining bytes
 			reading = std::min(remain, m_cached_data[i].size - m_cache_offset);
 			remain = remain - reading;
@@ -378,7 +379,7 @@ inline bool FileLoader::readBytes(unsigned char* buffer, int size, long pos)
 			m_lastError = ERROR_SEEK_ERROR;
 			return false;
 		}
-		int value = fread(buffer, 1, size, m_file);
+		size_t value = fread(buffer, 1, size, m_file);
 		if(value != size){
 			m_lastError = ERROR_EOF;
 			return false;
@@ -506,7 +507,7 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 	}
 	if(loading_cache == -1){
 		for(i = 0; i < CACHE_BLOCKS; i++){
-			if((long)(std::abs((long)m_cached_data[i].base - base_pos)) > (long)(2*m_cache_size)){
+			if((long)(labs((long)m_cached_data[i].base - base_pos)) > (long)(2*m_cache_size)){
 				loading_cache = i;
 				break;
 			}
@@ -515,7 +516,7 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 			loading_cache = 0;
 		}
 	}
-			
+
 	if(m_cached_data[loading_cache].data == NULL){
 		m_cached_data[loading_cache].data = new unsigned char[m_cache_size];
 	}

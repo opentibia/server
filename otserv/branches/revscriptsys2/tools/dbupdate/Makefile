@@ -1,11 +1,11 @@
 
 CC = g++
-CFLAGS = -Wall -D__USE_MYSQL__ -D__USE_SQLITE__
-LIBS = -lsqlite3 -lmysqlclient -llua -lboost_thread-mt
+CFLAGS = -Wall -D__USE_MYSQL__ -D__USE_SQLITE__ -I/usr/include/lua5.1
+LIBS = -lsqlite3 -lmysqlclient -llua5.1 -lboost_thread-mt
 OBJS = dbupdate.o configmanager.o database.o databasemysql.o \
 	databasesqlite.o
 
-all: dbupdate
+all: dbupdate dbupdate.lua
 
 clean: 
 	rm dbupdate *.o
@@ -30,3 +30,9 @@ databasemysql.o: ./../../databasemysql.cpp
 
 databasesqlite.o: ./../../databasesqlite.cpp
 	${CC} -c ${CFLAGS} -o $*.o ./../../$*.cpp
+
+
+dbupdate.lua: dbupdate.lua.dist
+	cp dbupdate.lua.dist dbupdate.lua
+	#Don't forget to edit dbupdate.lua
+

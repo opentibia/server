@@ -23,7 +23,7 @@
 
 #include <string>
 #include <stdio.h>
-
+#include <stdlib.h>
 
 struct NodeStruct;
 
@@ -91,7 +91,7 @@ enum FILELOADER_ERRORS{
 	ERROR_INVALID_FORMAT,
 	ERROR_TELL_ERROR,
 	ERROR_COULDNOTWRITE,
-	ERROR_CACHE_ERROR,
+	ERROR_CACHE_ERROR
 };
 
 class PropStream;
@@ -118,13 +118,13 @@ protected:
 	enum SPECIAL_BYTES{
 		NODE_START = 0xFE,
 		NODE_END = 0xFF,
-		ESCAPE_CHAR = 0xFD,
+		ESCAPE_CHAR = 0xFD
 	};
 
 	bool parseNode(NODE node);
 
 	inline bool readByte(int &value);
-	inline bool readBytes(unsigned char* buffer, int size, long pos);
+	inline bool readBytes(unsigned char* buffer, unsigned int size, long pos);
 	inline bool checks(const NODE node);
 	inline bool safeSeek(unsigned long pos);
 	inline bool safeTell(long &pos);
@@ -161,8 +161,8 @@ protected:
 	struct _cache{
 		unsigned long loaded;
 		unsigned long base;
-		unsigned long size;
 		unsigned char* data;
+		size_t size;
 	};
 	#define CACHE_BLOCKS 3
 	unsigned long m_cache_size;
@@ -184,7 +184,7 @@ public:
 		end = a + size;
 	}
 
-	long size(){return end-p;}
+	int64_t size(){return end-p;}
 
 	template <typename T>
 	inline bool GET_STRUCT(T* &ret){
@@ -332,7 +332,7 @@ public:
 	}
 
 	inline void ADD_STRING(const std::string& add){
-		uint16_t str_len = add.size();
+		uint16_t str_len = (uint16_t)add.size();
 
 		ADD_USHORT(str_len);
 
@@ -346,8 +346,8 @@ public:
 	}
 
 	inline void ADD_LSTRING(const std::string& add){
-		uint32_t str_len = add.size();
- 
+		uint32_t str_len = (uint32_t)add.size();
+
 		ADD_ULONG(str_len);
 
 		if((buffer_size - size) < str_len){

@@ -1509,8 +1509,8 @@ int LuaState::lua_Tile_getCreatures()
 
 	newTable();
 	int n = 1;
-	for(CreatureVector::iterator iter = tile->creatures.begin(),
-		end_iter = tile->creatures.end();
+	for(CreatureVector::iterator iter = tile->getCreatures()->begin(),
+		end_iter = tile->getCreatures()->end();
 		iter != end_iter; ++iter, ++n)
 	{
 		pushThing(*iter);
@@ -1525,13 +1525,15 @@ int LuaState::lua_Tile_getMoveableItems()
 
 	newTable();
 	int n = 1;
-	for(ItemVector::iterator iter = tile->downItems.begin(),
-		end_iter = tile->downItems.end();
-		iter != end_iter; ++iter)
-	{
-		if((*iter)->isNotMoveable() == false) {
-			pushThing(*iter);
-			setField(-2, n++);
+	if(tile->getItemList()){
+		for(ItemVector::iterator iter = tile->getItemList()->begin(),
+			end_iter = tile->getItemList()->end();
+			iter != end_iter; ++iter)
+		{
+			if((*iter)->isNotMoveable() == false) {
+				pushThing(*iter);
+				setField(-2, n++);
+			}
 		}
 	}
 	return 1;
@@ -1548,21 +1550,16 @@ int LuaState::lua_Tile_getItems()
 		setField(-2, n++);
 	}
 
-	for(ItemVector::iterator iter = tile->topItems.begin(),
-		end_iter = tile->topItems.end();
-		iter != end_iter; ++iter, ++n)
-	{
-		pushThing(*iter);
-		setField(-2, n);
+	if(tile->getItemList()){
+		for(ItemVector::iterator iter = tile->getItemList()->begin(),
+			end_iter = tile->getItemList()->end();
+			iter != end_iter; ++iter, ++n)
+		{
+			pushThing(*iter);
+			setField(-2, n);
+		}
 	}
 
-	for(ItemVector::iterator iter = tile->downItems.begin(),
-		end_iter = tile->downItems.end();
-		iter != end_iter; ++iter, ++n)
-	{
-		pushThing(*iter);
-		setField(-2, n);
-	}
 	return 1;
 }
 
@@ -3760,7 +3757,7 @@ int LuaState::lua_House_getDoors()
 
 	newTable();
 	int n = 1;
-	for(HouseDoorList::iterator hit = house->getHouseDoorBegin(), end = house->getHouseDoorEnd();
+	for(HouseDoorList::iterator hit = house->getDoorBegin(), end = house->getDoorEnd();
 		hit != end; ++hit)
 	{
 		pushThing(*hit);
@@ -3833,7 +3830,7 @@ int LuaState::lua_House_getTiles()
 	
 	newTable();
 	int n = 1;
-	for(HouseTileList::iterator hit = house->getHouseTileBegin(), end = house->getHouseTileEnd();
+	for(HouseTileList::iterator hit = house->getTileBegin(), end = house->getTileEnd();
 		hit != end; ++hit)
 	{
 		pushTile(*hit);

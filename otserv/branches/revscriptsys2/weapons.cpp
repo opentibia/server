@@ -44,11 +44,10 @@ Weapon::Weapon()
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
-	exhaustion = false;
+	exhaustion = 0;
 	premium = false;
 	enabled = true;
 	wieldUnproperly = false;
-	exhaustion = 0;
 	range = 1;
 	ammoAction = AMMOACTION_NONE;
 }
@@ -111,7 +110,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	if(readXMLInteger(p, "exhaustion", intValue)){
-		exhaustion = (intValue == 1);
+		exhaustion = intValue;
 	}
 
 	if(readXMLInteger(p, "prem", intValue)){
@@ -304,6 +303,12 @@ bool Weapon::useFist(Player* player, Creature* target)
 		int32_t attackValue = 7;
 
 		int32_t maxDamage = getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
+
+		Vocation* vocation = player->getVocation();
+		if(vocation && vocation->getMeleeBaseDamage(WEAPON_NONE) != 1.0){
+			maxDamage = int32_t(maxDamage * vocation->getMeleeBaseDamage(WEAPON_NONE));
+		}
+
 		int32_t damage = -random_range(0, maxDamage, DISTRO_NORMAL);
 
 		CombatParams params;
@@ -380,15 +385,14 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		}
 	}
 
-	if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
-		if(exhaustion){
+	if(!player->hasFlag(PlayerFlag_HasNoExhaustion) && hasExhaustion()){
+		if(exhaustion == -1)
 			player->addCombatExhaust(g_game.getFightExhaustionTicks());
-		}
+		else
+			player->addCombatExhaust(exhaustion);
 	}
 
-
 	int32_t manaCost = getManaCost(player);
-
 	if(manaCost > 0){
 		player->addManaSpent(manaCost);
 		if(!player->hasFlag(PlayerFlag_HasInfiniteMana)){
@@ -584,6 +588,12 @@ int32_t WeaponMelee::getElementDamage(const Player* player, const Item* item) co
 	int32_t attackSkill = player->getWeaponSkill(item);
 	float attackFactor = player->getAttackFactor();
 	int32_t maxValue = getMaxWeaponDamage(player->getLevel(), attackSkill, elementDamage, attackFactor);
+
+	Vocation* vocation = player->getVocation();
+	if(vocation && vocation->getMeleeBaseDamage(item->getWeaponType()) != 1.0){
+		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage(item->getWeaponType()));
+	}
+
 	return -random_range(0, maxValue, DISTRO_NORMAL);
 }
 
@@ -593,6 +603,11 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* targe
 	int32_t attackValue = std::max((int32_t)0, ((int32_t)item->getAttack() - elementDamage));
 	float attackFactor = player->getAttackFactor();
 	int32_t maxValue = getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
+
+	Vocation* vocation = player->getVocation();
+	if(vocation && vocation->getMeleeBaseDamage(item->getWeaponType()) != 1.0){
+		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage(item->getWeaponType()));
+	}
 
 	if(maxDamage){
 		return -maxValue;
@@ -695,6 +710,15 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 }
 /*
 // REVSCRIPT TODO ?
+bool WeaponDistance::interruptSwing() const
+{
+	if(!g_config.getNumber(ConfigManager::DISTANCE_WEAPON_INTERRUPT_SWING)){
+		return false;
+	}
+	
+	return true;
+}
+
 int32_t WeaponDistance::playerWeaponCheck(Player* player, Creature* target) const
 {
 	const ItemType& it = Item::items[id];
@@ -779,29 +803,33 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		Weapon::internalUseWeapon(player, item, target, damageModifier);
 	}
 	else{
-		//miss target
-		typedef std::pair<int32_t, int32_t> dPair;
-		std::vector<dPair> destList;
-		destList.push_back(dPair(-1, -1));
-		destList.push_back(dPair(-1, 0));
-		destList.push_back(dPair(-1, 1));
-		destList.push_back(dPair(0, -1));
-		destList.push_back(dPair(0, 1));
-		destList.push_back(dPair(1, -1));
-		destList.push_back(dPair(1, 0));
-		destList.push_back(dPair(1, 1));
-
-		std::random_shuffle(destList.begin(), destList.end());
-
-		Position destPos = target->getPosition();
+		// We failed attack, miss!
 		Tile* destTile = target->getTile();
-		Tile* tmpTile = NULL;
+		if(!Position::areInRange<1,1,0>(player->getPosition(), target->getPosition())){
+			typedef std::pair<int32_t, int32_t> dPair;
+			std::vector<dPair> destList;
+			destList.push_back(dPair(-1, -1));
+			destList.push_back(dPair(-1, 0));
+			destList.push_back(dPair(-1, 1));
+			destList.push_back(dPair(0, -1));
+			destList.push_back(dPair(0, 0));
+			destList.push_back(dPair(0, 1));
+			destList.push_back(dPair(1, -1));
+			destList.push_back(dPair(1, 0));
+			destList.push_back(dPair(1, 1));
 
-		for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
-			tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
-			if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID)){
-				destTile = tmpTile;
-				break;
+			std::random_shuffle(destList.begin(), destList.end());
+
+			Position destPos = target->getPosition();
+			Tile* tmpTile = NULL;
+
+			for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
+				tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
+				// Blocking tiles or tiles without ground ain't valid targets for spears
+				if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID) && tmpTile->ground != NULL){
+					destTile = tmpTile;
+					break;
+				}
 			}
 		}
 
@@ -841,13 +869,17 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 	int32_t attackSkill = player->getSkill(SKILL_DIST, SKILL_LEVEL);
 	float attackFactor = player->getAttackFactor();
 	int32_t maxValue = getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
+	int32_t minValue = 0;
 
+	Vocation* vocation = player->getVocation();
+	if(vocation && vocation->getMeleeBaseDamage(WEAPON_DIST) != 1.0){
+		maxValue = int32_t(maxValue * vocation->getMeleeBaseDamage(WEAPON_DIST));
+	}
 
 	if(maxDamage){
 		return -maxValue;
 	}
 
-	int32_t minValue = 0;
 	if(target){
 		if(target->getPlayer()){
 			minValue = (int32_t)std::ceil(player->getLevel() * 0.1);
@@ -855,6 +887,10 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 		else{
 			minValue = (int32_t)std::ceil(player->getLevel() * 0.2);
 		}
+	}
+	
+	if(vocation && vocation->getMeleeBaseDamage(WEAPON_DIST) != 1.0){
+		minValue = int32_t(minValue * vocation->getMeleeBaseDamage(WEAPON_DIST));
 	}
 
 	return -random_range(minValue, maxValue, DISTRO_NORMAL);
@@ -949,9 +985,18 @@ bool WeaponWand::configureWeapon(const ItemType& it)
 
 int32_t WeaponWand::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
-	if(maxDamage){
-		return -maxChange;
+	int32_t minValue = minChange;
+	int32_t maxValue = maxChange;
+
+	Vocation* vocation = player->getVocation();
+	if(vocation && vocation->getWandBaseDamage() != 1.0){
+		 minValue = int32_t(minValue * vocation->getWandBaseDamage());
+		 maxValue = int32_t(maxValue * vocation->getWandBaseDamage());
 	}
 
-	return random_range(-minChange, -maxChange, DISTRO_NORMAL);
+	if(maxDamage){
+		return -maxValue;
+	}
+
+	return random_range(-minValue, -maxValue, DISTRO_NORMAL);
 }

@@ -24,10 +24,6 @@
 
 #include <iostream>
 
-#if defined __WINDOWS__ || defined WIN32
-#include <winsock2.h>
-#endif
-
 #include "database.h"
 #include "databasemysql.h"
 #ifdef __MYSQL_ALT_INCLUDE__
@@ -47,7 +43,7 @@ DatabaseMySQL::DatabaseMySQL()
 
 	// connection handle initialization
 	if(!mysql_init(&m_handle)){
-		std::cout << "Failed to initialize MySQL connection handle." << std::endl;
+		std::cout << std::endl << "Failed to initialize MySQL connection handle." << std::endl;
 		return;
 	}
 
@@ -65,10 +61,27 @@ DatabaseMySQL::DatabaseMySQL()
 		//mySQL servers < 5.0.19 has a bug where MYSQL_OPT_RECONNECT is (incorrectly) reset by mysql_real_connect calls
 		//See http://dev.mysql.com/doc/refman/5.0/en/mysql-options.html for more information.
 		mysql_options(&m_handle, MYSQL_OPT_RECONNECT, &reconnect);
-		std::cout << "[Warning] Outdated mySQL server detected. Consider upgrading to a newer version." << std::endl;
+		std::cout << std::endl << "[Warning] Outdated mySQL server detected. Consider upgrading to a newer version." << std::endl;
 	}
 
 	m_connected = true;
+
+	if(g_config.getString(ConfigManager::MAP_STORAGE_TYPE) == "binary"){
+		DBQuery query;
+		query << "SHOW variables LIKE 'max_allowed_packet';";
+
+		DBResult* result;
+		if((result = storeQuery(query.str()))){
+			int32_t max_query = result->getDataInt("Value");
+			freeResult(result);
+
+			if(max_query < 16777216){
+				std::cout << std::endl << "[Warning] max_allowed_packet might be set to low for binary map storage." << std::endl;
+				std::cout << "Use the following query to raise max_allow_packet: ";
+				std::cout << "SET GLOBAL max_allowed_packet = 16777216;";
+			}
+		}
+	}
 }
 
 DatabaseMySQL::~DatabaseMySQL()
@@ -139,7 +152,7 @@ bool DatabaseMySQL::executeQuery(const std::string &query)
 
 	// executes the query
 	if(mysql_real_query(&m_handle, query.c_str(), query.length()) != 0){
-		std::cout << "mysql_real_query(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+		std::cout << "mysql_real_query(): " << query.substr(0, 256) << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
 
 		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
@@ -185,7 +198,7 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 
 	// error occured
 	if(!m_res){
-		std::cout << "mysql_store_result(): " << query << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
+		std::cout << "mysql_store_result(): " << query.substr(0, 256) << ": MYSQL ERROR: " << mysql_error(&m_handle) << std::endl;
 		int error = mysql_errno(&m_handle);
 
 		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
@@ -198,6 +211,11 @@ DBResult* DatabaseMySQL::storeQuery(const std::string &query)
 	// retriving results of query
 	DBResult* res = new MySQLResult(m_res);
 	return verifyResult(res);
+}
+
+uint64_t DatabaseMySQL::getLastInsertedRowID()
+{
+	return (uint64_t)mysql_insert_id(&m_handle);
 }
 
 std::string DatabaseMySQL::escapeString(const std::string &s)

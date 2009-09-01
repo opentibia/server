@@ -30,11 +30,17 @@
 class ProtocolStatus : public Protocol
 {
 public:
+	// static protocol information
+	enum {server_sends_first = false};
+	enum {protocol_identifier = 0xFF};
+	enum {use_checksum = false};
+	static const char* protocol_name() {return "status protocol";}
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolStatusCount;
 #endif
 
-	ProtocolStatus(Connection* connection) : Protocol(connection)
+	ProtocolStatus(Connection_ptr connection) : Protocol(connection)
 	{
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		protocolStatusCount++;
@@ -72,7 +78,7 @@ public:
 	bool hasSlot() const;
 
 	std::string getStatusString() const;
-	void getInfo(uint32_t requestedInfo, OutputMessage* output, NetworkMessage& msg) const;
+	void getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const;
 
 	uint32_t getPlayersOnline() const {return m_playersonline;}
 	uint32_t getMaxPlayersOnline() const {return m_playersmax;}

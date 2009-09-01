@@ -31,7 +31,9 @@
 #include "outputmessage.h"
 #include "rsa.h"
 
-void Protocol::onSendMessage(OutputMessage* msg)
+extern RSA g_RSA;
+
+void Protocol::onSendMessage(OutputMessage_ptr msg)
 {
 	#ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Protocol::onSendMessage" << std::endl;
@@ -48,10 +50,13 @@ void Protocol::onSendMessage(OutputMessage* msg)
 			XTEA_encrypt(*msg);
 			msg->addCryptoHeader(m_checksumEnabled);
 		}
+		else if(m_checksumEnabled){
+			msg->addCryptoHeader(true);
+		}
 	}
 
 	if(msg == m_outputBuffer){
-		m_outputBuffer = NULL;
+		m_outputBuffer.reset();
 	}
 }
 
@@ -71,9 +76,9 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 	parsePacket(msg);
 }
 
-OutputMessage* Protocol::getOutputBuffer()
+OutputMessage_ptr Protocol::getOutputBuffer()
 {
-	if(m_outputBuffer){
+	if(m_outputBuffer && m_outputBuffer->getMessageLength() < NETWORKMESSAGE_MAXSIZE - 4096){
 		return m_outputBuffer;
 	}
 	else if(m_connection){
@@ -81,7 +86,7 @@ OutputMessage* Protocol::getOutputBuffer()
 		return m_outputBuffer;
 	}
 	else{
-		return NULL;
+		return OutputMessage_ptr();
 	}
 }
 
@@ -89,7 +94,7 @@ void Protocol::releaseProtocol()
 {
 	if(m_refCount > 0){
 		//Reschedule it and try again.
-		Scheduler::getScheduler().addEvent( createSchedulerTask(SCHEDULER_MINTICKS,
+		g_scheduler.addEvent( createSchedulerTask(SCHEDULER_MINTICKS,
 			boost::bind(&Protocol::releaseProtocol, this)));
 	}
 	else{
@@ -101,11 +106,7 @@ void Protocol::deleteProtocolTask()
 {
 	//dispather thread
 	assert(m_refCount == 0);
-	setConnection(NULL);
-
-	if(m_outputBuffer){
-		OutputMessagePool::getInstance()->releaseMessage(m_outputBuffer);
-	}
+	setConnection(Connection_ptr());
 
 	delete this;
 }
@@ -185,6 +186,11 @@ bool Protocol::XTEA_decrypt(NetworkMessage& msg)
 	return true;
 }
 
+bool Protocol::RSA_decrypt(NetworkMessage& msg)
+{
+	return RSA_decrypt(&g_RSA, msg);
+}
+
 bool Protocol::RSA_decrypt(RSA* rsa, NetworkMessage& msg)
 {
 	if(msg.getMessageLength() - msg.getReadPos() != 128){
@@ -199,7 +205,9 @@ bool Protocol::RSA_decrypt(RSA* rsa, NetworkMessage& msg)
 	}
 
 	if(msg.GetByte() != 0){
+#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Warning: [Protocol::RSA_decrypt]. First byte != 0" << std::endl;
+#endif
 		return false;
 	}
 

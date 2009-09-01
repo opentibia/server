@@ -25,6 +25,7 @@
 #include "const.h"
 
 #include <list>
+#include <vector>
 #include <map>
 class Player;
 class Creature;
@@ -56,11 +57,10 @@ public:
 	void updateAllPartyIcons();
 	void updatePartyIcons(Player* player);
 	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
-	void broadcastLoot(Creature* creature, Container* corpse);
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 	bool canOpenCorpse(uint32_t ownerId);
 
-	void shareExperience(uint64_t experience);
+	void shareExperience(uint64_t experience, bool fromMonster);
 	bool setSharedExperience(Player* player, bool _sharedExpActive);
 	bool isSharedExperienceActive() const {return sharedExpActive;}
 	bool isSharedExperienceEnabled() const {return sharedExpEnabled;}

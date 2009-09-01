@@ -20,18 +20,16 @@
 
 #include "otpch.h"
 
-#include "definitions.h"
-#include "otsystem.h"
-#include "boost/asio.hpp"
-
-#include "math.h"
 #include "tools.h"
 #include "configmanager.h"
 #include "md5.h"
 #include "sha1.h"
+
+#include "math.h"
 #include <sstream>
-#include <iomanip>
 #include <iostream>
+#include <iomanip>
+#include <algorithm>
 
 extern ConfigManager g_config;
 
@@ -65,6 +63,12 @@ void trim_right(std::string& source, const std::string& t)
 void trim_left(std::string& source, const std::string& t)
 {
 	source.erase(0, source.find_first_not_of(t));
+}
+
+void trim(std::string& source, const std::string& t)
+{
+	trim_left(source, t);
+	trim_right(source, t);
 }
 
 void toLowerCaseString(std::string& source)
@@ -200,18 +204,17 @@ bool readXMLContentString(xmlNodePtr node, std::string& value)
 
 std::vector<std::string> explodeString(const std::string& inString, const std::string& separator)
 {
-   std::vector<std::string> returnVector;
-   std::string::size_type start = 0;
-   std::string::size_type end = 0;
+	std::vector<std::string> returnVector;
+	std::string::size_type start = 0;
+	std::string::size_type end = 0;
 
-   while((end=inString.find (separator, start)) != std::string::npos){
-      returnVector.push_back (inString.substr (start, end-start));
-      start = end+separator.size();
-   }
+	while((end=inString.find (separator, start)) != std::string::npos){
+		returnVector.push_back (inString.substr (start, end-start));
+		start = end+separator.size();
+	}
 
-   returnVector.push_back (inString.substr (start));
-   return returnVector;
-
+	returnVector.push_back (inString.substr (start));
+	return returnVector;
 }
 
 bool hasBitSet(uint32_t flag, uint32_t flags)
@@ -222,7 +225,7 @@ bool hasBitSet(uint32_t flag, uint32_t flags)
 #define RAND_MAX24 16777216
 uint32_t rand24b()
 {
-	return (rand() << 12) ^ (rand()) & (0xFFFFFF);
+	return ((rand() << 12) ^ ((rand()) & (0xFFFFFF)) );
 }
 
 float box_muller(float m, float s)
@@ -234,7 +237,7 @@ float box_muller(float m, float s)
 	static float y2;
 	static int use_last = 0;
 
-	if (use_last)		        // use value from previous call
+	if(use_last)			// use value from previous call
 	{
 		y1 = y2;
 		use_last = 0;
@@ -305,7 +308,7 @@ void hexdump(unsigned char *_data, int _len) {
 
 		fprintf(stderr, " ");
 		for(i = 0; i < 16 && i < _len; i++)
-			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
+			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? 'ï¿½' : _data[i]);
 
 		fprintf(stderr, "\n");
 	}
@@ -345,8 +348,11 @@ std::string urlEncode(const char* str)
 	return out;
 }
 
-bool passwordTest(const std::string &plain, std::string &hash)
+bool passwordTest(std::string plain, std::string &hash)
 {
+	// Salt it beforehand
+	plain += g_config.getString(ConfigManager::PASSWORD_SALT);
+
 	switch(g_config.getNumber(ConfigManager::PASSWORD_TYPE)){
 	case PASSWORD_TYPE_PLAIN:
 	{
@@ -400,10 +406,11 @@ bool passwordTest(const std::string &plain, std::string &hash)
 	return false;
 }
 
-//buffer should have at least 17 bytes
-void formatIP(uint32_t ip, char* buffer)
+std::string convertIPToString(uint32_t ip)
 {
+	char buffer[20];
 	sprintf(buffer, "%d.%d.%d.%d", ip & 0xFF, (ip >> 8) & 0xFF, (ip >> 16) & 0xFF, (ip >> 24));
+	return buffer;
 }
 
 //buffer should have at least 21 bytes
@@ -411,7 +418,7 @@ void formatDate(time_t time, char* buffer)
 {
 	const tm* tms = localtime(&time);
 	if(tms){
-		sprintf(buffer, "%02d/%02d/%04d  %02d:%02d:%02d", tms->tm_mday, tms->tm_mon + 1, tms->tm_year + 1900,
+		sprintf(buffer, "%02d/%02d/%04d %02d:%02d:%02d", tms->tm_mday, tms->tm_mon + 1, tms->tm_year + 1900,
 			tms->tm_hour, tms->tm_min, tms->tm_sec);
 	}
 	else{
@@ -420,7 +427,7 @@ void formatDate(time_t time, char* buffer)
 }
 
 //buffer should have at least 16 bytes
-void formatDate2(time_t time, char* buffer)
+void formatDateShort(time_t time, char* buffer)
 {
 	const tm* tms = localtime(&time);
 	if(tms){
@@ -630,6 +637,113 @@ AmmoAction_t getAmmoAction(const std::string& strValue)
 	return AMMOACTION_NONE;
 }
 
+std::string getViolationReasonString(int32_t reasonId)
+{
+	switch(reasonId)
+	{
+		case 0:
+			return "Offensive Name";
+		case 1:
+			return "Invalid Name Format";
+		case 2:
+			return "Unsuitable Name";
+		case 3:
+			return "Name Inciting Rule Violation";
+		case 4:
+			return "Offensive Statement";
+		case 5:
+			return "Spamming";
+		case 6:
+			return "Illegal Advertising";
+		case 7:
+			return "Off-Topic Public Statement";
+		case 8:
+			return "Non-English Public Statement";
+		case 9:
+			return "Inciting Rule Violation";
+		case 10:
+			return "Bug Abuse";
+		case 11:
+			return "Game Weakness Abuse";
+		case 12:
+			return "Using Unofficial Software to Play";
+		case 13:
+			return "Hacking";
+		case 14:
+			return "Multi-Clienting";
+		case 15:
+			return "Account Trading or Sharing";
+		case 16:
+			return "Threatening Gamemaster";
+		case 17:
+			return "Pretending to Have Influence on Rule Enforcement";
+		case 18:
+			return "False Report to Gamemaster";
+		case 19:
+			return "Destructive Behaviour";
+	}
+
+	return "Unknown Reason";
+}
+
+std::string getViolationActionString(violationAction_t actionId, bool ipBanishment)
+{
+	std::string action;
+	switch(actionId)
+	{
+		case ACTION_NOTATION:
+			action = "Notation";
+			break;
+		case ACTION_NAMEREPORT:
+			action = "Name Report";
+			break;
+		case ACTION_BANREPORT:
+			action = "Name Report + Banishment";
+			break;
+		case ACTION_BANFINAL:
+			action = "Banishment + Final Warning";
+			break;
+		case ACTION_BANREPORTFINAL:
+			action = "Name Report + Banishment + Final Warning";
+			break;
+		case ACTION_STATEMENT:
+			action = "Statement Report";
+			break;
+		case ACTION_DELETION:
+			action = "Deletion";
+			break;
+		case ACTION_BANISHMENT:
+		default:
+			action = "Banishment";
+			break;
+	}
+
+	if(ipBanishment)
+		action += " + IP Banishment";
+
+	return action;
+}
+
+std::string playerSexAdjectiveString(playersex_t sex)
+{
+	if(sex % 2 == 0){
+		return "her";
+	}
+	else{
+		return "his";
+	}
+}
+
+std::string playerSexSubjectString(playersex_t sex)
+{
+	if(sex % 2 == 0){
+		return "She";
+	}
+	else{
+		return "He";
+	}
+}
+
 #define MOD_ADLER 65521
 uint32_t adlerChecksum(uint8_t *data, int32_t len)
 {
@@ -638,20 +752,20 @@ uint32_t adlerChecksum(uint8_t *data, int32_t len)
 		return 0;
 	}
 
-    uint32_t a = 1, b = 0;
-    while (len > 0)
-    {
-        size_t tlen = len > 5552 ? 5552 : len;
-        len -= tlen;
-        do
-        {
-            a += *data++;
-            b += a;
-        } while (--tlen);
+	uint32_t a = 1, b = 0;
+	while (len > 0)
+	{
+		size_t tlen = len > 5552 ? 5552 : len;
+		len -= tlen;
+		do
+		{
+			a += *data++;
+			b += a;
+		} while (--tlen);
 
-        a %= MOD_ADLER;
-        b %= MOD_ADLER;
-    }
+		a %= MOD_ADLER;
+		b %= MOD_ADLER;
+		}
 
-    return (b << 16) | a;
+	return (b << 16) | a;
 }

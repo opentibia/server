@@ -33,7 +33,7 @@ public:
 	virtual const Teleport* getTeleport() const {return this;};
 	
 	//serialization
-	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	void setDestPos(const Position& pos) {destPos = pos;}
@@ -54,8 +54,8 @@ public:
 	virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing);
 	virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count);
 
-	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
-	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 private:
 	Position destPos;

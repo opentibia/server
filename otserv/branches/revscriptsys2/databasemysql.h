@@ -27,6 +27,8 @@
 #error "database.h should be included first."
 #endif
 
+#include "otsystem.h"
+
 #ifdef __MYSQL_ALT_INCLUDE__
 #include <mysql.h>
 #else
@@ -49,6 +51,8 @@ public:
 
 	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
 	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
+
+	DATABASE_VIRTUAL uint64_t getLastInsertedRowID();
 
 	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
 	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length);

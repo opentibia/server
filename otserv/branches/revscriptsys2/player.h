@@ -57,7 +57,7 @@ enum playerinfo_t {
 	PLAYERINFO_MAXMANA,
 	PLAYERINFO_MAGICLEVEL,
 	PLAYERINFO_MAGICLEVELPERCENT,
-	PLAYERINFO_SOUL,
+	PLAYERINFO_SOUL
 };
 
 enum freeslot_t {
@@ -72,11 +72,14 @@ typedef std::map<uint32_t, Depot*> DepotMap;
 typedef std::map<std::string, std::string> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
+typedef std::map<uint32_t, std::string> ChannelStatementMap;
 typedef std::list<std::string> LearnedInstantSpellList;
 typedef std::list<Party*> PartyList;
 
 #define PLAYER_MAX_SPEED 1500
 #define PLAYER_MIN_SPEED 10
+const int32_t MAX_STAMINA = 42 * 60 * 60 * 1000;
+const int32_t MAX_STAMINA_MINUTES = MAX_STAMINA / 60000;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -96,6 +99,8 @@ public:
 
 	static MuteCountMap muteCountMap;
 	static int32_t maxMessageBuffer;
+	static ChannelStatementMap channelStatementMap;
+	static uint32_t channelStatementGuid;
 
 	virtual const std::string& getName() const {return name;}
 	virtual const std::string& getNameDescription() const {return name;}
@@ -126,8 +131,8 @@ public:
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
-	int getPremiumDays() const;
-	bool isPremium() const;
+	uint16_t getPremiumDays() const {return premiumDays;}
+	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
 
 	bool isOffline() const {return (getID() == 0);}
 	void disconnect() {if(client) client->disconnect();}
@@ -151,17 +156,23 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
-	//uint32_t getAccountName() const {return accountName;}
+	std::string getAccountName() const {return accountName;}
 	uint32_t getAccountId() const {return accountId;}
 	uint32_t getLevel() const {return level;}
 	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
-	int32_t getAccessLevel() const {return accessLevel;}
+	int16_t getAccessLevel() const {return accessLevel;}
+	int16_t getViolationLevel() const {return violationLevel;}
+	std::string getGroupName() const {return groupName;}
 	const std::string& getAccessGroup() const {return groupName;}
 
 	void setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
+	Vocation* getVocation() const {return vocation;};
 
 	playersex_t getSex() const {return sex;}
+	bool isMale() const {return getSex() % 2 != 0;}
+	bool isFemale() const {return getSex() % 2 == 0;}
+
 	void setSex(playersex_t);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	int64_t getExperience() const {return experience;}
@@ -173,10 +184,12 @@ public:
 	uint32_t getTown() const {return town;}
 	void setTown(uint32_t _town) {town = _town;}
 
+	bool isLoginAttackLocked(uint32_t attackerId) const;
+
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
 	virtual bool canSeeInvisibility() const;
-	uint32_t isMuted();
+	uint32_t getMuteTime();
 	void addMessageBuffer();
 	void removeMessageBuffer();
 
@@ -207,7 +220,10 @@ public:
 	virtual int32_t getMaxHealth() const {return getPlayerInfo(PLAYERINFO_MAXHEALTH);}
 	virtual int32_t getMaxMana() const {return getPlayerInfo(PLAYERINFO_MAXMANA);}
 
+	// Returns the inventory item in the slot position
 	Item* getInventoryItem(slots_t slot) const;
+	// As above, but returns NULL if the item can not be weared in that slot (armor in hand for example)
+	Item* getEquippedItem(slots_t slot) const;
 
 	bool isItemAbilityEnabled(slots_t slot) const {return inventoryAbilities[slot];}
 	void setItemAbility(slots_t slot, bool enabled) {inventoryAbilities[slot] = enabled;}
@@ -221,13 +237,12 @@ public:
 
 	void setConditionSuppressions(uint32_t conditions, bool remove);
 
+	double getRateValue(levelTypes_t rateType) const {return rateValue[rateType];}
+	void setRateValue(levelTypes_t rateType, double value){rateValue[rateType] = value;}
+
 	uint32_t getLossPercent(lossTypes_t lossType) const {return lossPercent[lossType];}
 	void setLossPercent(lossTypes_t lossType, uint32_t newPercent)
 	{
-		if(newPercent > 100){
-			newPercent = 100;
-		}
-
 		lossPercent[lossType] = newPercent;
 	}
 
@@ -261,10 +276,15 @@ public:
 	virtual void onWalkAborted();
 	virtual void onWalkComplete();
 
+	void checkIdleTime(uint32_t ticks);
+	void resetIdle() {idleTime = 0; idleWarned = false;};
+	void setIdleTime(uint32_t value, bool warned){idleTime = value; idleWarned = warned;}
+
 	void setChaseMode(chaseMode_t mode);
 	void setFightMode(fightMode_t mode);
 	void setSafeMode(bool _safeMode) {safeMode = _safeMode;}
 	bool hasSafeMode() const {return safeMode;}
+	uint16_t getIcons() const;
 
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);
@@ -294,9 +314,9 @@ public:
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext = true);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss, bool showtext = true);
-	void addManaSpent(uint32_t amount);
-	void addSkillAdvance(skills_t skill, uint32_t count);
+	virtual void drainMana(Creature* attacker, int32_t point, bool showtext = true);
+	void addManaSpent(uint32_t amount, bool useMultiplier = true);
+	void addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier = true);
 
 	virtual int32_t getArmor() const;
 	virtual int32_t getDefense() const;
@@ -305,30 +325,36 @@ public:
 
 	void addCombatExhaust(uint32_t ticks);
 	void addHealExhaust(uint32_t ticks);
-	void addInFightTicks(bool pzlock = false);
+	void addInFightTicks(uint32_t ticks, bool pzlock = false);
 	void addDefaultRegeneration(uint32_t addTicks);
 
 	virtual uint64_t getGainedExperience(Creature* attacker) const;
+	void getGainExperience(uint64_t& gainExp, bool fromMonster);
 
 	//combat event functions
-	virtual void onAddCondition(ConditionType_t type);
-	virtual void onAddCombatCondition(ConditionType_t type);
-	virtual void onEndCondition(ConditionType_t type);
+	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
+	virtual void onAddCombatCondition(ConditionType_t type, bool hadCondition);
+	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
+	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
 	virtual void onAttackedCreature(Creature* target);
+	virtual void onSummonAttackedCreature(Creature* summon, Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
+	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target);
-	virtual void onGainExperience(uint64_t gainExp);
-	virtual void onGainSharedExperience(uint64_t gainExp);
+	virtual void onGainExperience(uint64_t gainExp, bool fromMonster);
+	virtual void onGainSharedExperience(uint64_t gainExp, bool fromMonster);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
 	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
 	virtual void onIdleStatus();
 	virtual void onPlacedCreature();
-	virtual void onRemovedCreature();
+	virtual void sendReLoginWindow();
 	virtual void getCreatureLight(LightInfo& light) const;
 
 	void setParty(Party* _party) {party = _party;}
@@ -348,60 +374,39 @@ public:
 	void addAttacked(const Player* attacked);
 	void clearAttacked();
 	void addUnjustifiedDead(const Player* attacked);
-	void setSkull(Skulls_t newSkull) {skull = newSkull;}
+	void setSkull(Skulls_t newSkull) {skullType = newSkull;}
 	void sendCreatureSkull(const Creature* creature) const
 		{if(client) client->sendCreatureSkull(creature);}
-	void checkRedSkullTicks(int32_t ticks);
+	void checkSkullTicks(int32_t ticks);
 #endif
-	const OutfitListType& getPlayerOutfits();
-	bool canWear(uint32_t _looktype, uint32_t _addons);
-	void addOutfit(uint32_t _looktype, uint32_t _addons);
-	bool remOutfit(uint32_t _looktype, uint32_t _addons);
+
+	void checkRecentlyGainedExperience(uint32_t interval);
+	bool canWearOutfit(uint32_t outfitId, uint32_t addons);
+	bool addOutfit(uint32_t outfitId, uint32_t addons);
+	bool removeOutfit(uint32_t outfitId, uint32_t addons);
 	bool canLogout();
+	void broadcastLoot(Creature* creature, Container* corpse);
+	bool checkPzBlockOnCombat(Player* targetPlayer);
 
 	//tile
 	//send methods
-	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item)
-		{if(client) client->sendAddTileItem(tile, pos, item);}
-	void sendUpdateTileItem(const Tile* tile, const Position& pos,
-		uint32_t stackpos, const Item* olditem, const Item* newitem)
-		{if(client) client->sendUpdateTileItem(tile, pos, stackpos, newitem);}
-	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item)
-		{if(client) client->sendRemoveTileItem(tile, pos, stackpos);}
-	void sendUpdateTile(const Tile* tile, const Position& pos)
-		{if(client) client->sendUpdateTile(tile, pos);}
+	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item);
+	void sendUpdateTileItem(const Tile* tile, const Position& pos, const Item* olditem, const Item* newitem);
+	void sendRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
+	void sendUpdateTile(const Tile* tile, const Position& pos);
 
-	void sendCreatureAppear(const Creature* creature, bool isLogin)
-		{if(client) client->sendAddCreature(creature, isLogin);}
-	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
-		{if(client) client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);}
+	void sendCreatureAppear(const Creature* creature, const Position& pos);
+	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
 	void sendCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-	const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport)
-		{if(client) client->sendMoveCreature(creature, newTile, newPos, oldTile, oldPos, oldStackPos, teleport);}
+		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
-	void sendCreatureTurn(const Creature* creature, uint32_t stackpos)
-		{if(client) client->sendCreatureTurn(creature, stackpos);}
-	void sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text)
-		{if(client) client->sendCreatureSay(creature, type, text);}
-	void sendCreatureSquare(const Creature* creature, SquareColor_t color)
-		{if(client) client->sendCreatureSquare(creature, color);}
-	void sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
-		{if(client) client->sendCreatureOutfit(creature, outfit);}
-	void sendCreatureChangeVisible(const Creature* creature, bool visible)
-		{
-			if(client){
-				if(visible){
-					client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
-				}
-				else{
-					client->sendCreatureInvisible(creature);
-				}
-			}
-		}
-	void sendCreatureLight(const Creature* creature)
-		{if(client) client->sendCreatureLight(creature);}
-	void sendCreatureShield(const Creature* creature)
-	    {if(client) client->sendCreatureShield(creature);}
+	void sendCreatureTurn(const Creature* creature);
+	void sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text);
+	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
+	void sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
+	void sendCreatureChangeVisible(const Creature* creature, bool visible);
+	void sendCreatureLight(const Creature* creature);
+	void sendCreatureShield(const Creature* creature);
 
 	//container
 	void sendAddContainerItem(const Container* container, const Item* item);
@@ -420,22 +425,22 @@ public:
 
 	//event methods
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+	virtual void onUpdateTileItem(const Tile* tile, const Position& pos,
 		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
-	virtual void onRemoveTileItem(const Tile* tile, const Position& pos, uint32_t stackpos,
+	virtual void onRemoveTileItem(const Tile* tile, const Position& pos,
 		const ItemType& iType, const Item* item);
 	virtual void onUpdateTile(const Tile* tile, const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
-	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+		const Tile* oldTile, const Position& oldPos, bool teleport);
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
 
 	//virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
-	//virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
+	//virtual void onCreatureTurn(const Creature* creature);
 	//virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 
 	//container
@@ -457,7 +462,7 @@ public:
 	//other send messages
 	void sendAnimatedText(const Position& pos, unsigned char color, std::string text) const
 		{if(client) client->sendAnimatedText(pos,color,text);}
-	void sendCancel(const char* msg) const
+	void sendCancel(const std::string& msg) const
 		{if(client) client->sendCancel(msg);}
 	void sendCancelMessage(ReturnValue message) const;
 	void sendCancelTarget() const
@@ -479,7 +484,6 @@ public:
 	void sendIcons() const;
 	void sendMagicEffect(const Position& pos, unsigned char type) const
 		{if(client) client->sendMagicEffect(pos,type);}
-	void sendPing(uint32_t interval);
 	void sendStats();
 	void sendSkills() const
 		{if(client) client->sendSkills();}
@@ -499,6 +503,7 @@ public:
 	void sendSaleItemList() const
 		{}//if(client) client->sendSaleItemList(shopItemList);}
 	void sendCloseShop() const
+		// REVSCRIPT TODO
 	    {}//if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{}//if(client) client->sendTradeItemRequest(player, item, ack);}
@@ -535,13 +540,13 @@ public:
 	void sendAddMarker(const Position& pos, uint8_t markType, const std::string& desc)
 		{if (client) client->sendAddMarker(pos, markType, desc);}
 
-	void receivePing() {if(npings > 0) npings--;}
+	void receivePing() {last_pong = OTSYS_TIME();}
 
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t interval);
 
-	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
-	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	Item* getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen);
 	void setWriteItem(Item* item, uint16_t _maxWriteLen = 0);
@@ -552,6 +557,7 @@ public:
 	void setNextAction(int64_t time) {if(time > nextAction) {nextAction = time;}}
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 	uint32_t getNextActionTime() const;
+	virtual uint32_t getAttackSpeed() const;
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
@@ -563,7 +569,7 @@ public:
 	void openShopWindow(const std::list<ShopInfo>& shop);
 	void closeShopWindow();
 	void updateSaleShopList(uint32_t itemId);
-	bool hasShopItemForSale(uint32_t itemId);
+	bool hasShopItemForSale(uint32_t itemId, uint8_t subType);
 	*/
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;
@@ -571,6 +577,13 @@ public:
 	//items
 	ContainerVector containerVec;
 	void preSave();
+
+	//stamina
+	void addStamina(int64_t value);
+	void removeStamina(int64_t value) {addStamina(-value);}
+	int32_t getStaminaMinutes();
+    int32_t getStamina() {return stamina;}
+    int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
 
 	//depots
 	DepotMap depots;
@@ -581,17 +594,19 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	std::string getSkillName(int skillid);
-	void gainExperience(uint64_t exp);
+	void gainExperience(uint64_t& gainExp, bool fromMonster);
+	void removeExperience(uint64_t exp, bool updateStats = true);
 
-	void updateInventoryWeigth();
+	void updateInventoryWeight();
 
 	void setNextWalkActionTask(SchedulerTask* task);
 	void setNextWalkTask(SchedulerTask* task);
 	void setNextActionTask(SchedulerTask* task);
 
+	void onDie();
 	void die();
 	virtual Item* dropCorpse();
-	virtual Item* getCorpse();
+	virtual Item* createCorpse();
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -612,6 +627,7 @@ protected:
 	virtual int32_t __getFirstIndex() const;
 	virtual int32_t __getLastIndex() const;
 	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
+	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap, bool itemCount = true) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void __internalAddThing(Thing* thing);
@@ -624,20 +640,22 @@ protected:
 	uint32_t levelPercent;
 	uint32_t magLevel;
 	uint32_t magLevelPercent;
-	int32_t accessLevel;
+	int16_t accessLevel;
+	int16_t violationLevel;
 	std::string groupName;
 	uint64_t experience;
 	uint32_t damageImmunities;
 	uint32_t conditionImmunities;
 	uint32_t conditionSuppressions;
 	uint32_t condition;
+	int32_t stamina;
 	uint32_t manaSpent;
 	Vocation_t vocation_id;
 	Vocation* vocation;
 	playersex_t sex;
 	int32_t soul, soulMax;
 	uint64_t groupFlags;
-	int32_t premiumEnd;
+	uint16_t premiumDays;
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 	uint32_t actionTaskEvent;
@@ -645,11 +663,14 @@ protected:
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 
+	int32_t idleTime;
+	bool idleWarned;
+
 	double inventoryWeight;
 	double capacity;
 
-	uint32_t internal_ping;
-	uint32_t npings;
+	int64_t last_ping;
+	int64_t last_pong;
 	int64_t nextAction;
 
 	bool pzLocked;
@@ -667,9 +688,11 @@ protected:
 
 	//account variables
 	uint32_t accountId;
-	//std::string accountName;
+	std::string accountName;
 	std::string password;
 	time_t lastLoginSaved;
+	time_t lastLogout;
+	int64_t lastLoginMs;
 	Position loginPosition;
 	uint32_t lastip;
 
@@ -688,6 +711,9 @@ protected:
 
 	//loss percent variables
 	uint32_t lossPercent[LOSS_LAST + 1];
+
+	//rate value variables
+	double rateValue[LEVEL_LAST + 1];
 
 	LearnedInstantSpellList learnedInstantSpellList;
 
@@ -717,7 +743,8 @@ protected:
 	StorageMap storageMap;
 	LightInfo itemsLight;
 
-	OutfitList m_playerOutfits;
+	OutfitMap outfits;
+	bool requestedOutfitWindow;
 
 	//read/write storage data
 	uint32_t windowTextId;
@@ -727,45 +754,24 @@ protected:
 	uint32_t editListId;
 
 #ifdef __SKULLSYSTEM__
-	int64_t redSkullTicks;
-	Skulls_t skull;
+	Skulls_t skullType;
+	int64_t lastSkullTime;
 	typedef std::set<uint32_t> AttackedSet;
 	AttackedSet attackedSet;
 #endif
 
 	void updateItemsLight(bool internal = false);
-	virtual int32_t getStepSpeed() const
-	{
-		if(getSpeed() > PLAYER_MAX_SPEED){
-			return PLAYER_MAX_SPEED;
-		}
-		else if(getSpeed() < PLAYER_MIN_SPEED){
-			return PLAYER_MIN_SPEED;
-		}
-
-		return getSpeed();
-	}
-	void updateBaseSpeed()
-	{
-		if(!hasFlag(PlayerFlag_SetMaxSpeed)){
-			baseSpeed = 220 + (2* (level - 1));
-		}
-		else{
-			baseSpeed = 900;
-		};
-	}
+	virtual int32_t getStepSpeed() const;
+	void updateBaseSpeed();
 
 	static uint32_t getPercentLevel(uint64_t count, uint32_t nextLevelCount);
-	virtual uint64_t getLostExperience() const {
-		return (skillLoss ? (experience * lossPercent[LOSS_EXPERIENCE]/100) : 0);
-	}
+	virtual uint64_t getLostExperience() const;
 
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
 	virtual uint32_t getConditionSuppressions() const { return conditionSuppressions; }
 	virtual uint16_t getLookCorpse() const;
-	virtual uint32_t getAttackSpeed() const;
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;

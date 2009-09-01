@@ -24,14 +24,18 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
-					<Add option="-pg" />
+					<Add option="-llibxml2" />
+					<Add option="-llibmysql" />
+					<Add option="-lgmp" />
+					<Add option="-llua" />
+					<Add option="-llibboost_system-mgw34-mt-1_40" />
+					<Add option="-llibboost_regex-mgw34-mt-1_40" />
+					<Add option="-llibboost_thread-mgw34-mt-1_40" />
+					<Add option="-lmingw32" />
+					<Add option="-lwsock32" />
+					<Add option="-lws2_32" />
 					<Add option="-Wl,-Map=..\otserv.map" />
-					<Add option="..\libxml2.dll" />
-					<Add library="wsock32" />
-					<Add library="ws2_32" />
-					<Add library="mysql" />
-					<Add library="liblibxml2" />
-					<Add library="lua" />
+					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
@@ -44,17 +48,24 @@
 				<Compiler>
 					<Add option="-O1" />
 					<Add option="-Wno-unused-parameter" />
+					<Add option="-mthreads" />
 					<Add option="-D__USE_SQLITE__" />
 					<Add option="-D__USE_MYSQL__" />
 					<Add option="-D__SKULLSYSTEM__" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="wsock32" />
-					<Add library="ws2_32" />
-					<Add library="mysql" />
-					<Add library="liblibxml2" />
-					<Add library="lua" />
+					<Add option="-llibxml2" />
+					<Add option="-llibmysql" />
+					<Add option="-lgmp" />
+					<Add option="-llua" />
+					<Add option="-llibboost_system-mgw34-mt-1_40" />
+					<Add option="-llibboost_regex-mgw34-mt-1_40" />
+					<Add option="-llibboost_thread-mgw34-mt-1_40" />
+					<Add option="-lmingw32" />
+					<Add option="-lwsock32" />
+					<Add option="-lws2_32" />
+					<Add library="sqlite3" />
 					<Add library="boost_system" />
 					<Add library="boost_filesystem" />
 					<Add library="boost_regex" />
@@ -84,6 +95,11 @@
 					<Add library="mysqlclient" />
 					<Add library="xml2" />
 					<Add library="lua5.1" />
+					<Add library="boost_regex" />
+					<Add library="gmp" />
+					<Add library="boost_system" />
+					<Add library="boost_thread" />
+					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 			<Target title="Release Unix">
@@ -105,6 +121,11 @@
 					<Add library="mysqlclient" />
 					<Add library="xml2" />
 					<Add library="lua5.1" />
+					<Add library="boost_regex" />
+					<Add library="gmp" />
+					<Add library="boost_system" />
+					<Add library="boost_thread" />
+					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 		</Build>
@@ -116,13 +137,6 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Linker>
-			<Add library="boost_regex" />
-			<Add library="gmp" />
-			<Add library="boost_system" />
-			<Add library="sqlite3" />
-			<Add library="boost_thread" />
-		</Linker>
 		<Unit filename="..\AUTHORS" />
 		<Unit filename="..\Doxyfile" />
 		<Unit filename="..\LICENSE" />
@@ -205,8 +219,6 @@
 		<Unit filename="..\iomapotbm.h" />
 		<Unit filename="..\iomapserialize.cpp" />
 		<Unit filename="..\iomapserialize.h" />
-		<Unit filename="..\iomapxml.cpp" />
-		<Unit filename="..\iomapxml.h" />
 		<Unit filename="..\ioplayer.cpp" />
 		<Unit filename="..\ioplayer.h" />
 		<Unit filename="..\item.cpp" />

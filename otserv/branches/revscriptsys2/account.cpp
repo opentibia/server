@@ -29,7 +29,7 @@
 
 Account::Account()
 {
-	accnumber = 0;
+	number = warnings = 0;
 	premEnd = 0;
 }
 
@@ -38,13 +38,17 @@ Account::~Account()
 	charList.clear();
 }
 
-uint16_t Account::getPremiumDaysLeft() const {
-	uint32_t today = uint32_t(time(NULL) / 86400);
-	if(premEnd == (time_t)(-1))
+uint16_t Account::getPremiumDaysLeft(uint32_t _premEnd)
+{
+	uint32_t today = (uint32_t)time(NULL) / 86400;
+	if((time_t)_premEnd == time_t(-1))
 		return 0xFFFF;
-	if(uint32_t(premEnd / 86400) < today)
+
+	if(uint32_t(_premEnd / 86400) < today)
 		return 0;
-	if(uint32_t(premEnd / 86400) - today >= 0xFFFF)
+
+	if(uint32_t(_premEnd / 86400) - today >= 0xFFFF)
 		return 0xFFFF;
-	return uint32_t(premEnd / 86400) - today;
+
+	return uint16_t(uint32_t(_premEnd / 86400) - today);
 }

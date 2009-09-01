@@ -42,7 +42,7 @@ enum ChannelID {
 	CHANNEL_RL_CHAT    = 0x07,
 	CHANNEL_PARTY      = 0x08,
 	CHANNEL_HELP       = 0x09,
-	CHANNEL_PRIVATE    = 0xFFFF,
+	CHANNEL_PRIVATE    = 0xFFFF
 };
 
 class ChatChannel
@@ -119,6 +119,8 @@ public:
 	void removeUserFromAllChannels(Player* player);
 
 	uint16_t getFreePrivateChannelId();
+	bool isPrivateChannel(uint16_t channelId);
+	bool isMuteableChannel(uint16_t channelId, SpeakClass type);
 
 	bool talkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId);
 

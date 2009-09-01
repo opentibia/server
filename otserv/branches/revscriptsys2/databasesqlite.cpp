@@ -182,6 +182,11 @@ DBResult* DatabaseSQLite::storeQuery(const std::string &query)
 	return verifyResult(results);
 }
 
+uint64_t DatabaseSQLite::getLastInsertedRowID()
+{
+	return (uint64_t)sqlite3_last_insert_rowid(m_handle);
+}
+
 std::string DatabaseSQLite::escapeString(const std::string &s)
 {
 	// remember about quoiting even an empty string!

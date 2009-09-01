@@ -40,7 +40,7 @@ public:
 	void setEventId(uint32_t eventid) {m_eventid = eventid;}
 	uint32_t getEventId() const {return m_eventid;}
 
-	boost::system_time getCycle() const {return m_cycle;}
+	boost::system_time getCycle() const {return m_expiration;}
 
 	bool operator<(const SchedulerTask& other) const
 	{
@@ -49,18 +49,16 @@ public:
 
 protected:
 
-	SchedulerTask(uint32_t delay, boost::function<void (void)> f) : Task(f) {
-		m_cycle = boost::get_system_time() + boost::posix_time::milliseconds(delay);
+	SchedulerTask(uint32_t delay, const boost::function<void (void)>& f) : Task(delay, f) {
 		m_eventid = 0;
 	}
 
-	boost::system_time m_cycle;
 	uint32_t m_eventid;
 
-	friend SchedulerTask* createSchedulerTask(uint32_t, boost::function<void (void)>);
+	friend SchedulerTask* createSchedulerTask(uint32_t, const boost::function<void (void)>&);
 };
 
-inline SchedulerTask* createSchedulerTask(uint32_t delay, boost::function<void (void)> f)
+inline SchedulerTask* createSchedulerTask(uint32_t delay, const boost::function<void (void)>& f)
 {
 	assert(delay != 0);
 	if(delay < SCHEDULER_MINTICKS){
@@ -81,29 +79,24 @@ public:
 class Scheduler
 {
 public:
+	Scheduler();
 	~Scheduler() {}
-
-	static Scheduler& getScheduler()
-	{
-		static Scheduler scheduler;
-		return scheduler;
-	}
 
 	uint32_t addEvent(SchedulerTask* task);
 	bool stopEvent(uint32_t eventId);
+
+	void start();
 	void stop();
 	void shutdown();
-
-	static void schedulerThread(void* p);
 
 	enum SchedulerState{
 		STATE_RUNNING,
 		STATE_CLOSING,
-		STATE_TERMINATED,
+		STATE_TERMINATED
 	};
 
 protected:
-	Scheduler();
+	static void schedulerThread(void* p);
 
 	boost::mutex m_eventLock;
 	boost::condition_variable m_eventSignal;
@@ -112,9 +105,10 @@ protected:
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > m_eventList;
 	typedef std::set<uint32_t> EventIdSet;
 	EventIdSet m_eventIds;
-	static SchedulerState m_threadState;
+	SchedulerState m_threadState;
 };
 
+extern Scheduler g_scheduler;
 
 #endif
 

@@ -99,109 +99,108 @@ void Mailbox::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 	//
 }
 
-void Mailbox::postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Mailbox::postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postAddNotification(actor, thing, index, LINK_PARENT);
+	getParent()->postAddNotification(actor, thing, oldParent, index, LINK_PARENT);
 }
 
-void Mailbox::postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Mailbox::postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postRemoveNotification(actor, thing, index, isCompleteRemoval, LINK_PARENT);
+	getParent()->postRemoveNotification(actor, thing, newParent, index, isCompleteRemoval, LINK_PARENT);
+}
+
+bool Mailbox::sendItemTo(Creature* actor, const std::string name, uint32_t depotId, Item* item)
+{
+	uint32_t guid;
+	std::string dbname = name;
+	if(!IOPlayer::instance()->getGuidByName(guid, dbname)){
+		return false;
+	}
+	
+	Player* player = g_game.getPlayerByNameEx(name);
+	if(!player){
+		return false;
+	}
+
+	bool result = false;
+	Depot* depot = player->getDepot(depotId, true);
+	if(depot){
+		if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
+			item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
+		{
+			if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
+				g_game.transformItem(actor, item, item->getID() + 1);
+			}
+
+			result = true;
+		}
+	}
+
+	if(player->isOffline()){
+		IOPlayer::instance()->savePlayer(player);
+		delete player;
+	}
+
+	return result;
 }
 
 bool Mailbox::sendItem(Creature* actor, Item* item)
 {
-	std::string receiver = std::string("");
-	uint32_t dp = 0;
+	std::string name;
+	uint32_t depotId = 0;
 
-	if(!getReceiver(item, receiver, dp)){
+	if(!getRepicient(item, name, depotId)){
 		return false;
 	}
 
-	if(receiver == "" || dp == 0){ /**No need to continue if its still empty**/
+	if(name == "" || depotId == 0){
 		return false;
 	}
-	
-	uint32_t guid;
-	if(!IOPlayer::instance()->getGuidByName(guid, receiver)){
-		return false;
-	}
-	
-	if(Player* player = g_game.getPlayerByName(receiver)){ 
-		Depot* depot = player->getDepot(dp, true);
 
-		if(depot){
-			if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
-				item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR){
-				g_game.transformItem(actor, item, item->getID() + 1); /**Change it to stamped!**/	
-			}
-			return true;
-		}
-	}
-	else if(IOPlayer::instance()->playerExists(receiver)){
-		Player* player = new Player(receiver, NULL);
-		
-		if(!IOPlayer::instance()->loadPlayer(player, receiver)){
-			#ifdef __DEBUG_MAILBOX__
-			std::cout << "Failure: [Mailbox::sendItem], can not load player: " << receiver << std::endl;
-			#endif
-			delete player;
-			return false;
-		}
-		
-		#ifdef __DEBUG_MAILBOX__
-		std::string playerName = player->getName();
-		if(g_game.getPlayerByName(playerName)){
-			std::cout << "Failure: [Mailbox::sendItem], receiver is online: " << receiver << "," << playerName << std::endl;
-			delete player;
-			return false;
-		}
-		#endif
-
-		Depot* depot = player->getDepot(dp, true);
-		if(depot){
-			if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
-				item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR){
-				g_game.transformItem(actor, item, item->getID() + 1);
-			}
-
-			IOPlayer::instance()->savePlayer(player); 
-			
-			delete player;			
-			return true;
-		}
-
-		delete player;
-	}
-	
-	return false;
+	return sendItemTo(actor, name, depotId, item);
 }
 
-bool Mailbox::getReceiver(Item* item, std::string& name, uint32_t& dp)
+bool Mailbox::getDepotId(const std::string& strTown, uint32_t& depotId)
+{
+	Town* town = Towns::getInstance().getTown(strTown);
+	if(town){
+		depotId = town->getTownID();
+	}
+	else{
+		return false;
+	}
+	
+	return true;
+}
+
+bool Mailbox::getRepicient(Item* item, std::string& name, uint32_t& depotId)
 {
 	if(!item){
 		return false;
 	}
 
-	if(item->getID() == ITEM_PARCEL){ /**We need to get the text from the label incase its a parcel**/
+	if(item->getID() == ITEM_PARCEL){
 		Container* parcel = item->getContainer();
-
-		for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); cit++){
-			if((*cit)->getID() == ITEM_LABEL){
-				item = (*cit);
-				
-				if(item->getText() != ""){
-					break;	
-				}  
-			} 
+		if(parcel){
+			for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); cit++){
+				if((*cit)->getID() == ITEM_LABEL){
+					item = (*cit);
+					
+					if(item->getText() != ""){
+						break;	
+					}  
+				} 
+			}
 		}
 	}
-	else if(item->getID() != ITEM_LETTER){/**The item is somehow not a parcel or letter**/
-		std::cout << "Mailbox::getReciver error, trying to get reciecer from unkown item! ID:: " << item->getID() << "." << std::endl;
+	else if(item->getID() != ITEM_LETTER){
+#ifdef __DEBUG__
+		std::cout << "Mailbox::getReceiver error, trying to get receiver from unknown item! ID:: " << item->getID() << "." << std::endl;
+#endif
 		return false;
 	}
 
-	if(!item || item->getText() == "") /**No label/letter found or its empty.**/
+	if(!item || item->getText() == "")
 		return false;
 
 	std::string temp;
@@ -224,18 +223,17 @@ bool Mailbox::getReceiver(Item* item, std::string& name, uint32_t& dp)
 		++curLine;
 	}
 
-	Town* town = Towns::getInstance().getTown(strTown);
-	if(town){
-		dp = town->getTownID();
-	}
-	else{
+	if(strTown.empty()){
 		return false;
 	}
-	
-	return true;
+
+	trim(name);
+	trim(strTown);
+
+	return getDepotId(strTown, depotId);
 }
 
-bool Mailbox::canSend(const Item* item) const
+bool Mailbox::canSend(const Item* item)
 {
 	if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
 		return true;

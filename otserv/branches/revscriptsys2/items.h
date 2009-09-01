@@ -62,7 +62,7 @@ enum ItemTypes_t {
 
 struct Abilities{
 	Abilities();
-	
+
 	struct Absorb {
 			int16_t resistances[COMBAT_COUNT];
 
@@ -70,7 +70,7 @@ struct Abilities{
 			bool reduce(CombatType_t type, int32_t& dmg) const;
 			std::ostream& getDescription(std::ostream& os) const;
 	protected:
-			std::ostream& getDescription(std::ostream& os, bool& first, unsigned int combat_type) const;
+			std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
 	} absorb;
 
 
@@ -98,6 +98,9 @@ struct Abilities{
 
 	uint32_t conditionImmunities;
 	uint32_t conditionSuppressions;
+
+	bool preventItemLoss;
+	bool preventSkillLoss;
 };
 
 class Condition;
@@ -152,11 +155,13 @@ public:
 	int32_t        extraDefense;
 	int32_t        armor;
 	uint16_t       slotPosition;
+	uint16_t       wieldPosition;
 	bool           isVertical;
 	bool           isHorizontal;
 	bool           isHangable;
 	bool           allowDistRead;
 	bool           clientCharges;
+	bool           lookThrough;
 	uint16_t       speed;
 	int32_t        decayTo;
 	uint32_t       decayTime;
@@ -219,6 +224,8 @@ public:
 	AmmoAction_t ammoAction;
 	int32_t fluidSource;
 
+	uint32_t currency;
+
 	Abilities abilities;
 
 	Condition* condition;
@@ -273,6 +280,8 @@ public:
 	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
 	ItemType* getElement(uint32_t id) {return items.getElement(id);}
 	uint32_t size() {return items.size();}
+
+	std::map<uint32_t, ItemType*> currencyMap;
 
 protected:
 	void loadWeaponDefaults();

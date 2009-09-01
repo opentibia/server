@@ -25,6 +25,9 @@
 #include "thing.h"
 #include "items.h"
 
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
 #include <iostream>
 #include <list>
 #include <vector>
@@ -58,7 +61,7 @@ enum ITEMPROPERTY{
 
 enum TradeEvents_t{
 	ON_TRADE_TRANSFER,
-	ON_TRADE_CANCEL,
+	ON_TRADE_CANCEL
 };
 
 enum ItemDecayState_t{
@@ -102,7 +105,13 @@ enum AttrTypes_t{
 	ATTR_CHARGES = 22,
 	// This is NOT stored in serializeAttr, but rather used by IOMapSerialize
 	// look at that code for the ugly hack that makes this work. :)
-	ATTR_CONTAINER_ITEMS = 23, 
+	ATTR_CONTAINER_ITEMS = 23
+};
+
+enum Attr_ReadValue{
+	ATTR_READ_CONTINUE,
+	ATTR_READ_ERROR,
+	ATTR_READ_END
 };
 
 class ItemAttributes{
@@ -122,7 +131,7 @@ public:
 			m_firstAttr = new Attribute(*i.m_firstAttr);
 		}
 	}
-	
+
 	void setSpecialDescription(const std::string& desc) {setStrAttr(ATTR_ITEM_DESC, desc);}
 	void resetSpecialDescription() {removeAttribute(ATTR_ITEM_DESC);}
 	const std::string& getSpecialDescription() const {return getStrAttr(ATTR_ITEM_DESC);}
@@ -140,45 +149,45 @@ public:
 	const std::string& getWriter() const {return getStrAttr(ATTR_ITEM_WRITTENBY);}
 
 	void setActionId(uint16_t n) {if(n < 100) n = 100; setIntAttr(ATTR_ITEM_ACTIONID, n);}
-	uint16_t getActionId() const {return getIntAttr(ATTR_ITEM_ACTIONID);}
+	uint16_t getActionId() const {return (uint16_t)getIntAttr(ATTR_ITEM_ACTIONID);}
 
 	void setUniqueId(uint16_t n) {if(n < 1000) n = 1000; setIntAttr(ATTR_ITEM_UNIQUEID, n);}
-	uint16_t getUniqueId() const {return getIntAttr(ATTR_ITEM_UNIQUEID);}
+	uint16_t getUniqueId() const {return (uint16_t)getIntAttr(ATTR_ITEM_UNIQUEID);}
 
 	void setCharges(uint16_t n) {setIntAttr(ATTR_ITEM_CHARGES, n);}
-	uint16_t getCharges() const {return getIntAttr(ATTR_ITEM_CHARGES);}
+	uint16_t getCharges() const {return (uint16_t)getIntAttr(ATTR_ITEM_CHARGES);}
 
 	void setFluidType(uint16_t n) {setIntAttr(ATTR_ITEM_FLUIDTYPE, n);}
-	uint16_t getFluidType() const {return getIntAttr(ATTR_ITEM_FLUIDTYPE);}
+	uint16_t getFluidType() const {return (uint16_t)getIntAttr(ATTR_ITEM_FLUIDTYPE);}
 
 	void setOwner(uint32_t _owner) {setIntAttr(ATTR_ITEM_OWNER, _owner);}
-	uint32_t getOwner() const {return getIntAttr(ATTR_ITEM_OWNER);}
+	uint32_t getOwner() const {return (uint32_t)getIntAttr(ATTR_ITEM_OWNER);}
 
 	void setCorpseOwner(uint32_t _corpseOwner) {setIntAttr(ATTR_ITEM_CORPSEOWNER, _corpseOwner);}
-	uint32_t getCorpseOwner() {return getIntAttr(ATTR_ITEM_CORPSEOWNER);}
+	uint32_t getCorpseOwner() {return (uint32_t)getIntAttr(ATTR_ITEM_CORPSEOWNER);}
 
 	void setDuration(int32_t time) {setIntAttr(ATTR_ITEM_DURATION, time);}
 	void decreaseDuration(int32_t time) {increaseIntAttr(ATTR_ITEM_DURATION, -time);}
-	int32_t getDuration() const {return getIntAttr(ATTR_ITEM_DURATION);}
+	int32_t getDuration() const {return (int32_t)getIntAttr(ATTR_ITEM_DURATION);}
 
 	void setDecaying(ItemDecayState_t decayState) {setIntAttr(ATTR_ITEM_DECAYING, decayState);}
-	uint32_t getDecaying() const {return getIntAttr(ATTR_ITEM_DECAYING);}
+	uint32_t getDecaying() const {return (uint32_t)getIntAttr(ATTR_ITEM_DECAYING);}
 
 protected:
 	enum itemAttrTypes{
-		ATTR_ITEM_ACTIONID = 1,
-		ATTR_ITEM_UNIQUEID = 2,
-		ATTR_ITEM_DESC = 4,
-		ATTR_ITEM_TEXT = 8,
-		ATTR_ITEM_WRITTENDATE = 16,
-		ATTR_ITEM_WRITTENBY = 32,
-		ATTR_ITEM_OWNER = 65536,
-		ATTR_ITEM_DURATION = 131072,
-		ATTR_ITEM_DECAYING = 262144,
-		ATTR_ITEM_CORPSEOWNER = 524288,
-		ATTR_ITEM_CHARGES = 1048576,
-		ATTR_ITEM_FLUIDTYPE = 2097152,
-		ATTR_ITEM_DOORID = 4194304
+		ATTR_ITEM_ACTIONID = 1 << 0,
+		ATTR_ITEM_UNIQUEID = 1 << 1,
+		ATTR_ITEM_DESC = 1 << 2,
+		ATTR_ITEM_TEXT = 1 << 3,
+		ATTR_ITEM_WRITTENDATE = 1 << 4,
+		ATTR_ITEM_WRITTENBY = 1 << 5,
+		ATTR_ITEM_OWNER = 1 << 6,
+		ATTR_ITEM_DURATION = 1 << 7,
+		ATTR_ITEM_DECAYING = 1 << 8,
+		ATTR_ITEM_CORPSEOWNER = 1 << 9,
+		ATTR_ITEM_CHARGES = 1 << 10,
+		ATTR_ITEM_FLUIDTYPE = 1 << 11,
+		ATTR_ITEM_DOORID = 1 << 12
 	};
 
 	bool hasAttribute(itemAttrTypes type) const;
@@ -243,6 +252,9 @@ public:
 	//Factory member to create item of right type based on type
 	static Item* CreateItem(const uint16_t _type, uint16_t _count = 1);
 	static Item* CreateItem(PropStream& propStream);
+	static bool loadItem(xmlNodePtr node, Container* parent);
+	static bool loadContainer(xmlNodePtr node, Container* parent);
+
 	static Items items;
 
 	// Constructor for items
@@ -279,7 +291,7 @@ public:
 	static std::string getWeightDescription(const ItemType& it, double weight, uint32_t count = 1);
 
 	//serialization
-	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool unserializeAttr(PropStream& propStream);
 	virtual bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
@@ -294,6 +306,10 @@ public:
 	uint16_t getClientID() const {return items[id].clientId;}
 	void setID(uint16_t newid);
 
+	// Returns the player that is holding this item in his inventory
+	Player* getHoldingPlayer();
+	const Player* getHoldingPlayer() const;
+
 	WeaponType_t getWeaponType() const {return items[id].weaponType;}
 	Weapon* getWeapon() const {return items[id].weaponInstance;}
 	Ammo_t	getAmmoType() const {return items[id].ammoType;}
@@ -305,13 +321,14 @@ public:
 	int getDefense() const {return items[id].defence;}
 	int getExtraDef() const {return items[id].extraDefense;}
 	int getSlotPosition() const {return items[id].slotPosition;}
+	int getWieldPosition() const {return items[id].wieldPosition;}
 	int getHitChance() const {return items[id].hitChance;}
 
 	bool isReadable() const {return items[id].canReadText;}
 	bool canWriteText() const {return items[id].canWriteText;}
-	int32_t getMaxWriteLength() const {return items[id].maxTextLen;}
+	uint16_t getMaxWriteLength() const {return items[id].maxTextLen;}
 
-	int getWorth() const;
+	uint32_t getWorth() const;
 	void getLight(LightInfo& lightInfo);
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
@@ -346,7 +363,9 @@ public:
 
 	// get the number of items
 	uint16_t getItemCount() const {return count;}
-	void setItemCount(uint16_t n) {count = n;}
+	void setItemCount(uint8_t n) {count = n;}
+
+	static uint32_t countByType(const Item* i, int checkType, bool multiCount);
 
 	void setDefaultSubtype();
 	bool hasSubType() const;
@@ -366,7 +385,7 @@ public:
 
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
-	virtual void onRemoved() {};
+	virtual void onRemoved();
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
 protected:
@@ -381,5 +400,19 @@ protected:
 };
 
 typedef std::list<Item *> ItemList;
+
+inline uint32_t Item::countByType(const Item* i, int checkType, bool multiCount){
+	if(checkType == -1 || checkType == i->getSubType()){
+
+		if(multiCount)
+			return i->getItemCount();
+
+		if(i->isRune())
+			return i->getCharges();
+
+		return i->getItemCount();
+	}
+	return 0;
+}
 
 #endif

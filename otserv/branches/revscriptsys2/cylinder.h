@@ -23,6 +23,7 @@
 
 #include "definitions.h"
 #include "thing.h"
+#include <map>
 
 class Item;
 class Creature;
@@ -143,7 +144,7 @@ public:
 	  * \param index is the objects new index value
 	  * \param link holds the relation the object has to the cylinder
 	  */
-	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER) = 0;
+	virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER) = 0;
 
 	/**
 	  * Is sent after an operation (move/remove) to update internal values
@@ -153,7 +154,7 @@ public:
 	  * \param isCompleteRemoval indicates if the item was completely removed or just partially (stackables)
 	  * \param link holds the relation the object has to the cylinder
 	  */
-	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER) = 0;
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER) = 0;
 
 	/**
 	  * Gets the index of an object
@@ -190,6 +191,14 @@ public:
 	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
 
 	/**
+	  * Get the amount of items of a all types
+	  * \param countMap a map to put the itemID:count mapping in
+	  * \param itemCount if set to true it will only count items and not other subtypes like charges
+	  * \param returns a map mapping item id to count (same as first argument)
+	  */
+	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap, bool itemCount = true) const;
+
+	/**
 	  * Adds an object to the cylinder without sending to the client(s)
 	  * \param thing is the object to add
 	  */
@@ -213,7 +222,7 @@ public:
 		uint32_t flags) const {return RET_NOTPOSSIBLE;}
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount, uint32_t flags) const {return RET_NOTPOSSIBLE;}
-	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const {return RET_NOTPOSSIBLE;}
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const {return (thing->getParent() == this ? RET_NOERROR : RET_NOTPOSSIBLE);}
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 		uint32_t& flags) {return NULL;}
 
@@ -223,8 +232,8 @@ public:
 	virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing) {}
 	virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count) {}
 
-	virtual void postAddNotification(Creature* actor, Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER) {}
-	virtual void postRemoveNotification(Creature* actor, Thing* thing, int32_t index, bool isCompleteRemoval,
+	virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER) {}
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval,
 		cylinderlink_t link = LINK_OWNER) {}
 
 	virtual bool isPushable() const {return false;}

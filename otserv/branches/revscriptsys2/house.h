@@ -33,9 +33,7 @@
 #include "player.h"
 
 class House;
-//[ added for beds system
 class BedItem;
-//]
 
 class AccessList
 {
@@ -54,7 +52,7 @@ public:
 
 private:
 	typedef OTSERV_HASH_SET<uint32_t> PlayerList;
-	typedef OTSERV_HASH_SET<uint32_t> GuildList; //TODO: include ranks
+	typedef std::list< std::pair<uint32_t, std::string> > GuildList;
 
 	typedef std::list<std::string> ExpressionList;
 	typedef std::list<std::pair<boost::regex, bool> > RegExList;
@@ -77,7 +75,7 @@ public:
 	House* getHouse(){return house;};
 
 	//serialization
-	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	void setDoorId(uint32_t _doorId){ setIntAttr(ATTR_ITEM_DOORID, (uint32_t)_doorId);};
@@ -103,22 +101,19 @@ private:
 
 enum AccessList_t{
 	GUEST_LIST = 0x100,
-	SUBOWNER_LIST = 0x101,
+	SUBOWNER_LIST = 0x101
 };
 
 enum AccessHouseLevel_t{
 	HOUSE_NO_INVITED = 0,
 	HOUSE_GUEST = 1,
 	HOUSE_SUBOWNER = 2,
-	HOUSE_OWNER = 3,
+	HOUSE_OWNER = 3
 };
 
 typedef std::list<HouseTile*> HouseTileList;
 typedef std::list<Door*> HouseDoorList;
-//[ added for beds system
 typedef std::list<BedItem*> HouseBedItemList;
-//]
-
 
 class HouseTransferItem : public Item
 {
@@ -140,6 +135,14 @@ protected:
 class House
 {
 public:
+	enum syncflags_t{
+		HOUSE_SYNC_TOWNID		= 0,
+		HOUSE_SYNC_NAME			= 1 << 0,
+		HOUSE_SYNC_PRICE		= 1 << 1,
+		HOUSE_SYNC_RENT			= 1 << 2,
+		HOUSE_SYNC_GUILDHALL	= 1 << 3
+	};
+
 	House(uint32_t _houseid);
 	~House();
 
@@ -166,14 +169,17 @@ public:
 	void setHouseOwner(uint32_t guid);
 	uint32_t getHouseOwner() const {return houseOwner;}
 
-	void setPaidUntil(uint32_t paid){paidUntil = paid;}
-	uint32_t getPaidUntil() const {return paidUntil;}
+	void setPaidUntil(time_t paid){paidUntil = paid;}
+	time_t getPaidUntil() const {return paidUntil;}
 
 	void setRent(uint32_t _rent){rent = _rent;}
 	uint32_t getRent() const {return rent;}
 
-	void setLastWarning(uint32_t _lastWarning) {lastWarning = _lastWarning;}
-	uint32_t getLastWarning() {return lastWarning;}
+	bool hasSyncFlag(syncflags_t flag) const {return ((syncFlags & (uint32_t)flag) == (uint32_t)flag);}
+	void resetSyncFlag(syncflags_t flag) {syncFlags &= ~(uint32_t)flag;}
+
+	void setLastWarning(time_t _lastWarning) {lastWarning = _lastWarning;}
+	time_t getLastWarning() {return lastWarning;}
 
 	void setPayRentWarnings(uint32_t warnings) {rentWarnings = warnings;}
 	uint32_t getPayRentWarnings() const {return rentWarnings;}
@@ -181,10 +187,18 @@ public:
 	void setTownId(uint32_t _town){townid = _town;}
 	uint32_t getTownId() const {return townid;}
 
+	void setGuildHall(bool _guildHall) {guildHall = _guildHall;}
+	bool isGuildHall() const {return guildHall;}
+
+	void setPendingDepotTransfer(bool _pendingDepotTransfer) {pendingDepotTransfer = _pendingDepotTransfer;}
+	bool getPendingDepotTransfer() const {return pendingDepotTransfer;}
+
 	uint32_t getHouseId() const {return houseid;}
 
 	void addDoor(Door* door);
 	void removeDoor(Door* door);
+	void addBed(BedItem* bed);
+
 	Door* getDoorByNumber(uint32_t doorId);
 	Door* getDoorByNumber(uint32_t doorId) const;
 	Door* getDoorByPosition(const Position& pos);
@@ -193,16 +207,18 @@ public:
 	void resetTransferItem();
 	bool executeTransfer(HouseTransferItem* item, Player* player);
 
-	HouseTileList::iterator getHouseTileBegin() {return houseTiles.begin();}
-	HouseTileList::iterator getHouseTileEnd() {return houseTiles.end();}
-	uint32_t getHouseTileSize() {return houseTiles.size();}
+	HouseTileList::iterator getTileBegin() {return houseTiles.begin();}
+	HouseTileList::iterator getTileEnd() {return houseTiles.end();}
+	size_t getTileCount() {return houseTiles.size();}
 
-	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
-	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
+	HouseDoorList::iterator getDoorBegin() {return doorList.begin();}
+	HouseDoorList::iterator getDoorEnd() {return doorList.end();}
+	size_t getDoorCount() {return doorList.size();}
 
-	void addBed(BedItem* bed);
-	HouseBedItemList::iterator getHouseBedsBegin() {return bedsList.begin();}
-	HouseBedItemList::iterator getHouseBedsEnd() {return bedsList.end();}
+	HouseBedItemList::iterator getBedsBegin() {return bedsList.begin();}
+	HouseBedItemList::iterator getBedsEnd() {return bedsList.end();}
+	size_t getBedTiles() {return bedsList.size();}
+	uint32_t getBedCount() {return (uint32_t)std::ceil((double)getBedTiles() / 2);} //each bed takes 2 sqms of space, ceil is just for bad maps
 
 	// Transfers all items to depot and clicks all players (useful for map updates, for example)
 	void cleanHouse();
@@ -217,18 +233,19 @@ private:
 	std::string houseOwnerName;
 	HouseTileList houseTiles;
 	HouseDoorList doorList;
-	//[ added for beds system
 	HouseBedItemList bedsList;
-	//]
 	AccessList guestList;
 	AccessList subOwnerList;
 	std::string houseName;
 	Position posEntry;
-	uint32_t paidUntil;
+	time_t paidUntil;
 	uint32_t rentWarnings;
-	uint32_t lastWarning;
+	time_t lastWarning;
 	uint32_t rent;
 	uint32_t townid;
+	bool guildHall;
+	uint32_t syncFlags;
+	bool pendingDepotTransfer;
 
 	HouseTransferItem* transferItem;
 	Container transfer_container;
@@ -241,7 +258,7 @@ enum RentPeriod_t{
 	RENTPERIOD_WEEKLY,
 	RENTPERIOD_MONTHLY,
 	RENTPERIOD_YEARLY,
-	RENTPERIOD_NEVER,
+	RENTPERIOD_NEVER
 };
 
 class Houses
@@ -258,10 +275,10 @@ public:
 	House* getHouse(uint32_t houseid, bool add = false)
 	{
 		HouseMap::iterator it = houseMap.find(houseid);
-
 		if(it != houseMap.end()){
 			return it->second;
 		}
+		
 		if(add){
 			House* house = new House(houseid);
 			houseMap[houseid] = house;
@@ -270,21 +287,24 @@ public:
 		else{
 			return NULL;
 		}
-
 	}
 
 	House* getHouseByPlayerId(uint32_t playerId);
 
 	bool loadHousesXML(std::string filename);
-
+	bool payRent(Player* player, House* house, time_t time = 0);
 	bool payHouses();
+	void getRentPeriodString(std::string& strPeriod);
 
 	HouseMap::iterator getHouseBegin() {return houseMap.begin();}
 	HouseMap::iterator getHouseEnd() {return houseMap.end();}
 
+	bool payHouse(House* house, time_t time);
+
 private:
 	RentPeriod_t rentPeriod;
 	HouseMap houseMap;
+	friend class IOMapSerialize;
 };
 
 #endif

@@ -23,7 +23,7 @@
 
 #include "definitions.h"
 
-#define NETWORKMESSAGE_MAXSIZE 15360
+#define NETWORKMESSAGE_MAXSIZE 15340
 
 
 const int32_t Map_maxViewportX = 11;		//min value: maxClientViewportX + 1
@@ -89,6 +89,17 @@ enum MagicEffectClasses {
 	NM_ME_PLANTATTACK      = 0x36, //54
 	NM_ME_TUTORIALARROW    = 0x37, //55
 	NM_ME_TUTORIALSQUARE   = 0x38, //56
+	NM_ME_MIRRORHORIZONTAL = 0x39, //57
+	NM_ME_MIRRORVERTICAL   = 0x3A, //58
+	NM_ME_SKULLHORIZONTAL  = 0x3B, //59
+	NM_ME_SKULLVERTICAL    = 0x3C, //60
+	NM_ME_ASSASSIN         = 0x3D, //61
+	NM_ME_STEPSHORIZONTAL  = 0x3E, //62
+	NM_ME_BLOODYSTEPS      = 0x3F, //63
+	NM_ME_STEPSVERTICAL    = 0x40, //64
+	NM_ME_YALAHARIGHOST    = 0x41, //65
+	NM_ME_BATS             = 0x42, //66
+	NM_ME_SMOKE            = 0x43, //67
 	//for internal use, dont send to client
 	NM_ME_NONE             = 0xFF,
 	NM_ME_UNK              = 0xFFFF
@@ -163,11 +174,12 @@ enum SpeakClass {
 	SPEAK_CHANNEL_R2    	= 0x11,	//Talk red anonymously on chat - #d
 	//SPEAK_                = 0x12, //?
 	SPEAK_MONSTER_SAY   	= 0x13,	//Talk orange
-	SPEAK_MONSTER_YELL  	= 0x14,	//Yell orange
+	SPEAK_MONSTER_YELL  	= 0x14	//Yell orange
 };
 
 enum MessageClasses {
-	MSG_STATUS_CONSOLE_RED		= 0x11, //Red message in the console
+	MSG_CLASS_FIRST				= 0x12,
+	MSG_STATUS_CONSOLE_RED		= MSG_CLASS_FIRST, //Red message in the console
 	MSG_STATUS_CONSOLE_ORANGE2	= 0x13, //Orange message in the console
 	MSG_STATUS_CONSOLE_ORANGE	= 0x14, //Orange message in the console
 	MSG_STATUS_WARNING			= 0x15, //Red message in game window and in the console
@@ -177,6 +189,7 @@ enum MessageClasses {
 	MSG_INFO_DESCR				= 0x19, //Green message in game window and in the console
 	MSG_STATUS_SMALL			= 0x1A, //White message at the bottom of the game window"
 	MSG_STATUS_CONSOLE_BLUE		= 0x1B, //Blue message in the console
+	MSG_CLASS_LAST				= MSG_STATUS_CONSOLE_BLUE
 };
 
 enum FluidColors_t {
@@ -210,10 +223,10 @@ enum FluidTypes_t {
 
 	FLUID_LAVA        = FLUID_RED + 24,
 	FLUID_RUM         = FLUID_BROWN + 24,
-	FLUID_SWAMP       = FLUID_GREEN + 24,
+	FLUID_SWAMP       = FLUID_GREEN + 24
 };
 
-const uint32_t reverseFluidMap[] = {
+const uint8_t reverseFluidMap[] = {
 	FLUID_EMPTY,
 	FLUID_WATER,
 	FLUID_MANA,
@@ -236,10 +249,10 @@ enum ClientFluidTypes_t {
 	CLIENTFLUID_GREEN   = 0x06,
 	CLIENTFLUID_BROWN   = 0x07,
 	CLIENTFLUID_YELLOW  = 0x08,
-	CLIENTFLUID_WHITE   = 0x09,
+	CLIENTFLUID_WHITE   = 0x09
 };
 
-const uint32_t fluidMap[] = {
+const uint8_t fluidMap[] = {
 	CLIENTFLUID_EMPTY,
 	CLIENTFLUID_BLUE,
 	CLIENTFLUID_RED,
@@ -252,7 +265,7 @@ const uint32_t fluidMap[] = {
 
 enum SquareColor_t {
 	SQ_COLOR_NONE   = 256,
-	SQ_COLOR_BLACK  = 0,
+	SQ_COLOR_BLACK  = 0
 };
 
 enum TextColor_t {
@@ -267,10 +280,11 @@ enum TextColor_t {
 	TEXTCOLOR_YELLOW      = 210,
 	TEXTCOLOR_WHITE_EXP   = 215,
 	TEXTCOLOR_NONE        = 255,
-	TEXTCOLOR_UNK         = 256,
+	TEXTCOLOR_UNK         = 256
 };
 
 enum Icons_t{
+	ICON_NONE       = 0,
 	ICON_POISON     = 1,
 	ICON_BURN       = 2,
 	ICON_ENERGY     = 4,
@@ -284,6 +298,8 @@ enum Icons_t{
 	ICON_DAZZLED    = 1024,
 	ICON_CURSED     = 2048,
 	ICON_PARTY_BUFF = 4096,
+	ICON_PZBLOCK    = 8192,
+	ICON_PZ         = 16384
 };
 
 enum WeaponType_t {
@@ -329,6 +345,8 @@ enum Skulls_t{
 	SKULL_GREEN     = 2,
 	SKULL_WHITE     = 3,
 	SKULL_RED       = 4,
+	SKULL_BLACK     = 5,
+	SKULL_LAST
 };
 
 enum PartyShields_t{
@@ -382,7 +400,7 @@ enum item_t {
 	ITEM_LETTER_STAMPED   = 2598,
 	ITEM_LABEL            = 2599,
 
-	ITEM_DOCUMENT_RO      = 1968, //read-only
+	ITEM_DOCUMENT_RO      = 1968 //read-only
 };
 
 enum PlayerFlags{
@@ -427,9 +445,70 @@ enum PlayerFlags{
 	PlayerFlag_IsAlwaysPremium,             //2^37 = 137438953472
 	PlayerFlag_CanAnswerRuleViolations,     //2^38 = 274877906944
 	PlayerFlag_CanReloadContent,            //2^39 = 549755813888
+	PlayerFlag_ShowGroupInsteadOfVocation,  //2^40 = 1099511627776
+	PlayerFlag_HasInfiniteStamina,          //2^41 = 2199023255552
+	PlayerFlag_CannotMoveItems,             //2^42 = 4398046511104
+	PlayerFlag_CannotMoveCreatures,         //2^43 = 8796093022208
+	PlayerFlag_CanReportBugs,               //2^44 = 17592186044416
+	PlayerFlag_CanSeeSpecialDescription,    //2^45 = 35184372088832
+	PlayerFlag_CannotBeSeen,                //2^46 = 70368744177664
 	//add new flags here
 	PlayerFlag_LastFlag
 };
+
+enum ViolationActions_t
+{
+	Action_None                     = 0,
+	Action_Notation                 = 1 << 0,
+	Action_Namelock                 = 1 << 1,
+	Action_Banishment               = 1 << 2,
+	Action_NamelockBan              = 1 << 3,
+	Action_BanFinalWarning          = 1 << 4,
+	Action_NamelockBanFinalWarning  = 1 << 5,
+	Action_StatementReport          = 1 << 6,
+	Action_IpBan                    = 1 << 7
+};
+
+const int32_t violationReasons[5] =
+{
+	0,	//ignore this
+	3,	//all name reasons
+	9,	//all name & statement reasons
+	18,	//all name, statement & cheating reasons
+	19	//all name, statement & cheating reasons & ip-banishment
+};
+
+const int32_t violationNames[5] =
+{
+	Action_None,
+	Action_Namelock,
+	Action_Namelock,
+	Action_Namelock | Action_NamelockBan,
+	Action_Namelock | Action_NamelockBan | Action_NamelockBanFinalWarning | Action_IpBan
+};
+
+const int32_t violationStatements[5] =
+{
+	Action_None,
+	Action_None,
+	Action_StatementReport,
+	Action_StatementReport | Action_Notation | Action_Banishment,
+	Action_StatementReport | Action_Notation | Action_Banishment | Action_BanFinalWarning | Action_IpBan
+};
+
+//Reserved player storage key ranges
+//[10000000 - 20000000]
+#define PSTRG_RESERVED_RANGE_START  10000000
+#define PSTRG_RESERVED_RANGE_SIZE   10000000
+//[1000 - 1500]
+#define PSTRG_OUTFITS_RANGE_START   (PSTRG_RESERVED_RANGE_START + 1000)
+#define PSTRG_OUTFITS_RANGE_SIZE    500
+
+//[1500 - 2000]
+#define PSTRG_OUTFITSID_RANGE_START   (PSTRG_RESERVED_RANGE_START + 1500)
+#define PSTRG_OUTFITSID_RANGE_SIZE    500
+
+#define IS_IN_KEYRANGE(key, range) (key >= PSTRG_##range##_START && ((key - PSTRG_##range##_START) < PSTRG_##range##_SIZE))
 
 #endif
 

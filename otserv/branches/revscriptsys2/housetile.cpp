@@ -26,7 +26,7 @@
 extern Game g_game;
 
 HouseTile::HouseTile(int x, int y, int z, House* _house) :
-	Tile(x, y, z)
+	DynamicTile(x, y, z)
 {
 	house = _house;
 	setFlag(TILESTATE_HOUSE);
@@ -84,6 +84,9 @@ ReturnValue HouseTile::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		if(const Player* player = creature->getPlayer()){
 			if(!house->isInvited(player) && !player->hasFlag(PlayerFlag_CanEditHouses))
 				return RET_PLAYERISNOTINVITED;
+		}
+		else{
+			return RET_NOTPOSSIBLE;
 		}
 	}
 

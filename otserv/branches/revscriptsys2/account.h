@@ -33,16 +33,12 @@ public:
 	Account();
 	~Account();
 
-	uint32_t accnumber;
-	std::string name;
+	static uint16_t getPremiumDaysLeft(uint32_t _premEnd);
 
-	// < current time is none, (time_t)(-1) is infinite.
-	time_t premEnd;
+	uint32_t number, warnings;
+	std::string name, password;
 
-	uint16_t getPremiumDaysLeft() const;
-
-	std::string password;
-
+	time_t premEnd; // < current time is none, (time_t)(-1) is infinite.
 	std::list<std::string> charList;
 };
 

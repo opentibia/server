@@ -21,7 +21,7 @@
 
 #include "chat.h"
 #include "player.h"
-#include "game.h"
+#include "tools.h"
 
 // Avoid unnecessary includes!
 extern void g_gameUnscript(void* v);
@@ -72,16 +72,15 @@ bool PrivateChatChannel::removeInvited(Player* player)
 void PrivateChatChannel::invitePlayer(Player* player, Player* invitePlayer)
 {
 	if(player != invitePlayer && addInvited(invitePlayer)){
-		std::string msg;
-		msg = player->getName();
-		msg += " invites you to ";
-		msg += (player->getSex() == PLAYERSEX_FEMALE ? "her" : "his");
-		msg += " private chat channel.";
-		invitePlayer->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		std::stringstream msg;
+		msg << player->getName() << " invites you to " << playerSexAdjectiveString(player->getSex())
+			<<  " private chat channel.";
+		
+		invitePlayer->sendTextMessage(MSG_INFO_DESCR, msg.str().c_str());
 
-		msg = invitePlayer->getName();
-		msg += " has been invited.";
-		player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		msg.str("");
+		msg << invitePlayer->getName() << " has been invited.";
+		player->sendTextMessage(MSG_INFO_DESCR, msg.str().c_str());
 	}
 }
 
@@ -126,7 +125,7 @@ bool ChatChannel::addUser(Player* player)
 	if(it != m_users.end())
 		return false;
 
-	if(getId() == 0x03 && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule Violations channel
+	if(getId() == CHANNEL_RULE_REP && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule Violations channel
 		return false;
 	}
 
@@ -152,9 +151,6 @@ bool ChatChannel::removeUser(Player* player, bool sendCloseChannel /*= false*/)
 
 bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time /*= 0*/)
 {
-	bool success = false;
-	UsersMap::iterator it;
-
 	// Can't speak to a channel you're not connected to
 	if(fromPlayer){
 		UsersMap::const_iterator iter = m_users.find(fromPlayer->getID());
@@ -162,24 +158,29 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& t
 			return false;
 	}
 
+	// Add trade muted condition
+	if(getId() == CHANNEL_TRADE || getId() == CHANNEL_TRADE_ROOK){
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_TRADE_MUTED, 120000, 0);
+		fromPlayer->addCondition(condition);
+	}
+
+	UsersMap::iterator it;
 	for(it = m_users.begin(); it != m_users.end(); ++it){
 		if(m_deaf_user != it->second)
 			it->second->sendToChannel(fromPlayer, type, text, getId(), time);
-		success = true;
 	}
-	return success;
+
+	return true;
 }
 
 bool ChatChannel::sendInfo(SpeakClass type, const std::string& text, uint32_t time)
 {
-	bool success = false;
 	UsersMap::iterator it;
-
 	for(it = m_users.begin(); it != m_users.end(); ++it){
 		it->second->sendToChannel(NULL, type, text, getId(), time);
-		success = true;
 	}
-	return success;
+
+	return true;
 }
 
 Chat::Chat()
@@ -220,13 +221,41 @@ Chat::~Chat()
 	m_privateChannels.clear();
 }
 
-uint16_t Chat::getFreePrivateChannelId() {
+uint16_t Chat::getFreePrivateChannelId()
+{
 	for(uint16_t i = 100; i < 10000; ++i){
 		if(m_privateChannels.find(i) == m_privateChannels.end()){
 			return i;
 		}
 	}
 	return 0;
+}
+
+bool Chat::isPrivateChannel(uint16_t channelId)
+{
+	if(m_privateChannels.find(channelId) == m_privateChannels.end()){
+		return false;
+	}
+
+	return true;
+}
+
+bool Chat::isMuteableChannel(uint16_t channelId, SpeakClass type)
+{
+	//Npc channel
+	if(type == SPEAK_PRIVATE_PN){
+		return false;
+	}
+
+	//Others
+	if(type == SPEAK_CHANNEL_Y){
+		//Guild and private channels
+		if(channelId == CHANNEL_GUILD || isPrivateChannel(channelId)){
+			return false;
+		}
+	}
+
+	return true;
 }
 
 ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
@@ -256,7 +285,7 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 		}
 
 		//find a free private channel slot
-		uint32_t i = getFreePrivateChannelId();
+		uint16_t i = getFreePrivateChannelId();
 		if(i != 0) {
 			PrivateChatChannel* newChannel = new PrivateChatChannel(i, player->getName() + "'s Channel");
 
@@ -360,6 +389,14 @@ void Chat::removeUserFromAllChannels(Player* player)
 		if(channel->getOwner() == player->getGUID())
 			deleteChannel(player, channel->getId());
 	}
+
+	for(NormalChannelMap::iterator it = m_normalChannels.begin(); it != m_normalChannels.end(); ++it){
+		it->second->removeUser(player);
+	}
+
+	for(GuildChannelMap::iterator it = m_guildChannels.begin(); it != m_guildChannels.end(); ++it){
+		it->second->removeUser(player);
+	}	
 }
 
 bool Chat::talkToChannel(Player* player, SpeakClass type, const std::string& text, uint16_t channelId)
@@ -377,6 +414,26 @@ bool Chat::talkToChannel(Player* player, SpeakClass type, const std::string& tex
 				type = SPEAK_CHANNEL_O;
 			}
 			break;
+		}
+		// Players can't speak in these channels while they're level 1
+		// Also, there is a delay of 2 minutes for trade and trade rook
+		case CHANNEL_TRADE:
+		case CHANNEL_TRADE_ROOK:
+		case CHANNEL_RL_CHAT:
+		case CHANNEL_GAME_CHAT:
+		{
+			if(!player->hasFlag(PlayerFlag_CannotBeMuted)){
+				if(player->getLevel() < 2){
+					player->sendCancel("You may not speak into channels as long as you are on level 1.");
+					return true;
+					break;
+				}
+				else if((channelId == CHANNEL_TRADE || channelId == CHANNEL_TRADE_ROOK) && player->hasCondition(CONDITION_TRADE_MUTED)){
+					player->sendCancel("You may only place one offer in two minutes.");
+					return true;
+					break;
+				}
+			}
 		}
 		default:
 		{
@@ -429,6 +486,12 @@ ChannelList Chat::getChannelList(Player* player)
 	for(itn = m_normalChannels.begin(); itn != m_normalChannels.end(); ++itn){
 		if(itn->first == CHANNEL_RULE_REP && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule violations channel
 			continue;
+		}
+		if(!player->hasFlag(PlayerFlag_CannotBeMuted)){
+			if(itn->first == CHANNEL_TRADE && player->getVocationId() == 0)
+				continue;
+			if(itn->first == CHANNEL_TRADE_ROOK && player->getVocationId() != 0)
+				continue;
 		}
 
 		ChatChannel *channel = itn->second;

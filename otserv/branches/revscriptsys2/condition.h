@@ -49,18 +49,18 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason) = 0;
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
-	virtual uint32_t getIcons() const;
+	virtual uint16_t getIcons() const;
 	ConditionId_t getId() const {return id;}
 	uint32_t getSubId() const {return subId;}
 
 	virtual Condition* clone() const = 0;
 
 	ConditionType_t getType() const { return conditionType;}
-	int64_t getEndTime() const {return endTime;}
+	int64_t getEndTime() const {return ticks == -1? 0 : endTime;}
 	int32_t getTicks() const { return ticks; }
 	void setTicks(int32_t newTicks);
 
-	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param);
+	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param = 0);
 	static Condition* createCondition(PropStream& propStream);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
@@ -93,7 +93,7 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
-	virtual uint32_t getIcons() const;
+	virtual uint16_t getIcons() const;
 
 	virtual ConditionGeneric* clone()  const { return new ConditionGeneric(*this); }
 };
@@ -212,7 +212,7 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
-	virtual uint32_t getIcons() const;
+	virtual uint16_t getIcons() const;
 
 	virtual ConditionDamage* clone()  const { return new ConditionDamage(*this); }
 
@@ -258,7 +258,7 @@ public:
 	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
-	virtual uint32_t getIcons() const;
+	virtual uint16_t getIcons() const;
 
 	virtual ConditionSpeed* clone()  const { return new ConditionSpeed(*this); }
 
