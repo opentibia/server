@@ -365,7 +365,7 @@ public:
 	uint16_t getItemCount() const {return count;}
 	void setItemCount(uint8_t n) {count = n;}
 
-	static uint32_t countByType(const Item* i, int checkType, bool multiCount);
+	static uint32_t countByType(const Item* i, int32_t checkType, bool multiCount);
 
 	void setDefaultSubtype();
 	bool hasSubType() const;
@@ -403,7 +403,7 @@ protected:
 
 typedef std::list<Item *> ItemList;
 
-inline uint32_t Item::countByType(const Item* i, int checkType, bool multiCount){
+inline uint32_t Item::countByType(const Item* i, int32_t checkType, bool multiCount){
 	if(checkType == -1 || checkType == i->getSubType()){
 
 		if(multiCount)

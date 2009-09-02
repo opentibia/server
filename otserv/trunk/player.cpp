@@ -1327,7 +1327,7 @@ bool Player::hasShopItemForSale(uint32_t itemId, uint8_t subType)
 	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
 		if(it->itemId == itemId && (*it).buyPrice > 0){
 			const ItemType& iit = Item::items[itemId];
-			if(iit.stackable || iit.isRune()){
+			if(iit.isFluidContainer() || iit.isSplash() || iit.isRune()){
 				return it->subType == subType;
 			}
 

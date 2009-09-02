@@ -514,6 +514,9 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 								else if(it.stackable){
 									li.subType = 1;
 								}
+								else if(it.isFluidContainer() || it.isSplash()){
+									li.subType = 0;
+								}
 							}
 
 							if(readXMLString(tmpNode, "name", strValue)){
@@ -2057,11 +2060,17 @@ uint32_t Npc::getListItemPrice(uint16_t itemId, ShopEvent_t type)
 void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
 		uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
+	int8_t subType = -1;
+	const ItemType& it = Item::items[itemId];
+	if(it.hasSubType() && !it.stackable){
+		subType = count;
+	}
+
 	if(type == SHOPEVENT_BUY){
 		NpcState* npcState = getState(player, true);
 		if(npcState){
 			npcState->amount = amount;
-			npcState->subType = count;
+			npcState->subType = subType;
 			npcState->itemId = itemId;
 			npcState->buyPrice = getListItemPrice(itemId, SHOPEVENT_BUY);
 			npcState->ignoreCapacity = ignoreCapacity;
@@ -2074,7 +2083,7 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 		NpcState* npcState = getState(player, true);
 		if(npcState){
 			npcState->amount = amount;
-			npcState->subType = count;
+			npcState->subType = subType;
 			npcState->itemId = itemId;
 			npcState->sellPrice = getListItemPrice(itemId, SHOPEVENT_SELL);
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPSELL, false);
