@@ -132,6 +132,10 @@ bool Mailbox::sendItemTo(const std::string name, uint32_t depotId, Item* item)
 				g_game.transformItem(item, item->getID() + 1);
 			}
 
+			if(!player->isOffline()){
+				player->onReceiveMail(depotId);
+			}
+
 			result = true;
 		}
 	}

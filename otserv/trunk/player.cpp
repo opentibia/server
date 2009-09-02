@@ -1017,6 +1017,42 @@ bool Player::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+void Player::onReceiveMail(uint32_t depotId)
+{
+	if(isNearDepotBox(depotId)){
+		sendTextMessage(MSG_INFO_DESCR, "New mail has arrived.");
+	}
+}
+
+bool Player::isNearDepotBox(uint32_t depotId)
+{
+	Position pos = getPosition();
+
+	for(int32_t cx = -1; cx <= 1; ++cx){
+		for(int32_t cy = -1; cy <= 1; ++cy){
+			Tile* tile = g_game.getTile(pos.x + cx, pos.y + cy, pos.z);
+			if(!tile){
+				return false;
+			}
+
+			for(uint32_t i = 0; i < tile->getThingCount(); ++i){
+				if(Item* item = tile->__getThing(i)->getItem()){
+					const ItemType& it = Item::items[item->getID()];
+					if(it.type == ITEM_TYPE_DEPOT){
+						Depot* depot = NULL;
+						if(item->getContainer() && (depot = item->getContainer()->getDepot())){
+							if(depot->getDepotId() == depotId){
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
 
 Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 {

@@ -265,6 +265,8 @@ public:
 
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
+	void onReceiveMail(uint32_t depotId);
+	bool isNearDepotBox(uint32_t depotId);
 
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
