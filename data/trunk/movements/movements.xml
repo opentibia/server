@@ -8,7 +8,7 @@
 	<moveevent event="StepIn" itemid="1748" script="quest_chest_walk.lua"/>
 	<moveevent event="StepIn" itemid="1749" script="quest_chest_walk.lua"/>
 
-	<!-- East/South stairs
+	<!-- East/South stairs -->
 	<moveevent event="StepIn" itemid="459" script="floor_level_change.lua"/>
 
 	<!-- Footprint -->
