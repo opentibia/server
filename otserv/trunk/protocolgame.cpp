@@ -1741,7 +1741,12 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 			for(std::list<ShopInfo>::const_iterator it = shop.begin(); it != shop.end(); ++it){
 				const ShopInfo& sInfo = *it;
 				if(sInfo.sellPrice > 0){
-					int8_t subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
+					int8_t subtype = -1;
+					const ItemType& it = Item::items[sInfo.itemId];
+					if(it.hasSubType() && !it.stackable){
+						subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
+					}
+
 					uint32_t count = player->__getItemTypeCount(sInfo.itemId, subtype);
 					if(count > 0){
 						saleMap[sInfo.itemId] = count;
@@ -1762,7 +1767,12 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 			for(std::list<ShopInfo>::const_iterator it = shop.begin(); it != shop.end(); ++it){
 				const ShopInfo& sInfo = *it;
 				if(sInfo.sellPrice > 0){
-					int8_t subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
+					int8_t subtype = -1;
+					const ItemType& it = Item::items[sInfo.itemId];
+					if(it.hasSubType() && !it.stackable){
+						subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
+					}
+
 					if(subtype != -1){
 						// This shop item requires extra checks
 						uint32_t count = player->__getItemTypeCount(sInfo.itemId, subtype);

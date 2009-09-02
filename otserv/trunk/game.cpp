@@ -1032,6 +1032,12 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 		uint32_t n = 0;
 		while((subCylinder = toCylinder->__queryDestination(index, creature, &toItem, flags)) != toCylinder){
 			toCylinder->getTile()->moveCreature(creature, subCylinder);
+
+			if(creature->getParent() != subCylinder){
+				//could happen if a script move the creature
+				break;
+			}
+
 			toCylinder = subCylinder;
 			flags = 0;
 
