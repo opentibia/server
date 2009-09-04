@@ -1381,9 +1381,9 @@ void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t d
 
 void Monster::changeHealth(int32_t healthChange)
 {
-	Creature::changeHealth(healthChange);
 	//In case a player with ignore flag set attacks the monster
 	setIdle(false);
+	Creature::changeHealth(healthChange);
 }
 
 bool Monster::challengeCreature(Creature* creature)
