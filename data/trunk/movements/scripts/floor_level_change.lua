@@ -1,5 +1,5 @@
 function onStepIn(cid, item, pos, frompos)
-	if frompos.x < pos.x then
+	if frompos.x < pos.x and frompos.z > pos.z then
 		local newpos = pos
 		newpos.x = newpos.x + 1
 		doTeleportThing(cid, newpos)
@@ -8,7 +8,7 @@ function onStepIn(cid, item, pos, frompos)
 		newpos.z = newpos.z + 1
 		newpos.x = newpos.x - 2
 		doTeleportThing(cid, newpos)
-	elseif frompos.y < pos.y then
+	elseif frompos.y < pos.y and frompos.z > pos.z then
 		local newpos = pos
 		newpos.y = newpos.y + 1
 		doTeleportThing(cid, newpos)
