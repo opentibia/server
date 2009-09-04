@@ -3850,6 +3850,10 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 
 void Game::addCreatureCheck(Creature* creature)
 {
+	if(creature->isRemoved()){
+		return;
+	}
+
 	creature->creatureCheck = true;
 
 	if(creature->checkCreatureVectorIndex >= 0){
@@ -3910,10 +3914,6 @@ void Game::checkCreatures()
 			creature->checkCreatureVectorIndex = -1;
 			it = checkCreatureVector.erase(it);
 			FreeThing(creature);
-
-			if(creature->getHealth() <= 0){
-				creature->onDie();
-			}
 		}
 	}
 
