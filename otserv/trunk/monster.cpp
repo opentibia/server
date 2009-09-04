@@ -551,6 +551,10 @@ bool Monster::selectTarget(Creature* creature)
 
 void Monster::setIdle(bool _idle)
 {
+	if(isRemoved() || getHealth() <= 0){
+		return;
+	}
+
 	isIdle = _idle;
 
 	if(!isIdle){
@@ -566,10 +570,6 @@ void Monster::setIdle(bool _idle)
 
 void Monster::updateIdleStatus()
 {
-	if(getHealth() <= 0 || isRemoved()){
-		return;
-	}
-
 	bool idle = false;
 
 	if(conditions.empty()){
@@ -1205,7 +1205,7 @@ void Monster::die()
 	destroySummons();
 	clearTargetList();
 	clearFriendList();
-	setIdle(true);
+	onIdleStatus();
 	Creature::die();
 }
 
