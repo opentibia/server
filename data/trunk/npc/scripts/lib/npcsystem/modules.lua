@@ -78,7 +78,7 @@ if(Modules == nil) then
 			return false
 		end
 
-		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == true or parameters.premium == false) then
+		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium == false) then
 			local oldVoc = getPlayerVocation(cid)
 			if(parameters.promotions[oldVoc] == oldVoc or parameters.promotions[oldVoc] == nil) then
 				npcHandler:say('You are already promoted!', cid)
@@ -110,7 +110,7 @@ if(Modules == nil) then
 			return false
 		end
 
-		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == true or parameters.premium == false) then
+		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium == false) then
 			if(parameters.level ~= nil and getPlayerLevel(cid) < parameters.level) then
 				npcHandler:say('You must reach level ' .. parameters.level .. ' before I can let you go there.', cid)
 			elseif(doPlayerRemoveMoney(cid, parameters.cost) ~= TRUE) then
@@ -378,7 +378,7 @@ if(Modules == nil) then
 		local destination = parentParameters.destination
 		local premium = parentParameters.premium
 
-		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == true or parameters.premium ~= true) then
+		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium ~= true) then
 			if(doPlayerRemoveMoney(cid, cost) ~= TRUE) then
 				npcHandler:say('You do not have enough money!', cid)
 			else
@@ -421,7 +421,7 @@ if(Modules == nil) then
 		local destination = parameters.destination
 		local premium = parameters.premium
 
-		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == true or parameters.premium ~= true) then
+		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium ~= true) then
 			if(doPlayerRemoveMoney(cid, cost) == TRUE) then
 				doTeleportThing(cid, destination)
 				doSendMagicEffect(destination, 10)
