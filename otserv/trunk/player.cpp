@@ -1026,6 +1026,7 @@ void Player::onReceiveMail(uint32_t depotId)
 
 bool Player::isNearDepotBox(uint32_t depotId)
 {
+	
 	Position pos = getPosition();
 
 	for(int32_t cx = -1; cx <= 1; ++cx){
@@ -1033,6 +1034,10 @@ bool Player::isNearDepotBox(uint32_t depotId)
 			Tile* tile = g_game.getTile(pos.x + cx, pos.y + cy, pos.z);
 			if(!tile){
 				return false;
+			}
+
+			if(!tile->hasFlag(TILESTATE_DEPOT)){
+				continue;
 			}
 
 			for(uint32_t i = 0; i < tile->getThingCount(); ++i){
