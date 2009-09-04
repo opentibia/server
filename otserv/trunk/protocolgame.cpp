@@ -2935,7 +2935,7 @@ void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopInfo item)
 		msg->AddByte(1);
 	}
 
-	msg->AddString(Item::getDescription(it, -1, NULL, item.subType, false));
+	msg->AddString(it.name);
 	msg->AddU32((uint32_t)(it.weight*100));
 	msg->AddU32(item.buyPrice);
 	msg->AddU32(item.sellPrice);
