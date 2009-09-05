@@ -102,7 +102,7 @@ void OutputMessagePool::sendAll()
 
 	for(it = m_toAddQueue.begin(); it != m_toAddQueue.end();){
 		//drop messages that are older than 10 seconds
-		if(OTSYS_TIME() - (*it)->getFrame() > 10 * 1000 ){
+		if(OTSYS_TIME() - (*it)->getFrame() > 10 * 1000){
 			(*it)->getProtocol()->onSendMessage(*it);
 			it = m_toAddQueue.erase(it);
 			continue;
@@ -115,7 +115,7 @@ void OutputMessagePool::sendAll()
 
 	m_toAddQueue.clear();
 
-	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end(); ){
+	for(it = m_autoSendOutputMessages.begin(); it != m_autoSendOutputMessages.end()){
 		OutputMessage_ptr omsg = *it;
 		#ifdef __NO_PLAYER_SENDBUFFER__
 		//use this define only for debugging

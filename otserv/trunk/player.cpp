@@ -1026,7 +1026,6 @@ void Player::onReceiveMail(uint32_t depotId)
 
 bool Player::isNearDepotBox(uint32_t depotId)
 {
-	
 	Position pos = getPosition();
 
 	for(int32_t cx = -1; cx <= 1; ++cx){
