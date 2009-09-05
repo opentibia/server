@@ -144,15 +144,25 @@ AC_SUBST(LUA_CFLAGS)
 AC_SUBST(LUA_LIBS)
 
 # check for mysql if it is enabled
-if test -n "$MYSQL_FLAGS"; then 
+if test -n "$MYSQL_FLAGS"; then
+	AC_CACHE_SAVE()
 	AC_CHECK_HEADERS([mysql/mysql.h],[MYSQL_LIBS=-lmysqlclient],[AC_MSG_ERROR("mysql headers missing.")])
-	AC_CHECK_LIB(mysqlclient, main,[],[AC_MSG_ERROR("Linking against mysql-client failed.")])
+	AC_CHECK_LIB(mysqlclient, main,[],[
+		if [ -d /usr/lib/mysql ]
+		then
+			AC_CACHE_LOAD()
+			cp -R /usr/lib/mysql/libmysqlclient* /usr/lib
+			AC_CHECK_LIB(mysqlclient, main,[], [AC_MSG_ERROR("Linking against mysql-client failed.")])
+		else
+			AC_MSG_ERROR("Linking against mysql-client failed.")
+		fi
+	])
 	AC_SUBST(MYSQL_LIBS)
 fi
 
 # check for postgresql if it is enabled
 if test -n "$PGSQL_FLAGS"; then 
-	AC_CHECK_HEADERS([postgresql/libpq-fe.h],[PGSQL_LIBS=-lpg],[AC_MSG_ERROR("postgresql headers missing.")])
+	AC_CHECK_HEADERS([postgresql/libpq-fe.h],[/usr/include/libpq-fe.h],[PGSQL_LIBS=-lpg],[AC_MSG_ERROR("postgresql headers missing.")])
 	AC_CHECK_LIB(pq, main,[],[AC_MSG_ERROR("Linking against libpq failed.")])
 	AC_SUBST(PGSQL_LIBS)
 fi
