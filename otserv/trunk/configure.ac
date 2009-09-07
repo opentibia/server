@@ -145,13 +145,22 @@ AC_SUBST(LUA_LIBS)
 
 # check for mysql if it is enabled
 if test -n "$MYSQL_FLAGS"; then
-	AC_CACHE_SAVE()
 	AC_CHECK_HEADERS([mysql/mysql.h],[MYSQL_LIBS=-lmysqlclient],[AC_MSG_ERROR("mysql headers missing.")])
+	# It would be nice if this function didn't cache its value
+	# If we could clear the cache value of this
+	# function, or not cache it at all, we wouldn't need to
+	# re-run the configuration.ac after we've copied the libs
 	AC_CHECK_LIB(mysqlclient, main,[],[
-		if [ -d /usr/lib/mysql ]
-		then
-			AC_CACHE_LOAD()
-			cp -R /usr/lib/mysql/libmysqlclient* /usr/lib
+		# 64-bit libs are in a different dir
+		if test -d /usr/lib64/mysql; then
+			echo "NOTICE -- Copying mysql-client files into the /usr/lib64 directory."
+			echo "NOTICE -- If mysql-client is not found, please re-run the configure script."
+			cp -R -s -f /usr/lib64/mysql/libmysqlclient* /usr/lib64
+			AC_CHECK_LIB(mysqlclient, main,[], [AC_MSG_ERROR("Linking against mysql-client failed.")])
+		elif test -d /usr/lib/mysql; then
+			echo "NOTICE -- Copying mysql-client files into the /usr/lib directory."
+			echo "NOTICE -- If mysql-client is not found, please re-run the configure script."
+			cp -R -s -f /usr/lib/mysql/libmysqlclient* /usr/lib
 			AC_CHECK_LIB(mysqlclient, main,[], [AC_MSG_ERROR("Linking against mysql-client failed.")])
 		else
 			AC_MSG_ERROR("Linking against mysql-client failed.")
