@@ -104,7 +104,7 @@ void House::setHouseOwner(uint32_t guid)
 void House::updateDoorDescription()
 {
 	std::stringstream houseDescription;
-	houseDescription << "It belongs to house '" << houseName << "'. " << std::endl;
+	houseDescription << "It belongs to house '" << houseName << "'." << std::endl;
 
 	if(houseOwner != 0){
 		houseDescription << houseOwnerName << " owns this house.";
