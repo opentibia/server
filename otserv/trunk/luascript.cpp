@@ -1378,6 +1378,9 @@ void LuaScriptInterface::registerFunctions()
 	//doMoveCreature(cid, direction)
 	lua_register(m_luaState, "doMoveCreature", LuaScriptInterface::luaDoMoveCreature);
 
+	//doSetCreatureDirection(cid, direction)
+	lua_register(m_luaState, "doSetCreatureDirection", LuaScriptInterface::luaDoSetCreatureDirection);
+
 	//doPlayerSetMasterPos(cid, pos)
 	lua_register(m_luaState, "doPlayerSetMasterPos", LuaScriptInterface::luaDoPlayerSetMasterPos);
 
@@ -6507,6 +6510,38 @@ int LuaScriptInterface::luaDoMoveCreature(lua_State *L)
 	if(creature){
 		ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)direction, FLAG_NOLIMIT);
 		lua_pushnumber(L, ret);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoSetCreatureDirection(lua_State *L)
+{
+	//doSetCreatureDirection(cid, direction)
+	uint32_t direction = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	switch(direction){
+		case NORTH:
+		case SOUTH:
+		case WEST:
+		case EAST:
+			break;
+		default:
+			reportErrorFunc("No valid direction");
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+	}
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		creature->setDirection((Direction)direction);
+		lua_pushnumber(L, LUA_TRUE);
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
