@@ -412,6 +412,7 @@ protected:
 	static int luaGetTileItemById(lua_State *L);
 	static int luaGetTileItemByType(lua_State *L);
 	static int luaGetTileThingByPos(lua_State *L);
+	static int luaGetTileThingByTopOrder(lua_State *L);
 	static int luaGetTopCreature(lua_State *L);
 	static int luaGetItemSpecialDescription(lua_State *L);
 

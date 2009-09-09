@@ -1227,6 +1227,9 @@ void LuaScriptInterface::registerFunctions()
 	//getTileThingByPos(pos)
 	lua_register(m_luaState, "getTileThingByPos", LuaScriptInterface::luaGetTileThingByPos);
 
+	//getTileThingByTopOrder(pos, topOrder)
+	lua_register(m_luaState, "getTileThingByTopOrder", LuaScriptInterface::luaGetTileThingByTopOrder);	
+
 	//getTopCreature(pos)
 	lua_register(m_luaState, "getTopCreature", LuaScriptInterface::luaGetTopCreature);
 
@@ -3599,6 +3602,34 @@ int LuaScriptInterface::luaGetTileThingByPos(lua_State *L)
 	pushThing(L, thing, uid);
 	return 1;
 }
+
+int LuaScriptInterface::luaGetTileThingByTopOrder(lua_State *L)
+{
+	//getTileThingByTopOrder(pos, topOrder)
+
+	uint32_t topOrder = popNumber(L);
+	PositionEx pos;
+	popPosition(L, pos);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(!tile){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	Thing* thing = tile->getItemByTopOrder(topOrder);
+	if(!thing){
+		pushThing(L, NULL, 0);
+		return 1;
+	}
+
+	uint32_t uid = env->addThing(thing);
+	pushThing(L, thing, uid);
+	return 1;
+}
+
 
 int LuaScriptInterface::luaGetTopCreature(lua_State *L)
 {
