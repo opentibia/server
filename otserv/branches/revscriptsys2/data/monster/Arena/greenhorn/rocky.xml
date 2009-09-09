@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Rocky" nameDescription="rocky" race="undead" experience="190" speed="170">
+	<health now="250" max="250"/>
+	<look type="95" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag runonhealth="30"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-1" max="-80"/>
+	</attacks>
+	<defenses armor="30" defense="30">
+		<defense name="healing" interval="2000" chance="50" min="15" max="35">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="100"/>
+		<element energyPercent="100"/>
+		<element firePercent="13"/>
+	</elements>
+	<voices interval="5000" chance="10">
+		<voice sentence="Another little gladiator!"/>
+		<voice sentence="Come into my embrace."/>
+	</voices>
+</monster>

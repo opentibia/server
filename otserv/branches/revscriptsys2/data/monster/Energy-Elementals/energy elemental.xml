@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Energy Elemental" nameDescription="an energy elemental" race="undead" experience="450" speed="250" manacost="0">
+	<health now="500" max="500"/>
+	<look type="293" corpse="1495"/>
+	<targetchange interval="20000" chance="15"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="85"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="1"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="55" attack="50"/>
+		<attack name="energy" interval="2000" chance="20" range="6" radius="2" target="1" min="-168" max="-220">
+			<attribute key="shootEffect" value="energy"/>
+			<attribute key="areaEffect" value="purpleenergy"/>
+		</attack>
+		<attack name="energy" interval="1000" chance="11" range="3" target="1" min="0" max="-130">
+			<attribute key="areaEffect" value="energy"/>
+		</attack>
+		<attack name="energycondition" interval="1000" chance="15" radius="3" target="0">
+			<atttribute key="areaEffect" value="yellowenergy"/>
+		</attack>
+	</attacks>
+	<defenses armor="50" defense="50">
+		<defense name="healing" interval="2000" chance="15" min="90" max="150">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element physicalPercent="25"/>
+		<element holyPercent="15"/>
+		<element death="17"/>
+		<element earth="-15"/>
+	</elements>
+	<immunities>
+		<immunity ice="1"/>
+		<immunity fire="1"/>
+		<immunity energy="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<loot>
+		<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+		<item id="8303" countmax="2" chance="1500"/><!-- energy soil -->
+		<item id="7439" chance="2100"/><!-- berserk potion -->
+		<item id="2150" countmax="3" chance="4500"/><!-- small amethyst -->
+		<item id="8920" chance="1000"/><!-- wand of starstorm -->
+	</loot>
+</monster>

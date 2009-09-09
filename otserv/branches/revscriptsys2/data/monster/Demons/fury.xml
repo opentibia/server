@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Fury" nameDescription="a fury" race="blood" experience="4000" speed="460" manacost="0">
+	<health now="4100" max="4100"/>
+	<look type="149" head="94" body="77" legs="96" feet="0" addons="3" corpse="6081"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="60"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-100" max="-500"/>
+		<attack name="physical" interval="2000" chance="17" range="7" min="-140" max="-200">
+			<attribute key="shootEffect" value="throwingstar"/>
+		</attack>
+		<attack name="melee" interval="1000" chance="15" range="7" radius="3" target="0" min="-115" max="-155">
+			<attribute key="areaEffect" value="blackspark"/>
+		</attack>
+		<attack name="melee" interval="3000" chance="30" length="8" spread="0" min="-300" max="-420">
+			<attribute key="areaEffect" value="redspark"/>
+		</attack>
+		<attack name="physical" interval="1000" chance="25" range="7" min="-170" max="-200">
+			<attribute key="shootEffect" value="snowball"/>
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="30">
+		<defense name="healing" interval="1000" chance="25" min="180" max="290">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="100"/>
+		<element icePercent="40"/>
+		<element holyPercent="40"/>
+		<element deathPercent="-20"/>
+		<element energyPercent="-20"/>
+		<element earthPercent="-15"/>
+		<element physicalPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+	<immunity invisible="1"/>
+	</immunities>
+	<voices interval="3000" chance="30">
+		<voice sentence="Ahhhhrrrr!"/>
+		<voice sentence="Waaaaah!"/>
+		<voice sentence="Carnage!"/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="83" chance="100000"/><!-- gold coin -->
+		<item id="2645" chance="400"/><!-- steel boots -->
+		<item id="6558" countmax="3" chance="5555"/><!-- concentrated demonic blood -->
+		<item id="2666" countmax="1" chance="25000"/><!-- meat -->
+		<item id="6500" countmax="1" chance="2500"/><!-- demonic essence -->
+		<item id="5944" chance="8888"/><!-- soul orb -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2487" chance="600"/><!-- crown armor -->
+				<item id="2181" chance="1333"/><!-- terra rod -->
+				<item id="2143" countmax="1" chance="12000"/><!-- white pearl -->
+				<item id="2156" chance="1900"/><!-- red gem -->
+				<item id="5911" chance="1800"/><!-- red piece of cloth -->
+			</inside>
+		</item>
+	</loot>
+</monster>

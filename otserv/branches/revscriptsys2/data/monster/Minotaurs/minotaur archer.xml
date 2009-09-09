@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Minotaur Archer" nameDescription="a minotaur archer" race="blood" experience="65" speed="170" manacost="390">
+	<health now="100" max="100"/>
+	<look type="24" corpse="5982"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="10"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="20" attack="15"/>
+		<attack name="physical" interval="1000" chance="34" range="7" min="-45" max="-85">
+			<attribute key="shootEffect" value="bolt"/>
+		</attack>
+	</attacks>
+	<defenses armor="7" defense="8"/>
+	<elements>
+		<element firePercent="20"/>
+		<element holyPercent="10"/>
+		<element icePercent="-10"/>
+		<element deathPercent="-5"/>
+	</elements>
+	<voices interval="5000" chance="10">
+		<voice sentence="Ruan Wihmpy!"/>
+		<voice sentence="Kaplar!"/>
+	</voices>
+	<loot>
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="28" chance="100000"/><!-- gold coin -->
+		<item id="2543" countmax="18" chance="70000"/><!-- bolt -->
+		<item id="2666" countmax="3" chance="50000"/><!-- meat -->
+		<item id="2483" chance="10000"/><!-- scale armor -->
+		<item id="2481" chance="6666"/><!-- soldier helmet -->
+		<item id="5878" countmax="1" chance="5000"/><!-- minotaur leather -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2455" chance="6666"/><!-- crossbow -->
+				<item id="7363" countmax="8" chance="6000"/><!-- piercing bolt -->
+				<item id="2465" chance="5000"/><!--  brass armor-->
+				<item id="2464" chance="10000"/><!-- chain armor -->
+				<item id="2648" chance="4000"/><!-- chain legs -->
+				<item id="2458" chance="10000"/><!-- chain helmet -->
+			</inside>
+		</item>
+	</loot>
+</monster>

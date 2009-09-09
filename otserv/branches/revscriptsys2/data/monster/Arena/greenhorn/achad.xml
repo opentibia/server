@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Achad" nameDescription="achad" race="blood" experience="70" speed="185">
+	<health now="185" max="185"/>
+	<look type="146" head="93" body="93" legs="57" feet="97" addons="3" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="1"/>
+	<flags>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="50"/>
+		<flag runonhealth="55"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-26" max="-40"/>
+	</attacks>
+	<elements>
+		<element firePercent="10"/>
+	</elements>
+	<voices interval="5000" chance="10">
+		<voice sentence="You won't pass me."/>
+		<voice sentence="I have travelled far to fight here."/>
+	</voices>
+	<defenses armor="20" defense="19"/>
+</monster>

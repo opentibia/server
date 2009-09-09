@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Lizard Sentinel" nameDescription="a lizard sentinel" race="blood" experience="110" speed="240" manacost="0">
+	<health now="265" max="265"/>
+	<look type="114" corpse="6040"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="10"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="35" attack="26"/>
+		<attack name="physical" interval="1000" chance="7" range="7" min="-40" max="-70">
+			<attribute key="shootEffect" value="spear"/>
+		</attack>
+	</attacks>
+	<defenses armor="17" defense="14"/>
+	<elements>
+		<element earthPercent="100"/>
+		<element energyPercent="10"/>
+		<element icePercent="5"/>
+		<element firePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="10">
+		<voice sentence="Tssss!"/>
+	</voices>
+	<loot>
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+		<item id="2148" countmax="25" chance="100000"/><!-- gold coin -->
+		<item id="2182" chance="450"/><!-- snakebite rod -->
+		<item id="2425" chance="1428"/><!-- obsidian lance -->
+		<item id="2381" chance="6666"/><!-- halberd -->
+		<item id="2457" chance="6666"/><!-- steel helmet -->
+		<item id="3974" chance="366"/><!-- sentinel shield -->
+		<item id="3965" chance="250"/><!-- hunting spear -->
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="5876" countmax="1" chance="5000"/><!-- lizard leather -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2148" countmax="50" chance="100000"/><!-- gold coin -->
+				<item id="2147" countmax="4" chance="4000"/><!-- small ruby -->
+				<item id="2654" chance="20000"/><!-- cape -->
+				<item id="5881" countmax="1" chance="5000"/><!-- lizard scale -->
+			</inside>
+		</item>
+	</loot>
+</monster>

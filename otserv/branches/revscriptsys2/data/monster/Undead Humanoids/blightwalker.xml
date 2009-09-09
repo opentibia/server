@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Blightwalker" nameDescription="a blightwalker" race="undead" experience="3350" speed="240" manacost="0">
+	<health now="8900" max="8900"/>
+	<look type="246" corpse="6354"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-0" max="-450"/>
+		<attack name="physical" interval="1500" chance="34" range="7" min="-105" max="-155">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>
+		<attack name="manadrain" interval="2000" chance="25" range="7" min="-140" max="-220">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="15">
+		<defense name="healing" interval="1000" chance="50" min="75" max="125">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="100"/>
+		<element deathPercent="100"/>
+		<element firePercent="60"/>
+		<element energyPercent="40"/>
+		<element icePercent="33"/>
+		<element physicalPercent="-5"/>
+		<element holyPercent="-30"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+	</immunities>
+	<voices interval="5000" chance="10">
+		<voice sentence="I can see you decaying!"/>
+		<voice sentence="Let me taste your mortality!"/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="20" chance="100000"/><!-- gold coin -->
+		<item id="2694" countmax="3" chance="5000"/><!-- bunch of wheat -->
+		<item id="2050" chance="10000"/><!-- torch -->
+		<item id="2230" chance="6666"/><!-- bone -->
+		<item id="2260" chance="2222"/><!-- blank rune -->
+		<item id="5902" chance="1100"/><!-- honeycomb -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2386" chance="2000"/><!-- axe -->
+				<item id="2649" chance="2500"/><!-- leather legs -->
+				<item id="6500" countmax="2" chance="2222"/><!-- demonic essence -->
+				<item id="5944" countmax="1" chance="1667"/><!-- soul orb -->
+				<item id="2436" chance="909"/><!-- skull staff -->
+				<item id="2550" chance="5000"/><!-- scythe -->
+			</inside>
+		</item>
+	</loot>
+</monster>

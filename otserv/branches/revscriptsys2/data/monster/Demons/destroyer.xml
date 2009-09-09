@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Destroyer" nameDescription="a destroyer" race="blood" experience="2000" speed="270" manacost="0">
+	<health now="3700" max="3700"/>
+	<look type="236" corpse="6320"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-0" max="-480"/>
+		<attack name="physical" interval="1000" chance="15" range="7" min="-90" max="-165">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="35">
+		<defense name="speed" interval="1000" chance="7" speedchange="380" duration="8000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="100"/>
+		<element firePercent="45"/>
+		<element physicalPercent="20"/>
+		<element earthPercent="20"/>
+		<element deathPercent="20"/>
+		<element icePercent="-15"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="10">
+		<voice sentence="Destructiooooon!"/>
+		<voice sentence="It's a good day to destroy!"/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="82" chance="100000"/><!-- gold coin -->
+		<item id="2645" chance="2222"/><!-- steel boots -->
+		<item id="2152" countmax="3" chance="200000"/><!-- platinum coin -->
+		<item id="2393" chance="660"/><!-- giant sword -->
+		<item id="5741" chance="1000"/><!-- skull helmet -->
+		<item id="2666" countmax="5" chance="30000"/><!-- meat -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2463" chance="6666"/><!-- plate armor -->
+				<item id="2416" chance="9999"/><!-- crowbar -->
+				<item id="2489" chance="2500"/><!-- dark armor -->
+				<item id="2150" countmax="2" chance="7500"/><!-- small amethyst -->
+			</inside>
+		</item>
+	</loot>
+</monster>
