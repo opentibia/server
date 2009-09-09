@@ -6540,7 +6540,7 @@ int LuaScriptInterface::luaDoSetCreatureDirection(lua_State *L)
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
-		creature->setDirection((Direction)direction);
+		g_game.internalCreatureTurn(creature, (Direction)direction);
 		lua_pushnumber(L, LUA_TRUE);
 	}
 	else{

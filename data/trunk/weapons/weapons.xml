@@ -416,10 +416,12 @@
 		<vocation name="Paladin"/>
 		<vocation name="Royal Paladin" showInDescription="0"/>
 	</distance>
+	<distance id="8854" level="1" unproperly="1" function="default"/> <!-- Elvish Bow -->
+	
 
  	<!-- Ammunition -->
 	<distance id="2545" event="script" value="poison_arrow.lua"/>
-	<distance id="2546" event="script" value="burst_arrow.lua"/>
+	<distance id="2546" event="script" value="explosive_arrow.lua"/>
 	<distance id="7366" event="script" value="viper_star.lua"/>
 	<distance id="7838" type="energy" function="default"/>
 	<distance id="7839" type="ice" function="default"/>
