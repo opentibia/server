@@ -11,7 +11,7 @@ function onStepIn(cid, item, pos, frompos)
 		doTeleportThing(cid, {x = pos.x - 2, y = pos.y, z = pos.z + 1, stackpos = 0})
 	end
 
-	stair_pos = {x = pos.x - 1, y = pos.y, z = pos.z + 1, stackpos = 0}
+	stair_pos = {x = pos.x, y = pos.y - 1, z = pos.z + 1, stackpos = 0}
 	stair = getTileThingByTopOrder(stair_pos, 2)
 
 	if isInArray(STAIRS_SOUTH, stair.itemid) == TRUE then
