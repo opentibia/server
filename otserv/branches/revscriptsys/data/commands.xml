@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-
-<commands>
-
--- Gods
-<command cmd="/reload" access="3" />		-- Reload configurations
-
-</commands>
