@@ -149,6 +149,7 @@ public:
 	DECLARE_PROPERTY(int32_t, changeTargetSpeed)
 	DECLARE_PROPERTY(int32_t, changeTargetChance)
 
+	#undef DECLARE_PROPERTY
 private:
 	void self_copy();
 	InternalCreatureType* impl;
