@@ -487,10 +487,10 @@ void Actor::onFollowCreatureComplete(const Creature* creature)
 	}
 }
 
-BlockType_t Actor::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
+BlockType Actor::blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
 	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
-	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+	BlockType blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
 	if(damage != 0){
 		int32_t elementMod = 0;
@@ -606,7 +606,7 @@ void Actor::updateIdleStatus()
 	setIdle(idle);
 }
 
-void Actor::onAddCondition(ConditionType_t type, bool hadCondition)
+void Actor::onAddCondition(ConditionType type, bool hadCondition)
 {
 	Creature::onAddCondition(type, hadCondition);
 
@@ -618,7 +618,7 @@ void Actor::onAddCondition(ConditionType_t type, bool hadCondition)
 	updateIdleStatus();
 }
 
-void Actor::onEndCondition(ConditionType_t type, bool lastCondition)
+void Actor::onEndCondition(ConditionType type, bool lastCondition)
 {
 	Creature::onEndCondition(type, lastCondition);
 
@@ -1378,7 +1378,7 @@ void Actor::dropLoot(Container* corpse)
 	}
 }
 
-bool Actor::isImmune(CombatType_t type) const
+bool Actor::isImmune(CombatType type) const
 {
 	ElementMap::const_iterator it = cType.elementMap().find(type);
 	if(it != cType.elementMap().end()){
@@ -1396,7 +1396,7 @@ void Actor::setNormalCreatureLight()
 	internalLight.color = cType.lightColor();
 }
 
-void Actor::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext)
+void Actor::drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext)
 {
 	Creature::drainHealth(attacker, combatType, damage, showtext);
 

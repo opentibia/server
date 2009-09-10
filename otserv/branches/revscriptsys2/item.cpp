@@ -780,11 +780,11 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 				}
 			}
 
-			if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
+			if(it.abilities.stats[*STAT_MAGICPOINTS] != 0){
 				if(it.attack != 0 || it.defence != 0 || it.extraDefense != 0)
 					s << ", ";
 
-				s << "magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+				s << "magic level " << std::showpos << (int32_t)it.abilities.stats[*STAT_MAGICPOINTS] << std::noshowpos;
 			}
 			s << ")";
 		}
@@ -948,15 +948,9 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		s << " It is temporarily enchanted with ";
 		std::string strElement = "";
 		int32_t elementDamage = it.abilities.elementDamage;
-		switch(it.abilities.elementType){
-			case COMBAT_ICEDAMAGE: strElement = "ice"; break;
-			case COMBAT_EARTHDAMAGE: strElement = "earth"; break;
-			case COMBAT_FIREDAMAGE: strElement = "fire"; break;
-			case COMBAT_ENERGYDAMAGE: strElement = "energy"; break;
-			default: break;
-		}
 
-		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
+		// REVSCRIPT TODO fix so it uses "fire" instead of "COMBAT_FIRE"
+		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << it.abilities.elementType.toString() << " damage).";
 	}
 
 	if(item && item->getSpecialDescription() != ""){

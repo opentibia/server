@@ -363,26 +363,24 @@ void OnUseItem::Event::update_instance(Manager& state, Environment& environment,
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a player equip/dequip an item
 
-OnEquipItem::Event::Event(Player* user, Item* item, slots_t slot, bool equip) :
+OnEquipItem::Event::Event(Player* user, Item* item, SlotType slot, bool equip) :
 	user(user),
 	item(item),
 	equip(equip)
 {
-	switch(slot){
-		case SLOT_HEAD: equipslot = SLOTP_HEAD; break;
-		case SLOT_NECKLACE: equipslot = SLOTP_NECKLACE; break;
-		case SLOT_BACKPACK: equipslot = SLOTP_BACKPACK; break;
-		case SLOT_ARMOR: equipslot = SLOTP_ARMOR; break;
-		case SLOT_RIGHT: equipslot = SLOTP_RIGHT; break;
-		case SLOT_LEFT: equipslot = SLOTP_LEFT; break;
-		case SLOT_LEGS: equipslot = SLOTP_LEGS; break;
-		case SLOT_FEET: equipslot = SLOTP_FEET; break;
-		case SLOT_RING: equipslot = SLOTP_RING; break;
-		case SLOT_AMMO: equipslot = SLOTP_AMMO; break;
+	switch(slot.value()){
+		case ::enums::SLOT_HEAD:     equipslot = SLOTPOSITION_HEAD;     break;
+		case ::enums::SLOT_NECKLACE: equipslot = SLOTPOSITION_NECKLACE; break;
+		case ::enums::SLOT_BACKPACK: equipslot = SLOTPOSITION_BACKPACK; break;
+		case ::enums::SLOT_ARMOR:    equipslot = SLOTPOSITION_ARMOR;    break;
+		case ::enums::SLOT_RIGHT:    equipslot = SLOTPOSITION_RIGHT;    break;
+		case ::enums::SLOT_LEFT:     equipslot = SLOTPOSITION_LEFT;     break;
+		case ::enums::SLOT_LEGS:     equipslot = SLOTPOSITION_LEGS;     break;
+		case ::enums::SLOT_FEET:     equipslot = SLOTPOSITION_FEET;     break;
+		case ::enums::SLOT_RING:     equipslot = SLOTPOSITION_RING;     break;
+		case ::enums::SLOT_AMMO:     equipslot = SLOTPOSITION_AMMO;     break;
 
-		default:
-			equipslot = 0;
-			break;
+		default:                     equipslot = SLOTPOSITION_NONE;     break;
 	}
 }
 
@@ -391,7 +389,7 @@ OnEquipItem::Event::~Event() {
 
 bool OnEquipItem::Event::check_match(const ScriptInformation& info) {
 
-	if(((info.slot & equipslot) != equipslot) ||  info.equip != equip){
+	if((info.slot & equipslot) || info.equip != equip){
 		return false;
 	}
 

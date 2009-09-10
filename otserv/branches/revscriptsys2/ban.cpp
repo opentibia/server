@@ -229,7 +229,7 @@ bool BanManager::addIpBan(uint32_t ip, uint32_t mask, int32_t time,
 }
 
 bool BanManager::addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid,
-	std::string comment, std::string statement, uint32_t reason, violationAction_t action) const
+	std::string comment, std::string statement, uint32_t reason, ViolationAction action) const
 {
 	if(playerId == 0) return false;
 	Database* db = Database::instance();
@@ -246,7 +246,7 @@ bool BanManager::addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid,
 }
 
 bool BanManager::addPlayerBan(const std::string& name, int32_t time, uint32_t adminid,
-	std::string comment, std::string statement, uint32_t reason, violationAction_t action) const
+	std::string comment, std::string statement, uint32_t reason, ViolationAction action) const
 {
 	uint32_t guid = 0;
 	std::string n = name;
@@ -255,7 +255,7 @@ bool BanManager::addPlayerBan(const std::string& name, int32_t time, uint32_t ad
 }
 
 bool BanManager::addPlayerStatement(uint32_t playerId, uint32_t adminid, std::string comment,
-	std::string statement, uint32_t reason, violationAction_t action) const
+	std::string statement, uint32_t reason, ViolationAction action) const
 {
 	if(playerId == 0) return false;
 	Database* db = Database::instance();
@@ -272,7 +272,7 @@ bool BanManager::addPlayerStatement(uint32_t playerId, uint32_t adminid, std::st
 }
 
 bool BanManager::addAccountBan(uint32_t account, int32_t time, uint32_t adminid,
-	std::string comment, std::string statement, uint32_t reason, violationAction_t action) const
+	std::string comment, std::string statement, uint32_t reason, ViolationAction action) const
 {
 	if(account == 0) return false;
 	Database* db = Database::instance();
@@ -289,7 +289,7 @@ bool BanManager::addAccountBan(uint32_t account, int32_t time, uint32_t adminid,
 }
 
 bool BanManager::addAccountNotation(uint32_t account, uint32_t adminid, std::string comment,
-	std::string statement, uint32_t reason, violationAction_t action) const
+	std::string statement, uint32_t reason, ViolationAction action) const
 {
 	if(account == 0) return false;
 	Database* db = Database::instance();
@@ -406,7 +406,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 		ban.added = (uint32_t)result->getDataLong("id");
 		ban.adminId = result->getDataInt("admin_id");
 		ban.reason = result->getDataInt("reason");
-		ban.action = (violationAction_t)result->getDataInt("action");
+		ban.action = ViolationAction(result->getDataInt("action"));
 		ban.comment = result->getDataString("comment");
 		ban.statement = result->getDataString("statement");
 

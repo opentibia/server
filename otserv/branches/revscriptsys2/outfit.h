@@ -27,7 +27,29 @@
 #include <list>
 #include "enums.h"
 
-struct Outfit{
+struct OutfitType
+{
+	OutfitType(){
+		lookHead   = 0;
+		lookBody   = 0;
+		lookLegs   = 0;
+		lookFeet   = 0;
+		lookType   = 0;
+		lookTypeEx = 0;
+		lookAddons = 0;
+	}
+
+	uint32_t lookType;
+	uint32_t lookTypeEx;
+	uint32_t lookHead;
+	uint32_t lookBody;
+	uint32_t lookLegs;
+	uint32_t lookFeet;
+	uint32_t lookAddons;
+};
+
+struct Outfit
+{
 	Outfit() : outfitId(0), lookType(0), addons(0), isPremium(false), isDefault(false), name("") {}
 	uint32_t outfitId;
 	uint32_t lookType;
@@ -57,13 +79,13 @@ public:
 
 	uint32_t getOutfitId(uint32_t lookType);
 	bool getOutfit(uint32_t lookType, Outfit& outfit);
-	bool getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit);
-	const OutfitMap& getOutfits(playersex_t playersex);
+	bool getOutfit(uint32_t outfitId, PlayerSex sex, Outfit& outfit);
+	const OutfitMap& getOutfits(PlayerSex playersex);
 
 private:
 	Outfits();
 	OutfitList allOutfits;
-	std::map<playersex_t, OutfitMap > outfitMaps;
+	std::map<PlayerSex, OutfitMap > outfitMaps;
 };
 
 #endif

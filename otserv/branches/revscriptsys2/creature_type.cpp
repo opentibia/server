@@ -57,11 +57,11 @@ public:
 	int health;
 	int health_max;
 
-	Outfit_t outfit;
+	OutfitType outfit;
 	int32_t lookcorpse;
-	int conditionImmunities;
-	int damageImmunities;
-	RaceType_t race;
+	ConditionType conditionImmunities;
+	CombatType damageImmunities;
+	RaceType race;
 	bool isSummonable;
 	bool isIllusionable;
 	bool isConvinceable;
@@ -125,8 +125,8 @@ void InternalCreatureType::reset()
 	outfit.lookAddons = 0;
 	lookcorpse = 0;
 
-	conditionImmunities = 0;
-	damageImmunities = 0;
+	conditionImmunities = CONDITION_NONE;
+	damageImmunities = COMBAT_NONE;
 	race = RACE_BLOOD;
 	isSummonable = false;
 	isIllusionable = false;
@@ -312,11 +312,11 @@ DEFINE_PROPERTY(bool, pushable)
 DEFINE_PROPERTY(int, base_speed)
 DEFINE_PROPERTY(int, health)
 DEFINE_PROPERTY(int, health_max)
-DEFINE_PROPERTY(Outfit_t, outfit)
+DEFINE_PROPERTY(OutfitType, outfit)
 DEFINE_PROPERTY(int32_t, lookcorpse)
-DEFINE_PROPERTY(int, conditionImmunities)
-DEFINE_PROPERTY(int, damageImmunities)
-DEFINE_PROPERTY(RaceType_t, race)
+DEFINE_PROPERTY(ConditionType, conditionImmunities)
+DEFINE_PROPERTY(CombatType, damageImmunities)
+DEFINE_PROPERTY(RaceType, race)
 DEFINE_PROPERTY(bool, isSummonable)
 DEFINE_PROPERTY(bool, isIllusionable)
 DEFINE_PROPERTY(bool, isConvinceable)

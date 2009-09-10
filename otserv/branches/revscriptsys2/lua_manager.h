@@ -25,6 +25,7 @@
 #include <map>
 #include "boost_common.h"
 #include "enums.h"
+#include "outfit.h"
 
 extern "C"
 {
@@ -181,7 +182,7 @@ public:
 	House* popHouse(Script::ErrorMode mode = Script::ERROR_THROW);
 	ChatChannel* popChannel(Script::ErrorMode mode = Script::ERROR_THROW);
 	Waypoint_ptr popWaypoint(Script::ErrorMode mode = Script::ERROR_THROW);
-	Outfit_t popOutfit(Script::ErrorMode mode = Script::ERROR_THROW);
+	OutfitType popOutfit(Script::ErrorMode mode = Script::ERROR_THROW);
 
 	// Push
 	void pushThing(Thing* thing);
@@ -190,7 +191,7 @@ public:
 	void pushHouse(House* house);
 	void pushChannel(ChatChannel* channel);
 	void pushWaypoint(Waypoint_ptr pos);
-	void pushOutfit(const Outfit_t& outfit);
+	void pushOutfit(const OutfitType& outfit);
 
 
 	// Generic

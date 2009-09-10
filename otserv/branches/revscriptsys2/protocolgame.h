@@ -25,7 +25,32 @@
 #include <string>
 #include "protocol.h"
 #include "enums.h"
-#include "creature.h"
+#include "const.h"
+
+struct OutfitType;
+struct LightInfo;
+
+struct ShopInfo{
+	uint32_t itemId;
+	int32_t subType;
+	uint32_t buyPrice;
+	uint32_t sellPrice;
+	// Name can be found using Item::items[itemId].
+	
+	ShopInfo(){
+		itemId = 0;
+		subType = 1;
+		buyPrice = 0;
+		sellPrice = 0;
+	};
+	ShopInfo(uint32_t _itemId, int32_t _subType = 0,
+		uint32_t _buyPrice = 0, uint32_t _sellPrice = 0){
+		itemId = _itemId;
+		subType = _subType;
+		buyPrice = _buyPrice;
+		sellPrice = _sellPrice;
+	};
+};
 
 enum connectResult_t{
 	CONNECT_SUCCESS = 1,
@@ -191,7 +216,7 @@ private:
 	void sendCancelWalk();
 	void sendChangeSpeed(const Creature* creature, uint32_t speed);
 	void sendCancelTarget();
-	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
+	void sendCreatureOutfit(const Creature* creature, const OutfitType& outfit);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
 
@@ -244,9 +269,9 @@ private:
 	void sendCloseContainer(uint32_t cid);
 
 	//inventory
-	void sendAddInventoryItem(slots_t slot, const Item* item);
-	void sendUpdateInventoryItem(slots_t slot, const Item* item);
-	void sendRemoveInventoryItem(slots_t slot);
+	void sendAddInventoryItem(SlotType slot, const Item* item);
+	void sendUpdateInventoryItem(SlotType slot, const Item* item);
+	void sendRemoveInventoryItem(SlotType slot);
 
 	//Help functions
 
@@ -270,7 +295,7 @@ private:
 	void AddPlayerStats(NetworkMessage_ptr msg);
 	void AddCreatureSpeak(NetworkMessage_ptr msg, const Creature* creature, SpeakClass type, std::string text, uint16_t channelId, uint32_t time = 0);
 	void AddCreatureHealth(NetworkMessage_ptr msg,const Creature* creature);
-	void AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const Outfit_t& outfit);
+	void AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const OutfitType& outfit);
 	void AddCreatureInvisible(NetworkMessage_ptr msg, const Creature* creature);
 	void AddPlayerSkills(NetworkMessage_ptr msg);
 	void AddWorldLight(NetworkMessage_ptr msg, const LightInfo& lightInfo);
@@ -293,9 +318,9 @@ private:
 	void RemoveContainerItem(NetworkMessage_ptr msg, uint8_t cid, uint8_t slot);
 
 	//inventory
-	void AddInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item);
-	void UpdateInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item);
-	void RemoveInventoryItem(NetworkMessage_ptr msg, slots_t slot);
+	void AddInventoryItem(NetworkMessage_ptr msg, SlotType slot, const Item* item);
+	void UpdateInventoryItem(NetworkMessage_ptr msg, SlotType slot, const Item* item);
+	void RemoveInventoryItem(NetworkMessage_ptr msg, SlotType slot);
 
 	//shop
 	void AddShopItem(NetworkMessage_ptr msg, const ShopInfo item);

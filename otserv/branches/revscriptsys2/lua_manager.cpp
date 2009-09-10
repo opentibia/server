@@ -361,7 +361,7 @@ void LuaState::pushPosition(const PositionEx& pos)
 	setField(-2, "stackpos");
 }
 
-void LuaState::pushOutfit(const Outfit_t& outfit)
+void LuaState::pushOutfit(const OutfitType& outfit)
 {
 	newTable();
 	pushInteger(outfit.lookType);
@@ -493,9 +493,9 @@ Position LuaState::popPosition(Script::ErrorMode mode /* = Script::ERROR_THROW *
 	return pos;
 }
 
-Outfit_t LuaState::popOutfit(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+OutfitType LuaState::popOutfit(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 {
-	Outfit_t outfit;
+	OutfitType outfit;
 	if(!isTable(-1)) {
 		HandleError(mode, "Attempt to treat non-table value as an outfit.");
 		pop();

@@ -81,7 +81,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 
 	// Getting all player properties
-	player->setSex((playersex_t)result->getDataInt("sex"));
+	player->setSex((PlayerSex)result->getDataInt("sex"));
 	player->setDirection((Direction)result->getDataInt("direction"));
 	player->level = std::max((uint32_t)1, (uint32_t)result->getDataInt("level"));
 
@@ -234,8 +234,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	if((result = db->storeQuery(query.str()))){
 		//now iterate over the skills
 		do{
-			int skillid = result->getDataInt("skillid");
-			if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST){
+			try {
+				SkillType skillid = SkillType::fromInteger(result->getDataInt("skillid"));
+				
 				uint32_t skillLevel = result->getDataInt("value");
 				uint32_t skillCount = result->getDataInt("count");
 
@@ -245,9 +246,11 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 					skillCount = 0;
 				}
 
-				player->skills[skillid][SKILL_LEVEL] = skillLevel;
-				player->skills[skillid][SKILL_TRIES] = skillCount;
-				player->skills[skillid][SKILL_PERCENT] = Player::getPercentLevel(skillCount, nextSkillCount);
+				player->skills[skillid.value()][SKILL_LEVEL] = skillLevel;
+				player->skills[skillid.value()][SKILL_TRIES] = skillCount;
+				player->skills[skillid.value()][SKILL_PERCENT] = Player::getPercentLevel(skillCount, nextSkillCount);
+			} catch(enum_conversion_error&) {
+				std::cout << "Unknown skill ID when loading player " << result->getDataInt("skillid") << std::endl;
 			}
 		}while(result->next());
 		db->freeResult(result);
@@ -457,7 +460,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 				return false;
 			}
 
-			propWriteStream.ADD_UCHAR(CONDITIONATTR_END);
+			propWriteStream.ADD_UCHAR(*CONDITIONATTR_END);
 		}
 	}
 
@@ -488,7 +491,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	<< ", `posy` = " << player->getLoginPosition().y
 	<< ", `posz` = " << player->getLoginPosition().z
 	<< ", `cap` = " << player->getCapacity()
-	<< ", `sex` = " << player->sex
+	<< ", `sex` = " << player->sex.value()
 	<< ", `conditions` = " << db->escapeBlob(conditions, conditionsSize)
 	<< ", `loss_experience` = " << (int32_t)player->getLossPercent(LOSS_EXPERIENCE)
 	<< ", `loss_mana` = " << (int32_t)player->getLossPercent(LOSS_MANASPENT)

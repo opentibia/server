@@ -868,48 +868,12 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 
 	OnEquipItem::ScriptInformation si_onequip;
 
-	if(slot == "head") {
-		si_onequip.slot = SLOTP_HEAD;
+	try {
+		si_onequip.slot = SlotPosition::fromString(slot);
+	} catch(enum_conversion_error& e) {
+		throw Error(std::string("Invalid slot position (") + e.what() + ")");
 	}
-	else if(slot == "neck") {
-		si_onequip.slot = SLOTP_NECKLACE;
-	}
-	else if(slot == "backpack") {
-		si_onequip.slot = SLOTP_BACKPACK;
-	}
-	else if(slot == "armor") {
-		si_onequip.slot = SLOTP_ARMOR;
-	}
-	else if(slot == "right-hand") {
-		si_onequip.slot = SLOTP_RIGHT;
-	}
-	else if(slot == "left-hand") {
-		si_onequip.slot = SLOTP_LEFT;
-	}
-	else if(slot == "legs") {
-		si_onequip.slot = SLOTP_LEGS;
-	}
-	else if(slot == "feet") {
-		si_onequip.slot = SLOTP_FEET;
-	}
-	else if(slot == "ring") {
-		si_onequip.slot = SLOTP_RING;
-	}
-	else if(slot == "ammo") {
-		si_onequip.slot = SLOTP_AMMO;
-	}
-	else if(slot == "hand") {
-		si_onequip.slot = (SLOTP_LEFT | SLOTP_RIGHT);
-	}
-	else if(slot == "any") {
-		si_onequip.slot = (SLOTP_HEAD | SLOTP_NECKLACE | SLOTP_BACKPACK |
-			SLOTP_ARMOR | SLOTP_RIGHT | SLOTP_LEFT | SLOTP_LEGS |
-			SLOTP_FEET | SLOTP_RING | SLOTP_AMMO);
-	}
-	else{
-		throw Error("Invalid argument (3) 'slot'");
-	}
-
+	
 	if(method == "itemid") {
 		si_onequip.method = OnEquipItem::FILTER_ITEMID;
 	}
@@ -949,42 +913,42 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	OnEquipItem::ScriptInformation si_ondeequip;
 
 	if(slot == "head") {
-		si_ondeequip.slot = SLOTP_HEAD;
+		si_ondeequip.slot = SLOTPOSITION_HEAD;
 	}
 	else if(slot == "neck") {
-		si_ondeequip.slot = SLOTP_NECKLACE;
+		si_ondeequip.slot = SLOTPOSITION_NECKLACE;
 	}
 	else if(slot == "backpack") {
-		si_ondeequip.slot = SLOTP_BACKPACK;
+		si_ondeequip.slot = SLOTPOSITION_BACKPACK;
 	}
 	else if(slot == "armor") {
-		si_ondeequip.slot = SLOTP_ARMOR;
+		si_ondeequip.slot = SLOTPOSITION_ARMOR;
 	}
 	else if(slot == "right-hand") {
-		si_ondeequip.slot = SLOTP_RIGHT;
+		si_ondeequip.slot = SLOTPOSITION_RIGHT;
 	}
 	else if(slot == "left-hand") {
-		si_ondeequip.slot = SLOTP_LEFT;
+		si_ondeequip.slot = SLOTPOSITION_LEFT;
 	}
 	else if(slot == "legs") {
-		si_ondeequip.slot = SLOTP_LEGS;
+		si_ondeequip.slot = SLOTPOSITION_LEGS;
 	}
 	else if(slot == "feet") {
-		si_ondeequip.slot = SLOTP_FEET;
+		si_ondeequip.slot = SLOTPOSITION_FEET;
 	}
 	else if(slot == "ring") {
-		si_ondeequip.slot = SLOTP_RING;
+		si_ondeequip.slot = SLOTPOSITION_RING;
 	}
 	else if(slot == "ammo") {
-		si_ondeequip.slot = SLOTP_AMMO;
+		si_ondeequip.slot = SLOTPOSITION_AMMO;
 	}
 	else if(slot == "hand") {
-		si_ondeequip.slot = (SLOTP_LEFT | SLOTP_RIGHT);
+		si_ondeequip.slot = (SLOTPOSITION_LEFT | SLOTPOSITION_RIGHT);
 	}
 	else if(slot == "any") {
-		si_ondeequip.slot = (SLOTP_HEAD | SLOTP_NECKLACE | SLOTP_BACKPACK |
-			SLOTP_ARMOR | SLOTP_RIGHT | SLOTP_LEFT | SLOTP_LEGS |
-			SLOTP_FEET | SLOTP_RING | SLOTP_AMMO);
+		si_ondeequip.slot = (SLOTPOSITION_HEAD | SLOTPOSITION_NECKLACE | SLOTPOSITION_BACKPACK |
+			SLOTPOSITION_ARMOR | SLOTPOSITION_RIGHT | SLOTPOSITION_LEFT | SLOTPOSITION_LEGS |
+			SLOTPOSITION_FEET | SLOTPOSITION_RING | SLOTPOSITION_AMMO);
 	}
 	else{
 		throw Error("Invalid argument (3) 'slot'");
@@ -1742,7 +1706,7 @@ int LuaState::lua_Creature_getOutfit()
 
 int LuaState::lua_Creature_setOutfit()
 {
-	Outfit_t outfit = popOutfit();
+	OutfitType outfit = popOutfit();
 	Creature* creature = popCreature();
 	g_game.internalCreatureChangeOutfit(creature, outfit);
 	pushBoolean(true);
@@ -1780,7 +1744,7 @@ int LuaState::lua_createActor()
 
 	// Create an empty actor, with some default values
 	CreatureType ct;
-	Outfit_t ot;
+	OutfitType ot;
 	ot.lookType = 130;
 	ct.outfit(ot);
 
@@ -2121,7 +2085,7 @@ int LuaState::lua_Player_getGuildNick()
 int LuaState::lua_Player_getSex()
 {
 	Player* p = popPlayer();
-	push(p->getSex() == PLAYERSEX_MALE);
+	push(p->getSex());
 	return 1;
 }
 
@@ -2190,15 +2154,13 @@ int LuaState::lua_Player_addExperience()
 
 int LuaState::lua_Player_getInventoryItem()
 {
-	int slot = popInteger();
+	SlotType slot(popInteger());
 	Player* player = popPlayer();
 
-	if(slot < SLOT_FIRST || slot > SLOT_LAST)
-	{
+	if(!slot.exists())
 		throw Error("Player.getInventoryItem: slot out of range!");
-	}
 
-	Item* i = player->getInventoryItem((slots_t)slot);
+	Item* i = player->getInventoryItem((SlotType)slot);
 	if(i)
 		pushThing(i);
 	else
@@ -2772,7 +2734,7 @@ int LuaState::lua_CombatArea_create()
 
 int LuaState::lua_Condition_create()
 {
-	ConditionType_t type = (ConditionType_t)popNumber();
+	ConditionType type = (ConditionType)popNumber();
 
 	Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, type, 0, 0);
 	if(!condition)
@@ -2806,7 +2768,7 @@ int LuaState::lua_Combat_setCondition()
 int LuaState::lua_Combat_setParameter()
 {
 	uint32_t value = popUnsignedInteger();
-	CombatParam_t key = (CombatParam_t)popInteger();
+	CombatParam key = (CombatParam)popInteger();
 	Combat* combat = popCombat();
 
 	combat->setParam(key, value);
@@ -2818,7 +2780,7 @@ int LuaState::lua_Condition_setParameter()
 {
 	//setConditionParam(condition, key, value)
 	int32_t value = popInteger();
-	ConditionParam_t key = (ConditionParam_t)popInteger();
+	ConditionParam key = (ConditionParam)popInteger();
 	Condition* condition = popCondition();
 
 	condition->setParam(key, value);
@@ -2843,7 +2805,7 @@ int LuaState::lua_Condition_addDamage()
 
 int LuaState::lua_Condition_addOutfit()
 {
-	Outfit_t outfit = popOutfit();
+	OutfitType outfit = popOutfit();
 	ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(popCondition());
 
 	if(!condition)
@@ -2921,7 +2883,7 @@ int LuaState::luaSetCombatFormula(lua_State *L)
 	double minb = popFloatNumber(L);
 	double mina = popFloatNumber(L);
 
-	formulaType_t type = (formulaType_t)popNumber(L);
+	FormulaType type = (FormulaType)popNumber(L);
 	uint32_t combatId = popNumber(L);
 
 	Combat* combat = env->getCombatObject(combatId);
@@ -3079,7 +3041,7 @@ int LuaState::luaDoAreaCombatHealth(lua_State *L)
 	PositionEx pos;
 	popPosition(L, pos);
 
-	CombatType_t combatType = (CombatType_t)popNumber(L);
+	CombatType combatType = (CombatType)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnvironment* env = getScriptEnv();
@@ -3119,7 +3081,7 @@ int LuaState::luaDoTargetCombatHealth(lua_State *L)
 	uint8_t effect = (uint8_t)popNumber(L);
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
-	CombatType_t combatType = (CombatType_t)popNumber(L);
+	CombatType combatType = (CombatType)popNumber(L);
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -3330,7 +3292,7 @@ int LuaState::luaDoAreaCombatDispel(lua_State *L)
 {
 	//doAreaCombatDispel(cid, pos, area, type, effect)
 	uint8_t effect = (uint8_t)popNumber(L);
-	ConditionType_t dispelType = (ConditionType_t)popNumber(L);
+	ConditionType dispelType = (ConditionType)popNumber(L);
 	uint32_t areaId = popNumber(L);
 	PositionEx pos;
 	popPosition(L, pos);
@@ -3370,7 +3332,7 @@ int LuaStateLuaState::luaDoTargetCombatDispel(lua_State *L)
 {
 	//doTargetCombatDispel(cid, target, type, effect)
 	uint8_t effect = (uint8_t)popNumber(L);
-	ConditionType_t dispelType = (ConditionType_t)popNumber(L);
+	ConditionType dispelType = (ConditionType)popNumber(L);
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -3637,7 +3599,7 @@ int LuaState::luaDoRemoveCondition(lua_State *L)
 {
 	//doRemoveCondition(cid, type)
 
-	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
+	ConditionType conditionType = (ConditionType)popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnvironment* env = getScriptEnv();
@@ -4195,7 +4157,7 @@ int LuaScriptInterface::luaDoPlayerAddSkillTry()
 	if(skillid < SKILL_FIRST || skillid > SKILL_LAST) {
 		throwLuaException("Invalid skill index!");
 	}
-	player->addSkillAdvance((skills_t)skillid, n);
+	player->addSkillAdvance((SkillType)skillid, n);
 	pushBoolean(true);
 	return 1;
 }
@@ -4292,7 +4254,7 @@ int LuaScriptInterface::luaGetPlayerLossPercent()
 	if(lossType > LOSS_LAST){
 		throwLuaException("No valid lossType");
 	}
-	uint32_t value = player->getLossPercent((lossTypes_t)lossType);
+	uint32_t value = player->getLossPercent((LossType)lossType);
 	pushNumber(value);
 	return 1;
 }
@@ -4311,7 +4273,7 @@ int LuaScriptInterface::luaDoPlayerSetLossPercent()
 		reportLuaError("lossPercent value higher than 100, truncated to 100");
 		newPercent = 100;
 	}
-	player->setLossPercent((lossTypes_t)lossType, newPercent);
+	player->setLossPercent((LossType)lossType, newPercent);
 	pushBoolean(true);
 	return 1;
 }
@@ -5144,7 +5106,7 @@ int LuaScriptInterface::luaDoChangeSpeed()
 int LuaScriptInterface::luaSetCreatureOutfit()
 {
 	//doSetCreatureOutfit(creature, outfit)
-	Outfit_t outfit;
+	OutfitType outfit;
 	outfit.lookType = getField("type");
 	outfit.lookTypeEx = getField("extra");
 	outfit.lookHead = getField("head");
@@ -5165,7 +5127,7 @@ int LuaScriptInterface::luaGetCreatureOutfit()
 {
 	//getCreatureOutfit(creature)
 	Creature* creature = popCreature();
-	const Outfit_t outfit = creature->getCurrentOutfit();
+	const OutfitType outfit = creature->getCurrentOutfit();
 
 	lua_newtable(m_luaState);
 	setField("type", outfit.lookType);
@@ -5552,7 +5514,7 @@ int LuaScriptInterface::luaIsPremium()
 int LuaScriptInterface::luaHasCondition()
 {
 	//hasCondition(creature, conditionid)
-	ConditionType_t conditionType = (ConditionType_t)popUnsignedInteger();
+	ConditionType conditionType = (ConditionType)popUnsignedInteger();
 	Creature* creature = popCreature();
 
 	pushBoolean(creature->hasCondition(conditionType));

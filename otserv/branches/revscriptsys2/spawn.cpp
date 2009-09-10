@@ -460,7 +460,7 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 bool Spawn::addNPC(const std::string& name, const Position& pos, Direction dir)
 {
 	CreatureType ct;
-	Outfit_t ot;
+	OutfitType ot;
 	ot.lookType = 130;
 	ct.outfit(ot);
 

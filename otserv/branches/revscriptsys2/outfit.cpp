@@ -92,40 +92,16 @@ bool Outfits::loadFromXml(const std::string& datadir)
 							}
 
 							if(readXMLString(pchild, "type", strValue)){
-								playersex_t playersex = PLAYERSEX_LAST;
+								try {
+									PlayerSex playersex = PlayerSex::fromStringI(strValue);
 
-								if(asLowerCaseString(strValue) == "female"){
-									playersex = PLAYERSEX_FEMALE;
-								}
-								else if(asLowerCaseString(strValue) == "male"){
-									playersex = PLAYERSEX_MALE;
-								}
-								else if(asLowerCaseString(strValue) == "femalegm"){
-									playersex = PLAYERSEX_FEMALE_GAMEMASTER;
-								}
-								else if(asLowerCaseString(strValue) == "malegm"){
-									playersex = PLAYERSEX_MALE_GAMEMASTER;
-								}
-								else if(asLowerCaseString(strValue) == "femalecm"){
-									playersex = PLAYERSEX_FEMALE_MANAGER;
-								}
-								else if(asLowerCaseString(strValue) == "malecm"){
-									playersex = PLAYERSEX_MALE_MANAGER;
-								}
-								else if(asLowerCaseString(strValue) == "femalegod"){
-									playersex = PLAYERSEX_FEMALE_GOD;
-								}
-								else if(asLowerCaseString(strValue) == "malegod"){
-									playersex = PLAYERSEX_MALE_GOD;
-								}
-								else{
+									allOutfits.push_back(outfit);
+									outfitMaps[playersex][outfit.outfitId] = outfit;
+								} catch(enum_conversion_error&) {
 									std::cout << "Invalid playersex " << strValue << " for an outfit." << std::endl;
 									pchild = pchild->next;
 									continue;
 								}
-
-								allOutfits.push_back(outfit);
-								outfitMaps[playersex][outfit.outfitId] = outfit;
 							}
 							else{
 								std::cout << "Missing playersex for an outfit." << std::endl;
@@ -171,7 +147,7 @@ bool Outfits::getOutfit(uint32_t lookType, Outfit& outfit)
 	return false;
 }
 
-bool Outfits::getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit)
+bool Outfits::getOutfit(uint32_t outfitId, PlayerSex sex, Outfit& outfit)
 {
 	OutfitMap map = getOutfits(sex);
 	OutfitMap::iterator it = map.find(outfitId);
@@ -183,7 +159,7 @@ bool Outfits::getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit)
 	return false;
 }
 
-const OutfitMap& Outfits::getOutfits(playersex_t playersex)
+const OutfitMap& Outfits::getOutfits(PlayerSex playersex)
 {
 	return outfitMaps[playersex];
 }

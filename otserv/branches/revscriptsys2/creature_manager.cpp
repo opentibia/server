@@ -89,7 +89,7 @@ bool CreatureManager::reload()
 	return loadFromXml(datadir, true);
 }
 
-ConditionDamage* CreatureManager::getDamageCondition(ConditionType_t conditionType,
+ConditionDamage* CreatureManager::getDamageCondition(ConditionType conditionType,
 	int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval)
 {
 	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, 0, 0));
@@ -241,7 +241,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 				}
 			}
 
-			ConditionType_t conditionType = CONDITION_NONE;
+			ConditionType conditionType = CONDITION_NONE;
 			int32_t minDamage = 0;
 			int32_t maxDamage = 0;
 			int32_t startDamage = 0;
@@ -363,7 +363,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 				}
 			}
 
-			ConditionType_t conditionType;
+			ConditionType conditionType;
 			if(speedChange > 0){
 				conditionType = CONDITION_HASTE;
 				combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
@@ -393,7 +393,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 				}
 			}
 			else if(readXMLInteger(node, "item", intValue)){
-				Outfit_t outfit;
+				OutfitType outfit;
 				outfit.lookTypeEx(intValue);
 
 				ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
@@ -436,7 +436,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 				asLowerCaseString(name) == "poisoncondition" ||
 				asLowerCaseString(name) == "energycondition" ||
 				asLowerCaseString(name) == "drowncondition"){
-			ConditionType_t conditionType = CONDITION_NONE;
+			ConditionType conditionType = CONDITION_NONE;
 			uint32_t tickInterval = 2000;
 
 			if(name == "firecondition"){
@@ -745,7 +745,7 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
-				Outfit_t& outfit = mType->outfit();
+				OutfitType& outfit = mType->outfit();
 
 				if(readXMLInteger(p, "type", intValue)){
 					outfit.lookType = intValue;
@@ -1035,7 +1035,7 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"element") == 0){
-						//CombatType_t type = COMBAT_NONE;
+						//CombatType type = COMBAT_NONE;
 						//int32_t percent = 0;
 
 						if(readXMLInteger(tmpNode, "physicalPercent", intValue)){

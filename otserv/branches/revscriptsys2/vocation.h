@@ -28,11 +28,14 @@
 
 class Vocation
 {
-public:
+	// Only Vocations may construct / destroy us
+	Vocation(uint32_t id);
 	~Vocation();
+public:
+	uint32_t getID() const {return id;}
 	const std::string& getVocName() const {return name;}
 	const std::string& getVocDescription() const {return description;}
-	uint32_t getReqSkillTries(int32_t skill, int32_t level);
+	uint32_t getReqSkillTries(SkillType skill, int32_t level);
 	uint32_t getReqMana(int32_t magLevel);
 
 	uint32_t getHPGain() const {return gainHP;};
@@ -71,9 +74,7 @@ public:
 	void debugVocation();
 
 protected:
-	friend class Vocations;
-	Vocation();
-
+	uint32_t id;
 	std::string name;
 	std::string description;
 
@@ -89,8 +90,8 @@ protected:
 	uint16_t maxSoul;
 	uint16_t gainSoulTicks;
 
-	uint32_t skillBases[SKILL_LAST + 1];
-	float skillMultipliers[SKILL_LAST + 1];
+	uint32_t skillBases[SkillType::size];
+	float skillMultipliers[SkillType::size];
 	float manaMultiplier;
 
 	float swordBaseDamage;
@@ -108,7 +109,9 @@ protected:
 
 	typedef std::map<uint32_t, uint32_t> cacheMap;
 	cacheMap cacheMana;
-	cacheMap cacheSkill[SKILL_LAST + 1];
+	cacheMap cacheSkill[SkillType::size];
+	
+	friend class Vocations;
 };
 
 
@@ -125,7 +128,6 @@ public:
 private:
 	typedef std::map<uint32_t, Vocation*> VocationsMap;
 	VocationsMap vocationsMap;
-	Vocation def_voc;
 };
 
 #endif

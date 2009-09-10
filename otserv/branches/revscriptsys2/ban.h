@@ -40,7 +40,7 @@ struct Ban {
 	int32_t expires;
 	uint32_t adminId;
 	uint32_t reason;
-	violationAction_t action;
+	ViolationAction action;
 	std::string comment;
 	std::string statement;
 	std::string value;
@@ -78,15 +78,15 @@ public:
 	void addLoginAttempt(uint32_t clientip, bool isSuccess);
 	bool addIpBan(uint32_t ip, uint32_t mask, int32_t time, uint32_t adminid, std::string comment) const;
 	bool addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, violationAction_t action) const;
+		std::string statement, uint32_t reason, ViolationAction action) const;
 	bool addPlayerBan(const std::string& name, int32_t time, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, violationAction_t action) const;
+		std::string statement, uint32_t reason, ViolationAction action) const;
 	bool addPlayerStatement(uint32_t playerId, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, violationAction_t action) const;
+		std::string statement, uint32_t reason, ViolationAction action) const;
 	bool addAccountBan(uint32_t account, int32_t time, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, violationAction_t action) const;
+		std::string statement, uint32_t reason, ViolationAction action) const;
 	bool addAccountNotation(uint32_t account, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, violationAction_t action) const;
+		std::string statement, uint32_t reason, ViolationAction action) const;
 
 	bool removeIpBans(uint32_t ip, uint32_t mask = 0xFFFFFFFF) const;
 	bool removePlayerBans(uint32_t guid) const;

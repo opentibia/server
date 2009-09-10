@@ -269,13 +269,13 @@ namespace Script {
 		struct ScriptInformation {
 			FilterType method;
 			uint16_t id;
-			uint32_t slot;
+			SlotPosition slot;
 			bool equip;
 		};
 
 		class Event : public Script::Event {
 		public:
-			Event(Player* user, Item* item, slots_t slot, bool equip);
+			Event(Player* user, Item* item, SlotType slot, bool equip);
 			~Event();
 
 			std::string getName() const {return "OnEquipItem";}
@@ -293,7 +293,7 @@ namespace Script {
 		protected:
 			Player* user;
 			Item* item;
-			uint32_t equipslot;
+			SlotPosition equipslot;
 			bool equip;
 		};
 	}

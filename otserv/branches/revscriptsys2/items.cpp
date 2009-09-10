@@ -76,7 +76,7 @@ ItemType::ItemType()
 	showCount     = true;
 	weaponType    = WEAPON_NONE;
 	weaponInstance= NULL;
-	slotPosition  = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
+	slotPosition  = SLOTPOSITION_RIGHT | SLOTPOSITION_LEFT | SLOTPOSITION_AMMO;
 	wieldPosition = SLOT_HAND;
 	ammoType      = AMMO_NONE;
 	ammoAction    = AMMOACTION_NONE;
@@ -690,35 +690,35 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(asLowerCaseString(strValue) == "slottype"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "head"){
-										it.slotPosition |= SLOTP_HEAD;
+										it.slotPosition |= SLOTPOSITION_HEAD;
 										it.wieldPosition = SLOT_HEAD;
 									}
 									else if(asLowerCaseString(strValue) == "body"){
-										it.slotPosition |= SLOTP_ARMOR;
+										it.slotPosition |= SLOTPOSITION_ARMOR;
 										it.wieldPosition = SLOT_ARMOR;
 									}
 									else if(asLowerCaseString(strValue) == "legs"){
-										it.slotPosition |= SLOTP_LEGS;
+										it.slotPosition |= SLOTPOSITION_LEGS;
 										it.wieldPosition = SLOT_LEGS;
 									}
 									else if(asLowerCaseString(strValue) == "feet"){
-										it.slotPosition |= SLOTP_FEET;
+										it.slotPosition |= SLOTPOSITION_FEET;
 										it.wieldPosition = SLOT_FEET;
 									}
 									else if(asLowerCaseString(strValue) == "backpack"){
-										it.slotPosition |= SLOTP_BACKPACK;
+										it.slotPosition |= SLOTPOSITION_BACKPACK;
 										it.wieldPosition = SLOT_BACKPACK;
 									}
 									else if(strcasecmp(strValue.c_str(), "two-handed") == 0){
-										it.slotPosition |= SLOTP_TWO_HAND;
+										it.slotPosition |= SLOTPOSITION_TWO_HAND;
 										it.wieldPosition = SLOT_HAND;
 									}
 									else if(asLowerCaseString(strValue) == "necklace"){
-										it.slotPosition |= SLOTP_NECKLACE;
+										it.slotPosition |= SLOTPOSITION_NECKLACE;
 										it.wieldPosition = SLOT_NECKLACE;
 									}
 									else if(asLowerCaseString(strValue) == "ring"){
-										it.slotPosition |= SLOTP_RING;
+										it.slotPosition |= SLOTPOSITION_RING;
 										it.wieldPosition = SLOT_RING;
 									}
 									else if(asLowerCaseString(strValue) == "hand"){
@@ -896,153 +896,153 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "skillsword"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_SWORD] = intValue;
+									it.abilities.skills[*SKILL_SWORD] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillaxe"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_AXE] = intValue;
+									it.abilities.skills[*SKILL_AXE] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillclub"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_CLUB] = intValue;
+									it.abilities.skills[*SKILL_CLUB] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skilldist"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_DIST] = intValue;
+									it.abilities.skills[*SKILL_DIST] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillfish"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_FISH] = intValue;
+									it.abilities.skills[*SKILL_FISH] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillshield"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_SHIELD] = intValue;
+									it.abilities.skills[*SKILL_SHIELD] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillfist"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_FIST] = intValue;
+									it.abilities.skills[*SKILL_FIST] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "maxhitpoints"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.stats[STAT_MAXHITPOINTS] = intValue;
+									it.abilities.stats[*STAT_MAXHITPOINTS] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "maxhitpointspercent"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.statsPercent[STAT_MAXHITPOINTS] = intValue;
+									it.abilities.statsPercent[*STAT_MAXHITPOINTS] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "maxmanapoints"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.stats[STAT_MAXMANAPOINTS] = intValue;
+									it.abilities.stats[*STAT_MAXMANAPOINTS] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "maxmanapointspercent"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.statsPercent[STAT_MAXMANAPOINTS] = intValue;
+									it.abilities.statsPercent[*STAT_MAXMANAPOINTS] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "soulpoints"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.stats[STAT_SOULPOINTS] = intValue;
+									it.abilities.stats[*STAT_SOULPOINTS] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "soulpointspercent"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.statsPercent[STAT_SOULPOINTS] = intValue;
+									it.abilities.statsPercent[*STAT_SOULPOINTS] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "magicpoints"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.stats[STAT_MAGICPOINTS] = intValue;
+									it.abilities.stats[*STAT_MAGICPOINTS] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "magicpointspercent"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.statsPercent[STAT_MAGICPOINTS] = intValue;
+									it.abilities.statsPercent[*STAT_MAGICPOINTS] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentall"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ENERGYDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_FIREDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_EARTHDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ICEDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_HOLYDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DEATHDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_LIFEDRAIN)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_MANADRAIN)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DROWNDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_ENERGYDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_FIREDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_EARTHDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_ICEDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_HOLYDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_DEATHDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_PHYSICALDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_LIFEDRAIN.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_MANADRAIN.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_DROWNDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentallelements"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ENERGYDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_FIREDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_EARTHDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ICEDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_HOLYDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DEATHDAMAGE)] = intValue;
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_ENERGYDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_FIREDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_EARTHDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_ICEDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_HOLYDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_DEATHDAMAGE.index()] = intValue;
+									it.abilities.absorb.resistances[COMBAT_PHYSICALDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentenergy"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ENERGYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_ENERGYDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentfire"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_FIREDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_FIREDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentpoison" ||
 									asLowerCaseString(strValue) == "absorbpercentearth"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_EARTHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_EARTHDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentice"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_ICEDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_ICEDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentholy"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_HOLYDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_HOLYDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentdeath"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DEATHDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_DEATHDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentlifedrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_LIFEDRAIN)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_LIFEDRAIN.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentmanadrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_MANADRAIN)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_MANADRAIN.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentdrown"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_DROWNDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_DROWNDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "absorbpercentphysical"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
+									it.abilities.absorb.resistances[COMBAT_PHYSICALDAMAGE.index()] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressdrunk"){
@@ -1113,7 +1113,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(asLowerCaseString(strValue) == "field"){
 								it.group = ITEM_GROUP_MAGICFIELD;
 								it.type = ITEM_TYPE_MAGICFIELD;
-								CombatType_t combatType = COMBAT_NONE;
+								CombatType combatType = COMBAT_NONE;
 								ConditionDamage* conditionDamage = NULL;
 
 								if(readXMLString(itemAttributesNode, "value", strValue)){
@@ -1462,8 +1462,8 @@ Abilities::Abilities()
 	speed = 0;
 	manaShield = false;
 	invisible = false;
-	conditionImmunities = 0;
-	conditionSuppressions = 0;
+	conditionImmunities = CONDITION_NONE;
+	conditionSuppressions = CONDITION_NONE;
 
 	regeneration = false;
 	healthGain = 0;
@@ -1478,18 +1478,21 @@ Abilities::Abilities()
 
 bool Abilities::Absorb::any() const
 {
-	for(int32_t c = 0; c != COMBAT_COUNT; ++c){
-		if(resistances[c] != 0)
+	CombatType::iterator c = COMBAT_PHYSICALDAMAGE;
+	for(; c != CombatType::end(); ++c){
+		if(resistances[c->index()] != 0)
 			return true;
 	}
 	return false;
 }
 
-std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, int32_t type) const
+std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, CombatType type) const
 {
-	if(resistances[type] == 0)
+	if(resistances[type.index()] == 0)
 		return os;
-	os << (first? " " : ", ") << CombatTypeName(type == COMBAT_NONE? COMBAT_NONE: (CombatType_t)(1 << (type-1))) << " " << std::noshowpos << resistances[type] << "%";
+	// REVSCRIPT TODO: Print "fire" instead of "COMBAT_FIRE"
+	os << (first? " " : ", ") << type;
+	os << " " << std::noshowpos << resistances[type.index()] << "%";
 	first = false;
 	return os;
 }
@@ -1497,26 +1500,20 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, i
 std::ostream& Abilities::Absorb::getDescription(std::ostream& os) const
 {
 	bool first = true;
-	for(int32_t c = 0; c != COMBAT_COUNT; ++c){
-		getDescription(os, first, c);
-	}
+	for(CombatType::iterator c = COMBAT_PHYSICALDAMAGE; c != CombatType::end(); ++c)
+		getDescription(os, first, *c);
 	return os;
 }
 
-bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
+bool Abilities::Absorb::reduce(CombatType ctype, int32_t& dmg) const
 {
 	bool r = false;
 	if(ctype == COMBAT_NONE)
 		return r;
 
-	for(int32_t c = 0;  c < COMBAT_COUNT; ++c) {
-		if(ctype & (1 << c)) {
-			// Correct type!
-			if(resistances[c+1] > 0)
-				r = true;
-			dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[c+1]) / 100.);
-		}
-	}
+	if(resistances[ctype.index()] > 0)
+		r = true;
+	dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[ctype.index()]) / 100.);
 	
 	return r;
 }

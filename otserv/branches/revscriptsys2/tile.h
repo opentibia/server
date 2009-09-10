@@ -194,7 +194,7 @@ public:
 		}
 	}
 
-	ZoneType_t getZone() const {
+	ZoneType getZone() const {
 		if(hasFlag(TILESTATE_PROTECTIONZONE)){
 			return ZONE_PROTECTION;
 		}

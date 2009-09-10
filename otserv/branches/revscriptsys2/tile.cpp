@@ -601,7 +601,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 			MagicField* field = getFieldItem();
 			if(field && !field->isBlocking()){
-				CombatType_t combatType = field->getCombatType();
+				CombatType combatType = field->getCombatType();
 				//There is 3 options for a monster to enter a magic field
 				//1) Actor is immune
 				if(!monster->isImmune(combatType)){

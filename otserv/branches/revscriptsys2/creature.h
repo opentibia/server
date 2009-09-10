@@ -156,7 +156,7 @@ public:
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
 
-	virtual RaceType_t getRace() const {return RACE_NONE;}
+	virtual RaceType getRace() const {return RACE_NONE;}
 	Direction getDirection() const { return direction;}
 	void setDirection(Direction dir) { direction = dir;}
 
@@ -200,11 +200,11 @@ public:
 	virtual int32_t getMana() const {return mana;}
 	virtual int32_t getMaxMana() const {return manaMax;}
 
-	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
-	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
-	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
+	const OutfitType getCurrentOutfit() const {return currentOutfit;}
+	const void setCurrentOutfit(OutfitType outfit) {currentOutfit = outfit;}
+	const OutfitType getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
-	ZoneType_t getZone() const;
+	ZoneType getZone() const;
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -227,7 +227,7 @@ public:
 	//combat functions
 	Creature* getAttackedCreature() { return attackedCreature; }
 	virtual bool setAttackedCreature(Creature* creature);
-	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
+	virtual BlockType blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 
 	void setMaster(Creature* creature) {master = creature;}
@@ -244,31 +244,31 @@ public:
 
 	virtual int32_t getArmor() const {return 0;}
 	virtual int32_t getDefense() const {return 0;}
-	virtual float getAttackFactor() const {return 1.0f;}
-	virtual float getDefenseFactor() const {return 1.0f;}
+	virtual double getAttackFactor() const {return 1.0;}
+	virtual double getDefenseFactor() const {return 1.0;}
 
 	bool addCondition(Condition* condition);
 	bool addCombatCondition(Condition* condition);
-	void removeCondition(ConditionType_t type, ConditionId_t id);
-	void removeCondition(ConditionType_t type);
+	void removeCondition(ConditionType type, ConditionID id);
+	void removeCondition(ConditionType type);
 	void removeCondition(Condition* condition);
-	void removeCondition(const Creature* attacker, ConditionType_t type);
-	Condition* getCondition(ConditionType_t type, ConditionId_t id, uint32_t subId) const;
-	Condition* getCondition(ConditionType_t type) const;
+	void removeCondition(const Creature* attacker, ConditionType type);
+	Condition* getCondition(ConditionType type, ConditionID id, uint32_t subId) const;
+	Condition* getCondition(ConditionType type) const;
 	void executeConditions(uint32_t interval);
-	bool hasCondition(ConditionType_t type, bool checkTime = true) const;
-	virtual bool isImmune(ConditionType_t type) const;
-	virtual bool isImmune(CombatType_t type) const;
-	virtual bool isSuppress(ConditionType_t type) const;
-	virtual uint32_t getDamageImmunities() const { return 0; }
-	virtual uint32_t getConditionImmunities() const { return 0; }
-	virtual uint32_t getConditionSuppressions() const { return 0; }
+	bool hasCondition(ConditionType type, bool checkTime = true) const;
+	virtual bool isImmune(ConditionType type) const;
+	virtual bool isImmune(CombatType type) const;
+	virtual bool isSuppress(ConditionType type) const;
+	virtual CombatType getDamageImmunities() const { return COMBAT_NONE; }
+	virtual ConditionType getConditionImmunities() const { return CONDITION_NONE; }
+	virtual ConditionType getConditionSuppressions() const { return CONDITION_NONE; }
 	virtual bool isAttackable() const { return true;}
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 
 	virtual void gainHealth(Creature* caster, int32_t healthGain);
-	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext);
+	virtual void drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss, bool showtext);
 
 	virtual bool challengeCreature(Creature* creature) {return false;};
@@ -283,10 +283,10 @@ public:
 	bool hasBeenAttacked(uint32_t attackerId) const;
 
 	//combat event functions
-	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
-	virtual void onAddCombatCondition(ConditionType_t type, bool hadCondition);
-	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
-	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
+	virtual void onAddCondition(ConditionType type, bool hadCondition);
+	virtual void onAddCombatCondition(ConditionType type, bool hadCondition);
+	virtual void onEndCondition(ConditionType type, bool lastCondition);
+	virtual void onTickCondition(ConditionType type, int32_t interval, bool& bRemove);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onAttackedCreature(Creature* target) {};
 	virtual void onSummonAttackedCreature(Creature* summon, Creature* target) {};
@@ -300,10 +300,10 @@ public:
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(uint64_t gainExp, bool fromMonster);
 	virtual void onGainSharedExperience(uint64_t gainExp, bool fromMonster);
-	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
-	virtual void onBlockHit(BlockType_t blockType);
-	virtual void onChangeZone(ZoneType_t zone);
-	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
+	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType blockType);
+	virtual void onBlockHit(BlockType blockType);
+	virtual void onChangeZone(ZoneType zone);
+	virtual void onAttackedCreatureChangeZone(ZoneType zone);
 	virtual void onIdleStatus();
 
 	virtual void getCreatureLight(LightInfo& light) const;
@@ -333,7 +333,7 @@ public:
 	virtual void onCreatureTurn(const Creature* creature) { };
 	virtual void onCreatureSay(const Creature* creature, SpeakClass type, const std::string& text);
 
-	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
+	virtual void onCreatureChangeOutfit(const Creature* creature, const OutfitType& outfit) { };
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature) {};
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
 	virtual void onPlacedCreature() {};
@@ -381,8 +381,8 @@ protected:
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
 
-	Outfit_t currentOutfit;
-	Outfit_t defaultOutfit;
+	OutfitType currentOutfit;
+	OutfitType defaultOutfit;
 
 	Position masterPos;
 	int32_t masterRadius;
@@ -420,7 +420,7 @@ protected:
 	typedef std::map<uint32_t, CountBlock_t> CountMap;
 	CountMap damageMap;
 	CountMap healMap;
-	CombatType_t lastDamageSource;
+	CombatType lastDamageSource;
 	uint32_t lastHitCreature;
 	uint32_t blockCount;
 	uint32_t blockTicks;

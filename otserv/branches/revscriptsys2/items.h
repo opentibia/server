@@ -26,25 +26,11 @@
 #include "definitions.h"
 #include "const.h"
 #include "enums.h"
+#include "condition_attributes.h"
 #include "itemloader.h"
-//[ added for beds system
 #include "position.h"
-//]
 #include <map>
 
-#define SLOTP_WHEREEVER 0xFFFFFFFF
-#define SLOTP_HEAD 1
-#define	SLOTP_NECKLACE 2
-#define	SLOTP_BACKPACK 4
-#define	SLOTP_ARMOR 8
-#define	SLOTP_RIGHT 16
-#define	SLOTP_LEFT 32
-#define	SLOTP_LEGS 64
-#define	SLOTP_FEET 128
-#define	SLOTP_RING 256
-#define	SLOTP_AMMO 512
-#define	SLOTP_DEPOT 1024
-#define	SLOTP_TWO_HAND 2048
 
 enum ItemTypes_t {
 	ITEM_TYPE_NONE = 0,
@@ -64,26 +50,26 @@ struct Abilities{
 	Abilities();
 
 	struct Absorb {
-			int16_t resistances[COMBAT_COUNT];
+			int16_t resistances[CombatType::size];
 
 			bool any() const;
-			bool reduce(CombatType_t type, int32_t& dmg) const;
+			bool reduce(CombatType type, int32_t& dmg) const;
 			std::ostream& getDescription(std::ostream& os) const;
 	protected:
-			std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
+			std::ostream& getDescription(std::ostream& os, bool& first, CombatType combat_type) const;
 	} absorb;
 
 
 	//elemental damage
-	CombatType_t elementType;
+	CombatType elementType;
 	int16_t elementDamage;
 
 	//extra skill modifiers
-	int32_t skills[SKILL_LAST + 1];
+	int32_t skills[SkillType::size];
 
 	//stats modifiers
-	int32_t stats[STAT_LAST + 1];
-	int32_t statsPercent[STAT_LAST + 1];
+	int32_t stats[SkillType::size];
+	int32_t statsPercent[SkillType::size];
 
 	int32_t speed;
 	bool manaShield;
@@ -96,8 +82,8 @@ struct Abilities{
 	uint32_t manaGain;
 	uint32_t manaTicks;
 
-	uint32_t conditionImmunities;
-	uint32_t conditionSuppressions;
+	ConditionType conditionImmunities;
+	ConditionType conditionSuppressions;
 
 	bool preventItemLoss;
 	bool preventSkillLoss;
@@ -154,8 +140,8 @@ public:
 	int32_t        defence;
 	int32_t        extraDefense;
 	int32_t        armor;
-	uint16_t       slotPosition;
-	uint16_t       wieldPosition;
+	SlotPosition   slotPosition;
+	SlotType       wieldPosition;
 	bool           isVertical;
 	bool           isHorizontal;
 	bool           isHangable;
@@ -166,7 +152,7 @@ public:
 	int32_t        decayTo;
 	uint32_t       decayTime;
 	bool           stopTime;
-	RaceType_t     corpseType;
+	RaceType     corpseType;
 
 	bool           canReadText;
 	bool           canWriteText;
@@ -229,7 +215,7 @@ public:
 	Abilities abilities;
 
 	Condition* condition;
-	CombatType_t combatType;
+	CombatType combatType;
 	bool replaceable;
 };
 

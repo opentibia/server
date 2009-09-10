@@ -74,7 +74,7 @@ public:
 	virtual std::string getDescription(int32_t lookDistance) const {return strDescription + '.';}
 	virtual void updateNameDescription();
 
-	virtual RaceType_t getRace() const { return cType.race(); }
+	virtual RaceType getRace() const { return cType.race(); }
 	virtual int32_t getArmor() const { return cType.armor(); }
 	virtual int32_t getDefense() const { return cType.defense(); }
 	virtual bool isPushable() const { return cType.pushable() && (baseSpeed > 0); }
@@ -99,7 +99,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
 		const Tile* oldTile, const Position& oldPos, bool teleport);
 
-	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showeffect);
+	virtual void drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showeffect);
 	virtual void changeHealth(int32_t healthChange);
 
 	virtual void onWalk();
@@ -126,8 +126,8 @@ public:
 	bool isTarget(Creature* creature);
 	bool isFleeing() const {return getHealth() <= cType.runAwayHealth();}
 
-	bool isImmune(CombatType_t type) const;
-	BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
+	bool isImmune(CombatType type) const;
+	BlockType blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 
 private:
@@ -175,8 +175,8 @@ private:
 	void updateIdleStatus();
 	bool getIdleStatus() const {return isIdle;}
 
-	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
-	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
+	virtual void onAddCondition(ConditionType type, bool hadCondition);
+	virtual void onEndCondition(ConditionType type, bool lastCondition);
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature);
 
 	bool canUseAttack(const Position& pos, const Creature* target) const;
@@ -203,8 +203,8 @@ private:
 	virtual uint64_t getLostExperience() const { return ((skillLoss ? cType.experience(): 0)); }
 	virtual int getLookCorpse() { return cType.lookcorpse(); }
 	virtual void dropLoot(Container* corpse);
-	virtual uint32_t getDamageImmunities() const { return cType.damageImmunities(); }
-	virtual uint32_t getConditionImmunities() const { return cType.conditionImmunities(); }
+	virtual CombatType getDamageImmunities() const { return cType.damageImmunities(); }
+	virtual ConditionType getConditionImmunities() const { return cType.conditionImmunities(); }
 	virtual uint16_t getLookCorpse() const { return cType.lookcorpse(); }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 	virtual bool useCacheMap() const {return true;}

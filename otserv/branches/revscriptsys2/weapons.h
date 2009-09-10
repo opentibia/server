@@ -68,7 +68,7 @@ protected:
 
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual void onUsedAmmo(Player* player, Item* item, Tile* destTile) const;
-	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
+	virtual bool getSkillType(const Player* player, const Item* item, SkillType& skill, uint32_t& skillpoint) const {return false;};
 
 	int32_t getManaCost(const Player* player) const;
 
@@ -107,9 +107,9 @@ public:
 protected:
 	void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	void onUsedAmmo(Player* player, Item* item, Tile* destTile) const;
-	bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
+	bool getSkillType(const Player* player, const Item* item, SkillType& skill, uint32_t& skillpoint) const;
 
-	CombatType_t elementType;
+	CombatType elementType;
 	int16_t elementDamage;
 };
 
@@ -128,7 +128,7 @@ public:
 protected:
 	void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	void onUsedAmmo(Player* player, Item* item, Tile* destTile) const;
-	bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
+	bool getSkillType(const Player* player, const Item* item, SkillType& skill, uint32_t& skillpoint) const;
 
 	int32_t hitChance;
 	int32_t maxHitChance;
@@ -147,7 +147,7 @@ public:
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 
 protected:
-	bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
+	bool getSkillType(const Player* player, const Item* item, SkillType& skill, uint32_t& skillpoint) const {return false;};
 
 	int32_t minChange;
 	int32_t maxChange;

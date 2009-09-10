@@ -40,14 +40,14 @@ class Combat;
 class CombatDamageCalculationCallback {
 public:
 	CombatDamageCalculationCallback() : type(FORMULA_UNDEFINED) {}
-	CombatDamageCalculationCallback(formulaType_t type) : type(type) {}
+	CombatDamageCalculationCallback(FormulaType type) : type(type) {}
 	CombatDamageCalculationCallback(const CombatDamageCalculationCallback& c) : type(c.type) {}
 	CombatDamageCalculationCallback& operator=(const CombatDamageCalculationCallback& rhs) {type = rhs.type; return *this;}
 
 	void operator()(Creature* creature, int32_t& min, int32_t& max, bool useCharges) const;
 	operator bool() const {return type != FORMULA_UNDEFINED;}
 protected:
-	formulaType_t type;
+	FormulaType type;
 };
 
 /*
@@ -57,7 +57,7 @@ public:
 	void onTileCombat(Creature* creature, Tile* tile) const;
 
 protected:
-	formulaType_t type;
+	FormulaType type;
 };
 
 class TargetCallback : public CallBack{
@@ -66,7 +66,7 @@ public:
 	void onTargetCombat(Creature* creature, Creature* target) const;
 
 protected:
-	formulaType_t type;
+	FormulaType type;
 };
 */
 struct CombatParams{
@@ -86,8 +86,8 @@ struct CombatParams{
 	}
 
 	std::list<const Condition*> conditionList;
-	ConditionType_t dispelType;
-	CombatType_t combatType;
+	ConditionType dispelType;
+	CombatType combatType;
 	bool blockedByArmor;
 	bool blockedByShield;
 	bool targetCasterOrTopMost;
@@ -285,8 +285,8 @@ public:
 	static bool isInPvpZone(const Creature* attacker, const Creature* target);
 	static bool isUnjustKill(const Creature* attacker, const Creature* target);
 	static bool isPlayerCombat(const Creature* target);
-	static CombatType_t ConditionToDamageType(ConditionType_t type);
-	static ConditionType_t DamageToConditionType(CombatType_t type);
+	static CombatType ConditionToDamageType(ConditionType type);
+	static ConditionType DamageToConditionType(CombatType type);
 	static ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
@@ -298,7 +298,7 @@ public:
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;
 
-	bool setParam(CombatParam_t param, uint32_t value);
+	bool setParam(CombatParam param, uint32_t value);
 	void setArea(AreaCombat* _area)
 	{
 		if(area){
@@ -309,7 +309,7 @@ public:
 	}
 	bool hasArea() const {return area != NULL;}
 	void setCondition(const Condition* _condition) {params.conditionList.push_back(_condition);}
-	void setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb);
+	void setPlayerCombatValues(FormulaType _type, double _mina, double _minb, double _maxa, double _maxb);
 	void postCombatEffects(Creature* caster, const Position& pos) const {Combat::postCombatEffects(caster, pos, params);}
 
 protected:
@@ -331,7 +331,7 @@ protected:
 	CombatParams params;
 
 	//formula variables
-	formulaType_t formulaType;
+	FormulaType formulaType;
 	double mina;
 	double minb;
 	double maxa;
@@ -349,7 +349,7 @@ public:
 	virtual const MagicField* getMagicField() const {return this;};
 
 	bool isReplaceable() const {return Item::items[getID()].replaceable;}
-	CombatType_t getCombatType() const {
+	CombatType getCombatType() const {
 		const ItemType& it = items[getID()];
 		return it.combatType;
 	}
@@ -358,38 +358,5 @@ public:
 private:
 	int64_t createTime;
 };
-
-inline std::string CombatTypeName(CombatType_t combat) {
-	switch(combat){
-		case COMBAT_NONE: return "unknown";
-		case COMBAT_PHYSICALDAMAGE: return "physical";
-		case COMBAT_ENERGYDAMAGE: return "energy";
-		case COMBAT_EARTHDAMAGE: return "earth";
-		case COMBAT_FIREDAMAGE: return "fire";
-		case COMBAT_UNDEFINEDDAMAGE: return "undefined";
-		case COMBAT_LIFEDRAIN: return "life drain";
-		case COMBAT_MANADRAIN: return "mana drain";
-		case COMBAT_HEALING: return "healing";
-		case COMBAT_DROWNDAMAGE: return "drown";
-		case COMBAT_ICEDAMAGE: return "ice";
-		case COMBAT_HOLYDAMAGE: return "holy";
-		case COMBAT_DEATHDAMAGE: return "death";
-	}
-	return "none";
-}
-
-inline int32_t CombatTypeToIndex(CombatType_t combat) {
-	if(combat == COMBAT_NONE) return 0;
-	for(int32_t c = 0; c < COMBAT_COUNT; ++c){
-		if(combat & (1 << c))
-			return c+1;
-	}
-	return 0;
-}
-
-inline CombatType_t CombatIndexToType(int combatindex) {
-	if(combatindex == 0) return COMBAT_NONE;
-	return (CombatType_t)(1 << (combatindex-1));
-}
 
 #endif

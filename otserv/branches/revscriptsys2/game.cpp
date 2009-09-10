@@ -795,7 +795,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 		}
 	}
 	else{
-		//container
+		//from inside a container
 		if(pos.y & 0x40){
 			uint8_t fromCid = pos.y & 0x0F;
 			uint8_t slot = pos.z;
@@ -824,7 +824,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 		}
 		//inventory
 		else{
-			slots_t slot = (slots_t)static_cast<unsigned char>(pos.y);
+			SlotType slot = (SlotType)static_cast<unsigned char>(pos.y);
 			return player->getInventoryItem(slot);
 		}
 	}
@@ -1384,7 +1384,7 @@ bool Game::playerLogout(Player* player, bool forced, bool timeout)
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::playerEquipItem(Player* player, Item* item, slots_t slot, bool equip)
+bool Game::playerEquipItem(Player* player, Item* item, SlotType slot, bool equip)
 {
 	if(!script_system)
 		return false; // Not handled
@@ -3880,7 +3880,7 @@ bool Game::playerShowQuestLine(uint32_t playerId, uint16_t questId)
 	return true;
 }
 
-bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMode_t chaseMode, bool safeMode)
+bool Game::playerSetFightModes(uint32_t playerId, FightMode fightMode, ChaseMode chaseMode, bool safeMode)
 {
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
@@ -3946,7 +3946,7 @@ bool Game::playerRequestOutfit(uint32_t playerId)
 	return true;
 }
 
-bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
+bool Game::playerChangeOutfit(uint32_t playerId, OutfitType outfit)
 {
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
@@ -4498,7 +4498,7 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 	}
 }
 
-void Game::internalCreatureChangeOutfit(Creature* creature, const Outfit_t& outfit)
+void Game::internalCreatureChangeOutfit(Creature* creature, const OutfitType& outfit)
 {
 	creature->setCurrentOutfit(outfit);
 
@@ -4553,7 +4553,7 @@ void Game::changeLight(const Creature* creature)
 	}
 }
 
-bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
+bool Game::combatBlockHit(CombatType combatType, Creature* attacker, Creature* target,
 	int32_t& healthChange, bool checkDefense, bool checkArmor)
 {
 	if(target->getPlayer() && target->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
@@ -4574,7 +4574,7 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 	}
 
 	int32_t damage = -healthChange;
-	BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+	BlockType blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 	healthChange = -damage;
 
 	if(blockType == BLOCK_DEFENSE){
@@ -4588,36 +4588,20 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 	else if(blockType == BLOCK_IMMUNITY){
 		uint8_t hitEffect = 0;
 
-		switch(combatType){
-			case COMBAT_UNDEFINEDDAMAGE:
-				break;
-
-			case COMBAT_ENERGYDAMAGE:
-			case COMBAT_FIREDAMAGE:
-			case COMBAT_PHYSICALDAMAGE:
-			case COMBAT_ICEDAMAGE:
-			case COMBAT_DEATHDAMAGE:
-			{
-				hitEffect = NM_ME_BLOCKHIT;
-				break;
-			}
-
-			case COMBAT_EARTHDAMAGE:
-			{
-				hitEffect = NM_ME_POISON_RINGS;
-				break;
-			}
-
-			case COMBAT_HOLYDAMAGE:
-			{
-				hitEffect = NM_ME_HOLYDAMAGE;
-				break;
-			}
-
-			default:
-				hitEffect = NM_ME_PUFF;
-				break;
-		}
+		if(combatType == COMBAT_UNDEFINEDDAMAGE)
+			; // Nothing
+		else if(combatType == COMBAT_ENERGYDAMAGE &&
+				combatType == COMBAT_FIREDAMAGE &&
+				combatType == COMBAT_PHYSICALDAMAGE &&
+				combatType == COMBAT_ICEDAMAGE &&
+				combatType == COMBAT_DEATHDAMAGE)
+			hitEffect = NM_ME_BLOCKHIT;
+		else if(combatType == COMBAT_EARTHDAMAGE)
+			hitEffect = NM_ME_POISON_RINGS;
+		else if(combatType == COMBAT_HOLYDAMAGE)
+			hitEffect = NM_ME_HOLYDAMAGE;
+		else
+			hitEffect = NM_ME_PUFF;
 
 		addMagicEffect(list, targetPos, hitEffect);
 
@@ -4627,14 +4611,14 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 	return false;
 }
 
-bool Game::combatChangeHealth(CombatType_t combatType, 
+bool Game::combatChangeHealth(CombatType combatType, 
 	Creature* attacker, Creature* target, int32_t healthChange, 
 	bool showeffect /*= true*/)
 {
 	return combatChangeHealth(combatType, NM_ME_UNK, TEXTCOLOR_UNK, attacker, target, healthChange);
 }
 
-bool Game::combatChangeHealth(CombatType_t combatType, 
+bool Game::combatChangeHealth(CombatType combatType, 
 	MagicEffectClasses customHitEffect, TextColor_t customTextColor, 
 	Creature* attacker, Creature* target, int32_t healthChange, 
 	bool showeffect)
@@ -4685,102 +4669,71 @@ bool Game::combatChangeHealth(CombatType_t combatType,
 					TextColor_t textColor = TEXTCOLOR_NONE;
 					uint8_t hitEffect = 0;
 
-					switch(combatType){
-						case COMBAT_PHYSICALDAMAGE:
-						{
-							Item* splash = NULL;
-							switch(target->getRace()){
-								case RACE_VENOM:
-									textColor = TEXTCOLOR_LIGHTGREEN;
-									hitEffect = NM_ME_POISON;
-									splash = Item::CreateItem(ITEM_SMALLSPLASH, FLUID_GREEN);
-									break;
+					if(combatType == COMBAT_PHYSICALDAMAGE)
+					{
+						RaceType race = target->getRace();
 
-								case RACE_BLOOD:
-									textColor = TEXTCOLOR_RED;
-									hitEffect = NM_ME_DRAW_BLOOD;
-									splash = Item::CreateItem(ITEM_SMALLSPLASH, FLUID_BLOOD);
-									break;
-
-								case RACE_UNDEAD:
-									textColor = TEXTCOLOR_LIGHTGREY;
-									hitEffect = NM_ME_HIT_AREA;
-									break;
-
-								case RACE_FIRE:
-									textColor = TEXTCOLOR_ORANGE;
-									hitEffect = NM_ME_DRAW_BLOOD;
-									break;
-
-								case RACE_ENERGY:
-									textColor = TEXTCOLOR_PURPLE;
-									hitEffect = NM_ME_ENERGY_DAMAGE;
-									break;
-
-								default:
-									break;
-							}
+						if(race == RACE_VENOM){
+							textColor = TEXTCOLOR_LIGHTGREEN;
+							hitEffect = NM_ME_POISON;
 						}
-
-						case COMBAT_ENERGYDAMAGE:
-						{
+						else if(race == RACE_BLOOD){
+							textColor = TEXTCOLOR_RED;
+							hitEffect = NM_ME_DRAW_BLOOD;
+						}
+						else if(race == RACE_UNDEAD){
+							textColor = TEXTCOLOR_LIGHTGREY;
+							hitEffect = NM_ME_HIT_AREA;
+						}
+						else if(race == RACE_FIRE){
+							textColor = TEXTCOLOR_ORANGE;
+							hitEffect = NM_ME_DRAW_BLOOD;
+						}
+						else if(race == RACE_ENERGY){
 							textColor = TEXTCOLOR_PURPLE;
 							hitEffect = NM_ME_ENERGY_DAMAGE;
-							break;
 						}
-
-						case COMBAT_EARTHDAMAGE:
-						{
-							textColor = TEXTCOLOR_LIGHTGREEN;
-							hitEffect = NM_ME_POISON_RINGS;
-							break;
-						}
-
-						case COMBAT_DROWNDAMAGE:
-						{
-							textColor = TEXTCOLOR_LIGHTBLUE;
-							hitEffect = NM_ME_LOSE_ENERGY;
-							break;
-						}
-
-						case COMBAT_FIREDAMAGE:
-						{
-							textColor = TEXTCOLOR_ORANGE;
-							hitEffect = NM_ME_HITBY_FIRE;
-							break;
-						}
-
-						case COMBAT_ICEDAMAGE:
-						{
-							textColor = TEXTCOLOR_LIGHTBLUE;
-							hitEffect = NM_ME_ICEATTACK;
-							break;
-						}
-
-						case COMBAT_HOLYDAMAGE:
-						{
-							textColor = TEXTCOLOR_YELLOW;
-							hitEffect = NM_ME_HOLYDAMAGE;
-							break;
-						}
-
-						case COMBAT_DEATHDAMAGE:
-						{
-							textColor = TEXTCOLOR_DARKRED;
-							hitEffect = NM_ME_SMALLCLOUDS;
-							break;
-						}
-
-						case COMBAT_LIFEDRAIN:
-						{
-							textColor = TEXTCOLOR_RED;
-							hitEffect = NM_ME_MAGIC_BLOOD;
-							break;
-						}
-
-						default:
-							break;
-						}
+					}
+					else if(combatType == COMBAT_ENERGYDAMAGE)
+					{
+						textColor = TEXTCOLOR_PURPLE;
+						hitEffect = NM_ME_ENERGY_DAMAGE;
+					}
+					else if(combatType == COMBAT_EARTHDAMAGE)
+					{
+						textColor = TEXTCOLOR_LIGHTGREEN;
+						hitEffect = NM_ME_POISON_RINGS;
+					}
+					else if(combatType == COMBAT_DROWNDAMAGE)
+					{
+						textColor = TEXTCOLOR_LIGHTBLUE;
+						hitEffect = NM_ME_LOSE_ENERGY;
+					}
+					else if(combatType == COMBAT_FIREDAMAGE)
+					{
+						textColor = TEXTCOLOR_ORANGE;
+						hitEffect = NM_ME_HITBY_FIRE;
+					}
+					else if(combatType == COMBAT_ICEDAMAGE)
+					{
+						textColor = TEXTCOLOR_LIGHTBLUE;
+						hitEffect = NM_ME_ICEATTACK;
+					}
+					else if(combatType == COMBAT_HOLYDAMAGE)
+					{
+						textColor = TEXTCOLOR_YELLOW;
+						hitEffect = NM_ME_HOLYDAMAGE;
+					}
+					else if(combatType == COMBAT_DEATHDAMAGE)
+					{
+						textColor = TEXTCOLOR_DARKRED;
+						hitEffect = NM_ME_SMALLCLOUDS;
+					}
+					else if(combatType == COMBAT_LIFEDRAIN)
+					{
+						textColor = TEXTCOLOR_RED;
+						hitEffect = NM_ME_MAGIC_BLOOD;
+					}
 
 					if(textColor != TEXTCOLOR_NONE){
 						std::stringstream ss;
@@ -4826,7 +4779,7 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 		}
 
 		int32_t manaLoss = std::min(target->getMana(), -manaChange);
-		BlockType_t blockType = target->blockHit(attacker, COMBAT_MANADRAIN, manaLoss);
+		BlockType blockType = target->blockHit(attacker, COMBAT_MANADRAIN, manaLoss);
 
 		if(blockType != BLOCK_NONE){
 			if(showeffect)
@@ -5224,7 +5177,7 @@ void Game::showUseHotkeyMessage(Player* player, Item* item)
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 }
 
-bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
+bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, ViolationAction actionType,
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment)
 {
 	Player* player = getPlayerByID(playerId);
@@ -5278,118 +5231,11 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 	Account account =  IOAccount::instance()->loadAccount(acc, true);
 	int16_t removeNotations = 2; //2 - remove notations & kick, 1 - kick, 0 - nothing
-	switch(actionType)
+		
+	if(actionType == ACTION_NOTATION)
 	{
-		case ACTION_NOTATION:
-		{
-			g_bans.addAccountNotation(account.number, player->getGUID(), comment, statement, reasonId, actionType);
-			if(g_bans.getNotationsCount(account.number) >= (uint32_t)g_config.getNumber(ConfigManager::NOTATIONS_TO_BAN)){
-				account.warnings++;
-				if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
-					actionType = ACTION_DELETION;
-					g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType);
-				}
-				else if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN)){
-					if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-						ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
-						account.warnings--;
-				}
-				else{
-					if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-						ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
-						account.warnings--;
-				}
-			}
-			else
-				removeNotations = 0;
-
-			break;
-		}
-
-		case ACTION_NAMEREPORT:
-		{
-			g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
-			removeNotations = 1;
-			break;
-		}
-
-		case ACTION_BANREPORT:
-		{
-			if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
-				actionType = ACTION_DELETION;
-				g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType);
-			}
-			else
-			{
-				account.warnings++;
-				if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN)){
-					if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-						ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
-						account.warnings--;
-				}
-				else{
-					if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-						ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
-						account.warnings--;
-				}
-
-				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
-			}
-
-			break;
-		}
-
-		case ACTION_BANFINAL:
-		{
-			if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
-				actionType = ACTION_DELETION;
-				if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType))
-					account.warnings--;
-			}
-			else if(g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-				ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
-				account.warnings = g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION) - 1;
-
-			break;
-		}
-
-		case ACTION_BANREPORTFINAL:{
-			if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
-				actionType = ACTION_DELETION;
-				if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType))
-					account.warnings--;
-			}
-			else{
-				if(g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
-					account.warnings = g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION);
-
-				g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
-			}
-
-			break;
-		}
-
-		case ACTION_STATEMENT:
-		{
-			ChannelStatementMap::iterator it = Player::channelStatementMap.find(channelId);
-			if(it != Player::channelStatementMap.end()){
-				statement = it->second;
-				g_bans.addPlayerStatement(guid, player->getGUID(), comment, statement, reasonId, actionType);
-				Player::channelStatementMap.erase(it);
-			}
-			else{
-				player->sendCancel("Statement has already been reported.");
-				return false;
-			}
-
-			removeNotations = 0;
-			break;
-		}
-
-		case ACTION_BANISHMENT:
-		default:
-		{
+		g_bans.addAccountNotation(account.number, player->getGUID(), comment, statement, reasonId, actionType);
+		if(g_bans.getNotationsCount(account.number) >= (uint32_t)g_config.getNumber(ConfigManager::NOTATIONS_TO_BAN)){
 			account.warnings++;
 			if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
 				actionType = ACTION_DELETION;
@@ -5400,12 +5246,107 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
 					account.warnings--;
 			}
-			else if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
-				ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
-				account.warnings--;
-
-			break;
+			else{
+				if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
+					ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
+					account.warnings--;
+			}
 		}
+		else
+			removeNotations = 0;
+	}
+
+	else if(actionType == ACTION_NAMEREPORT)
+	{
+		g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
+		removeNotations = 1;
+	}
+
+	else if(actionType == ACTION_BANREPORT)
+	{
+		if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+			actionType = ACTION_DELETION;
+			g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType);
+		}
+		else
+		{
+			account.warnings++;
+			if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN)){
+				if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
+					ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
+					account.warnings--;
+			}
+			else{
+				if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
+					ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
+					account.warnings--;
+			}
+
+			g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
+		}
+	}
+
+	else if(actionType == ACTION_BANFINAL)
+	{
+		if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+			actionType = ACTION_DELETION;
+			if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType))
+				account.warnings--;
+		}
+		else if(g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
+				ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
+		{
+			account.warnings = g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION) - 1;
+		}
+	}
+
+	else if(actionType == ACTION_BANREPORTFINAL)
+	{
+		if(account.warnings++ >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+			actionType = ACTION_DELETION;
+			if(!g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType))
+				account.warnings--;
+		}
+		else{
+			if(g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
+				ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
+				account.warnings = g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION);
+
+			g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
+		}
+	}
+
+	else if(actionType == ACTION_STATEMENT)
+	{
+		ChannelStatementMap::iterator it = Player::channelStatementMap.find(channelId);
+		if(it != Player::channelStatementMap.end()){
+			statement = it->second;
+			g_bans.addPlayerStatement(guid, player->getGUID(), comment, statement, reasonId, actionType);
+			Player::channelStatementMap.erase(it);
+		}
+		else{
+			player->sendCancel("Statement has already been reported.");
+			return false;
+		}
+
+		removeNotations = 0;
+	}
+
+	else
+	{
+		account.warnings++;
+		if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_DELETION)){
+			actionType = ACTION_DELETION;
+			g_bans.addAccountBan(account.number, -1, player->getGUID(), comment, statement, reasonId, actionType);
+		}
+		else if(account.warnings >= (uint32_t)g_config.getNumber(ConfigManager::WARNINGS_TO_FINALBAN)){
+			if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
+				ConfigManager::FINALBAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
+				account.warnings--;
+		}
+		else if(!g_bans.addAccountBan(account.number, (time(NULL) + g_config.getNumber(
+			ConfigManager::BAN_LENGTH)), player->getGUID(), comment, statement, reasonId, actionType))
+			account.warnings--;
 	}
 
 	if(ipBanishment && ip > 0)

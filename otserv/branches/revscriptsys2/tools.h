@@ -78,9 +78,9 @@ Ammo_t getAmmoType(const std::string& strValue);
 AmmoAction_t getAmmoAction(const std::string& strValue);
 
 std::string getViolationReasonString(int32_t reasonId);
-std::string getViolationActionString(violationAction_t actionId, bool ipBanishment);
-std::string playerSexAdjectiveString(playersex_t sex);
-std::string playerSexSubjectString(playersex_t sex);
+std::string getViolationActionString(ViolationAction actionId, bool ipBanishment);
+std::string playerSexAdjectiveString(PlayerSex sex);
+std::string playerSexSubjectString(PlayerSex sex);
 
 uint32_t adlerChecksum(uint8_t *data, int32_t len);
 

@@ -378,7 +378,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 {
 	if(!player->hasFlag(PlayerFlag_NotGainSkill)){
-		skills_t skillType;
+		SkillType skillType;
 		uint32_t skillPoint = 0;
 		if(getSkillType(player, item, skillType, skillPoint)){
 			player->addSkillAdvance(skillType, skillPoint);
@@ -530,26 +530,16 @@ void WeaponMelee::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 }
 
 bool WeaponMelee::getSkillType(const Player* player, const Item* item,
-	skills_t& skill, uint32_t& skillpoint) const
+	SkillType& skill, uint32_t& skillpoint) const
 {
 	skillpoint = 0;
 
 	if(player->getAddAttackSkill()){
-		switch(player->getLastAttackBlockType()){
-			case BLOCK_DEFENSE:
-			case BLOCK_ARMOR:
-			case BLOCK_NONE:
-			{
-				skillpoint = 1;
-				break;
-			}
-
-			default:
-			{
-				skillpoint = 0;
-				break;
-			}
-		}
+		BlockType block = player->getLastAttackBlockType();;
+		if(block == BLOCK_DEFENSE || block == BLOCK_ARMOR || block == BLOCK_NONE)
+			skillpoint = 1;
+		else
+			skillpoint = 0;
 	}
 
 	WeaponType_t weaponType = item->getWeaponType();
@@ -897,30 +887,19 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 }
 
 bool WeaponDistance::getSkillType(const Player* player, const Item* item,
-	skills_t& skill, uint32_t& skillpoint) const
+	SkillType& skill, uint32_t& skillpoint) const
 {
 	skill = SKILL_DIST;
 	skillpoint = 0;
 
 	if(player->getAddAttackSkill()){
-		switch(player->getLastAttackBlockType()){
-			case BLOCK_NONE:
-			{
-				skillpoint = 2;
-				break;
-			}
-
-			case BLOCK_DEFENSE:
-			case BLOCK_ARMOR:
-			{
-				skillpoint = 1;
-				break;
-			}
-
-			default:
-				skillpoint = 0;
-				break;
-		}
+		BlockType block = player->getLastAttackBlockType();;
+		if(block == BLOCK_DEFENSE || block == BLOCK_ARMOR)
+			skillpoint = 1;
+		else if(block == BLOCK_NONE)
+			skillpoint = 2;
+		else
+			skillpoint = 0;
 	}
 
 	return true;

@@ -70,63 +70,52 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 			return true;
 		}
 		else{
-			switch(formulaType){
-				case FORMULA_LEVELMAGIC:
-				{
-					max = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * mina + minb);
-					min = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * maxa + maxb);
+			if(formulaType== FORMULA_LEVELMAGIC){
+				max = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * mina + minb);
+				min = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * maxa + maxb);
 
-					Vocation* vocation = player->getVocation();
-					if(vocation){
-						if(max > 0 && min > 0 && vocation->getHealingBaseDamage() != 1.0){
-							min = int32_t(min * vocation->getHealingBaseDamage());
-							max = int32_t(max * vocation->getHealingBaseDamage());
-						}
-						else if(max < 0 && min < 0 && vocation->getMagicBaseDamage() != 1.0){
-							min = int32_t(min * vocation->getMagicBaseDamage());
-							max = int32_t(max * vocation->getMagicBaseDamage());
-						}
+				Vocation* vocation = player->getVocation();
+				if(vocation){
+					if(max > 0 && min > 0 && vocation->getHealingBaseDamage() != 1.0){
+						min = int32_t(min * vocation->getHealingBaseDamage());
+						max = int32_t(max * vocation->getHealingBaseDamage());
 					}
-
-					return true;
-					break;
+					else if(max < 0 && min < 0 && vocation->getMagicBaseDamage() != 1.0){
+						min = int32_t(min * vocation->getMagicBaseDamage());
+						max = int32_t(max * vocation->getMagicBaseDamage());
+					}
 				}
 
-				case FORMULA_SKILL:
-				{
-					Item* tool = player->getWeapon();
-					const Weapon* weapon = tool->getWeapon();
+				return true;
+			}
+			else if(formulaType == FORMULA_SKILL){
+				Item* tool = player->getWeapon();
+				const Weapon* weapon = tool->getWeapon();
 
-					min = (int32_t)minb;
+				min = (int32_t)minb;
 
-					if(weapon){
-						max = (int32_t)(weapon->getWeaponDamage(player, target, tool, true) * maxa + maxb);
-						if(params.useCharges && tool->hasCharges() && g_config.getNumber(ConfigManager::REMOVE_WEAPON_CHARGES)){
-							int32_t newCharge = std::max((int32_t)0, ((int32_t)tool->getCharges()) - 1);
-							g_game.transformItem(player, tool, tool->getID(), newCharge);
-						}
+				if(weapon){
+					max = (int32_t)(weapon->getWeaponDamage(player, target, tool, true) * maxa + maxb);
+					if(params.useCharges && tool->hasCharges() && g_config.getNumber(ConfigManager::REMOVE_WEAPON_CHARGES)){
+						int32_t newCharge = std::max((int32_t)0, ((int32_t)tool->getCharges()) - 1);
+						g_game.transformItem(player, tool, tool->getID(), newCharge);
 					}
-					else{
-						max = (int32_t)maxb;
-					}
-
-					return true;
-					break;
+				}
+				else{
+					max = (int32_t)maxb;
 				}
 
-				case FORMULA_VALUE:
-				{
-					min = (int32_t)mina;
-					max = (int32_t)maxa;
-					return true;
-					break;
-				}
-
-				default:
-					min = 0;
-					max = 0;
-					return false;
-					break;
+				return true;
+			}
+			else if(formulaType == FORMULA_VALUE){
+				min = (int32_t)mina;
+				max = (int32_t)maxa;
+				return true;
+			}
+			else{
+				min = 0;
+				max = 0;
+				return false;
 			}
 
 			//std::cout << "No callback set for combat" << std::endl;
@@ -161,79 +150,48 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	}
 }
 
-CombatType_t Combat::ConditionToDamageType(ConditionType_t type)
+CombatType Combat::ConditionToDamageType(ConditionType type)
 {
-	switch(type){
-		case CONDITION_FIRE:
-			return COMBAT_FIREDAMAGE;
-			break;
-
-		case CONDITION_ENERGY:
-			return COMBAT_ENERGYDAMAGE;
-			break;
-
-		case CONDITION_DROWN:
-			return COMBAT_DROWNDAMAGE;
-			break;
-
-		case CONDITION_POISON:
-			return COMBAT_EARTHDAMAGE;
-			break;
-
-		case CONDITION_FREEZING:
-			return COMBAT_ICEDAMAGE;
-			break;
-
-		case CONDITION_DAZZLED:
-			return COMBAT_HOLYDAMAGE;
-			break;
-
-		case CONDITION_CURSED:
-			return COMBAT_DEATHDAMAGE;
-			break;
-
-		default:
-			break;
-	}
-
+	if(type == CONDITION_FIRE)
+		return COMBAT_FIREDAMAGE;
+	
+	if(type == CONDITION_ENERGY)
+		return COMBAT_ENERGYDAMAGE;
+	
+	if(type == CONDITION_DROWN)
+		return COMBAT_DROWNDAMAGE;
+	
+	if(type == CONDITION_POISON)
+		return COMBAT_EARTHDAMAGE;
+	
+	if(type == CONDITION_FREEZING)
+		return COMBAT_ICEDAMAGE;
+	
+	if(type == CONDITION_DAZZLED)
+		return COMBAT_HOLYDAMAGE;
+	
+	if(type == CONDITION_CURSED)
+		return COMBAT_DEATHDAMAGE;
+	
 	return COMBAT_NONE;
 }
 
-ConditionType_t Combat::DamageToConditionType(CombatType_t type)
+ConditionType Combat::DamageToConditionType(CombatType type)
 {
-	switch(type){
-		case COMBAT_FIREDAMAGE:
-			return CONDITION_FIRE;
-			break;
-
-		case COMBAT_ENERGYDAMAGE:
-			return CONDITION_ENERGY;
-			break;
-
-		case COMBAT_DROWNDAMAGE:
-			return CONDITION_DROWN;
-			break;
-
-		case COMBAT_EARTHDAMAGE:
-			return CONDITION_POISON;
-			break;
-
-		case COMBAT_ICEDAMAGE:
-			return CONDITION_FREEZING;
-			break;
-
-		case COMBAT_HOLYDAMAGE:
-			return CONDITION_DAZZLED;
-			break;
-
-		case COMBAT_DEATHDAMAGE:
-			return CONDITION_CURSED;
-			break;
-
-		default:
-			break;
-	}
-
+	if(type == COMBAT_FIREDAMAGE)
+		return CONDITION_FIRE;
+	if(type == COMBAT_ENERGYDAMAGE)
+		return CONDITION_ENERGY;
+	if(type == COMBAT_DROWNDAMAGE)
+		return CONDITION_DROWN;
+	if(type == COMBAT_EARTHDAMAGE)
+		return CONDITION_POISON;
+	if(type == COMBAT_ICEDAMAGE)
+		return CONDITION_FREEZING;
+	if(type == COMBAT_HOLYDAMAGE)
+		return CONDITION_DAZZLED;
+	if(type == COMBAT_DEATHDAMAGE)
+		return CONDITION_CURSED;
 	return CONDITION_NONE;
 }
 
@@ -447,7 +405,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 	return RET_NOERROR;
 }
 
-void Combat::setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb)
+void Combat::setPlayerCombatValues(FormulaType _type, double _mina, double _minb, double _maxa, double _maxb)
 {
 	formulaType = _type;
 	mina = _mina;
@@ -456,87 +414,56 @@ void Combat::setPlayerCombatValues(formulaType_t _type, double _mina, double _mi
 	maxb = _maxb;
 }
 
-bool Combat::setParam(CombatParam_t param, uint32_t value)
+bool Combat::setParam(CombatParam param, uint32_t value)
 {
-	switch(param){
-		case COMBATPARAM_COMBATTYPE:
-		{
-			params.combatType = (CombatType_t)value;
-			return true;
-		}
-
-		case COMBATPARAM_EFFECT:
-		{
-			params.impactEffect = (uint8_t)value;
-			return true;
-		}
-
-		case COMBATPARAM_DISTANCEEFFECT:
-		{
-			params.distanceEffect = (uint8_t)value;
-			return true;
-		}
-
-		case COMBATPARAM_BLOCKEDBYARMOR:
-		{
-			params.blockedByArmor = (value != 0);
-			return true;
-		}
-
-		case COMBATPARAM_BLOCKEDBYSHIELD:
-		{
-			params.blockedByShield = (value != 0);
-			return true;
-		}
-
-		case COMBATPARAM_TARGETCASTERORTOPMOST:
-		{
-			params.targetCasterOrTopMost = (value != 0);
-			return true;
-		}
-
-		case COMBATPARAM_CREATEITEM:
-		{
-			params.itemId = value;
-			return true;
-		}
-
-		case COMBATPARAM_AGGRESSIVE:
-		{
-			params.isAggressive = (value != 0);
-			return true;
-		}
-
-		case COMBATPARAM_DISPEL:
-		{
-			params.dispelType = (ConditionType_t)value;
-			return true;
-		}
-
-		case COMBATPARAM_USECHARGES:
-		{
-			params.useCharges = (value != 0);
-			return true;
-		}
-
-		case COMBATPARAM_HITEFFECT:
-		{
-			params.hitEffect = (MagicEffectClasses)value;
-			return true;
-		}
-
-		case COMBATPARAM_HITTEXTCOLOR:
-		{
-			params.hitTextColor = (TextColor_t)value;
-			return true;
-		}
-
-		default:
-		{
-			break;
-		}
+	if(param == COMBATPARAM_COMBATTYPE){
+		params.combatType = (CombatType)value;
+		return true;
 	}
-
+	if(param == COMBATPARAM_EFFECT){
+		params.impactEffect = (uint8_t)value;
+		return true;
+	}
+	if(param == COMBATPARAM_DISTANCEEFFECT){
+		params.distanceEffect = (uint8_t)value;
+		return true;
+	}
+	if(param == COMBATPARAM_BLOCKEDBYARMOR){
+		params.blockedByArmor = (value != 0);
+		return true;
+	}
+	if(param == COMBATPARAM_BLOCKEDBYSHIELD){
+		params.blockedByShield = (value != 0);
+		return true;
+	}
+	if(param == COMBATPARAM_TARGETCASTERORTOPMOST){
+		params.targetCasterOrTopMost = (value != 0);
+		return true;
+	}
+	if(param == COMBATPARAM_CREATEITEM){
+		params.itemId = value;
+		return true;
+	}
+	if(param == COMBATPARAM_AGGRESSIVE){
+		params.isAggressive = (value != 0);
+		return true;
+	}
+	if(param == COMBATPARAM_DISPEL){
+		params.dispelType = (ConditionType)value;
+		return true;
+	}
+	if(param == COMBATPARAM_USECHARGES){
+		params.useCharges = (value != 0);
+		return true;
+	}
+	if(param == COMBATPARAM_HITEFFECT){
+		params.hitEffect = (MagicEffectClasses)value;
+		return true;
+	}
+	if(param == COMBATPARAM_HITTEXTCOLOR){
+		params.hitTextColor = (TextColor_t)value;
+		return true;
+	}
 	return false;
 }
 /*

@@ -686,62 +686,47 @@ std::string getViolationReasonString(int32_t reasonId)
 	return "Unknown Reason";
 }
 
-std::string getViolationActionString(violationAction_t actionId, bool ipBanishment)
+std::string getViolationActionString(ViolationAction actionId, bool ipBanishment)
 {
 	std::string action;
-	switch(actionId)
-	{
-		case ACTION_NOTATION:
-			action = "Notation";
-			break;
-		case ACTION_NAMEREPORT:
-			action = "Name Report";
-			break;
-		case ACTION_BANREPORT:
-			action = "Name Report + Banishment";
-			break;
-		case ACTION_BANFINAL:
-			action = "Banishment + Final Warning";
-			break;
-		case ACTION_BANREPORTFINAL:
-			action = "Name Report + Banishment + Final Warning";
-			break;
-		case ACTION_STATEMENT:
-			action = "Statement Report";
-			break;
-		case ACTION_DELETION:
-			action = "Deletion";
-			break;
-		case ACTION_BANISHMENT:
-		default:
-			action = "Banishment";
-			break;
-	}
 
+	if(actionId == ACTION_NOTATION)
+		action = "Notation";
+	else if(actionId == ACTION_NAMEREPORT)
+		action = "Name Report";
+	else if(actionId == ACTION_BANREPORT)
+		action = "Name Report + Banishment";
+	else if(actionId == ACTION_BANFINAL)
+		action = "Banishment + Final Warning";
+	else if(actionId == ACTION_BANREPORTFINAL)
+		action = "Name Report + Banishment + Final Warning";
+	else if(actionId == ACTION_STATEMENT)
+		action = "Statement Report";
+	else if(actionId == ACTION_DELETION)
+		action = "Deletion";
+	else if(actionId == ACTION_BANISHMENT)
+			action = "Banishment";
+	
 	if(ipBanishment)
 		action += " + IP Banishment";
 
 	return action;
 }
 
-std::string playerSexAdjectiveString(playersex_t sex)
+std::string playerSexAdjectiveString(PlayerSex sex)
 {
-	if(sex % 2 == 0){
+	if(sex.value() % 2 == 0)
 		return "her";
-	}
-	else{
+	else
 		return "his";
-	}
 }
 
-std::string playerSexSubjectString(playersex_t sex)
+std::string playerSexSubjectString(PlayerSex sex)
 {
-	if(sex % 2 == 0){
+	if(sex.value() % 2 == 0)
 		return "She";
-	}
-	else{
+	else
 		return "He";
-	}
 }
 
 #define MOD_ADLER 65521

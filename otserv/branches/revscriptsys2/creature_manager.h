@@ -46,7 +46,7 @@ public:
 	static uint32_t getLootRandom();
 
 private:
-	ConditionDamage* getDamageCondition(ConditionType_t conditionType,
+	ConditionDamage* getDamageCondition(ConditionType conditionType,
 		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
 	//bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "");
 

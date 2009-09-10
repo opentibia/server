@@ -1067,7 +1067,7 @@ void ProtocolGame::parseSetOutfit(NetworkMessage& msg)
 	uint8_t lookfeet = msg.GetByte();
 	uint8_t lookaddons = msg.GetByte();
 
-	Outfit_t newOutfit;
+	OutfitType newOutfit;
 	newOutfit.lookType = looktype;
 	newOutfit.lookHead = lookhead;
 	newOutfit.lookBody = lookbody;
@@ -1213,7 +1213,7 @@ void ProtocolGame::parseFightModes(NetworkMessage& msg)
 	uint8_t rawSafeMode = msg.GetByte();
 
 	bool safeMode = (rawSafeMode == 1);
-	chaseMode_t chaseMode = CHASEMODE_STANDSTILL;
+	ChaseMode chaseMode = CHASEMODE_STANDSTILL;
 
 	if(rawChaseMode == 0){
 		chaseMode = CHASEMODE_STANDSTILL;
@@ -1222,7 +1222,7 @@ void ProtocolGame::parseFightModes(NetworkMessage& msg)
 		chaseMode = CHASEMODE_FOLLOW;
 	}
 
-	fightMode_t fightMode = FIGHTMODE_ATTACK;
+	FightMode fightMode = FIGHTMODE_ATTACK;
 
 	if(rawFightMode == 1){
 		fightMode = FIGHTMODE_ATTACK;
@@ -1409,7 +1409,7 @@ void ProtocolGame::parseViolationWindow(NetworkMessage& msg)
 {
 	std::string target = msg.GetString();
 	uint8_t reason = msg.GetByte();
-	violationAction_t action = (violationAction_t)msg.GetByte();
+	ViolationAction action = (ViolationAction)msg.GetByte();
 	std::string comment = msg.GetString();
 	std::string statement = (action == ACTION_STATEMENT ? "" : msg.GetString());
 	uint16_t channelId = msg.GetU16();
@@ -1466,7 +1466,7 @@ void ProtocolGame::sendOpenPrivateChannel(const std::string& receiver)
 	}
 }
 
-void ProtocolGame::sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit)
+void ProtocolGame::sendCreatureOutfit(const Creature* creature, const OutfitType& outfit)
 {
 	if(canSee(creature)){
 		NetworkMessage_ptr msg = getOutputBuffer();
@@ -2260,7 +2260,7 @@ void ProtocolGame::sendMoveCreature(const Creature* creature, const Tile* newTil
 }
 
 //inventory
-void ProtocolGame::sendAddInventoryItem(slots_t slot, const Item* item)
+void ProtocolGame::sendAddInventoryItem(SlotType slot, const Item* item)
 {
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
@@ -2269,7 +2269,7 @@ void ProtocolGame::sendAddInventoryItem(slots_t slot, const Item* item)
 	}
 }
 
-void ProtocolGame::sendUpdateInventoryItem(slots_t slot, const Item* item)
+void ProtocolGame::sendUpdateInventoryItem(SlotType slot, const Item* item)
 {
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
@@ -2278,7 +2278,7 @@ void ProtocolGame::sendUpdateInventoryItem(slots_t slot, const Item* item)
 	}
 }
 
-void ProtocolGame::sendRemoveInventoryItem(slots_t slot)
+void ProtocolGame::sendRemoveInventoryItem(SlotType slot)
 {
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
@@ -2549,7 +2549,7 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 	msg->AddByte((int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1)));
 	msg->AddByte((uint8_t)creature->getDirection());
 	if(creature->isInvisible()){
-		static Outfit_t outfit;
+		static OutfitType outfit;
 		AddCreatureOutfit(msg, creature, outfit);
 	}
 	else{
@@ -2687,7 +2687,7 @@ void ProtocolGame::AddCreatureHealth(NetworkMessage_ptr msg,const Creature* crea
 	msg->AddByte((int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1)));
 }
 
-void ProtocolGame::AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const Outfit_t& outfit)
+void ProtocolGame::AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const OutfitType& outfit)
 {
 	msg->AddU16(outfit.lookType);
 	if(outfit.lookType != 0){
@@ -2853,36 +2853,36 @@ void ProtocolGame::MoveDownCreature(NetworkMessage_ptr msg, const Creature* crea
 }
 
 //inventory
-void ProtocolGame::AddInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item)
+void ProtocolGame::AddInventoryItem(NetworkMessage_ptr msg, SlotType slot, const Item* item)
 {
 	if(item == NULL){
 		msg->AddByte(0x79);
-		msg->AddByte(slot);
+		msg->AddByte(slot.value());
 	}
 	else{
 		msg->AddByte(0x78);
-		msg->AddByte(slot);
+		msg->AddByte(slot.value());
 		msg->AddItem(item);
 	}
 }
 
-void ProtocolGame::UpdateInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item)
+void ProtocolGame::UpdateInventoryItem(NetworkMessage_ptr msg, SlotType slot, const Item* item)
 {
 	if(item == NULL){
 		msg->AddByte(0x79);
-		msg->AddByte(slot);
+		msg->AddByte(slot.value());
 	}
 	else{
 		msg->AddByte(0x78);
-		msg->AddByte(slot);
+		msg->AddByte(slot.value());
 		msg->AddItem(item);
 	}
 }
 
-void ProtocolGame::RemoveInventoryItem(NetworkMessage_ptr msg, slots_t slot)
+void ProtocolGame::RemoveInventoryItem(NetworkMessage_ptr msg, SlotType slot)
 {
 	msg->AddByte(0x79);
-	msg->AddByte(slot);
+	msg->AddByte(slot.value());
 }
 
 //containers

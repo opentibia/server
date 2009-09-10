@@ -79,6 +79,8 @@ struct TeleportDest{
 };
 #pragma pack()
 
+struct LightInfo;
+
 enum AttrTypes_t{
 	// attr 0 means end of attribute list
 	//ATTR_DESCRIPTION = 1,
@@ -320,8 +322,8 @@ public:
 	int getArmor() const {return items[id].armor;}
 	int getDefense() const {return items[id].defence;}
 	int getExtraDef() const {return items[id].extraDefense;}
-	int getSlotPosition() const {return items[id].slotPosition;}
-	int getWieldPosition() const {return items[id].wieldPosition;}
+	SlotPosition getSlotPosition() const {return items[id].slotPosition;}
+	SlotType getWieldPosition() const {return items[id].wieldPosition;}
 	int getHitChance() const {return items[id].hitChance;}
 
 	bool isReadable() const {return items[id].canReadText;}

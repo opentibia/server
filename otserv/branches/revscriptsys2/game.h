@@ -30,6 +30,7 @@
 #include "templates.h"
 #include "enums.h"
 #include "scheduler.h"
+#include "outfit.h"
 
 namespace Script {
 	class Manager;
@@ -507,7 +508,7 @@ public:
 	bool playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerFollowCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerCancelAttackAndFollow(uint32_t playerId);
-	bool playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMode_t chaseMode, bool safeMode);
+	bool playerSetFightModes(uint32_t playerId, FightMode fightMode, ChaseMode chaseMode, bool safeMode);
 	bool playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteId, uint8_t stackPos);
 	bool playerRequestAddVip(uint32_t playerId, const std::string& name);
 	bool playerRequestRemoveVip(uint32_t playerId, uint32_t guid);
@@ -516,7 +517,7 @@ public:
 	bool playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 		std::string receiver, std::string text);
 	bool checkPlayerMute(uint16_t channelId, SpeakClass type);
-	bool playerChangeOutfit(uint32_t playerId, Outfit_t outfit);
+	bool playerChangeOutfit(uint32_t playerId, OutfitType outfit);
 	bool playerInviteToParty(uint32_t playerId, uint32_t invitedId);
 	bool playerJoinParty(uint32_t playerId, uint32_t leaderId);
 	bool playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId);
@@ -525,14 +526,14 @@ public:
 	bool playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown);
 	bool playerShowQuestLog(uint32_t playerId);
 	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
-	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
+	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, ViolationAction actionType,
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
 	bool playerReportBug(uint32_t playerId, std::string comment);
 
 	// Script event callbacks, all are in the game class so we don't have to include the script files
 	bool playerLogout(Player* player, bool forced, bool timeout);
 	bool playerLogin(Player* player);
-	bool playerEquipItem(Player* player, Item* item, slots_t slot, bool equip);
+	bool playerEquipItem(Player* player, Item* item, SlotType slot, bool equip);
 	bool onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
 	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
 	bool onSpawn(Actor* actor);
@@ -562,7 +563,7 @@ public:
 		bool clearSight = true, int32_t maxSearchDist = -1);
 
 	void changeSpeed(Creature* creature, int32_t varSpeedDelta);
-	void internalCreatureChangeOutfit(Creature* creature, const Outfit_t& oufit);
+	void internalCreatureChangeOutfit(Creature* creature, const OutfitType& oufit);
 	void internalCreatureChangeVisible(Creature* creature, bool visible);
 	void changeLight(const Creature* creature);
 
@@ -586,11 +587,11 @@ public:
 	void checkLight();
 	bool kickPlayer(uint32_t playerId);
 
-	bool combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
+	bool combatBlockHit(CombatType combatType, Creature* attacker, Creature* target,
 		int32_t& healthChange, bool checkDefense, bool checkArmor);
 
-	bool combatChangeHealth(CombatType_t combatType, MagicEffectClasses hitEffect, TextColor_t customTextColor, Creature* attacker, Creature* target, int32_t healthChange, bool showeffect = true);
-	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target, int32_t healthChange, bool showeffect = true);
+	bool combatChangeHealth(CombatType combatType, MagicEffectClasses hitEffect, TextColor_t customTextColor, Creature* attacker, Creature* target, int32_t healthChange, bool showeffect = true);
+	bool combatChangeHealth(CombatType combatType, Creature* attacker, Creature* target, int32_t healthChange, bool showeffect = true);
 	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange, bool showeffect = true);
 
 	// Action helper function

@@ -82,7 +82,7 @@ typedef std::list<summonBlock_t> SummonList;
 typedef std::list<spellBlock_t> SpellList;
 typedef std::vector<voiceBlock_t> VoiceVector;
 //typedef std::list<std::string> MonsterScriptList;
-typedef std::map<CombatType_t, int32_t> ElementMap;
+typedef std::map<CombatType, int32_t> ElementMap;
 
 
 class InternalCreatureType;
@@ -120,11 +120,11 @@ public:
 	DECLARE_PROPERTY(int, health)
 	DECLARE_PROPERTY(int, health_max)
 	
-	DECLARE_PROPERTY(Outfit_t, outfit)
+	DECLARE_PROPERTY(OutfitType, outfit)
 	DECLARE_PROPERTY(int32_t, lookcorpse)
-	DECLARE_PROPERTY(int, conditionImmunities)
-	DECLARE_PROPERTY(int, damageImmunities)
-	DECLARE_PROPERTY(RaceType_t, race)
+	DECLARE_PROPERTY(ConditionType, conditionImmunities)
+	DECLARE_PROPERTY(CombatType, damageImmunities)
+	DECLARE_PROPERTY(RaceType, race)
 	
 	DECLARE_PROPERTY(bool, isSummonable)
 	DECLARE_PROPERTY(bool, isIllusionable)

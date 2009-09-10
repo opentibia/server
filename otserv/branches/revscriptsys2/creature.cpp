@@ -534,7 +534,7 @@ void Creature::onRemoved()
 
 }
 
-void Creature::onChangeZone(ZoneType_t zone)
+void Creature::onChangeZone(ZoneType zone)
 {
 	if(attackedCreature){
 		if(zone == ZONE_PROTECTION){
@@ -543,7 +543,7 @@ void Creature::onChangeZone(ZoneType_t zone)
 	}
 }
 
-void Creature::onAttackedCreatureChangeZone(ZoneType_t zone)
+void Creature::onAttackedCreatureChangeZone(ZoneType zone)
 {
 	if(zone == ZONE_PROTECTION){
 		internalCreatureDisappear(attackedCreature, false);
@@ -773,18 +773,10 @@ void Creature::die()
 Item* Creature::dropCorpse()
 {
 	Item* splash = NULL;
-	switch(getRace()){
-		case RACE_VENOM:
-			splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_GREEN);
-			break;
-
-		case RACE_BLOOD:
-			splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
-			break;
-
-		default:
-			break;
-	}
+	if(getRace() == RACE_VENOM)
+		splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_GREEN);
+	else if(getRace() == RACE_BLOOD)
+		splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
 
 	Tile* tile = getTile();
 	if(splash){
@@ -816,7 +808,8 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		list.push_back(DeathEntry(lhc, 0, Combat::isUnjustKill(lhc, this))); // Final Hit killer
 	}
 	else{
-		list.push_back(DeathEntry(CombatTypeName(lastDamageSource), 0));
+		// REVSCRIPT TODO convert to "fire" instead of "COMBAT_FIRE"
+		list.push_back(DeathEntry(lastDamageSource.toString(), 0));
 	}
 
 	if(assist_count == 0){
@@ -969,7 +962,7 @@ void Creature::gainHealth(Creature* caster, int32_t healthGain)
 	}
 }
 
-void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage, bool showtext)
+void Creature::drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext)
 {
 	lastDamageSource = combatType;
 	changeHealth(-damage);
@@ -998,10 +991,10 @@ Position Creature::getPosition() const {
 	return _tile->getTilePosition();
 }
 
-BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
+BlockType Creature::blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
 	bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
-	BlockType_t blockType = BLOCK_NONE;
+	BlockType blockType = BLOCK_NONE;
 
 	if(isImmune(combatType)){
 		damage = 0;
@@ -1085,7 +1078,7 @@ bool Creature::setAttackedCreature(Creature* creature)
 	return true;
 }
 
-ZoneType_t Creature::getZone() const {
+ZoneType Creature::getZone() const {
 	const Tile* tile = getTile();
 	if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
 		return ZONE_PROTECTION;
@@ -1228,7 +1221,7 @@ void Creature::addHealPoints(Creature* caster, int32_t healthPoints)
 	}
 }
 
-void Creature::onAddCondition(ConditionType_t type, bool hadCondition)
+void Creature::onAddCondition(ConditionType type, bool hadCondition)
 {
 	if(type == CONDITION_INVISIBLE && !hadCondition){
 		g_game.internalCreatureChangeVisible(this, false);
@@ -1241,29 +1234,29 @@ void Creature::onAddCondition(ConditionType_t type, bool hadCondition)
 	}
 }
 
-void Creature::onAddCombatCondition(ConditionType_t type, bool hadCondition)
+void Creature::onAddCombatCondition(ConditionType type, bool hadCondition)
 {
 	//
 }
 
-void Creature::onEndCondition(ConditionType_t type, bool lastCondition)
+void Creature::onEndCondition(ConditionType type, bool lastCondition)
 {
 	if(type == CONDITION_INVISIBLE && lastCondition){
 		g_game.internalCreatureChangeVisible(this, true);
 	}
 }
 
-void Creature::onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove)
+void Creature::onTickCondition(ConditionType type, int32_t interval, bool& bRemove)
 {
 	if(const MagicField* field = getTile()->getFieldItem()){
-		switch(type){
-			case CONDITION_FIRE: bRemove = (field->getCombatType() != COMBAT_FIREDAMAGE); break;
-			case CONDITION_ENERGY: bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE); break;
-			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_EARTHDAMAGE); break;
-			case CONDITION_DROWN: bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE); break;
-			default:
-				break;
-		}
+		if(type == CONDITION_FIRE)
+			bRemove = (field->getCombatType() != COMBAT_FIREDAMAGE);
+		else if(type == CONDITION_ENERGY)
+			bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE);
+		else if(type == CONDITION_POISON)
+			bRemove = (field->getCombatType() != COMBAT_EARTHDAMAGE);
+		else if(type == CONDITION_DROWN)
+			bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE);
 	}
 }
 
@@ -1341,12 +1334,12 @@ void Creature::onGainSharedExperience(uint64_t gainExp, bool fromMonster)
 	}
 }
 
-void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
+void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType blockType)
 {
 	//
 }
 
-void Creature::onBlockHit(BlockType_t blockType)
+void Creature::onBlockHit(BlockType blockType)
 {
 	//
 }
@@ -1415,7 +1408,7 @@ bool Creature::addCombatCondition(Condition* condition)
 	bool hadCondition = hasCondition(condition->getType(), false);
 
 	//Caution: condition variable could be deleted after the call to addCondition
-	ConditionType_t type = condition->getType();
+	ConditionType type = condition->getType();
 	if(!addCondition(condition)){
 		return false;
 	}
@@ -1424,7 +1417,7 @@ bool Creature::addCombatCondition(Condition* condition)
 	return true;
 }
 
-void Creature::removeCondition(ConditionType_t type)
+void Creature::removeCondition(ConditionType type)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		if((*it)->getType() == type){
@@ -1443,7 +1436,7 @@ void Creature::removeCondition(ConditionType_t type)
 	}
 }
 
-void Creature::removeCondition(ConditionType_t type, ConditionId_t id)
+void Creature::removeCondition(ConditionType type, ConditionID id)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		if((*it)->getType() == type && (*it)->getId() == id){
@@ -1462,7 +1455,7 @@ void Creature::removeCondition(ConditionType_t type, ConditionId_t id)
 	}
 }
 
-void Creature::removeCondition(const Creature* attacker, ConditionType_t type)
+void Creature::removeCondition(const Creature* attacker, ConditionType type)
 {
 	ConditionList tmpList = conditions;
 
@@ -1489,7 +1482,7 @@ void Creature::removeCondition(Condition* condition)
 	}
 }
 
-Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id, uint32_t subId) const
+Condition* Creature::getCondition(ConditionType type, ConditionID id, uint32_t subId) const
 {
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
 		if((*it)->getType() == type && (*it)->getId() == id && (*it)->getSubId() == subId){
@@ -1500,7 +1493,7 @@ Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id, uint32
 	return NULL;
 }
 
-Condition* Creature::getCondition(ConditionType_t type) const
+Condition* Creature::getCondition(ConditionType type) const
 {
 	//This one just returns the first one found.
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
@@ -1522,7 +1515,7 @@ void Creature::executeConditions(uint32_t interval)
 			Condition* condition = *it;
 			it = conditions.erase(it);
 
-			condition->endCondition(this, CONDITIONEND_TICKS);
+			condition->endCondition(this, ConditionEndICKS);
 			bool lastCondition = !hasCondition(condition->getType(), false);
 			onEndCondition(condition->getType(), lastCondition);
 
@@ -1534,7 +1527,7 @@ void Creature::executeConditions(uint32_t interval)
 	}
 }
 
-bool Creature::hasCondition(ConditionType_t type, bool checkTime /*= true*/) const
+bool Creature::hasCondition(ConditionType type, bool checkTime /*= true*/) const
 {
 	if(isSuppress(type)){
 		return false;
@@ -1549,19 +1542,19 @@ bool Creature::hasCondition(ConditionType_t type, bool checkTime /*= true*/) con
 	return false;
 }
 
-bool Creature::isImmune(CombatType_t type) const
+bool Creature::isImmune(CombatType type) const
 {
-	return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type);
+	return getDamageImmunities() & type;
 }
 
-bool Creature::isImmune(ConditionType_t type) const
+bool Creature::isImmune(ConditionType type) const
 {
-	return ((getConditionImmunities() & (uint32_t)type) == (uint32_t)type);
+	return (getConditionImmunities() & type);
 }
 
-bool Creature::isSuppress(ConditionType_t type) const
+bool Creature::isSuppress(ConditionType type) const
 {
-	return ((getConditionSuppressions() & (uint32_t)type) == (uint32_t)type);
+	return (getConditionSuppressions() & type);
 }
 
 std::string Creature::getDescription(int32_t lookDistance) const
