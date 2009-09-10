@@ -439,7 +439,7 @@ protected:
 	virtual double getDamageRatio(Creature* attacker) const;
 	DeathList getKillers(int32_t assist_count = 1);
 	virtual void dropLoot(Container* corpse) {};
-	virtual uint16_t getLookCorpse() const { return 0; }
+	virtual uint16_t getCorpseId() const { return 0; }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 	virtual Item* dropCorpse();
 	virtual Item* createCorpse();

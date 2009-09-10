@@ -124,7 +124,7 @@ public:
 	const CreatureList& getFriendList() {return friendList;}
 
 	bool isTarget(Creature* creature);
-	bool isFleeing() const {return getHealth() <= cType.runAwayHealth();}
+	bool isFleeing() const {return getHealth() <= cType.fleeHealth();}
 
 	bool isImmune(CombatType type) const;
 	BlockType blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
@@ -201,11 +201,10 @@ private:
 	bool isOpponent(const Creature* creature);
 
 	virtual uint64_t getLostExperience() const { return ((skillLoss ? cType.experience(): 0)); }
-	virtual int getLookCorpse() { return cType.lookcorpse(); }
 	virtual void dropLoot(Container* corpse);
 	virtual CombatType getDamageImmunities() const { return cType.damageImmunities(); }
 	virtual ConditionType getConditionImmunities() const { return cType.conditionImmunities(); }
-	virtual uint16_t getLookCorpse() const { return cType.lookcorpse(); }
+	virtual uint16_t getCorpseId() const { return cType.corpseId(); }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 	virtual bool useCacheMap() const {return true;}
 };

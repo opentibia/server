@@ -920,7 +920,7 @@ bool Creature::hasBeenAttacked(uint32_t attackerId) const
 
 Item* Creature::createCorpse()
 {
-	Item* corpse = Item::CreateItem(getLookCorpse());
+	Item* corpse = Item::CreateItem(getCorpseId());
 	return corpse;
 }
 

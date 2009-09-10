@@ -51,14 +51,14 @@ public:
 	uint32_t staticAttackChance;
 	int maxSummons;
 	int targetDistance;
-	int runAwayHealth;
+	int fleeHealth;
 	bool pushable;
 	int base_speed;
 	int health;
 	int health_max;
 
 	OutfitType outfit;
-	int32_t lookcorpse;
+	int32_t corpseId;
 	ConditionType conditionImmunities;
 	CombatType damageImmunities;
 	RaceType race;
@@ -110,7 +110,7 @@ void InternalCreatureType::reset()
 	staticAttackChance = 95;
 	maxSummons = 0;
 	targetDistance = 1;
-	runAwayHealth = 0;
+	fleeHealth = 0;
 	pushable = true;
 	base_speed = 200;
 	health = 100;
@@ -123,7 +123,7 @@ void InternalCreatureType::reset()
 	outfit.lookType   = 0;
 	outfit.lookTypeEx = 0;
 	outfit.lookAddons = 0;
-	lookcorpse = 0;
+	corpseId = 0;
 
 	conditionImmunities = CONDITION_NONE;
 	damageImmunities = COMBAT_NONE;
@@ -307,13 +307,13 @@ DEFINE_PROPERTY(bool, canPushCreatures)
 DEFINE_PROPERTY(uint32_t, staticAttackChance)
 DEFINE_PROPERTY(int, maxSummons)
 DEFINE_PROPERTY(int, targetDistance)
-DEFINE_PROPERTY(int, runAwayHealth)
+DEFINE_PROPERTY(int, fleeHealth)
 DEFINE_PROPERTY(bool, pushable)
 DEFINE_PROPERTY(int, base_speed)
 DEFINE_PROPERTY(int, health)
 DEFINE_PROPERTY(int, health_max)
 DEFINE_PROPERTY(OutfitType, outfit)
-DEFINE_PROPERTY(int32_t, lookcorpse)
+DEFINE_PROPERTY(int32_t, corpseId)
 DEFINE_PROPERTY(ConditionType, conditionImmunities)
 DEFINE_PROPERTY(CombatType, damageImmunities)
 DEFINE_PROPERTY(RaceType, race)

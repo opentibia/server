@@ -912,7 +912,7 @@ bool Player::canOpenCorpse(uint32_t ownerId)
 	return false;
 }
 
-uint16_t Player::getLookCorpse() const
+uint16_t Player::getCorpseId() const
 {
 	if(sex != 0)
 		return ITEM_MALE_CORPSE;

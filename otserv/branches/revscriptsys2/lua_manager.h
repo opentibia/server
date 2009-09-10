@@ -153,6 +153,7 @@ public:
 	template <> double popValue<double>() {return popFloat();}
 	template <> std::string popValue<std::string>() {return popString();}
 	template <> uint64_t popValue<uint64_t>() {return (uint64_t)popFloat();}
+	template <> Enum<E, size_> popValue() {return Enum<E, size_>(popInteger());}
 	#endif
 
 	// Push
@@ -310,7 +311,7 @@ public:
 	int lua_Actor_getShouldReload();
 	int lua_Actor_getAlwaysThink();
 
-	// Creature type changes
+	// Actor type changes
 	int lua_Actor_setArmor();
 	int lua_Actor_getArmor();
 	int lua_Actor_setDefense();
@@ -329,6 +330,50 @@ public:
 	int lua_Actor_getMaxSummons();
 	int lua_Actor_setName();
 	int lua_Actor_setNameDescription();
+	int lua_Actor_setStaticAttackChance();
+	int lua_Actor_getStaticAttackChance();
+	int lua_Actor_setFleeHealth();
+	int lua_Actor_getFleeHealth();
+	int lua_Actor_setPushable();
+	int lua_Actor_getPushable();
+	int lua_Actor_setBaseSpeed();
+	int lua_Actor_getBaseSpeed();
+	int lua_Actor_setMaxHealth();
+	int lua_Actor_getCorpseId();
+	//int lua_Actor_setConditionImmunities();
+	//int lua_Actor_getConditionImmunities();
+	//int lua_Actor_setDamageImmunities();
+	//int lua_Actor_getDamageImmunities();
+	int lua_Actor_setRace();
+	int lua_Actor_getRace();
+	int lua_Actor_isSummonable();
+	int lua_Actor_isConvinceable();
+	int lua_Actor_isIllusionable();
+	int lua_Actor_setCanBeAttacked();
+	int lua_Actor_getCanBeAttacked();
+	int lua_Actor_setCanBeLured();
+	int lua_Actor_getCanBeLured();
+	int lua_Actor_setLightLevel();
+	int lua_Actor_getLightLevel();
+	int lua_Actor_setLightColor();
+	int lua_Actor_getLightColor();
+	int lua_Actor_getManaCost();
+
+	/*
+	TODO:
+	SummonList summonList;
+	LootItems lootItems;
+	ElementMap elementMap;
+	SpellList spellAttackList;
+	SpellList spellDefenseList;
+
+	uint32_t yellChance;
+	uint32_t yellSpeedTicks;
+	VoiceVector voiceVector;
+
+	int32_t changeTargetSpeed;
+	int32_t changeTargetChance;
+	*/
 
 	// - - - Player
 	int lua_Player_getFood();

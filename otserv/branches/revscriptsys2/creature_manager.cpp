@@ -702,7 +702,7 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 						}
 
 						if(readXMLInteger(tmpNode, "runonhealth", intValue)){
-							mType->runAwayHealth(intValue);
+							mType->fleeHealth(intValue);
 						}
 						
 						if(readXMLInteger(tmpNode, "lureable", intValue)){
@@ -778,7 +778,7 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 				}
 
 				if(readXMLInteger(p, "corpse", intValue)){
-					mType->lookcorpse(intValue);
+					mType->corpseId(intValue);
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){

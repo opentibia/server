@@ -772,7 +772,7 @@ protected:
 	virtual CombatType getDamageImmunities() const { return damageImmunities; }
 	virtual ConditionType getConditionImmunities() const { return conditionImmunities; }
 	virtual ConditionType getConditionSuppressions() const { return conditionSuppressions; }
-	virtual uint16_t getLookCorpse() const;
+	virtual uint16_t getCorpseId() const;
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 
 	friend class Game;

@@ -171,6 +171,31 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "setName(string newname)", &Manager::lua_Actor_setName);
 	registerMemberFunction("Actor", "setNameDescription(string newname)", &Manager::lua_Actor_setNameDescription);
 
+	registerMemberFunction("Actor", "setStaticAttackChance(int chance)", &Manager::lua_Actor_setStaticAttackChance);
+	registerMemberFunction("Actor", "getStaticAttackChance()", &Manager::lua_Actor_getStaticAttackChance);
+	registerMemberFunction("Actor", "setFleeHealth(int health)", &Manager::lua_Actor_setFleeHealth);
+	registerMemberFunction("Actor", "getFleeHealth()", &Manager::lua_Actor_getFleeHealth);
+	registerMemberFunction("Actor", "setPushable(bool pushable)", &Manager::lua_Actor_setPushable);
+	registerMemberFunction("Actor", "getPushable()", &Manager::lua_Actor_getPushable);
+	registerMemberFunction("Actor", "setBaseSpeed(int newbasespeed)", &Manager::lua_Actor_setBaseSpeed);
+	registerMemberFunction("Actor", "getBaseSpeed()", &Manager::lua_Actor_getBaseSpeed);
+	registerMemberFunction("Actor", "setMaxHealth(int newmaxhealth)", &Manager::lua_Actor_setMaxHealth);
+	registerMemberFunction("Actor", "getCorpseId()", &Manager::lua_Actor_getCorpseId);
+	registerMemberFunction("Actor", "setRace(int racetype)", &Manager::lua_Actor_setRace);
+	registerMemberFunction("Actor", "getRace()", &Manager::lua_Actor_getRace);
+	registerMemberFunction("Actor", "isSummonable()", &Manager::lua_Actor_isSummonable);
+	registerMemberFunction("Actor", "isConvinceable()", &Manager::lua_Actor_isConvinceable);
+	registerMemberFunction("Actor", "isIllusionable()", &Manager::lua_Actor_isIllusionable);
+	registerMemberFunction("Actor", "setCanBeAttacked(boolean isAttackable)", &Manager::lua_Actor_setCanBeAttacked);
+	registerMemberFunction("Actor", "getCanBeAttacked()", &Manager::lua_Actor_getCanBeAttacked);
+	registerMemberFunction("Actor", "setCanBeLured(boolean isLureable)", &Manager::lua_Actor_setCanBeLured);
+	registerMemberFunction("Actor", "getCanBeLured()", &Manager::lua_Actor_getCanBeLured);
+	registerMemberFunction("Actor", "setLightLevel(int newlightlevel)", &Manager::lua_Actor_setLightLevel);
+	registerMemberFunction("Actor", "getLightLevel()", &Manager::lua_Actor_getLightLevel);
+	registerMemberFunction("Actor", "setLightColor(int newlightcolor)", &Manager::lua_Actor_setLightColor);
+	registerMemberFunction("Actor", "getLightColor()", &Manager::lua_Actor_getLightColor);
+	registerMemberFunction("Actor", "getManaCost()", &Manager::lua_Actor_getManaCost);
+
 	registerGlobalFunction("createMonster(string monstertypename, table pos)", &Manager::lua_createMonster);
 	registerGlobalFunction("createActor(string name, table pos)", &Manager::lua_createActor);
 
@@ -1798,7 +1823,6 @@ int LuaState::lua_Actor_getAlwaysThink()
 	return 1;
 }
 
-
 template <class T>
 int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
 	T value = l->popValue<T>();
@@ -1911,6 +1935,149 @@ int LuaState::lua_Actor_setNameDescription()
 	actor->updateNameDescription();
 	pushBoolean(true);
 	return 1;
+}
+
+int LuaState::lua_Actor_setStaticAttackChance()
+{
+	return Actor_modAttribute(this, &CreatureType::staticAttackChance);
+}
+
+int LuaState::lua_Actor_getStaticAttackChance()
+{
+	return Actor_getAttribute(uint32_t, staticAttackChance);
+}
+
+int LuaState::lua_Actor_setFleeHealth()
+{
+	return Actor_modAttribute(this, &CreatureType::fleeHealth);
+}
+
+int LuaState::lua_Actor_getFleeHealth()
+{
+	return Actor_getAttribute(int, fleeHealth);
+}
+
+int LuaState::lua_Actor_setPushable()
+{
+	return Actor_modAttribute(this, &CreatureType::pushable);
+}
+
+int LuaState::lua_Actor_getPushable()
+{
+	return Actor_getAttribute(bool, pushable);
+}
+
+int LuaState::lua_Actor_setBaseSpeed()
+{
+	return Actor_modAttribute(this, &CreatureType::base_speed);
+}
+
+int LuaState::lua_Actor_getBaseSpeed()
+{
+	return Actor_getAttribute(int, base_speed);
+}
+
+int LuaState::lua_Actor_setMaxHealth()
+{
+	return Actor_modAttribute(this, &CreatureType::health_max);
+}
+
+int LuaState::lua_Actor_getCorpseId()
+{
+	return Actor_getAttribute(int32_t, corpseId);
+}
+
+/*
+int LuaState::lua_Actor_setConditionImmunities()
+{
+	return Actor_modAttribute(this, &CreatureType::conditionImmunities);
+}
+
+int LuaState::lua_Actor_getConditionImmunities()
+{
+	return Actor_getAttribute(ConditionType, conditionImmunities);
+}
+
+int LuaState::lua_Actor_setDamageImmunities()
+{
+	return Actor_modAttribute(this, &CreatureType::damageImmunities);
+}
+
+int LuaState::lua_Actor_getDamageImmunities()
+{
+	return Actor_getAttribute(CombatType, damageImmunities);
+}
+*/
+
+int LuaState::lua_Actor_setRace()
+{
+	//return Actor_modAttribute(this, &CreatureType::race);
+	return 0;
+}
+
+int LuaState::lua_Actor_getRace()
+{
+	return Actor_getAttribute(RaceType, race);
+}
+
+int LuaState::lua_Actor_isSummonable()
+{
+	return Actor_getAttribute(bool, isSummonable);
+}
+
+int LuaState::lua_Actor_isConvinceable()
+{
+	return Actor_getAttribute(bool, isConvinceable);
+}
+
+int LuaState::lua_Actor_isIllusionable()
+{
+	return Actor_getAttribute(bool, isIllusionable);
+}
+
+int LuaState::lua_Actor_setCanBeAttacked()
+{
+	return Actor_modAttribute(this, &CreatureType::isAttackable);
+}
+
+int LuaState::lua_Actor_getCanBeAttacked()
+{
+	return Actor_getAttribute(bool, isAttackable);
+}
+
+int LuaState::lua_Actor_setCanBeLured()
+{
+	return Actor_modAttribute(this, &CreatureType::isLureable);
+}
+
+int LuaState::lua_Actor_getCanBeLured()
+{
+	return Actor_getAttribute(bool, isLureable);
+}
+
+int LuaState::lua_Actor_setLightLevel()
+{
+	return Actor_modAttribute(this, &CreatureType::lightLevel);
+}
+
+int LuaState::lua_Actor_getLightLevel()
+{
+	return Actor_getAttribute(int, lightLevel);
+}
+
+int LuaState::lua_Actor_setLightColor()
+{
+	return Actor_modAttribute(this, &CreatureType::lightColor);
+}
+
+int LuaState::lua_Actor_getLightColor()
+{
+	return Actor_getAttribute(int, lightColor);
+}
+
+int LuaState::lua_Actor_getManaCost()
+{
+	return Actor_getAttribute(uint32_t, manaCost);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
