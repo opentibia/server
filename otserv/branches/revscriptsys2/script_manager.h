@@ -51,6 +51,7 @@ namespace Script {
 			std::string name;
 			std::string type_name;
 			std::vector<std::string> types;
+			boost::any default_value;
 			int optional_level;
 		};
 
@@ -85,6 +86,7 @@ namespace Script {
 		void parseWhitespace(std::string& str);
 		std::string parseIdentifier(std::string& s);
 		ComposedTypeDeclaration parseTypeDeclaration(std::string& s);
+		boost::any parseDefaultDefinition(std::string& s);
 
 		friend class LuaClassType;
 	};

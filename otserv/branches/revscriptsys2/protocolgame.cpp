@@ -278,14 +278,14 @@ bool ProtocolGame::logout(bool forced)
 				return false;
 			}
 
-			if(g_game.playerLogout(player, false, false)) {
+			if(g_game.onPlayerLogout(player, false, false)) {
 				//Let the script handle the error message
 				return false;
 			}
 		}
 		else{
 			// execute the script even when we log out
-			g_game.playerLogout(player, true, false);
+			g_game.onPlayerLogout(player, true, false);
 		}
 	}
 

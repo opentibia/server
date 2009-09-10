@@ -689,6 +689,46 @@ namespace Script {
 			int interval;
 		};
 	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnAdvance event
+	// Triggered when a player advances in a skill
+
+	namespace OnAdvance {
+		enum FilterType {
+			FILTER_ALL,
+			FILTER_SKILL
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			LevelType skill;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* player, LevelType skill, uint32_t oldskilllevel, uint32_t newskilllevel);
+			~Event();
+
+			std::string getName() const {return "OnAdvance";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
+			LevelType skill;
+			uint32_t oldSkillLevel;
+			uint32_t newSkillLevel;
+		};
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -384,10 +384,7 @@ PlayerFlag_IgnoreWeaponCheck = 35
 PlayerFlag_CannotBeMuted = 36
 PlayerFlag_IsAlwaysPremium = 37
 PlayerFlag_CanAnswerRuleViolations = 38
-	
 
-SKILL_LEVEL = -2
-SKILL_MAGIC = -1
 SKILL_FIST = 0
 SKILL_CLUB = 1
 SKILL_SWORD = 2
@@ -396,3 +393,12 @@ SKILL_DIST = 4
 SKILL_SHIELD = 5
 SKILL_FISH = 6
 
+LEVEL_FIST = 0
+LEVEL_CLUB = 1
+LEVEL_SWORD = 2
+LEVEL_AXE = 3
+LEVEL_DIST = 4
+LEVEL_SHIELD = 5
+LEVEL_FISH = 6
+LEVEL_MAGIC = 7
+LEVEL_EXPERIENCE = 8

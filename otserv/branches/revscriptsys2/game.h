@@ -531,9 +531,10 @@ public:
 	bool playerReportBug(uint32_t playerId, std::string comment);
 
 	// Script event callbacks, all are in the game class so we don't have to include the script files
-	bool playerLogout(Player* player, bool forced, bool timeout);
-	bool playerLogin(Player* player);
-	bool playerEquipItem(Player* player, Item* item, SlotType slot, bool equip);
+	bool onPlayerLogout(Player* player, bool forced, bool timeout);
+	bool onPlayerLogin(Player* player);
+	bool onPlayerEquipItem(Player* player, Item* item, SlotType slot, bool equip);
+	bool onPlayerAdvance(Player* player, LevelType skill, uint32_t oldLevel, uint32_t newLevel);
 	bool onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
 	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
 	bool onSpawn(Actor* actor);

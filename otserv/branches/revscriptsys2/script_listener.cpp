@@ -34,7 +34,7 @@ Listener::Listener(ListenerType t, const boost::any& data, Manager& manager) :
 	manager(manager)
 {
 	std::ostringstream os;
-	os << "Listener_" << type_ << "_" << ID;
+	os << "Listener_" << type_.value() << "_" << ID;
 	datatag = os.str();
 }
 

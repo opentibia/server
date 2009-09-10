@@ -21,6 +21,10 @@ function Player:sendCancel(msg)
 	self:sendMessage(MESSAGE_STATUS_SMALL, msg)
 end
 
+function Player:sendAdvance(msg)
+	self:sendMessage(MESSAGE_EVENT_ADVANCE, msg)
+end
+
 function Player:getTimeSinceLogin()
 	return os.difftime(os.time(), self:getLastLogin())
 end
@@ -119,7 +123,7 @@ function Player:isInvulnerable()
 end
 
 
--- Event handlers
+-- Login / Logout
 function otstd.Player.LoginHandler(event)
 	local player = event.player
 	-- Nothing yet
@@ -134,5 +138,41 @@ function otstd.Player.LogoutHandler(event)
 	player:setStorageValue("__playtime", player:getPlayTime())
 end
 
-otstd.Player.listener = registerOnLogin(otstd.Player.LoginHandler)
-otstd.Player.listener = registerOnLogout(otstd.Player.LogoutHandler)
+otstd.Player.onLoginListener   = registerOnLogin(otstd.Player.LoginHandler)
+otstd.Player.onLogoutListener = registerOnLogout(otstd.Player.LogoutHandler)
+
+-- Advance handlers
+
+function otstd.Player.AdvanceHandler(event)
+	local player = event.player
+	local message = ""
+	
+	if event.skill == LEVEL_FIST then
+		message = "You advanced in fist fighting."
+	elseif event.skill == LEVEL_CLUB then
+		message = "You advanced in club fighting."
+	elseif event.skill == LEVEL_SWORD then
+		message = "You advanced in sword fighting."
+	elseif event.skill == LEVEL_AXE then
+		message = "You advanced in axe fighting."
+	elseif event.skill == LEVEL_DIST then
+		message = "You advanced in dist fighting."
+	elseif event.skill == LEVEL_SHIELD then
+		message = "You advanced in shield fighting."
+	elseif event.skill == LEVEL_FISHING then
+		message = "You advanced in fishing fighting."
+	elseif event.skill == LEVEL_MAGIC then
+		message = "You advanced to magic level " .. event.newLevel .. "."
+	elseif event.skill == LEVEL_EXPERIENCE then
+		message = "You advanced from Level " .. event.oldLevel .. " to Level " .. event.newLevel .. "."
+	else
+		message = "You advanced, but not in any skill?"
+	end
+	
+	player:sendAdvance(message)
+end
+
+otstd.Player.onAdvanceListener = registerOnAdvance(otstd.Player.AdvanceHandler)
+
+
+

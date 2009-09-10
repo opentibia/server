@@ -144,6 +144,7 @@ public:
 	std::string popString();
 	Position popPosition(Script::ErrorMode mode = Script::ERROR_THROW);
 	void* getUserdata();
+	template <class ET> ET popEnum() {return ET(popInteger());}
 
 	template <typename T> T popValue();
 	#ifndef __GNUC__
@@ -250,6 +251,8 @@ public:
 	int lua_registerGenericEvent_OnDeEquipItem();
 	int lua_registerGenericEvent_OnStepInCreature();
 	int lua_registerGenericEvent_OnStepOutCreature();
+	int lua_registerGenericEvent_OnAdvance();
+	int lua_registerSpecificEvent_OnAdvance();
 	int lua_registerSpecificEvent_OnMoveCreature();
 	int lua_registerGenericEvent_OnMoveItem();
 	int lua_registerGenericEvent_OnSpawn();

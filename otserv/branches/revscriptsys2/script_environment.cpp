@@ -80,49 +80,57 @@ bool Environment::stopListener(ListenerStringMap& list, uint32_t id) {
 }
 
 bool Environment::stopListener(ListenerType type, uint32_t id) {
-	if(type == ON_SAY_LISTENER){
-		if(stopListener(Generic.OnSay, id))
-			return true;
-	}
-	else if(type == ON_USE_ITEM_LISTENER){
-		if(stopListener(Generic.OnUseItem, id))
-			return true;
-	}
-	else if(type == ON_EQUIP_ITEM_LISTENER){
-		if(stopListener(Generic.OnEquipItem, id))
-			return true;
-	}
-	else if(type == ON_MOVE_CREATURE_LISTENER){
-		if(stopListener(Generic.OnMoveCreature, id))
-			return true;
-	}
-	else if(type == ON_MOVE_ITEM_LISTENER){
-		if(stopListener(Generic.OnMoveItem, id))
-			return true;
-	}
-	else if(type == ON_OPEN_CHANNEL_LISTENER){
-		if(stopListener(Generic.OnJoinChannel, id))
-			return true;
-	}
-	else if(type == ON_CLOSE_CHANNEL_LISTENER){
-		if(stopListener(Generic.OnLeaveChannel, id))
-			return true;
-	}
-	else if(type == ON_LOGIN_LISTENER){
-		if(stopListener(Generic.OnLogin, id))
-			return true;
-	}
-	else if(type == ON_LOGOUT_LISTENER){
-		if(stopListener(Generic.OnLogout, id))
-			return true;
-	}
-	else if(type == ON_TURN_LISTENER){
-		if(stopListener(Generic.OnTurn, id))
-			return true;
-	}
-	else if(type == ON_SPAWN_LISTENER){
-		if(stopListener(Generic.OnSpawn, id))
-			return true;
+	switch(type.value())
+	{
+		case enums::ON_SAY_LISTENER:
+			if(stopListener(Generic.OnSay, id))
+				return true;
+			break;
+		case enums::ON_USE_ITEM_LISTENER:
+			if(stopListener(Generic.OnUseItem, id))
+				return true;
+			break;
+		case enums::ON_EQUIP_ITEM_LISTENER:
+			if(stopListener(Generic.OnEquipItem, id))
+				return true;
+			break;
+		case enums::ON_MOVE_CREATURE_LISTENER:
+			if(stopListener(Generic.OnMoveCreature, id))
+				return true;
+			break;
+		case enums::ON_MOVE_ITEM_LISTENER:
+			if(stopListener(Generic.OnMoveItem, id))
+				return true;
+			break;
+		case enums::ON_OPEN_CHANNEL_LISTENER:
+			if(stopListener(Generic.OnJoinChannel, id))
+				return true;
+			break;
+		case enums::ON_CLOSE_CHANNEL_LISTENER:
+			if(stopListener(Generic.OnLeaveChannel, id))
+				return true;
+			break;
+		case enums::ON_LOGIN_LISTENER:
+			if(stopListener(Generic.OnLogin, id))
+				return true;
+			return false; // No specific listeners
+		case enums::ON_LOGOUT_LISTENER:
+			if(stopListener(Generic.OnLogout, id))
+				return true;
+			break;
+		case enums::ON_TURN_LISTENER:
+			if(stopListener(Generic.OnTurn, id))
+				return true;
+			break;
+		case enums::ON_SPAWN_LISTENER:
+			if(stopListener(Generic.OnSpawn, id))
+				return true;
+			return false; // No specific listeners
+		case enums::ON_ADVANCE_LISTENER:
+			if(stopListener(Generic.OnAdvance, id))
+				return true;
+		default:
+			break;
 	}
 	
 	// Try specific

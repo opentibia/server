@@ -135,53 +135,67 @@ int Manager::luaFunctionCallback(lua_State* L) {
 
 	// If the script failed
 	try {
+		// In here it's safe to allocate complex objects
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
 
 		int argument_count = state->getStackSize();
 		if((unsigned int)argument_count > cc->parameters.size()) {
 			throw Script::Error("Too many arguments passed to function " + cc->name);
 		}
-		int parsed_argument_count = 0;
-		int last_optional_level = 0;
+
+		// This loop counts how many argument required arguments we need, at least
+		// This could probably be done at register time out
+		int required_arguments = 0;
 
 		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
 				ctditer != cc->parameters.end();
 				++ctditer)
 		{
-			const ComposedTypeDeclaration& ctd = *ctditer;
-			parsed_argument_count += 1;
-
-			if(ctd.optional_level == 0) {
-				// Required argument
-				if(argument_count < parsed_argument_count) {
-					throw Script::Error("Too few arguments passed to function " + cc->name);
-				}
-			}
-			else {
-				// Optional argument
-				if(argument_count < parsed_argument_count) {
-					// Optional argument!
-					// Perhaps a default argument should be pushed?
-					parsed_argument_count -= 1;
-					break; // We don't need to parse more
-				}
-				last_optional_level = ctd.optional_level;
-			}
+			if(ctditer->optional_level == 0)
+				required_arguments += 1;
+		}
+		
+		if(argument_count < required_arguments) {
+			throw Script::Error("Too few arguments passed to function " + cc->name);
 		}
 
-		int passed_argument_count = parsed_argument_count;
-
-		parsed_argument_count = 0;
+		// parsed_argument_count is how many arguments we have parsed in the loop so far
+		int parsed_argument_count = 0;
 		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
 				ctditer != cc->parameters.end();
 				++ctditer)
 		{
 			const ComposedTypeDeclaration& ctd = *ctditer;
 
-			if(parsed_argument_count >= passed_argument_count) {
+			bool ignoreTypeCheck = false;
+
+			if(required_arguments - parsed_argument_count > 0 && !ctd.default_value.empty() && ctd.optional_level > 0) {
+				// We got an optional argument, and one is missing on this spot!
+				// Push our default argument onto the stack
+				if(ctd.default_value.type() == typeid(std::string))
+					state->push(boost::any_cast<std::string>(ctd));
+				else if(ctd.default_value.type() == typeid(int))
+					state->push(boost::any_cast<std::string>(ctd));
+				else if(ctd.default_value.type() == typeid(void*))
+					state->pushNil();
+				else
+					throw Error("Cannot deduce type of optional argument default value (function " + ctd.name + ") (source error)");
+				// inject it to the correct position
+				state->insert(parsed_argument_count+1);
+				// We now have one more argument passed
+				required_arguments += 1;
+
+				ignoreTypeCheck = true;
+			}
+
+			if(parsed_argument_count >= required_arguments) {
+				// We have already parsed all passed arguments
 				break;
 			}
 			parsed_argument_count += 1;
+
+			if(ignoreTypeCheck)
+				continue;
 
 			std::string expected_type = "";
 
@@ -278,7 +292,8 @@ int Manager::luaFunctionCallback(lua_State* L) {
 ///////////////////////////////////////////////////////////////////////////////
 // Internal parsing of arguments
 
-Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
+Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s)
+{
 	ComposedCallback_ptr cc(new ComposedCallback);
 	// Parse name
 	parseWhitespace(s);
@@ -291,6 +306,8 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 	assert(s[0] == '(');
 	s.erase(s.begin());
 	int optional_level = 0;
+	// We can't have optional arguments in two places in the argument list
+	bool already_optional = false;
 
 	parseWhitespace(s);
 	// Size must at least be 1 so there can be a closing )
@@ -310,9 +327,24 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 
 			ComposedTypeDeclaration type = parseTypeDeclaration(s);
 			type.optional_level = optional_level;
-			cc->parameters.push_back(type);
 
 			parseWhitespace(s);
+			assert(s.size() > 0);
+
+			if(s[0] == '='){
+				// Parse default value
+				s.erase(s.begin());
+
+				parseWhitespace(s);
+				assert(s.size() > 0);
+
+				type.default_value = parseDefaultDefinition(s);
+				
+				parseWhitespace(s);
+			}
+
+			// Modifications to type will be ignored after this line
+			cc->parameters.push_back(type);
 
 			assert(s.size() > 0);
 			assert(s[0] == ',' || s[0] == '[' || s[0] == ')' || s[0] == ']');
@@ -321,6 +353,9 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 				s.erase(s.begin());
 			}
 			else if(s[0] == '[')  {
+				// We can't have two optional groups in the same argument list!
+				assert(already_optional == false);
+
 				s.erase(s.begin());
 				parseWhitespace(s);
 				assert(s.size() > 0);
@@ -335,17 +370,28 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 				assert(optional_level > 0);
 				optional_level -= 1;
 
-				while(optional_level >= 1) {
-					// After a ']' only another ']' can follow
-					assert(s[0] == ']');
-					s.erase(s.begin());
-					parseWhitespace(s);
-					optional_level -= 1;
+				while(true) {
+					if(s[0] == ','){
+						// Declaration continues after this, but we decreased optional_level already
+						s.erase(s.begin());
+						parseWhitespace(s);
+						already_optional = true;
+						break;
+					}
+					else{
+						if(optional_level == 0)
+							break;
+
+						// If declaration does not continue, after a ']' only another ']' can follow
+						assert(s[0] == ']');
+						s.erase(s.begin());
+						parseWhitespace(s);
+						optional_level -= 1;
+					}
 				}
-				// There must be an equal amount of [ and ]
-				assert(optional_level == 0);
-				// After ]]]] the declaration must end
-				assert(s[0] == ')');
+				// We have parsed an optional group inside the argument list
+				if(already_optional)
+					continue;
 				break;
 			}
 			else if(s[0] == ')') {
@@ -354,11 +400,15 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s) {
 				break;
 			}
 		}
+		
+		// There must be an equal amount of [ and ]
+		assert(optional_level == 0);
 	}
 	return cc;
 }
 
-void Manager::parseWhitespace(std::string& s) {
+void Manager::parseWhitespace(std::string& s)
+{
 	std::string::iterator iter = s.begin();
 	while(*iter == ' ' || *iter == '\t' || *iter == '\n') {
 		++iter;
@@ -366,7 +416,8 @@ void Manager::parseWhitespace(std::string& s) {
 	s.erase(s.begin(), iter);
 }
 
-std::string Manager::parseIdentifier(std::string &s) {
+std::string Manager::parseIdentifier(std::string &s)
+{
 	std::string::iterator iter = s.begin();
 	assert(
 		(*iter >= 'a' && *iter <= 'z') ||
@@ -386,7 +437,8 @@ std::string Manager::parseIdentifier(std::string &s) {
 	return r;
 }
 
-Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
+Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s)
+{
 	ComposedTypeDeclaration ctd;
 	while(true) {
 		std::string type = parseIdentifier(s);
@@ -399,6 +451,9 @@ Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 		}
 		if(type == "position") {
 			type = "table";
+		}
+		if(type == "bool") {
+			type = "boolean";
 		}
 
 		// Checked on server start
@@ -423,6 +478,46 @@ Manager::ComposedTypeDeclaration Manager::parseTypeDeclaration(std::string& s) {
 	ctd.name = parseIdentifier(s);
 
 	return ctd;
+}
+
+boost::any Manager::parseDefaultDefinition(std::string& s)
+{
+	if(s[0] == '"'){
+		// string
+		std::string::iterator si = std::find(s.begin() + 1, s.end(), '"');
+		assert(si != s.end());
+		
+		std::string name(s.begin() + 1, si);
+
+		s.erase(s.begin(), si);
+
+		return boost::any(s);
+	}
+	else if(s[0] >= '0' && s[0] <= '9'){
+		// integer
+		std::string::iterator si = s.begin() + s.find_first_not_of("0123456789");
+		assert(si != s.end());
+		
+		std::string name(s.begin(), si);
+
+		s.erase(s.begin(), si);
+
+		// Create the integer
+		int tmpi = 0;
+		std::istringstream is(s);
+		is >> tmpi;
+
+		return boost::any(tmpi);
+	}
+	else if(s.size() > 3 && s.substr(0, 3) == "nil"){
+		s.erase(s.begin(), s.begin() + 3);
+		return boost::any((void*)1);
+	}
+	// Must be of one of the above types
+	assert(false);
+
+	// To avoid compiler warnings
+	return boost::any();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

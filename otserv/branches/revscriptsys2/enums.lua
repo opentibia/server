@@ -20,11 +20,11 @@ BeginEnumFile("enums")
 
 enum ("RaceType",
 	"RACE_NONE",
-	"RACE_VENOM ",
-	"RACE_BLOOD",
-	"RACE_UNDEAD",
-	"RACE_FIRE",
-	"RACE_ENERGY"
+	{"RACE_VENOM ", "venom"},
+	{"RACE_BLOOD", "blood"},
+	{"RACE_UNDEAD", "undead"},
+	{"RACE_FIRE", "fire"},
+	{"RACE_ENERGY", "energy"}
 )
 
 enum ({name="CombatType", bitmask=true},
@@ -288,6 +288,7 @@ enum ("Script::ListenerType",
 	"ON_SPAWN_LISTENER",
 	"ON_KILL_LISTENER",
 	"ON_DIE_LISTENER",
+	"ON_ADVANCE_LISTENER",
 	-- Creature specific only
 	"ON_THINK_LISTENER",
 	"ON_HEAR_LISTENER",

@@ -93,6 +93,7 @@ void Manager::registerClasses() {
 	registerClass("OnLoseCreatureEvent", "Event");
 	registerClass("OnSpawnEvent", "Event");
 	registerClass("OnThinkEvent", "Event");
+	registerClass("OnAdvanceEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -383,6 +384,9 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnLookAtItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtItem);
 	registerGlobalFunction("registerOnLookAtCreature(Creature creature, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
 	registerGlobalFunction("registerOnPlayerLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
+	
+	registerGlobalFunction("registerOnAdvance([int skillid = nil], function callback)", &Manager::lua_registerGenericEvent_OnAdvance);
+	registerGlobalFunction("registerOnPlayerAdvance(Player player [, int skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
@@ -1081,44 +1085,6 @@ int LuaState::lua_registerGenericEvent_OnStepOutCreature() {
 	return 1;
 }
 
-/*
-int LuaState::lua_registerGenericEvent_OnMoveCreature() {
-	// Store callback
-	insert(-3);
-
-	int id = popInteger();
-	std::string method = popString();
-
-	OnMoveCreature::ScriptInformation si_onmovecreature;
-	if(method == "itemid") {
-		si_onmovecreature.method = OnMoveCreature::FILTER_ITEMID;
-	}
-	else if(method == "actionid") {
-		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
-	}
-	else if(method == "uniqueid") {
-		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
-	}
-	else {
-		throw Error("Invalid argument (1) 'method'");
-	}
-	si_onmovecreature.id = id;
-	si_onmovecreature.moveType = OnMoveCreature::TYPE_MOVE;
-
-	boost::any p(si_onmovecreature);
-	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager));
-
-	environment->Generic.OnMoveCreature.push_back(listener);
-
-	// Register event
-	setRegistryItem(listener->getLuaTag());
-
-	// Return listener
-	pushString(listener->getLuaTag());
-	return 1;
-}
-*/
-
 int LuaState::lua_registerGenericEvent_OnSpawn() {
 	// Store callback
 	insert(-2);
@@ -1307,6 +1273,91 @@ int LuaState::lua_registerSpecificEvent_OnCreatureThink() {
 	return 1;
 }
 
+int LuaState::lua_registerGenericEvent_OnAdvance() {
+	OnAdvance::ScriptInformation si_onadvance;
+
+	// We always receive to arguments
+	// store callback
+	insert(-2);
+
+	// nil as first means no skill
+	if(isNil()){
+		si_onadvance.method = OnAdvance::FILTER_ALL;
+		si_onadvance.skill = LEVEL_EXPERIENCE; // Unused, just don't leave it hanging
+	}
+	else{
+		si_onadvance.method = OnAdvance::FILTER_SKILL;
+
+		try {
+			si_onadvance.skill = LevelType::fromString(popString());
+		} catch(enum_conversion_error& e) {
+			throw Error(std::string("Invalid argument (1) level type '") + e.what() + "'.");
+		}
+	}
+	// Pop the nil
+	pop();
+
+	boost::any p(si_onadvance);
+	Listener_ptr listener(new Listener(ON_ADVANCE_LISTENER, p, *manager));
+
+	// Add it to the listener list
+	environment->Generic.OnAdvance.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener tag
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnAdvance() {
+	Creature* who = NULL;
+	OnAdvance::ScriptInformation si_onadvance;
+
+	// store callback
+	insert(-3);
+
+	// Then comes the skill, nil means all
+	if(isNil()){
+		si_onadvance.method = OnAdvance::FILTER_ALL;
+		si_onadvance.skill = LEVEL_EXPERIENCE; // Unused, just don't leave it hanging
+	}
+	else{
+		si_onadvance.method = OnAdvance::FILTER_SKILL;
+
+		try {
+			si_onadvance.skill = LevelType::fromString(popString());
+		} catch(enum_conversion_error& e) {
+			throw Error(std::string("Invalid argument (2) level type '") + e.what() + "'.");
+		}
+	}
+	// Pop the nil
+	pop();
+
+	// Finally player
+	who = popPlayer();
+
+	// Callback is now the top of the stack
+	boost::any p(si_onadvance);
+	Listener_ptr listener(
+		new Listener(ON_ADVANCE_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Stop listener function
+
 int LuaState::lua_stopListener() {
 	std::string listener_id = popString();
 
@@ -1338,6 +1389,7 @@ int LuaState::lua_stopListener() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Member functions
+///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Class Event
@@ -1832,12 +1884,21 @@ int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
 	return 1;
 }
 
-#define Actor_getAttribute(T, mfp) \
+template <class E, int size_>
+int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const Enum<E, size_>&)){
+	Enum<E, size_> value = l->popEnum<Enum<E, size_> >();
+	Actor* actor = l->popActor();
+	((actor->getType()).*(mfp))(value);
+	l->pushBoolean(true);
+	return 1;
+}
+
+#define Actor_getAttribute(mfp) \
 	push(popActor()->getType().mfp()), 1
 
 int LuaState::lua_Actor_getArmor()
 {
-	return Actor_getAttribute(int, armor);
+	return Actor_getAttribute(armor);
 }
 
 int LuaState::lua_Actor_setArmor()
@@ -1847,7 +1908,7 @@ int LuaState::lua_Actor_setArmor()
 
 int LuaState::lua_Actor_getDefense()
 {
-	return Actor_getAttribute(int, defense);
+	return Actor_getAttribute(defense);
 }
 
 int LuaState::lua_Actor_setDefense()
@@ -1857,7 +1918,7 @@ int LuaState::lua_Actor_setDefense()
 
 int LuaState::lua_Actor_getExperienceWorth()
 {
-	return Actor_getAttribute(uint64_t, experience);
+	return Actor_getAttribute(experience);
 }
 
 int LuaState::lua_Actor_setExperienceWorth()
@@ -1867,7 +1928,7 @@ int LuaState::lua_Actor_setExperienceWorth()
 
 int LuaState::lua_Actor_getCanPushItems()
 {
-	return Actor_getAttribute(bool, canPushItems);
+	return Actor_getAttribute(canPushItems);
 }
 
 int LuaState::lua_Actor_setCanPushItems()
@@ -1877,7 +1938,7 @@ int LuaState::lua_Actor_setCanPushItems()
 
 int LuaState::lua_Actor_getCanPushCreatures()
 {
-	return Actor_getAttribute(bool, canPushCreatures);
+	return Actor_getAttribute(canPushCreatures);
 }
 
 int LuaState::lua_Actor_setCanPushCreatures()
@@ -1904,7 +1965,7 @@ int LuaState::lua_Actor_setSpeed()
 
 int LuaState::lua_Actor_getTargetDistance()
 {
-	return Actor_getAttribute(int, targetDistance);
+	return Actor_getAttribute(targetDistance);
 }
 
 int LuaState::lua_Actor_setTargetDistance()
@@ -1914,7 +1975,7 @@ int LuaState::lua_Actor_setTargetDistance()
 
 int LuaState::lua_Actor_getMaxSummons()
 {
-	return Actor_getAttribute(int, maxSummons);
+	return Actor_getAttribute(maxSummons);
 }
 
 int LuaState::lua_Actor_setMaxSummons()
@@ -1944,7 +2005,7 @@ int LuaState::lua_Actor_setStaticAttackChance()
 
 int LuaState::lua_Actor_getStaticAttackChance()
 {
-	return Actor_getAttribute(uint32_t, staticAttackChance);
+	return Actor_getAttribute(staticAttackChance);
 }
 
 int LuaState::lua_Actor_setFleeHealth()
@@ -1954,7 +2015,7 @@ int LuaState::lua_Actor_setFleeHealth()
 
 int LuaState::lua_Actor_getFleeHealth()
 {
-	return Actor_getAttribute(int, fleeHealth);
+	return Actor_getAttribute(fleeHealth);
 }
 
 int LuaState::lua_Actor_setPushable()
@@ -1964,7 +2025,7 @@ int LuaState::lua_Actor_setPushable()
 
 int LuaState::lua_Actor_getPushable()
 {
-	return Actor_getAttribute(bool, pushable);
+	return Actor_getAttribute(pushable);
 }
 
 int LuaState::lua_Actor_setBaseSpeed()
@@ -1974,7 +2035,7 @@ int LuaState::lua_Actor_setBaseSpeed()
 
 int LuaState::lua_Actor_getBaseSpeed()
 {
-	return Actor_getAttribute(int, base_speed);
+	return Actor_getAttribute(base_speed);
 }
 
 int LuaState::lua_Actor_setMaxHealth()
@@ -1984,7 +2045,7 @@ int LuaState::lua_Actor_setMaxHealth()
 
 int LuaState::lua_Actor_getCorpseId()
 {
-	return Actor_getAttribute(int32_t, corpseId);
+	return Actor_getAttribute(corpseId);
 }
 
 /*
@@ -1995,7 +2056,7 @@ int LuaState::lua_Actor_setConditionImmunities()
 
 int LuaState::lua_Actor_getConditionImmunities()
 {
-	return Actor_getAttribute(ConditionType, conditionImmunities);
+	return Actor_getAttribute(conditionImmunities);
 }
 
 int LuaState::lua_Actor_setDamageImmunities()
@@ -2005,34 +2066,33 @@ int LuaState::lua_Actor_setDamageImmunities()
 
 int LuaState::lua_Actor_getDamageImmunities()
 {
-	return Actor_getAttribute(CombatType, damageImmunities);
+	return Actor_getAttribute(damageImmunities);
 }
 */
 
 int LuaState::lua_Actor_setRace()
 {
-	//return Actor_modAttribute(this, &CreatureType::race);
-	return 0;
+	return Actor_modAttribute(this, &CreatureType::race);
 }
 
 int LuaState::lua_Actor_getRace()
 {
-	return Actor_getAttribute(RaceType, race);
+	return Actor_getAttribute(race);
 }
 
 int LuaState::lua_Actor_isSummonable()
 {
-	return Actor_getAttribute(bool, isSummonable);
+	return Actor_getAttribute(isSummonable);
 }
 
 int LuaState::lua_Actor_isConvinceable()
 {
-	return Actor_getAttribute(bool, isConvinceable);
+	return Actor_getAttribute(isConvinceable);
 }
 
 int LuaState::lua_Actor_isIllusionable()
 {
-	return Actor_getAttribute(bool, isIllusionable);
+	return Actor_getAttribute(isIllusionable);
 }
 
 int LuaState::lua_Actor_setCanBeAttacked()
@@ -2042,7 +2102,7 @@ int LuaState::lua_Actor_setCanBeAttacked()
 
 int LuaState::lua_Actor_getCanBeAttacked()
 {
-	return Actor_getAttribute(bool, isAttackable);
+	return Actor_getAttribute(isAttackable);
 }
 
 int LuaState::lua_Actor_setCanBeLured()
@@ -2052,7 +2112,7 @@ int LuaState::lua_Actor_setCanBeLured()
 
 int LuaState::lua_Actor_getCanBeLured()
 {
-	return Actor_getAttribute(bool, isLureable);
+	return Actor_getAttribute(isLureable);
 }
 
 int LuaState::lua_Actor_setLightLevel()
@@ -2062,7 +2122,7 @@ int LuaState::lua_Actor_setLightLevel()
 
 int LuaState::lua_Actor_getLightLevel()
 {
-	return Actor_getAttribute(int, lightLevel);
+	return Actor_getAttribute(lightLevel);
 }
 
 int LuaState::lua_Actor_setLightColor()
@@ -2072,12 +2132,12 @@ int LuaState::lua_Actor_setLightColor()
 
 int LuaState::lua_Actor_getLightColor()
 {
-	return Actor_getAttribute(int, lightColor);
+	return Actor_getAttribute(lightColor);
 }
 
 int LuaState::lua_Actor_getManaCost()
 {
-	return Actor_getAttribute(uint32_t, manaCost);
+	return Actor_getAttribute(manaCost);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

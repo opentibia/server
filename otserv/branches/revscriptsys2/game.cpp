@@ -1368,7 +1368,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	return true;
 }
 
-bool Game::playerLogin(Player* player)
+bool Game::onPlayerLogin(Player* player)
 {
 	if(!script_system)
 		return false; // Not handled
@@ -1376,7 +1376,7 @@ bool Game::playerLogin(Player* player)
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::playerLogout(Player* player, bool forced, bool timeout)
+bool Game::onPlayerLogout(Player* player, bool forced, bool timeout)
 {
 	if(!script_system)
 		return false; // Not handled
@@ -1384,11 +1384,19 @@ bool Game::playerLogout(Player* player, bool forced, bool timeout)
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::playerEquipItem(Player* player, Item* item, SlotType slot, bool equip)
+bool Game::onPlayerEquipItem(Player* player, Item* item, SlotType slot, bool equip)
 {
 	if(!script_system)
 		return false; // Not handled
 	Script::OnEquipItem::Event evt(player, item, slot, equip);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onPlayerAdvance(Player* player, LevelType skill, uint32_t oldLevel, uint32_t newLevel)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnAdvance::Event evt(player, skill, oldLevel, newLevel);
 	return script_system->dispatchEvent(evt);
 }
 
@@ -4394,6 +4402,9 @@ void Game::checkCreatureAttack(uint32_t creatureId)
 
 void Game::addCreatureCheck(Creature* creature)
 {
+	if(creature->isRemoved())
+		return;
+
 	creature->creatureCheck = true;
 
 	if(creature->checkCreatureVectorIndex >= 0){
@@ -4469,10 +4480,6 @@ void Game::checkCreatures()
 			creature->checkCreatureVectorIndex = -1;
 			it = checkCreatureVector.erase(it);
 			FreeThing(creature);
-
-			if(creature->getHealth() <= 0){
-				creature->onDie();
-			}
 		}
 	}
 

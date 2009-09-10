@@ -758,15 +758,12 @@ void Player::addSkillAdvance(SkillType skill, uint32_t count, bool useMultiplier
 
 	//Need skill up?
 	if(skills[skill.value()][SKILL_TRIES] >= vocation->getReqSkillTries(skill, skills[skill.value()][SKILL_LEVEL] + 1)){
-	 	skills[skill.value()][SKILL_LEVEL]++;
-	 	skills[skill.value()][SKILL_TRIES] = 0;
+		int oldlevel = skills[skill.value()][SKILL_LEVEL]++;
+		skills[skill.value()][SKILL_TRIES] = 0;
 		skills[skill.value()][SKILL_PERCENT] = 0;
-		std::stringstream advMsg;
-		// REVSCRIPT TODO convert to correct skill name ("sword fighting" instead of SKILL_SWORD)
-		advMsg << "You advanced in " << skill.toString() << ".";
-		sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
+		
+		g_game.onPlayerAdvance(this, LevelType(skill.value()), oldlevel, skills[skill.value()][SKILL_LEVEL]);
 
-		// REVSCRIPT TODO event callback (onAdvance)
 		sendSkills();
 	}
 	else{
@@ -1483,7 +1480,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 		for(SlotType::iterator slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
 			if((item = getInventoryItem(*slot))){
 				g_game.startDecay(item);
-				g_game.playerEquipItem(this, item, *slot, true);
+				g_game.onPlayerEquipItem(this, item, *slot, true);
 			}
 		}
 
@@ -1902,7 +1899,7 @@ void Player::onThink(uint32_t interval)
 			}
 			else{
 				//Occurs when the player closes the game without logging out (x-logging).
-				if(g_game.playerLogout(this, false, true))
+				if(g_game.onPlayerLogout(this, false, true))
 					g_game.removeCreature(this, true);
 			}
 		}
@@ -2021,13 +2018,9 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 
 		if(manaSpent >= reqMana){
 			manaSpent -= reqMana;
-			magLevel++;
+			int oldlevel = magLevel++;
 
-			std::stringstream MaglvMsg;
-			MaglvMsg << "You advanced to magic level " << magLevel << ".";
-			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
-
-			// REVSCRIPT TODO event callback (onAdvance)
+			g_game.onPlayerAdvance(this, LEVEL_MAGIC, oldlevel, magLevel);
 
 			sendStats();
 		}
@@ -2073,11 +2066,7 @@ void Player::addExperience(uint64_t exp)
 			getParty()->updateSharedExperience();
 		}
 
-		std::stringstream levelMsg;
-		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
-		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
-
-		// REVSCRIPT TODO event callback (onAdvance)
+		g_game.onPlayerAdvance(this, LEVEL_EXPERIENCE, prevLevel, newLevel);
 	}
 
 	currLevelExp = Player::getExpForLevel(level);
@@ -2401,7 +2390,7 @@ void Player::die()
 
 				skills[i->value()][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i->value()][SKILL_TRIES] - lostSkillTries));
 			}
-  		}
+		}
 
 		Creature::die();
 		sendReLoginWindow();
@@ -3221,7 +3210,7 @@ Thing* Player::__getThing(uint32_t index) const
 void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
-		g_game.playerEquipItem(this, thing->getItem(), (SlotType)index, true);
+		g_game.onPlayerEquipItem(this, thing->getItem(), (SlotType)index, true);
 	}
 
 	bool requireListUpdate = true;
@@ -3275,7 +3264,7 @@ void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* 
 void Player::postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
-		g_game.playerEquipItem(this, thing->getItem(), (SlotType)index, false /*,isCompleteRemoval*/);
+		g_game.onPlayerEquipItem(this, thing->getItem(), (SlotType)index, false /*,isCompleteRemoval*/);
 	}
 
 	bool requireListUpdate = true;
@@ -3748,7 +3737,7 @@ void Player::onIdleStatus()
 
 void Player::onPlacedCreature()
 {
-	if(g_game.playerLogin(this)){
+	if(g_game.onPlayerLogin(this)){
 		kickPlayer(); //The script won't let the player be online for now.
 	}
 }

@@ -93,6 +93,7 @@ namespace Script {
 			ListenerList OnLoad;
 			ListenerList OnUnload;
 			ListenerStringMap OnSpawn;
+			ListenerList OnAdvance;
 		} Generic;
 		SpecificListenerMap specific_listeners;
 
