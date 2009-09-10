@@ -153,7 +153,6 @@ public:
 	template <> double popValue<double>() {return popFloat();}
 	template <> std::string popValue<std::string>() {return popString();}
 	template <> uint64_t popValue<uint64_t>() {return (uint64_t)popFloat();}
-	template <> Enum<E, size_> popValue() {return Enum<E, size_>(popInteger());}
 	#endif
 
 	// Push
