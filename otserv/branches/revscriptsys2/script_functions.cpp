@@ -142,6 +142,12 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "say(string msg)", &Manager::lua_Creature_say);
 	registerMemberFunction("Creature", "setOutfit(table outfit)", &Manager::lua_Creature_setOutfit);
 	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
+	registerMemberFunction("Creature", "getSpeed()", &Manager::lua_Creature_getSpeed);
+	registerMemberFunction("Creature", "getArmor()", &Manager::lua_Creature_getArmor);
+	registerMemberFunction("Creature", "getDefense()", &Manager::lua_Creature_getDefense);
+	registerMemberFunction("Creature", "getBaseSpeed()", &Manager::lua_Creature_getBaseSpeed);
+	registerMemberFunction("Creature", "isPushable()", &Manager::lua_Creature_isPushable);
+	registerMemberFunction("Creature", "getTarget()", &Manager::lua_Creature_getTarget);	
 
 	registerGlobalFunction("getCreatureByName(string name)", &Manager::lua_getCreatureByName);
 	registerGlobalFunction("getCreaturesByName(string name)", &Manager::lua_getCreaturesByName);
@@ -152,34 +158,27 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "setAlwaysThink(boolean shouldreload)", &Manager::lua_Actor_setAlwaysThink);
 	registerMemberFunction("Actor", "getAlwaysThink()", &Manager::lua_Actor_getAlwaysThink);
 
-	// Creature type
 	registerMemberFunction("Actor", "setArmor(int newarmor)", &Manager::lua_Actor_setArmor);
-	registerMemberFunction("Actor", "getArmor()", &Manager::lua_Actor_getArmor);
 	registerMemberFunction("Actor", "setDefense(int newdefense)", &Manager::lua_Actor_setDefense);
-	registerMemberFunction("Actor", "getDefense()", &Manager::lua_Actor_getDefense);
 	registerMemberFunction("Actor", "setExperienceWorth(int newexp)", &Manager::lua_Actor_setExperienceWorth);
 	registerMemberFunction("Actor", "getExperienceWorth()", &Manager::lua_Actor_getExperienceWorth);
-	registerMemberFunction("Actor", "setCanPushItems(int newvalue)", &Manager::lua_Actor_setCanPushItems);
+	registerMemberFunction("Actor", "setCanPushItems(boolean canpushitems)", &Manager::lua_Actor_setCanPushItems);
 	registerMemberFunction("Actor", "getCanPushItems()", &Manager::lua_Actor_getCanPushItems);
-	registerMemberFunction("Actor", "setCanPushCreatures(int newvalue)", &Manager::lua_Actor_setCanPushCreatures);
+	registerMemberFunction("Actor", "setCanPushCreatures(boolean canpushcreatures)", &Manager::lua_Actor_setCanPushCreatures);
 	registerMemberFunction("Actor", "getCanPushCreatures()", &Manager::lua_Actor_getCanPushCreatures);
 	registerMemberFunction("Actor", "setSpeed(int newspeed)", &Manager::lua_Actor_setSpeed);
-	registerMemberFunction("Actor", "getSpeed()", &Manager::lua_Actor_getSpeed);
 	registerMemberFunction("Actor", "setTargetDistance(int newtargetdistance)", &Manager::lua_Actor_setTargetDistance);
 	registerMemberFunction("Actor", "getTargetDistance()", &Manager::lua_Actor_getTargetDistance);
 	registerMemberFunction("Actor", "setMaxSummons(int newsummons)", &Manager::lua_Actor_setMaxSummons);
 	registerMemberFunction("Actor", "getMaxSummons()", &Manager::lua_Actor_getMaxSummons);
 	registerMemberFunction("Actor", "setName(string newname)", &Manager::lua_Actor_setName);
 	registerMemberFunction("Actor", "setNameDescription(string newname)", &Manager::lua_Actor_setNameDescription);
-
 	registerMemberFunction("Actor", "setStaticAttackChance(int chance)", &Manager::lua_Actor_setStaticAttackChance);
 	registerMemberFunction("Actor", "getStaticAttackChance()", &Manager::lua_Actor_getStaticAttackChance);
 	registerMemberFunction("Actor", "setFleeHealth(int health)", &Manager::lua_Actor_setFleeHealth);
 	registerMemberFunction("Actor", "getFleeHealth()", &Manager::lua_Actor_getFleeHealth);
 	registerMemberFunction("Actor", "setPushable(bool pushable)", &Manager::lua_Actor_setPushable);
-	registerMemberFunction("Actor", "getPushable()", &Manager::lua_Actor_getPushable);
 	registerMemberFunction("Actor", "setBaseSpeed(int newbasespeed)", &Manager::lua_Actor_setBaseSpeed);
-	registerMemberFunction("Actor", "getBaseSpeed()", &Manager::lua_Actor_getBaseSpeed);
 	registerMemberFunction("Actor", "setMaxHealth(int newmaxhealth)", &Manager::lua_Actor_setMaxHealth);
 	registerMemberFunction("Actor", "getCorpseId()", &Manager::lua_Actor_getCorpseId);
 	registerMemberFunction("Actor", "setRace(int racetype)", &Manager::lua_Actor_setRace);
@@ -196,6 +195,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "setLightColor(int newlightcolor)", &Manager::lua_Actor_setLightColor);
 	registerMemberFunction("Actor", "getLightColor()", &Manager::lua_Actor_getLightColor);
 	registerMemberFunction("Actor", "getManaCost()", &Manager::lua_Actor_getManaCost);
+	registerMemberFunction("Actor", "setTarget(Creature target)", &Manager::lua_Actor_setTarget);
 
 	registerGlobalFunction("createMonster(string monstertypename, table pos)", &Manager::lua_createMonster);
 	registerGlobalFunction("createActor(string name, table pos)", &Manager::lua_createActor);
@@ -216,6 +216,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getFreeCap()", &Manager::lua_Player_getFreeCap);
 	registerMemberFunction("Player", "getMaximumCap()", &Manager::lua_Player_getMaximumCap);
 	registerMemberFunction("Player", "getSex()", &Manager::lua_Player_getSex);
+	registerMemberFunction("Player", "getAccess()", &Manager::lua_Player_getAccess);
 	registerMemberFunction("Player", "getVocationID()", &Manager::lua_Player_getVocationID);
 	registerMemberFunction("Player", "getTownID()", &Manager::lua_Player_getTownID);
 	registerMemberFunction("Player", "getGUID()", &Manager::lua_Player_getGUID);
@@ -1764,6 +1765,53 @@ int LuaState::lua_Creature_walk()
 	return 1;
 }
 
+int LuaState::lua_Creature_getSpeed()
+{
+	Creature* creature = popCreature();
+	pushInteger(creature->getSpeed());
+	return 1;
+}
+
+int LuaState::lua_Creature_getArmor()
+{
+	Creature* creature = popCreature();
+	pushInteger(creature->getArmor());
+	return 1;
+}
+
+int LuaState::lua_Creature_getDefense()
+{
+	Creature* creature = popCreature();
+	pushInteger(creature->getDefense());
+	return 1;
+}
+
+int LuaState::lua_Creature_getBaseSpeed()
+{
+	Creature* creature = popCreature();
+	pushInteger(creature->getBaseSpeed());
+	return 1;
+}
+
+int LuaState::lua_Creature_isPushable()
+{
+	Creature* creature = popCreature();
+	pushInteger(creature->isPushable());
+	return 1;
+}
+
+/*
+registerMemberFunction("Creature", "getCanPushItems()", &Manager::lua_Creature_getCanPushItems);
+registerMemberFunction("Creature", "getCanPushCreatures()", &Manager::lua_Creature_getCanPushCreatures);
+*/
+
+int LuaState::lua_Creature_getTarget()
+{
+	Creature* creature = popCreature();
+	pushThing(creature->getAttackedCreature());
+	return 1;
+}
+
 int LuaState::lua_Creature_say()
 {
 	std::string msg = popString();
@@ -1896,19 +1944,10 @@ int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const Enum<E, size
 #define Actor_getAttribute(mfp) \
 	push(popActor()->getType().mfp()), 1
 
-int LuaState::lua_Actor_getArmor()
-{
-	return Actor_getAttribute(armor);
-}
 
 int LuaState::lua_Actor_setArmor()
 {
 	return Actor_modAttribute(this, &CreatureType::armor);
-}
-
-int LuaState::lua_Actor_getDefense()
-{
-	return Actor_getAttribute(defense);
 }
 
 int LuaState::lua_Actor_setDefense()
@@ -1946,13 +1985,6 @@ int LuaState::lua_Actor_setCanPushCreatures()
 	return Actor_modAttribute(this, &CreatureType::canPushCreatures);
 }
 
-int LuaState::lua_Actor_getSpeed()
-{
-	Actor* actor = popActor();
-	pushInteger(actor->getSpeed());
-	return 1;
-}
-
 int LuaState::lua_Actor_setSpeed()
 {
 	int value = popInteger();
@@ -1985,7 +2017,13 @@ int LuaState::lua_Actor_setMaxSummons()
 
 int LuaState::lua_Actor_setName()
 {
-	return Actor_modAttribute(this, &CreatureType::name);
+	std::string value = popString();
+	Actor* actor = popActor();
+	actor->getType().name(value);
+	//TODO: notify all clients about the name change
+
+	pushBoolean(true);
+	return 1;
 }
 
 int LuaState::lua_Actor_setNameDescription()
@@ -2023,24 +2061,28 @@ int LuaState::lua_Actor_setPushable()
 	return Actor_modAttribute(this, &CreatureType::pushable);
 }
 
-int LuaState::lua_Actor_getPushable()
-{
-	return Actor_getAttribute(pushable);
-}
-
 int LuaState::lua_Actor_setBaseSpeed()
 {
-	return Actor_modAttribute(this, &CreatureType::base_speed);
-}
+	int value = popInteger();
+	Actor* actor = popActor();
+	actor->getType().base_speed(value);
+	actor->updateBaseSpeed();
+	g_game.changeSpeed(actor, 0);
 
-int LuaState::lua_Actor_getBaseSpeed()
-{
-	return Actor_getAttribute(base_speed);
+	pushBoolean(true);
+	return 1;
 }
 
 int LuaState::lua_Actor_setMaxHealth()
 {
-	return Actor_modAttribute(this, &CreatureType::health_max);
+	int value = popInteger();
+	Actor* actor = popActor();
+	actor->getType().health_max(value);
+	actor->updateMaxHealth();
+	g_game.addCreatureHealth(actor);
+
+	pushBoolean(true);
+	return 1;
 }
 
 int LuaState::lua_Actor_getCorpseId()
@@ -2117,7 +2159,14 @@ int LuaState::lua_Actor_getCanBeLured()
 
 int LuaState::lua_Actor_setLightLevel()
 {
-	return Actor_modAttribute(this, &CreatureType::lightLevel);
+	int value = popInteger();
+	Actor* actor = popActor();
+	actor->getType().lightLevel(value);
+	actor->updateLightLevel();
+	g_game.changeLight(actor);
+
+	pushBoolean(true);
+	return 1;
 }
 
 int LuaState::lua_Actor_getLightLevel()
@@ -2127,7 +2176,14 @@ int LuaState::lua_Actor_getLightLevel()
 
 int LuaState::lua_Actor_setLightColor()
 {
-	return Actor_modAttribute(this, &CreatureType::lightColor);
+	int value = popInteger();
+	Actor* actor = popActor();
+	actor->getType().lightColor(value);
+	actor->updateLightColor();
+	g_game.changeLight(actor);
+
+	pushBoolean(true);
+	return 1;
 }
 
 int LuaState::lua_Actor_getLightColor()
@@ -2138,6 +2194,14 @@ int LuaState::lua_Actor_getLightColor()
 int LuaState::lua_Actor_getManaCost()
 {
 	return Actor_getAttribute(manaCost);
+}
+
+int LuaState::lua_Actor_setTarget()
+{
+	Creature* target = popCreature();
+	Actor* actor = popActor();
+	pushBoolean(actor->setAttackedCreature(target));
+	return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

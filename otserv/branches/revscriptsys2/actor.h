@@ -72,6 +72,10 @@ public:
 	virtual const std::string& getName() const {return cType.name();}
 	virtual const std::string& getNameDescription() const {return cType.nameDescription();}
 	virtual std::string getDescription(int32_t lookDistance) const {return strDescription + '.';}
+	virtual void updateBaseSpeed();
+	virtual void updateMaxHealth();
+	virtual void updateLightLevel();
+	virtual void updateLightColor();
 	virtual void updateNameDescription();
 
 	virtual RaceType getRace() const { return cType.race(); }

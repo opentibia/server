@@ -300,6 +300,12 @@ public:
 	int lua_Creature_say();
 	int lua_Creature_setOutfit();
 	int lua_Creature_walk();
+	int lua_Creature_getSpeed();
+	int lua_Creature_getArmor();
+	int lua_Creature_getDefense();
+	int lua_Creature_getBaseSpeed();
+	int lua_Creature_isPushable();
+	int lua_Creature_getTarget();
 
 	int lua_getCreatureByName();
 	int lua_getCreaturesByName();
@@ -315,17 +321,14 @@ public:
 
 	// Actor type changes
 	int lua_Actor_setArmor();
-	int lua_Actor_getArmor();
 	int lua_Actor_setDefense();
-	int lua_Actor_getDefense();
 	int lua_Actor_setExperienceWorth();
 	int lua_Actor_getExperienceWorth();
 	int lua_Actor_setCanPushItems();
 	int lua_Actor_getCanPushItems();
-	int lua_Actor_setCanPushCreatures();
 	int lua_Actor_getCanPushCreatures();
+	int lua_Actor_setCanPushCreatures();
 	int lua_Actor_setSpeed();
-	int lua_Actor_getSpeed();
 	int lua_Actor_setTargetDistance();
 	int lua_Actor_getTargetDistance();
 	int lua_Actor_setMaxSummons();
@@ -337,9 +340,7 @@ public:
 	int lua_Actor_setFleeHealth();
 	int lua_Actor_getFleeHealth();
 	int lua_Actor_setPushable();
-	int lua_Actor_getPushable();
 	int lua_Actor_setBaseSpeed();
-	int lua_Actor_getBaseSpeed();
 	int lua_Actor_setMaxHealth();
 	int lua_Actor_getCorpseId();
 	//int lua_Actor_setConditionImmunities();
@@ -360,6 +361,7 @@ public:
 	int lua_Actor_setLightColor();
 	int lua_Actor_getLightColor();
 	int lua_Actor_getManaCost();
+	int lua_Actor_setTarget();
 
 	/*
 	TODO:
@@ -389,6 +391,7 @@ public:
 	int lua_Player_getMaximumCap();
 	int lua_Player_getLevel();
 	int lua_Player_getMagicLevel();
+	int lua_Player_getCorpseId();
 
 	int lua_Player_getSex();
 	int lua_Player_getAccess();

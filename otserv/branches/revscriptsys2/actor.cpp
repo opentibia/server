@@ -116,6 +116,26 @@ CreatureType& Actor::getType()
 	return cType;
 }
 
+void Actor::updateBaseSpeed()
+{
+	baseSpeed = cType.base_speed();
+}
+
+void Actor::updateMaxHealth()
+{
+	healthMax = cType.health_max();
+}
+
+void Actor::updateLightColor()
+{
+	internalLight.color = cType.lightColor();
+}
+
+void Actor::updateLightLevel()
+{
+	internalLight.level = cType.lightLevel();
+}
+
 void Actor::updateNameDescription()
 {
 	strDescription = cType.nameDescription();
