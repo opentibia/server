@@ -200,8 +200,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "getLightColor()", &Manager::lua_Actor_getLightColor);
 	registerMemberFunction("Actor", "getManaCost()", &Manager::lua_Actor_getManaCost);
 	registerMemberFunction("Actor", "setTarget(Creature target)", &Manager::lua_Actor_setTarget);
-	registerMemberFunction("Actor", "lua_Actor_setConditionImmunities(table immunities)", &Manager::lua_Actor_setConditionImmunities);
-	registerMemberFunction("Actor", "lua_Actor_setDamageImmunities(table immunities)", &Manager::lua_Actor_setDamageImmunities);
+	registerMemberFunction("Actor", "setConditionImmunities(table immunities)", &Manager::lua_Actor_setConditionImmunities);
+	registerMemberFunction("Actor", "setDamageImmunities(table immunities)", &Manager::lua_Actor_setDamageImmunities);
 
 	registerGlobalFunction("createMonster(string monstertypename, table pos)", &Manager::lua_createMonster);
 	registerGlobalFunction("createActor(string name, table pos)", &Manager::lua_createActor);
