@@ -34,7 +34,8 @@ typedef std::list<Creature*> CreatureList;
 enum TargetSearchType_t{
 	TARGETSEARCH_DEFAULT,
 	TARGETSEARCH_RANDOM,
-	TARGETSEARCH_ATTACKRANGE
+	TARGETSEARCH_ATTACKRANGE,
+	TARGETSEARCH_NEAREAST
 };
 
 class Monster : public Creature

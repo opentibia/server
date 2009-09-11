@@ -429,18 +429,45 @@ bool Monster::searchTarget(TargetSearchType_t searchType /*= TARGETSEARCH_DEFAUL
 		}
 	}
 
-	if(!resultList.empty()){
-		uint32_t index = random_range(0, resultList.size() - 1);
-		CreatureList::iterator it = resultList.begin();
-		std::advance(it, index);
-#ifdef __DEBUG__
-		std::cout << "Selecting target " << (*it)->getName() << std::endl;
-#endif
-		return selectTarget(*it);
-	}
+	switch(searchType){
+		case TARGETSEARCH_NEAREAST:
+		{
+			Creature* target = NULL;
+			int32_t minRange = -1;
+			for(std::list<Creature*>::iterator it = resultList.begin(); it != resultList.end(); ++it){
+				if(minRange == -1 || std::max(std::abs(myPos.x - (*it)->getPosition().x), std::abs(myPos.y - (*it)->getPosition().y)) < minRange){
+					target = *it;
+					minRange = std::max(std::abs(myPos.x - (*it)->getPosition().x), std::abs(myPos.y - (*it)->getPosition().y));
+				}
+			}
 
-	if(searchType == TARGETSEARCH_ATTACKRANGE){
-		return false;
+			if(target && selectTarget(target)){
+				return true;
+			}
+
+			break;
+		}
+
+		case TARGETSEARCH_DEFAULT:
+		case TARGETSEARCH_ATTACKRANGE:
+		case TARGETSEARCH_RANDOM:
+		default:
+		{
+			if(!resultList.empty()){
+				uint32_t index = random_range(0, resultList.size() - 1);
+				CreatureList::iterator it = resultList.begin();
+				std::advance(it, index);
+#ifdef __DEBUG__
+				std::cout << "Selecting target " << (*it)->getName() << std::endl;
+#endif
+				return selectTarget(*it);
+			}
+
+			if(searchType == TARGETSEARCH_ATTACKRANGE){
+				return false;
+			}
+			break;
+		}
 	}
 
 	//lets just pick the first target in the list
@@ -787,7 +814,12 @@ void Monster::onThinkTarget(uint32_t interval)
 					targetChangeCooldown = (uint32_t)mType->changeTargetSpeed;
 
 					if(mType->changeTargetChance >= random_range(1, 100)){
-						searchTarget(TARGETSEARCH_RANDOM);
+						if(mType->targetDistance <= 1){
+							searchTarget(TARGETSEARCH_RANDOM);
+						}
+						else{
+							searchTarget(TARGETSEARCH_NEAREAST);
+						}
 					}
 				}
 			}
