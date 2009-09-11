@@ -2183,28 +2183,6 @@ int LuaState::lua_Actor_getCorpseId()
 	return Actor_getAttribute(corpseId);
 }
 
-/*
-int LuaState::lua_Actor_setConditionImmunities()
-{
-	return Actor_modAttribute(this, &CreatureType::conditionImmunities);
-}
-
-int LuaState::lua_Actor_getConditionImmunities()
-{
-	return Actor_getAttribute(conditionImmunities);
-}
-
-int LuaState::lua_Actor_setDamageImmunities()
-{
-	return Actor_modAttribute(this, &CreatureType::damageImmunities);
-}
-
-int LuaState::lua_Actor_getDamageImmunities()
-{
-	return Actor_getAttribute(damageImmunities);
-}
-*/
-
 int LuaState::lua_Actor_setRace()
 {
 	return Actor_modAttribute(this, &CreatureType::race);
