@@ -147,7 +147,11 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getDefense()", &Manager::lua_Creature_getDefense);
 	registerMemberFunction("Creature", "getBaseSpeed()", &Manager::lua_Creature_getBaseSpeed);
 	registerMemberFunction("Creature", "isPushable()", &Manager::lua_Creature_isPushable);
-	registerMemberFunction("Creature", "getTarget()", &Manager::lua_Creature_getTarget);	
+	registerMemberFunction("Creature", "getTarget()", &Manager::lua_Creature_getTarget);
+	registerMemberFunction("Creature", "isImmuneToCondition(int conditiontype)", &Manager::lua_Creature_isImmuneToCondition);
+	registerMemberFunction("Creature", "isImmuneToCombat(int combattype)", &Manager::lua_Creature_isImmuneToCombat);
+	registerMemberFunction("Creature", "getConditionImmunities()", &Manager::lua_Creature_getConditionImmunities);
+	registerMemberFunction("Creature", "getDamageImmunities()", &Manager::lua_Creature_getDamageImmunities);
 
 	registerGlobalFunction("getCreatureByName(string name)", &Manager::lua_getCreatureByName);
 	registerGlobalFunction("getCreaturesByName(string name)", &Manager::lua_getCreaturesByName);
@@ -196,6 +200,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "getLightColor()", &Manager::lua_Actor_getLightColor);
 	registerMemberFunction("Actor", "getManaCost()", &Manager::lua_Actor_getManaCost);
 	registerMemberFunction("Actor", "setTarget(Creature target)", &Manager::lua_Actor_setTarget);
+	registerMemberFunction("Actor", "lua_Actor_setConditionImmunities(table immunities)", &Manager::lua_Actor_setConditionImmunities);
+	registerMemberFunction("Actor", "lua_Actor_setDamageImmunities(table immunities)", &Manager::lua_Actor_setDamageImmunities);
 
 	registerGlobalFunction("createMonster(string monstertypename, table pos)", &Manager::lua_createMonster);
 	registerGlobalFunction("createActor(string name, table pos)", &Manager::lua_createActor);
@@ -1800,15 +1806,52 @@ int LuaState::lua_Creature_isPushable()
 	return 1;
 }
 
-/*
-registerMemberFunction("Creature", "getCanPushItems()", &Manager::lua_Creature_getCanPushItems);
-registerMemberFunction("Creature", "getCanPushCreatures()", &Manager::lua_Creature_getCanPushCreatures);
-*/
-
 int LuaState::lua_Creature_getTarget()
 {
 	Creature* creature = popCreature();
 	pushThing(creature->getAttackedCreature());
+	return 1;
+}
+
+int LuaState::lua_Creature_isImmuneToCondition()
+{
+	Creature* creature = popCreature();
+	int32_t conditionType = popInteger();
+
+	pushBoolean(creature->isImmune(ConditionType(conditionType)));
+	return 1;
+}
+
+int LuaState::lua_Creature_isImmuneToCombat()
+{
+	Creature* creature = popCreature();
+	int32_t combatType = popInteger();
+
+	pushBoolean(creature->isImmune(CombatType(combatType)));
+	return 1;
+}
+
+int LuaState::lua_Creature_getConditionImmunities()
+{
+	Creature* creature = popCreature();
+
+	newTable();
+	for(ConditionType::iterator i = CONDITION_POISON; i != ConditionType::end(); ++i){
+		pushBoolean(creature->isImmune(*i));
+		setField(-2, i->toString());
+	}
+	return 1;
+}
+
+int LuaState::lua_Creature_getDamageImmunities()
+{
+	Creature* creature = popCreature();
+
+	newTable();
+	for(CombatType::iterator i = COMBAT_PHYSICALDAMAGE; i != CombatType::end(); ++i){
+		pushBoolean(creature->isImmune(*i));
+		setField(-2, i->toString());
+	}
 	return 1;
 }
 
@@ -2003,6 +2046,56 @@ int LuaState::lua_Actor_getTargetDistance()
 int LuaState::lua_Actor_setTargetDistance()
 {
 	return Actor_modAttribute(this, &CreatureType::targetDistance);
+}
+
+int LuaState::lua_Actor_setConditionImmunities()
+{
+	if(!isTable(-1)) {
+		HandleError(Script::ERROR_THROW, "Attempt to treat non-table value as an immunity-table.");
+		pop();
+		pushBoolean(false);
+		return 1;
+	}
+
+	ConditionType immunities = CONDITION_NONE;
+	for(ConditionType::iterator i = CONDITION_POISON; i != ConditionType::end(); ++i){
+		getField(-1, i->toString());
+		immunities |= (ConditionType)popInteger();		
+	}
+
+	pop();
+
+	Actor* actor = popActor();
+	actor->getType().conditionImmunities(immunities);
+	//actor->updateMapCache();
+
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_setDamageImmunities()
+{
+	if(!isTable(-1)) {
+		HandleError(Script::ERROR_THROW, "Attempt to treat non-table value as an immunity-table.");
+		pop();
+		pushBoolean(false);
+		return 1;
+	}
+
+	CombatType immunities = COMBAT_NONE;
+	for(CombatType::iterator i = COMBAT_PHYSICALDAMAGE; i != CombatType::end(); ++i){
+		getField(-1, i->toString());
+		immunities |= (CombatType)popInteger();		
+	}
+
+	pop();
+
+	Actor* actor = popActor();
+	actor->getType().damageImmunities(immunities);
+	//actor->updateMapCache();
+
+	pushBoolean(true);
+	return 1;
 }
 
 int LuaState::lua_Actor_getMaxSummons()

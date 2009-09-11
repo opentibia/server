@@ -306,6 +306,10 @@ public:
 	int lua_Creature_getBaseSpeed();
 	int lua_Creature_isPushable();
 	int lua_Creature_getTarget();
+	int lua_Creature_isImmuneToCondition();
+	int lua_Creature_isImmuneToCombat();
+	int lua_Creature_getConditionImmunities();
+	int lua_Creature_getDamageImmunities();
 
 	int lua_getCreatureByName();
 	int lua_getCreaturesByName();
@@ -343,10 +347,6 @@ public:
 	int lua_Actor_setBaseSpeed();
 	int lua_Actor_setMaxHealth();
 	int lua_Actor_getCorpseId();
-	//int lua_Actor_setConditionImmunities();
-	//int lua_Actor_getConditionImmunities();
-	//int lua_Actor_setDamageImmunities();
-	//int lua_Actor_getDamageImmunities();
 	int lua_Actor_setRace();
 	int lua_Actor_getRace();
 	int lua_Actor_isSummonable();
@@ -362,6 +362,8 @@ public:
 	int lua_Actor_getLightColor();
 	int lua_Actor_getManaCost();
 	int lua_Actor_setTarget();
+	int lua_Actor_setConditionImmunities();
+	int lua_Actor_setDamageImmunities();
 
 	/*
 	TODO:
