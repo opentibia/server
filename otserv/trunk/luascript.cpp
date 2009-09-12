@@ -1519,9 +1519,6 @@ void LuaScriptInterface::registerFunctions()
 	//cleanHouse(houseid)
 	lua_register(m_luaState, "cleanHouse", LuaScriptInterface::luaCleanHouse);
 
-	//payHouseRent(guid, houseid)
-	lua_register(m_luaState, "payHouseRent", LuaScriptInterface::luaPayHouseRent);
-
 	//getWorldType()
 	lua_register(m_luaState, "getWorldType", LuaScriptInterface::luaGetWorldType);
 
@@ -4652,31 +4649,6 @@ int LuaScriptInterface::luaCleanHouse(lua_State *L)
 		lua_pushnumber(L, LUA_FALSE);
 	}
 
-	return 1;
-}
-
-int LuaScriptInterface::luaPayHouseRent(lua_State *L)
-{
-	//payHouseRent(houseid, guid[, time])
-	uint32_t time = 0;
-	if(lua_gettop(L) > 2){
-		time = popNumber(L);
-	}
-	uint32_t guid = popNumber(L);
-	uint32_t houseid = popNumber(L);
-
-	Player* player = g_game.getPlayerByGuid(guid);
-	House* house = Houses::getInstance().getHouse(houseid);
-	if(house){
-		if(player){
-			if(Houses::getInstance().payRent(player, house, (time_t)time)){
-				lua_pushnumber(L, LUA_FALSE);
-				return 1;
-			}
-		}
-	}
-
-	lua_pushnumber(L, LUA_FALSE);
 	return 1;
 }
 

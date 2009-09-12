@@ -165,7 +165,7 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 		}
 		if(cmdstring == it->first || (!it->second->isCaseSensitive() && strcasecmp(it->first.c_str(), cmdstring.c_str()) == 0)){
 			bool ret = true;
-			if(player && player->getAccessLevel() < it->second->getAccessLevel()){
+			if(player->getAccessLevel() < it->second->getAccessLevel()){
 				if(player->getAccessLevel() > 0){
 					player->sendTextMessage(MSG_STATUS_SMALL, "You can not execute this command.");
 					ret = false;
@@ -180,7 +180,8 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 				else{
 					TalkActionFunction* func = talkAction->getFunction();
 					if(func){
-						ret = func(player, cmdstring, paramstring);
+						func(player, cmdstring, paramstring);
+						ret = false;
 					}
 				}
 			}
@@ -193,6 +194,7 @@ TalkActionResult_t TalkActions::onPlayerSpeak(Player* player, SpeakClasses type,
 			}
 		}
 	}
+
 	return TALKACTION_CONTINUE;
 }
 
@@ -341,7 +343,6 @@ bool TalkAction::placeNpc(Player* player, const std::string& words, const std::s
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
-		return true;
 	}
 
 	return false;
@@ -427,18 +428,16 @@ bool TalkAction::closeServer(Player* player, const std::string& words, const std
 bool TalkAction::openServer(Player* player, const std::string& words, const std::string& param)
 {
 	g_game.setGameState(GAME_STATE_NORMAL);
-
 	if(player){
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now open.");
 	}
+
 	return true;
 }
 
 bool TalkAction::shutdownServer(Player* player, const std::string& words, const std::string& param)
 {
-	// Save most everything
 	g_game.setGameState(GAME_STATE_SHUTDOWN);
-
 	return true;
 }
 
@@ -590,7 +589,7 @@ bool TalkAction::refreshMap(Player* player, const std::string& words, const std:
 	}
 
 	g_game.proceduralRefresh();
-
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Refreshed map.");
+
 	return true;
 }
