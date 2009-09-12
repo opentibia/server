@@ -62,8 +62,7 @@ enum GameState_t {
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
 	GAME_STATE_SHUTDOWN,
-	GAME_STATE_CLOSING,
-	GAME_STATE_LAST
+	GAME_STATE_CLOSING
 };
 
 enum LightState_t {
@@ -71,19 +70,6 @@ enum LightState_t {
 	LIGHT_STATE_NIGHT,
 	LIGHT_STATE_SUNSET,
 	LIGHT_STATE_SUNRISE
-};
-
-enum ReloadType_t {
-	RELOAD_ACTIONS,
-	RELOAD_MOVE_EVENTS,
-	RELOAD_MONSTERS,
-	RELOAD_NPCS,
-	RELOAD_TALKACTIONS,
-	RELOAD_CONFIG,
-	RELOAD_SPELLS,
-	RELOAD_RAIDS,
-	RELOAD_CREATURE_EVENTS,
-	RELOAD_LAST
 };
 
 struct RuleViolation {
@@ -517,7 +503,6 @@ public:
 	void loadGameState();
 	void refreshMap(Map::TileMap::iterator* begin = NULL, int clean_max = 0);
 	void proceduralRefresh(Map::TileMap::iterator* begin = NULL);
-	bool reloadContent(ReloadType_t type);
 
 	//Events
 	void checkCreatureWalk(uint32_t creatureId);
