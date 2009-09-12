@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
-	local access = getPlayerAccess(cid)
-	if access < 2 then
-		return TRUE
+	if(param == "") then
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
+		return FALSE
 	end
 
 	local creature = getCreatureByName(param)
@@ -9,7 +9,7 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature or player not found.")
 		return FALSE
 	end
-	
+
 	local creatureAccess = 0
 	if(isPlayer(creature) == LUA_TRUE) then
 		creatureAccess = getPlayerAccess(creature)

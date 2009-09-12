@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
-	local access = getPlayerAccess(cid)
-	if access < 2 then
-		return TRUE
+	if(param == "") then
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
+		return FALSE
 	end
 
 	local townid = getTownIdByName(param)

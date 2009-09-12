@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,6 +22,7 @@
 
 #include "logger.h"
 #include <iostream>
+#include <ctime>
 #include "tools.h"
 /*
 void Logger::logMessage(std::string channel, eLogType type, int level,
@@ -43,9 +44,9 @@ void Logger::logMessage(std::string channel, eLogType type, int level,
 	std::cout << "Type: " << sType << std::endl;
 	std::cout << "Level: " << level << std::endl;
 	std::cout << "Message: " << message << std::endl;
-	std::cout << "Func: " << func << std::endl; 
-	std::cout << "Line: " << line << std::endl; 
-	std::cout << "File: " << file << std::endl; 
+	std::cout << "Func: " << func << std::endl;
+	std::cout << "Line: " << line << std::endl;
+	std::cout << "File: " << file << std::endl;
 }
 */
 
@@ -67,7 +68,7 @@ void Logger::logMessage(const char* channel, eLogType type, int level, std::stri
 {
 	//TODO: decide if should be saved or not depending on channel type and level
 	// if should be save decide where and how
-	
+
 	//write timestamp of the event
 	char buffer[32];
 	time_t tmp = time(NULL);

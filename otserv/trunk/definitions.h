@@ -168,6 +168,7 @@ enum passwordType_t{
 		#define OTSERV_HASH_SET std::tr1::unordered_set
 	#endif
 	#include <assert.h>
+	#include <stdint.h>
 	#define ATOI64 atoll
 
 #else

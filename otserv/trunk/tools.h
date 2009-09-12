@@ -24,6 +24,11 @@
 #include <libxml/parser.h>
 #include <vector>
 #include <iostream>
+#include <ctime>
+#include <cstring>
+
+#include <boost/tokenizer.hpp>
+typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 #include "enums.h"
 #include "const.h"
@@ -83,5 +88,9 @@ std::string playerSexAdjectiveString(playersex_t sex);
 std::string playerSexSubjectString(playersex_t sex);
 
 uint32_t adlerChecksum(uint8_t *data, int32_t len);
+
+void showTime(std::stringstream& str, uint32_t time);
+uint32_t parseTime(const std::string& time);
+std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end);
 
 #endif

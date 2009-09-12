@@ -1,8 +1,4 @@
 function onSay(cid, words, param, channel)
-	if getPlayerAccess(cid) < 2 then
-		return TRUE
-	end
-
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the message that will be broadcasted.")
 		return FALSE

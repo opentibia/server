@@ -740,3 +740,16 @@ function doPlayerSellItem(cid, itemid, count, cost)
 	return LUA_ERROR
 
 end
+
+function getContainerCapById(itemid)
+	local container = doCreateItemEx(itemid, 1)
+	local capacity
+	if isContainer(container) == LUA_TRUE then
+		capacity = getContainerCap(container)
+		doRemoveItem(container)
+		return capacity
+	else
+		doRemoveItem(container)
+		return LUA_ERROR
+	end
+end

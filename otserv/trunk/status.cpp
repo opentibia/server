@@ -182,13 +182,11 @@ std::string Status::getStatusString() const
 	ss.str("");
 	xmlAddChild(root, p);
 
-	/*
 	p = xmlNewNode(NULL,(const xmlChar*)"monsters");
 	ss << g_game.getMonstersOnline();
 	xmlSetProp(p, (const xmlChar*) "total", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlAddChild(root, p);
-	*/
 
 	p = xmlNewNode(NULL,(const xmlChar*)"map");
 	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)m_mapname.c_str());

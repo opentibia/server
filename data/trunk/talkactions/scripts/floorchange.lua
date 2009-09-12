@@ -1,9 +1,4 @@
 function onSay(cid, words, param)
-	-- Check access
-	if getPlayerAccess(cid) < 2 then
-		return TRUE
-	end
-
 	-- Get number of floors
 	local nfloors = 1
 	if(param ~= "" and tonumber(param)) then

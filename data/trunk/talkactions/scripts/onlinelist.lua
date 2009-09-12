@@ -1,8 +1,8 @@
 function onSay(cid, words, param)
 	local onlineList = getPlayersOnlineList()
-	
+
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Players Online:")
-	
+
 	local str = ""
 	local j = 1
 	local k = 0
@@ -21,7 +21,7 @@ function onSay(cid, words, param)
 			j = j + 1
 		else
 			k = k + 1
-		end	
+		end
 	end
 
 	if str ~= "" then
@@ -31,7 +31,7 @@ function onSay(cid, words, param)
 
 	local total = #onlineList - k
 	if total == 1 then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Total: " .. total .. " player online.")
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Total: 1 player online.")
 	else
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Total: " .. total .. " players online.")
 	end

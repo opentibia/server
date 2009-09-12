@@ -21,7 +21,8 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstring>
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 

@@ -63,6 +63,8 @@ protected:
 	LuaScriptInterface m_scriptInterface;
 };
 
+typedef bool (TalkActionFunction)(Player*, const std::string&, const std::string&);
+
 class TalkAction : public Event
 {
 public:
@@ -70,20 +72,38 @@ public:
 	virtual ~TalkAction();
 
 	virtual bool configureEvent(xmlNodePtr p);
+	virtual bool loadFunction(const std::string& functionName);
 
 	std::string getWords() const {return commandString;}
 	TalkActionFilterType getFilterType() const {return filterType;}
+	TalkActionFunction* getFunction() const {return function;}
 	bool isCaseSensitive() const {return caseSensitive;}
+	int16_t getAccessLevel() const {return accessLevel;}
+	bool isScripted() const {return m_scripted;}
+
 	//scripting
-	uint32_t executeSay(Creature* creature, const std::string& words, const std::string& param);
-	//
+	bool executeSay(Player* player, const std::string& words, const std::string& param);
 
 protected:
 	virtual std::string getScriptEventName();
 
+	static TalkActionFunction shutdownServer;
+	static TalkActionFunction placeNpc;
+	static TalkActionFunction reloadInfo;
+	static TalkActionFunction closeServer;
+	static TalkActionFunction openServer;
+	static TalkActionFunction sellHouse;
+	static TalkActionFunction forceRaid;
+	static TalkActionFunction refreshMap;
+	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static TalkActionFunction serverDiag;
+	#endif
+
 	std::string commandString;
 	TalkActionFilterType filterType;
 	bool caseSensitive;
+	int16_t accessLevel;
+	TalkActionFunction* function;
 };
 
 #endif

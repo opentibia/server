@@ -769,3 +769,82 @@ uint32_t adlerChecksum(uint8_t *data, int32_t len)
 
 	return (b << 16) | a;
 }
+
+void showTime(std::stringstream& str, uint32_t time)
+{
+	if(time == 0xFFFFFFFF){
+		str << "permanent";
+	}
+	else if(time == 0){
+		str << "serversave";
+	}
+	else{
+		char buffer[32];
+		formatDate((time_t)time, buffer);
+		str << buffer;
+	}
+}
+
+uint32_t parseTime(const std::string& time)
+{
+	if(time == "serversave" || time == "shutdown"){
+		return 0;
+	}
+	if(time == "permanent"){
+		return 0xFFFFFFFF;
+	}
+	else{
+		boost::char_separator<char> sep("+");
+		tokenizer timetoken(time, sep);
+		tokenizer::iterator timeit = timetoken.begin();
+		if(timeit == timetoken.end()){
+			return 0;
+		}
+		uint32_t number = atoi(timeit->c_str());
+		uint32_t multiplier = 0;
+		++timeit;
+		if(timeit == timetoken.end()){
+			return 0;
+		}
+		if(*timeit == "m") //minute
+			multiplier = 60;
+		if(*timeit == "h") //hour
+			multiplier = 60*60;
+		if(*timeit == "d") //day
+			multiplier = 60*60*24;
+		if(*timeit == "w") //week
+			multiplier = 60*60*24*7;
+		if(*timeit == "o") //month
+			multiplier = 60*60*24*30;
+		if(*timeit == "y") //year
+			multiplier = 60*60*24*365;
+
+		uint32_t currentTime = std::time(NULL);
+		return currentTime + number*multiplier;
+	}
+}
+
+std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end)
+{
+	std::string tmp;
+	if(it == end){
+		return "";
+	}
+	else{
+		tmp = *it;
+		++it;
+		if(tmp[0] == '"'){
+			tmp.erase(0,1);
+			while(it != end && tmp[tmp.length() - 1] != '"'){
+				tmp += " " + *it;
+				++it;
+			}
+
+			if(tmp.length() > 0 && tmp[tmp.length() - 1] == '"'){
+				tmp.erase(tmp.length() - 1);
+			}
+		}
+		return tmp;
+	}
+}
+

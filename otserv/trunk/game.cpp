@@ -32,7 +32,6 @@
 #include "otsystem.h"
 #include "tasks.h"
 #include "items.h"
-#include "commands.h"
 #include "creature.h"
 #include "player.h"
 #include "monster.h"
@@ -53,14 +52,18 @@
 #include "raids.h"
 #include "spawn.h"
 #include "quests.h"
+#include "movement.h"
 
 extern ConfigManager g_config;
 extern Actions* g_actions;
-extern Commands commands;
 extern BanManager g_bans;
 extern Chat g_chat;
 extern TalkActions* g_talkactions;
 extern Spells* g_spells;
+extern Monsters g_monsters;
+extern MoveEvents* g_moveEvents;
+extern Npcs g_npcs;
+extern CreatureEvents* g_creatureEvents;
 
 Game::Game()
 {
@@ -3474,10 +3477,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return true;
 	}
 
-	if(playerSayCommand(player, type, text)){
-		return true;
-	}
-
 	if(isMuteableChannel || muteTime == 0){
 		if(playerSaySpell(player, type, text)){
 			return true;
@@ -3529,20 +3528,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 
 		default:
 			break;
-	}
-
-	return false;
-}
-
-bool Game::playerSayCommand(Player* player, SpeakClasses type, const std::string& text)
-{
-	//First, check if this was a command
-	for(uint32_t i = 0; i < commandTags.size(); i++){
-		if(commandTags[i] == text.substr(0,1)){
-			if(commands.exeCommand(player, text) || player->getAccessLevel() > 0){
-				return true;
-			}
-		}
 	}
 
 	return false;
@@ -4560,27 +4545,6 @@ bool Game::closeRuleViolation(Player* player)
 	return true;
 }
 
-void Game::addCommandTag(std::string tag)
-{
-	bool found = false;
-	for(uint32_t i=0; i< commandTags.size() ;i++){
-		if(commandTags[i] == tag){
-			found = true;
-			break;
-		}
-	}
-
-	if(!found){
-		commandTags.push_back(tag);
-	}
-}
-
-void Game::resetCommandTag()
-{
-	commandTags.clear();
-}
-
-
 void Game::shutdown()
 {
 	std::cout << "Shutting down server...";
@@ -4912,4 +4876,53 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 		return true;
 	}
 	return false;
+}
+
+bool Game::reloadContent(ReloadType_t type)
+{
+	switch(type){
+	case RELOAD_ACTIONS:
+		g_actions->reload();
+		break;
+
+	case RELOAD_MONSTERS:
+		g_monsters.reload();
+		break;
+
+	case RELOAD_NPCS:
+		g_npcs.reload();
+		break;
+
+	case RELOAD_CONFIG:
+		g_config.reload();
+		break;
+
+	case RELOAD_TALKACTIONS:
+		g_talkactions->reload();
+		break;
+
+	case RELOAD_MOVE_EVENTS:
+		g_moveEvents->reload();
+		break;
+
+	case RELOAD_SPELLS:
+		g_spells->reload();
+		g_monsters.reload();
+		break;
+
+	case RELOAD_RAIDS:
+		Raids::getInstance()->reload();
+		Raids::getInstance()->startup();
+		break;
+
+	case RELOAD_CREATURE_EVENTS:
+		g_creatureEvents->reload();
+		break;
+
+	default:
+		return false;
+		break;
+	}
+
+	return true;
 }

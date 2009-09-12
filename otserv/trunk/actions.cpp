@@ -32,13 +32,10 @@
 #include "tools.h"
 #include "spells.h"
 #include "configmanager.h"
-//[ added for beds system
 #include "beds.h"
-//]
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-
 
 #include <sstream>
 
@@ -145,8 +142,8 @@ ReturnValue Actions::canUse(const Player* player, const Position& pos)
 bool Actions::hasAction(const Item* item) const
 {
 	return	(getAction(item, ACTION_UNIQUEID) != NULL) ||
-			(getAction(item, ACTION_ACTIONID) != NULL) || 
-			(getAction(item, ACTION_ITEMID) != NULL) || 
+			(getAction(item, ACTION_ACTIONID) != NULL) ||
+			(getAction(item, ACTION_ITEMID) != NULL) ||
 			(getAction(item, ACTION_RUNEID) != NULL);
 }
 

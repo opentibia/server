@@ -51,7 +51,6 @@
 
 #include "monsters.h"
 #include "npc.h"
-#include "commands.h"
 #include "outfit.h"
 #include "vocation.h"
 #include "scriptmanager.h"
@@ -84,7 +83,6 @@ Dispatcher g_dispatcher;
 Scheduler g_scheduler;
 RSA g_RSA;
 ConfigManager g_config;
-Commands commands;
 Monsters g_monsters;
 Npcs g_npcs;
 BanManager g_bans;
@@ -526,18 +524,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::cout << "[done]" << std::endl;
 
-	//load commands
-	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "commands.xml";
-	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
-	if(!commands.loadXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
-	}
-	std::cout << "[done]" << std::endl;
-
 	// load item data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.otb";
@@ -618,7 +604,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 
 	std::cout << ":: Worldtype: " << asUpperCaseString(worldType) << std::endl;
-	
+
 	std::cout << ":: Cleaning online players info... " << std::flush;
 	if(!IOPlayer::instance()->cleanOnlineInfo()){
 		std::stringstream errormsg;
@@ -671,7 +657,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	g_game.setGameState(GAME_STATE_INIT);
 
 	// Tie ports and register services
-	
+
 	// Tibia protocols
 	service_manager->add<ProtocolGame>(g_config.getNumber(ConfigManager::GAME_PORT));
 	service_manager->add<ProtocolLogin>(g_config.getNumber(ConfigManager::LOGIN_PORT));

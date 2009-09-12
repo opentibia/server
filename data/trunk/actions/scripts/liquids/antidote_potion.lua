@@ -7,6 +7,9 @@ setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
 setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
 setCombatParam(combat, COMBAT_PARAM_DISPEL, CONDITION_POISON)
 
+local exhaust = createConditionObject(CONDITION_EXHAUSTED)
+setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))
+
 function onUse(cid, item, frompos, item2, topos)
 	if(isPlayer(item2.uid) == FALSE) then
 		return FALSE

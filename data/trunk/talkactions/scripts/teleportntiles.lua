@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
-	local access = getPlayerAccess(cid)
-	if access < 2 then
-		return TRUE
+	if(param == "") then
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
+		return FALSE
 	end
 
 	local ntiles = tonumber(param)
@@ -41,8 +41,8 @@ function onSay(cid, words, param)
 			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_TELEPORT)
 		end
 	else
-		doPlayerSendCancel(cid, "Destination is not reachable.")		
+		doPlayerSendCancel(cid, "Destination is not reachable.")
 	end
-		
+
 	return FALSE
 end

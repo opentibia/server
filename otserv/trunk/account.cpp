@@ -23,8 +23,6 @@
 #include <functional>
 #include <iostream>
 
-#include "definitions.h"
-
 #include "account.h"
 
 Account::Account()

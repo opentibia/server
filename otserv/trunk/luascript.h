@@ -226,7 +226,8 @@ enum PlayerInfo_t{
 	PlayerInfoBalance,
 	PlayerInfoPzLock,
 	PlayerInfoPremium,
-	PlayerInfoLastLogin
+	PlayerInfoLastLogin,
+	PlayerInfoIp
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -442,6 +443,7 @@ protected:
 	static int luaSetHouseAccessList(lua_State *L);
 	static int luaGetHouseList(lua_State *L);
 	static int luaCleanHouse(lua_State *L);
+	static int luaPayHouseRent(lua_State *L);
 
 	//get player info functions
 	static int luaGetPlayerFood(lua_State *L);
@@ -626,6 +628,7 @@ protected:
 	static int luaIsPzLocked(lua_State *L);
 	static int luaDoSaveServer(lua_State *L);
 	//
+	static int luaGetPlayerIp(lua_State *L);
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
 

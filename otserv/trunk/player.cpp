@@ -1197,7 +1197,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		break;
 
 	case RET_CANNOTUSETHISOBJECT:
-		sendCancel("You can not use this object.");
+		sendCancel("You cannot use this object.");
 		break;
 
 	case RET_PLAYERWITHTHISNAMEISNOTONLINE:

@@ -650,7 +650,7 @@ if(Modules == nil) then
 				end
 				return backpack, amount
 			end
-			
+
 			local item = doCreateItemEx(itemid, amount)
 			if(doPlayerAddItemEx(cid, item, ignoreCapacity) ~= RETURNVALUE_NOERROR) then
 				return {}, 0
@@ -659,11 +659,7 @@ if(Modules == nil) then
 		end
 
 		if(buyWithBackpacks) then
-			local backpack = doCreateItemEx(backpackId, 1)
-			local backpackCapacity = getContainerCap(backpack)
-
-			doRemoveItem(backpack)
-
+			local backpackCapacity = getContainerCapById(backpackId)
 			local backpackCount = math.ceil(amount / backpackCapacity)
 			local itemCount = amount
 
@@ -720,9 +716,7 @@ if(Modules == nil) then
 		local backpackId = 1988
 
 		if(buyWithBackpacks) then
-			local backpack = doCreateItemEx(backpackId, 1)
-			cost = cost + (math.ceil(amount / getContainerCap(backpack)) * 20)
-			doRemoveItem(backpack)
+			cost = cost + (math.ceil(amount / getContainerCapById(backpackId)) * 20)
 		end
 
 		if(getPlayerMoney(cid) < cost) then

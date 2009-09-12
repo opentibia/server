@@ -41,7 +41,6 @@ class Creature;
 class Monster;
 class Npc;
 class CombatInfo;
-class Commands;
 
 enum stackPosType_t{
 	STACKPOS_NORMAL,
@@ -63,7 +62,8 @@ enum GameState_t {
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
 	GAME_STATE_SHUTDOWN,
-	GAME_STATE_CLOSING
+	GAME_STATE_CLOSING,
+	GAME_STATE_LAST
 };
 
 enum LightState_t {
@@ -71,6 +71,19 @@ enum LightState_t {
 	LIGHT_STATE_NIGHT,
 	LIGHT_STATE_SUNSET,
 	LIGHT_STATE_SUNRISE
+};
+
+enum ReloadType_t {
+	RELOAD_ACTIONS,
+	RELOAD_MOVE_EVENTS,
+	RELOAD_MONSTERS,
+	RELOAD_NPCS,
+	RELOAD_TALKACTIONS,
+	RELOAD_CONFIG,
+	RELOAD_SPELLS,
+	RELOAD_RAIDS,
+	RELOAD_CREATURE_EVENTS,
+	RELOAD_LAST
 };
 
 struct RuleViolation {
@@ -504,6 +517,7 @@ public:
 	void loadGameState();
 	void refreshMap(Map::TileMap::iterator* begin = NULL, int clean_max = 0);
 	void proceduralRefresh(Map::TileMap::iterator* begin = NULL);
+	bool reloadContent(ReloadType_t type);
 
 	//Events
 	void checkCreatureWalk(uint32_t creatureId);
@@ -541,9 +555,6 @@ public:
 
 	int getLightHour() {return light_hour;}
 
-	void addCommandTag(std::string tag);
-	void resetCommandTag();
-
 	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
 	bool cancelRuleViolation(Player* player);
 	bool closeRuleViolation(Player* player);
@@ -552,7 +563,6 @@ public:
 
 protected:
 
-	bool playerSayCommand(Player* player, SpeakClasses type, const std::string& text);
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
 	bool playerWhisper(Player* player, const std::string& text);
 	bool playerYell(Player* player, const std::string& text);
@@ -617,7 +627,6 @@ protected:
 	ServiceManager* service_manager;
 	Map* map;
 
-	std::vector<std::string> commandTags;
 };
 
 #endif

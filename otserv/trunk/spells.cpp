@@ -26,7 +26,6 @@
 #include "housetile.h"
 #include "spells.h"
 #include "combat.h"
-#include "commands.h"
 #include "monsters.h"
 #include "configmanager.h"
 #include "const.h"

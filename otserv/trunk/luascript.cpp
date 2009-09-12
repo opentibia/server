@@ -1093,6 +1093,9 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerFreeCap(cid)
 	lua_register(m_luaState, "getPlayerFreeCap", LuaScriptInterface::luaGetPlayerFreeCap);
 
+	//getPlayerIp()
+	lua_register(m_luaState, "getPlayerIp", LuaScriptInterface::luaGetPlayerIp);
+
 	//getCreatureLight(cid)
 	lua_register(m_luaState, "getCreatureLight", LuaScriptInterface::luaGetCreatureLight);
 
@@ -1228,7 +1231,7 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getTileThingByPos", LuaScriptInterface::luaGetTileThingByPos);
 
 	//getTileThingByTopOrder(pos, topOrder)
-	lua_register(m_luaState, "getTileThingByTopOrder", LuaScriptInterface::luaGetTileThingByTopOrder);	
+	lua_register(m_luaState, "getTileThingByTopOrder", LuaScriptInterface::luaGetTileThingByTopOrder);
 
 	//getTopCreature(pos)
 	lua_register(m_luaState, "getTopCreature", LuaScriptInterface::luaGetTopCreature);
@@ -1515,6 +1518,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//cleanHouse(houseid)
 	lua_register(m_luaState, "cleanHouse", LuaScriptInterface::luaCleanHouse);
+
+	//payHouseRent(guid, houseid)
+	lua_register(m_luaState, "payHouseRent", LuaScriptInterface::luaPayHouseRent);
 
 	//getWorldType()
 	lua_register(m_luaState, "getWorldType", LuaScriptInterface::luaGetWorldType);
@@ -1972,6 +1978,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoLastLogin:
 			value = player->getLastLoginSaved();
 			break;
+		case PlayerInfoIp:
+			value = player->getIP();
+			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
@@ -2115,6 +2124,11 @@ int LuaScriptInterface::luaIsPremium(lua_State *L)
 int LuaScriptInterface::luaGetPlayerLastLogin(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoLastLogin);
+}
+
+int LuaScriptInterface::luaGetPlayerIp(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoIp);
 }
 //
 
@@ -4641,6 +4655,31 @@ int LuaScriptInterface::luaCleanHouse(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaPayHouseRent(lua_State *L)
+{
+	//payHouseRent(houseid, guid[, time])
+	uint32_t time = 0;
+	if(lua_gettop(L) > 2){
+		time = popNumber(L);
+	}
+	uint32_t guid = popNumber(L);
+	uint32_t houseid = popNumber(L);
+
+	Player* player = g_game.getPlayerByGuid(guid);
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		if(player){
+			if(Houses::getInstance().payRent(player, house, (time_t)time)){
+				lua_pushnumber(L, LUA_FALSE);
+				return 1;
+			}
+		}
+	}
+
+	lua_pushnumber(L, LUA_FALSE);
+	return 1;
+}
+
 int LuaScriptInterface::luaGetWorldType(lua_State *L)
 {
 	//getWorldType()
@@ -6733,7 +6772,7 @@ int LuaScriptInterface::luaGetPlayersByIPAddress(lua_State *L)
 
 int LuaScriptInterface::luaGetAccountNumberByPlayerName(lua_State *L)
 {
-	//getPlayerGUIDByName(name)
+	//getAccountNumberByPlayerName(name)
 	std::string name = popString(L);
 
 	Player* player = g_game.getPlayerByName(name);

@@ -1,9 +1,4 @@
-function onSay (cid, words, param, channel)
-	local access = getPlayerAccess(cid)
-	if access < 3 then
-		return TRUE
-	end
-
+function onSay (cid, words, param)
 	local amount = 1
 	param = tonumber(param)
 	if(param) then

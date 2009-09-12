@@ -480,7 +480,6 @@ protected:
 
 	friend class Game;
 	friend class Map;
-	friend class Commands;
 	friend class LuaScriptInterface;
 };
 

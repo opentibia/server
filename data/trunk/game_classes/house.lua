@@ -18,7 +18,7 @@ local HOUSE_CONFIG =
 	needPremium = getConfigValue('house_only_premium'),
 	levelToBuyHouse = getConfigValue('house_level')
 }
-	
+
 House = {
 	id = 0
 }
@@ -170,6 +170,15 @@ end
 		return setHouseOwner(self.id, guid)
 	end
 
+	function House:payRent(guid)
+		local guid = tonumber(guid)
+		if(tonumber(self.id) == 0) then
+			error('House:payRent(): House ID not set!')
+		end
+
+		return payHouseRent(self.id, guid)
+	end
+
 	-- Buy function for the house
 	function House:buy(cid)
 		if(tonumber(self.id) == 0) then
@@ -189,7 +198,7 @@ end
 
 		if self:getOwner() ~= 0 then
 			doPlayerSendCancel(cid, 'Someone already owns this house.')
-			return false		
+			return false
 		end
 
 		if House.getHouseByOwnerGUID(guid) ~= nil then
