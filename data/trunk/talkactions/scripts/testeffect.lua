@@ -7,7 +7,7 @@ function onSay(cid, words, param)
 	end
 
 	if param then
-		 doSendMagicEffect(getPlayerPosition(cid), param)
+		doSendMagicEffect(getPlayerPosition(cid), param)
 	else
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Invalid parameter.")
 	end

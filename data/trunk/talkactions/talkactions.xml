@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <talkactions>
-
 	<!-- Gods -->
 	<talkaction words="/i" access="3" filter="first word" script="createitembyid.lua"/>
 	<talkaction words="/n" access="3" filter="first word" script="createitembyname.lua"/>
@@ -36,7 +35,7 @@
 	<talkaction words="/getonline" access="1" filter="first word" script="accessonlinelist.lua"/>
 	<talkaction words="/gethouse" access="1" filter="first word" script="gethouse.lua"/>
 	<talkaction words="/info" access="1" filter="first word" script="getinfo.lua"/>
-	<talkaction words="/z" access="1" filter="first word" script="testcommand.lua"/>
+	<talkaction words="/z" access="1" filter="first word" script="testeffect.lua"/>
 	<talkaction words="/zt" access="1" filter="first word" script="testtutorial.lua"/>
 
 	<!-- Players -->
@@ -46,5 +45,4 @@
 	<talkaction words="!houseinfo" access="0" script="houseinfo.lua"/>
 	<talkaction words="!online" access="0" script="onlinelist.lua"/>
 	<talkaction words="!unjustkills" access="0" script="unjustkills.lua"/>
-
 </talkactions>

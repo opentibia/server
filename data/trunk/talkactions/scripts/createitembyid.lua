@@ -1,6 +1,7 @@
 function onSay(cid, words, param)
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
+		doSendMagicEffect(playerPos, CONST_ME_POFF)
 		return FALSE
 	else
 		param = string.explode(param, " ")
@@ -19,10 +20,12 @@ function onSay(cid, words, param)
 		else
 			doDecayItem(item)
 			doSendMagicEffect(playerPos, CONST_ME_MAGIC_GREEN)
+			return FALSE
 		end
 	else
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
 	end
 
+	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned.")
 	return FALSE
 end

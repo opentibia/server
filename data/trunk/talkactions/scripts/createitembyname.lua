@@ -1,11 +1,11 @@
 function onSay(cid, words, param)
-	local playerPos = getPlayerPosition(cid)
 	if param == "" then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned.")
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
 		return FALSE
 	end
 
+	local playerPos = getPlayerPosition(cid)
 	local length = param:len()
 	local stringPos1 = string.find(param, "\"")
 	local stringPos2 = length
