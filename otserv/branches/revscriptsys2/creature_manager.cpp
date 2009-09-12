@@ -582,17 +582,20 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 
 		if(readXMLString(root, "race", strValue)){
 			toLowerCaseString(strValue);
-			if((strValue == "venom") || (atoi(strValue.c_str()) == 1)){
+			if((strValue == "venom") || (atoi(strValue.c_str()) == enums::RACE_VENOM)){
 				mType->race(RACE_VENOM);
 			}
-			else if((strValue == "blood") || (atoi(strValue.c_str()) == 2)){
+			else if((strValue == "blood") || (atoi(strValue.c_str()) == enums::RACE_BLOOD)){
 				mType->race(RACE_BLOOD);
 			}
-			else if((strValue == "undead") || (atoi(strValue.c_str()) == 3)){
+			else if((strValue == "undead") || (atoi(strValue.c_str()) == enums::RACE_UNDEAD)){
 				mType->race(RACE_UNDEAD);
 			}
-			else if((strValue == "fire") || (atoi(strValue.c_str()) == 4)){
+			else if((strValue == "fire") || (atoi(strValue.c_str()) == enums::RACE_FIRE)){
 				mType->race(RACE_FIRE);
+			}
+			else if((strValue == "energy") || (atoi(strValue.c_str()) == enums::RACE_ENERGY)){
+				mType->race(RACE_ENERGY);
 			}
 			else{
 				SHOW_XML_WARNING("Unknown race type " << strValue);

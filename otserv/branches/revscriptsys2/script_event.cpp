@@ -469,7 +469,7 @@ OnMoveCreature::Event::~Event()
 
 bool OnMoveCreature::Event::check_match(const ScriptInformation& info)
 {
-	if(moveType != info.moveType){
+	if(moveType != TYPE_MOVE && moveType != info.moveType){
 		return false;
 	}
 

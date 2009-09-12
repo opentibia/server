@@ -249,11 +249,13 @@ public:
 	int lua_registerSpecificEvent_OnLook();
 	int lua_registerGenericEvent_OnEquipItem();
 	int lua_registerGenericEvent_OnDeEquipItem();
-	int lua_registerGenericEvent_OnStepInCreature();
-	int lua_registerGenericEvent_OnStepOutCreature();
+	int lua_registerSpecificEvent_CreatureMove();
+	int lua_registerSpecificEvent_CreatureMoveIn();
+	int lua_registerSpecificEvent_CreatureMoveOut();
+	int lua_registerGenericEvent_CreatureMoveIn();
+	int lua_registerGenericEvent_CreatureMoveOut();
 	int lua_registerGenericEvent_OnAdvance();
 	int lua_registerSpecificEvent_OnAdvance();
-	int lua_registerSpecificEvent_OnMoveCreature();
 	int lua_registerGenericEvent_OnMoveItem();
 	int lua_registerGenericEvent_OnSpawn();
 	int lua_registerSpecificEvent_OnCreatureTurn();

@@ -356,10 +356,11 @@ void Manager::registerFunctions() {
 
 	registerGlobalFunction("registerOnUseItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
 
-	registerGlobalFunction("registerOnStepInCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnStepInCreature);
-	registerGlobalFunction("registerOnStepOutCreature(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnStepOutCreature);
-	registerGlobalFunction("registerOnCreatureMove(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnMoveCreature);
-	registerGlobalFunction("registerOnMoveCreature(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnMoveCreature);
+	registerGlobalFunction("registerOnCreatureMove(Creature who, function callback)", &Manager::lua_registerSpecificEvent_CreatureMove);
+	registerGlobalFunction("registerOnCreatureMoveIn(Creature who, string method, int filter, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveIn);
+	registerGlobalFunction("registerOnCreatureMoveOut(Creature who, string method, int filter, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveOut);
+	registerGlobalFunction("registerOnAnyCreatureMoveIn(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_CreatureMoveIn);
+	registerGlobalFunction("registerOnAnyCreatureMoveOut(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_CreatureMoveOut);
 
 	registerGlobalFunction("registerOnAnyCreatureTurn(function callback)", &Manager::lua_registerGenericEvent_OnCreatureTurn);
 	registerGlobalFunction("registerOnCreatureTurn(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnCreatureTurn);
@@ -1018,7 +1019,117 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_OnStepInCreature() {
+int LuaState::lua_registerSpecificEvent_CreatureMove() {
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	OnMoveCreature::ScriptInformation si_onmovecreature;
+	si_onmovecreature.method = OnMoveCreature::FILTER_NONE;
+	si_onmovecreature.id = 0;
+	si_onmovecreature.slot = 0;
+	si_onmovecreature.moveType = OnMoveCreature::TYPE_MOVE;
+
+	boost::any p(si_onmovecreature);
+	Listener_ptr listener(
+		new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_CreatureMoveIn() {
+	// Store callback
+	insert(-4);
+
+	int id = popInteger();
+	std::string method = popString();
+	Creature* who = popCreature();
+
+	OnMoveCreature::ScriptInformation si_onmovecreature;
+	if(method == "itemid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_onmovecreature.slot = 0;
+	si_onmovecreature.id = id;
+	si_onmovecreature.moveType = OnMoveCreature::TYPE_STEPIN;
+
+	boost::any p(si_onmovecreature);
+	Listener_ptr listener(
+		new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_CreatureMoveOut() {
+	// Store callback
+	insert(-4);
+
+	int id = popInteger();
+	std::string method = popString();
+	Creature* who = popCreature();
+
+	OnMoveCreature::ScriptInformation si_onmovecreature;
+	if(method == "itemid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
+	}
+	else if(method == "uniqueid") {
+		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
+	}
+	else {
+		throw Error("Invalid argument (1) 'method'");
+	}
+	si_onmovecreature.slot = 0;
+	si_onmovecreature.id = id;
+	si_onmovecreature.moveType = OnMoveCreature::TYPE_STEPOUT;
+
+	boost::any p(si_onmovecreature);
+	Listener_ptr listener(
+		new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_CreatureMoveIn() {
 	// Store callback
 	insert(-3);
 
@@ -1055,7 +1166,7 @@ int LuaState::lua_registerGenericEvent_OnStepInCreature() {
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_OnStepOutCreature() {
+int LuaState::lua_registerGenericEvent_CreatureMoveOut() {
 	// Store callback
 	insert(-3);
 
@@ -1115,36 +1226,7 @@ int LuaState::lua_registerGenericEvent_OnSpawn() {
 	return 1;
 }
 
-int LuaState::lua_registerSpecificEvent_OnMoveCreature() {
-	// Store callback
-	insert(-2);
-
-	Creature* who = popCreature();
-
-	OnMoveCreature::ScriptInformation si_onmovecreature;
-	si_onmovecreature.method = OnMoveCreature::FILTER_NONE;
-	si_onmovecreature.id = 0;
-	si_onmovecreature.slot = 0;
-	si_onmovecreature.moveType = OnMoveCreature::TYPE_MOVE;
-
-	boost::any p(si_onmovecreature);
-	Listener_ptr listener(
-		new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager),
-		boost::bind(&Listener::deactivate, _1));
-
-	environment->registerSpecificListener(listener);
-	who->addListener(listener);
-
-	// Register event
-	setRegistryItem(listener->getLuaTag());
-
-	// Return listener
-	pushString(listener->getLuaTag());
-	return 1;
-}
-
-int LuaState::lua_registerGenericEvent_OnCreatureTurn()
-{
+int LuaState::lua_registerGenericEvent_OnCreatureTurn() {
 	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, boost::any(), *manager));
 
 	environment->Generic.OnTurn.push_back(listener);
