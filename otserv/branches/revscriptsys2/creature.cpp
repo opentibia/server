@@ -738,6 +738,16 @@ void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 	//
 }
 
+void Creature::onPlacedCreature()
+{
+	g_game.onCreatureMove(this, this, NULL, getTile());
+}
+
+void Creature::onRemovedCreature()
+{
+	g_game.onCreatureMove(this, this, getTile(), NULL);
+}
+
 void Creature::onDie()
 {
 	DeathList killers = getKillers(g_config.getNumber(ConfigManager::DEATH_ASSIST_COUNT));

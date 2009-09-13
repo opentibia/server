@@ -455,10 +455,10 @@ OnMoveCreature::Event::Event(Creature* actor, Creature* moving_creature, Tile* f
 	if(fromTile && toTile){
 		moveType = TYPE_MOVE;
 	}
-	else if(fromTile){
+	else if(toTile){
 		moveType = TYPE_STEPIN;
 	}
-	else if(toTile){
+	else if(fromTile){
 		moveType = TYPE_STEPOUT;
 	}
 }
@@ -477,7 +477,15 @@ bool OnMoveCreature::Event::check_match(const ScriptInformation& info)
 		return true;
 	}
 
-	return (isMatch(info, fromTile) || isMatch(info, toTile));
+	if(info.moveType == TYPE_STEPIN){
+		return isMatch(info, toTile);
+	}
+
+	if(info.moveType == TYPE_STEPOUT){
+		return isMatch(info, fromTile);
+	}
+
+	return false;
 }
 
 bool OnMoveCreature::Event::isMatch(const ScriptInformation& info, Tile* tile)
@@ -524,20 +532,10 @@ void OnMoveCreature::Event::push_instance(LuaState& state, Environment& environm
 	state.pushThing(actor);
 	state.setField(-2, "creature");
 
-	if(moveType == TYPE_MOVE){
-		state.pushThing(fromTile);
-		state.setField(-2, "fromTile");
-		state.pushThing(toTile);
-		state.setField(-2, "toTile");
-	}
-	else if(moveType == TYPE_STEPIN){
-		state.pushThing(fromTile);
-		state.setField(-2, "toTile");
-	}
-	else if(moveType == TYPE_STEPOUT){
-		state.pushThing(toTile);
-		state.setField(-2, "fromTile");
-	}
+	state.pushThing(fromTile);
+	state.setField(-2, "fromTile");
+	state.pushThing(toTile);
+	state.setField(-2, "toTile");
 
 	state.pushThing(moving_creature);
 	state.setField(-2, "moving_creature");

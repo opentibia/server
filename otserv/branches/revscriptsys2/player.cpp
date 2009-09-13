@@ -3737,6 +3737,8 @@ void Player::onIdleStatus()
 
 void Player::onPlacedCreature()
 {
+	Creature::onPlacedCreature();
+
 	if(g_game.onPlayerLogin(this)){
 		kickPlayer(); //The script won't let the player be online for now.
 	}

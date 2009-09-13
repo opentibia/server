@@ -3,9 +3,6 @@ local movecreature_example = {}
 local count_steps = {}
 
 function movecreature_example.move_callback(event)
-	--local pos = event.toTile:getPosition()
-	--event.creature:say("I moved to " .. pos.x .. ":" .. pos.y .. ":" .. pos.z)
-
 	local c = count_steps[event.creature:getID()]
 	if c then
 		c.steps = c.steps + 1

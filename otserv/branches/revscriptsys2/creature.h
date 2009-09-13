@@ -336,8 +336,8 @@ public:
 	virtual void onCreatureChangeOutfit(const Creature* creature, const OutfitType& outfit) { };
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature) {};
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
-	virtual void onPlacedCreature() {};
-	virtual void onRemovedCreature() {};
+	virtual void onPlacedCreature();
+	virtual void onRemovedCreature();
 
 	virtual WeaponType_t getWeaponType() {return WEAPON_NONE;}
 	virtual bool getCombatValues(int32_t& min, int32_t& max) {return false;}
