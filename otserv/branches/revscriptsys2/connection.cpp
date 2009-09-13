@@ -31,6 +31,7 @@
 #include "admin.h"
 #include "status.h"
 
+#include "boost_common.h"
 #include <boost/bind.hpp>
 
 bool Connection::m_logError = true;

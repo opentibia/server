@@ -51,7 +51,7 @@ public:
 	}
 
 	// Get the value of the iterator
-	ET operator* () {return ET(ET::enum_type(i->first.value()));}
+	ET operator* () {return ET(typename ET::enum_type(i->first.value()));}
 	// Evil reinterpret cast, /should/ never break
 	const ET* operator->() {return reinterpret_cast<const ET*>(&(i->first));}
 
@@ -80,6 +80,15 @@ template <class E, int size_>
 class Enum {
 protected:
 	E e;
+
+	// Types used internally
+	typedef std::map<Enum<E, size_>, std::string > EnumToString;
+	typedef std::map<std::string, Enum<E, size_> > StringToEnum;
+	// Required for some name-resolving of BitEnums
+	typedef Enum<E, size_> base_class;
+	typedef E enum_type;
+
+
 public:
 	Enum() : e(E(0)) {}
 	Enum(E e) : e(e) {}
@@ -124,7 +133,7 @@ public:
 	 */
 	static std::string toString(const Enum<E, size_>& _e) {
 		init();
-		EnumToString::const_iterator i = enum_to_string.find(_e);
+		typename EnumToString::const_iterator i = enum_to_string.find(_e);
 		if(i == enum_to_string.end()) {
 			std::ostringstream os;
 			os << "Enum " << enum_name << " value out of range (" << (int)_e.e << ")";
@@ -141,7 +150,7 @@ public:
 	 **/
 	static Enum<E, size_> fromString(const std::string& str) {
 		init();
-		StringToEnum::const_iterator i = string_to_enum.find(str);
+		typename StringToEnum::const_iterator i = string_to_enum.find(str);
 		if(i == string_to_enum.end()) {
 			std::ostringstream os;
 			os << "Enum " << enum_name << " value does not exist (" << str << ")";
@@ -158,7 +167,7 @@ public:
 	 **/
 	static Enum<E, size_> fromInteger(int id) {
 		init();
-		EnumToString::const_iterator i = enum_to_string.find(Enum<E, size_>(id));
+		typename EnumToString::const_iterator i = enum_to_string.find(Enum<E, size_>(id));
 		if(i == enum_to_string.end()) {
 			std::ostringstream os;
 			os << "Enum " << enum_name << " value is invalid (" << id << ")";
@@ -176,7 +185,7 @@ public:
 	 **/
 	static Enum<E, size_> fromStringI(const std::string& str) {
 		init();
-		StringToEnum::const_iterator i = lstring_to_enum.find(str);
+		typename StringToEnum::const_iterator i = lstring_to_enum.find(str);
 		if(i == lstring_to_enum.end()) {
 			std::ostringstream os;
 			os << "Enum " << enum_name << " value out of range (" << str << ")";
@@ -193,7 +202,7 @@ public:
 	 */
 	static bool exists(int v) {
 		init();
-		EnumToString::const_iterator i = enum_to_string.find(E(v));
+		typename EnumToString::const_iterator i = enum_to_string.find(E(v));
 		return i != enum_to_string.end();
 	}
 
@@ -240,12 +249,6 @@ public:
 	}
 
 protected: // Private stuff
-
-	typedef std::map<Enum<E, size_>, std::string > EnumToString;
-	typedef std::map<std::string, Enum<E, size_> > StringToEnum;
-	// Required for some name-resolving of BitEnums
-	typedef Enum<E, size_> base_class;
-	typedef E enum_type;
 
 	static void initialize();
 
@@ -296,18 +299,18 @@ template <class E, int size_ =  -1 /* Will always cause error when trying to use
 class BitEnum : public Enum<E, size_> {
 public:
 	BitEnum() {};
-	BitEnum(E e) : Enum(e) {}
-	BitEnum(const Enum<E, size_>& e) : Enum(e) {}
-	BitEnum(const BitEnum<E, size_>& e) : Enum(e.e) {}
-	explicit BitEnum(int e) : Enum(e) {}
+	BitEnum(E e) : Enum<E, size_>(e) {}
+	BitEnum(const Enum<E, size_>& e) : Enum<E, size_>(e) {}
+	BitEnum(const BitEnum<E, size_>& e) : Enum<E, size_>(e.e) {}
+	explicit BitEnum(int e) : Enum<E, size_>(e) {}
 
-	BitEnum<E, size_> operator~() const {return E(~int(e));}
+	BitEnum<E, size_> operator~() const {return E(~int(Enum<E, size_>::e));}
 
-	BitEnum<E, size_> operator|(const BitEnum<E, size_>& o) const {return E(int(e) | int(o.e));}
-	BitEnum<E, size_> operator&(const BitEnum<E, size_>& o) const {return E(int(e) & int(o.e));}
+	BitEnum<E, size_> operator|(const BitEnum<E, size_>& o) const {return E(int(Enum<E, size_>::e) | int(o.e));}
+	BitEnum<E, size_> operator&(const BitEnum<E, size_>& o) const {return E(int(Enum<E, size_>::e) & int(o.e));}
 
-	BitEnum<E, size_>& operator|=(const BitEnum<E, size_>& o) {e = E(int(e) | int(o.e)); return *this;}
-	BitEnum<E, size_>& operator&=(const BitEnum<E, size_>& o) {e = E(int(e) & int(o.e)); return *this;}
+	BitEnum<E, size_>& operator|=(const BitEnum<E, size_>& o) {Enum<E, size_>::e = E(int(Enum<E, size_>::e) | int(o.e)); return *this;}
+	BitEnum<E, size_>& operator&=(const BitEnum<E, size_>& o) {Enum<E, size_>::e = E(int(Enum<E, size_>::e) & int(o.e)); return *this;}
 	
 	// Classes
 	typedef enum_iterator< BitEnum<E, size_> > iterator;
@@ -350,7 +353,7 @@ public:
 	 */
 	int index() const {
 		for(int i = 1, j = 0; ; i <<= 1, ++j){
-			if((int(e) & i) == i)
+			if((int(Enum<E, size_>::e) & i) == i)
 				return j;
 			if(i == (1 << 30))
 				break;
@@ -365,16 +368,16 @@ public:
 	 * Returns an iterator to the first element
 	 */
 	static iterator begin() {
-		init();
-		return iterator(enum_to_string.begin());
+		Enum<E, size_>::init();
+		return iterator(Enum<E, size_>::enum_to_string.begin());
 	}
 
 	/**
 	 * Returns an iterator to a virtual element beyond the last element
 	 */
 	static iterator end()   {
-		init();
-		return iterator(enum_to_string.end());
+		Enum<E, size_>::init();
+		return iterator(Enum<E, size_>::enum_to_string.end());
 	}
 };
 

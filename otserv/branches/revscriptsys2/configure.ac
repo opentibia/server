@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.50])
-AC_INIT([otserv], [0.6.3.SVN])
+AC_INIT([otserv], [0.7.0.SVN])
 AM_INIT_AUTOMAKE([1.10 foreign])
 AC_CONFIG_SRCDIR([player.h])
 AC_CONFIG_HEADER([config.h])
@@ -16,9 +16,6 @@ AC_ARG_ENABLE(debug, [  --enable-debug      enable debuging],
 	[DEBUG_FLAGS="-D__DEBUG__MOVESYS__ -D__DEBUG_HOUSES__ -D__DEBUG_MAILBOX__ -D__DEBUG_LUASCRIPTS__ -D__DEBUG_NET__"]
 )
 AC_SUBST(DEBUG_FLAGS)
-
-# check if we want to use otserv.lua instead config.lua
-AC_ARG_ENABLE(otconfig, [  --enable-otconfig      use otserv.lua configuration], [ OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__LUA_NAME_ALTER__"])
 
 # check if we want skulls
 AC_ARG_ENABLE(skulls, [  --enable-skulls      enable skull system], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__SKULLSYSTEM__"])
@@ -131,6 +128,12 @@ AC_CHECK_LIB(boost_date_time-gcc-mt, main, , [
 			AC_MSG_ERROR("Linking against boost::date-time library failed.")])
 	])
 ])
+AC_CHECK_LIB(boost_filesystem-gcc-mt, main, , [
+	AC_CHECK_LIB(boost_filesystem-mt, main, , [
+		AC_CHECK_LIB(boost_filesystem, main, , [
+			AC_MSG_ERROR("Linking against boost::filesystem library failed.")])
+	])
+])
 
 #check boost asio
 AC_CHECK_HEADERS([boost/asio.hpp], ,[AC_MSG_ERROR("boost::asio header not found.")])
@@ -171,5 +174,5 @@ if test -n "$SQLITE_FLAGS"; then
 	AC_SUBST(SQLITE_LIBS)
 fi
 
-AC_CONFIG_FILES([Makefile data/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

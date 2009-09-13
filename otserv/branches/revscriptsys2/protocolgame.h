@@ -23,9 +23,17 @@
 #define __OTSERV_PROTOCOLGAME_H__
 
 #include <string>
+#include <list>
+#include <map>
+#include <vector>
 #include "protocol.h"
 #include "enums.h"
 #include "const.h"
+#include "position.h"
+
+class Item;
+class Creature;
+class Player;
 
 struct OutfitType;
 struct LightInfo;

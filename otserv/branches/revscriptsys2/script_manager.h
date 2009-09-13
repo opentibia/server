@@ -19,6 +19,8 @@
 #ifndef __OTSERV_SCRIPT_MANAGER__
 #define __OTSERV_SCRIPT_MANAGER__
 
+#include "boost_common.h"
+#include <boost/any.hpp>
 #include "lua_manager.h"
 
 #include <set>
