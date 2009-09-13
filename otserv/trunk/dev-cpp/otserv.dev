@@ -199,26 +199,6 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit18]
-FileName=..\commands.cpp
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit19]
-FileName=..\commands.h
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit20]
 FileName=..\condition.cpp
 CompileCpp=1

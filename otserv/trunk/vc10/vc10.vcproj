@@ -217,10 +217,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\commands.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\condition.cpp"
 				>
 			</File>
@@ -529,10 +525,6 @@
 			</File>
 			<File
 				RelativePath="..\combat.h"
-				>
-			</File>
-			<File
-				RelativePath="..\commands.h"
 				>
 			</File>
 			<File

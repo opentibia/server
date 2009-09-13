@@ -27,6 +27,7 @@
 					<Add option="-llibxml2" />
 					<Add option="-llibmysql" />
 					<Add option="-lgmp" />
+					<Add option="-lsqlite3" />
 					<Add option="-llua" />
 					<Add option="-llibboost_system-mgw34-mt-1_40" />
 					<Add option="-llibboost_regex-mgw34-mt-1_40" />
@@ -35,7 +36,6 @@
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 					<Add option="-Wl,-Map=..\otserv.map" />
-					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
@@ -58,6 +58,7 @@
 					<Add option="-llibxml2" />
 					<Add option="-llibmysql" />
 					<Add option="-lgmp" />
+					<Add option="-lsqlite3" />
 					<Add option="-llua" />
 					<Add option="-llibboost_system-mgw34-mt-1_40" />
 					<Add option="-llibboost_regex-mgw34-mt-1_40" />
@@ -65,7 +66,6 @@
 					<Add option="-lmingw32" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
-					<Add library="sqlite3" />
 				</Linker>
 			</Target>
 			<Target title="Debug Unix">
@@ -164,8 +164,6 @@
 		<Unit filename="..\chat.h" />
 		<Unit filename="..\combat.cpp" />
 		<Unit filename="..\combat.h" />
-		<Unit filename="..\commands.cpp" />
-		<Unit filename="..\commands.h" />
 		<Unit filename="..\condition.cpp" />
 		<Unit filename="..\condition.h" />
 		<Unit filename="..\config.lua.dist" />

@@ -37,7 +37,7 @@ EXTRA_DIST=autogen.sh \
 	beds.h		 fileloader.h	   npc.h	     talkaction.h \
 	chat.h		 game.h		   otpch.h	     tasks.h \
 	combat.h	 house.h	   otsystem.h	     teleport.h \
-	commands.h	 housetile.h	   outfit.h	     templates.h \
+	housetile.h	   outfit.h	     templates.h \
 	condition.h	 ioaccount.h	   outputmessage.h   thing.h \
 	config.h	 iomap.h	   party.h	     tile.h \
 	configmanager.h  iomapotbm.h	   player.h	     tools.h \
@@ -64,7 +64,7 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	beds.cpp	   game.cpp	       npc.cpp		   spells.cpp \
 	chat.cpp	   house.cpp	       otserv.cpp	   status.cpp \
 	combat.cpp	   housetile.cpp       outfit.cpp	   talkaction.cpp \
-	commands.cpp	   ioaccount.cpp       outputmessage.cpp   tasks.cpp \
+	ioaccount.cpp       outputmessage.cpp   tasks.cpp \
 	condition.cpp	   iomapotbm.cpp       party.cpp	   teleport.cpp \
 	configmanager.cpp  iomapserialize.cpp  player.cpp	   thing.cpp \
 	connection.cpp	   position.cpp	   tile.cpp \
