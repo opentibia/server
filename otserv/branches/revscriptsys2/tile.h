@@ -124,7 +124,7 @@ private:
 	friend class Tile;
 };
 
-class Tile : public Cylinder, public Thing
+class Tile : public Cylinder
 {
 public:
 	static Tile& null_tile;

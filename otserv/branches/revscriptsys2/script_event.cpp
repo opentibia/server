@@ -664,7 +664,7 @@ void OnMoveItem::Event::push_instance(LuaState& state, Environment& environment)
 	state.pushClassTableInstance("OnMoveItemEvent");
 	state.pushThing(actor);
 	state.setField(-2, "creature");
-	state.pushThing(tile);
+	state.pushTile(tile);
 	state.setField(-2, "tile");
 	state.pushThing(item);
 	state.setField(-2, "item");

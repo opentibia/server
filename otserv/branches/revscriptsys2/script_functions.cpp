@@ -1529,7 +1529,7 @@ int LuaState::lua_Thing_getZ()
 int LuaState::lua_Thing_getParentTile()
 {
 	Thing* thing = popThing();
-	pushThing(thing->getTile());
+	pushTile(thing->getTile());
 	return 1;
 }
 
