@@ -158,12 +158,6 @@ uint32_t Tile::getDownItemCount() const
 	return 0;
 }
 
-std::string Tile::getDescription(int32_t lookDistance) const
-{
-	std::string ret = "You dont know why, but you cant see anything!";
-	return ret;
-}
-
 Teleport* Tile::getTeleportItem() const
 {
 	if(!hasFlag(TILESTATE_TELEPORT)){

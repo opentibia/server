@@ -143,9 +143,6 @@ public:
 	const HouseTile* getHouseTile() const;
 	bool isHouseTile() const;
 
-	virtual int getThrowRange() const {return 0;}
-	virtual bool isPushable() const {return false;}
-
 	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
@@ -210,8 +207,6 @@ public:
 	}
 
 	bool hasHeight(uint32_t n) const;
-	virtual std::string getDescription(int32_t lookDistance) const;
-
 	void moveCreature(Creature* actor, Creature* creature, Cylinder* toCylinder, bool teleport = false);
 	int32_t getClientIndexOfThing(const Player* player, const Thing* thing) const;
 
