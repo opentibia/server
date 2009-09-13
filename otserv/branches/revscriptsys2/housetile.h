@@ -42,7 +42,7 @@ public:
 	virtual void __addThing(Creature* actor, int32_t index, Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
-	House* getHouse() {return house;};
+	House* getHouse() {return house;}
 
 private:
 	void updateHouse(Item* item);

@@ -289,7 +289,7 @@ protected:
 class PropWriteStream{
 public:
 	PropWriteStream(){buffer = (char*)malloc(32*sizeof(char)); buffer_size = 32; size = 0; memset(buffer, 0, 32*sizeof(char));}
-	~PropWriteStream(){free(buffer);};
+	~PropWriteStream(){free(buffer);}
 
 	const char* getStream(uint32_t& _size) const{
 		_size = size;

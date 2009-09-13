@@ -131,12 +131,12 @@ protected:
 public:
 	virtual ~Creature();
 
-	virtual Creature* getCreature() {return this;};
-	virtual const Creature* getCreature()const {return this;};
-	virtual Player* getPlayer() {return NULL;};
-	virtual const Player* getPlayer() const {return NULL;};
-	virtual Actor* getActor() {return NULL;};
-	virtual const Actor* getActor() const {return NULL;};
+	virtual Creature* getCreature() {return this;}
+	virtual const Creature* getCreature()const {return this;}
+	virtual Player* getPlayer() {return NULL;}
+	virtual const Player* getPlayer() const {return NULL;}
+	virtual Actor* getActor() {return NULL;}
+	virtual const Actor* getActor() const {return NULL;}
 
 	void getPathToFollowCreature();
 
@@ -166,9 +166,9 @@ public:
 		masterRadius = radius;
 	}
 
-	virtual int getThrowRange() const {return 1;};
-	virtual bool isPushable() const {return (getWalkDelay() <= 0);};
-	virtual bool isRemoved() const {return isInternalRemoved;};
+	virtual int getThrowRange() const {return 1;}
+	virtual bool isPushable() const {return (getWalkDelay() <= 0);}
+	virtual bool isRemoved() const {return isInternalRemoved;}
 	virtual bool canSeeInvisibility() const { return false;}
 
 	int32_t getWalkDelay(Direction dir) const;
@@ -271,8 +271,8 @@ public:
 	virtual void drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss, bool showtext);
 
-	virtual bool challengeCreature(Creature* creature) {return false;};
-	virtual bool convinceCreature(Creature* creature) {return false;};
+	virtual bool challengeCreature(Creature* creature) {return false;}
+	virtual bool convinceCreature(Creature* creature) {return false;}
 
 	virtual void onDie();
 	virtual void die();

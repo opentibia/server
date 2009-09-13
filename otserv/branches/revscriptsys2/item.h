@@ -267,20 +267,20 @@ public:
 
 	virtual ~Item();
 
-	virtual Item* getItem() {return this;};
-	virtual const Item* getItem() const {return this;};
-	virtual Container* getContainer() {return NULL;};
-	virtual const Container* getContainer() const {return NULL;};
-	virtual Teleport* getTeleport() {return NULL;};
-	virtual const Teleport* getTeleport() const {return NULL;};
-	virtual TrashHolder* getTrashHolder() {return NULL;};
-	virtual const TrashHolder* getTrashHolder() const {return NULL;};
-	virtual Mailbox* getMailbox() {return NULL;};
-	virtual const Mailbox* getMailbox() const {return NULL;};
-	virtual Door* getDoor() {return NULL;};
-	virtual const Door* getDoor() const {return NULL;};
-	virtual MagicField* getMagicField() {return NULL;};
-	virtual const MagicField* getMagicField() const {return NULL;};
+	virtual Item* getItem() {return this;}
+	virtual const Item* getItem() const {return this;}
+	virtual Container* getContainer() {return NULL;}
+	virtual const Container* getContainer() const {return NULL;}
+	virtual Teleport* getTeleport() {return NULL;}
+	virtual const Teleport* getTeleport() const {return NULL;}
+	virtual TrashHolder* getTrashHolder() {return NULL;}
+	virtual const TrashHolder* getTrashHolder() const {return NULL;}
+	virtual Mailbox* getMailbox() {return NULL;}
+	virtual const Mailbox* getMailbox() const {return NULL;}
+	virtual Door* getDoor() {return NULL;}
+	virtual const Door* getDoor() const {return NULL;}
+	virtual MagicField* getMagicField() {return NULL;}
+	virtual const MagicField* getMagicField() const {return NULL;}
 	//[ added for beds system
 	virtual BedItem* getBed(){ return NULL; }
 	virtual const BedItem* getBed() const { return NULL; }
@@ -298,8 +298,8 @@ public:
 	virtual bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	virtual bool isPushable() const {return !isNotMoveable();};
-	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
+	virtual bool isPushable() const {return !isNotMoveable();}
+	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);}
 
 	virtual std::string getDescription(int32_t lookDistance) const;
 	std::string getWeightDescription() const;
@@ -388,7 +388,7 @@ public:
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
 	virtual void onRemoved();
-	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
+	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;}
 
 protected:
 	// If weight description is needed from outside of item class

@@ -54,8 +54,8 @@ public:
 
 	virtual ~Actor();
 
-	virtual Actor* getActor() {return this;};
-	virtual const Actor* getActor() const {return this;};
+	virtual Actor* getActor() {return this;}
+	virtual const Actor* getActor() const {return this;}
 
 	CreatureType& getType();
 
@@ -89,7 +89,7 @@ public:
 	bool isHostile() const { return cType.isHostile();}
 	virtual bool canSeeInvisibility() const { return Creature::isImmune(CONDITION_INVISIBLE);}
 	uint32_t getManaCost() const {return cType.manaCost();}	
-	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
+	void setSpawn(Spawn* _spawn) {spawn = _spawn;}
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);

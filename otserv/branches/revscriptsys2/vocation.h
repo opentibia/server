@@ -28,7 +28,6 @@
 
 class Vocation
 {
-	// Only Vocations may construct / destroy us
 	Vocation(uint32_t id);
 	~Vocation();
 public:
@@ -38,17 +37,17 @@ public:
 	uint32_t getReqSkillTries(SkillType skill, int32_t level);
 	uint32_t getReqMana(int32_t magLevel);
 
-	uint32_t getHPGain() const {return gainHP;};
-	uint32_t getManaGain() const {return gainMana;};
-	uint32_t getCapGain() const {return gainCap;};
+	uint32_t getHPGain() const {return gainHP;}
+	uint32_t getManaGain() const {return gainMana;}
+	uint32_t getCapGain() const {return gainCap;}
 
-	uint32_t getManaGainTicks() const {return gainManaTicks;};
-	uint32_t getManaGainAmount() const {return gainManaAmount;};
-	uint32_t getHealthGainTicks() const {return gainHealthTicks;};
-	uint32_t getHealthGainAmount() const {return gainHealthAmount;};
+	uint32_t getManaGainTicks() const {return gainManaTicks;}
+	uint32_t getManaGainAmount() const {return gainManaAmount;}
+	uint32_t getHealthGainTicks() const {return gainHealthTicks;}
+	uint32_t getHealthGainAmount() const {return gainHealthAmount;}
 
-	uint16_t getSoulMax() const {return maxSoul;};
-	uint16_t getSoulGainTicks() const {return gainSoulTicks;};
+	uint16_t getSoulMax() const {return maxSoul;}
+	uint16_t getSoulGainTicks() const {return gainSoulTicks;}
 
 	float getMeleeBaseDamage(WeaponType_t weaponType) const
 	{
@@ -64,12 +63,12 @@ public:
 			return fistBaseDamage;
 	};
 
-	float getMagicBaseDamage() const {return magicBaseDamage;};
-	float getWandBaseDamage() const {return wandBaseDamage;};
-	float getHealingBaseDamage() const {return healingBaseDamage;};
+	float getMagicBaseDamage() const {return magicBaseDamage;}
+	float getWandBaseDamage() const {return wandBaseDamage;}
+	float getHealingBaseDamage() const {return healingBaseDamage;}
 
-	float getBaseDefense() const {return baseDefense;};
-	float getArmorDefense() const {return armorDefense;};
+	float getBaseDefense() const {return baseDefense;}
+	float getArmorDefense() const {return armorDefense;}
 
 	void debugVocation();
 

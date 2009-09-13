@@ -218,7 +218,7 @@ public:
 	*
 	* \return true if moved, false if there are no more results.
 	*/
-	DATABASE_VIRTUAL bool next() {return false;};
+	DATABASE_VIRTUAL bool next() {return false;}
 
 protected:
 	_DBResult() {};

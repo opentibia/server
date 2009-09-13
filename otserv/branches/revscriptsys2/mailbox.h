@@ -32,8 +32,8 @@ public:
 	Mailbox(uint16_t _type);
 	~Mailbox();
 	
-	virtual Mailbox* getMailbox() {return this;};
-	virtual const Mailbox* getMailbox() const {return this;};
+	virtual Mailbox* getMailbox() {return this;}
+	virtual const Mailbox* getMailbox() const {return this;}
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,

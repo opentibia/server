@@ -69,17 +69,17 @@ public:
 	Door(uint16_t _type);
 	virtual ~Door();
 
-	virtual Door* getDoor() {return this;};
-	virtual const Door* getDoor() const {return this;};
+	virtual Door* getDoor() {return this;}
+	virtual const Door* getDoor() const {return this;}
 
-	House* getHouse(){return house;};
+	House* getHouse(){return house;}
 
 	//serialization
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	void setDoorId(uint32_t _doorId){ setIntAttr(ATTR_ITEM_DOORID, (uint32_t)_doorId);};
-	uint32_t getDoorId() const{ return getIntAttr(ATTR_ITEM_DOORID);};
+	void setDoorId(uint32_t _doorId){ setIntAttr(ATTR_ITEM_DOORID, (uint32_t)_doorId);}
+	uint32_t getDoorId() const{ return getIntAttr(ATTR_ITEM_DOORID);}
 
 	bool canUse(const Player* player);
 

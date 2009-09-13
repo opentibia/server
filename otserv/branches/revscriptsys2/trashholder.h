@@ -31,8 +31,8 @@ public:
 	TrashHolder(uint16_t _type, MagicEffectClasses _effect = NM_ME_NONE);
 	~TrashHolder();
 	
-	virtual TrashHolder* getTrashHolder() {return this;};
-	virtual const TrashHolder* getTrashHolder() const {return this;};
+	virtual TrashHolder* getTrashHolder() {return this;}
+	virtual const TrashHolder* getTrashHolder() const {return this;}
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,

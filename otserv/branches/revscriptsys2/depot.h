@@ -28,15 +28,15 @@ public:
 	Depot(uint16_t _type);
 	~Depot();
 
-	virtual Depot* getDepot() {return this;};
-	virtual const Depot* getDepot() const {return this;};
+	virtual Depot* getDepot() {return this;}
+	virtual const Depot* getDepot() const {return this;}
 
 	//serialization
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 
-	uint32_t getDepotId() const {return depotId;};
-	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
-	void setDepotId(uint32_t id) {depotId = id;};
+	uint32_t getDepotId() const {return depotId;}
+	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;}
+	void setDepotId(uint32_t id) {depotId = id;}
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
