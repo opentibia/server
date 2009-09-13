@@ -532,9 +532,9 @@ void OnMoveCreature::Event::push_instance(LuaState& state, Environment& environm
 	state.pushThing(actor);
 	state.setField(-2, "creature");
 
-	state.pushThing(fromTile);
+	state.pushTile(fromTile);
 	state.setField(-2, "fromTile");
-	state.pushThing(toTile);
+	state.pushTile(toTile);
 	state.setField(-2, "toTile");
 
 	state.pushThing(moving_creature);

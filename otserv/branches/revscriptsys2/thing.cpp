@@ -128,14 +128,14 @@ Position Thing::getPosition() const
 {
 	const Tile* tile = getTile();
 	if(tile){
-		return tile->getTilePosition();
+		return tile->getPosition();
 	}
 	else{
 		#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Thing::getPosition],  NULL tile" << std::endl;
 		DEBUG_REPORT
 		#endif
-		return Tile::null_tile.getTilePosition();
+		return Tile::null_tile.getPosition();
 	}
 }
 

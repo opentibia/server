@@ -56,8 +56,8 @@ Item* Container::clone() const
 
 Container* Container::getParentContainer()
 {
-	if(Thing* thing = getParent()) {
-		if(Item* item = thing->getItem()) {
+	if(Cylinder* cylinder = getParent()){
+		if(Item* item = cylinder->getItem()){
 			return item->getContainer();
 		}
 	}
@@ -301,12 +301,14 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		return RET_THISISIMPOSSIBLE;
 	}
 
-	const Cylinder* cylinder = getParent();
-	while(cylinder){
-		if(cylinder == thing){
-			return RET_THISISIMPOSSIBLE;
+	if(const Container* container = item->getContainer()){
+		const Cylinder* cylinder = getParent();
+		while(cylinder){
+			if(cylinder == container){
+				return RET_THISISIMPOSSIBLE;
+			}
+			cylinder = cylinder->getParent();
 		}
-		cylinder = cylinder->getParent();
 	}
 	
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);

@@ -107,8 +107,8 @@ public:
 	virtual const std::string& getNameDescription() const {return name;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 
-	void setGUID(uint32_t _guid) {guid = _guid;};
-	uint32_t getGUID() const { return guid;};
+	void setGUID(uint32_t _guid) {guid = _guid;}
+	uint32_t getGUID() const { return guid;}
 	virtual uint32_t idRange(){ return 0x10000000;}
 	static AutoList<Player> listPlayer;
 	void removeList();
@@ -189,7 +189,7 @@ public:
 	bool isLoginAttackLocked(uint32_t attackerId) const;
 
 	virtual bool isPushable() const;
-	virtual int getThrowRange() const {return 1;};
+	virtual int getThrowRange() const {return 1;}
 	virtual bool canSeeInvisibility() const;
 	uint32_t getMuteTime();
 	void addMessageBuffer();
@@ -257,9 +257,9 @@ public:
 	virtual RaceType getRace() const {return RACE_BLOOD;}
 
 	//safe-trade functions
-	void setTradeState(TradeState state) {tradeState = state;};
-	TradeState getTradeState() {return tradeState;};
-	Item* getTradeItem() {return tradeItem;};
+	void setTradeState(TradeState state) {tradeState = state;}
+	TradeState getTradeState() {return tradeState;}
+	Item* getTradeItem() {return tradeItem;}
 
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
@@ -279,7 +279,7 @@ public:
 	virtual void onWalkComplete();
 
 	void checkIdleTime(uint32_t ticks);
-	void resetIdle() {idleTime = 0; idleWarned = false;};
+	void resetIdle() {idleTime = 0; idleWarned = false;}
 	void setIdleTime(uint32_t value, bool warned){idleTime = value; idleWarned = warned;}
 
 	void setChaseMode(ChaseMode mode);
@@ -590,6 +590,18 @@ public:
 	//depots
 	DepotMap depots;
 	uint32_t maxDepotLimit;
+
+	//cylinder implementations
+	virtual Cylinder* getParent() {return Creature::getParent();}
+	virtual const Cylinder* getParent() const {return Creature::getParent();}
+	virtual bool isRemoved() const {return Creature::isRemoved();}
+	virtual Position getPosition() const {return Creature::getPosition();}
+	virtual Tile* getTile() {return Creature::getTile();}
+	virtual const Tile* getTile() const {return Creature::getTile();}
+	virtual Item* getItem() {return NULL;}
+	virtual const Item* getItem() const {return NULL;}
+	virtual Creature* getCreature() {return this;}
+	virtual const Creature* getCreature() const {return this;}
 
 protected:
 	void checkTradeState(const Item* item);

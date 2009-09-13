@@ -124,7 +124,7 @@ private:
 	friend class Tile;
 };
 
-class Tile : public Cylinder
+class Tile : public Cylinder, public Thing
 {
 public:
 	static Tile& null_tile;
@@ -143,8 +143,8 @@ public:
 	const HouseTile* getHouseTile() const;
 	bool isHouseTile() const;
 
-	virtual int getThrowRange() const {return 0;};
-	virtual bool isPushable() const {return false;};
+	virtual int getThrowRange() const {return 0;}
+	virtual bool isPushable() const {return false;}
 
 	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
@@ -216,6 +216,16 @@ public:
 	int32_t getClientIndexOfThing(const Player* player, const Thing* thing) const;
 
 	//cylinder implementations
+	virtual Cylinder* getParent() {return NULL;}
+	virtual const Cylinder* getParent() const {return NULL;}
+	virtual bool isRemoved() const {return false;}
+	virtual Position getPosition() const {return tilePos;}
+	virtual Tile* getTile() {return this;}
+	virtual const Tile* getTile() const {return this;}
+	virtual Item* getItem() {return NULL;}
+	virtual const Item* getItem() const {return NULL;}
+	virtual Creature* getCreature() {return NULL;}
+	virtual const Creature* getCreature() const {return NULL;}
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
@@ -241,11 +251,6 @@ public:
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
-
-	virtual Position getPosition() const {return tilePos;}
-	const Position& getTilePosition() const {return tilePos;}
-
-	virtual bool isRemoved() const {return false;};
 
 private:
 	void onAddTileItem(Item* item);

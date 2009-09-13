@@ -47,8 +47,19 @@ enum cylinderlink_t{
 	LINK_NEAR
 };
 
-class Cylinder : virtual public Thing{
+class Cylinder{
 public:
+	virtual Cylinder* getParent() = 0;
+	virtual const Cylinder* getParent() const = 0;
+	virtual bool isRemoved() const = 0;
+	virtual Position getPosition() const = 0;
+	virtual Tile* getTile() = 0;
+	virtual const Tile* getTile() const = 0;
+	virtual Item* getItem() = 0;
+	virtual const Item* getItem() const = 0;
+	virtual Creature* getCreature() = 0;
+	virtual const Creature* getCreature() const = 0;
+
 	/**
 	  * Query if the cylinder can add an object
 	  * \param index points to the destination index (inventory slot/container position)
@@ -218,6 +229,17 @@ class VirtualCylinder : public Cylinder
 public:
 	static VirtualCylinder* virtualCylinder;
 
+	//cylinder implementations
+	virtual Cylinder* getParent() {return NULL;}
+	virtual bool isRemoved() const {return false;}
+	virtual const Cylinder* getParent() const {return NULL;}
+	virtual Position getPosition() const {return Position();}
+	virtual Tile* getTile() {return NULL;}
+	virtual const Tile* getTile() const {return NULL;}
+	virtual Item* getItem() {return NULL;}
+	virtual const Item* getItem() const {return NULL;}
+	virtual Creature* getCreature() {return NULL;}
+	virtual const Creature* getCreature() const {return NULL;}
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const {return RET_NOTPOSSIBLE;}
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
@@ -239,8 +261,6 @@ public:
 	virtual bool isPushable() const {return false;}
 	virtual int getThrowRange() const {return 1;}
 	virtual std::string getDescription(int32_t lookDistance) const {return "";}
-
-	virtual bool isRemoved() const {return false;}
 };
 
 

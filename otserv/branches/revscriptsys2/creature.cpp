@@ -992,13 +992,15 @@ void Creature::drainMana(Creature* attacker, int32_t points, bool showtext)
 	}
 }
 
-void Creature::setParent(Cylinder* cylinder){
+void Creature::setParent(Cylinder* cylinder)
+{
 	_tile = dynamic_cast<Tile*>(cylinder);
 	Thing::setParent(cylinder);
 }
 
-Position Creature::getPosition() const {
-	return _tile->getTilePosition();
+Position Creature::getPosition() const
+{
+	return _tile->getPosition();
 }
 
 BlockType Creature::blockHit(Creature* attacker, CombatType combatType, int32_t& damage,

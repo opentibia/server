@@ -806,9 +806,9 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 	*destItem = NULL;
 
 	if(floorChangeDown()){
-		int dx = getTilePosition().x;
-		int dy = getTilePosition().y;
-		int dz = getTilePosition().z + 1;
+		int dx = getPosition().x;
+		int dy = getPosition().y;
+		int dz = getPosition().z + 1;
 		Tile* downTile = g_game.getTile(dx, dy, dz);
 
 		if(downTile){
@@ -824,9 +824,9 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 		}
 	}
 	else if(floorChange()){
-		int dx = getTilePosition().x;
-		int dy = getTilePosition().y;
-		int dz = getTilePosition().z - 1;
+		int dx = getPosition().x;
+		int dy = getPosition().y;
+		int dz = getPosition().z - 1;
 
 		if(floorChange(NORTH))
 			dy -= 1;

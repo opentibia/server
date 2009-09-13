@@ -1539,8 +1539,10 @@ int LuaState::lua_Thing_getParent()
 	Cylinder* parent = thing->getParent();
 	if(parent->getTile()) {
 		pushTile(static_cast<Tile*>(parent));
-	} else if(parent->getItem() || parent->getCreature()) {
-		pushThing(parent);
+	} else if(parent->getItem()){
+		pushThing(parent->getItem());
+	} else if(parent->getCreature()){
+		pushThing(parent->getCreature());
 	} else {
 		pushNil();
 	}
