@@ -586,6 +586,10 @@ void Actor::alwaysThink(bool b)
 
 void Actor::setIdle(bool _idle)
 {
+	if(getHealth() <= 0 || isRemoved()){
+		return;
+	}
+
 	isIdle = _idle;
 
 	if(!isIdle){
@@ -601,10 +605,6 @@ void Actor::setIdle(bool _idle)
 
 void Actor::updateIdleStatus()
 {
-	if(getHealth() <= 0 || isRemoved()){
-		return;
-	}
-
 	bool idle = false;
 
 	if(conditions.empty()){
@@ -1250,7 +1250,7 @@ void Actor::die()
 
 	clearTargetList();
 	clearFriendList();
-	setIdle(true);
+	onIdleStatus();
 	Creature::die();
 }
 
@@ -1427,9 +1427,10 @@ void Actor::drainHealth(Creature* attacker, CombatType combatType, int32_t damag
 
 void Actor::changeHealth(int32_t healthChange)
 {
-	Creature::changeHealth(healthChange);
 	//In case a player with ignore flag set attacks the monster
 	setIdle(false);
+
+	Creature::changeHealth(healthChange);
 }
 
 bool Actor::challengeCreature(Creature* creature)

@@ -556,7 +556,7 @@ public:
 	bool ok() const;
 
 	// Returns a sweetly formatted stack trace
-	std::string report();
+	std::string report(const std::string& extramessage = "");
 protected:
 	std::string name;
 	int thread_state;

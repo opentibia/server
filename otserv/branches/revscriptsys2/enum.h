@@ -81,13 +81,13 @@ class Enum {
 protected:
 	E e;
 
-	// Types used internally
+public:
+	// Some useful types
 	typedef std::map<Enum<E, size_>, std::string > EnumToString;
 	typedef std::map<std::string, Enum<E, size_> > StringToEnum;
 	// Required for some name-resolving of BitEnums
 	typedef Enum<E, size_> base_class;
 	typedef E enum_type;
-
 
 public:
 	Enum() : e(E(0)) {}

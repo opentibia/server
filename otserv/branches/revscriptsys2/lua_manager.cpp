@@ -802,11 +802,18 @@ bool LuaThread::ok() const
 	return thread_state == 0 || thread_state == LUA_YIELD;
 }
 
-std::string LuaThread::report()
+std::string LuaThread::report(const std::string& extramessage)
 {
 	std::ostringstream os;
-	std::string errmsg = popString();
-	os << "Lua Error: " << errmsg << "\n";
+	if(extramessage.empty()){
+		// Fetch message from stack
+		std::string errmsg = popString();
+		os << "Lua Error: " << errmsg << "\n";
+	}
+	else{
+		// Custom message
+		os << "Lua Error: " << extramessage << "\n";
+	}
 	os << "Stack trace:\n";
 	os << "Line\tFunction\t\tSource\n";
 
@@ -843,28 +850,38 @@ int32_t LuaThread::run(int args)
 	if(ret == LUA_YIELD) {
 		// Thread yielded, add us to the manager
 		if(!isString() || !(popString() == "WAIT")){
-			std::cout << report();
+			std::cout << report("Tried to yield from thread with an invalid code.");
+			while(getStackSize() > 0)
+				pop();
 			return 0;
 		}
 
 		if(!isNumber()){
-			report();
+			report("Tried to wait a non-number duration.");
+			while(getStackSize() > 0)
+				pop();
 			return 0;
 		}
 
 		int32_t schedule = popInteger();
+		if(schedule < 1){
+			report("Minimum wait duration is 1 milliseconds.");
+			while(getStackSize() > 0)
+				pop();
+			return 0;
+		}
 		return schedule;
 	} else if(ret == 0) {
 		// Thread exited normally, do nothing, it will be garbage collected
 	} else if(ret == LUA_ERRRUN) {
-		std::cout << report();
+		std::cout << report("Runtime error while running thread.");
 	} else if(ret == LUA_ERRERR) {
 		// Can't handle, just print error message
 		std::cout << "Lua Error when recovering from error (thread " << name << ")\n";
 	} else if(ret == LUA_ERRMEM) {
 		std::cout << "Lua Error: Memory Allocation Failed!\n";
 	} else {
-		// ??
+		std::cout << "Lua Error: An unknown error occured!\n";
 	}
 	return 0;
 }
