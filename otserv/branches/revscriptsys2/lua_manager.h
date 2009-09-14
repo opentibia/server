@@ -524,13 +524,15 @@ protected:
 };
 
 template <> inline bool LuaState::popValue<bool>() {return popBoolean();}
-template <> inline int LuaState::popValue<int>() {return popInteger();}
 template <> inline uint32_t LuaState::popValue<uint32_t>() {return popUnsignedInteger();}
 template <> inline int32_t LuaState::popValue<int32_t>() {return (int32_t)popInteger();}
 template <> inline float LuaState::popValue<float>() {return popFloat();}
 template <> inline double LuaState::popValue<double>() {return popFloat();}
 template <> inline std::string LuaState::popValue<std::string>() {return popString();}
 template <> inline uint64_t LuaState::popValue<uint64_t>() {return (uint64_t)popFloat();}
+#ifndef __GNUC__
+template <> inline int LuaState::popValue<int>() {return popInteger();}
+#endif
 
 class LuaThread : public LuaState {
 public:

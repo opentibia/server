@@ -862,9 +862,9 @@ bool OnLook::Event::check_match(const ScriptInformation& info)
 			case FILTER_ITEMID:
 				return item && item->getID() == info.id;
 			case FILTER_ACTIONID:
-				return item && item->getActionId() == info.id;
+				return item && (uint32_t)item->getActionId() == info.id;
 			case FILTER_UNIQUEID:
-				return item && item->getUniqueId() == info.id;
+				return item && (uint32_t)item->getUniqueId() == info.id;
 			case FILTER_CREATUREID:
 				return creature && creature->getID() == info.id;
 			default: break;

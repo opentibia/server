@@ -54,7 +54,7 @@ public:
 	const float* getFloat() const;
 	const bool* getBoolean() const;
 	boost::any get() const;
-	
+
 private:
 	enum Type {
 		STRING = 1,
@@ -63,7 +63,7 @@ private:
 		BOOLEAN = 4,
 		NONE = 0
 	} type;
-	char data[sizeof std::string];
+	char data[sizeof(std::string)];
 };
 
 class ItemAttributes

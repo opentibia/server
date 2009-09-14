@@ -100,10 +100,10 @@ protected:
 public:
 	virtual ~Thing();
 
-	void useThing2() {++useCount;}
-	void releaseThing2() {
-		--useCount;
-		if(useCount <= 0)
+	void addRef() {++m_refCount;}
+	void unRef() {
+		--m_refCount;
+		if(m_refCount <= 0)
 			delete this;
 	}
 
@@ -133,7 +133,7 @@ public:
 
 private:
 	Cylinder* parent;
-	int32_t useCount;
+	int32_t m_refCount;
 };
 
 

@@ -26,10 +26,11 @@
 // Avoid unnecessary includes!
 extern void g_gameUnscriptThing(Thing* thing);
 
-Thing::Thing()
+Thing::Thing() :
+	parent(NULL),
+	m_refCount(0)
 {
-	parent = NULL;
-	useCount = 0;
+	//
 }
 
 Thing::~Thing()

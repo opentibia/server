@@ -176,10 +176,10 @@ public:
 	std::string getWriter() const;
 
 	void setActionId(int32_t n);
-	int getActionId() const;
+	int32_t getActionId() const;
 
 	void setUniqueId(int32_t n);
-	int getUniqueId() const;
+	int32_t getUniqueId() const;
 
 	void setCharges(uint16_t n);
 	uint16_t getCharges() const;
@@ -426,7 +426,7 @@ inline void Item::setActionId(int32_t n) {
 	setAttribute("aid", n);
 }
 
-inline int Item::getActionId() const {
+inline int32_t Item::getActionId() const {
 	const int32_t* aid = getIntegerAttribute("aid");
 	if(aid)
 		return *aid;
@@ -437,7 +437,7 @@ inline void Item::setUniqueId(int32_t n) {
 	setAttribute("uid", n);
 }
 
-inline int Item::getUniqueId() const {
+inline int32_t Item::getUniqueId() const {
 	const int32_t* uid = getIntegerAttribute("uid");
 	if(uid)
 		return *uid;
