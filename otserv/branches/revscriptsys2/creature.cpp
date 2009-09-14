@@ -1353,7 +1353,7 @@ void Creature::addSummon(Creature* creature)
 	creature->setDropLoot(false);
 	creature->setLossSkill(false);
 	creature->setMaster(this);
-	creature->useThing2();
+	creature->addRef();
 	summons.push_back(creature);
 }
 
@@ -1365,7 +1365,7 @@ void Creature::removeSummon(const Creature* creature)
 		(*cit)->setDropLoot(false);
 		(*cit)->setLossSkill(true);
 		(*cit)->setMaster(NULL);
-		(*cit)->releaseThing2();
+		(*cit)->unRef();
 		summons.erase(cit);
 	}
 }
@@ -1376,7 +1376,7 @@ void Creature::destroySummons()
 		(*cit)->setAttackedCreature(NULL);
 		(*cit)->changeHealth(-(*cit)->getHealth());
 		(*cit)->setMaster(NULL);
-		(*cit)->releaseThing2();
+		(*cit)->unRef();
 	}
 	summons.clear();
 }

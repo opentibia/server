@@ -178,7 +178,7 @@ Player::~Player()
 	for(SlotType::iterator i = SlotType::begin(); i != SlotType::end(); ++i){
 		if(getInventoryItem(*i)){
 			getInventoryItem(*i)->setParent(NULL);
-			getInventoryItem(*i)->releaseThing2();
+			getInventoryItem(*i)->unRef();
 			inventory[i->value()] = NULL;
 			inventoryAbilities[i->value()] = false;
 		}
@@ -186,7 +186,7 @@ Player::~Player()
 
 	DepotMap::iterator it;
 	for(it = depots.begin();it != depots.end(); it++){
-		it->second->releaseThing2();
+		it->second->unRef();
 	}
 
 	//std::cout << "Player destructor " << this << std::endl;
@@ -1323,13 +1323,13 @@ void Player::setWriteItem(Item* item, uint16_t _maxWriteLen /*= 0*/)
 {
 	windowTextId++;
 	if(writeItem){
-		writeItem->releaseThing2();
+		writeItem->unRef();
 	}
 
 	if(item){
 		writeItem = item;
 		maxWriteLen = _maxWriteLen;
-		writeItem->useThing2();
+		writeItem->addRef();
 	}
 	else{
 		writeItem = NULL;

@@ -1132,7 +1132,7 @@ bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool e
 
 	//std::cout << "internalPlaceCreature: " << creature << " " << creature->getID() << std::endl;
 
-	creature->useThing2();
+	creature->addRef();
 	creature->setID();
 	listCreature.addList(creature);
 	creature->addList();
@@ -3263,7 +3263,7 @@ bool Game::internalStartTrade(Player* player, Player* tradePartner, Item* tradeI
 	player->tradePartner = tradePartner;
 	player->tradeItem = tradeItem;
 	player->tradeState = TRADE_INITIATED;
-	tradeItem->useThing2();
+	tradeItem->addRef();
 	tradeItems[tradeItem] = player->getID();
 
 	player->sendTradeItemRequest(player, tradeItem, true);
@@ -4403,7 +4403,7 @@ void Game::addCreatureCheck(Creature* creature)
 
 	toAddCheckCreatureVector.push_back(creature);
 	creature->checkCreatureVectorIndex = random_range(0, EVENT_CREATURECOUNT - 1);
-	creature->useThing2();
+	creature->addRef();
 }
 
 void Game::removeCreatureCheck(Creature* creature)
@@ -4898,7 +4898,7 @@ void Game::startDecay(Item* item)
 
 		int32_t dur = item->getDuration();
 		if(dur > 0){
-			item->useThing2();
+			item->addRef();
 			item->setDecaying(DECAYING_TRUE);
 			toDecayItems.push_back(item);
 		}
@@ -5131,7 +5131,7 @@ void Game::cleanup()
 {
 	//free memory
 	for(std::vector<Thing*>::iterator it = ToReleaseThings.begin(); it != ToReleaseThings.end(); ++it){
-		(*it)->releaseThing2();
+		(*it)->unRef();
 	}
 
 	ToReleaseThings.clear();

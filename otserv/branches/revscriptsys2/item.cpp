@@ -75,7 +75,7 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 1*/)
 			newItem = new Item(_type, _count);
 		}
 
-		newItem->useThing2();
+		newItem->addRef();
 	}
 	return newItem;
 }

@@ -115,7 +115,7 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 	Player* _player = g_game.getPlayerByName(name);
 	if(!_player || g_config.getNumber(ConfigManager::ALLOW_CLONES)){
 		player = new Player(name, this);
-		player->useThing2();
+		player->addRef();
 		player->setID();
 
 		if(!IOPlayer::instance()->loadPlayer(player, name, true)){
@@ -237,7 +237,7 @@ bool ProtocolGame::connect(uint32_t playerId)
 	}
 
 	player = _player;
-	player->useThing2();
+	player->addRef();
 	player->isConnecting = false;
 	player->client = this;
 	player->client->sendAddCreature(player, player->getPosition(),

@@ -2813,7 +2813,7 @@ int LuaState::lua_createItem()
 	int id = popUnsignedInteger();
 
 	Item* item = Item::CreateItem((uint16_t)id, (count < 0? 0 : count));
-	item->useThing2();
+	item->addRef();
 	pushThing(item);
 	// It will be freed if not assigned to any parent
 	g_game.FreeThing(item);

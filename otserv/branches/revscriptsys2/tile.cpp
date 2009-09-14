@@ -1419,7 +1419,7 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, const Cylinder* ol
 	}
 
 	//add a reference to this item, it may be deleted after being added (mailbox for example)
-	thing->useThing2();
+	thing->addRef();
 
 	if(link == LINK_OWNER){
 		//calling movement scripts
