@@ -18,31 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_ITEM_H__
 #define __OTSERV_ITEM_H__
 
-#include "thing.h"
+#include "classes.h"
 #include "items.h"
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
-#include <iostream>
-#include <list>
-#include <vector>
-
-class Creature;
-class Player;
-class Container;
-class Depot;
-class Teleport;
-class TrashHolder;
-class Mailbox;
-class Door;
-class MagicField;
-class BedItem;
-class Weapon;
 
 enum ITEMPROPERTY{
 	BLOCKSOLID = 0,
@@ -78,8 +58,6 @@ struct TeleportDest{
 	uint8_t	_z;
 };
 #pragma pack()
-
-struct LightInfo;
 
 enum AttrTypes_t{
 	// attr 0 means end of attribute list

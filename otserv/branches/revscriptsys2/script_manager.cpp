@@ -15,15 +15,11 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
-
-#include <sstream>
 
 #include "script_manager.h"
 #include "script_event.h"
 #include "script_environment.h"
-
 #include "configmanager.h"
 
 extern ConfigManager g_config;

@@ -18,18 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _CONFIG_MANAGER_H
-#define _CONFIG_MANAGER_H
-
-#include <string>
-
-extern "C"
-{
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-}
-
+#ifndef __OTSERV_CONFIGMANAGER_H__
+#define __OTSERV_CONFIGMANAGER_H__
 
 class ConfigManager {
 public:

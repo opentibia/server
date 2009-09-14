@@ -19,15 +19,12 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
 #if defined WIN32
 #include <winerror.h>
 #endif
 
 #include "protocol.h"
 #include "scheduler.h"
-#include "connection.h"
 #include "outputmessage.h"
 #include "rsa.h"
 

@@ -18,12 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __HOUSETILE_H__
-#define __HOUSETILE_H__
+#ifndef __OTSERV_HOUSETILE_H__
+#define __OTSERV_HOUSETILE_H__
 
+#include "classes.h"
 #include "tile.h"
-
-class House;
 
 // House tiles are almost always dynamic
 class HouseTile : public DynamicTile

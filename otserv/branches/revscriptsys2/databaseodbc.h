@@ -30,8 +30,8 @@
 
 #ifdef __USE_ODBC__
 
-#ifndef __DATABASE_ODBC_H__
-#define __DATABASE_ODBC_H__
+#ifndef __OTSERV_DATABASEODBC_H__
+#define __OTSERV_DATABASEODBC_H__
 
 #ifndef __OTSERV_DATABASE_H__
 #error "database.h should be included first."

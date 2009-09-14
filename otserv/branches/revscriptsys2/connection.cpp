@@ -19,20 +19,11 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "connection.h"
 #include "protocol.h"
 #include "outputmessage.h"
-#include "tasks.h"
 #include "scheduler.h"
-#include "connection.h"
-#include "tools.h"
 #include "server.h"
-#include "protocolgame.h"
-#include "protocolold.h"
-#include "admin.h"
-#include "status.h"
-
-#include "boost_common.h"
-#include <boost/bind.hpp>
 
 bool Connection::m_logError = true;
 

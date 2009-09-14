@@ -18,13 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_PROTOCOL_LOGIN_H__
-#define __OTSERV_PROTOCOL_LOGIN_H__
+#ifndef __OTSERV_PROTOCOLLOGIN_H__
+#define __OTSERV_PROTOCOLLOGIN_H__
 
+#include "classes.h"
 #include "protocol.h"
-
-class NetworkMessage;
-class OutputMessage;
 
 class ProtocolLogin : public Protocol
 {

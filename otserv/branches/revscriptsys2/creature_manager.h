@@ -18,19 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_CREATURE_MANAGER_H__
-#define __OTSERV_CREATURE_MANAGER_H__
+#ifndef __OTSERV_CREATUREMANAGER_H__
+#define __OTSERV_CREATUREMANAGER_H__
 
-#include <string>
-#include <map>
-
-#include <libxml/parser.h>
-
+#include "classes.h"
 #include "condition_attributes.h"
-
-class CreatureType;
-class ConditionDamage;
-struct LootBlock;
 
 class CreatureManager{
 public:

@@ -18,17 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_IOMAPSERIALIZE_H__
 #define __OTSERV_IOMAPSERIALIZE_H__
 
-class Map;
-
-#include "iomapserialize.h"
+#include "classes.h"
 #include "database.h"
-#include "map.h"
-
-#include <string>
 
 class IOMapSerialize{
 public:

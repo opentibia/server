@@ -18,12 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __IOPLAYER_H
-#define __IOPLAYER_H
+#ifndef __OTSERV_IOPLAYER_H__
+#define __OTSERV_IOPLAYER_H__
 
-#include <string>
-
-#include "player.h"
+#include "classes.h"
+#include "creature.h"
 #include "database.h"
 
 enum UnjustKillPeriod_t{

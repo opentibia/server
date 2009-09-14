@@ -21,9 +21,6 @@
 
 #include "protocolold.h"
 #include "outputmessage.h"
-#include "connection.h"
-
-#include "rsa.h"
 #include "game.h"
 
 extern Game g_game;

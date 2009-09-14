@@ -20,21 +20,16 @@
 #include "otpch.h"
 
 #include "spawn.h"
+#include "scheduler.h"
 #include "game.h"
 #include "actor.h"
 #include "player.h"
-#include "tools.h"
 #include "configmanager.h"
 #include "creature_manager.h"
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
 
 extern ConfigManager g_config;
 extern CreatureManager g_creature_types;
 extern Game g_game;
-
-class CreatureType;
 
 #define MINSPAWN_INTERVAL 10000
 #define DEFAULTSPAWN_INTERVAL 60000

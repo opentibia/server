@@ -20,16 +20,10 @@
 #include "otpch.h"
 
 #include "status.h"
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include "configmanager.h"
-#include <sstream>
-#include "game.h"
-#include "connection.h"
-#include "networkmessage.h"
 #include "outputmessage.h"
-#include "tools.h"
+#include "game.h"
 #include "player.h"
+#include "configmanager.h"
 
 #ifndef WIN32
 	#define SOCKET_ERROR -1

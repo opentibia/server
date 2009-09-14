@@ -21,10 +21,6 @@
 #ifndef __OTSERV_OUTFIT_H__
 #define __OTSERV_OUTFIT_H__
 
-#include <vector>
-#include <string>
-#include <map>
-#include <list>
 #include "enums.h"
 
 struct OutfitType
@@ -58,8 +54,6 @@ struct Outfit
 	bool isDefault;
 	std::string name;
 };
-
-//typedef std::map<uint32_t, OutfitList > OutfitMap;
 
 typedef std::list<Outfit> OutfitList;
 typedef std::map<uint32_t, Outfit > OutfitMap;

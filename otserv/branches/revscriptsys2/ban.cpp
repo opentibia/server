@@ -20,8 +20,8 @@
 #include "otpch.h"
 
 #include "ban.h"
+#include "otsystem.h"
 #include "tools.h"
-
 #include "configmanager.h"
 #include "ioplayer.h"
 #include "database.h"

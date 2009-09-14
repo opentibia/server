@@ -16,10 +16,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#include <string>
-#include <map>
-#include <boost/shared_ptr.hpp>
+#ifndef __OTSERV_WAYPOINTS_H__
+#define __OTSERV_WAYPOINTS_H__
+
 #include <boost/enable_shared_from_this.hpp>
+#include "tools.h"
 
 class Waypoint : public boost::enable_shared_from_this<Waypoint> {
 public:
@@ -59,3 +60,5 @@ inline Waypoint_ptr Waypoints::getWaypointByName(const std::string& name) const
 	}
 	return f->second;
 }
+
+#endif

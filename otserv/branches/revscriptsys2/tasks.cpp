@@ -20,6 +20,7 @@
 #include "otpch.h"
 
 #include "tasks.h"
+#include "otsystem.h"
 #include "outputmessage.h"
 #include "game.h"
 

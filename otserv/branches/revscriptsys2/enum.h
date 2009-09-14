@@ -16,15 +16,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef ENUM_H
-#define ENUM_H
+#ifndef OTSERV_ENUM_H__
+#define OTSERV_ENUM_H__
 
 #include <assert.h>
-#include <string>
-#include <sstream>
-#include <map>
 #include <stdexcept>
-#include <algorithm>
 
 class enum_conversion_error : public std::logic_error {
 public:

@@ -15,16 +15,14 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
 
-#include "lua_manager.h"
 #include "script_event.h"
+#include "lua_manager.h"
 #include "script_environment.h"
 #include "script_listener.h"
 #include "script_manager.h"
 #include "tools.h"
-
 #include "tile.h"
 #include "player.h"
 #include "creature.h"

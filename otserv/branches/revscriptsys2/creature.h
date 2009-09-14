@@ -18,22 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_CREATURE_H__
 #define __OTSERV_CREATURE_H__
 
-#include "definitions.h"
-
-#include <boost/any.hpp>
-
+#include "classes.h"
 #include "templates.h"
-#include "position.h"
 #include "condition.h"
 #include "const.h"
-#include "enums.h"
-#include "thing.h"
-
-#include <list>
 
 typedef std::list<Condition*> ConditionList;
 
@@ -90,14 +81,6 @@ struct DeathLessThan{
 
 typedef std::vector<DeathEntry> DeathList;
 
-class Map;
-class Thing;
-class Container;
-class Player;
-class Actor;
-class ItemType;
-class Item;
-class Tile;
 namespace Script {
 	class Listener;
 	typedef boost::shared_ptr<Listener> Listener_ptr;

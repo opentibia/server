@@ -22,9 +22,6 @@
 #include "thing.h"
 #include "cylinder.h"
 #include "tile.h"
-#include "creature.h"
-#include "item.h"
-#include "player.h"
 
 // Avoid unnecessary includes!
 extern void g_gameUnscriptThing(Thing* thing);

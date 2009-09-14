@@ -18,20 +18,12 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_NETWORK_MESSAGE_H__
-#define __OTSERV_NETWORK_MESSAGE_H__
-
-#include <boost/shared_ptr.hpp>
+#ifndef __OTSERV_NETWORKMESSAGE_H__
+#define __OTSERV_NETWORKMESSAGE_H__
 
 #include "definitions.h"
 #include "otsystem.h"
 #include "const.h"
-
-class Item;
-class Creature;
-class Player;
-class Position;
-class RSA;
 
 class NetworkMessage
 {

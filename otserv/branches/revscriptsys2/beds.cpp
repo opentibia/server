@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// a Tile represents a single field on the map.
-// it is a list of Items
+//
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,10 +21,12 @@
 #include "otpch.h"
 
 #include "beds.h"
+#include "scheduler.h"
+#include "player.h"
+#include "tile.h"
 #include "house.h"
 #include "ioplayer.h"
 #include "game.h"
-#include "player.h"
 #include "configmanager.h"
 
 extern Game g_game;

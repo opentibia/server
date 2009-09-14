@@ -20,7 +20,6 @@
 #include "otpch.h"
 
 #include "scheduler.h"
-#include <iostream>
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"

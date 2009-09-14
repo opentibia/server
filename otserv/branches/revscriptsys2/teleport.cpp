@@ -21,7 +21,6 @@
 
 #include "teleport.h"
 #include "game.h"
-#include <sstream>
 
 extern Game g_game;
 

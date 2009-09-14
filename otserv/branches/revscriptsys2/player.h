@@ -21,27 +21,12 @@
 #ifndef __OTSERV_PLAYER_H__
 #define __OTSERV_PLAYER_H__
 
+#include "classes.h"
 #include "otsystem.h"
 #include "creature.h"
-#include "container.h"
-#include "depot.h"
 #include "cylinder.h"
-#include "outfit.h"
-#include "enums.h"
 #include "vocation.h"
 #include "protocolgame.h"
-
-#include <vector>
-#include <ctime>
-#include <algorithm>
-
-class Quest;
-class House;
-class Weapon;
-class ProtocolGame;
-class Party;
-class SchedulerTask;
-struct LightInfo;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,

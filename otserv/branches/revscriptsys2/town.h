@@ -18,16 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
-#ifndef __TOWN_H__
-#define __TOWN_H__
-
-#include <string>
-#include <list>
-#include <map>
+#ifndef __OTSERV_TOWN_H__
+#define __OTSERV_TOWN_H__
 
 #include "position.h"
-#include "definitions.h"
 
 class Town
 {

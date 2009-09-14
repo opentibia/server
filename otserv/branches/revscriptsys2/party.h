@@ -21,16 +21,8 @@
 #ifndef __OTSERV_PARTY_H__
 #define __OTSERV_PARTY_H__
 
-#include "definitions.h"
+#include "classes.h"
 #include "const.h"
-
-#include <list>
-#include <vector>
-#include <map>
-class Player;
-class Creature;
-class Container;
-class Party;
 
 typedef std::vector<Player*> PlayerVector;
 

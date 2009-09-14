@@ -21,8 +21,8 @@
 
 #include "container.h"
 #include "iomapotbm.h"
-#include "game.h"
 #include "player.h"
+#include "game.h"
 
 extern Game g_game;
 

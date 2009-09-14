@@ -19,13 +19,11 @@
 #ifndef __OTSERV_LUA_MANAGER_H__
 #define __OTSERV_LUA_MANAGER_H__
 
-#include <string>
-#include <queue>
-#include <stdexcept>
-#include <map>
-#include "boost_common.h"
+#include "classes.h"
 #include "enums.h"
 #include "outfit.h"
+#include <queue>
+#include <stdexcept>
 
 extern "C"
 {
@@ -34,18 +32,6 @@ extern "C"
 	#include <lualib.h>
 }
 
-class Player;
-class Creature;
-class Actor;
-class Thing;
-class Position;
-class PositionEx;
-class Town;
-class Item;
-class Tile;
-class House;
-class ChatChannel;
-class Waypoint;
 typedef shared_ptr<Waypoint> Waypoint_ptr;
 
 namespace Script {

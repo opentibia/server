@@ -18,11 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_LOGGER_H__
 #define __OTSERV_LOGGER_H__
-
-#include "definitions.h"
 
 #ifdef __GNUC__
 #define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
@@ -31,16 +28,8 @@
 #define __OTSERV_PRETTY_FUNCTION__ __FUNCDNAME__
 #endif
 
-/*
-#define LOG_MESSAGE(channel, type, level, message) \
-	Logger::getInstance()->logMessage(channel, type, level, message, __OTSERV_PRETTY_FUNCTION__, __LINE__, __FILE__);
-*/
-
 #define LOG_MESSAGE(channel, type, level, message) \
 	Logger::getInstance()->logMessage(channel, type, level, message, __OTSERV_PRETTY_FUNCTION__);
-
-#include <string>
-#include <map>
 
 enum eLogType {
 	LOGTYPE_EVENT,
@@ -55,10 +44,7 @@ public:
 		static Logger instance;
 		return &instance;
 	}
-	/*void logMessage(std::string channel, eLogType type, int level,
-			std::string message, std::string func,
-			int line, std::string file);
-	*/
+
 	void logMessage(const char* channel, eLogType type, int level,
 			std::string message, const char* func);
 private:

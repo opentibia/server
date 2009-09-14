@@ -17,37 +17,10 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
 
 #include "logger.h"
-#include <iostream>
 #include "tools.h"
-/*
-void Logger::logMessage(std::string channel, eLogType type, int level,
-			std::string message, std::string func,
-			int line, std::string file)
-{
-	std::string sType;
-	switch(type){
-	case LOGTYPE_ERROR:
-			sType = "error";
-			break;
-	case LOGTYPE_EVENT:
-			sType = "event";
-			break;
-	case LOGTYPE_WARNING:
-			sType = "warning";
-}
-	std::cout << "Channel: " << channel << std::endl;
-	std::cout << "Type: " << sType << std::endl;
-	std::cout << "Level: " << level << std::endl;
-	std::cout << "Message: " << message << std::endl;
-	std::cout << "Func: " << func << std::endl; 
-	std::cout << "Line: " << line << std::endl; 
-	std::cout << "File: " << file << std::endl; 
-}
-*/
 
 Logger::Logger()
 {

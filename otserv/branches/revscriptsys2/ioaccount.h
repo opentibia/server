@@ -18,14 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_IOACCOUNT_H__
 #define __OTSERV_IOACCOUNT_H__
 
-#include <string>
-
-#include "account.h"
-#include "definitions.h"
+#include "classes.h"
 
 /** Baseclass for all Player-Loaders */
 class IOAccount {

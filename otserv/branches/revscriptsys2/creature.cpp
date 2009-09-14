@@ -20,21 +20,12 @@
 #include "otpch.h"
 
 #include "creature.h"
+#include "scheduler.h"
 #include "game.h"
 #include "player.h"
-#include "actor.h"
-#include "container.h"
-#include "condition.h"
 #include "combat.h"
 #include "configmanager.h"
-#include "party.h"
-
 #include "script_listener.h"
-
-#include <string>
-#include <sstream>
-#include <vector>
-#include <algorithm>
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"

@@ -18,19 +18,14 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_ITEMS_H__
 #define __OTSERV_ITEMS_H__
 
-
-#include "definitions.h"
+#include "classes.h"
 #include "const.h"
 #include "enums.h"
 #include "condition_attributes.h"
 #include "itemloader.h"
-#include "position.h"
-#include <map>
-
 
 enum ItemTypes_t {
 	ITEM_TYPE_NONE = 0,
@@ -88,9 +83,6 @@ struct Abilities{
 	bool preventItemLoss;
 	bool preventSkillLoss;
 };
-
-class Condition;
-class Weapon;
 
 class ItemType {
 private:

@@ -21,6 +21,7 @@
 
 #include "housetile.h"
 #include "house.h"
+#include "player.h"
 #include "game.h"
 
 extern Game g_game;

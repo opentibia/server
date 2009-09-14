@@ -4,12 +4,8 @@
 
 #define __OTSERV_OTCP_H__
 
-//#undef __USE_OTPCH__
-
 // Definitions should be global.
 #include "definitions.h"
-
-#ifdef __USE_OTPCH__
 
 #ifdef __WINDOWS__
 #include <winerror.h>
@@ -35,6 +31,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <iostream>
+#include <fstream>
 //lua
 extern "C"
 {
@@ -43,7 +41,5 @@ extern "C"
 	#include <lualib.h>
 }
 //otserv
+#include "position.h"
 #include "thing.h"
-
-#endif
-

@@ -18,15 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_OTTHREAD_H__
 #define __OTSERV_OTTHREAD_H__
 
 #include "logger.h"
-
-#include <list>
-#include <vector>
-#include <algorithm>
 
 typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
 

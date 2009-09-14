@@ -18,12 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_STATUS_H
-#define __OTSERV_STATUS_H
-
-#include <string>
-#include "definitions.h"
-#include "networkmessage.h"
+#ifndef __OTSERV_STATUS_H__
+#define __OTSERV_STATUS_H__
 
 #include "protocol.h"
 

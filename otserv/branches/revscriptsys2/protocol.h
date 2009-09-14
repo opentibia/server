@@ -21,16 +21,10 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
-#include <stdio.h>
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
+#include "classes.h"
 
-class NetworkMessage;
-class OutputMessage;
-class Connection;
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;
-class RSA;
 
 #define CLIENT_VERSION_MIN 850
 #define CLIENT_VERSION_MAX 850

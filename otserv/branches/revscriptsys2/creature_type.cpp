@@ -19,11 +19,10 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "tools.h"
 #include "creature_type.h"
-#include "actor.h"
-#include "configmanager.h"
 #include "container.h"
+#include "tools.h"
+#include "configmanager.h"
 
 extern ConfigManager g_config;
 

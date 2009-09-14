@@ -17,32 +17,15 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+
 #ifndef __OTSERV_GAME_H__
 #define __OTSERV_GAME_H__
 
-#include <queue>
-#include <vector>
-#include <set>
-
+#include "classes.h"
 #include "map.h"
-#include "enums.h"
-#include "position.h"
 #include "templates.h"
 #include "enums.h"
-#include "scheduler.h"
-#include "outfit.h"
-
-namespace Script {
-	class Manager;
-	class Environment;
-}
-class ServiceManager;
-class Player;
-class Creature;
-class Actor;
-class CombatInfo;
-class Commands;
-class ChatChannel;
+#include "const.h"
 
 enum stackPosType_t{
 	STACKPOS_NORMAL,
@@ -96,6 +79,11 @@ private:
 
 typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 typedef std::vector<Player*> PlayerVector;
+
+namespace Script {
+	class Manager;
+	class Environment;
+}
 
 #define EVENT_LIGHTINTERVAL  10000
 #define EVENT_DECAYINTERVAL  1000

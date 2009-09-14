@@ -19,17 +19,12 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <algorithm>
-#include <functional>
-#include <iostream>
-
-#include "definitions.h"
-
 #include "account.h"
 
 Account::Account()
 {
-	number = warnings = 0;
+	number = 0;
+	warnings = 0;
 	premEnd = 0;
 }
 

@@ -22,18 +22,7 @@
 #define __OTSERV_CONDITION_H__
 
 #include "condition_attributes.h"
-
-#include "fileloader.h"
-#include "enums.h"
 #include "outfit.h"
-
-#include <vector>
-#include <list>
-#include <vector>
-
-class Creature;
-class Player;
-class PropStream;
 
 struct LightInfo{
 	uint32_t level;

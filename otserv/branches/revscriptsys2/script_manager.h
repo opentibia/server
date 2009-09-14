@@ -19,10 +19,9 @@
 #ifndef __OTSERV_SCRIPT_MANAGER__
 #define __OTSERV_SCRIPT_MANAGER__
 
+#include "lua_manager.h"
 #include "boost_common.h"
 #include <boost/any.hpp>
-#include "lua_manager.h"
-
 #include <set>
 
 namespace Script {

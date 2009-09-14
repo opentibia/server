@@ -26,8 +26,6 @@
 #include "depot.h"
 #include "town.h"
 
-#include <sstream>
-
 extern Game g_game;
 
 Mailbox::Mailbox(uint16_t _type) : Item(_type)

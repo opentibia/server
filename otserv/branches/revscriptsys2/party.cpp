@@ -23,10 +23,7 @@
 #include "player.h"
 #include "game.h"
 #include "chat.h"
-#include "tools.h"
 #include "configmanager.h"
-
-#include <sstream>
 
 extern Game g_game;
 extern Chat g_chat;

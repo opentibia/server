@@ -18,13 +18,12 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_MONSTERS_H__
-#define __OTSERV_MONSTERS_H__
+#ifndef __OTSERV_CREATURE_TYPE_H__
+#define __OTSERV_CREATURE_TYPE_H__
 
-#include <string>
-#include "creature.h"
-
-#include <libxml/parser.h>
+#include "classes.h"
+#include "outfit.h"
+#include "condition_attributes.h"
 
 #define MAX_LOOTCHANCE 100000
 #define MAX_STATICWALK 100
@@ -83,9 +82,6 @@ typedef std::list<spellBlock_t> SpellList;
 typedef std::vector<voiceBlock_t> VoiceVector;
 //typedef std::list<std::string> MonsterScriptList;
 typedef std::map<CombatType, int32_t> ElementMap;
-
-
-class InternalCreatureType;
 
 class CreatureType{
 	CreatureType& operator=(const CreatureType& ct);

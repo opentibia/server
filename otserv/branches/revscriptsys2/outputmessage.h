@@ -18,20 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_OUTPUT_MESSAGE_H__
-#define __OTSERV_OUTPUT_MESSAGE_H__
+#ifndef __OTSERV_OUTPUTMESSAGE_H__
+#define __OTSERV_OUTPUTMESSAGE_H__
 
+#include "classes.h"
 #include "networkmessage.h"
 #include "connection.h"
-#include <boost/thread.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/bind.hpp>
 #include "tools.h"
-#include <list>
-
-#include <boost/utility.hpp>
-
-class Protocol;
 
 #define OUTPUT_POOL_SIZE 100
 

@@ -23,8 +23,6 @@
 
 #include "enums.h"
 #include "const.h"
-#include <string>
-#include <map>
 
 class Vocation
 {

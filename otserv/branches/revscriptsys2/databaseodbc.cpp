@@ -32,8 +32,6 @@
 
 #ifdef __USE_ODBC__
 
-#include <iostream>
-
 #include "database.h"
 #include "databaseodbc.h"
 

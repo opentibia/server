@@ -19,23 +19,24 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
-#include <string>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <fstream>
-
 #include "otsystem.h"
+#include "tasks.h"
+#include "scheduler.h"
 #include "server.h"
+#include "database.h"
 #include "ioplayer.h"
-#include <boost/thread.hpp>
-#include <boost/asio.hpp>
-
-#include <stdlib.h>
-#include <time.h>
 #include "game.h"
+#include "vocation.h"
+#include "creature_manager.h"
+#include "protocolgame.h"
+#include "protocolold.h"
+#include "protocollogin.h"
+#include "status.h"
+#include "admin.h"
+#include "tools.h"
+#include "ban.h"
+#include "rsa.h"
+#include "configmanager.h"
 
 
 #if !defined(__WINDOWS__)
@@ -47,23 +48,6 @@
 #else
 	#define OTSERV_ACCESS(file,mode) _access(file,mode)
 #endif
-
-
-#include "actor.h"
-#include "outfit.h"
-#include "vocation.h"
-#include "configmanager.h"
-#include "creature_manager.h"
-
-#include "tools.h"
-#include "ban.h"
-#include "rsa.h"
-
-#include "protocolgame.h"
-#include "protocolold.h"
-#include "protocollogin.h"
-#include "status.h"
-#include "admin.h"
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"

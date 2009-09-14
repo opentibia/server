@@ -15,22 +15,22 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
 
 #include "lua_manager.h"
 #include "script_manager.h"
-
 #include "script_event.h"
 #include "script_listener.h"
-
 #include "configmanager.h"
+#include "housetile.h"
+#include "player.h"
 #include "game.h"
 #include "actor.h"
 #include "town.h"
 #include "chat.h"
 #include "house.h"
 #include "spawn.h"
+#include "vocation.h"
 
 extern ConfigManager g_config;
 extern Game g_game;

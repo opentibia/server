@@ -20,9 +20,6 @@
 #include "otpch.h"
 
 #include "depot.h"
-#include "tools.h"
-
-#include <sstream>
 
 Depot::Depot(uint16_t _type) :
 Container(_type)

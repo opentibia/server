@@ -76,12 +76,8 @@
 //		message(string)
 //
 
-#include "player.h"
-#include "logger.h"
-#include <string>
-
-class NetworkMessage;
-class RSA;
+#include "classes.h"
+#include "protocol.h"
 
 enum{
 	//

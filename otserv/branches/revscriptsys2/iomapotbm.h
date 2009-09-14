@@ -22,7 +22,6 @@
 #define __OTSERV_IOMAPOTBM_H__
 
 #include "iomap.h"
-#include "item.h"
 
 enum OTBM_AttrTypes_t{
 	OTBM_ATTR_DESCRIPTION = 1,

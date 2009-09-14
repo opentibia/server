@@ -20,30 +20,19 @@
 #include "otpch.h"
 
 #include "protocolgame.h"
-#include "networkmessage.h"
-#include "outputmessage.h"
-#include "items.h"
+#include "scheduler.h"
+#include "tasks.h"
+#include "game.h"
 #include "tile.h"
 #include "player.h"
 #include "chat.h"
-#include "configmanager.h"
-#include "game.h"
+#include "outputmessage.h"
+#include "ioaccount.h"
 #include "ioplayer.h"
-#include "house.h"
+#include "container.h"
 #include "waitlist.h"
 #include "ban.h"
-#include "ioaccount.h"
-#include "connection.h"
-#include "definitions.h"
-
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <time.h>
-#include <list>
-#include <fstream>
-
-#include <boost/function.hpp>
+#include "configmanager.h"
 
 extern Game g_game;
 extern ConfigManager g_config;

@@ -21,31 +21,12 @@
 #ifndef __OTSERV_MAP_H__
 #define __OTSERV_MAP_H__
 
-#include <queue>
-#include <bitset>
-#include <map>
-
-#include "boost_common.h"
-
-#include "position.h"
-#include "item.h"
-#include "iomapserialize.h"
-#include "fileloader.h"
-
-#include "tools.h"
+#include "classes.h"
 #include "tile.h"
 #include "waypoints.h"
-
-class Creature;
-class Player;
-class Game;
-struct FindPathParams;
+#include <bitset>
 
 #define MAP_MAX_LAYERS 16
-
-class Tile;
-class Map;
-class IOMap;
 
 struct AStarNode{
 	int32_t x, y;
@@ -102,7 +83,6 @@ struct Floor{
 };
 
 class FrozenPathingConditionCall;
-class QTreeLeafNode;
 
 class QTreeNode{
 public:

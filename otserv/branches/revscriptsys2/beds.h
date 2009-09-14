@@ -18,19 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTS_BEDS_H__
-#define __OTS_BEDS_H__
+#ifndef __OTSERV_BEDS_H__
+#define __OTSERV_BEDS_H__
 
+#include "classes.h"
 #include "item.h"
-#include "position.h"
-#include "definitions.h"
-
-#include <ctime>
-#include <list>
-
-class House;
-class Player;
-
 
 class BedItem : public Item
 {

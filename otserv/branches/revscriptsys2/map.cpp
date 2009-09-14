@@ -19,30 +19,11 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
-#include <string>
-#include <sstream>
-#include <map>
-#include <algorithm>
-
-#include <boost/config.hpp>
-#include <boost/bind.hpp>
-
-#include "iomap.h"
-#include "iomapotbm.h"
-#include "iomapserialize.h"
-
-#include <stdio.h>
-#include <iomanip>
-
-#include "items.h"
 #include "map.h"
-#include "tile.h"
-#include "combat.h"
+#include "iomapserialize.h"
+#include "iomapotbm.h"
 #include "creature.h"
-
-#include "player.h"
+#include "combat.h"
 #include "configmanager.h"
 
 extern ConfigManager g_config;

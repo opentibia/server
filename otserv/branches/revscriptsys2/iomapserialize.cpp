@@ -19,13 +19,15 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "iomapserialize.h"
+#include "otsystem.h"
+#include "player.h"
 #include "ioplayer.h"
-
-#include "house.h"
 #include "configmanager.h"
 #include "game.h"
+#include "house.h"
+#include "depot.h"
+#include "housetile.h"
 
 extern ConfigManager g_config;
 extern Game g_game;

@@ -21,24 +21,13 @@
 #ifndef __OTSERV_CONNECTION_H__
 #define __OTSERV_CONNECTION_H__
 
-#include "definitions.h"
-#include <boost/asio.hpp>
-
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
+#include "classes.h"
+#include "networkmessage.h"
 #include <boost/enable_shared_from_this.hpp>
 
-#include "networkmessage.h"
-
-class Protocol;
-class OutputMessage;
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
-class Connection;
 typedef boost::shared_ptr<Connection> Connection_ptr;
-class ServiceBase;
 typedef boost::shared_ptr<ServiceBase> Service_ptr;
-class ServicePort;
 typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
 
 #ifdef __DEBUG_NET__

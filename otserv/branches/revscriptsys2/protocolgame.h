@@ -18,25 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_PROTOCOLGAME_H__
 #define __OTSERV_PROTOCOLGAME_H__
 
-#include <string>
-#include <list>
-#include <map>
-#include <vector>
+#include "classes.h"
 #include "protocol.h"
 #include "enums.h"
 #include "const.h"
-#include "position.h"
-
-class Item;
-class Creature;
-class Player;
-
-struct OutfitType;
-struct LightInfo;
 
 struct ShopInfo{
 	uint32_t itemId;
@@ -67,15 +55,7 @@ enum connectResult_t{
 	CONNECT_INTERNALERROR = 4
 };
 
-class NetworkMessage;
 typedef boost::shared_ptr<NetworkMessage> NetworkMessage_ptr;
-class Player;
-class Game;
-class House;
-class Container;
-class Tile;
-class Connection;
-class Quest;
 
 class ProtocolGame : public Protocol
 {

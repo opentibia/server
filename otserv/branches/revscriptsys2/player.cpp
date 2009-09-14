@@ -19,17 +19,10 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <algorithm>
-
-#include <stdlib.h>
-
-#include "enums.h"
 #include "player.h"
+//#include "tasks.h"
+#include "scheduler.h"
+#include "enums.h"
 #include "ioplayer.h"
 #include "game.h"
 #include "configmanager.h"
@@ -39,6 +32,7 @@
 #include "combat.h"
 #include "status.h"
 #include "beds.h"
+#include "depot.h"
 #include "party.h"
 #include "weapons.h"
 
@@ -752,8 +746,8 @@ void Player::addSkillAdvance(SkillType skill, uint32_t count, bool useMultiplier
 	skills[skill.value()][SKILL_TRIES] += count * g_config.getNumber(ConfigManager::RATE_SKILL);
 
 #if __DEBUG__
-	std::cout << getName() << ", has the vocation: " << (int)getVocationId() << " and is training his " << skill << ". Tries: " << skills[skill][SKILL_TRIES] << "(" << vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1) << ")" << std::endl;
-	std::cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
+	std::cout << getName() << ", has the vocation: " << (int)getVocationId() << " and is training his " << skill << ". Tries: " << skills[skill.value()][SKILL_TRIES] << "(" << vocation->getReqSkillTries(skill, skills[skill.value()][SKILL_LEVEL] + 1) << ")" << std::endl;
+	std::cout << "Current skill: " << skills[skill.value()][SKILL_LEVEL] << std::endl;
 #endif
 
 	//Need skill up?
@@ -761,7 +755,7 @@ void Player::addSkillAdvance(SkillType skill, uint32_t count, bool useMultiplier
 		int oldlevel = skills[skill.value()][SKILL_LEVEL]++;
 		skills[skill.value()][SKILL_TRIES] = 0;
 		skills[skill.value()][SKILL_PERCENT] = 0;
-		
+
 		g_game.onPlayerAdvance(this, LevelType(skill.value()), oldlevel, skills[skill.value()][SKILL_LEVEL]);
 
 		sendSkills();
@@ -790,7 +784,7 @@ void Player::setVarStats(PlayerStatType stat, int32_t modifier)
 			g_game.addCreatureHealth(this);
 		}
 	}
-	
+
 	else if(STAT_MAXMANAPOINTS)
 	{
 		if(getMana() > getMaxMana()){
@@ -804,16 +798,16 @@ int32_t Player::getDefaultStats(PlayerStatType stat)
 {
 	if(stat == STAT_MAXHITPOINTS)
 		return getMaxHealth() - getVarStats(STAT_MAXHITPOINTS);
-	
+
 	if(stat == STAT_MAXMANAPOINTS)
 		return getMaxMana() - getVarStats(STAT_MAXMANAPOINTS);
-	
+
 	if(stat == STAT_SOULPOINTS)
 		return getPlayerInfo(PLAYERINFO_SOUL) - getVarStats(STAT_SOULPOINTS);
-	
+
 	if(stat == STAT_MAGICPOINTS)
 		return getMagicLevel() - getVarStats(STAT_MAGICPOINTS);
-	
+
 	return 0;
 }
 
@@ -1621,7 +1615,7 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 		if(tradePartner){
 			g_game.internalCloseTrade(this);
 		}
-	
+
 		// REVSCRIPTSYS
 		// Close shop window when player logs out
 		//closeShopWindow();
@@ -2201,16 +2195,16 @@ bool Player::hasShield() const
 
 	return result;
 }
-BlockType Player::blockHit(Creature* attacker, CombatType combatType, int32_t& damage, 
-							 bool checkDefense /* = false*/, bool checkArmor /* = false*/) 
-{ 
-	BlockType blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor); 
+BlockType Player::blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
+							 bool checkDefense /* = false*/, bool checkArmor /* = false*/)
+{
+	BlockType blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
-	if(attacker) 
-		sendCreatureSquare(attacker, SQ_COLOR_BLACK); 
+	if(attacker)
+		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
 
-	if(blockType != BLOCK_NONE) 
-		return blockType; 
+	if(blockType != BLOCK_NONE)
+		return blockType;
 
 	if(damage != 0){
 		//reduce damage against inventory items
@@ -2233,8 +2227,8 @@ BlockType Player::blockHit(Creature* attacker, CombatType combatType, int32_t& d
 			damage = 0;
 			blockType = BLOCK_DEFENSE;
 		}
-	} 
-	return blockType; 
+	}
+	return blockType;
 }
 
 uint32_t Player::getIP() const
@@ -3321,9 +3315,9 @@ void Player::postRemoveNotification(Creature* actor, Thing* thing, const Cylinde
 				autoCloseContainers(container);
 			}
 		}
-		
+
 		// REVSCRIPTSYS TODO
-		// 
+		//
 		/*
 		if(shopOwner && requireListUpdate){
 			updateSaleShopList(item->getID());

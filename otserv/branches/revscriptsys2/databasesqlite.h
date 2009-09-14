@@ -20,16 +20,14 @@
 
 #ifdef __USE_SQLITE__
 
-#ifndef __DATABASE_SQLITE_H__
-#define __DATABASE_SQLITE_H__
+#ifndef __OTSERV_DATABASESQLITE_H__
+#define __OTSERV_DATABASESQLITE_H__
 
 #ifndef __OTSERV_DATABASE_H__
 #error "database.h should be included first."
 #endif
 
 #include <sqlite3.h>
-#include <sstream>
-#include <map>
 
 class DatabaseSQLite : public _Database
 {

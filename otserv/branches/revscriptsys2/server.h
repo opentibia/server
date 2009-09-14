@@ -21,23 +21,15 @@
 #ifndef __OTSERV_SERVER_H__
 #define __OTSERV_SERVER_H__
 
-#include "definitions.h"
-#include <iostream>
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
+#include "classes.h"
 #include <boost/utility.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-class Connection;
-typedef boost::shared_ptr<Connection> Connection_ptr;
-class Protocol;
-class NetworkMessage;
-
 class ServiceBase;
 class ServicePort;
-
 typedef boost::shared_ptr<ServiceBase> Service_ptr;
 typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
+typedef boost::shared_ptr<Connection> Connection_ptr;
 
 // The Service class is very thin, it's only real job is to create dynamic
 // dispatch of the protocol attributes, which would otherwise be very hard,

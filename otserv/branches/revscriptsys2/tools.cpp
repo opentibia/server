@@ -17,19 +17,13 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
 
 #include "tools.h"
-#include "configmanager.h"
 #include "md5.h"
 #include "sha1.h"
-
-#include "math.h"
-#include <sstream>
-#include <iostream>
+#include "configmanager.h"
 #include <iomanip>
-#include <algorithm>
 
 extern ConfigManager g_config;
 

@@ -20,10 +20,8 @@
 
 #ifndef __OTSERV_BAN_H__
 #define __OTSERV_BAN_H__
-#include "enums.h"
 
-#include <boost/thread.hpp>
-#include <list>
+#include "enums.h"
 
 enum BanType_t {
 	BAN_IPADDRESS = 1,

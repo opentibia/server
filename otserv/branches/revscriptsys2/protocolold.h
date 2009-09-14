@@ -18,13 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_PROTOCOL_OLD_H__
-#define __OTSERV_PROTOCOL_OLD_H__
+#ifndef __OTSERV_PROTOCOLOLD_H__
+#define __OTSERV_PROTOCOLOLD_H__
 
+#include "classes.h"
 #include "protocol.h"
-
-class NetworkMessage;
-class OutputMessage;
 
 class ProtocolOld : public Protocol
 {

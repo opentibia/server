@@ -20,16 +20,10 @@
 #include "otpch.h"
 
 #include "weapons.h"
-#include "definitions.h"
-#include "combat.h"
-#include "tools.h"
-#include "configmanager.h"
+#include "game.h"
+#include "player.h"
 #include "vocation.h"
-
-#include <sstream>
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+#include "configmanager.h"
 
 extern Game g_game;
 extern Vocations g_vocations;

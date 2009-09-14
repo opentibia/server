@@ -19,9 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <iostream>
-#include <sstream>
-
 #include "waitlist.h"
 #include "status.h"
 #include "player.h"

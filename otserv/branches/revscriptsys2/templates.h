@@ -18,13 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __TEMPLATES_H__
-#define __TEMPLATES_H__
+#ifndef __OTSERV_TEMPLATES_H__
+#define __OTSERV_TEMPLATES_H__
 
 #include <set>
-#include <map>
-
-#include <boost/thread.hpp>
 
 template<class T> class AutoList
 {

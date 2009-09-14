@@ -19,23 +19,16 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "item.h"
-#include "tools.h"
-
-// Item subtypes
+#include "creature.h"
+#include "weapons.h"
+#include "house.h"
 #include "beds.h"
 #include "container.h"
 #include "depot.h"
 #include "mailbox.h"
 #include "teleport.h"
 #include "trashholder.h"
-#include "house.h" // Door item
-#include "combat.h" // Magic Field item
-#include "weapons.h"
-
-#include <iostream>
-#include <sstream>
 #include <iomanip>
 
 Items Item::items;

@@ -16,19 +16,12 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_SCRIPT_ENVIROMENT__
-#define __OTSERV_SCRIPT_ENVIROMENT__
+#ifndef __OTSERV_SCRIPT_ENVIRONMENT__
+#define __OTSERV_SCRIPT_ENVIRONMENT__
 
+#include "classes.h"
 #include <boost/bimap.hpp>
-#include <string>
-#include <vector>
-#include <map>
-#include "boost_common.h"
 #include "enums.h"
-
-class Combat;
-class Creature;
-class Thing;
 
 namespace Script {
 	class Listener;
@@ -117,7 +110,7 @@ namespace Script {
 		if(thing_iter == object_map.right.end()) {
 			ObjectID id = getFreeID();
 			object_map.left.insert(std::make_pair(id, obj));
-#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+#ifdef __DEBUG_SCRIPT_ENVIRONMENT_OBJECTMAP__
 			std::cout << "Added object " << obj << " with id " << id << std::endl;
 			debugOutput();
 #endif
@@ -131,7 +124,7 @@ namespace Script {
 		if(thing_iter == object_map.right.end()) {
 			ObjectID id = getFreeID();
 			object_map.left.insert(std::make_pair(id, reinterpret_cast<void*>(thing)));
-#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+#ifdef __DEBUG_SCRIPT_ENVIRONMENT_OBJECTMAP__
 			std::cout << "Added thing " << thing << " with id " << id << std::endl;
 			debugOutput();
 #endif
@@ -153,7 +146,7 @@ namespace Script {
 
 		// Add the new one back in
 		object_map.left.insert(std::make_pair(id, reinterpret_cast<void*>(newthing)));
-#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+#ifdef __DEBUG_SCRIPT_ENVIRONMENT_OBJECTMAP__
 		std::cout << "Reassigned thing " << oldthing << " with new ref " << newthing << " using id " << id << std::endl;
 		debugOutput();
 #endif
@@ -182,7 +175,7 @@ namespace Script {
 			return false;
 		}
 		object_map.left.erase(id_iter);
-#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+#ifdef __DEBUG_SCRIPT_ENVIRONMENT_OBJECTMAP__
 		std::cout << "Removed object with ID " << id << std::endl;
 		debugOutput();
 #endif
@@ -195,7 +188,7 @@ namespace Script {
 			return false;
 		}
 		object_map.right.erase(obj_iter);
-#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+#ifdef __DEBUG_SCRIPT_ENVIRONMENT_OBJECTMAP__
 		std::cout << "Removed Object " << obj << std::endl;
 		debugOutput();
 #endif
@@ -208,7 +201,7 @@ namespace Script {
 			return false;
 		}
 		object_map.right.erase(thing_iter);
-#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+#ifdef __DEBUG_SCRIPT_ENVIRONMENT_OBJECTMAP__
 		std::cout << "Removed Thing " << thing << std::endl;
 		debugOutput();
 #endif
@@ -216,7 +209,7 @@ namespace Script {
 	}
 
 	inline void Environment::debugOutput() const {
-#ifdef __DEBUG_SCRIPT_ENVIROMENT_OBJECTMAP__
+#ifdef __DEBUG_SCRIPT_ENVIRONMENT_OBJECTMAP__
 		ObjectMap::left_const_iterator debug_iter = object_map.left.begin();
 		std::cout << "Object map, counter is at " << objectID_counter << " :" << std::endl;
 		while(debug_iter != object_map.left.end()) {

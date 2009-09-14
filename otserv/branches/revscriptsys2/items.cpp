@@ -20,16 +20,8 @@
 #include "otpch.h"
 
 #include "items.h"
-#include "item.h"
 #include "condition.h"
-#include "tools.h"
 #include "weapons.h"
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
-#include <iostream>
-#include <string>
 
 uint32_t Items::dwMajorVersion = 0;
 uint32_t Items::dwMinorVersion = 0;

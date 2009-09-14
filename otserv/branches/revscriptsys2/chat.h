@@ -21,15 +21,8 @@
 #ifndef __OTSERV_CHAT_H__
 #define __OTSERV_CHAT_H__
 
-#include <map>
-#include <list>
-#include <string>
-
+#include "classes.h"
 #include "const.h"
-#include "definitions.h"
-
-class Player;
-class Party;
 
 typedef std::map<uint32_t, Player*> UsersMap;
 

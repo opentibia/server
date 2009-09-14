@@ -18,11 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_RSA_H__
 #define __OTSERV_RSA_H__
-
-#include <boost/thread.hpp>
 
 #include "gmp.h"
 

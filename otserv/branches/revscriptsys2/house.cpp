@@ -19,18 +19,16 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <sstream>
-#include <algorithm>
-
 #include "house.h"
+#include "player.h"
 #include "ioplayer.h"
+#include "housetile.h"
 #include "game.h"
 #include "town.h"
 #include "configmanager.h"
 #include "tools.h"
-//[ added for beds system
+#include "depot.h"
 #include "beds.h"
-//]
 
 extern ConfigManager g_config;
 extern Game g_game;

@@ -18,14 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_ALLOCATOR_H
-#define __OTSERV_ALLOCATOR_H
+#ifndef __OTSERV_ALLOCATOR_H__
+#define __OTSERV_ALLOCATOR_H__
 
 #ifdef __OTSERV_ALLOCATOR__
 
 #include <memory>
 #include <cstdlib>
-#include <map>
 #include <fstream>
 #include <ctime>
 #include <boost/pool/pool.hpp>

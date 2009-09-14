@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __TRASHHOLDER_H__
-#define __TRASHHOLDER_H__
+#ifndef __OTSERV_TRASHHOLDER_H__
+#define __OTSERV_TRASHHOLDER_H__
 
 #include "item.h"
 #include "cylinder.h"

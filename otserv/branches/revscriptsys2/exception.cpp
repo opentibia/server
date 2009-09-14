@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Exception Handler class
+// Exception handler class
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,21 +17,16 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
 
 #if defined __EXCEPTION_TRACER__
 
-#include <iostream>
+#include "exception.h"
+#include "configmanager.h"
 #include <fstream>
 #include <iomanip>
 #include <ctime>
 #include <stdlib.h>
-#include <map>
-
-#include <boost/thread.hpp>
-#include "exception.h"
-#include "configmanager.h"
 
 extern ConfigManager g_config;
 

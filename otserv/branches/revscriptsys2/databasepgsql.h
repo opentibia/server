@@ -20,8 +20,8 @@
 
 #ifdef __USE_PGSQL__
 
-#ifndef __DATABASE_PGSQL_H__
-#define __DATABASE_PGSQL_H__
+#ifndef __OTSERV_DATABASEPGSQL_H__
+#define __OTSERV_DATABASEPGSQL_H__
 
 #ifndef __OTSERV_DATABASE_H__
 #error "database.h should be included first."

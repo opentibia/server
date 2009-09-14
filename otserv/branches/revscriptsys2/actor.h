@@ -18,15 +18,12 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_ACTOR_H__
 #define __OTSERV_ACTOR_H__
 
+#include "classes.h"
+#include "creature.h"
 #include "creature_type.h"
-
-class Creature;
-class Game;
-class Spawn;
 
 typedef std::list<Creature*> CreatureList;
 

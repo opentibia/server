@@ -18,11 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __WAITLIST_H__
-#define __WAITLIST_H__
+#ifndef __OTSERV_WAITLIST_H__
+#define __OTSERV_WAITLIST_H__
 
-#include "game.h"
-#include "networkmessage.h"
+#include "classes.h"
 
 struct Wait{
 	uint32_t acc;

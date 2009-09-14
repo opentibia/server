@@ -21,20 +21,9 @@
 #ifndef __OTSERV_COMBAT_H__
 #define __OTSERV_COMBAT_H__
 
-#include "thing.h"
-#include "condition.h"
+#include "classes.h"
 #include "map.h"
 #include "otsystem.h"
-#include "otsystem.h"
-
-#include <vector>
-
-class Condition;
-class Creature;
-class Position;
-class Item;
-class Combat;
-
 
 //for luascript callback
 class CombatDamageCalculationCallback {

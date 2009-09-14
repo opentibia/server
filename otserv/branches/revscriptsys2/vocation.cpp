@@ -19,13 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "vocation.h"
-#include <iostream>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <cmath>
-
 #include "tools.h"
 
 Vocations::Vocations()

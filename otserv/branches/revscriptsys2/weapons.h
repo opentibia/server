@@ -18,19 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_WEAPONS_H__
 #define __OTSERV_WEAPONS_H__
 
-#include "game.h"
-#include "player.h"
+#include "classes.h"
 #include "combat.h"
-#include "const.h"
-
-class Weapon;
-class WeaponMelee;
-class WeaponDistance;
-class WeaponWand;
 
 class Weapon
 {

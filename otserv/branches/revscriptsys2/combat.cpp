@@ -20,17 +20,11 @@
 #include "otpch.h"
 
 #include "combat.h"
-
+#include "player.h"
+#include "condition.h"
 #include "configmanager.h"
 #include "game.h"
-#include "creature.h"
-#include "player.h"
-#include "const.h"
-#include "tools.h"
 #include "weapons.h"
-#include "party.h"
-
-#include <sstream>
 
 extern Game g_game;
 extern ConfigManager g_config;

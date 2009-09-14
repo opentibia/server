@@ -21,14 +21,10 @@
 #ifndef __OTSERV_SCHEDULER_H__
 #define __OTSERV_SCHEDULER_H__
 
-#include <boost/bind.hpp>
-#include <vector>
-#include <queue>
-#include <set>
-
 #include "tasks.h"
 #include "otsystem.h"
-#include "otsystem.h"
+#include <queue>
+#include <set>
 
 #define SCHEDULER_MINTICKS 20
 

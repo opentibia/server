@@ -21,9 +21,7 @@
 #ifndef __OTSERV_FILELOADER_H__
 #define __OTSERV_FILELOADER_H__
 
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
+#include "classes.h"
 
 struct NodeStruct;
 
@@ -93,8 +91,6 @@ enum FILELOADER_ERRORS{
 	ERROR_COULDNOTWRITE,
 	ERROR_CACHE_ERROR
 };
-
-class PropStream;
 
 class FileLoader{
 public:

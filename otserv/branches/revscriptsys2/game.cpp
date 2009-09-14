@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// class representing the gamestate
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,40 +19,29 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
-#include <string>
-#include <sstream>
-#include <map>
-#include <fstream>
-
-#include <boost/config.hpp>
-#include <boost/bind.hpp>
-
-#include "otsystem.h"
+#include "game.h"
+#include "scheduler.h"
 #include "tasks.h"
-#include "items.h"
-#include "creature.h"
 #include "player.h"
 #include "actor.h"
-#include "game.h"
 #include "tile.h"
-#include "house.h"
 #include "combat.h"
 #include "ioplayer.h"
+#include "account.h"
 #include "ioaccount.h"
 #include "chat.h"
-#include "configmanager.h"
 #include "server.h"
 #include "party.h"
 #include "ban.h"
 #include "spawn.h"
 #include "beds.h"
+#include "house.h"
+#include "depot.h"
 #include "creature_manager.h"
-
 #include "script_environment.h"
 #include "script_manager.h"
 #include "script_event.h"
+#include "configmanager.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"

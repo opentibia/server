@@ -19,21 +19,14 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "ioaccount.h"
-
-#include <algorithm>
-#include <functional>
-#include <sstream>
-
 #include "database.h"
-#include <iostream>
-
 #include "configmanager.h"
+#include "account.h"
 
 extern ConfigManager g_config;
 
-Account IOAccount::loadAccount(const std::string& name, bool preLoad/* = false*/)
+Account IOAccount::loadAccount(const std::string& name, bool preLoad /* = false*/)
 {
 	Account acc;
 

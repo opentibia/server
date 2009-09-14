@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Base class for the Account Loader/Saver
+// Base class for the account loader/saver
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,17 +19,13 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "ioplayer.h"
-#include "ioaccount.h"
-#include "item.h"
+#include "fileloader.h"
+#include "player.h"
+#include "account.h"
+#include "depot.h"
 #include "town.h"
 #include "configmanager.h"
-#include "tools.h"
-#include "definitions.h"
-
-#include <iostream>
-#include <iomanip>
 
 extern ConfigManager g_config;
 

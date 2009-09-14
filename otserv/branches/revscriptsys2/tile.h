@@ -2,7 +2,6 @@
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
 // a Tile represents a single field on the map.
-// it is a list of Items
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,21 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_TILE_H__
 #define __OTSERV_TILE_H__
 
+#include "classes.h"
 #include "cylinder.h"
 #include "item.h"
 #include <boost/shared_ptr.hpp>
-
-class Creature;
-class Teleport;
-class TrashHolder;
-class Mailbox;
-class MagicField;
-class QTreeLeafNode;
-class BedItem;
 
 typedef std::vector<Creature*> CreatureVector;
 typedef std::list<Creature*> SpectatorVec;
@@ -71,8 +62,6 @@ enum tileflags_t{
 	TILESTATE_NOFIELDBLOCKPATH			= 1 << 23,
 	TILESTATE_DYNAMIC_TILE				= 1 << 24
 };
-
-class HouseTile;
 
 class TileItemVector
 {
@@ -129,7 +118,7 @@ class Tile : public Cylinder
 public:
 	static Tile& null_tile;
 	Tile(uint16_t x, uint16_t y, uint16_t z);
-	~Tile();
+	virtual ~Tile();
 
 	TileItemVector* getItemList();
 	const TileItemVector* getItemList() const;

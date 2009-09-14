@@ -18,15 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_POS_H
-#define __OTSERV_POS_H
-
-#include "definitions.h"
-#include <stdlib.h>
-#include <cstdlib>
-#include <cmath>
-#include <iostream>
-
+#ifndef __OTSERV_POSITION_H__
+#define __OTSERV_POSITION_H__
 
 enum Direction {
 	NORTH = 0,

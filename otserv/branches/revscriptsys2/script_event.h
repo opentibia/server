@@ -19,29 +19,18 @@
 #ifndef __OTSERV_SCRIPT_EVENT__
 #define __OTSERV_SCRIPT_EVENT__
 
-#include <string>
+#include "classes.h"
+#include "script_environment.h"
+#include "script_listener.h"
+#include "chat.h"
+#include "const.h"
 #include "boost/any.hpp"
 #include "boost_common.h"
 
-#include "script_environment.h"
-#include "script_listener.h"
-
-#include "const.h"
-#include "thing.h"
-#include "creature.h"
-
 // Forward declarations
-class Creature;
-class PositionEx;
-
 class LuaState;
 class LuaThread;
 typedef boost::shared_ptr<LuaThread> LuaThread_ptr;
-
-namespace Script {
-	class Manager;
-	class Environment;
-}
 
 // These are actually defined in the .cpp file, so you CAN ONLY USE THEM IN script_event.cpp
 template<class T, class ScriptInformation>

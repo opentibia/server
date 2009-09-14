@@ -19,19 +19,16 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <vector>
-#include <string>
-#include <sstream>
-#include <algorithm>
-
 #include "actor.h"
-#include "creature_manager.h"
+#include "tasks.h"
 #include "player.h"
 #include "game.h"
 #include "combat.h"
 #include "spawn.h"
+#include "container.h"
 #include "configmanager.h"
 #include "party.h"
+#include "creature_manager.h"
 
 extern Game g_game;
 extern ConfigManager g_config;
@@ -964,7 +961,6 @@ bool Actor::pushItem(Item* item, int32_t radius)
 
 void Actor::pushItems(Tile* tile)
 {
-	uint32_t moveCount = 0;
 	uint32_t removeCount = 0;
 
 	//We can not use iterators here since we can push the item to another tile

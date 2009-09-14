@@ -18,10 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __THING_H__
-#define __THING_H__
+#ifndef __OTSERV_THING_H__
+#define __OTSERV_THING_H__
 
-
+#include "classes.h"
 #include "position.h"
 
 /*Notice: remember to add new error codes to global.lua*/
@@ -92,11 +92,6 @@ enum ReturnValue{
 	RET_NOTREQUIREDLEVEL = 64,
 	RET_NEEDPREMIUMTOEQUIPITEM = 65
 };
-
-class Tile;
-class Cylinder;
-class Item;
-class Creature;
 
 class Thing {
 protected:

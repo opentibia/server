@@ -19,12 +19,6 @@
 #ifndef __OTSERV_SCRIPT_EVENT_LISTENER_H__
 #define __OTSERV_SCRIPT_EVENT_LISTENER_H__
 
-#include "boost_common.h"
-#include <boost/any.hpp>
-
-#include <vector>
-#include <string>
-
 #include "enums.h"
 
 namespace Script {
