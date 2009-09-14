@@ -57,7 +57,6 @@ extern Npcs g_npcs;
 extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
 extern CreatureEvents* g_creatureEvents;
-extern Game g_game;
 
 TalkActions::TalkActions() :
 m_scriptInterface("TalkAction Interface")
