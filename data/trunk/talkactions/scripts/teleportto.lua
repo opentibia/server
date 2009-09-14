@@ -20,7 +20,7 @@ function onSay(cid, words, param)
 		creatureAccess = getPlayerAccess(creature)
 	end
 
-	if creatureAccess < access then
+	if creatureAccess < getPlayerAccess(cid) then
 		local oldPlayerPos = getPlayerPosition(cid)
 		if(doTeleportThing(cid, destPos) ~= LUA_ERROR) then
 			if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
