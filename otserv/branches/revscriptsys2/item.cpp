@@ -180,38 +180,27 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 }
 
 Item::Item(const Item &i) :
-	Thing(), ItemAttributes()
+	Thing(), ItemAttributes(i)
 {
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
-
-	m_attributes = i.m_attributes;
-	if(i.m_firstAttr){
-		m_firstAttr = new Attribute(*i.m_firstAttr);
-	}
 }
 
 Item* Item::clone() const
 {
 	Item* _item = Item::CreateItem(id, count);
-	_item->m_attributes = m_attributes;
-	if(m_firstAttr){
-		_item->m_firstAttr = new Attribute(*m_firstAttr);
-	}
+	_item->attributes = attributes;
 
 	return _item;
 }
 
 void Item::copyAttributes(Item* item)
 {
-	m_attributes = item->m_attributes;
-	if(item->m_firstAttr){
-		m_firstAttr = new Attribute(*item->m_firstAttr);
-	}
+	*(ItemAttribute*)(this) = *(ItemAttribute*)(item);
 
-	removeAttribute(ATTR_ITEM_DECAYING);
-	removeAttribute(ATTR_ITEM_DURATION);
+	eraseAttribute("decaying");
+	eraseAttribute("duration");
 }
 
 Item::~Item()
@@ -241,15 +230,13 @@ void Item::setID(uint16_t newid)
 	uint32_t newDuration = it.decayTime * 1000;
 
 	if(newDuration == 0 && !it.stopTime && it.decayTo == -1){
-		removeAttribute(ATTR_ITEM_DECAYING);
-		removeAttribute(ATTR_ITEM_DURATION);
+		eraseAttribute("decaying");
+		eraseAttribute("duration");
 	}
 
-	if(hasAttribute(ATTR_ITEM_CORPSEOWNER)){
-		removeAttribute(ATTR_ITEM_CORPSEOWNER);
-	}
+	eraseAttribute("corpseowner");
 
-	if(newDuration > 0 && (!prevIt.stopTime || !hasAttribute(ATTR_ITEM_DURATION)) ){
+	if(newDuration > 0 && (!prevIt.stopTime || getIntegerAttribute("duration") == NULL) ){
 		setDecaying(DECAYING_FALSE);
 		setDuration(newDuration);
 	}
@@ -517,15 +504,21 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 
 bool Item::unserializeAttr(PropStream& propStream)
 {
+	// Backwards-compatible reading of attributes
 	uint8_t attr_type;
 	while(propStream.GET_UCHAR(attr_type) && attr_type != 0){
-		Attr_ReadValue ret = readAttr((AttrTypes_t)attr_type, propStream);
-		if(ret == ATTR_READ_ERROR){
-			return false;
-			break;
+		if(attr_type == ATTR_ATTRIBUTE_MAP){
+			if(!ItemAttributes::unserializeAttributeMap(propStream))
+				return false;
 		}
-		else if(ret == ATTR_READ_END){
-			return true;
+		else{
+			Attr_ReadValue ret = readAttr((AttrTypes_t)attr_type, propStream);
+			if(ret == ATTR_READ_ERROR){
+				return false;
+			}
+			else if(ret == ATTR_READ_END){
+				return true;
+			}
 		}
 	}
 
@@ -545,54 +538,9 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream) const
 		propWriteStream.ADD_UCHAR(_count);
 	}
 
-	if(hasCharges()){
-		uint16_t _count = getCharges();
-		propWriteStream.ADD_UCHAR(ATTR_CHARGES);
-		propWriteStream.ADD_USHORT(_count);
-	}
-
-	if(!isNotMoveable() /*moveable*/){
-		uint16_t _actionId = getActionId();
-		if(_actionId){
-			propWriteStream.ADD_UCHAR(ATTR_ACTION_ID);
-			propWriteStream.ADD_USHORT(_actionId);
-		}
-	}
-
-	const std::string& _text = getText();
-	if(_text.length() > 0){
-		propWriteStream.ADD_UCHAR(ATTR_TEXT);
-		propWriteStream.ADD_STRING(_text);
-	}
-
-	const time_t _writtenDate = getWrittenDate();
-	if(_writtenDate > 0){
-		propWriteStream.ADD_UCHAR(ATTR_WRITTENDATE);
-		propWriteStream.ADD_ULONG(_writtenDate);
-	}
-
-	const std::string& _writer = getWriter();
-	if(_writer.length() > 0){
-		propWriteStream.ADD_UCHAR(ATTR_WRITTENBY);
-		propWriteStream.ADD_STRING(_writer);
-	}
-
-	const std::string& _specialDesc = getSpecialDescription();
-	if(_specialDesc.length() > 0){
-		propWriteStream.ADD_UCHAR(ATTR_DESC);
-		propWriteStream.ADD_STRING(_specialDesc);
-	}
-
-	if(hasAttribute(ATTR_ITEM_DURATION)){
-		uint32_t duration = getDuration();
-		propWriteStream.ADD_UCHAR(ATTR_DURATION);
-		propWriteStream.ADD_ULONG(duration);
-	}
-
-	uint32_t decayState = getDecaying();
-	if(decayState == DECAYING_TRUE || decayState == DECAYING_PENDING){
-		propWriteStream.ADD_UCHAR(ATTR_DECAYING_STATE);
-		propWriteStream.ADD_UCHAR(decayState);
+	if(attributes && attributes->size()){
+		propWriteStream.ADD_UCHAR(ATTR_ATTRIBUTE_MAP);
+		serializeAttributeMap(propWriteStream);
 	}
 
 	return true;
@@ -687,23 +635,23 @@ std::string Item::getLongName(const ItemType& it, int32_t lookDistance,
 		subType = item->getSubType();
 	}
 
-	if(item){
-		subType = item->getSubType();
-	}
+	const std::string& name = (item? item->getName() : it.name);
+	const std::string& plural = (item? item->getPluralName() : it.pluralName);
+	const std::string& article = (item? item->getArticle() : it.article);
 
-	if(it.name.length()){
+	if(name.length()){
 		if(it.stackable && subType > 1){
 			if(it.showCount){
 				s << subType << " ";
 			}
 
-			s << it.pluralName;
+			s << plural;
 		}
 		else{
-			if(addArticle && !it.article.empty()){
-				s << it.article << " ";
+			if(addArticle && !article.empty()){
+				s << article << " ";
 			}
-			s << it.name;
+			s << name;
 		}
 	}
 	else{
@@ -729,6 +677,8 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 	}
 
 	s << getLongName(it, lookDistance, item, subType, addArticle);
+
+	int armor = (item? item->getArmor() : it.armor);
 
 	if(it.isRune()){
 		s << "(\"" << it.runeSpellName << "\", Charges:" << subType <<").";
@@ -759,22 +709,24 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 		else if(it.weaponType != WEAPON_AMMO && it.weaponType != WEAPON_WAND){ // Arrows and Bolts doesn't show atk
 			s << " (";
-			if(it.attack != 0){
-				s << "Atk:" << (int32_t)it.attack;
-			}
+			int attack = (item? item->getAttack() : it.attack);
+			if(attack != 0)
+				s << "Atk:" << attack;
 
-			if(it.defence != 0 || it.extraDefense != 0){
-				if(it.attack != 0)
+			int defense = (item? item->getDefense() : it.defense);
+			int extraDefense = (item? item->getExtraDef() : it.extraDefense);
+			if(defense != 0 || extraDefense != 0){
+				if(attack != 0)
 					s << " ";
 
-				s << "Def:" << (int32_t)it.defence;
-				if(it.extraDefense != 0){
-					s << " " << std::showpos << (int)it.extraDefense << std::noshowpos;
+				s << "Def:" << (int32_t)defense;
+				if(extraDefense != 0){
+					s << " " << std::showpos << (int)extraDefense << std::noshowpos;
 				}
 			}
 
 			if(it.abilities.stats[*STAT_MAGICPOINTS] != 0){
-				if(it.attack != 0 || it.defence != 0 || it.extraDefense != 0)
+				if(it.attack != 0 || it.defense != 0 || it.extraDefense != 0)
 					s << ", ";
 
 				s << "magic level " << std::showpos << (int32_t)it.abilities.stats[*STAT_MAGICPOINTS] << std::noshowpos;
@@ -793,7 +745,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		s << ".";
 	}
-	else if(it.armor != 0 || it.abilities.absorb.any()){
+	else if(armor != 0 || it.abilities.absorb.any()){
 		if(it.showCharges){
 			if(subType > 1){
 				s << " that has " << (int32_t)subType << " charges left";
@@ -803,7 +755,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			}
 		}
 
-		s << " (Arm:" << it.armor;
+		s << " (Arm:" << armor;
 
 		if(it.abilities.absorb.any()){
 			s << ", protection";
@@ -878,7 +830,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 	}
 	else if(it.showDuration){
-		if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
+		if(item && item->hasIntegerAttribute("duration")){
 			int32_t duration = item->getDuration() / 1000;
 			s << " that has energy for ";
 
@@ -994,17 +946,6 @@ std::string Item::getWeightDescription(const ItemType& it, double weight, uint32
 	return ss.str();
 }
 
-
-void Item::setUniqueId(uint16_t n)
-{
-	if(getUniqueId() != 0)
-		return;
-
-	ItemAttributes::setUniqueId(n);
-	// REVSCRIPT TODO Make sure they are added to the environment
-	//ScriptEnvironment::addUniqueThing(this);
-}
-
 bool Item::canDecay()
 {
 	if(isRemoved()){
@@ -1036,246 +977,9 @@ void Item::getLight(LightInfo& lightInfo)
 	lightInfo.level = it.lightLevel;
 }
 
-std::string ItemAttributes::emptyString("");
 
-const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
-{
-	if(!validateStrAttrType(type))
-		return emptyString;
 
-	//this will *NOT* create the attribute if it does not exist
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return *(std::string*)attr->value;
-	}
-	else{
-		return emptyString;
-	}
-}
 
-void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
-{
-	if(!validateStrAttrType(type))
-		return;
 
-	if(value.length() == 0)
-		return;
 
-	//this will create the attribute if it does not exist
-	Attribute* attr = getAttr(type);
-	if(attr){
-		//if has a previous value delete it
-		if(attr->value){
-			delete (std::string*)attr->value;
-		}
-		//create the new value as string
-		attr->value = (void*)new std::string(value);
-	}
-}
 
-bool ItemAttributes::hasAttribute(itemAttrTypes type) const
-{
-	if(!validateIntAttrType(type))
-		return false;
-
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return true;
-	}
-
-	return false;
-}
-
-void ItemAttributes::removeAttribute(itemAttrTypes type)
-{
-	//check if we have it
-	if((type & m_attributes) != 0){
-		//go trough the linked list until find it
-		Attribute* prevAttr = NULL;
-		Attribute* curAttr = m_firstAttr;
-		while(curAttr != NULL){
-			if(curAttr->type == type){
-				//found so remove it from the linked list
-				if(prevAttr){
-					prevAttr->next = curAttr->next;
-				}
-				else{
-					m_firstAttr = curAttr->next;
-				}
-				//remove it from flags
-				m_attributes = m_attributes & ~type;
-
-				//delete string if it is string type
-				if(validateStrAttrType(type)){
-					delete (std::string*)curAttr->value;
-				}
-				//finally delete the attribute and return
-				delete curAttr;
-				return;
-			}
-
-			//advance in the linked list
-			prevAttr = curAttr;
-			curAttr = curAttr->next;
-		}
-	}
-}
-
-uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
-{
-	if(!validateIntAttrType(type))
-		return 0;
-
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value));
-	}
-	else{
-		return 0;
-	}
-}
-
-void ItemAttributes::setIntAttr(itemAttrTypes type, int32_t value)
-{
-	if(!validateIntAttrType(type))
-		return;
-
-	Attribute* attr = getAttr(type);
-	if(attr){
-		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(value));
-	}
-}
-
-void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
-{
-	if(!validateIntAttrType(type))
-		return;
-
-	Attribute* attr = getAttr(type);
-	if(attr){
-		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value)) + value));
-	}
-}
-
-bool ItemAttributes::validateIntAttrType(itemAttrTypes type)
-{
-	//list of numeric type attributes
-	switch(type){
-	case ATTR_ITEM_ACTIONID:
-	case ATTR_ITEM_UNIQUEID:
-	case ATTR_ITEM_OWNER:
-	case ATTR_ITEM_DURATION:
-	case ATTR_ITEM_DECAYING:
-	case ATTR_ITEM_WRITTENDATE:
-	case ATTR_ITEM_CORPSEOWNER:
-	case ATTR_ITEM_CHARGES:
-	case ATTR_ITEM_FLUIDTYPE:
-	case ATTR_ITEM_DOORID:
-		return true;
-		break;
-
-	default:
-		return false;
-		break;
-	}
-	return false;
-}
-
-bool ItemAttributes::validateStrAttrType(itemAttrTypes type)
-{
-	//list of text type attributes
-	switch(type){
-	case ATTR_ITEM_DESC:
-	case ATTR_ITEM_TEXT:
-	case ATTR_ITEM_WRITTENBY:
-		return true;
-		break;
-	default:
-		return false;
-		break;
-	}
-	return false;
-}
-
-void ItemAttributes::addAttr(Attribute* attr)
-{
-	//add an attribute to the linked list
-	if(m_firstAttr){
-		//is not the first, so look for the end of the list
-		Attribute* curAttr = m_firstAttr;
-		while(curAttr->next){
-			curAttr = curAttr->next;
-		}
-		//and add it at the end
-		curAttr->next = attr;
-	}
-	else{
-		//is the first
-		m_firstAttr = attr;
-	}
-	//add it to flags
-	m_attributes = m_attributes | attr->type;
-}
-
-ItemAttributes::Attribute* ItemAttributes::getAttrConst(itemAttrTypes type) const
-{
-	//check flags
-	if((type & m_attributes) == 0){
-		return NULL;
-	}
-	//it is here, so search it in the linked list
-	Attribute* curAttr = m_firstAttr;
-	while(curAttr){
-		if(curAttr->type == type){
-			//found
-			return curAttr;
-		}
-		curAttr = curAttr->next;
-	}
-	//not found?
-	std::cout << "Warning: [ItemAttributes::getAttrConst] (type & m_attributes) != 0 but attribute not found" << std::endl;
-	return NULL;
-}
-
-ItemAttributes::Attribute* ItemAttributes::getAttr(itemAttrTypes type)
-{
-	Attribute* curAttr;
-	if((type & m_attributes) == 0){
-		//if that type was not present add it
-		curAttr = new Attribute(type);
-		addAttr(curAttr);
-		return curAttr;
-	}
-	else{
-		//was present, search and return it
-		curAttr = m_firstAttr;
-		while(curAttr){
-			if(curAttr->type == type){
-				return curAttr;
-			}
-			curAttr = curAttr->next;
-		}
-	}
-	std::cout << "Warning: [ItemAttributes::getAttr] (type & m_attributes) != 0 but attribute not found" << std::endl;
-	curAttr = new Attribute(type);
-	addAttr(curAttr);
-	return curAttr;
-}
-
-void ItemAttributes::deleteAttrs(Attribute* attr)
-{
-	//deletes all attributes recursively
-	if(attr){
-		//if is string type, delete the allocated string
-		if(validateStrAttrType(attr->type)){
-			delete (std::string*)attr->value;
-		}
-		Attribute* next_attr = attr->next;
-		attr->next = NULL;
-		//delete next while it was not NULL
-		if(next_attr){
-			deleteAttrs(next_attr);
-		}
-		delete attr;
-	}
-}

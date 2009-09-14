@@ -3,38 +3,6 @@ debug.traceback = stacktrace
 
 -- STRING
 
-function string.explode(str, delimiter)
-	if str == nil then
-		return {}
-	end
-	t = {}
-	for v in string.gmatch(str, "([^".. delimiter .."]*)" .. delimiter .. "?") do
-		table.insert(t, v)
-	end
-	table.remove(t) -- Removes last element (Always "")
-	return t
-end
-
-function string.strip_whitespace(str)
-	if str == nil then return str end
-	local start = string.find(str, "[^%s]") -- First non-whitespace character
-	local _end = -1
-	
-	local last_space = string.find(str:reverse(), "[^%s]")
-	if last_space then
-		 _end = #str + 1 - last_space -- Last non-whitespace character
-	end
-	
-	if start ~= nil and _end ~= nil then
-		return string.sub(str, start, _end)
-	elseif start ~= nil then
-		return string.sub(str, start)
-	elseif _end ~= nil then
-		return string.sub(str, 1, _end)
-	end
-	return str
-end
-
 function formatDHMS(n)
 	local ss = ""
 	local days = 0
@@ -86,28 +54,6 @@ function formatDHMS(n)
 end
 
 -- TABLE
-
-function table.find(t, val, comparator)
-	for k, v in pairs(t) do
-		if v == val then
-			return k
-		end
-	end
-	return nil
-end
-
-function table.findf(t, comparator)
-	for k, v in pairs(t) do
-		if f(val) then
-			return k
-		end
-	end
-	return nil
-end
-
-function table.contains(t, val)
-	return table.find(t, val) ~= nil
-end
 
 -- IP
 

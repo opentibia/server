@@ -1706,3 +1706,31 @@ Script::ListenerList Creature::getListeners(Script::ListenerType type)
 void Creature::clearListeners() {
 	registered_listeners.clear();
 }
+
+void Creature::setCustomValue(const std::string& key, const std::string& value)
+{
+	storageMap[key] = value;
+}
+
+bool Creature::eraseCustomValue(const std::string& key)
+{
+	StorageMap::iterator it;
+	it = storageMap.find(key);
+	if(it != storageMap.end()){
+		storageMap.erase(it);
+		return true;
+	}
+	return false;
+}
+
+bool Creature::getCustomValue(const std::string& key, std::string& value) const
+{
+	StorageMap::const_iterator it;
+	it = storageMap.find(key);
+	if(it != storageMap.end()){
+		value = it->second;
+		return true;
+	}
+	return false;
+}
+

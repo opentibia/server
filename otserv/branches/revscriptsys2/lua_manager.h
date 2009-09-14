@@ -77,9 +77,9 @@ public:
 	// Swap top element with a value on the stack
 	void swap(int idx);
 	// Get the type of the value as a string
-	std::string typeOf(int idx = -1);
+	std::string typeName(int idx = -1);
 	// Get the type as a lua string
-	int rawtypeOf(int idx = -1);
+	int rawtype(int idx = -1);
 	// Duplicates the top value at index
 	void duplicate(int idx = -1);
 
@@ -133,14 +133,16 @@ public:
 	template <class ET> ET popEnum() {return ET(popInteger());}
 
 	template <typename T> T popValue();
-	#ifndef __GNUC__
-	template <> bool popValue<bool>() {return popBoolean();}
-	template <> int popValue<int>() {return popInteger();}
-	template <> uint32_t popValue<uint32_t>() {return popUnsignedInteger();}
-	template <> double popValue<double>() {return popFloat();}
-	template <> std::string popValue<std::string>() {return popString();}
-	template <> uint64_t popValue<uint64_t>() {return (uint64_t)popFloat();}
-	#endif
+#ifndef __GNUC__
+	template <> bool popValue<bool>();
+	template <> int popValue<int>();
+	template <> uint32_t popValue<uint32_t>();
+	template <> int32_t popValue<int32_t>();
+	template <> float popValue<float>();
+	template <> double popValue<double>();
+	template <> std::string popValue<std::string>();
+	template <> uint64_t popValue<uint64_t>();
+#endif
 
 	// Push
 	void pushNil();
@@ -299,6 +301,9 @@ public:
 	int lua_Creature_getConditionImmunities();
 	int lua_Creature_getDamageImmunities();
 
+	int lua_Creature_setRawCustomValue();
+	int lua_Creature_getRawCustomValue();
+
 	int lua_getCreatureByName();
 	int lua_getCreaturesByName();
 
@@ -394,9 +399,6 @@ public:
 	int lua_Player_getLastLogin();
 	int lua_Player_hasGroupFlag();
 
-	int lua_Player_setStorageValue();
-	int lua_Player_getStorageValue();
-
 	int lua_Player_getGuildID();
 	int lua_Player_getGuildName();
 	int lua_Player_getGuildRank();
@@ -430,22 +432,22 @@ public:
 	int lua_isValidItemID();
 
 	int lua_Item_getItemID();
-	int lua_Item_getActionID();
-	int lua_Item_getUniqueID();
 	int lua_Item_getCount();
 	int lua_Item_getWeight();
 	int lua_Item_isPickupable();
-	int lua_Item_getSpecialDescription();
 	int lua_Item_getSubtype();
-	int lua_Item_getText();
 
 	int lua_Item_setItemID();
-	int lua_Item_setActionID();
 	int lua_Item_setCount();
-	int lua_Item_setSpecialDescription();
 	int lua_Item_setSubtype();
-	int lua_Item_setText();
 	int lua_Item_startDecaying();
+
+	int lua_Item_setStringAttribute();
+	int lua_Item_setIntegerAttribute();
+	int lua_Item_setFloatAttribute();
+	int lua_Item_setBooleanAttribute();
+	int lua_Item_getRawAttribute();
+	int lua_Item_eraseAttribute();
 
 
 	// - Tile
@@ -521,14 +523,14 @@ protected:
 	friend class Script::Manager;
 };
 
-#ifdef __GNUC__
-template <> bool LuaState::popValue<bool>();
-template <> int LuaState::popValue<int>();
-template <> uint32_t LuaState::popValue<uint32_t>();
-template <> double LuaState::popValue<double>();
-template <> std::string LuaState::popValue<std::string>();
-template <> uint64_t LuaState::popValue<uint64_t>();
-#endif
+template <> inline bool LuaState::popValue<bool>() {return popBoolean();}
+template <> inline int LuaState::popValue<int>() {return popInteger();}
+template <> inline uint32_t LuaState::popValue<uint32_t>() {return popUnsignedInteger();}
+template <> inline int32_t LuaState::popValue<int32_t>() {return (int32_t)popInteger();}
+template <> inline float LuaState::popValue<float>() {return popFloat();}
+template <> inline double LuaState::popValue<double>() {return popFloat();}
+template <> inline std::string LuaState::popValue<std::string>() {return popString();}
+template <> inline uint64_t LuaState::popValue<uint64_t>() {return (uint64_t)popFloat();}
 
 class LuaThread : public LuaState {
 public:

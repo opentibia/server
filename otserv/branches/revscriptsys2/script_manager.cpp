@@ -164,7 +164,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 			const ComposedTypeDeclaration& ctd = *ctditer;
 
 			bool ignoreTypeCheck = false;
-
+			/*
 			if(required_arguments - parsed_argument_count > 0 && !ctd.default_value.empty() && ctd.optional_level > 0) {
 				// We got an optional argument, and one is missing on this spot!
 				// Push our default argument onto the stack
@@ -182,7 +182,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 				required_arguments += 1;
 
 				ignoreTypeCheck = true;
-			}
+			}*/
 
 			if(parsed_argument_count >= required_arguments) {
 				// We have already parsed all passed arguments
@@ -261,7 +261,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 					" - Expected '" << expected_type << "' for argument " <<
 					"'" << ctd.name << "'" <<
 					" type was " <<
-					"'" << state->typeOf(parsed_argument_count) << "'";
+					"'" << state->typeName(parsed_argument_count) << "'";
 				throw Error(os.str());
 			}
 		}

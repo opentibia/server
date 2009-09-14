@@ -32,6 +32,7 @@ require("otstd/classes/items")
 require("otstd/classes/teleport")
 require("otstd/classes/container")
 require("otstd/classes/creature")
+require("otstd/classes/actor")
 require("otstd/classes/player")
 
 require("otstd/classes/tile")

@@ -88,7 +88,7 @@ bool Event::call(Manager& state, Environment& environment, Listener_ptr listener
 	bool propagate = propagate_by_default;
 	thread->getField(-1, "skipped");
 
-	if(thread->rawtypeOf() == LUA_TNIL){
+	if(thread->rawtype() == LUA_TNIL){
 		// use default
 		thread->pop();
 	} else if(thread->isBoolean(-1)) {

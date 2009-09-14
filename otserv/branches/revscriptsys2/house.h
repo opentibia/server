@@ -68,8 +68,8 @@ public:
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	void setDoorId(uint32_t _doorId){ setIntAttr(ATTR_ITEM_DOORID, (uint32_t)_doorId);}
-	uint32_t getDoorId() const{ return getIntAttr(ATTR_ITEM_DOORID);}
+	void setDoorId(uint32_t _doorId) {setAttribute("doorid", (int32_t)_doorId);}
+	uint32_t getDoorId() const {const int32_t* _doorId = getIntegerAttribute("doorid"); if(_doorId) return (uint32_t)*_doorId; return 0;}
 
 	bool canUse(const Player* player);
 

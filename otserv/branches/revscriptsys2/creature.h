@@ -27,6 +27,7 @@
 #include "const.h"
 
 typedef std::list<Condition*> ConditionList;
+typedef std::map<std::string, std::string> StorageMap;
 
 struct FindPathParams{
 	bool fullPathSearch;
@@ -341,6 +342,11 @@ public:
 	void addListener(Script::Listener_ptr listener);
 	Script::ListenerList getListeners(Script::ListenerType type);
 	void clearListeners();
+	
+	// Custom value interface
+	void setCustomValue(const std::string& key, const std::string& value);
+	bool eraseCustomValue(const std::string& key);
+	bool getCustomValue(const std::string& key, std::string& value) const;
 
 protected:
 	static const int32_t mapWalkWidth = Map_maxViewportX * 2 + 1;
@@ -360,6 +366,7 @@ protected:
 	bool creatureCheck;
 
 	Script::ListenerList registered_listeners;
+	StorageMap storageMap;
 
 	int32_t health, healthMax;
 	int32_t mana, manaMax;

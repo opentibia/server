@@ -337,7 +337,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		do{
 			std::string key = result->getDataString("key");
 			std::string value = result->getDataString("value");
-			player->addStorageValue(key, value);
+			player->setCustomValue(key, value);
 		}while(result->next());
 		db->freeResult(result);
 	}

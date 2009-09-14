@@ -3,6 +3,36 @@ function Creature:type()
 	return "Creature"
 end
 
+function Creature:setCustomValue(key, value)
+	if type(value) == "nil" then
+		return self:setRawCustomValue(key, nil)
+	elseif type(value) == "boolean" then
+		return self:setRawCustomValue(key, string.char(value and 1 or 0))
+	elseif type(value) == "string" or type(value) == "number" then
+		return self:setRawCustomValue(key, value)
+	elseif type(value) == "table" then
+		return self:setRawCustomValue(key, table.serialize(value))
+	end
+	error("Creature custom values must be either boolean, string, number or table (was " + type(value) + ").")
+end
+
+function Creature:getCustomValue(key)
+	value = self:getRawCustomValue(key)
+	if not value then
+		return nil
+	elseif value == string.char(1) then
+		return true
+	elseif value == string.char(0) then
+		return false
+	elseif value:len() > 0 and value:sub(1, 1) == '{' then
+		return table.unserialize(value)
+	end
+	return value
+end
+
+Creature.setStorageValue = Creature.setCustomValue
+Creature.getStorageValue = Creature.getCustomValue
+
 function Creature:addHealth(howmuch)
 	r = true
 	if howmuch < 0 then
@@ -50,3 +80,4 @@ function Creature:canSee(what, multifloor)
 	
 	return false
 end
+

@@ -55,7 +55,6 @@ enum freeslot_t {
 typedef std::pair<uint32_t, Container*> containervector_pair;
 typedef std::vector<containervector_pair> ContainerVector;
 typedef std::map<uint32_t, Depot*> DepotMap;
-typedef std::map<std::string, std::string> StorageMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
 typedef std::map<uint32_t, std::string> ChannelStatementMap;
@@ -129,10 +128,6 @@ public:
 	int32_t getContainerID(const Container* container) const;
 	Container* getContainer(uint32_t cid);
 	bool canOpenCorpse(uint32_t ownerId);
-
-	void addStorageValue(const std::string& key, const std::string& value);
-	bool eraseStorageValue(const std::string& key);
-	bool getStorageValue(const std::string& key, std::string& value) const;
 
 	bool withdrawMoney(uint32_t amount);
 	bool depositMoney(uint32_t amount);
@@ -491,7 +486,7 @@ public:
 		{}//if(client) client->sendSaleItemList(shopItemList);}
 	void sendCloseShop() const
 		// REVSCRIPT TODO
-	    {}//if(client) client->sendCloseShop();}
+		{}//if(client) client->sendCloseShop();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{}//if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const
@@ -569,8 +564,8 @@ public:
 	void addStamina(int64_t value);
 	void removeStamina(int64_t value) {addStamina(-value);}
 	int32_t getStaminaMinutes();
-    int32_t getStamina() {return stamina;}
-    int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
+	int32_t getStamina() {return stamina;}
+	int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
 
 	//depots
 	DepotMap depots;
@@ -738,7 +733,6 @@ protected:
 	std::string guildNick;
 	uint32_t guildLevel;
 
-	StorageMap storageMap;
 	LightInfo itemsLight;
 
 	OutfitMap outfits;

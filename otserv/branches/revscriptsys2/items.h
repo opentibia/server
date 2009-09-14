@@ -129,7 +129,7 @@ public:
 	ShootType_t    shootType;
 	MagicEffectClasses magicEffect;
 	int32_t        attack;
-	int32_t        defence;
+	int32_t        defense;
 	int32_t        extraDefense;
 	int32_t        armor;
 	SlotPosition   slotPosition;

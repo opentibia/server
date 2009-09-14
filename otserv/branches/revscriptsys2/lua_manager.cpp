@@ -138,12 +138,12 @@ void LuaState::swap(int idx)
 	lua_remove(state, idx+1);
 }
 
-std::string LuaState::typeOf(int idx)
+std::string LuaState::typeName(int idx)
 {
 	return lua_typename(state, lua_type(state, idx));
 }
 
-int LuaState::rawtypeOf(int idx)
+int LuaState::rawtype(int idx)
 {
 	return lua_type(state, idx);
 }
@@ -827,11 +827,12 @@ std::string LuaThread::report(const std::string& extramessage)
 
 		os << "\t";
 
-		int tabcount = 16;
-		if(ar.name) {
-			os << ar.name;
-			tabcount -= 16 - strlen(ar.name);
-		}
+		int tabcount = 20;
+		if(!ar.name)
+			ar.name = "<unknown>";
+		os << ar.name;
+		tabcount -= 20 - strlen(ar.name);
+
 		while(tabcount-- > 0)
 			os << " ";
 
@@ -873,7 +874,7 @@ int32_t LuaThread::run(int args)
 	} else if(ret == 0) {
 		// Thread exited normally, do nothing, it will be garbage collected
 	} else if(ret == LUA_ERRRUN) {
-		std::cout << report("Runtime error while running thread.");
+		std::cout << report();
 	} else if(ret == LUA_ERRERR) {
 		// Can't handle, just print error message
 		std::cout << "Lua Error when recovering from error (thread " << name << ")\n";

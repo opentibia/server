@@ -3146,9 +3146,9 @@ bool Game::playerWriteItem(uint32_t playerId, uint32_t windowTextId, const std::
 		}
 	}
 	else{
-		writeItem->resetText();
-		writeItem->resetWriter();
-		writeItem->resetWrittenDate();
+		writeItem->clearText();
+		writeItem->clearWriter();
+		writeItem->clearWrittenDate();
 	}
 
 	uint16_t newId = Item::items[writeItem->getID()].writeOnceItemId;

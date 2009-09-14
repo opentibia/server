@@ -142,7 +142,7 @@ otstd.Player.onLoginListener   = registerOnLogin(otstd.Player.LoginHandler)
 otstd.Player.onLogoutListener = registerOnLogout(otstd.Player.LogoutHandler)
 
 -- Advance handlers
-
+--[[
 function otstd.Player.AdvanceHandler(event)
 	local player = event.player
 	local message = ""
@@ -174,5 +174,4 @@ end
 
 otstd.Player.onAdvanceListener = registerOnAdvance(otstd.Player.AdvanceHandler)
 
-
-
+]]--

@@ -75,7 +75,7 @@ ItemType::ItemType()
 	shootType     = (ShootType_t)0;
 	magicEffect   = NM_ME_NONE;
 	attack        = 0;
-	defence       = 0;
+	defense       = 0;
 	extraDefense  = 0;
 	armor         = 0;
 	decayTo       = -1;
@@ -496,7 +496,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "defense"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.defence = intValue;
+									it.defense = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "extradef"){

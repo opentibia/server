@@ -132,6 +132,9 @@ void Manager::registerClasses() {
 	registerGlobalFunction("getThingByID(int id)", &Manager::lua_getThingByID);
 
 	// Creature
+	registerMemberFunction("Creature", "setRawCustomValue(string key, mixed value)", &Manager::lua_Creature_setRawCustomValue);
+	registerMemberFunction("Creature", "getRawCustomValue(string key)", &Manager::lua_Creature_getRawCustomValue);
+
 	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
@@ -207,9 +210,6 @@ void Manager::registerClasses() {
 	registerGlobalFunction("createActor(string name, table pos)", &Manager::lua_createActor);
 
 	// Player
-	registerMemberFunction("Player", "setStorageValue(string key, string value)", &Manager::lua_Player_setStorageValue);
-	registerMemberFunction("Player", "getStorageValue(string key)", &Manager::lua_Player_getStorageValue);
-
 	registerMemberFunction("Player", "getFood()", &Manager::lua_Player_getFood);
 	registerMemberFunction("Player", "getMana()", &Manager::lua_Player_getMana);
 	registerMemberFunction("Player", "getLevel()", &Manager::lua_Player_getLevel);
@@ -258,22 +258,25 @@ void Manager::registerClasses() {
 	// Item
 	registerGlobalFunction("createItem(int newid[, int count])", &Manager::lua_createItem);
 	registerMemberFunction("Item", "getItemID()", &Manager::lua_Item_getItemID);
-	registerMemberFunction("Item", "getActionID()", &Manager::lua_Item_getActionID);
-	registerMemberFunction("Item", "getUniqueID()", &Manager::lua_Item_getUniqueID);
 	registerMemberFunction("Item", "getCount()", &Manager::lua_Item_getCount);
 	registerMemberFunction("Item", "getWeight()", &Manager::lua_Item_getWeight);
 	registerMemberFunction("Item", "isPickupable()", &Manager::lua_Item_isPickupable);
-	registerMemberFunction("Item", "getText()", &Manager::lua_Item_getText);
-	registerMemberFunction("Item", "getSpecialDescription()", &Manager::lua_Item_getSpecialDescription);
 	registerMemberFunction("Item", "getSubtype()", &Manager::lua_Item_getSubtype);
 
 	registerMemberFunction("Item", "setItemID(int newid [, int newtype])", &Manager::lua_Item_setItemID);
-	registerMemberFunction("Item", "setActionID(int id)", &Manager::lua_Item_setActionID);
 	registerMemberFunction("Item", "setCount(int newcount)", &Manager::lua_Item_setCount);
 	registerMemberFunction("Item", "startDecaying()", &Manager::lua_Item_startDecaying);
-	registerMemberFunction("Item", "setText(string text)", &Manager::lua_Item_setText);
-	registerMemberFunction("Item", "setSpecialDescription(string text)", &Manager::lua_Item_setSpecialDescription);
 	registerMemberFunction("Item", "setSubtype(int newtype)", &Manager::lua_Item_setSubtype);
+
+	registerMemberFunction("Item", "getRawAttribute(string key)", &Manager::lua_Item_getRawAttribute);
+	registerMemberFunction("Item", "eraseAttribute(string key)", &Manager::lua_Item_eraseAttribute);
+	// We expose type-safe versions as type is important for internal state
+	// The generic setAttribute is defined in item.lua
+	registerMemberFunction("Item", "setStringAttribute(string key, string value)", &Manager::lua_Item_setStringAttribute);
+	registerMemberFunction("Item", "setIntegerAttribute(string key, int value)", &Manager::lua_Item_setIntegerAttribute);
+	registerMemberFunction("Item", "setFloatAttribute(string key, float value)", &Manager::lua_Item_setFloatAttribute);
+	registerMemberFunction("Item", "setBooleanAttribute(string key, boolean value)", &Manager::lua_Item_setBooleanAttribute);
+	
 
 	registerGlobalFunction("getItemType(int itemid)", &Manager::lua_getItemType);
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
@@ -1939,6 +1942,45 @@ int LuaState::lua_Creature_getDamageImmunities()
 	return 1;
 }
 
+int LuaState::lua_Creature_setRawCustomValue()
+{
+	bool remove = false;
+	std::string value;
+	if(isNil(-1)) {
+		pop();
+		remove = true;
+	}
+	else if(isString(-1) || isNumber(-1)){
+		value = popString();
+	}
+	else{
+		throw Error("Raw creature custom value must be either string or number (was " + typeName() + ").");
+	}
+	std::string key = popString();
+	Creature* creature = popCreature();
+
+	if(remove)
+		creature->eraseCustomValue(key);
+	else
+		creature->setCustomValue(key, value);
+
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Creature_getRawCustomValue()
+{
+	std::string key = popString();
+	Creature* creature = popCreature();
+	std::string value;
+	if(creature->getCustomValue(key, value)) {
+		pushString(value);
+	} else {
+		pushNil();
+	}
+	return 1;
+}
+
 int LuaState::lua_Creature_say()
 {
 	std::string msg = popString();
@@ -2361,41 +2403,6 @@ int LuaState::lua_Actor_setTarget()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Class Player
-
-int LuaState::lua_Player_setStorageValue()
-{
-	bool remove = false;
-	std::string value;
-	if(isNil(-1)) {
-		pop();
-		remove = true;
-	} else {
-		value = popString();
-	}
-	std::string key = popString();
-	Player* player = popPlayer();
-
-	if(remove)
-		player->eraseStorageValue(key);
-	else
-		player->addStorageValue(key, value);
-
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaState::lua_Player_getStorageValue()
-{
-	std::string key = popString();
-	Player* player = popPlayer();
-	std::string value;
-	if(player->getStorageValue(key, value)) {
-		pushString(value);
-	} else {
-		pushNil();
-	}
-	return 1;
-}
 
 int LuaState::lua_Player_getFood()
 {
@@ -2820,20 +2827,6 @@ int LuaState::lua_Item_getItemID()
 	return 1;
 }
 
-int LuaState::lua_Item_getActionID()
-{
-	Item* item = popItem();
-	pushInteger(item->getActionId());
-	return 1;
-}
-
-int LuaState::lua_Item_getUniqueID()
-{
-	Item* item = popItem();
-	pushInteger(item->getUniqueId());
-	return 1;
-}
-
 int LuaState::lua_Item_getCount()
 {
 	Item* item = popItem();
@@ -2870,19 +2863,67 @@ int LuaState::lua_Item_isPickupable()
 	return 1;
 }
 
-int LuaState::lua_Item_getText()
+// Attributes!
+
+// Template function to prevent code duplication
+template<typename T>
+int setItemAttribute(LuaState* state)
 {
-	Item* item = popItem();
-	pushString(item->getText());
+	T value = state->popValue<T>();
+	std::string key = state->popString();
+	Item* item = state->popItem();
+
+	item->setAttribute(key, value);
+
+	state->pushBoolean(true);
 	return 1;
 }
 
-int LuaState::lua_Item_getSpecialDescription()
+#define exposeItemAttribute(Name, Type) \
+int LuaState::lua_Item_set ## Name ## Attribute()                                   \
+{                                                                                   \
+	return setItemAttribute<Type>(this);                                            \
+}
+
+exposeItemAttribute(String, std::string)
+exposeItemAttribute(Integer, int32_t)
+exposeItemAttribute(Float, float)
+exposeItemAttribute(Boolean, bool)
+
+
+int LuaState::lua_Item_getRawAttribute()
 {
+	std::string key = popString();
 	Item* item = popItem();
-	pushInteger(item->getID());
+
+	boost::any value = item->getAttribute(key);
+
+	if(value.empty())
+		pushNil();
+	if(value.type() == typeid(std::string))
+		push(boost::any_cast<std::string>(value));
+	if(value.type() == typeid(int32_t))
+		push(boost::any_cast<int32_t>(value));
+	if(value.type() == typeid(float))
+		push(boost::any_cast<float>(value));
+	if(value.type() == typeid(bool))
+		push(boost::any_cast<bool>(value));
+	else
+		pushNil();
 	return 1;
 }
+
+int LuaState::lua_Item_eraseAttribute()
+{
+	std::string key = popString();
+	Item* item = popItem();
+
+	item->eraseAttribute(key);
+
+	pushBoolean(true);
+	return 1;
+}
+
 
 int LuaState::lua_Item_setItemID()
 {
@@ -2947,33 +2988,6 @@ int LuaState::lua_Item_setSubtype()
 	return 1;
 }
 
-int LuaState::lua_Item_setText()
-{
-	std::string text = popString();
-	Item* item = popItem();
-	item->setText(text);
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaState::lua_Item_setSpecialDescription()
-{
-	std::string text = popString();
-	Item* item = popItem();
-	item->setSpecialDescription(text);
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaState::lua_Item_setActionID()
-{
-	int actionid = popInteger();
-	Item* item = popItem();
-	item->setActionId(actionid);
-	pushBoolean(true);
-	return 1;
-}
-
 int LuaState::lua_getItemIDByName()
 {
 	std::string name = popString();
@@ -3030,7 +3044,7 @@ int LuaState::lua_getItemType()
 	setField(-1, "shootType", it.shootType);
 	setField(-1, "magicEffect", it.magicEffect);
 	setField(-1, "attack", it.attack);
-	setField(-1, "defence", it.defence);
+	setField(-1, "defense", it.defense);
 	setField(-1, "extraDefense", it.extraDefense);
 	setField(-1, "armor", it.armor);
 	setField(-1, "slotPosition", it.slotPosition);
