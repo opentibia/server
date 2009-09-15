@@ -69,20 +69,20 @@ void LuaState::HandleError(const std::string& error)
 }
 
 // Stack manipulation
-int LuaState::getStackSize()
+int32_t LuaState::getStackSize()
 {
 	return lua_gettop(state);
 }
 
-bool LuaState::checkStackSize(int low, int high)
+bool LuaState::checkStackSize(int32_t low, int32_t high)
 {
-	int t = getStackSize();
+	int32_t t = getStackSize();
 	if(t < low) return false;
 	if(high != -1 && t > high) return false;
 	return true;
 }
 
-void LuaState::duplicate(int idx /* = -1 */)
+void LuaState::duplicate(int32_t idx /* = -1 */)
 {
 	lua_pushvalue(state, idx);
 }
@@ -94,17 +94,17 @@ void LuaState::newTable()
 	lua_newtable(state);
 }
 
-void LuaState::getField(int index, const std::string& field_name)
+void LuaState::getField(int32_t index, const std::string& field_name)
 {
 	lua_getfield(state, index, field_name.c_str());
 }
 
-void LuaState::setField(int index, const std::string& field_name)
+void LuaState::setField(int32_t index, const std::string& field_name)
 {
 	lua_setfield(state, index, field_name.c_str());
 }
 
-void LuaState::setField(int index, int field_index)
+void LuaState::setField(int32_t index, int32_t field_index)
 {
 	push(field_index);
 	lua_insert(state, -2);
@@ -122,7 +122,7 @@ void LuaState::clearStack()
 	lua_settop(state, 0);
 }
 
-void LuaState::insert(int idx)
+void LuaState::insert(int32_t idx)
 {
 	if(idx < 0 && idx < -lua_gettop(state))
 		throw Script::Error("Insertion to position outside stack (under).");
@@ -131,76 +131,76 @@ void LuaState::insert(int idx)
 	lua_insert(state, idx);
 }
 
-void LuaState::swap(int idx)
+void LuaState::swap(int32_t idx)
 {
 	lua_insert(state, idx);
 	lua_pushvalue(state, idx+1);
 	lua_remove(state, idx+1);
 }
 
-std::string LuaState::typeName(int idx)
+std::string LuaState::typeName(int32_t idx)
 {
 	return lua_typename(state, lua_type(state, idx));
 }
 
-int LuaState::rawtype(int idx)
+int32_t LuaState::rawtype(int32_t idx)
 {
 	return lua_type(state, idx);
 }
 
 // Check
-bool LuaState::isNil(int index)
+bool LuaState::isNil(int32_t index)
 {
 	return lua_isnil(state, index);
 }
 
-bool LuaState::isBoolean(int index)
+bool LuaState::isBoolean(int32_t index)
 {
 	return lua_isboolean(state, index) || lua_isnil(state, index);
 }
 
-bool LuaState::isNumber(int index)
+bool LuaState::isNumber(int32_t index)
 {
 	return lua_isnumber(state, index) != 0;
 }
 
-bool LuaState::isString(int index)
+bool LuaState::isString(int32_t index)
 {
 	return lua_isstring(state, index) != 0;
 }
 
-bool LuaState::isUserdata(int index)
+bool LuaState::isUserdata(int32_t index)
 {
 	return lua_isuserdata(state, index) != 0;
 }
 
-bool LuaState::isLuaFunction(int index)
+bool LuaState::isLuaFunction(int32_t index)
 {
 	return lua_isfunction(state, index) != 0;
 }
 
-bool LuaState::isCFunction(int index)
+bool LuaState::isCFunction(int32_t index)
 {
 	return lua_iscfunction(state, index) != 0;
 }
 
-bool LuaState::isThread(int index)
+bool LuaState::isThread(int32_t index)
 {
 	return lua_isthread(state, index) != 0;
 }
 
-bool LuaState::isTable(int index)
+bool LuaState::isTable(int32_t index)
 {
 	return lua_istable(state, index) != 0;
 }
 
-bool LuaState::isFunction(int index)
+bool LuaState::isFunction(int32_t index)
 {
 	return lua_isfunction(state, index) != 0 || lua_iscfunction(state, index) != 0;
 }
 
 // Pop
-void LuaState::pop(int n)
+void LuaState::pop(int32_t n)
 {
 	lua_pop(state, n);
 }
@@ -530,11 +530,11 @@ Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 	}
 
 	getField(-1, "__x");
-	int x = popInteger();
+	int32_t x = popInteger();
 	getField(-1, "__y");
-	int y = popInteger();
+	int32_t y = popInteger();
 	getField(-1, "__z");
-	int z = popInteger();
+	int32_t z = popInteger();
 
 	Tile* tile = g_game.getTile(x, y, z);
 	if(!tile) HandleError(mode, "Tile position is invalid.");
@@ -701,7 +701,7 @@ bool LuaStateManager::loadFile(std::string file)
 {
 	//std::cout << "Loaded file " << file << std::endl;
 	//loads file as a chunk at stack top
-	int ret = luaL_loadfile(state, file.c_str());
+	int32_t ret = luaL_loadfile(state, file.c_str());
 
 	if(ret != 0){
 		std::cout << "Lua Error: " << popString() << std::endl;
@@ -818,7 +818,7 @@ std::string LuaThread::report(const std::string& extramessage)
 
 	lua_Debug ar;
 
-	int level = 0;
+	int32_t level = 0;
 	while(lua_getstack(state, level++, &ar) != 0) {
 		lua_getinfo(state, "nSl", &ar);
 
@@ -827,7 +827,7 @@ std::string LuaThread::report(const std::string& extramessage)
 
 		os << "\t";
 
-		int tabcount = 20;
+		int32_t tabcount = 20;
 		if(!ar.name)
 			ar.name = "<unknown>";
 		os << ar.name;
@@ -843,9 +843,9 @@ std::string LuaThread::report(const std::string& extramessage)
 	return os.str();
 }
 
-int32_t LuaThread::run(int args)
+int32_t LuaThread::run(int32_t args)
 {
-	int ret = lua_resume(state, args);
+	int32_t ret = lua_resume(state, args);
 	thread_state = ret;
 	if(ret == LUA_YIELD) {
 		// Thread yielded, add us to the manager

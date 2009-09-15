@@ -35,26 +35,26 @@ public:
 
 	void reset();
 
-	int reference_count;
+	int32_t reference_count;
 
 	std::string name;
 	std::string nameDescription;
 	std::string fileLoaded;
 	uint64_t experience;
 
-	int defense;
-	int armor;
+	int32_t defense;
+	int32_t armor;
 
 	bool canPushItems;
 	bool canPushCreatures;
 	uint32_t staticAttackChance;
-	int maxSummons;
-	int targetDistance;
-	int fleeHealth;
+	int32_t maxSummons;
+	int32_t targetDistance;
+	int32_t fleeHealth;
 	bool pushable;
-	int base_speed;
-	int health;
-	int health_max;
+	int32_t base_speed;
+	int32_t health;
+	int32_t health_max;
 
 	OutfitType outfit;
 	int32_t corpseId;
@@ -68,8 +68,8 @@ public:
 	bool isHostile;
 	bool isLureable;
 
-	int lightLevel;
-	int lightColor;
+	int32_t lightLevel;
+	int32_t lightColor;
 
 	uint32_t manaCost;
 	SummonList summonList;
@@ -299,18 +299,18 @@ DEFINE_PROPERTY(std::string, name)
 DEFINE_PROPERTY(std::string, nameDescription)
 DEFINE_PROPERTY(std::string, fileLoaded)
 DEFINE_PROPERTY(uint64_t, experience)
-DEFINE_PROPERTY(int, defense)
-DEFINE_PROPERTY(int, armor)
+DEFINE_PROPERTY(int32_t, defense)
+DEFINE_PROPERTY(int32_t, armor)
 DEFINE_PROPERTY(bool, canPushItems)
 DEFINE_PROPERTY(bool, canPushCreatures)
 DEFINE_PROPERTY(uint32_t, staticAttackChance)
-DEFINE_PROPERTY(int, maxSummons)
-DEFINE_PROPERTY(int, targetDistance)
-DEFINE_PROPERTY(int, fleeHealth)
+DEFINE_PROPERTY(int32_t, maxSummons)
+DEFINE_PROPERTY(int32_t, targetDistance)
+DEFINE_PROPERTY(int32_t, fleeHealth)
 DEFINE_PROPERTY(bool, pushable)
-DEFINE_PROPERTY(int, base_speed)
-DEFINE_PROPERTY(int, health)
-DEFINE_PROPERTY(int, health_max)
+DEFINE_PROPERTY(int32_t, base_speed)
+DEFINE_PROPERTY(int32_t, health)
+DEFINE_PROPERTY(int32_t, health_max)
 DEFINE_PROPERTY(OutfitType, outfit)
 DEFINE_PROPERTY(int32_t, corpseId)
 DEFINE_PROPERTY(ConditionType, conditionImmunities)
@@ -322,8 +322,8 @@ DEFINE_PROPERTY(bool, isConvinceable)
 DEFINE_PROPERTY(bool, isAttackable)
 DEFINE_PROPERTY(bool, isHostile)
 DEFINE_PROPERTY(bool, isLureable)
-DEFINE_PROPERTY(int, lightLevel)
-DEFINE_PROPERTY(int, lightColor)
+DEFINE_PROPERTY(int32_t, lightLevel)
+DEFINE_PROPERTY(int32_t, lightColor)
 DEFINE_PROPERTY(uint32_t, manaCost)
 DEFINE_PROPERTY(SummonList, summonList)
 DEFINE_PROPERTY(LootItems, lootItems)

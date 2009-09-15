@@ -53,7 +53,7 @@ namespace Script {
 			std::string type_name;
 			std::vector<std::string> types;
 			boost::any default_value;
-			int optional_level;
+			int32_t optional_level;
 		};
 
 		struct ComposedCallback {
@@ -68,7 +68,7 @@ namespace Script {
 		std::map<std::string, LuaClassType_ptr> class_list;
 		FunctionMap function_map;
 		uint32_t function_id_counter;
-		int event_nested_level;
+		int32_t event_nested_level;
 
 		// Expose functions/classes to lua
 		void registerClass(const std::string& cname);

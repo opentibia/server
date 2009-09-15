@@ -65,42 +65,42 @@ public:
 
 	// Stack manipulation
 	// Returns the size of the stack
-	int getStackSize();
+	int32_t getStackSize();
 	// Checks if the size of the stack is between low and high
-	bool checkStackSize(int low, int high = -1);
+	bool checkStackSize(int32_t low, int32_t high = -1);
 
 	// Removes all elements from the stack
 	void clearStack();
 
 	// Move value to the given index
-	void insert(int idx);
+	void insert(int32_t idx);
 	// Swap top element with a value on the stack
-	void swap(int idx);
+	void swap(int32_t idx);
 	// Get the type of the value as a string
-	std::string typeName(int idx = -1);
+	std::string typeName(int32_t idx = -1);
 	// Get the type as a lua string
-	int rawtype(int idx = -1);
+	int32_t rawtype(int32_t idx = -1);
 	// Duplicates the top value at index
-	void duplicate(int idx = -1);
+	void duplicate(int32_t idx = -1);
 
 	// Table manipulation
 	void newTable();
 
 	// Top value as value, index is position of the target table on the stack
-	void setField(int index, const std::string& field_name);
-	void setField(int index, int field_index);
+	void setField(int32_t index, const std::string& field_name);
+	void setField(int32_t index, int32_t field_index);
 	template<typename T>
-	void setField(int index, const std::string& field_name, const T& t) {
+	void setField(int32_t index, const std::string& field_name, const T& t) {
 		push(t);
 		setField((index <= -10000? index : (index < 0? index - 1 : index)), field_name);
 	}
 	template<typename T>
-	void setField(int index, int field_index, const T& t) {
+	void setField(int32_t index, int32_t field_index, const T& t) {
 		push(t);
 		setField((index <= -10000? index : (index < 0? index - 1 : index)), field_index);
 	}
 	// Pushes value onto the stack
-	void getField(int index, const std::string& field_name);
+	void getField(int32_t index, const std::string& field_name);
 
 	// Top value as value
 	void setGlobal(const std::string& gname) {setField(LUA_GLOBALSINDEX, gname);}
@@ -111,18 +111,18 @@ public:
 	void getRegistryItem(const std::string& rname) {getField(LUA_REGISTRYINDEX, rname);}
 
 	// Check
-	bool isNil(int index = -1);
-	bool isBoolean(int index = -1);
-	bool isNumber(int index = -1); // No way to decide if it's double or int
-	bool isString(int index = -1);
-	bool isUserdata(int index = -1);
-	bool isLuaFunction(int index = -1);
-	bool isCFunction(int index = -1);
-	bool isFunction(int index = -1);
-	bool isThread(int index = -1);
-	bool isTable(int index = -1);
+	bool isNil(int32_t index = -1);
+	bool isBoolean(int32_t index = -1);
+	bool isNumber(int32_t index = -1); // No way to decide if it's double or int
+	bool isString(int32_t index = -1);
+	bool isUserdata(int32_t index = -1);
+	bool isLuaFunction(int32_t index = -1);
+	bool isCFunction(int32_t index = -1);
+	bool isFunction(int32_t index = -1);
+	bool isThread(int32_t index = -1);
+	bool isTable(int32_t index = -1);
 	// Pop
-	void pop(int n = 1);
+	void pop(int32_t n = 1);
 	bool popBoolean();
 	int32_t popInteger();
 	uint32_t popUnsignedInteger();
@@ -135,7 +135,6 @@ public:
 	template <typename T> T popValue();
 #ifndef __GNUC__
 	template <> bool popValue<bool>();
-	template <> int popValue<int>();
 	template <> uint32_t popValue<uint32_t>();
 	template <> int32_t popValue<int32_t>();
 	template <> float popValue<float>();
@@ -185,13 +184,16 @@ public:
 
 	// Generic
 	void push(bool b) {pushBoolean(b);}
-	void push(int i) {pushInteger(i);}
+	void push(int32_t i) {pushInteger(i);}
 	void push(uint32_t ui) {pushUnsignedInteger(ui);}
 	void push(uint64_t ui) {pushFloat((double)ui);}
 	void push(double d) {pushFloat(d);}
 	void push(const std::string& str) {pushString(str);}
 	void push(Thing* thing) {pushThing(thing);}
 	void push(const Position& pos) {pushPosition(pos);}
+	#ifndef __GNUC__
+	void push(int i) {pushInteger(i);}
+	#endif
 
 	// Don't use pushTable on a userdata class and vice-versa (events are table classes, everything else userdata)
 	Script::ObjectID* pushClassInstance(const std::string& classname);
@@ -530,9 +532,6 @@ template <> inline float LuaState::popValue<float>() {return popFloat();}
 template <> inline double LuaState::popValue<double>() {return popFloat();}
 template <> inline std::string LuaState::popValue<std::string>() {return popString();}
 template <> inline uint64_t LuaState::popValue<uint64_t>() {return (uint64_t)popFloat();}
-#ifndef __GNUC__
-template <> inline int LuaState::popValue<int>() {return popInteger();}
-#endif
 
 class LuaThread : public LuaState {
 public:
@@ -541,7 +540,7 @@ public:
 	virtual ~LuaThread();
 
 	// Returns time to sleep, 0 if execution ended
-	int32_t run(int args);
+	int32_t run(int32_t args);
 
 	bool ok() const;
 
@@ -549,7 +548,7 @@ public:
 	std::string report(const std::string& extramessage = "");
 protected:
 	std::string name;
-	int thread_state;
+	int32_t thread_state;
 };
 
 typedef shared_ptr<LuaThread> LuaThread_ptr;

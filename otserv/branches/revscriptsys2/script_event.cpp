@@ -68,7 +68,7 @@ bool Event::call(Manager& state, Environment& environment, Listener_ptr listener
 
 
 	// Run thread
-	int ms = thread->run(1);
+	int32_t ms = thread->run(1);
 	if(ms > 0)
 		state.scheduleThread(ms, thread);
 
@@ -862,11 +862,11 @@ bool OnLook::Event::check_match(const ScriptInformation& info)
 			case FILTER_ITEMID:
 				return item && item->getID() == info.id;
 			case FILTER_ACTIONID:
-				return item && (uint32_t)item->getActionId() == info.id;
+				return item && item->getActionId() == info.id;
 			case FILTER_UNIQUEID:
-				return item && (uint32_t)item->getUniqueId() == info.id;
+				return item && item->getUniqueId() == info.id;
 			case FILTER_CREATUREID:
-				return creature && creature->getID() == info.id;
+				return creature && (int32_t)creature->getID() == info.id;
 			default: break;
 		}
 	}
@@ -1033,7 +1033,7 @@ void OnSpawn::Event::update_instance(Manager& state, Environment& environment, L
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature thinks
 
-OnThink::Event::Event(Creature* creature, int interval) :
+OnThink::Event::Event(Creature* creature, int32_t interval) :
 	creature(creature),
 	interval(interval)
 {

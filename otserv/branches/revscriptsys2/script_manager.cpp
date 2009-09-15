@@ -58,7 +58,7 @@ int Manager::luaCompareClassInstances(lua_State* L)
 {
 	/*
 	std::cout << "Compare" << std::endl;
-	int n = lua_gettop(L);
+	int32_t n = lua_gettop(L);
 	while(--n >= 0)
 		std::cout << luaL_typename(L, -n-1) << std::endl;
 	*/
@@ -84,7 +84,7 @@ int Manager::luaGetClassInstanceID(lua_State* L)
 {
 	/*
 	std::cout << "GetID" << std::endl;
-	int n = lua_gettop(L);
+	int32_t n = lua_gettop(L);
 	while(--n >= 0)
 		std::cout << luaL_typename(L, -n-1) << std::endl;
 	*/
@@ -134,14 +134,14 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		// In here it's safe to allocate complex objects
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
 
-		int argument_count = state->getStackSize();
+		int32_t argument_count = state->getStackSize();
 		if((unsigned int)argument_count > cc->parameters.size()) {
 			throw Script::Error("Too many arguments passed to function " + cc->name);
 		}
 
 		// This loop counts how many argument required arguments we need, at least
 		// This could probably be done at register time out
-		int required_arguments = 0;
+		int32_t required_arguments = 0;
 
 		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
 				ctditer != cc->parameters.end();
@@ -156,7 +156,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		}
 
 		// parsed_argument_count is how many arguments we have parsed in the loop so far
-		int parsed_argument_count = 0;
+		int32_t parsed_argument_count = 0;
 		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
 				ctditer != cc->parameters.end();
 				++ctditer)
@@ -266,7 +266,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 			}
 		}
 		// All arguments checked out, call the function!
-		int ret = (state->*(cc->func))();
+		int32_t ret = (state->*(cc->func))();
 		if(private_thread)
 			private_thread->~LuaThread();
 		return ret;
@@ -301,7 +301,7 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s)
 	}
 	assert(s[0] == '(');
 	s.erase(s.begin());
-	int optional_level = 0;
+	int32_t optional_level = 0;
 	// We can't have optional arguments in two places in the argument list
 	bool already_optional = false;
 
@@ -499,7 +499,7 @@ boost::any Manager::parseDefaultDefinition(std::string& s)
 		s.erase(s.begin(), si);
 
 		// Create the integer
-		int tmpi = 0;
+		int32_t tmpi = 0;
 		std::istringstream is(s);
 		is >> tmpi;
 

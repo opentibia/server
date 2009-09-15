@@ -658,7 +658,7 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 	// Store callback
 	insert(-3);
 
-	int id = popInteger();
+	int32_t id = popInteger();
 	std::string method = popString();
 
 	OnUseItem::ScriptInformation si_onuse;
@@ -903,7 +903,7 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	insert(-4);
 
 	std::string slot = popString();
-	int id = popInteger();
+	int32_t id = popInteger();
 	std::string method = popString();
 
 	OnEquipItem::ScriptInformation si_onequip;
@@ -947,7 +947,7 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	insert(-4);
 
 	std::string slot = popString();
-	int id = popInteger();
+	int32_t id = popInteger();
 	std::string method = popString();
 
 	OnEquipItem::ScriptInformation si_ondeequip;
@@ -1054,7 +1054,7 @@ int LuaState::lua_registerSpecificEvent_CreatureMoveIn() {
 	// Store callback
 	insert(-4);
 
-	int id = popInteger();
+	int32_t id = popInteger();
 	std::string method = popString();
 	Creature* who = popCreature();
 
@@ -1095,7 +1095,7 @@ int LuaState::lua_registerSpecificEvent_CreatureMoveOut() {
 	// Store callback
 	insert(-4);
 
-	int id = popInteger();
+	int32_t id = popInteger();
 	std::string method = popString();
 	Creature* who = popCreature();
 
@@ -1136,7 +1136,7 @@ int LuaState::lua_registerGenericEvent_CreatureMoveIn() {
 	// Store callback
 	insert(-3);
 
-	int id = popInteger();
+	int32_t id = popInteger();
 	std::string method = popString();
 
 	OnMoveCreature::ScriptInformation si_onmovecreature;
@@ -1173,7 +1173,7 @@ int LuaState::lua_registerGenericEvent_CreatureMoveOut() {
 	// Store callback
 	insert(-3);
 
-	int id = popInteger();
+	int32_t id = popInteger();
 	std::string method = popString();
 
 	OnMoveCreature::ScriptInformation si_onmovecreature;
@@ -1269,7 +1269,7 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 
 	bool isAddItem = popBoolean();
 	bool isItemOnTile = popBoolean();
-	int id = popInteger();
+	int32_t id = popInteger();
 	std::string method = popString();
 
 	OnMoveItem::ScriptInformation si_onmoveitem;
@@ -1583,7 +1583,7 @@ int LuaState::lua_Thing_getName() {
 
 int LuaState::lua_Thing_getDescription()
 {
-	int lookdistance = 0;
+	int32_t lookdistance = 0;
 	if(getStackSize() > 1) {
 		lookdistance = popInteger();
 	}
@@ -1623,7 +1623,7 @@ int LuaState::lua_getThingByID()
 
 int LuaState::lua_Tile_getThing()
 {
-	int index = popInteger(); // lua indices start at 1, but we don't give a crap!
+	int32_t index = popInteger(); // lua indices start at 1, but we don't give a crap!
 	Tile* tile = popTile();
 
 	// -1 is top item
@@ -1643,7 +1643,7 @@ int LuaState::lua_Tile_getCreatures()
 	Tile* tile = popTile();
 
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	for(CreatureVector::iterator iter = tile->getCreatures()->begin(),
 		end_iter = tile->getCreatures()->end();
 		iter != end_iter; ++iter, ++n)
@@ -1659,7 +1659,7 @@ int LuaState::lua_Tile_getMoveableItems()
 	Tile* tile = popTile();
 
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	if(tile->getItemList()){
 		for(ItemVector::iterator iter = tile->getItemList()->begin(),
 			end_iter = tile->getItemList()->end();
@@ -1679,7 +1679,7 @@ int LuaState::lua_Tile_getItems()
 	Tile* tile = popTile();
 
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	if(tile->ground) {
 		pushThing(tile->ground);
 		setField(-2, n++);
@@ -1699,7 +1699,7 @@ int LuaState::lua_Tile_getItems()
 }
 
 int LuaState::lua_Tile_getItemTypeCount() {
-	int type = popInteger();
+	int32_t type = popInteger();
 	Tile* tile = popTile();
 	push(((Cylinder*)tile)->__getItemTypeCount(type));
 	return 1;
@@ -1707,7 +1707,7 @@ int LuaState::lua_Tile_getItemTypeCount() {
 
 int LuaState::lua_Tile_queryAdd()
 {
-	int flags = 0;
+	int32_t flags = 0;
 	if(getStackSize() > 2) {
 		flags = popInteger();
 	}
@@ -1774,7 +1774,7 @@ int LuaState::lua_Tile_addItem()
 
 int LuaState::lua_Tile_hasProperty()
 {
-	int prop = popInteger();
+	int32_t prop = popInteger();
 	Tile* tile = popTile();
 	pushBoolean(tile && tile->hasProperty((ITEMPROPERTY)prop));
 	return 1;
@@ -1806,7 +1806,7 @@ int LuaState::lua_Creature_getHealthMax()
 
 int LuaState::lua_Creature_setHealth()
 {
-	int newval = popInteger();
+	int32_t newval = popInteger();
 	Creature* c = popCreature();
 
 	if(newval >= c->getHealth()){
@@ -1836,7 +1836,7 @@ int LuaState::lua_Creature_getNameDescription()
 
 int LuaState::lua_Creature_walk()
 {
-	int ndir = popInteger();
+	int32_t ndir = popInteger();
 	Creature* creature = popCreature();
 
 	switch(ndir){
@@ -2019,7 +2019,7 @@ int LuaState::lua_getCreaturesByName()
 	std::string name = popString();
 	std::vector<Creature*> creatures = g_game.getCreaturesByName(name);
 
-	int n = 1;
+	int32_t n = 1;
 	newTable();
 	for(std::vector<Creature*>::iterator i = creatures.begin(); i != creatures.end(); ++i){
 		pushThing(*i);
@@ -2093,7 +2093,7 @@ int LuaState::lua_Actor_getAlwaysThink()
 }
 
 template <class T>
-int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
+int32_t Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
 	T value = l->popValue<T>();
 	Actor* actor = l->popActor();
 	((actor->getType()).*(mfp))(value);
@@ -2101,8 +2101,8 @@ int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
 	return 1;
 }
 
-template <class E, int size_>
-int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const Enum<E, size_>&)){
+template <class E, int32_t size_>
+int32_t Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const Enum<E, size_>&)){
 	Enum<E, size_> value = l->popEnum<Enum<E, size_> >();
 	Actor* actor = l->popActor();
 	((actor->getType()).*(mfp))(value);
@@ -2156,7 +2156,7 @@ int LuaState::lua_Actor_setCanPushCreatures()
 
 int LuaState::lua_Actor_setSpeed()
 {
-	int value = popInteger();
+	int32_t value = popInteger();
 	Actor* actor = popActor();
 	g_game.changeSpeed(actor, value - actor->getSpeed());
 
@@ -2282,7 +2282,7 @@ int LuaState::lua_Actor_setPushable()
 
 int LuaState::lua_Actor_setBaseSpeed()
 {
-	int value = popInteger();
+	int32_t value = popInteger();
 	Actor* actor = popActor();
 	actor->getType().base_speed(value);
 	actor->updateBaseSpeed();
@@ -2294,7 +2294,7 @@ int LuaState::lua_Actor_setBaseSpeed()
 
 int LuaState::lua_Actor_setMaxHealth()
 {
-	int value = popInteger();
+	int32_t value = popInteger();
 	Actor* actor = popActor();
 	actor->getType().health_max(value);
 	actor->updateMaxHealth();
@@ -2356,7 +2356,7 @@ int LuaState::lua_Actor_getCanBeLured()
 
 int LuaState::lua_Actor_setLightLevel()
 {
-	int value = popInteger();
+	int32_t value = popInteger();
 	Actor* actor = popActor();
 	actor->getType().lightLevel(value);
 	actor->updateLightLevel();
@@ -2373,7 +2373,7 @@ int LuaState::lua_Actor_getLightLevel()
 
 int LuaState::lua_Actor_setLightColor()
 {
-	int value = popInteger();
+	int32_t value = popInteger();
 	Actor* actor = popActor();
 	actor->getType().lightColor(value);
 	actor->updateLightColor();
@@ -2454,7 +2454,7 @@ int LuaState::lua_Player_getManaMax()
 
 int LuaState::lua_Player_setMana()
 {
-	int newval = popInteger();
+	int32_t newval = popInteger();
 	Player* p = popPlayer();
 	g_game.combatChangeMana(NULL, p, newval - p->getMana(), false);
 	push(true);
@@ -2463,7 +2463,7 @@ int LuaState::lua_Player_setMana()
 
 int LuaState::lua_Player_addManaSpent()
 {
-	int mana = popInteger();
+	int32_t mana = popInteger();
 	Player* p = popPlayer();
 	p->addManaSpent(mana);
 	push(true);
@@ -2486,7 +2486,7 @@ int LuaState::lua_Player_getSoulPoints()
 
 int LuaState::lua_Player_setSoulPoints()
 {
-	int soul = popInteger();
+	int32_t soul = popInteger();
 	Player* p = popPlayer();
 	p->changeSoul(soul - p->getPlayerInfo(PLAYERINFO_SOUL));
 	push(true);
@@ -2589,7 +2589,7 @@ int LuaState::lua_Player_getSkullType()
 }
 int LuaState::lua_Player_hasGroupFlag()
 {
-	int f = popInteger();
+	int32_t f = popInteger();
 	Player* player = popPlayer();
 	if(f < 0 || f >= PlayerFlag_LastFlag)
 		throw Error("Invalid player flag passed to function Player.hasGroupFlag!");
@@ -2624,7 +2624,7 @@ int LuaState::lua_Player_getInventoryItem()
 
 int LuaState::lua_Player_getItemTypeCount()
 {
-	int type = popInteger();
+	int32_t type = popInteger();
 	Player* p = popPlayer();
 	push(((Cylinder*)p)->__getItemTypeCount(type));
 	return 1;
@@ -2639,7 +2639,7 @@ int LuaState::lua_Player_countMoney()
 
 int LuaState::lua_Player_removeMoney()
 {
-	int amount = popInteger();
+	int32_t amount = popInteger();
 	Player* player = popPlayer();
 	pushBoolean(g_game.removeMoney(NULL, player, amount));
 	return 1;
@@ -2647,7 +2647,7 @@ int LuaState::lua_Player_removeMoney()
 
 int LuaState::lua_Player_addMoney()
 {
-	int amount = popInteger();
+	int32_t amount = popInteger();
 	Player* player = popPlayer();
 	pushBoolean(g_game.addMoney(NULL, player, amount));
 	return 1;
@@ -2655,7 +2655,7 @@ int LuaState::lua_Player_addMoney()
 
 int LuaState::lua_Player_setVocation()
 {
-	int vocationID = popInteger();
+	int32_t vocationID = popInteger();
 	Player* player = popPlayer();
 
 	if(g_vocations.getVocation(vocationID)) {
@@ -2719,9 +2719,9 @@ int LuaState::lua_Player_addItem()
 
 int LuaState::lua_Player_removeItem()
 {
-	int subtype = -1;
-	int count = 1;
-	int itemid = 0;
+	int32_t subtype = -1;
+	int32_t count = 1;
+	int32_t itemid = 0;
 	if(getStackSize() > 3)
 		count = popInteger();
 	if(getStackSize() > 2)
@@ -2744,7 +2744,7 @@ int LuaState::lua_Player_removeItem()
 int LuaState::lua_getOnlinePlayers()
 {
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		if(!it->second->isRemoved()){
 			pushThing(it->second);
@@ -2766,7 +2766,7 @@ int LuaState::lua_getPlayersByName()
 	std::string name = popString();
 	std::vector<Player*> players = g_game.getPlayersByName(name);
 
-	int n = 1;
+	int32_t n = 1;
 	newTable();
 	for(std::vector<Player*>::iterator i = players.begin(); i != players.end(); ++i){
 		pushThing(*i);
@@ -2792,7 +2792,7 @@ int LuaState::lua_getPlayersByNameWildcard()
 	std::string name = popString();
 	std::vector<Player*> players = g_game.getPlayersByNameWildcard(name);
 
-	int n = 1;
+	int32_t n = 1;
 	newTable();
 	for(std::vector<Player*>::iterator i = players.begin(); i != players.end(); ++i){
 		pushThing(*i);
@@ -2806,11 +2806,11 @@ int LuaState::lua_getPlayersByNameWildcard()
 
 int LuaState::lua_createItem()
 {
-	int count = -1;
+	int32_t count = -1;
 	if(getStackSize() > 1) {
 		count = popInteger();
 	}
-	int id = popUnsignedInteger();
+	int32_t id = popUnsignedInteger();
 
 	Item* item = Item::CreateItem((uint16_t)id, (count < 0? 0 : count));
 	item->addRef();
@@ -2927,12 +2927,12 @@ int LuaState::lua_Item_eraseAttribute()
 
 int LuaState::lua_Item_setItemID()
 {
-	int newcount = -1;
+	int32_t newcount = -1;
 	if(getStackSize() > 2) {
 		newcount = popInteger();
 	}
 
-	int newid = popInteger();
+	int32_t newid = popInteger();
 	Item* item = popItem();
 
 	if(newid < 0 || newid > 65535) {
@@ -2960,7 +2960,7 @@ int LuaState::lua_Item_startDecaying()
 
 int LuaState::lua_Item_setCount()
 {
-	int newcount = popInteger();
+	int32_t newcount = popInteger();
 	Item* item = popItem();
 	if(!item->isStackable() && !item->isRune()) {
 		throw Error("Item.setCount: Item is not stackable!");
@@ -2975,7 +2975,7 @@ int LuaState::lua_Item_setCount()
 
 int LuaState::lua_Item_setSubtype()
 {
-	int newtype = popInteger();
+	int32_t newtype = popInteger();
 	Item* item = popItem();
 	if(!item->isRune() && !item->isFluidContainer() && !item->isSplash()) {
 		throw Error("Item.setSubtype: Item does not have a subtype!");
@@ -3003,7 +3003,7 @@ int LuaState::lua_getItemIDByName()
 
 int LuaState::lua_getItemType()
 {
-	int itemid = popInteger();
+	int32_t itemid = popInteger();
 
 	newTable();
 
@@ -3788,7 +3788,7 @@ int LuaState::luaDoAreaCombatDispel(lua_State *L)
 	return 1;
 }
 
-int LuaStateLuaState::luaDoTargetCombatDispel(lua_State *L)
+int LuaState::luaDoTargetCombatDispel(lua_State *L)
 {
 	//doTargetCombatDispel(cid, target, type, effect)
 	uint8_t effect = (uint8_t)popNumber(L);
@@ -4152,7 +4152,7 @@ int LuaState::lua_Town_getHouses()
 	Houses& houses = Houses::getInstance();
 
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
 		if(it->second->getTownId() == town->getTownID()){
 			pushHouse(it->second);
@@ -4178,7 +4178,7 @@ int LuaState::lua_House_getDoors()
 	House* house = popHouse();
 
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	for(HouseDoorList::iterator hit = house->getDoorBegin(), end = house->getDoorEnd();
 		hit != end; ++hit)
 	{
@@ -4251,7 +4251,7 @@ int LuaState::lua_House_getTiles()
 	House* house = popHouse();
 	
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	for(HouseTileList::iterator hit = house->getTileBegin(), end = house->getTileEnd();
 		hit != end; ++hit)
 	{
@@ -4362,7 +4362,7 @@ int LuaState::lua_Channel_getUsers()
 {
 	ChatChannel* channel = popChannel();
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	for(UsersMap::const_iterator iter = channel->getUsers().begin(); iter != channel->getUsers().end(); ++iter)
 	{
 		pushThing(iter->second);
@@ -4391,7 +4391,7 @@ int LuaState::lua_Channel_removeUser()
 int LuaState::lua_Channel_talk()
 {
 	std::string text = popString();
-	int t = popInteger();
+	int32_t t = popInteger();
 	/*Player* user = */popPlayer(ERROR_PASS);
 	ChatChannel* channel = popChannel();
 	channel->talk(NULL, (SpeakClass)t, text);
@@ -4447,9 +4447,9 @@ int LuaState::lua_sendMagicEffect()
 
 int LuaState::lua_getTile()
 {
-	int z = popInteger();
-	int y = popInteger();
-	int x = popInteger();
+	int32_t z = popInteger();
+	int32_t y = popInteger();
+	int32_t x = popInteger();
 	pushTile(g_game.getTile(x, y, z));
 	return 1;
 }
@@ -4459,7 +4459,7 @@ int LuaState::lua_getTowns()
 	Towns& towns = Towns::getInstance();
 
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	for(TownMap::const_iterator i = towns.getTownBegin(); i != towns.getTownEnd(); ++i){
 		pushTown(const_cast<Town*>((*i).second));
 		setField(-2, n++);
@@ -4472,7 +4472,7 @@ int LuaState::lua_getHouses()
 	Houses& houses = Houses::getInstance();
 
 	newTable();
-	int n = 1;
+	int32_t n = 1;
 	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
 		pushHouse(it->second);
 		setField(-2, n++);
@@ -4502,7 +4502,7 @@ int lua_BitUNot(lua_State *L)
 
 #define MULTIOP(type, name, op) \
 	int lua_Bit##name(lua_State *L) { \
-	int i, n = lua_gettop(L); \
+	int32_t i, n = lua_gettop(L); \
 	type w = (type)lua_tonumber(L, -1); \
 	lua_pop(L, 1); \
 	for(i = 2; i <= n; ++i){ \

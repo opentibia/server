@@ -216,7 +216,7 @@ namespace Script {
 
 		struct ScriptInformation {
 			FilterType method;
-			uint16_t id;
+			int32_t id;
 		};
 
 		class Event : public Script::Event {
@@ -257,7 +257,7 @@ namespace Script {
 
 		struct ScriptInformation {
 			FilterType method;
-			uint16_t id;
+			int32_t id;
 			SlotPosition slot;
 			bool equip;
 		};
@@ -308,7 +308,7 @@ namespace Script {
 
 		struct ScriptInformation {
 			FilterType method;
-			uint16_t id;
+			int32_t id;
 			uint32_t slot;
 			MoveType moveType;
 		};
@@ -379,7 +379,7 @@ namespace Script {
 
 		struct ScriptInformation {
 			FilterType method;
-			uint16_t id;
+			int32_t id;
 			bool addItem;
 			bool isItemOnTile;
 		};
@@ -552,7 +552,7 @@ namespace Script {
 
 		struct ScriptInformation {
 			FilterType method;
-			uint32_t id;
+			int32_t id;
 		};
 
 		class Event : public Script::Event {
@@ -661,7 +661,7 @@ namespace Script {
 	namespace OnThink {
 		class Event : public Script::Event {
 		public:
-			Event(Creature* creature, int interval);
+			Event(Creature* creature, int32_t interval);
 			~Event();
 
 			std::string getName() const {return "OnThink";}
@@ -675,7 +675,7 @@ namespace Script {
 
 		protected:
 			Creature* creature;
-			int interval;
+			int32_t interval;
 		};
 	}
 

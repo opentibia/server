@@ -125,7 +125,7 @@ const bool* ItemAttributes::getBooleanAttribute(const std::string& key) const
 boost::any ItemAttributes::getAttribute(const std::string& key) const
 {
 	if(!attributes)
-		return NULL;
+		return boost::any();
 
 	AttributeMap::iterator iter = attributes->find(key);
 	if(iter != attributes->end())
