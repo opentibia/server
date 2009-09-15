@@ -506,12 +506,13 @@
 	<item id="1086" article="a" name="sandstone wall"/>
 	<item id="1087" article="a" name="sandstone wall"/>
 	<item id="1088" article="a" name="sandstone wall"/>
+	<item id="1089" article="a" name="metal wall"/>
 	<item id="1090" article="a" name="metal wall"/>
 	<item id="1091" article="a" name="metal wall"/>
 	<item id="1092" article="a" name="metal wall"/>
 	<item id="1093" article="a" name="metal wall"/>
-	<item id="1095" article="a" name="metal wall"/>
 	<item id="1094" editorsuffix=" (Blank)"/>
+	<item id="1095" article="a" name="metal wall"/>
 	<item id="1096" article="a" name="metal wall"/>
 	<item id="1097" article="a" name="metal wall"/>
 	<item id="1098" article="a" name="metal wall"/>
@@ -1998,7 +1999,7 @@
 		<attribute key="writeable" value="1"/>
 		<attribute key="maxTextLen" value="1024"/>
 	</item>
-	<item id="1819" article="an" name="banner"/>
+	<item id="1819" article="a" name="banner"/>
 	<item id="1820" article="an" name="emblem"/>
 	<item id="1821" article="an" name="emblem"/>
 	<item id="1822" article="an" name="emblem"/>
