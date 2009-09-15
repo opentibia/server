@@ -165,6 +165,7 @@ public:
 	Player* popPlayer(Script::ErrorMode mode = Script::ERROR_THROW);
 	Actor* popActor(Script::ErrorMode mode = Script::ERROR_THROW);
 	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
+	Container* popContainer(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
 	Town* popTown(Script::ErrorMode mode = Script::ERROR_THROW);
 	House* popHouse(Script::ErrorMode mode = Script::ERROR_THROW);
@@ -388,6 +389,7 @@ public:
 	int lua_Player_getMaximumCap();
 	int lua_Player_getLevel();
 	int lua_Player_getMagicLevel();
+	int lua_Player_isPremium();
 	int lua_Player_getCorpseId();
 
 	int lua_Player_getSex();
@@ -418,6 +420,11 @@ public:
 	int lua_Player_countMoney();
 	int lua_Player_addMoney();
 	int lua_Player_removeMoney();
+	int lua_Player_getBalance();
+	int lua_Player_hasBalance();
+	int lua_Player_setBalance();
+	int lua_Player_depositMoney();
+	int lua_Player_withdrawMoney();
 
 	int lua_Player_sendMessage();
 
@@ -426,6 +433,10 @@ public:
 	int lua_getPlayersByName();
 	int lua_getPlayerByNameWildcard();
 	int lua_getPlayersByNameWildcard();
+
+	int lua_Player_canUseSpell();
+	int lua_Player_learnSpell();
+	int lua_Player_unlearnSpell();
 
 	// - - Item
 	int lua_createItem();
@@ -451,6 +462,11 @@ public:
 	int lua_Item_getRawAttribute();
 	int lua_Item_eraseAttribute();
 
+	// - Container
+	int lua_Container_addItem();
+	int lua_Container_getItem();
+	int lua_Container_getSize();
+	int lua_Container_getCapacity();
 
 	// - Tile
 	int lua_Tile_getThing();
