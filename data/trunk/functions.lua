@@ -743,9 +743,8 @@ end
 
 function getContainerCapById(itemid)
 	local container = doCreateItemEx(itemid, 1)
-	local capacity
-	if isContainer(container) == LUA_TRUE then
-		capacity = getContainerCap(container)
+	local capacity = getContainerCap(container)
+	if capacity ~= LUA_ERROR then
 		doRemoveItem(container)
 		return capacity
 	else
