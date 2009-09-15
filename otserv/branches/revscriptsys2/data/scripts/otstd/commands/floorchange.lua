@@ -54,9 +54,6 @@ function otstd.Commands.moveVerticalHandler(event, dir)
 			return
 		end
 	end
-	
-	
-	event.text = "" -- Don't display a message
 end
 
 MoveUp:register()

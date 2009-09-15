@@ -26,8 +26,8 @@ function Command:register()
 		error("Can not register command '" .. self.words .. " without handler!")
 	end
 	
-	function registerHandler(words)
-		function internalHandler(event)
+	local function registerHandler(words)
+		local function internalHandler(event)
 			local speaker = event.creature
 			event.player = speaker
 			if typeof(speaker, "Player") then
@@ -35,13 +35,14 @@ function Command:register()
 					event.cmd = words
 					event.param = event.text:sub(words:len()+1) or ""
 					self.handler(event)
+					event:skip()
 				end
 			else
 				error("A non-player creature attempted to use a command.")
 			end
 		end
 		
-		table.insert(self.Listeners, registerOnSay("beginning", true, words, internalHandler))
+		table.append(self.Listeners, registerOnSay("beginning", true, words, internalHandler))
 	end
 	
 	self.Listeners = {}

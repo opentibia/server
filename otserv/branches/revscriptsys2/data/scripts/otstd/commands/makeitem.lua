@@ -48,12 +48,12 @@ function MakeItem.handler(event)
 	
 	if item then
 		event.creature:addItem(item)
-		event.creature:sendNote(event.param:gsub(item:getName(), function(s) return "'" .. s .. "'" end) .. " created. (id:" .. item:getItemID() .. ")")
+		event.creature:sendNote(
+			item:getLongName() .. " created. (id:" .. item:getItemID() .. ")"
+			)
 	else
 		event.creature:sendNote("There is no item with that name/ID!")
 	end
-	
-	event.text = "" -- Don't display a message
 end
 
 MakeItem:register()

@@ -1,11 +1,11 @@
 
-local create_npc = Command:new("CreateNPC")
+local CreateNPC = Command:new("CreateNPC")
 
-create_npc.words = {"/npc"}
-create_npc.groups = {"Community Manager", "Server Administrator"}
+CreateNPC.words = {"/npc"}
+CreateNPC.groups = {"Community Manager", "Server Administrator"}
 
 -- Handlers
-function create_npc.handler(event)
+function CreateNPC.handler(event)
 	if #event.param == 0 then
 		event.creature:sendNote("You need to enter the name of a NPC.")
 	else
@@ -18,4 +18,4 @@ function create_npc.handler(event)
 	end
 end
 
-create_npc:register()
+CreateNPC:register()

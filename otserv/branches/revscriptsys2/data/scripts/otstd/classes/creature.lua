@@ -4,16 +4,17 @@ function Creature:type()
 end
 
 function Creature:setCustomValue(key, value)
-	if type(value) == "nil" then
+	local t = type(value)
+	if t == "nil" then
 		return self:setRawCustomValue(key, nil)
-	elseif type(value) == "boolean" then
+	elseif t == "boolean" then
 		return self:setRawCustomValue(key, string.char(value and 1 or 0))
-	elseif type(value) == "string" or type(value) == "number" then
+	elseif t == "string" or type(value) == "number" then
 		return self:setRawCustomValue(key, value)
-	elseif type(value) == "table" then
+	elseif t == "table" then
 		return self:setRawCustomValue(key, table.serialize(value))
 	end
-	error("Creature custom values must be either boolean, string, number or table (was " + type(value) + ").")
+	error("Creature custom values must be either boolean, string, number or table (was " + t + ").")
 end
 
 function Creature:getCustomValue(key)

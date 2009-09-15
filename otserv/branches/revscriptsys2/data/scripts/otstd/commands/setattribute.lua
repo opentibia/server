@@ -1,5 +1,5 @@
 
-SetItemAttribute = Command:new("SetItemAttribute")
+local SetItemAttribute = Command:new("SetItemAttribute")
 
 SetItemAttribute.words = {"/setattribute", "/setitemattribute", "/sia"}
 SetItemAttribute.groups = "All"
@@ -19,7 +19,6 @@ function SetItemAttribute.handler(event)
 		
 		item:setAttribute(key, value)
 		event.creature:sendNote("Set attribute \"" .. key .. "\" to \"" .. (value or "") .. "\".")
-		event.text = ""
 	end
 end
 

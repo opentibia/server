@@ -1,8 +1,8 @@
 
-local setstat = Command:new("SetStat")
+local SetPlayerStat = Command:new("SetPlayerStat")
 
-setstat.words = {"/ss", "/setstat"}
-setstat.groups = {"Community Manager", "Server Administrator"}
+SetPlayerStat.words = {"/ss", "/setstat"}
+SetPlayerStat.groups = {"Community Manager", "Server Administrator"}
 
 local actions = {
 	["health"] = function(event, params)
@@ -14,7 +14,7 @@ local actions = {
 	}
 		
 -- Handlers
-function setstat.handler(event)
+function SetPlayerStat.handler(event)
 	local params = string.explode(event.params, "=")
 	
 	
@@ -25,4 +25,4 @@ function setstat.handler(event)
 	end
 end
 
-setstat:register()
+SetPlayerStat:register()

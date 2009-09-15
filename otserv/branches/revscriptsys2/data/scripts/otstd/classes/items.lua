@@ -16,7 +16,7 @@ function getItemNameByID(itemid, count, alternate_name)
 	
 	s = ""
 	
-	if count == 1 then
+	if not count or count == 1 then
 		if item_type then
 			s = s .. item_type.article .. " " .. (alternate_name or item_type.name)
 		else
