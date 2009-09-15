@@ -1756,6 +1756,11 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 		return RET_NOTPOSSIBLE;
 	}
 
+	if(item->getParent() == NULL){
+		assert(fromCylinder == item->getParent());
+		return g_game.internalAddItem(actor, toCylinder, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+	}
+
 	Item* toItem = NULL;
 
 	Cylinder* subCylinder;

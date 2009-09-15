@@ -921,8 +921,8 @@ bool Houses::payRent(Player* player, House* house, time_t time /*= 0*/)
 	Depot* depot = player->getDepot(town->getTownID(), true);
 	if(depot){
 		if(g_config.getNumber(ConfigManager::USE_ACCBALANCE)){
-			if(player->balance >= house->getRent()){
-				player->balance -= house->getRent();
+			if(player->getBalance() >= house->getRent()){
+				player->setBalance(player->getBalance() - house->getRent());
 				hasEnoughMoney = true;
 			}
 		}

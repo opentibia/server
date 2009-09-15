@@ -345,8 +345,11 @@ public:
 	
 	// Custom value interface
 	void setCustomValue(const std::string& key, const std::string& value);
+	void setCustomValue(const std::string& key, int32_t value);
 	bool eraseCustomValue(const std::string& key);
 	bool getCustomValue(const std::string& key, std::string& value) const;
+	bool getCustomValue(const std::string& key, uint32_t value) const;
+	bool getCustomValue(const std::string& key, int32_t value) const;
 
 protected:
 	static const int32_t mapWalkWidth = Map_maxViewportX * 2 + 1;

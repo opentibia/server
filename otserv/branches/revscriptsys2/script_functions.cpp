@@ -2687,7 +2687,7 @@ int LuaState::lua_Player_removeMoney()
 int LuaState::lua_Player_getBalance()
 {
 	Player* player = popPlayer();
-	pushInteger(player->balance);
+	pushInteger(player->getBalance());
 	return 1;
 }
 
@@ -2699,7 +2699,7 @@ int LuaState::lua_Player_hasBalance()
 		return 1;
 	}
 	Player* player = popPlayer();
-	pushBoolean(player->balance >= (uint32_t)amount);
+	pushBoolean(player->getBalance() >= (uint32_t)amount);
 	return 1;
 }
 
@@ -2712,7 +2712,7 @@ int LuaState::lua_Player_setBalance()
 	}
 
 	Player* player = popPlayer();
-	player->balance = amount;
+	player->setBalance(amount);
 	pushBoolean(true);
 	return 1;
 }

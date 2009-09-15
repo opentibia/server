@@ -196,7 +196,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	uint32_t rankid = result->getDataInt("rank_id");
 
 	// place it here and now we can drop all additional query instances as all data were loaded
-	player->balance = result->getDataInt("balance");
+	player->setCustomValue("balance", result->getDataInt("balance"));
 	player->stamina = result->getDataInt("stamina");
 
 	player->guildNick = result->getDataString("guildnick");
@@ -496,7 +496,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	<< ", `loss_skills` = " << (int32_t)player->getLossPercent(LOSS_SKILLTRIES)
 	<< ", `loss_items` = " << (int32_t)player->getLossPercent(LOSS_ITEMS)
 	<< ", `loss_containers` = " << (int32_t)player->getLossPercent(LOSS_CONTAINERS)
-	<< ", `balance` = " << player->balance
+	<< ", `balance` = " << 0 //TODO: remove from database
 	<< ", `stamina` = " << player->stamina;
 
 #ifdef __SKULLSYSTEM__

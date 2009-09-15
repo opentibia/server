@@ -1712,6 +1712,13 @@ void Creature::setCustomValue(const std::string& key, const std::string& value)
 	storageMap[key] = value;
 }
 
+void Creature::setCustomValue(const std::string& key, int32_t value)
+{
+	std::stringstream ss;
+	ss << value;
+	setCustomValue(key, ss.str());
+}
+
 bool Creature::eraseCustomValue(const std::string& key)
 {
 	StorageMap::iterator it;
@@ -1734,3 +1741,24 @@ bool Creature::getCustomValue(const std::string& key, std::string& value) const
 	return false;
 }
 
+bool Creature::getCustomValue(const std::string& key, uint32_t value) const
+{
+	std::string strValue;
+	if(!getCustomValue(key, strValue)){
+		return false;
+	}
+
+	value = atoi(strValue.c_str());
+	return true;
+}
+
+bool Creature::getCustomValue(const std::string& key, int32_t value) const
+{
+	std::string strValue;
+	if(!getCustomValue(key, strValue)){
+		return false;
+	}
+
+	value = atoi(strValue.c_str());
+	return true;
+}

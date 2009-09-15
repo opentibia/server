@@ -147,7 +147,6 @@ Creature()
 	maxVipLimit = 50;
 	groupFlags = 0;
 	premiumDays = 0;
-	balance = 0;
 
 	sex = SEX_FEMALE;
 
@@ -4284,13 +4283,13 @@ bool Player::withdrawMoney(uint32_t amount)
 		return false;
 	}
 
-	if(balance < amount){
+	if(getBalance() < amount){
 		return false;
 	}
 
 	bool ret = g_game.addMoney(NULL, this, amount);
 	if(ret){
-		balance -= amount;
+		setBalance(getBalance() - amount);
 	}
 	return ret;
 }
@@ -4303,7 +4302,7 @@ bool Player::depositMoney(uint32_t amount)
 
 	bool ret = g_game.removeMoney(NULL, this, amount);
 	if(ret){
-		balance += amount;
+		setBalance(getBalance() + amount);
 	}
 
 	return ret;
@@ -4321,9 +4320,9 @@ bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 	}
 
 	bool result = false;
-	if(balance >= amount){
-		balance -= amount;
-		target->balance += amount;
+	if(getBalance() >= amount){
+		setBalance(getBalance() - amount);
+		target->setBalance(target->getBalance() + amount);
 		result = true;
 	}
 
