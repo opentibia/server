@@ -20,6 +20,7 @@
 #include "otpch.h"
 
 #include "ioplayer.h"
+#include "game.h"
 #include "fileloader.h"
 #include "player.h"
 #include "account.h"
@@ -28,6 +29,7 @@
 #include "configmanager.h"
 
 extern ConfigManager g_config;
+extern Game g_game;
 
 #ifndef __GNUC__
 #pragma warning( disable : 4005)
@@ -847,6 +849,41 @@ int32_t IOPlayer::getPlayerUnjustKillCount(const Player* player, UnjustKillPerio
 
 	db->freeResult(result);
 	return count;
+}
+
+bool IOPlayer::sendMail(Creature* actor, const std::string name, uint32_t depotId, Item* item)
+{
+	uint32_t guid;
+	std::string dbname = name;
+	if(!IOPlayer::instance()->getGuidByName(guid, dbname)){
+		return false;
+	}
+	
+	Player* player = g_game.getPlayerByNameEx(name);
+	if(!player){
+		return false;
+	}
+
+	bool result = false;
+	Depot* depot = player->getDepot(depotId, true);
+	if(depot){
+		if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
+			item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
+		{
+			if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
+				g_game.transformItem(actor, item, item->getID() + 1);
+			}
+
+			result = true;
+		}
+	}
+
+	if(player->isOffline()){
+		IOPlayer::instance()->savePlayer(player);
+		delete player;
+	}
+
+	return result;
 }
 
 bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)

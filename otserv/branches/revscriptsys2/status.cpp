@@ -143,7 +143,7 @@ std::string Status::getStatusString() const
 
 
 	p = xmlNewNode(NULL,(const xmlChar*)"serverinfo");
-	ss << getUptime();
+	ss << getUpTime();
 	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getString(ConfigManager::IP).c_str());
@@ -224,7 +224,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 	// sent back, so we'll save some bandwidth and
 	// make many
 	std::stringstream ss;
-	uint64_t running = getUptime();
+	uint64_t running = getUpTime();
 	// since we haven't all the things on the right place like map's
 	// creator/info and other things, i'll put the info chunked into
 	// operators, so the httpd server will only receive the existing
@@ -307,7 +307,7 @@ bool Status::hasSlot() const
 	return m_playersonline < m_playersmax;
 }
 
-uint64_t Status::getUptime() const
+uint64_t Status::getUpTime() const
 {
 	return (OTSYS_TIME() - m_start)/1000;
 }

@@ -63,7 +63,6 @@ public:
 	
 	static bool getDepotId(const std::string& strTown, uint32_t& depotId);
 	static bool getRepicient(Item* item, std::string& name, uint32_t& depotId);
-	static bool sendItemTo(Creature* actor, const std::string name, uint32_t depotId, Item* item);
 	static bool sendItem(Creature* actor, Item* item);
 	static bool canSend(const Item* item);
 };

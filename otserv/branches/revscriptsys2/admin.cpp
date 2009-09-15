@@ -545,7 +545,7 @@ void ProtocolAdmin::adminCommandSendMail(const std::string& xmlData)
 		Item* mailItem = createMail(xmlData, name, depotId);
 
 		if(mailItem){
-			if(Mailbox::sendItemTo(NULL, name, depotId, mailItem)){
+			if(IOPlayer::instance()->sendMail(NULL, name, depotId, mailItem)){
 				output->AddByte(AP_MSG_COMMAND_OK);
 			}
 			else{

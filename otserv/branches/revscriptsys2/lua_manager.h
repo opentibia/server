@@ -528,7 +528,11 @@ public:
 	int lua_sendMagicEffect();
 	int lua_getTile();
 	int lua_getTowns();
+	int lua_sendMailTo();
 	int lua_getHouses();
+	int lua_getWorldType();
+	int lua_getWorldTime();
+	int lua_getWorldUpTime();
 
 protected:
 	// Members

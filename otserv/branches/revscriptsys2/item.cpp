@@ -190,14 +190,20 @@ Item::Item(const Item &i) :
 Item* Item::clone() const
 {
 	Item* _item = Item::CreateItem(id, count);
-	_item->attributes = attributes;
+	if(attributes){
+		_item->attributes = new AttributeMap();
+		*_item->attributes = *attributes;
+	}
 
 	return _item;
 }
 
 void Item::copyAttributes(Item* item)
 {
-	*(ItemAttribute*)(this) = *(ItemAttribute*)(item);
+	if(item->attributes){
+		attributes = new AttributeMap();
+		*attributes = *item->attributes;
+	}
 
 	eraseAttribute("decaying");
 	eraseAttribute("duration");

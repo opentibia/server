@@ -669,7 +669,7 @@ Item* LuaState::popItem(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 
 Container* LuaState::popContainer(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 {
-	Thing* t = popThing(mode);
+	Item* t = popItem(mode);
 	if(t) {
 		Container* i = t->getContainer();
 		if(!i) HandleError(mode, "Object is not a container.");

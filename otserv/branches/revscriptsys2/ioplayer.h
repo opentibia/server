@@ -62,6 +62,7 @@ public:
 
 	bool addPlayerDeath(Player* dying_player, const DeathList& dl);
 	int32_t getPlayerUnjustKillCount(const Player* player, UnjustKillPeriod_t period);
+	bool sendMail(Creature* actor, const std::string name, uint32_t depotId, Item* item);
 
 	bool getGuidByName(uint32_t& guid, std::string& name);
 	bool getAccountByName(uint32_t& acc, std::string& name);

@@ -35,6 +35,7 @@ require("otstd/classes/creature")
 require("otstd/classes/actor")
 require("otstd/classes/player")
 
+require("otstd/classes/game")
 require("otstd/classes/tile")
 require("otstd/classes/map")
 require("otstd/classes/town")

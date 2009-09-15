@@ -81,7 +81,7 @@ public:
 
 	void setMaxPlayersOnline(int max){m_playersmax = max;}
 
-	uint64_t getUptime() const;
+	uint64_t getUpTime() const;
 
 protected:
 	Status();

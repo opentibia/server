@@ -21,6 +21,7 @@
 #ifndef __OTSERV_CONDITION_H__
 #define __OTSERV_CONDITION_H__
 
+#include "classes.h"
 #include "condition_attributes.h"
 #include "outfit.h"
 

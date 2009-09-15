@@ -24,6 +24,7 @@
 #include "configmanager.h"
 #include "housetile.h"
 #include "player.h"
+#include "ioplayer.h"
 #include "game.h"
 #include "actor.h"
 #include "town.h"
@@ -31,6 +32,7 @@
 #include "house.h"
 #include "spawn.h"
 #include "vocation.h"
+#include "status.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -321,6 +323,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Town", "getID()", &Manager::lua_Town_getID);
 	
 	registerGlobalFunction("getAllTowns()", &Manager::lua_getTowns);
+	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
 
 	// Waypoint
 	registerMemberFunction("Waypoint", "getPosition()", &Manager::lua_Waypoint_getPosition);
@@ -356,6 +359,10 @@ void Manager::registerClasses() {
 	registerMemberFunction("Channel", "addUser(Player player)", &Manager::lua_Channel_addUser);
 	registerMemberFunction("Channel", "removeUser(Player player)", &Manager::lua_Channel_removeUser);
 	registerMemberFunction("Channel", "talk(Player speaker, int type, string msg)", &Manager::lua_Channel_talk);
+
+	registerGlobalFunction("getWorldType()", &Manager::lua_getWorldType);
+	registerGlobalFunction("getWorldTime()", &Manager::lua_getWorldTime);
+	registerGlobalFunction("getWorldUpTime()", &Manager::lua_getWorldUpTime);
 }
 
 void Manager::registerFunctions() {
@@ -4618,6 +4625,37 @@ int LuaState::lua_getTowns()
 	return 1;
 }
 
+int LuaState::lua_sendMailTo()
+{
+	Town* town = NULL;
+	if(getStackSize() > 2) {
+		town = popTown();
+	}
+
+	uint32_t townId = 0;
+	std::string name = popString();
+
+	if(town == NULL){
+		if(!IOPlayer::instance()->getDefaultTown(name, townId)){
+			pushBoolean(false);
+			return 1;
+		}
+	}
+	else{
+		townId = town->getTownID();
+	}
+
+	Item* item = popItem();
+	if(item == NULL) {
+		pushBoolean(false);
+		return 1;
+	}
+
+	bool result = IOPlayer::instance()->sendMail(NULL, name, townId, item);
+	pushBoolean(result);
+	return 1;
+}
+
 int LuaState::lua_getHouses()
 {
 	Houses& houses = Houses::getInstance();
@@ -4629,6 +4667,25 @@ int LuaState::lua_getHouses()
 		setField(-2, n++);
 	}
 
+	return 1;
+}
+
+int LuaState::lua_getWorldType()
+{
+	//TODO: use pushEnum()
+	pushInteger(g_game.getWorldType());
+	return 1;
+}
+
+int LuaState::lua_getWorldTime()
+{
+	push(g_game.getLightHour());
+	return 1;
+}
+
+int LuaState::lua_getWorldUpTime()
+{
+	push(Status::instance()->getUpTime());
 	return 1;
 }
 

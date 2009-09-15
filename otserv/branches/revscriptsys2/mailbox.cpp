@@ -107,41 +107,6 @@ void Mailbox::postRemoveNotification(Creature* actor, Thing* thing, const Cylind
 	getParent()->postRemoveNotification(actor, thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 }
 
-bool Mailbox::sendItemTo(Creature* actor, const std::string name, uint32_t depotId, Item* item)
-{
-	uint32_t guid;
-	std::string dbname = name;
-	if(!IOPlayer::instance()->getGuidByName(guid, dbname)){
-		return false;
-	}
-	
-	Player* player = g_game.getPlayerByNameEx(name);
-	if(!player){
-		return false;
-	}
-
-	bool result = false;
-	Depot* depot = player->getDepot(depotId, true);
-	if(depot){
-		if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
-			item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
-		{
-			if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
-				g_game.transformItem(actor, item, item->getID() + 1);
-			}
-
-			result = true;
-		}
-	}
-
-	if(player->isOffline()){
-		IOPlayer::instance()->savePlayer(player);
-		delete player;
-	}
-
-	return result;
-}
-
 bool Mailbox::sendItem(Creature* actor, Item* item)
 {
 	std::string name;
@@ -155,7 +120,7 @@ bool Mailbox::sendItem(Creature* actor, Item* item)
 		return false;
 	}
 
-	return sendItemTo(actor, name, depotId, item);
+	return IOPlayer::instance()->sendMail(actor, name, depotId, item);
 }
 
 bool Mailbox::getDepotId(const std::string& strTown, uint32_t& depotId)
