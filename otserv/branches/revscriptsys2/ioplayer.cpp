@@ -196,7 +196,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	uint32_t rankid = result->getDataInt("rank_id");
 
 	// place it here and now we can drop all additional query instances as all data were loaded
-	player->setCustomValue("balance", result->getDataInt("balance"));
+	player->setBalance(result->getDataInt("balance"));
 	player->stamina = result->getDataInt("stamina");
 
 	player->guildNick = result->getDataString("guildnick");

@@ -249,11 +249,6 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "countMoney()", &Manager::lua_Player_countMoney);
 	registerMemberFunction("Player", "addMoney(int amount)", &Manager::lua_Player_addMoney);
 	registerMemberFunction("Player", "removeMoney(int amount)", &Manager::lua_Player_removeMoney);
-	registerMemberFunction("Player", "getBalance()", &Manager::lua_Player_getBalance);
-	registerMemberFunction("Player", "hasBalance(int amount)", &Manager::lua_Player_hasBalance);
-	registerMemberFunction("Player", "setBalance(int amount)", &Manager::lua_Player_setBalance);
-	registerMemberFunction("Player", "depositMoney(int amount)", &Manager::lua_Player_depositMoney);
-	registerMemberFunction("Player", "withdrawMoney(int amount)", &Manager::lua_Player_withdrawMoney);
 
 	registerMemberFunction("Player", "sendMessage(int type, string msg)", &Manager::lua_Player_sendMessage);
 
@@ -2681,59 +2676,6 @@ int LuaState::lua_Player_removeMoney()
 	int32_t amount = popInteger();
 	Player* player = popPlayer();
 	pushBoolean(g_game.removeMoney(NULL, player, amount));
-	return 1;
-}
-
-int LuaState::lua_Player_getBalance()
-{
-	Player* player = popPlayer();
-	pushInteger(player->getBalance());
-	return 1;
-}
-
-int LuaState::lua_Player_hasBalance()
-{
-	int32_t amount = popInteger();
-	if(amount < 0){
-		pushBoolean(false);
-		return 1;
-	}
-	Player* player = popPlayer();
-	pushBoolean(player->getBalance() >= (uint32_t)amount);
-	return 1;
-}
-
-int LuaState::lua_Player_setBalance()
-{
-	int32_t amount = popInteger();
-	if(amount < 0){
-		pushBoolean(false);
-		return 1;
-	}
-
-	Player* player = popPlayer();
-	player->setBalance(amount);
-	pushBoolean(true);
-	return 1;
-}
-
-int LuaState::lua_Player_depositMoney()
-{
-	int32_t amount = popInteger();
-	if(amount < 0){
-		pushBoolean(false);
-		return 1;
-	}
-	Player* player = popPlayer();
-	pushBoolean(player->depositMoney(amount));
-	return 1;
-}
-
-int LuaState::lua_Player_withdrawMoney()
-{
-	int32_t amount = popInteger();
-	Player* player = popPlayer();
-	pushBoolean(player->withdrawMoney(amount));
 	return 1;
 }
 

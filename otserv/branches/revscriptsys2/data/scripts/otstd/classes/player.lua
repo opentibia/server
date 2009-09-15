@@ -100,6 +100,38 @@ function Player:hasMoney(howmuch)
 	return self:countMoney() >= howmuch
 end
 
+function Player:getBalance()
+	return self:getStorageValue("__balance")
+end
+
+function Player:hasBalance(amount)
+	return getBalance() >= amount
+end
+
+function Player:setBalance(amount)
+	return self:setStorageValue("__balance", amount)
+end
+
+function Player:depositMoney(amount)
+	if self:removeMoney(amount) then
+		return self:setBalance(self:getBalance() + amount)
+	end
+
+	return false
+end
+
+function Player:withDrawMoney(amount)
+	if self:getBalance() < amount then
+		return false
+	end
+
+	if self:addMoney(amount) then
+		return self:setBalance(self:getBalance() - amount)
+	end
+
+	return false
+end
+
 -- Flags
 
 function Player:hasInfiniteMana()

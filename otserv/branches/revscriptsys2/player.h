@@ -129,8 +129,8 @@ public:
 	Container* getContainer(uint32_t cid);
 	bool canOpenCorpse(uint32_t ownerId);
 
-	void setBalance(uint32_t amount) {setCustomValue("balance", amount);}
-	uint32_t getBalance() {uint32_t amount = 0; if(getCustomValue("balance", amount)) {return amount;} return 0;}
+	void setBalance(uint32_t amount) {setCustomValue("__balance", amount);}
+	uint32_t getBalance() {uint32_t amount = 0; if(getCustomValue("__balance", amount)) {return amount;} return 0;}
 	bool withdrawMoney(uint32_t amount);
 	bool depositMoney(uint32_t amount);
 	bool transferMoneyTo(const std::string& name, uint32_t amount);

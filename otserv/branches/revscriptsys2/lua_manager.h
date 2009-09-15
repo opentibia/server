@@ -420,11 +420,6 @@ public:
 	int lua_Player_countMoney();
 	int lua_Player_addMoney();
 	int lua_Player_removeMoney();
-	int lua_Player_getBalance();
-	int lua_Player_hasBalance();
-	int lua_Player_setBalance();
-	int lua_Player_depositMoney();
-	int lua_Player_withdrawMoney();
 
 	int lua_Player_sendMessage();
 
