@@ -1337,7 +1337,14 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	boost::any p(si_onmoveitem);
 	Listener_ptr listener(new Listener(ON_MOVE_ITEM_LISTENER, p, *manager));
 
-	environment->Generic.OnMoveItem.push_back(listener);
+	switch(si_onmoveitem.method){
+		case OnMoveItem::FILTER_ITEMID: environment->Generic.OnMoveItem.ItemId[id].push_back(listener); break;
+		case OnMoveItem::FILTER_ACTIONID: environment->Generic.OnMoveItem.ActionId[id].push_back(listener); break;
+		case OnMoveItem::FILTER_UNIQUEID: environment->Generic.OnMoveItem.UniqueId[id].push_back(listener); break;
+
+		default:
+			break;
+	}
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());

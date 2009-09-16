@@ -78,6 +78,30 @@ bool Environment::stopListener(ListenerStringMap& list, uint32_t id) {
 	return false;
 }
 
+bool Environment::stopListener(ListenerItemMap& item_map, uint32_t id) {
+
+	Script::ListenerMap::iterator list_iter;
+	for(list_iter = item_map.ItemId.begin(); list_iter != item_map.ItemId.end(); ++list_iter){
+		if(stopListener(list_iter->second, id)){
+			return true;
+		}
+	}
+
+	for(list_iter = item_map.ActionId.begin(); list_iter != item_map.ActionId.end(); ++list_iter){
+		if(stopListener(list_iter->second, id)){
+			return true;
+		}
+	}
+
+	for(list_iter = item_map.UniqueId.begin(); list_iter != item_map.UniqueId.end(); ++list_iter){
+		if(stopListener(list_iter->second, id)){
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool Environment::stopListener(ListenerType type, uint32_t id) {
 	switch(type.value())
 	{

@@ -651,10 +651,35 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 
 bool OnMoveItem::Event::dispatch(Manager& state, Environment& environment)
 {
-	// Extremely naive solution
-	// Should be a map with id:callback instead.
-	return dispatchEvent<OnMoveItem::Event, ScriptInformation>
-		(this, state, environment, environment.Generic.OnMoveItem);
+	Script::ListenerMap::iterator list_iter = environment.Generic.OnMoveItem.ItemId.find(item->getID());
+	if(list_iter != environment.Generic.OnMoveItem.ItemId.end()){
+		if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
+			(this, state, environment, list_iter->second)){
+				return true;
+		}
+	}
+
+	if(item->getActionId() != 0){
+		list_iter = environment.Generic.OnMoveItem.ActionId.find(item->getActionId());
+		if(list_iter != environment.Generic.OnMoveItem.ActionId.end()){
+			if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
+				(this, state, environment, list_iter->second)){
+					return true;
+			}
+		}
+	}
+
+	if(item->getUniqueId() != 0){
+		list_iter = environment.Generic.OnMoveItem.UniqueId.find(item->getUniqueId());
+		if(list_iter != environment.Generic.OnMoveItem.UniqueId.end()){
+			if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
+				(this, state, environment, list_iter->second)){
+					return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void OnMoveItem::Event::push_instance(LuaState& state, Environment& environment)

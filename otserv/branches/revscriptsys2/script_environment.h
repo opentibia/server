@@ -30,6 +30,12 @@ namespace Script {
 	//typedef boost::shared_ptr<const Listener> Listener_cptr;
 
 	typedef std::vector<Listener_ptr> ListenerList;
+	typedef std::map<uint32_t, ListenerList > ListenerMap;
+	typedef struct{
+		ListenerMap ItemId;
+		ListenerMap ActionId;
+		ListenerMap UniqueId;
+	} ListenerItemMap;
 	typedef std::map<uint32_t, Listener_ptr> SpecificListenerMap;
 	typedef std::map<std::string, ListenerList> ListenerStringMap;
 
@@ -76,7 +82,6 @@ namespace Script {
 			ListenerList OnUseItem;
 			ListenerList OnEquipItem;
 			ListenerList OnMoveCreature;
-			ListenerList OnMoveItem;
 			ListenerList OnJoinChannel;
 			ListenerList OnLeaveChannel;
 			ListenerList OnLogin;
@@ -87,11 +92,13 @@ namespace Script {
 			ListenerList OnUnload;
 			ListenerStringMap OnSpawn;
 			ListenerList OnAdvance;
+			ListenerItemMap OnMoveItem;
 		} Generic;
 		SpecificListenerMap specific_listeners;
 
 	protected:
 		bool stopListener(ListenerList& list, uint32_t id);
+		bool stopListener(ListenerItemMap& item_map, uint32_t id);
 		bool stopListener(ListenerStringMap& list, uint32_t id);
 		void cleanupUnusedListeners(ListenerList& list);
 
