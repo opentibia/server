@@ -166,14 +166,14 @@ public:
 	bool floorChangeDown() const {return hasFlag(TILESTATE_FLOORCHANGE_DOWN);}
 	bool floorChange(Direction direction) const
 	{
-		switch(direction){
-		case NORTH:
+		switch(direction.value()){
+		case enums::NORTH:
 			return hasFlag(TILESTATE_FLOORCHANGE_NORTH);
-		case SOUTH:
+		case enums::SOUTH:
 			return hasFlag(TILESTATE_FLOORCHANGE_SOUTH);
-		case EAST:
+		case enums::EAST:
 			return hasFlag(TILESTATE_FLOORCHANGE_EAST);
-		case WEST:
+		case enums::WEST:
 			return hasFlag(TILESTATE_FLOORCHANGE_WEST);
 		default:
 			return false;

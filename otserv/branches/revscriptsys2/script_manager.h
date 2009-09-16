@@ -77,10 +77,14 @@ namespace Script {
 		void registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc);
 		void registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc);
 
+		template <class ET>
+		void registerEnum();
+
 		// Callback from lua
 		static int luaFunctionCallback(lua_State* L);
 		static int luaCompareClassInstances(lua_State* L);
 		static int luaGetClassInstanceID(lua_State* L);
+		static int luaCreateEnum(lua_State* L);
 
 		// Parse arguments
 		ComposedCallback_ptr parseFunctionDeclaration(std::string s);
@@ -103,6 +107,55 @@ namespace Script {
 		std::string name;
 		std::vector<std::string> parent_classes;
 	};
+}
+
+// Must be done here since it's a templated function
+template<class ET>
+inline void Script::Manager::registerEnum()
+{
+	registerClass(ET::name(), "Enum");
+
+	// Push Enum table
+	getGlobal(ET::name()); // index 1
+
+	//std::cout << "Global " << ET::name() << " table is " << lua_topointer(state, 1) << std::endl;
+	// Expose members
+	int n = 1;
+	for(ET::iterator ei = ET::begin(); ei != ET::end(); ++ei, ++n){
+
+		// Push class instance
+		pushClassTableInstance(ET::name()); // index 2
+
+		// Table to hold string values
+		newTable(); // index 3
+		// Should iterate over all possible values here
+		setField(3, 1, ei->toString());
+		
+		// Save the table
+		setField(2, "__strValues");
+		
+		// set integer converted value
+		setField(2, "__intValue", ei->value());
+		
+		// Push another pointer to the class instance
+		duplicate(2);
+
+		// Save first pointer to class instance as a global
+		//std::cout << "set " << ei->toString() << " to " << lua_topointer(state, -1) << " " << typeName(-1) << std::endl;
+		setGlobal(ei->toString());
+
+		//std::cout << "set field of " << lua_topointer(state, 1) << " to " << lua_topointer(state, -1) << " " << typeName(-1) << std::endl;
+		// Other should go into the table for this Enum
+		setField(1, n);
+
+		//std::cout << "stack is " << lua_gettop(state) << std::endl;
+	}
+
+	// We actually hide the class here in favor of pretty construction of it
+	// Another added bonus is that it's impossible to create new Enum values of this
+	// type from inside lua
+	lua_pushcclosure(state, luaCreateEnum, 1);
+	lua_setglobal(state, ET::name().c_str());
 }
 
 #endif

@@ -1420,39 +1420,39 @@ Position Combat::getCasterPosition(const Creature* creature, Direction dir)
 {
 	Position pos = creature->getPosition();
 
-	switch(dir){
-		case NORTH:
+	switch(dir.value()){
+		case enums::NORTH:
 			pos.y -= 1;
 			break;
 
-		case SOUTH:
+		case enums::SOUTH:
 			pos.y += 1;
 			break;
 
-		case EAST:
+		case enums::EAST:
 			pos.x += 1;
 			break;
 
-		case WEST:
+		case enums::WEST:
 			pos.x -= 1;
 			break;
 
-		case SOUTHWEST:
+		case enums::SOUTHWEST:
 			pos.x -= 1;
 			pos.y += 1;
 		break;
 
-		case NORTHWEST:
+		case enums::NORTHWEST:
 			pos.x -= 1;
 			pos.y -= 1;
 		break;
 
-		case NORTHEAST:
+		case enums::NORTHEAST:
 			pos.x += 1;
 			pos.y -= 1;
 		break;
 
-		case SOUTHEAST:
+		case enums::SOUTHEAST:
 			pos.x += 1;
 			pos.y += 1;
 		break;

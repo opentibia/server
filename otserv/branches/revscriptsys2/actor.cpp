@@ -1215,11 +1215,11 @@ bool Actor::isInSpawnRange(const Position& toPos)
 
 bool Actor::canWalkTo(Position pos, Direction dir)
 {
-	switch(dir){
-		case NORTH: pos.y += -1; break;
-		case WEST:  pos.x += -1; break;
-		case EAST:  pos.x += 1; break;
-		case SOUTH: pos.y += 1; break;
+	switch(dir.value()){
+		case enums::NORTH: pos.y += -1; break;
+		case enums::WEST:  pos.x += -1; break;
+		case enums::EAST:  pos.x += 1; break;
+		case enums::SOUTH: pos.y += 1; break;
 		default:
 			break;
 	}

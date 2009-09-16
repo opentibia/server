@@ -51,6 +51,7 @@ public:
 	virtual const Item* getItem() const {return this;}
 	virtual Creature* getCreature() {return NULL;}
 	virtual const Creature* getCreature() const {return NULL;}
+
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,

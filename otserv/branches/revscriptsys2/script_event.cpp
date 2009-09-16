@@ -576,7 +576,7 @@ void OnTurn::Event::push_instance(LuaState& state, Environment& environment)
 	state.pushClassTableInstance("OnTurnEvent");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
-	state.pushInteger(direction);
+	state.pushEnum(direction);
 	state.setField(-2, "direction");
 }
 
@@ -1114,7 +1114,8 @@ void OnAdvance::Event::push_instance(LuaState& state, Environment& environment)
 	state.pushClassTableInstance("OnAdvanceEvent");
 	state.pushThing(player);
 	state.setField(-2, "player");
-	state.setField(-1, "skill", skill.value());
+	state.pushEnum(skill);
+	state.setField(-2, "skill");
 	state.setField(-1, "oldLevel", oldSkillLevel);
 	state.setField(-1, "newLevel", newSkillLevel);
 }

@@ -5,6 +5,7 @@ require("otstd/classes/config")
 require("otstd/intrinistic/string")
 require("otstd/intrinistic/table")
 
+require("otstd/enum")
 require("otstd/constants")
 require("otstd/functions")
 require("otstd/itemids")

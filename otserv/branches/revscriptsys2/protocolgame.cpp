@@ -1854,7 +1854,7 @@ void ProtocolGame::sendCreatureTurn(const Creature* creature, uint32_t stackpos)
 				msg->AddByte(stackpos);
 				msg->AddU16(0x63); /*99*/
 				msg->AddU32(creature->getID());
-				msg->AddByte(creature->getDirection());
+				msg->AddByte(creature->getDirection().value() & 0xff);
 			}
 		}
 	}
@@ -1915,7 +1915,7 @@ void ProtocolGame::sendCancelWalk()
 	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0xB5);
-		msg->AddByte(player->getDirection());
+		msg->AddByte(player->getDirection().value() & 0xff);
 	}
 }
 
@@ -2536,7 +2536,7 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 	}
 
 	msg->AddByte((int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1)));
-	msg->AddByte((uint8_t)creature->getDirection());
+	msg->AddByte(creature->getDirection().value() & 0xff);
 	if(creature->isInvisible()){
 		static OutfitType outfit;
 		AddCreatureOutfit(msg, creature, outfit);

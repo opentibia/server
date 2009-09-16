@@ -1456,42 +1456,42 @@ ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Dire
 	Position destPos = currentPos;
 
 	bool canChangeFloor = true;
-	switch(direction){
-		case NORTH:
+	switch(direction.value()){
+		case enums::NORTH:
 			destPos.y -= 1;
 			break;
 
-		case SOUTH:
+		case enums::SOUTH:
 			destPos.y += 1;
 			break;
 
-		case WEST:
+		case enums::WEST:
 			destPos.x -= 1;
 			break;
 
-		case EAST:
+		case enums::EAST:
 			destPos.x += 1;
 			break;
 
-		case SOUTHWEST:
+		case enums::SOUTHWEST:
 			destPos.x -= 1;
 			destPos.y += 1;
 			canChangeFloor = false;
 			break;
 
-		case NORTHWEST:
+		case enums::NORTHWEST:
 			destPos.x -= 1;
 			destPos.y -= 1;
 			canChangeFloor = false;
 			break;
 
-		case NORTHEAST:
+		case enums::NORTHEAST:
 			destPos.x += 1;
 			destPos.y -= 1;
 			canChangeFloor = false;
 			break;
 
-		case SOUTHEAST:
+		case enums::SOUTHEAST:
 			destPos.x += 1;
 			destPos.y += 1;
 			canChangeFloor = false;

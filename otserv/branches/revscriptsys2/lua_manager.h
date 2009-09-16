@@ -122,7 +122,7 @@ public:
 	bool isThread(int32_t index = -1);
 	bool isTable(int32_t index = -1);
 	// Pop
-	void pop(int32_t n = 1);
+	void pop(int n = 1);
 	bool popBoolean();
 	int32_t popInteger();
 	uint32_t popUnsignedInteger();
@@ -130,7 +130,6 @@ public:
 	std::string popString();
 	Position popPosition(Script::ErrorMode mode = Script::ERROR_THROW);
 	void* getUserdata();
-	template <class ET> ET popEnum() {return ET(popInteger());}
 
 	template <typename T> T popValue();
 #ifndef __GNUC__
@@ -172,6 +171,7 @@ public:
 	ChatChannel* popChannel(Script::ErrorMode mode = Script::ERROR_THROW);
 	Waypoint_ptr popWaypoint(Script::ErrorMode mode = Script::ERROR_THROW);
 	OutfitType popOutfit(Script::ErrorMode mode = Script::ERROR_THROW);
+	template <class ET> ET popEnum(Script::ErrorMode mode = Script::ERROR_THROW);
 
 	// Push
 	void pushThing(Thing* thing);
@@ -181,6 +181,8 @@ public:
 	void pushChannel(ChatChannel* channel);
 	void pushWaypoint(Waypoint_ptr pos);
 	void pushOutfit(const OutfitType& outfit);
+	template<class E, int size_>
+	void pushEnum(const Enum<E, size_>&);
 
 
 	// Generic
@@ -440,6 +442,7 @@ public:
 	int lua_isValidItemID();
 
 	int lua_Item_getItemID();
+	int lua_Item_getLongName();
 	int lua_Item_getCount();
 	int lua_Item_getWeight();
 	int lua_Item_isPickupable();
@@ -547,6 +550,33 @@ template <> inline float LuaState::popValue<float>() {return popFloat();}
 template <> inline double LuaState::popValue<double>() {return popFloat();}
 template <> inline std::string LuaState::popValue<std::string>() {return popString();}
 template <> inline uint64_t LuaState::popValue<uint64_t>() {return (uint64_t)popFloat();}
+
+template <class ET> inline ET LuaState::popEnum(Script::ErrorMode mode){
+	ET e;
+	if(isNumber(-1)){
+		int32_t i = popInteger();
+		e = ET(i);
+		if(!e.exists()){
+			std::ostringstream os;
+			os << "Integer value " << i << " cannot be interpreted as enum of type " << ET::name() << ".";
+			HandleError(mode, os.str());
+		}
+	} else if(isString(-1)){
+		std::string s = popString();
+		try{
+			e = ET::fromString(s);
+		} catch(enum_conversion_error&){
+			HandleError(mode, "Can not construct enum of type " + ET::name() + " from value the string '" + s + "'.");
+		}
+	}
+	return e;
+}
+
+template<class E, int size_>
+inline void LuaState::pushEnum(const Enum<E, size_>& e){
+	getGlobal(e.toString());
+}
+
 
 class LuaThread : public LuaState {
 public:

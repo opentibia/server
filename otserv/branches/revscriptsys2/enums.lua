@@ -27,6 +27,17 @@ enum ("RaceType",
 	{"RACE_ENERGY", "energy"}
 )
 
+enum ("Direction",
+	"NORTH = 0",
+	"EAST = 1",
+	"SOUTH = 2",
+	"WEST = 3",
+	"SOUTHWEST = 4",
+	"SOUTHEAST = 5",
+	"NORTHWEST = 6",
+	"NORTHEAST = 7"
+)
+
 enum ({name="CombatType", bitmask=true},
 	{"COMBAT_NONE", "unknown", null=true},
 	{"COMBAT_PHYSICALDAMAGE", "physical"},

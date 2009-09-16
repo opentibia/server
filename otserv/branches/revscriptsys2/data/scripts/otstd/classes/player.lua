@@ -170,7 +170,7 @@ function otstd.Player.LogoutHandler(event)
 	player:setStorageValue("__playtime", player:getPlayTime())
 end
 
-otstd.Player.onLoginListener   = registerOnLogin(otstd.Player.LoginHandler)
+otstd.Player.onLoginListener  = registerOnLogin(otstd.Player.LoginHandler)
 otstd.Player.onLogoutListener = registerOnLogout(otstd.Player.LogoutHandler)
 
 -- Advance handlers

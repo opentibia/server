@@ -58,13 +58,20 @@ int Manager::luaCompareClassInstances(lua_State* L)
 {
 	/*
 	std::cout << "Compare" << std::endl;
-	int32_t n = lua_gettop(L);
+	int n = lua_gettop(L);
 	while(--n >= 0)
 		std::cout << luaL_typename(L, -n-1) << std::endl;
 	*/
 
 	//Manager* manager = (Manager*)(lua_touserdata(L, lua_upvalueindex(1)));
 	//Environment& e = manager->environment;
+
+	// Check that's it's two userdata instances (and not table classes)
+	if(!lua_isuserdata(L, -1) || !lua_isuserdata(L, -2)){
+		lua_pop(L, 2);
+		lua_pushboolean(L, 0);
+		return 1;
+	}
 
 	// 2 class instances are ontop of the stack
 	Script::ObjectID* objid1 = (Script::ObjectID*)lua_touserdata(L, -1);
@@ -84,13 +91,20 @@ int Manager::luaGetClassInstanceID(lua_State* L)
 {
 	/*
 	std::cout << "GetID" << std::endl;
-	int32_t n = lua_gettop(L);
+	int n = lua_gettop(L);
 	while(--n >= 0)
 		std::cout << luaL_typename(L, -n-1) << std::endl;
 	*/
 
 	// Phantom instance (always NIL)
 	lua_pop(L, 1);
+
+	// Check that's it's a userdata instance (and not a table class, even if that's impossible)
+	if(!lua_isuserdata(L, -1)){
+		lua_pop(L, 1);
+		lua_pushnil(L);
+		return 1;
+	}
 
 	// A class instances are ontop of the stack
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(L, -1);
@@ -102,6 +116,110 @@ int Manager::luaGetClassInstanceID(lua_State* L)
 		lua_pushnil(L);
 
 	return 1;
+}
+
+int Manager::luaCreateEnum(lua_State* L)
+{
+	// Upvalue contains the Enum table
+	if(lua_isnumber(L, -1)){
+		int en = lua_tonumber(L, -1);
+		
+		// Push the class table from upvalue
+		lua_pushvalue(L, lua_upvalueindex(1));
+
+		// Iterator over the table values
+		lua_pushnil(L);
+		while(lua_next(L, -2) != 0){
+			// Get int value
+			lua_getfield(L, 4, "__intValue");
+			// int value is at top of stack
+			if(lua_equal(L, 1, -1) == 1){
+				// pop __intValue
+				lua_pop(L, 1);
+
+				// We want this value, move to top of stack
+				lua_insert(L, 1);
+
+				// Pop enum key, class table and name str
+				lua_pop(L, 2);
+
+				// Only thing left is the enum value
+				return 1;
+			}
+			// Pop __intValue
+			lua_pop(L, 1);
+			// Pop value, keep key for next iteration
+			lua_pop(L, 1);
+		}
+		// Pop enum table, string
+		lua_pop(L, -2);
+
+		// Not found, we return nil
+		lua_pushnil(L);
+		return 1;
+	}
+	else if(lua_isstring(L, -1)){
+		// Construct from string
+		const char* name = lua_tostring(L, -1);
+
+		// Push the class table from upvalue
+		lua_pushvalue(L, lua_upvalueindex(1));
+		
+		// Iterator over the table values
+		lua_pushnil(L);
+		while(lua_next(L, -2) != 0){
+			// name str at 1
+			// class table at 2
+			// enum key is at 3
+			// enum value at 4
+
+			// Get strings
+			lua_getfield(L, 4, "__strValues");
+			// str value array is at top of stack, all indexes -1
+			// iterator over that array
+			lua_pushnil(L);
+			while(lua_next(L, -2)){
+				// __strValues at 5
+				// str key at 6
+				// str value at 7
+				if(lua_equal(L, 1, 7) == 1){
+					// Pop value, key, __strValues
+					lua_pop(L, 3);
+
+					// We want this value, move to top of stack
+					lua_insert(L, 1);
+
+					// Pop enum key, class table and name str
+					lua_pop(L, 3);
+
+					// Only thing left is the enum value
+					return 1;
+				}
+				// Pop key / value
+				lua_pop(L, 2);
+			}
+			// Pop __strValues
+			lua_pop(L, 1);
+			// Pop value, keep key for next iteration
+			lua_pop(L, 1);
+		}
+		// Pop enum table, string
+		lua_pop(L, -2);
+
+		// Not found, we return nil
+		lua_pushnil(L);
+		return 1;
+	}
+	else{
+		{ // must have scope to make sure std::string is deallocated properly.
+			std::string s = "Can not construct enum value from '";
+			s += lua_typename(L, -1);
+			s += "'";
+			lua_pop(L, 1);
+			lua_pushstring(L, s.c_str());
+		} // runs string destructor
+		return lua_error(L);
+	}
 }
 
 int Manager::luaFunctionCallback(lua_State* L) {
@@ -164,7 +282,6 @@ int Manager::luaFunctionCallback(lua_State* L) {
 			const ComposedTypeDeclaration& ctd = *ctditer;
 
 			bool ignoreTypeCheck = false;
-			/*
 			if(required_arguments - parsed_argument_count > 0 && !ctd.default_value.empty() && ctd.optional_level > 0) {
 				// We got an optional argument, and one is missing on this spot!
 				// Push our default argument onto the stack
@@ -182,7 +299,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 				required_arguments += 1;
 
 				ignoreTypeCheck = true;
-			}*/
+			}
 
 			if(parsed_argument_count >= required_arguments) {
 				// We have already parsed all passed arguments
@@ -577,6 +694,10 @@ void Manager::registerClass(const std::string& cname)
 	lua_pushvalue(state, -1); // Another reference to the table
 	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
 
+	// Set __name member to class name
+	lua_pushstring(state, cname.c_str());
+	lua_setfield(state, -2, "__name");
+
 	// Set the index metamethod for the class metatable to the class table
 	lua_setfield(state, -2, "__index");
 
@@ -600,6 +721,10 @@ void Manager::registerClass(const std::string& cname, const std::string& parent_
 	lua_newtable(state); // Class table
 	lua_pushvalue(state, -1); // Another reference to the table
 	lua_setfield(state, LUA_GLOBALSINDEX, cname.c_str());
+
+	// Set __name member to class name
+	lua_pushstring(state, cname.c_str());
+	lua_setfield(state, -2, "__name");
 
 	// Set the index metamethod for the class metatable to the class table
 	lua_setfield(state, -2, "__index");

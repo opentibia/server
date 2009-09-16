@@ -97,11 +97,11 @@ BedItem* BedItem::getNextBedItem()
 {
 	Direction dir = Item::items[getID()].bedPartnerDirection;
 	Position targetPos = getPosition();
-	switch(dir){
-		case NORTH: targetPos.y--; break;
-		case SOUTH: targetPos.y++; break;
-		case EAST: targetPos.x++; break;
-		case WEST: targetPos.x--; break;
+	switch(dir.value()){
+		case enums::NORTH: targetPos.y--; break;
+		case enums::SOUTH: targetPos.y++; break;
+		case enums::EAST: targetPos.x++; break;
+		case enums::WEST: targetPos.x--; break;
 		default: break;
 	}
 

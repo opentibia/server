@@ -200,7 +200,7 @@ bool LuaState::isFunction(int32_t index)
 }
 
 // Pop
-void LuaState::pop(int32_t n)
+void LuaState::pop(int n)
 {
 	lua_pop(state, n);
 }
@@ -706,6 +706,8 @@ void LuaStateManager::setupLuaStandardLibrary() {
 	lua_pushstring(state, (g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/?.lua").c_str());
 	//setField(2, "path");
 	lua_setfield(state, -2, "path");
+
+	lua_pop(state, 1);
 }
 
 bool LuaStateManager::loadFile(std::string file)

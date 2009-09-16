@@ -79,6 +79,31 @@ const luaL_Reg lua_BitReg[] =
 // Function list
 
 void Manager::registerClasses() {
+	// Enums
+	registerClass("Enum");
+	registerEnum<RaceType>();
+	registerEnum<Direction>();
+	registerEnum<CombatType>();
+	registerEnum<CombatParam>();
+	registerEnum<CallBackParam>();
+	registerEnum<ConditionParam>();
+	registerEnum<BlockType>();
+	registerEnum<ViolationAction>();
+	registerEnum<SkillType>();
+	registerEnum<LevelType>();
+	registerEnum<PlayerStatType>();
+	registerEnum<LossType>();
+	registerEnum<FormulaType>();
+	registerEnum<ConditionID>();
+	registerEnum<PlayerSex>();
+	registerEnum<ChaseMode>();
+	registerEnum<FightMode>();
+	registerEnum<TradeState>();
+	registerEnum<SlotType>();
+	registerEnum<SlotPosition>();
+	registerEnum<ZoneType>();
+	registerEnum<Script::ListenerType>();
+
 	// Classes...
 	registerClass("Event");
 	registerClass("OnSayEvent", "Event");
@@ -146,7 +171,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getOutfit()", &Manager::lua_Creature_getOutfit);
 	registerMemberFunction("Creature", "say(string msg)", &Manager::lua_Creature_say);
 	registerMemberFunction("Creature", "setOutfit(table outfit)", &Manager::lua_Creature_setOutfit);
-	registerMemberFunction("Creature", "walk(int direction)", &Manager::lua_Creature_walk);
+	registerMemberFunction("Creature", "walk(Direction direction)", &Manager::lua_Creature_walk);
 	registerMemberFunction("Creature", "getSpeed()", &Manager::lua_Creature_getSpeed);
 	registerMemberFunction("Creature", "getArmor()", &Manager::lua_Creature_getArmor);
 	registerMemberFunction("Creature", "getDefense()", &Manager::lua_Creature_getDefense);
@@ -265,6 +290,7 @@ void Manager::registerClasses() {
 	// Item
 	registerGlobalFunction("createItem(int newid[, int count])", &Manager::lua_createItem);
 	registerMemberFunction("Item", "getItemID()", &Manager::lua_Item_getItemID);
+	registerMemberFunction("Item", "getLongName()", &Manager::lua_Item_getLongName);
 	registerMemberFunction("Item", "getCount()", &Manager::lua_Item_getCount);
 	registerMemberFunction("Item", "getWeight()", &Manager::lua_Item_getWeight);
 	registerMemberFunction("Item", "isPickupable()", &Manager::lua_Item_isPickupable);
@@ -1660,7 +1686,7 @@ int LuaState::lua_Tile_getCreatures()
 	Tile* tile = popTile();
 
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	for(CreatureVector::iterator iter = tile->getCreatures()->begin(),
 		end_iter = tile->getCreatures()->end();
 		iter != end_iter; ++iter, ++n)
@@ -1676,7 +1702,7 @@ int LuaState::lua_Tile_getMoveableItems()
 	Tile* tile = popTile();
 
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	if(tile->getItemList()){
 		for(ItemVector::iterator iter = tile->getItemList()->begin(),
 			end_iter = tile->getItemList()->end();
@@ -1696,7 +1722,7 @@ int LuaState::lua_Tile_getItems()
 	Tile* tile = popTile();
 
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	if(tile->ground) {
 		pushThing(tile->ground);
 		setField(-2, n++);
@@ -1842,7 +1868,7 @@ int LuaState::lua_Creature_setHealth()
 int LuaState::lua_Creature_getOrientation()
 {
 	Creature* creature = popCreature();
-	pushInteger(creature->getDirection());
+	pushEnum(creature->getDirection());
 	return 1;
 }
 
@@ -1855,18 +1881,18 @@ int LuaState::lua_Creature_getNameDescription()
 
 int LuaState::lua_Creature_walk()
 {
-	int32_t ndir = popInteger();
+	Direction ndir = popEnum<Direction>();
 	Creature* creature = popCreature();
 
-	switch(ndir){
-		case NORTH:
-		case SOUTH:
-		case WEST:
-		case EAST:
-		case SOUTHWEST:
-		case NORTHWEST:
-		case NORTHEAST:
-		case SOUTHEAST:
+	switch(ndir.value()){
+		case ::enums::NORTH:
+		case ::enums::SOUTH:
+		case ::enums::WEST:
+		case ::enums::EAST:
+		case ::enums::SOUTHWEST:
+		case ::enums::NORTHWEST:
+		case ::enums::NORTHEAST:
+		case ::enums::SOUTHEAST:
 			break;
 		default:
 			throw Error("Creature:walk : Invalid direction");
@@ -2038,7 +2064,7 @@ int LuaState::lua_getCreaturesByName()
 	std::string name = popString();
 	std::vector<Creature*> creatures = g_game.getCreaturesByName(name);
 
-	int32_t n = 1;
+	int n = 1;
 	newTable();
 	for(std::vector<Creature*>::iterator i = creatures.begin(); i != creatures.end(); ++i){
 		pushThing(*i);
@@ -2112,7 +2138,7 @@ int LuaState::lua_Actor_getAlwaysThink()
 }
 
 template <class T>
-int32_t Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
+int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
 	T value = l->popValue<T>();
 	Actor* actor = l->popActor();
 	((actor->getType()).*(mfp))(value);
@@ -2121,7 +2147,7 @@ int32_t Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const T&)){
 }
 
 template <class E, int32_t size_>
-int32_t Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const Enum<E, size_>&)){
+int Actor_modAttribute(LuaState* l, void (CreatureType::*mfp)(const Enum<E, size_>&)){
 	Enum<E, size_> value = l->popEnum<Enum<E, size_> >();
 	Actor* actor = l->popActor();
 	((actor->getType()).*(mfp))(value);
@@ -2799,7 +2825,7 @@ int LuaState::lua_Player_removeItem()
 int LuaState::lua_getOnlinePlayers()
 {
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
 		if(!it->second->isRemoved()){
 			pushThing(it->second);
@@ -2821,7 +2847,7 @@ int LuaState::lua_getPlayersByName()
 	std::string name = popString();
 	std::vector<Player*> players = g_game.getPlayersByName(name);
 
-	int32_t n = 1;
+	int n = 1;
 	newTable();
 	for(std::vector<Player*>::iterator i = players.begin(); i != players.end(); ++i){
 		pushThing(*i);
@@ -2847,7 +2873,7 @@ int LuaState::lua_getPlayersByNameWildcard()
 	std::string name = popString();
 	std::vector<Player*> players = g_game.getPlayersByNameWildcard(name);
 
-	int32_t n = 1;
+	int n = 1;
 	newTable();
 	for(std::vector<Player*>::iterator i = players.begin(); i != players.end(); ++i){
 		pushThing(*i);
@@ -2879,6 +2905,13 @@ int LuaState::lua_Item_getItemID()
 {
 	Item* item = popItem();
 	pushInteger(item->getID());
+	return 1;
+}
+
+int LuaState::lua_Item_getLongName()
+{
+	Item* item = popItem();
+	pushString(item->getLongName());
 	return 1;
 }
 
@@ -4252,7 +4285,7 @@ int LuaState::lua_Town_getHouses()
 	Houses& houses = Houses::getInstance();
 
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
 		if(it->second->getTownId() == town->getTownID()){
 			pushHouse(it->second);
@@ -4278,7 +4311,7 @@ int LuaState::lua_House_getDoors()
 	House* house = popHouse();
 
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	for(HouseDoorList::iterator hit = house->getDoorBegin(), end = house->getDoorEnd();
 		hit != end; ++hit)
 	{
@@ -4351,7 +4384,7 @@ int LuaState::lua_House_getTiles()
 	House* house = popHouse();
 	
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	for(HouseTileList::iterator hit = house->getTileBegin(), end = house->getTileEnd();
 		hit != end; ++hit)
 	{
@@ -4462,7 +4495,7 @@ int LuaState::lua_Channel_getUsers()
 {
 	ChatChannel* channel = popChannel();
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	for(UsersMap::const_iterator iter = channel->getUsers().begin(); iter != channel->getUsers().end(); ++iter)
 	{
 		pushThing(iter->second);
@@ -4559,7 +4592,7 @@ int LuaState::lua_getTowns()
 	Towns& towns = Towns::getInstance();
 
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	for(TownMap::const_iterator i = towns.getTownBegin(); i != towns.getTownEnd(); ++i){
 		pushTown(const_cast<Town*>((*i).second));
 		setField(-2, n++);
@@ -4603,7 +4636,7 @@ int LuaState::lua_getHouses()
 	Houses& houses = Houses::getInstance();
 
 	newTable();
-	int32_t n = 1;
+	int n = 1;
 	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
 		pushHouse(it->second);
 		setField(-2, n++);
