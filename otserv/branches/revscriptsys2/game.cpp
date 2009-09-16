@@ -4748,13 +4748,6 @@ bool Game::combatChangeHealth(CombatType combatType,
 
 					if(customTextColor != TEXTCOLOR_UNK)
 						textColor = customTextColor;
-
-					if(textColor != TEXTCOLOR_NONE){
-						std::stringstream ss;
-						ss << damage;
-						addMagicEffect(list, targetPos, hitEffect);
-						addAnimatedText(list, targetPos, textColor, ss.str());
-					}
 				}
 			}
 		}
