@@ -1557,7 +1557,7 @@ void Player::onAttackedCreatureChangeZone(ZoneType zone)
 	}
 	else if(zone == ZONE_NORMAL){
 		//attackedCreature can leave a pvp zone if not pzlocked
-		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+		if(g_game.getWorldType() == WORLD_TYPE_NOPVP){
 			if(attackedCreature->getPlayer()){
 				setAttackedCreature(NULL);
 				onAttackedCreatureDissapear(false);
@@ -3444,7 +3444,7 @@ void Player::doAttacking(uint32_t interval)
 
 uint64_t Player::getGainedExperience(Creature* attacker) const
 {
-	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
+	if(g_game.getWorldType() == WORLD_TYPE_PVPE){
 		Player* attackerPlayer = attacker->getPlayer();
 		if(attackerPlayer && attackerPlayer != this && skillLoss){
 				/*Formula
@@ -3601,7 +3601,7 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 		remove = false;
 
 		//Means the condition is from an item, id == slot
-		if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
+		if(g_game.getWorldType() == WORLD_TYPE_PVPE){
 			SlotType slot = SlotType::fromInteger(condition->getId().value());
 			Item* item = getInventoryItem(slot);
 			if(item){
@@ -4069,7 +4069,7 @@ Skulls_t Player::getSkullClient(const Player* player) const
 		}
 	}
 
-	if(player->getSkull() == SKULL_NONE && isPartner(player) && g_game.getWorldType() != WORLD_TYPE_NO_PVP){
+	if(player->getSkull() == SKULL_NONE && isPartner(player) && g_game.getWorldType() != WORLD_TYPE_NOPVP){
 		return SKULL_GREEN;
 	}
 

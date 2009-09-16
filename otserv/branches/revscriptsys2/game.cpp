@@ -112,7 +112,7 @@ Game::~Game()
 	}
 }
 
-void Game::setWorldType(WorldType_t type)
+void Game::setWorldType(WorldType type)
 {
 	worldType = type;
 }

@@ -102,6 +102,7 @@ void Manager::registerClasses() {
 	registerEnum<SlotType>();
 	registerEnum<SlotPosition>();
 	registerEnum<ZoneType>();
+	registerEnum<WorldType>();
 	registerEnum<Script::ListenerType>();
 
 	// Classes...
@@ -315,6 +316,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Container", "getItem(int index)", &Manager::lua_Container_getItem);
 	registerMemberFunction("Container", "size()", &Manager::lua_Container_getSize);
 	registerMemberFunction("Container", "capacity()", &Manager::lua_Container_getCapacity);
+	registerMemberFunction("Container", "getItems()", &Manager::lua_Container_getItems);
 
 	registerGlobalFunction("getItemType(int itemid)", &Manager::lua_getItemType);
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
@@ -344,7 +346,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Town", "getID()", &Manager::lua_Town_getID);
 	
 	registerGlobalFunction("getAllTowns()", &Manager::lua_getTowns);
-	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
+	registerGlobalFunction("sendMailTo(Item item, string playername [, Town town])", &Manager::lua_sendMailTo);
 
 	// Waypoint
 	registerMemberFunction("Waypoint", "getPosition()", &Manager::lua_Waypoint_getPosition);
@@ -3121,6 +3123,19 @@ int LuaState::lua_Container_getCapacity()
 	return 1;
 }
 
+int LuaState::lua_Container_getItems()
+{
+	Container* container = popContainer();
+
+	newTable();
+	int n = 1;
+	for(ItemList::const_iterator it = container->getItems(); it != container->getEnd(); ++it){
+		pushThing(*it);
+		setField(-2, n++);
+	}
+	return 1;
+}
+
 int LuaState::lua_getItemIDByName()
 {
 	std::string name = popString();
@@ -4647,8 +4662,7 @@ int LuaState::lua_getHouses()
 
 int LuaState::lua_getWorldType()
 {
-	//TODO: use pushEnum()
-	pushInteger(g_game.getWorldType());
+	pushEnum(g_game.getWorldType());
 	return 1;
 }
 

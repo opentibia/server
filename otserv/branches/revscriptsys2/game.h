@@ -35,12 +35,6 @@ enum stackPosType_t{
 	STACKPOS_USEITEM
 };
 
-enum WorldType_t {
-	WORLD_TYPE_NO_PVP = 1,
-	WORLD_TYPE_PVP = 2,
-	WORLD_TYPE_PVP_ENFORCED = 3
-};
-
 enum GameState_t {
 	GAME_STATE_STARTUP,
 	GAME_STATE_INIT,
@@ -151,8 +145,8 @@ public:
 		return;
 	}
 
-	void setWorldType(WorldType_t type);
-	WorldType_t getWorldType() const {return worldType;}
+	void setWorldType(WorldType type);
+	WorldType getWorldType() const {return worldType;}
 	// These functions confuse me.. Why not use the config values?
 	uint32_t getInFightTicks() {return inFightTicks;}
 	uint32_t getExhaustionTicks() {return exhaustionTicks;}
@@ -708,7 +702,7 @@ protected:
 	uint32_t stairhopExhaustion;
 
 	GameState_t gameState;
-	WorldType_t worldType;
+	WorldType worldType;
 
 	ServiceManager* service_manager;
 	Map* map;

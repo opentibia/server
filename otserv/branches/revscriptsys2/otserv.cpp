@@ -587,9 +587,9 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	if(asLowerCaseString(worldType) == "pvp")
 		g_game.setWorldType(WORLD_TYPE_PVP);
 	else if(asLowerCaseString(worldType) == "no-pvp")
-		g_game.setWorldType(WORLD_TYPE_NO_PVP);
+		g_game.setWorldType(WORLD_TYPE_NOPVP);
 	else if(asLowerCaseString(worldType) == "pvp-enforced")
-		g_game.setWorldType(WORLD_TYPE_PVP_ENFORCED);
+		g_game.setWorldType(WORLD_TYPE_PVPE);
 	else{
 		ErrorMessage("Unknown world type!");
 		exit(-1);

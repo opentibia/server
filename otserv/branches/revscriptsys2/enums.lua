@@ -281,6 +281,13 @@ enum ("ZoneType",
 	"ZONE_NORMAL"
 )
 
+enum ("WorldType",
+	"WORLD_TYPE_NOPVP",
+	"WORLD_TYPE_PVP",
+	"WORLD_TYPE_PVPE"
+)
+
+
 enum ("Script::ListenerType",
 	-- Not tied to a creature
 	"ON_SAY_LISTENER",
