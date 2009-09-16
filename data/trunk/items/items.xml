@@ -2563,7 +2563,7 @@
 		<attribute key="decayTo" value="2043"/>
 		<attribute key="duration" value="180"/>
 	</item>
-	<item id="2043" article="an" name="used candelabrum">
+	<item id="2043" article="a" name="used candelabrum">
 		<attribute key="weight" value="4500"/>
 	</item>
 	<item id="2044" article="a" name="lamp">
@@ -2575,7 +2575,7 @@
 		<attribute key="decayTo" value="2046"/>
 		<attribute key="duration" value="180"/>
 	</item>
-	<item id="2046" article="an" name="used lamp">
+	<item id="2046" article="a" name="used lamp">
 		<attribute key="weight" value="3000"/>
 	</item>
 	<item id="2047" article="a" name="candlestick">
@@ -2587,7 +2587,7 @@
 		<attribute key="decayTo" value="2049"/>
 		<attribute key="duration" value="240"/>
 	</item>
-	<item id="2049" article="an" name="used candlestick">
+	<item id="2049" article="a" name="used candlestick">
 		<attribute key="weight" value="200"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="60"/>
