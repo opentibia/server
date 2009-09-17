@@ -2516,16 +2516,16 @@ void Player::preSave()
 		if(getSkull() != SKULL_BLACK){
 		#endif
 			health = healthMax;
-			mana = manaMax;
+			if(getZone() != ZONE_PVP){
+				mana = manaMax;
+			}
 		#ifdef __SKULLSYSTEM__
 		}
 		else{
-			if(healthMax >= 40){
-				health = 40;
-			}
-			else{
+			health = 40;
+			mana = 0;
+			if(healthMax <= 40){
 				health = healthMax;
-				mana = 0;
 			}
 		}
 		#endif
