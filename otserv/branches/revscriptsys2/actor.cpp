@@ -974,8 +974,7 @@ void Actor::pushItems(Tile* tile)
 		for(int32_t i = downItemSize - 1; i >= 0; --i){
 			assert(i >= 0 && i < downItemSize);
 			Item* item = items->at(i);
-			if(item && item->hasProperty(MOVEABLE) && (item->hasProperty(BLOCKPATH)
-				|| item->hasProperty(BLOCKSOLID))){
+			if(item && item->isMoveable() && (item->blockPathFind() || item->blockSolid() ) ){
 					if(moveCount < 20 && pushItem(item, 1)){
 						moveCount++;
 					}
@@ -1011,7 +1010,7 @@ bool Actor::pushCreature(Creature* creature)
 		const Position& tryPos = Combat::getCasterPosition(creature, *it);
 		Tile* toTile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
 
-		if(toTile && !toTile->hasProperty(BLOCKPATH)){
+		if(toTile && !toTile->blockPathFind()){
 			if(g_game.internalMoveCreature(this, creature, *it) == RET_NOERROR){
 				return true;
 			}

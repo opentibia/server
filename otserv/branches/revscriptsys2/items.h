@@ -112,7 +112,6 @@ public:
 	bool isRune() const {return clientCharges;}
 	bool isBed() const {return type == ITEM_TYPE_BED;}
 
-
 	uint16_t id;
 	uint16_t clientId;
 
@@ -134,32 +133,16 @@ public:
 	int32_t        armor;
 	SlotPosition   slotPosition;
 	SlotType       wieldPosition;
-	bool           isVertical;
-	bool           isHorizontal;
-	bool           isHangable;
-	bool           allowDistRead;
-	bool           clientCharges;
-	bool           lookThrough;
 	uint16_t       speed;
 	int32_t        decayTo;
 	uint32_t       decayTime;
 	bool           stopTime;
-	RaceType     corpseType;
+	RaceType       corpseType;
 
-	bool           canReadText;
-	bool           canWriteText;
 	uint16_t       maxTextLen;
 	uint16_t       writeOnceItemId;
-
-	bool           stackable;
-	bool           useable;
-	bool           moveable;
-	bool           alwaysOnTop;
 	int32_t        alwaysOnTopOrder;
-	bool           pickupable;
-	bool           rotateable;
 	int32_t        rotateTo;
-
 	int32_t        runeMagicLevel;
 	int32_t        runeLevel;
 	std::string    runeSpellName;
@@ -177,18 +160,30 @@ public:
 	uint16_t femaleSleeperID;
 	uint16_t noSleeperID;
 
+	bool blockSolid;
+	bool blockProjectile;
+	bool blockPathFind;
+	bool allowPickupable;
+	bool hasHeight;
+	bool isVertical;
+	bool isHorizontal;
+	bool isHangable;
+	bool clientCharges;
+	bool lookThrough;
+	bool pickupable;
+	bool rotateable;
+	bool stackable;
+	bool useable;
+	bool moveable;
+	bool alwaysOnTop;
+	bool canReadText;
+	bool canWriteText;
 	bool floorChangeDown;
 	bool floorChangeNorth;
 	bool floorChangeSouth;
 	bool floorChangeEast;
 	bool floorChangeWest;
-	bool hasHeight;
-
-	bool blockSolid;
-	bool blockPickupable;
-	bool blockProjectile;
-	bool blockPathFind;
-	bool allowPickupable;
+	bool allowDistRead;
 
 	unsigned short transformEquipTo;
 	unsigned short transformDeEquipTo;

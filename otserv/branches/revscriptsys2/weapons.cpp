@@ -810,7 +810,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 			for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
 				tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
 				// Blocking tiles or tiles without ground ain't valid targets for spears
-				if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID) && tmpTile->ground != NULL){
+				if(tmpTile && !tmpTile->hasFlag(TILESTATE_BLOCKSOLIDNOTMOVEABLE) && tmpTile->ground != NULL){
 					destTile = tmpTile;
 					break;
 				}

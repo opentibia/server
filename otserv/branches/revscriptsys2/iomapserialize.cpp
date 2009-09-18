@@ -346,7 +346,7 @@ bool IOMapSerialize::saveItems(Database* db, uint32_t tileId, uint32_t houseId, 
 		if(!item)
 			continue;
 
-		if(!(!item->isNotMoveable() ||
+		if(!(item->isMoveable() ||
 			item->getDoor() ||
 			(item->getContainer() && item->getContainer()->size() != 0)||
 			item->canWriteText() ||

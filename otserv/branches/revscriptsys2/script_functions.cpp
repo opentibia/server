@@ -101,6 +101,7 @@ void Manager::registerClasses() {
 	registerEnum<TradeState>();
 	registerEnum<SlotType>();
 	registerEnum<SlotPosition>();
+	registerEnum<ItemProp>();
 	registerEnum<ZoneType>();
 	registerEnum<WorldType>();
 	registerEnum<Script::ListenerType>();
@@ -332,7 +333,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
 	registerMemberFunction("Tile", "queryAdd()", &Manager::lua_Tile_queryAdd);
-	registerMemberFunction("Tile", "hasProperty(integer prop)", &Manager::lua_Tile_hasProperty);
+	registerMemberFunction("Tile", "hasProperty(ItemProp prop)", &Manager::lua_Tile_hasProperty);
 
 	registerMemberFunction("Tile", "isPZ()", &Manager::lua_Tile_isPZ);
 	registerMemberFunction("Tile", "isPVP()", &Manager::lua_Tile_isPVP);
@@ -1670,7 +1671,7 @@ int LuaState::lua_Tile_getMoveableItems()
 			end_iter = tile->getItemList()->end();
 			iter != end_iter; ++iter)
 		{
-			if((*iter)->isNotMoveable() == false) {
+			if((*iter)->isMoveable()) {
 				pushThing(*iter);
 				setField(-2, n++);
 			}
@@ -1781,9 +1782,9 @@ int LuaState::lua_Tile_addItem()
 
 int LuaState::lua_Tile_hasProperty()
 {
-	int32_t prop = popInteger();
+	ItemProp props = popEnum<ItemProp>();
 	Tile* tile = popTile();
-	pushBoolean(tile && tile->hasProperty((ITEMPROPERTY)prop));
+	pushBoolean(tile && tile->hasItemWithProperty(props.value()));
 	return 1;
 }
 
@@ -3198,7 +3199,6 @@ int LuaState::lua_getItemType()
 	setField(-1, "hasHeight", it.hasHeight);
 
 	setField(-1, "blockSolid", it.blockSolid);
-	setField(-1, "blockPickupable", it.blockPickupable);
 	setField(-1, "blockProjectile", it.blockProjectile);
 	setField(-1, "blockPathFind", it.blockPathFind);
 	setField(-1, "allowPickupable", it.allowPickupable);

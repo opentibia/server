@@ -23,21 +23,6 @@
 #include "items.h"
 #include "item_attributes.h"
 
-enum ITEMPROPERTY{
-	BLOCKSOLID = 0,
-	HASHEIGHT,
-	BLOCKPROJECTILE,
-	BLOCKPATH,
-	ISVERTICAL,
-	ISHORIZONTAL,
-	MOVEABLE,
-	IMMOVABLEBLOCKSOLID,
-	IMMOVABLEBLOCKPATH,
-	IMMOVABLENOFIELDBLOCKPATH,
-	NOFIELDBLOCKPATH,
-	SUPPORTHANGABLE
-};
-
 enum TradeEvents_t{
 	ON_TRADE_TRANSFER,
 	ON_TRADE_CANCEL
@@ -144,7 +129,7 @@ public:
 	virtual bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	virtual bool isPushable() const {return !isNotMoveable();}
+	virtual bool isPushable() const {return isMoveable();}
 	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);}
 
 	virtual std::string getDescription(int32_t lookDistance) const;
@@ -223,8 +208,10 @@ public:
 	void getLight(LightInfo& lightInfo);
 
 	// Item properties
-	bool hasProperty(enum ITEMPROPERTY prop) const;
-	bool isBlocking() const {return items[id].blockSolid;}
+	bool hasProperty(uint32_t props) const;
+	bool blockSolid() const {return items[id].blockSolid;}
+	bool blockPathFind() const {return items[id].blockPathFind;}
+	bool blockProjectile() const {return items[id].blockProjectile;}
 	bool isStackable() const {return items[id].stackable;}
 	bool isRune() const {return items[id].isRune();}
 	bool isFluidContainer() const {return (items[id].isFluidContainer());}
@@ -232,8 +219,7 @@ public:
 	bool isGroundTile() const {return items[id].isGroundTile();}
 	bool isSplash() const {return items[id].isSplash();}
 	bool isMagicField() const {return items[id].isMagicField();}
-	bool isNotMoveable() const {return !items[id].moveable;}
-	bool isMoveable() const {return items[id].moveable;}
+	bool isMoveable() const {return items[id].moveable && getUniqueId() == 0;}
 	bool isPickupable() const {return items[id].pickupable;}
 	bool isWeapon() const {return (items[id].weaponType != WEAPON_NONE);}
 	bool isUseable() const {return items[id].useable;}
@@ -242,7 +228,7 @@ public:
 	bool isDoor() const {return items[id].isDoor();}
 	bool isBed() const {return items[id].isBed();}
 	bool hasCharges() const {return items[id].charges != 0;}
-
+	bool hasHeight() const {return items[id].hasHeight;}
 	bool floorChangeDown() const {return items[id].floorChangeDown;}
 	bool floorChangeNorth() const {return items[id].floorChangeNorth;}
 	bool floorChangeSouth() const {return items[id].floorChangeSouth;}

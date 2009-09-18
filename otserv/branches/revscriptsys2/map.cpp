@@ -614,7 +614,7 @@ bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 
 			const Tile* tile = const_cast<Map*>(this)->getTile(rx, ry, rz);
 			if(tile){
-				if(tile->hasProperty(BLOCKPROJECTILE)){
+				if(tile->blockProjectile()){
 					return false;
 				}
 			}

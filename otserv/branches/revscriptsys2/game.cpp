@@ -732,7 +732,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			/*for move operations*/
 			if(type == STACKPOS_MOVE){
 				Item* item = tile->getTopDownItem();
-				if(item && !item->isNotMoveable())
+				if(item && item->isMoveable())
 					thing = item;
 				else
 					thing = tile->getTopVisibleCreature(player);
@@ -767,12 +767,12 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			if(player){
 				//do extra checks here if the thing is accessable
 				if(thing && thing->getItem()){
-					if(tile->hasProperty(ISVERTICAL)){
+					if(tile->isVertical()){
 						if(player->getPosition().x + 1 == tile->getPosition().x){
 							thing = NULL;
 						}
 					}
-					else if(tile->hasProperty(ISHORIZONTAL)){
+					else if(tile->isHorizontal()){
 						if(player->getPosition().y + 1 == tile->getPosition().y){
 							thing = NULL;
 						}
@@ -1338,7 +1338,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	}
 
 	if(player != movingCreature){
-		if(toTile->hasProperty(BLOCKPATH)){
+		if(toTile->blockProjectile()){
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
 			return false;
 		}
@@ -1502,9 +1502,9 @@ ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Dire
 		//try go up
 		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
 			Tile* tmpTile = getTile(currentPos.x, currentPos.y, currentPos.z - 1);
-			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
+			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->blockSolid())){
 				tmpTile = getTile(destPos.x, destPos.y, destPos.z - 1);
-				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)){
+				if(tmpTile && tmpTile->ground && !tmpTile->blockSolid()){
 					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 					destPos.z -= 1;
 				}
@@ -1513,7 +1513,7 @@ ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Dire
 		else{
 			//try go down
 			Tile* tmpTile = getTile(destPos);
-			if(currentPos.z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID)))){
+			if(currentPos.z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->blockSolid()))){
 				tmpTile = getTile(destPos.x, destPos.y, destPos.z + 1);
 
 				if(tmpTile && tmpTile->hasHeight(3)){
@@ -1587,8 +1587,6 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		return false;
 	}
 	
-	player->setNextActionTask(NULL);
-
 	player->setNextActionTask(NULL);
 
 	Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
@@ -1668,16 +1666,17 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	}
 
 	//hangable item specific code
-	if(item->isHangable() && toCylinder->getTile()->hasProperty(SUPPORTHANGABLE)){
+	Tile* toTile = toCylinder->getTile();
+	if(item->isHangable() && (toTile->isVertical() || toTile->isHorizontal())){
 		//destination supports hangable objects so need to move there first
 
-		if(toCylinder->getTile()->hasProperty(ISVERTICAL)){
+		if(toCylinder->getTile()->isVertical()){
 			if(player->getPosition().x + 1 == mapToPos.x){
 				player->sendCancelMessage(RET_NOTPOSSIBLE);
 				return false;
 			}
 		}
-		else if(toCylinder->getTile()->hasProperty(ISHORIZONTAL)){
+		else if(toCylinder->getTile()->isHorizontal()){
 			if(player->getPosition().y + 1 == mapToPos.y){
 				player->sendCancelMessage(RET_NOTPOSSIBLE);
 				return false;
@@ -1686,11 +1685,11 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 
 		if(!Position::areInRange<1,1,0>(playerPos, mapToPos)){
 			Position walkPos = mapToPos;
-			if(toCylinder->getTile()->hasProperty(ISVERTICAL)){
+			if(toCylinder->getTile()->isVertical()){
 				walkPos.x -= -1;
 			}
 
-			if(toCylinder->getTile()->hasProperty(ISHORIZONTAL)){
+			if(toCylinder->getTile()->isHorizontal()){
 				walkPos.y -= -1;
 			}
 

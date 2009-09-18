@@ -57,7 +57,7 @@ Tile* IOMapOTBM::createTile(Item*& ground, Item* item, int px, int py, int pz)
 {
 	Tile* tile;
 	if(ground){
-		if((item && item->isBlocking()) || ground->isBlocking()){
+		if((item && item->blockSolid()) || ground->blockSolid()){
 			// Tile is blocking with possibly some decoration, should be static
 			tile = new StaticTile(px, py, pz);
 		}
@@ -321,7 +321,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								return false;
 							}
 
-							if(isHouseTile && !item->isNotMoveable()){
+							if(isHouseTile && item->isMoveable()){
 								std::cout << "Warning: [OTBM loader] Moveable item in house id = " << house->getHouseId() << " Item type = " << item->getID() << std::endl;
 								delete item;
 								item = NULL;
@@ -371,7 +371,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 							}
 
 							if(item->unserializeItemNode(f, nodeItem, propStream)){
-								if(isHouseTile && !item->isNotMoveable()){
+								if(isHouseTile && item->isMoveable()){
 									std::cout << "Warning: [OTBM loader] Moveable item in house id = " << house->getHouseId() << " Item type = " << item->getID() << std::endl;
 									delete item;
 								}

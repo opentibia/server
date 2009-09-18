@@ -56,11 +56,13 @@ enum tileflags_t{
 	TILESTATE_BED                       = 1 << 17,
 	TILESTATE_BLOCKSOLID				= 1 << 18,
 	TILESTATE_BLOCKPATH					= 1 << 19,
-	TILESTATE_IMMOVABLEBLOCKSOLID		= 1 << 20,
-	TILESTATE_IMMOVABLEBLOCKPATH		= 1 << 21,
-	TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 1 << 22,
-	TILESTATE_NOFIELDBLOCKPATH			= 1 << 23,
-	TILESTATE_DYNAMIC_TILE				= 1 << 24
+	TILESTATE_VERTICAL					= 1 << 20,
+	TILESTATE_HORIZONTAL				= 1 << 21,
+	TILESTATE_BLOCKPROJECTILE			= 1 << 22,
+	TILESTATE_BLOCKSOLIDNOTMOVEABLE		= 1 << 23,
+	TILESTATE_BLOCKPATHNOTMOVEABLE		= 1 << 24,
+	TILESTATE_BLOCKPATHNOTFIELD			= 1 << 25,
+	TILESTATE_DYNAMIC_TILE				= 1 << 26
 };
 
 class TileItemVector
@@ -154,8 +156,14 @@ public:
 	uint32_t getTopItemCount() const;
 	uint32_t getDownItemCount() const;
 
-	bool hasProperty(enum ITEMPROPERTY prop) const;
-	bool hasProperty(Item* exclude, enum ITEMPROPERTY prop) const;
+	bool hasItemWithProperty(uint32_t props) const;
+	bool hasItemWithProperty(Item* exclude, uint32_t props) const;
+
+	bool blockSolid() const {return hasFlag(TILESTATE_BLOCKSOLID);}
+	bool blockPathFind() const {return hasFlag(TILESTATE_BLOCKPATH);}
+	bool blockProjectile() const {return hasFlag(TILESTATE_BLOCKPROJECTILE);}
+	bool isVertical() const {return hasFlag(TILESTATE_VERTICAL);}
+	bool isHorizontal() const {return hasFlag(TILESTATE_HORIZONTAL);}
 
 	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}
 	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}

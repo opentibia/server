@@ -552,75 +552,103 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream) const
 	return true;
 }
 
-bool Item::hasProperty(enum ITEMPROPERTY prop) const
+bool Item::hasProperty(uint32_t props) const
 {
 	const ItemType& it = items[id];
 
-	switch(prop){
-		case BLOCKSOLID:
-			if(it.blockSolid)
-				return true;
-			break;
-
-		case MOVEABLE:
-			if(it.moveable && getUniqueId() == 0)
-				return true;
-			break;
-
-		case HASHEIGHT:
-			if(it.hasHeight)
-				return true;
-			break;
-
-		case BLOCKPROJECTILE:
-			if(it.blockProjectile)
-				return true;
-			break;
-
-		case BLOCKPATH:
-			if(it.blockPathFind)
-				return true;
-			break;
-
-		case ISVERTICAL:
-			if(it.isVertical)
-				return true;
-			break;
-
-		case ISHORIZONTAL:
-			if(it.isHorizontal)
-				return true;
-			break;
-
-		case IMMOVABLEBLOCKSOLID:
-			if(it.blockSolid && (!it.moveable || getUniqueId() != 0))
-				return true;
-			break;
-
-		case IMMOVABLEBLOCKPATH:
-			if(it.blockPathFind && (!it.moveable || getUniqueId() != 0))
-				return true;
-			break;
-
-		case SUPPORTHANGABLE:
-			if(it.isHorizontal || it.isVertical)
-				return true;
-			break;
-
-		case IMMOVABLENOFIELDBLOCKPATH:
-			if(!it.isMagicField() && it.blockPathFind && (!it.moveable || getUniqueId() != 0))
-				return true;
-			break;
-
-		case NOFIELDBLOCKPATH:
-			if(!it.isMagicField() && it.blockPathFind)
-				return true;
-			break;
-
-		default:
-			return false;
+	if(hasBitSet(enums::ITEMPROP_BLOCKSOLID, props) && !it.blockSolid){
+		return false;
 	}
-	return false;
+
+	if(hasBitSet(enums::ITEMPROP_BLOCKPATHFIND, props) && !it.blockPathFind){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_BLOCKPROJECTILE, props) && !it.blockProjectile){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_ALLOWPICKUPABLE, props) && !it.allowPickupable){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_HASHEIGHT, props) && !it.hasHeight){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_ISVERTICAL, props) && !it.isVertical){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_ISHORIZONTAL, props) && !it.isHorizontal){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_CLIENTCHARGES, props) && !it.clientCharges){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_LOOKTHROUGH, props) && !it.lookThrough){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_PICKUPABLE, props) && !it.pickupable){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_ROTATEABLE, props) && !it.rotateable){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_STACKABLE, props) && !it.stackable){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_USEABLE, props) && !it.useable){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_MOVEABLE, props) && !(it.moveable && getUniqueId() == 0) ){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_ALWAYSONTOP, props) && !it.alwaysOnTop){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_CANREADTEXT, props) && !it.canReadText){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_CANWRITETEXT, props) && !it.canWriteText){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_FLOORCHANGEDOWN, props) && !it.floorChangeDown){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_FLOORCHANGENORTH, props) && !it.floorChangeNorth){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_FLOORCHANGESOUTH, props) && !it.floorChangeSouth){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_FLOORCHANGEEAST, props) && !it.floorChangeEast){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_FLOORCHANGEWEST, props) && !it.floorChangeWest){
+		return false;
+	}
+
+	if(hasBitSet(enums::ITEMPROP_ALLOWDISTREAD, props) && !it.allowDistRead){
+		return false;
+	}
+
+	return true;
 }
 
 double Item::getWeight() const

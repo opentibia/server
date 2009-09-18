@@ -262,7 +262,7 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 
 ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive)
 {
-	if(tile->hasProperty(BLOCKPROJECTILE)){
+	if(tile->blockProjectile()){
 		return RET_NOTENOUGHROOM;
 	}
 
@@ -1385,7 +1385,7 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 {
 	//remove magic walls/wild growth
-	if(isBlocking()){
+	if(blockSolid()){
 		g_game.internalRemoveItem(NULL, this, 1);
 	}
 	else{

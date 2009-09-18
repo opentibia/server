@@ -34,40 +34,6 @@ extern Game g_game;
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 Tile& Tile::null_tile = real_null_tile;
 
-bool Tile::hasProperty(enum ITEMPROPERTY prop) const
-{
-	if(ground && ground->hasProperty(prop)){
-		return true;
-	}
-
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-			if((*it)->hasProperty(prop))
-				return true;
-		}
-	}
-
-	return false;
-}
-
-bool Tile::hasProperty(Item* exclude, enum ITEMPROPERTY prop) const
-{
-	assert(exclude);
-	if(ground && exclude != ground && ground->hasProperty(prop)){
-		return true;
-	}
-
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-			Item* item = *it;
-			if(item != exclude && item->hasProperty(prop))
-				return true;
-		}
-	}
-
-	return false;
-}
-
 HouseTile* Tile::getHouseTile()
 {
 	if(isHouseTile())
@@ -92,7 +58,7 @@ bool Tile::hasHeight(uint32_t n) const
 	uint32_t height = 0;
 
 	if(ground){
-		if(ground->hasProperty(HASHEIGHT)){
+		if(ground->hasHeight()){
 			++height;
 		}
 
@@ -103,7 +69,7 @@ bool Tile::hasHeight(uint32_t n) const
 
 	if(const TileItemVector* items = getItemList()){
 		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-			if((*it)->hasProperty(HASHEIGHT)){
+			if((*it)->hasHeight()){
 				++height;
 			}
 
@@ -571,22 +537,22 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 
-			if(hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID)){
+			if(hasFlag(TILESTATE_BLOCKSOLIDNOTMOVEABLE)){
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH)){
+			if(hasBitSet(FLAG_PATHFINDING, flags) && (hasFlag(TILESTATE_BLOCKPATHNOTFIELD) && hasFlag(TILESTATE_BLOCKPATHNOTMOVEABLE)) ){
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(hasFlag(TILESTATE_BLOCKSOLID) || (hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILESTATE_NOFIELDBLOCKPATH))){
+			if(hasFlag(TILESTATE_BLOCKSOLID) || (hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILESTATE_BLOCKPATHNOTFIELD))){
 				if(!(monster->canPushItems() || hasBitSet(FLAG_IGNOREBLOCKITEM, flags) ) ){
 					return RET_NOTPOSSIBLE;
 				}
 			}
 
 			MagicField* field = getFieldItem();
-			if(field && !field->isBlocking()){
+			if(field && !field->blockSolid()){
 				CombatType combatType = field->getCombatType();
 				//There is 3 options for a monster to enter a magic field
 				//1) Actor is immune
@@ -698,7 +664,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOTPOSSIBLE;
 		}
 
-		if(creatures && !creatures->empty() && item->isBlocking() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+		if(creatures && !creatures->empty() && item->blockSolid() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
 				if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 					return RET_NOTENOUGHROOM;
@@ -778,7 +744,7 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count, uint32_t fla
 		return RET_NOTPOSSIBLE;
 	}
 
-	if(item->isNotMoveable() && !hasBitSet(FLAG_IGNORENOTMOVEABLE, flags)){
+	if(!item->isMoveable() && !hasBitSet(FLAG_IGNORENOTMOVEABLE, flags)){
 		return RET_NOTMOVEABLE;
 	}
 
@@ -1555,43 +1521,92 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 	}
 }
 
+bool Tile::hasItemWithProperty(uint32_t props) const
+{
+	if(ground && ground->hasProperty(props)){
+		return true;
+	}
+
+	if(const TileItemVector* items = getItemList()){
+		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
+			if((*it)->hasProperty(props))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+bool Tile::hasItemWithProperty(Item* exclude, uint32_t props) const
+{
+	assert(exclude);
+	if(ground && exclude != ground && ground->hasProperty(props)){
+		return true;
+	}
+
+	if(const TileItemVector* items = getItemList()){
+		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
+			Item* item = *it;
+			if(item != exclude && item->hasProperty(props))
+				return true;
+		}
+	}
+
+	return false;
+}
+
 void Tile::updateTileFlags(Item* item, bool removed)
 {
 	if(!removed){
 		if(!hasFlag(TILESTATE_FLOORCHANGE)){
-			if(item->floorChangeDown()){
+			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEDOWN)){
 				setFlag(TILESTATE_FLOORCHANGE);
 				setFlag(TILESTATE_FLOORCHANGE_DOWN);
 			}
-			if(item->floorChangeNorth()){
+			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGENORTH)){
 				setFlag(TILESTATE_FLOORCHANGE);
 				setFlag(TILESTATE_FLOORCHANGE_NORTH);
 			}
-			if(item->floorChangeSouth()){
+			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGESOUTH)){
 				setFlag(TILESTATE_FLOORCHANGE);
 				setFlag(TILESTATE_FLOORCHANGE_SOUTH);
 			}
-			if(item->floorChangeEast()){
+			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEEAST)){
 				setFlag(TILESTATE_FLOORCHANGE);
 				setFlag(TILESTATE_FLOORCHANGE_EAST);
 			}
-			if(item->floorChangeWest()){
+			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEWEST)){
 				setFlag(TILESTATE_FLOORCHANGE);
 				setFlag(TILESTATE_FLOORCHANGE_WEST);
 			}
 		}
 
-		if(item->hasProperty(IMMOVABLEBLOCKSOLID)){
-			setFlag(TILESTATE_IMMOVABLEBLOCKSOLID);
+		if(item->hasProperty(enums::ITEMPROP_BLOCKSOLID)){
+			setFlag(TILESTATE_BLOCKSOLID);
+
+			if(!item->hasProperty(enums::ITEMPROP_MOVEABLE)){
+				setFlag(TILESTATE_BLOCKSOLIDNOTMOVEABLE);
+			}
 		}
-		if(item->hasProperty(BLOCKPATH)){
+		if(item->hasProperty(enums::ITEMPROP_BLOCKPROJECTILE)){
 			setFlag(TILESTATE_BLOCKPATH);
+
+			if(!item->hasProperty(enums::ITEMPROP_MOVEABLE)){
+				setFlag(TILESTATE_BLOCKPATHNOTMOVEABLE);
+			}
+
+			if(!item->getMagicField()){
+				setFlag(TILESTATE_BLOCKPATHNOTFIELD);
+			}
 		}
-		if(item->hasProperty(NOFIELDBLOCKPATH)){
-			setFlag(TILESTATE_NOFIELDBLOCKPATH);
+		if(item->hasProperty(enums::ITEMPROP_BLOCKPROJECTILE)){
+			setFlag(TILESTATE_BLOCKPROJECTILE);
 		}
-		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH)){
-			setFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
+		if(item->hasProperty(enums::ITEMPROP_ISVERTICAL)){
+			setFlag(TILESTATE_VERTICAL);
+		}
+		if(item->hasProperty(enums::ITEMPROP_ISHORIZONTAL)){
+			setFlag(TILESTATE_HORIZONTAL);
 		}
 		if(item->getTeleport()){
 			setFlag(TILESTATE_TELEPORT);
@@ -1605,51 +1620,58 @@ void Tile::updateTileFlags(Item* item, bool removed)
 		if(item->getTrashHolder()){
 			setFlag(TILESTATE_TRASHHOLDER);
 		}
-		if(item->hasProperty(BLOCKSOLID)){
-			setFlag(TILESTATE_BLOCKSOLID);
-		}
 		if(item->getBed()){
 			setFlag(TILESTATE_BED);
 		}
 	}
 	else{
-		if(item->floorChangeDown()){
+		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEDOWN) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGEDOWN) ){
 			resetFlag(TILESTATE_FLOORCHANGE);
 			resetFlag(TILESTATE_FLOORCHANGE_DOWN);
 		}
-		if(item->floorChangeNorth()){
+		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGENORTH) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGENORTH) ){
 			resetFlag(TILESTATE_FLOORCHANGE);
 			resetFlag(TILESTATE_FLOORCHANGE_NORTH);
 		}
-		if(item->floorChangeSouth()){
+		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGESOUTH) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGESOUTH) ){
 			resetFlag(TILESTATE_FLOORCHANGE);
 			resetFlag(TILESTATE_FLOORCHANGE_SOUTH);
 		}
-		if(item->floorChangeEast()){
+		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEEAST) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGEEAST) ){
 			resetFlag(TILESTATE_FLOORCHANGE);
 			resetFlag(TILESTATE_FLOORCHANGE_EAST);
 		}
-		if(item->floorChangeWest()){
+		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEWEST) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGEWEST) ){
 			resetFlag(TILESTATE_FLOORCHANGE);
 			resetFlag(TILESTATE_FLOORCHANGE_WEST);
 		}
-		if(item->hasProperty(BLOCKSOLID) && !hasProperty(item, BLOCKSOLID)){
+
+		if(item->hasProperty(enums::ITEMPROP_BLOCKSOLID) && !hasItemWithProperty(item, enums::ITEMPROP_BLOCKSOLID) ){
 			resetFlag(TILESTATE_BLOCKSOLID);
+
+			if(!item->hasProperty(enums::ITEMPROP_MOVEABLE) && !hasItemWithProperty(item, enums::ITEMPROP_MOVEABLE) ){
+				resetFlag(TILESTATE_BLOCKSOLIDNOTMOVEABLE);
+			}
 		}
-		if(item->hasProperty(IMMOVABLEBLOCKSOLID) && !hasProperty(item, IMMOVABLEBLOCKSOLID)){
-			resetFlag(TILESTATE_IMMOVABLEBLOCKSOLID);
-		}
-		if(item->hasProperty(BLOCKPATH) && !hasProperty(item, BLOCKPATH)){
+		if(item->hasProperty(enums::ITEMPROP_BLOCKPROJECTILE) && !hasItemWithProperty(item, enums::ITEMPROP_BLOCKPROJECTILE) ){
 			resetFlag(TILESTATE_BLOCKPATH);
+
+			if(!item->hasProperty(enums::ITEMPROP_MOVEABLE) && !hasItemWithProperty(item, enums::ITEMPROP_MOVEABLE) ){
+				resetFlag(TILESTATE_BLOCKPATHNOTMOVEABLE);
+			}
+
+			if(!item->getMagicField()){
+				resetFlag(TILESTATE_BLOCKPATHNOTFIELD);
+			}
 		}
-		if(item->hasProperty(NOFIELDBLOCKPATH) && !hasProperty(item, NOFIELDBLOCKPATH)){
-			resetFlag(TILESTATE_NOFIELDBLOCKPATH);
+		if(item->hasProperty(enums::ITEMPROP_BLOCKPROJECTILE) && !hasItemWithProperty(item, enums::ITEMPROP_BLOCKPROJECTILE)){
+			resetFlag(TILESTATE_BLOCKPROJECTILE);
 		}
-		if(item->hasProperty(IMMOVABLEBLOCKPATH) && !hasProperty(item, IMMOVABLEBLOCKPATH)){
-			resetFlag(TILESTATE_IMMOVABLEBLOCKPATH);
+		if(item->hasProperty(enums::ITEMPROP_ISVERTICAL) && !hasItemWithProperty(item, enums::ITEMPROP_ISVERTICAL) ){
+			resetFlag(TILESTATE_VERTICAL);
 		}
-		if(item->hasProperty(IMMOVABLENOFIELDBLOCKPATH) && !hasProperty(item, IMMOVABLENOFIELDBLOCKPATH)){
-			resetFlag(TILESTATE_IMMOVABLENOFIELDBLOCKPATH);
+		if(item->hasProperty(enums::ITEMPROP_ISHORIZONTAL) && !hasItemWithProperty(item, enums::ITEMPROP_ISHORIZONTAL) ){
+			resetFlag(TILESTATE_HORIZONTAL);
 		}
 		if(item->getTeleport()){
 			resetFlag(TILESTATE_TELEPORT);
