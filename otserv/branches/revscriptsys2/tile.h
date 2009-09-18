@@ -32,39 +32,6 @@ typedef std::list<Player*> PlayerList;
 typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
 typedef std::vector<Item*> ItemVector;
 
-enum tileflags_t{
-	TILESTATE_NONE						= 0,
-	TILESTATE_PROTECTIONZONE			= 1 << 0,
-	TILESTATE_DEPRECATED_HOUSE			= 1 << 1,
-	TILESTATE_NOPVPZONE					= 1 << 2,
-	TILESTATE_NOLOGOUT					= 1 << 3,
-	TILESTATE_PVPZONE					= 1 << 4,
-	TILESTATE_REFRESH					= 1 << 5,
-
-	//internal usage
-	TILESTATE_HOUSE						= 1 << 6,
-	TILESTATE_FLOORCHANGE				= 1 << 7,
-	TILESTATE_FLOORCHANGE_DOWN			= 1 << 8,
-	TILESTATE_FLOORCHANGE_NORTH			= 1 << 9,
-	TILESTATE_FLOORCHANGE_SOUTH			= 1 << 10,
-	TILESTATE_FLOORCHANGE_EAST			= 1 << 11,
-	TILESTATE_FLOORCHANGE_WEST			= 1 << 12,
-	TILESTATE_TELEPORT      			= 1 << 13,
-	TILESTATE_MAGICFIELD                = 1 << 14,
-	TILESTATE_MAILBOX                   = 1 << 15,
-	TILESTATE_TRASHHOLDER               = 1 << 16,
-	TILESTATE_BED                       = 1 << 17,
-	TILESTATE_BLOCKSOLID				= 1 << 18,
-	TILESTATE_BLOCKPATH					= 1 << 19,
-	TILESTATE_VERTICAL					= 1 << 20,
-	TILESTATE_HORIZONTAL				= 1 << 21,
-	TILESTATE_BLOCKPROJECTILE			= 1 << 22,
-	TILESTATE_BLOCKSOLIDNOTMOVEABLE		= 1 << 23,
-	TILESTATE_BLOCKPATHNOTMOVEABLE		= 1 << 24,
-	TILESTATE_BLOCKPATHNOTFIELD			= 1 << 25,
-	TILESTATE_DYNAMIC_TILE				= 1 << 26
-};
-
 class TileItemVector
 {
 public:
@@ -159,43 +126,43 @@ public:
 	bool hasItemWithProperty(uint32_t props) const;
 	bool hasItemWithProperty(Item* exclude, uint32_t props) const;
 
-	bool blockSolid() const {return hasFlag(TILESTATE_BLOCKSOLID);}
-	bool blockPathFind() const {return hasFlag(TILESTATE_BLOCKPATH);}
-	bool blockProjectile() const {return hasFlag(TILESTATE_BLOCKPROJECTILE);}
-	bool isVertical() const {return hasFlag(TILESTATE_VERTICAL);}
-	bool isHorizontal() const {return hasFlag(TILESTATE_HORIZONTAL);}
+	bool blockSolid() const {return hasFlag(TILEPROP_BLOCKSOLID);}
+	bool blockPathFind() const {return hasFlag(TILEPROP_BLOCKPATH);}
+	bool blockProjectile() const {return hasFlag(TILEPROP_BLOCKPROJECTILE);}
+	bool isVertical() const {return hasFlag(TILEPROP_VERTICAL);}
+	bool isHorizontal() const {return hasFlag(TILEPROP_HORIZONTAL);}
 
-	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}
-	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
-	void resetFlag(tileflags_t flag) {m_flags &= ~(uint32_t)flag;}
+	bool hasFlag(TileProp flag) const {return ((m_flags & (uint32_t)flag.value()) == (uint32_t)flag.value());}
+	void setFlag(TileProp flag) {m_flags |= (uint32_t)flag.value();}
+	void resetFlag(TileProp flag) {m_flags &= ~(uint32_t)flag.value();}
 
-	bool positionChange() const {return hasFlag(TILESTATE_TELEPORT);}
-	bool floorChange() const {return hasFlag(TILESTATE_FLOORCHANGE);}
-	bool floorChangeDown() const {return hasFlag(TILESTATE_FLOORCHANGE_DOWN);}
+	bool positionChange() const {return hasFlag(TILEPROP_TELEPORT);}
+	bool floorChange() const {return hasFlag(TILEPROP_FLOORCHANGE);}
+	bool floorChangeDown() const {return hasFlag(TILEPROP_FLOORCHANGE_DOWN);}
 	bool floorChange(Direction direction) const
 	{
 		switch(direction.value()){
 		case enums::NORTH:
-			return hasFlag(TILESTATE_FLOORCHANGE_NORTH);
+			return hasFlag(TILEPROP_FLOORCHANGE_NORTH);
 		case enums::SOUTH:
-			return hasFlag(TILESTATE_FLOORCHANGE_SOUTH);
+			return hasFlag(TILEPROP_FLOORCHANGE_SOUTH);
 		case enums::EAST:
-			return hasFlag(TILESTATE_FLOORCHANGE_EAST);
+			return hasFlag(TILEPROP_FLOORCHANGE_EAST);
 		case enums::WEST:
-			return hasFlag(TILESTATE_FLOORCHANGE_WEST);
+			return hasFlag(TILEPROP_FLOORCHANGE_WEST);
 		default:
 			return false;
 		}
 	}
 
 	ZoneType getZone() const {
-		if(hasFlag(TILESTATE_PROTECTIONZONE)){
+		if(hasFlag(TILEPROP_PROTECTIONZONE)){
 			return ZONE_PROTECTION;
 		}
-		else if(hasFlag(TILESTATE_NOPVPZONE)){
+		else if(hasFlag(TILEPROP_NOPVPZONE)){
 			return ZONE_NOPVP;
 		}
-		else if(hasFlag(TILESTATE_PVPZONE)){
+		else if(hasFlag(TILEPROP_PVPZONE)){
 			return ZONE_PVP;
 		}
 		else{
@@ -253,7 +220,7 @@ private:
 	void updateTileFlags(Item* item, bool removed);
 
  protected:
-	bool is_dynamic() const {return (m_flags & TILESTATE_DYNAMIC_TILE) != 0;}
+	bool is_dynamic() const {return hasFlag(TILEPROP_DYNAMIC_TILE);}
 
 public:
 	QTreeLeafNode*	qt_node;
@@ -382,7 +349,7 @@ inline StaticTile::~StaticTile()
 inline DynamicTile::DynamicTile(uint16_t x, uint16_t y, uint16_t z) :
 	Tile(x, y, z)
 {
-	m_flags |= TILESTATE_DYNAMIC_TILE;
+	m_flags |= enums::TILEPROP_DYNAMIC_TILE;
 }
 
 inline DynamicTile::~DynamicTile()

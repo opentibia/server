@@ -36,7 +36,54 @@ function Tile:getTopMoveableThing()
 	return t
 end
 
-function Tile:isBlocking()
-	return self:hasProperty(ITEMPROP_BLOCKSOLID)
+function Tile:isPz()
+	return self:hasProperty(TILEPROP_PROTECTONZONE)
 end
 
+function Tile:isNoPVP()
+	return self:hasProperty(TILEPROP_NOPVPZONE)
+end
+
+function Tile:isNoLogout()
+	return self:hasProperty(TILEPROP_NOLOGOUT)
+end
+
+function Tile:isPVP()
+	return self:hasProperty(TILEPROP_PVPZONE)
+end
+
+function Tile:doesRefresh()
+	return self:hasProperty(TILEPROP_REFRESH)
+end
+
+function Tile:isBlocking()
+	return self:hasProperty(TILEPROP_BLOCKSOLID)
+end
+
+function Tile:floorChange()
+	return self:hasProperty(TILEPROP_FLOORCHANGE)
+end
+
+function Tile:floorChangeDown()
+	return self:hasProperty(TILEPROP_FLOORCHANGE_DOWN)
+end
+
+function Tile:floorChangeNorth()
+	return self:hasProperty(TILEPROP_FLOORCHANGE_NORTH)
+end
+
+function Tile:floorChangeSouth()
+	return self:hasProperty(TILEPROP_FLOORCHANGE_SOUTH)
+end
+
+function Tile:floorChangeEast()
+	return self:hasProperty(TILEPROP_FLOORCHANGE_EAST)
+end
+
+function Tile:floorChangeWest()
+	return self:hasProperty(TILEPROP_FLOORCHANGE_WEST)
+end
+
+function Tile:blockProjectile()
+	return self:hasProperty(TILEPROP_BLOCKPROJECTILE)
+end

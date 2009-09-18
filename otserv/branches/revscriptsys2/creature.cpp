@@ -1083,13 +1083,13 @@ bool Creature::setAttackedCreature(Creature* creature)
 
 ZoneType Creature::getZone() const {
 	const Tile* tile = getTile();
-	if(tile->hasFlag(TILESTATE_PROTECTIONZONE)){
+	if(tile->hasFlag(TILEPROP_PROTECTIONZONE)){
 		return ZONE_PROTECTION;
 	}
-	else if(tile->hasFlag(TILESTATE_NOPVPZONE)){
+	else if(tile->hasFlag(TILEPROP_NOPVPZONE)){
 		return ZONE_NOPVP;
 	}
-	else if(tile->hasFlag(TILESTATE_PVPZONE)){
+	else if(tile->hasFlag(TILEPROP_PVPZONE)){
 		return ZONE_PVP;
 	}
 	else{

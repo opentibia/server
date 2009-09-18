@@ -4270,7 +4270,7 @@ bool Player::canLogout()
 		return false;
 	}
 
-	if(getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+	if(getTile()->hasFlag(TILEPROP_NOLOGOUT)){
 		return false;
 	}
 
@@ -4366,7 +4366,7 @@ int32_t Player::getStaminaMinutes()
 void Player::checkIdleTime(uint32_t ticks)
 {
 	if(g_config.getNumber(ConfigManager::IDLE_TIME) > 0){
-		if(!getTile()->hasFlag(TILESTATE_NOLOGOUT) && !hasFlag(PlayerFlag_CanAlwaysLogin)){
+		if(!getTile()->hasFlag(TILEPROP_NOLOGOUT) && !hasFlag(PlayerFlag_CanAlwaysLogin)){
 			idleTime += ticks;
 			if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME)){
 				kickPlayer();

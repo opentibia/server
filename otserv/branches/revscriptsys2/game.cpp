@@ -1342,7 +1342,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
 			return false;
 		}
-		else if(movingCreature->getZone() == ZONE_PROTECTION && !toTile->hasFlag(TILESTATE_PROTECTIONZONE)){
+		else if(movingCreature->getZone() == ZONE_PROTECTION && !toTile->hasFlag(TILEPROP_PROTECTIONZONE)){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			return false;
 		}

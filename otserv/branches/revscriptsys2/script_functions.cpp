@@ -101,7 +101,7 @@ void Manager::registerClasses() {
 	registerEnum<TradeState>();
 	registerEnum<SlotType>();
 	registerEnum<SlotPosition>();
-	registerEnum<ItemProp>();
+	registerEnum<TileProp>();
 	registerEnum<ZoneType>();
 	registerEnum<WorldType>();
 	registerEnum<Script::ListenerType>();
@@ -333,13 +333,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
 	registerMemberFunction("Tile", "queryAdd()", &Manager::lua_Tile_queryAdd);
-	registerMemberFunction("Tile", "hasProperty(ItemProp prop)", &Manager::lua_Tile_hasProperty);
-
-	registerMemberFunction("Tile", "isPZ()", &Manager::lua_Tile_isPZ);
-	registerMemberFunction("Tile", "isPVP()", &Manager::lua_Tile_isPVP);
-	registerMemberFunction("Tile", "isNoPVP()", &Manager::lua_Tile_isNoPVP);
-	registerMemberFunction("Tile", "isNoLogout()", &Manager::lua_Tile_isNoLogout);
-	registerMemberFunction("Tile", "doesRefresh()", &Manager::lua_Tile_doesRefresh);
+	registerMemberFunction("Tile", "hasProperty(TileProp prop)", &Manager::lua_Tile_hasProperty);
 
 	registerMemberFunction("Tile", "getItemTypeCount(int itemid)", &Manager::lua_Tile_getItemTypeCount);
 
@@ -1724,41 +1718,6 @@ int LuaState::lua_Tile_queryAdd()
 	return 1;
 }
 
-int LuaState::lua_Tile_isPZ()
-{
-	Tile* tile = popTile();
-	pushBoolean(tile->hasFlag(TILESTATE_PROTECTIONZONE));
-	return 1;
-}
-
-int LuaState::lua_Tile_isNoPVP()
-{
-	Tile* tile = popTile();
-	pushBoolean(tile->hasFlag(TILESTATE_NOPVPZONE));
-	return 1;
-}
-
-int LuaState::lua_Tile_isPVP()
-{
-	Tile* tile = popTile();
-	pushBoolean(tile->hasFlag(TILESTATE_PVPZONE));
-	return 1;
-}
-
-int LuaState::lua_Tile_isNoLogout()
-{
-	Tile* tile = popTile();
-	pushBoolean(tile->hasFlag(TILESTATE_NOLOGOUT));
-	return 1;
-}
-
-int LuaState::lua_Tile_doesRefresh()
-{
-	Tile* tile = popTile();
-	pushBoolean(tile->hasFlag(TILESTATE_REFRESH));
-	return 1;
-}
-
 int LuaState::lua_Tile_addItem()
 {
 	Item* item = popItem(Script::ERROR_PASS);
@@ -1782,9 +1741,9 @@ int LuaState::lua_Tile_addItem()
 
 int LuaState::lua_Tile_hasProperty()
 {
-	ItemProp props = popEnum<ItemProp>();
+	TileProp prop = popEnum<TileProp>();
 	Tile* tile = popTile();
-	pushBoolean(tile && tile->hasItemWithProperty(props.value()));
+	pushBoolean(tile && tile->hasFlag(prop));
 	return 1;
 }
 

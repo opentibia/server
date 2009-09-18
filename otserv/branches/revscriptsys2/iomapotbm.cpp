@@ -249,7 +249,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					House* house = NULL;
 					Tile* tile = NULL;
 					Item* ground_item = NULL;
-					uint32_t tileflags = TILESTATE_NONE;
+					uint32_t tileflags = enums::TILEPROP_NONE;
 
 					if(type == OTBM_HOUSETILE){
 						uint32_t _houseid;
@@ -287,25 +287,25 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								return false;
 							}
 
-							if((flags & TILESTATE_PROTECTIONZONE) == TILESTATE_PROTECTIONZONE){
-								tileflags |= TILESTATE_PROTECTIONZONE;
+							if((flags & enums::TILEPROP_PROTECTIONZONE) == enums::TILEPROP_PROTECTIONZONE){
+								tileflags |= enums::TILEPROP_PROTECTIONZONE;
 							}
-							else if((flags & TILESTATE_NOPVPZONE) == TILESTATE_NOPVPZONE){
-								tileflags |= TILESTATE_NOPVPZONE;
+							else if((flags & enums::TILEPROP_NOPVPZONE) == enums::TILEPROP_NOPVPZONE){
+								tileflags |= enums::TILEPROP_NOPVPZONE;
 							}
-							else if((flags & TILESTATE_PVPZONE) == TILESTATE_PVPZONE){
-								tileflags |= TILESTATE_PVPZONE;
-							}
-
-							if((flags & TILESTATE_NOLOGOUT) == TILESTATE_NOLOGOUT){
-								tileflags |= TILESTATE_NOLOGOUT;
+							else if((flags & enums::TILEPROP_PVPZONE) == enums::TILEPROP_PVPZONE){
+								tileflags |= enums::TILEPROP_PVPZONE;
 							}
 
-							if((flags & TILESTATE_REFRESH) == TILESTATE_REFRESH){
+							if((flags & enums::TILEPROP_NOLOGOUT) == enums::TILEPROP_NOLOGOUT){
+								tileflags |= enums::TILEPROP_NOLOGOUT;
+							}
+
+							if((flags & enums::TILEPROP_REFRESH) == enums::TILEPROP_REFRESH){
 								if(house){
 									std::cout << "Warning [x:" << px << ", y:" << py << ", z:" << pz << "] " << " House tile flagged as refreshing!";
 								}
-								tileflags |= TILESTATE_REFRESH;
+								tileflags |= enums::TILEPROP_REFRESH;
 							}
 
 							break;
@@ -412,7 +412,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					if(!tile)
 						tile = createTile(ground_item, NULL, px, py, pz);
 
-					tile->setFlag((tileflags_t)tileflags);
+					tile->setFlag((TileProp)tileflags);
 
 					map->setTile(px, py, pz, tile);
 				}

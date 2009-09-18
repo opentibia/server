@@ -257,7 +257,7 @@ bool ProtocolGame::logout(bool forced)
 
 	if(!player->isRemoved()){
 		if(!forced){
-			if(player->getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+			if(player->getTile()->hasFlag(TILEPROP_NOLOGOUT)){
 				player->sendCancelMessage(RET_YOUCANNOTLOGOUTHERE);
 				return false;
 			}

@@ -50,7 +50,7 @@ const HouseTile* Tile::getHouseTile() const
 
 bool Tile::isHouseTile() const
 {
-	return hasFlag(TILESTATE_HOUSE);
+	return hasFlag(TILEPROP_HOUSE);
 }
 
 bool Tile::hasHeight(uint32_t n) const
@@ -118,7 +118,7 @@ uint32_t Tile::getDownItemCount() const
 
 Teleport* Tile::getTeleportItem() const
 {
-	if(!hasFlag(TILESTATE_TELEPORT)){
+	if(!hasFlag(TILEPROP_TELEPORT)){
 		return NULL;
 	}
 
@@ -134,7 +134,7 @@ Teleport* Tile::getTeleportItem() const
 
 MagicField* Tile::getFieldItem() const
 {
-	if(!hasFlag(TILESTATE_MAGICFIELD)){
+	if(!hasFlag(TILEPROP_MAGICFIELD)){
 		return NULL;
 	}
 
@@ -154,7 +154,7 @@ MagicField* Tile::getFieldItem() const
 
 TrashHolder* Tile::getTrashHolder() const
 {
-	if(!hasFlag(TILESTATE_TRASHHOLDER)){
+	if(!hasFlag(TILEPROP_TRASHHOLDER)){
 		return NULL;
 	}
 
@@ -174,7 +174,7 @@ TrashHolder* Tile::getTrashHolder() const
 
 Mailbox* Tile::getMailbox() const
 {
-	if(!hasFlag(TILESTATE_MAILBOX)){
+	if(!hasFlag(TILEPROP_MAILBOX)){
 		return NULL;
 	}
 
@@ -194,7 +194,7 @@ Mailbox* Tile::getMailbox() const
 
 BedItem* Tile::getBedItem() const
 {
-	if(!hasFlag(TILESTATE_BED)){
+	if(!hasFlag(TILEPROP_BED)){
 		return NULL;
 	}
 
@@ -505,7 +505,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOTPOSSIBLE;
 
 		if(const Actor* monster = creature->getActor()){
-			if(hasFlag(TILESTATE_PROTECTIONZONE))
+			if(hasFlag(TILEPROP_PROTECTIONZONE))
 				return RET_NOTPOSSIBLE;
 
 			if(floorChange() || positionChange()){
@@ -537,15 +537,15 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 
-			if(hasFlag(TILESTATE_BLOCKSOLIDNOTMOVEABLE)){
+			if(hasFlag(TILEPROP_BLOCKSOLIDNOTMOVEABLE)){
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(hasBitSet(FLAG_PATHFINDING, flags) && (hasFlag(TILESTATE_BLOCKPATHNOTFIELD) && hasFlag(TILESTATE_BLOCKPATHNOTMOVEABLE)) ){
+			if(hasBitSet(FLAG_PATHFINDING, flags) && (hasFlag(TILEPROP_BLOCKPATHNOTFIELD) && hasFlag(TILEPROP_BLOCKPATHNOTMOVEABLE)) ){
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(hasFlag(TILESTATE_BLOCKSOLID) || (hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILESTATE_BLOCKPATHNOTFIELD))){
+			if(hasFlag(TILEPROP_BLOCKSOLID) || (hasBitSet(FLAG_PATHFINDING, flags) && hasFlag(TILEPROP_BLOCKPATHNOTFIELD))){
 				if(!(monster->canPushItems() || hasBitSet(FLAG_IGNOREBLOCKITEM, flags) ) ){
 					return RET_NOTPOSSIBLE;
 				}
@@ -582,26 +582,26 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 
-			if(player->getParent() == NULL && hasFlag(TILESTATE_NOLOGOUT)){
+			if(player->getParent() == NULL && hasFlag(TILEPROP_NOLOGOUT)){
 				//player is trying to login to a "no logout" tile
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(player->isPzLocked() && !player->getTile()->hasFlag(TILESTATE_PVPZONE) && hasFlag(TILESTATE_PVPZONE)){
+			if(player->isPzLocked() && !player->getTile()->hasFlag(TILEPROP_PVPZONE) && hasFlag(TILEPROP_PVPZONE)){
 				//player is trying to enter a pvp zone while being pz-locked
 				return RET_PLAYERISPZLOCKEDENTERPVPZONE;
 			}
 
-			if(player->isPzLocked() && player->getTile()->hasFlag(TILESTATE_PVPZONE) && !hasFlag(TILESTATE_PVPZONE)){
+			if(player->isPzLocked() && player->getTile()->hasFlag(TILEPROP_PVPZONE) && !hasFlag(TILEPROP_PVPZONE)){
 				//player is trying to leave a pvp zone while being pz-locked
 				return RET_PLAYERISPZLOCKEDLEAVEPVPZONE;
 			}
 
-			if(hasFlag(TILESTATE_NOPVPZONE) && player->isPzLocked()){
+			if(hasFlag(TILEPROP_NOPVPZONE) && player->isPzLocked()){
 				return RET_PLAYERISPZLOCKED;
 			}
 
-			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->isPzLocked()){
+			if(hasFlag(TILEPROP_PROTECTIONZONE) && player->isPzLocked()){
 				return RET_PLAYERISPZLOCKED;
 			}
 		}
@@ -618,7 +618,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		if(items){
 			if(!hasBitSet(FLAG_IGNOREBLOCKITEM, flags)){
 				//If the FLAG_IGNOREBLOCKITEM bit isn't set we dont have to iterate every single item
-				if(hasFlag(TILESTATE_BLOCKSOLID)){
+				if(hasFlag(TILEPROP_BLOCKSOLID)){
 					return RET_NOTENOUGHROOM;
 				}
 			}
@@ -1403,19 +1403,19 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, const Cylinder* ol
 			}
 		}
 
-		if(hasFlag(TILESTATE_TELEPORT)){
+		if(hasFlag(TILEPROP_TELEPORT)){
 			Teleport* teleport = getTeleportItem();
 			if(teleport){
 				teleport->__addThing(actor, thing);
 			}
 		}
-		else if(hasFlag(TILESTATE_TRASHHOLDER)){
+		else if(hasFlag(TILEPROP_TRASHHOLDER)){
 			TrashHolder* trashholder = getTrashHolder();
 			if(trashholder){
 				trashholder->__addThing(actor, thing);
 			}
 		}
-		else if(hasFlag(TILESTATE_MAILBOX)){
+		else if(hasFlag(TILEPROP_MAILBOX)){
 			Mailbox* mailbox = getMailbox();
 			if(mailbox){
 				mailbox->__addThing(actor, thing);
@@ -1558,135 +1558,135 @@ bool Tile::hasItemWithProperty(Item* exclude, uint32_t props) const
 void Tile::updateTileFlags(Item* item, bool removed)
 {
 	if(!removed){
-		if(!hasFlag(TILESTATE_FLOORCHANGE)){
-			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEDOWN)){
-				setFlag(TILESTATE_FLOORCHANGE);
-				setFlag(TILESTATE_FLOORCHANGE_DOWN);
+		if(!hasFlag(TILEPROP_FLOORCHANGE)){
+			if(item->hasProperty(ITEMPROP_FLOORCHANGEDOWN)){
+				setFlag(TILEPROP_FLOORCHANGE);
+				setFlag(TILEPROP_FLOORCHANGE_DOWN);
 			}
-			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGENORTH)){
-				setFlag(TILESTATE_FLOORCHANGE);
-				setFlag(TILESTATE_FLOORCHANGE_NORTH);
+			if(item->hasProperty(ITEMPROP_FLOORCHANGENORTH)){
+				setFlag(TILEPROP_FLOORCHANGE);
+				setFlag(TILEPROP_FLOORCHANGE_NORTH);
 			}
-			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGESOUTH)){
-				setFlag(TILESTATE_FLOORCHANGE);
-				setFlag(TILESTATE_FLOORCHANGE_SOUTH);
+			if(item->hasProperty(ITEMPROP_FLOORCHANGESOUTH)){
+				setFlag(TILEPROP_FLOORCHANGE);
+				setFlag(TILEPROP_FLOORCHANGE_SOUTH);
 			}
-			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEEAST)){
-				setFlag(TILESTATE_FLOORCHANGE);
-				setFlag(TILESTATE_FLOORCHANGE_EAST);
+			if(item->hasProperty(ITEMPROP_FLOORCHANGEEAST)){
+				setFlag(TILEPROP_FLOORCHANGE);
+				setFlag(TILEPROP_FLOORCHANGE_EAST);
 			}
-			if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEWEST)){
-				setFlag(TILESTATE_FLOORCHANGE);
-				setFlag(TILESTATE_FLOORCHANGE_WEST);
-			}
-		}
-
-		if(item->hasProperty(enums::ITEMPROP_BLOCKSOLID)){
-			setFlag(TILESTATE_BLOCKSOLID);
-
-			if(!item->hasProperty(enums::ITEMPROP_MOVEABLE)){
-				setFlag(TILESTATE_BLOCKSOLIDNOTMOVEABLE);
+			if(item->hasProperty(ITEMPROP_FLOORCHANGEWEST)){
+				setFlag(TILEPROP_FLOORCHANGE);
+				setFlag(TILEPROP_FLOORCHANGE_WEST);
 			}
 		}
-		if(item->hasProperty(enums::ITEMPROP_BLOCKPROJECTILE)){
-			setFlag(TILESTATE_BLOCKPATH);
 
-			if(!item->hasProperty(enums::ITEMPROP_MOVEABLE)){
-				setFlag(TILESTATE_BLOCKPATHNOTMOVEABLE);
+		if(item->hasProperty(ITEMPROP_BLOCKSOLID)){
+			setFlag(TILEPROP_BLOCKSOLID);
+
+			if(!item->hasProperty(ITEMPROP_MOVEABLE)){
+				setFlag(TILEPROP_BLOCKSOLIDNOTMOVEABLE);
+			}
+		}
+		if(item->hasProperty(ITEMPROP_BLOCKPROJECTILE)){
+			setFlag(TILEPROP_BLOCKPATH);
+
+			if(!item->hasProperty(ITEMPROP_MOVEABLE)){
+				setFlag(TILEPROP_BLOCKPATHNOTMOVEABLE);
 			}
 
 			if(!item->getMagicField()){
-				setFlag(TILESTATE_BLOCKPATHNOTFIELD);
+				setFlag(TILEPROP_BLOCKPATHNOTFIELD);
 			}
 		}
-		if(item->hasProperty(enums::ITEMPROP_BLOCKPROJECTILE)){
-			setFlag(TILESTATE_BLOCKPROJECTILE);
+		if(item->hasProperty(ITEMPROP_BLOCKPROJECTILE)){
+			setFlag(TILEPROP_BLOCKPROJECTILE);
 		}
-		if(item->hasProperty(enums::ITEMPROP_ISVERTICAL)){
-			setFlag(TILESTATE_VERTICAL);
+		if(item->hasProperty(ITEMPROP_ISVERTICAL)){
+			setFlag(TILEPROP_VERTICAL);
 		}
-		if(item->hasProperty(enums::ITEMPROP_ISHORIZONTAL)){
-			setFlag(TILESTATE_HORIZONTAL);
+		if(item->hasProperty(ITEMPROP_ISHORIZONTAL)){
+			setFlag(TILEPROP_HORIZONTAL);
 		}
 		if(item->getTeleport()){
-			setFlag(TILESTATE_TELEPORT);
+			setFlag(TILEPROP_TELEPORT);
 		}
 		if(item->getMagicField()){
-			setFlag(TILESTATE_MAGICFIELD);
+			setFlag(TILEPROP_MAGICFIELD);
 		}
 		if(item->getMailbox()){
-			setFlag(TILESTATE_MAILBOX);
+			setFlag(TILEPROP_MAILBOX);
 		}
 		if(item->getTrashHolder()){
-			setFlag(TILESTATE_TRASHHOLDER);
+			setFlag(TILEPROP_TRASHHOLDER);
 		}
 		if(item->getBed()){
-			setFlag(TILESTATE_BED);
+			setFlag(TILEPROP_BED);
 		}
 	}
 	else{
-		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEDOWN) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGEDOWN) ){
-			resetFlag(TILESTATE_FLOORCHANGE);
-			resetFlag(TILESTATE_FLOORCHANGE_DOWN);
+		if(item->hasProperty(ITEMPROP_FLOORCHANGEDOWN) && !hasItemWithProperty(item, ITEMPROP_FLOORCHANGEDOWN) ){
+			resetFlag(TILEPROP_FLOORCHANGE);
+			resetFlag(TILEPROP_FLOORCHANGE_DOWN);
 		}
-		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGENORTH) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGENORTH) ){
-			resetFlag(TILESTATE_FLOORCHANGE);
-			resetFlag(TILESTATE_FLOORCHANGE_NORTH);
+		if(item->hasProperty(ITEMPROP_FLOORCHANGENORTH) && !hasItemWithProperty(item, ITEMPROP_FLOORCHANGENORTH) ){
+			resetFlag(TILEPROP_FLOORCHANGE);
+			resetFlag(TILEPROP_FLOORCHANGE_NORTH);
 		}
-		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGESOUTH) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGESOUTH) ){
-			resetFlag(TILESTATE_FLOORCHANGE);
-			resetFlag(TILESTATE_FLOORCHANGE_SOUTH);
+		if(item->hasProperty(ITEMPROP_FLOORCHANGESOUTH) && !hasItemWithProperty(item, ITEMPROP_FLOORCHANGESOUTH) ){
+			resetFlag(TILEPROP_FLOORCHANGE);
+			resetFlag(TILEPROP_FLOORCHANGE_SOUTH);
 		}
-		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEEAST) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGEEAST) ){
-			resetFlag(TILESTATE_FLOORCHANGE);
-			resetFlag(TILESTATE_FLOORCHANGE_EAST);
+		if(item->hasProperty(ITEMPROP_FLOORCHANGEEAST) && !hasItemWithProperty(item, ITEMPROP_FLOORCHANGEEAST) ){
+			resetFlag(TILEPROP_FLOORCHANGE);
+			resetFlag(TILEPROP_FLOORCHANGE_EAST);
 		}
-		if(item->hasProperty(enums::ITEMPROP_FLOORCHANGEWEST) && !hasItemWithProperty(item, enums::ITEMPROP_FLOORCHANGEWEST) ){
-			resetFlag(TILESTATE_FLOORCHANGE);
-			resetFlag(TILESTATE_FLOORCHANGE_WEST);
+		if(item->hasProperty(ITEMPROP_FLOORCHANGEWEST) && !hasItemWithProperty(item, ITEMPROP_FLOORCHANGEWEST) ){
+			resetFlag(TILEPROP_FLOORCHANGE);
+			resetFlag(TILEPROP_FLOORCHANGE_WEST);
 		}
 
-		if(item->hasProperty(enums::ITEMPROP_BLOCKSOLID) && !hasItemWithProperty(item, enums::ITEMPROP_BLOCKSOLID) ){
-			resetFlag(TILESTATE_BLOCKSOLID);
+		if(item->hasProperty(ITEMPROP_BLOCKSOLID) && !hasItemWithProperty(item, ITEMPROP_BLOCKSOLID) ){
+			resetFlag(TILEPROP_BLOCKSOLID);
 
-			if(!item->hasProperty(enums::ITEMPROP_MOVEABLE) && !hasItemWithProperty(item, enums::ITEMPROP_MOVEABLE) ){
-				resetFlag(TILESTATE_BLOCKSOLIDNOTMOVEABLE);
+			if(!item->hasProperty(ITEMPROP_MOVEABLE) && !hasItemWithProperty(item, ITEMPROP_MOVEABLE) ){
+				resetFlag(TILEPROP_BLOCKSOLIDNOTMOVEABLE);
 			}
 		}
-		if(item->hasProperty(enums::ITEMPROP_BLOCKPROJECTILE) && !hasItemWithProperty(item, enums::ITEMPROP_BLOCKPROJECTILE) ){
-			resetFlag(TILESTATE_BLOCKPATH);
+		if(item->hasProperty(ITEMPROP_BLOCKPROJECTILE) && !hasItemWithProperty(item, ITEMPROP_BLOCKPROJECTILE) ){
+			resetFlag(TILEPROP_BLOCKPATH);
 
-			if(!item->hasProperty(enums::ITEMPROP_MOVEABLE) && !hasItemWithProperty(item, enums::ITEMPROP_MOVEABLE) ){
-				resetFlag(TILESTATE_BLOCKPATHNOTMOVEABLE);
+			if(!item->hasProperty(ITEMPROP_MOVEABLE) && !hasItemWithProperty(item, ITEMPROP_MOVEABLE) ){
+				resetFlag(TILEPROP_BLOCKPATHNOTMOVEABLE);
 			}
 
 			if(!item->getMagicField()){
-				resetFlag(TILESTATE_BLOCKPATHNOTFIELD);
+				resetFlag(TILEPROP_BLOCKPATHNOTFIELD);
 			}
 		}
-		if(item->hasProperty(enums::ITEMPROP_BLOCKPROJECTILE) && !hasItemWithProperty(item, enums::ITEMPROP_BLOCKPROJECTILE)){
-			resetFlag(TILESTATE_BLOCKPROJECTILE);
+		if(item->hasProperty(ITEMPROP_BLOCKPROJECTILE) && !hasItemWithProperty(item, ITEMPROP_BLOCKPROJECTILE)){
+			resetFlag(TILEPROP_BLOCKPROJECTILE);
 		}
-		if(item->hasProperty(enums::ITEMPROP_ISVERTICAL) && !hasItemWithProperty(item, enums::ITEMPROP_ISVERTICAL) ){
-			resetFlag(TILESTATE_VERTICAL);
+		if(item->hasProperty(ITEMPROP_ISVERTICAL) && !hasItemWithProperty(item, ITEMPROP_ISVERTICAL) ){
+			resetFlag(TILEPROP_VERTICAL);
 		}
-		if(item->hasProperty(enums::ITEMPROP_ISHORIZONTAL) && !hasItemWithProperty(item, enums::ITEMPROP_ISHORIZONTAL) ){
-			resetFlag(TILESTATE_HORIZONTAL);
+		if(item->hasProperty(ITEMPROP_ISHORIZONTAL) && !hasItemWithProperty(item, ITEMPROP_ISHORIZONTAL) ){
+			resetFlag(TILEPROP_HORIZONTAL);
 		}
 		if(item->getTeleport()){
-			resetFlag(TILESTATE_TELEPORT);
+			resetFlag(TILEPROP_TELEPORT);
 		}
 		if(item->getMagicField()){
-			resetFlag(TILESTATE_MAGICFIELD);
+			resetFlag(TILEPROP_MAGICFIELD);
 		}
 		if(item->getMailbox()){
-			resetFlag(TILESTATE_MAILBOX);
+			resetFlag(TILEPROP_MAILBOX);
 		}
 		if(item->getTrashHolder()){
-			resetFlag(TILESTATE_TRASHHOLDER);
+			resetFlag(TILEPROP_TRASHHOLDER);
 		}
 		if(item->getBed()){
-			resetFlag(TILESTATE_BED);
+			resetFlag(TILEPROP_BED);
 		}
 	}
 }

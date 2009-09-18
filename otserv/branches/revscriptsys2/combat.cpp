@@ -291,7 +291,7 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 	}
 
 	//pz-zone
-	if(isAggressive && tile->hasFlag(TILESTATE_PROTECTIONZONE)){
+	if(isAggressive && tile->hasFlag(TILEPROP_PROTECTIONZONE)){
 		return RET_ACTIONNOTPERMITTEDINPROTECTIONZONE;
 	}
 
@@ -376,7 +376,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 
 		if(attacker->getPlayer() || attacker->isPlayerSummon()){
 			//nopvp-zone
-			if(target->getPlayer() && target->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
+			if(target->getPlayer() && target->getTile()->hasFlag(TILEPROP_NOPVPZONE)){
 				return RET_ACTIONNOTPERMITTEDINANONPVPZONE;
 			}
 
@@ -623,7 +623,7 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 			}
 		}
 		if(p_caster){
-			if(g_game.getWorldType() == WORLD_TYPE_NOPVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
+			if(g_game.getWorldType() == WORLD_TYPE_NOPVP || tile->hasFlag(TILEPROP_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD_PVP){
 					itemId = ITEM_FIREFIELD_NOPVP;
 				}
@@ -1395,7 +1395,7 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 			uint32_t owner = getOwner();
 			if(owner != 0 && purposeful){
 				bool harmfulField = true;
-				if(g_game.getWorldType() == WORLD_TYPE_NOPVP || getTile()->hasFlag(TILESTATE_NOPVPZONE) ){
+				if(g_game.getWorldType() == WORLD_TYPE_NOPVP || getTile()->hasFlag(TILEPROP_NOPVPZONE) ){
 					Creature* creature = g_game.getCreatureByID(owner);
 					if(creature){
 						if(creature->getPlayer() || creature->isPlayerSummon()){

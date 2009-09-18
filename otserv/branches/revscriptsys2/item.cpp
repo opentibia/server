@@ -556,95 +556,95 @@ bool Item::hasProperty(uint32_t props) const
 {
 	const ItemType& it = items[id];
 
-	if(hasBitSet(enums::ITEMPROP_BLOCKSOLID, props) && !it.blockSolid){
+	if(hasBitSet(ITEMPROP_BLOCKSOLID, props) && !it.blockSolid){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_BLOCKPATHFIND, props) && !it.blockPathFind){
+	if(hasBitSet(ITEMPROP_BLOCKPATHFIND, props) && !it.blockPathFind){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_BLOCKPROJECTILE, props) && !it.blockProjectile){
+	if(hasBitSet(ITEMPROP_BLOCKPROJECTILE, props) && !it.blockProjectile){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_ALLOWPICKUPABLE, props) && !it.allowPickupable){
+	if(hasBitSet(ITEMPROP_ALLOWPICKUPABLE, props) && !it.allowPickupable){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_HASHEIGHT, props) && !it.hasHeight){
+	if(hasBitSet(ITEMPROP_HASHEIGHT, props) && !it.hasHeight){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_ISVERTICAL, props) && !it.isVertical){
+	if(hasBitSet(ITEMPROP_ISVERTICAL, props) && !it.isVertical){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_ISHORIZONTAL, props) && !it.isHorizontal){
+	if(hasBitSet(ITEMPROP_ISHORIZONTAL, props) && !it.isHorizontal){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_CLIENTCHARGES, props) && !it.clientCharges){
+	if(hasBitSet(ITEMPROP_CLIENTCHARGES, props) && !it.clientCharges){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_LOOKTHROUGH, props) && !it.lookThrough){
+	if(hasBitSet(ITEMPROP_LOOKTHROUGH, props) && !it.lookThrough){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_PICKUPABLE, props) && !it.pickupable){
+	if(hasBitSet(ITEMPROP_PICKUPABLE, props) && !it.pickupable){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_ROTATEABLE, props) && !it.rotateable){
+	if(hasBitSet(ITEMPROP_ROTATEABLE, props) && !it.rotateable){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_STACKABLE, props) && !it.stackable){
+	if(hasBitSet(ITEMPROP_STACKABLE, props) && !it.stackable){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_USEABLE, props) && !it.useable){
+	if(hasBitSet(ITEMPROP_USEABLE, props) && !it.useable){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_MOVEABLE, props) && !(it.moveable && getUniqueId() == 0) ){
+	if(hasBitSet(ITEMPROP_MOVEABLE, props) && !(it.moveable && getUniqueId() == 0) ){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_ALWAYSONTOP, props) && !it.alwaysOnTop){
+	if(hasBitSet(ITEMPROP_ALWAYSONTOP, props) && !it.alwaysOnTop){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_CANREADTEXT, props) && !it.canReadText){
+	if(hasBitSet(ITEMPROP_CANREADTEXT, props) && !it.canReadText){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_CANWRITETEXT, props) && !it.canWriteText){
+	if(hasBitSet(ITEMPROP_CANWRITETEXT, props) && !it.canWriteText){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_FLOORCHANGEDOWN, props) && !it.floorChangeDown){
+	if(hasBitSet(ITEMPROP_FLOORCHANGEDOWN, props) && !it.floorChangeDown){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_FLOORCHANGENORTH, props) && !it.floorChangeNorth){
+	if(hasBitSet(ITEMPROP_FLOORCHANGENORTH, props) && !it.floorChangeNorth){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_FLOORCHANGESOUTH, props) && !it.floorChangeSouth){
+	if(hasBitSet(ITEMPROP_FLOORCHANGESOUTH, props) && !it.floorChangeSouth){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_FLOORCHANGEEAST, props) && !it.floorChangeEast){
+	if(hasBitSet(ITEMPROP_FLOORCHANGEEAST, props) && !it.floorChangeEast){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_FLOORCHANGEWEST, props) && !it.floorChangeWest){
+	if(hasBitSet(ITEMPROP_FLOORCHANGEWEST, props) && !it.floorChangeWest){
 		return false;
 	}
 
-	if(hasBitSet(enums::ITEMPROP_ALLOWDISTREAD, props) && !it.allowDistRead){
+	if(hasBitSet(ITEMPROP_ALLOWDISTREAD, props) && !it.allowDistRead){
 		return false;
 	}
 

@@ -174,7 +174,7 @@ void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
 		std::cout << "Error: Map::setTile() already exists." << std::endl;
 	}
 
-	if(newtile->hasFlag(TILESTATE_REFRESH)){
+	if(newtile->hasFlag(TILEPROP_REFRESH)){
 		RefreshBlock_t rb;
 		rb.lastRefresh = OTSYS_TIME();
 		if(TileItemVector* newtileItems = newtile->getItemList()){
@@ -194,7 +194,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool exte
 	bool placeInPZ = false;
 
 	if(tile){
-		placeInPZ = tile->hasFlag(TILESTATE_PROTECTIONZONE);
+		placeInPZ = tile->hasFlag(TILEPROP_PROTECTIONZONE);
 
 		ReturnValue ret = tile->__queryAdd(0, creature, 1, FLAG_IGNOREBLOCKITEM);
 		if(forceLogin || ret == RET_NOERROR || ret == RET_PLAYERISNOTINVITED){
@@ -241,7 +241,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool exte
 			tryPos.y = tryPos.y + dy;
 
 			tile = getTile(tryPos);
-			if(!tile || (placeInPZ && !tile->hasFlag(TILESTATE_PROTECTIONZONE)))
+			if(!tile || (placeInPZ && !tile->hasFlag(TILEPROP_PROTECTIONZONE)))
 				continue;
 
 			if(tile->__queryAdd(0, creature, 1, 0) == RET_NOERROR){

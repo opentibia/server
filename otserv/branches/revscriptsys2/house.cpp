@@ -61,7 +61,7 @@ House::~House()
 
 void House::addTile(HouseTile* tile)
 {
-	tile->setFlag(TILESTATE_PROTECTIONZONE);
+	tile->setFlag(TILEPROP_PROTECTIONZONE);
 	houseTiles.push_back(tile);
 }
 

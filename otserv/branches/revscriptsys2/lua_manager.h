@@ -475,13 +475,6 @@ public:
 	int lua_Tile_addItem();
 	int lua_Tile_getItemTypeCount();
 	int lua_Tile_hasProperty();
-
-	int lua_Tile_isPZ();
-	int lua_Tile_isPVP();
-	int lua_Tile_isNoPVP();
-	int lua_Tile_isNoLogout();
-	int lua_Tile_doesRefresh();
-
 	int lua_Tile_queryAdd();
 
 	// - House
