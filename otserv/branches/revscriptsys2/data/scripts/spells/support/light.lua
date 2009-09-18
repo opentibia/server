@@ -1,3 +1,4 @@
+--[[
 local light = Spell:new("Light")
 
 light.words       = "utevo lux"
@@ -16,3 +17,4 @@ light.condition  = Condition:new{
 
 
 light:register()
+]]--

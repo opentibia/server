@@ -726,9 +726,10 @@ bool LuaStateManager::loadFile(std::string file)
 	}
 
 	//execute it
+	// REVSCRIPT TODO a better error handler here
 	ret = lua_pcall(state, 0, 0, 0);
 	if(ret != 0) {
-		std::cout << "Lua Error: Failed to load file - " << popString() << std::endl;
+		std::cout << "Lua Error: Failed to load file " << file << " - " << popString() << std::endl;
 		return false;
 	}
 	return true;

@@ -24,6 +24,8 @@ function typeof(val, t)
 	return type(val) == t
 end
 
+
+-- Don't use require_directory as order is important.
 require("otstd/classes/events")
 
 require("otstd/classes/thing")
@@ -35,7 +37,6 @@ require("otstd/classes/creature")
 require("otstd/classes/actor")
 require("otstd/classes/player")
 
-require("otstd/classes/game")
 require("otstd/classes/tile")
 require("otstd/classes/map")
 require("otstd/classes/town")

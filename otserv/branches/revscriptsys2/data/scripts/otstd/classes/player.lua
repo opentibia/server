@@ -100,6 +100,18 @@ function Player:hasMoney(howmuch)
 	return self:countMoney() >= howmuch
 end
 
+-- Return contents of both hands
+function Player:getHandContents()
+	local hands = {}
+	local left = self:getInventoryItem(SLOT_LEFT)
+	local right = self:getInventoryItem(SLOT_RIGHT)
+	if left then table.append(hands, left) end
+	if right then table.append(hands, right) end
+	return hands
+end
+
+-- Bank functions
+
 function Player:getBalance()
 	return self:getStorageValue("__balance")
 end
@@ -108,10 +120,30 @@ function Player:hasBalance(amount)
 	return getBalance() >= amount
 end
 
+-- Modify contents, does not take 
 function Player:setBalance(amount)
 	return self:setStorageValue("__balance", amount)
 end
 
+function Player:addBalance(amount)
+	if amount < 0 then
+		return self:removeBalance(amount)
+	end
+	self:setBalance(self:getBalance() + amount)
+	return true
+end
+
+function Player:removeBalance(amount)
+	if amount < 0 then
+		return self:addBalance(amount)
+	end
+	if self:getBalance() < amount then
+		return false
+	end
+	self:setBalance(self:getBalance() - amount)
+end
+
+-- These adds / removes money from the Player
 function Player:depositMoney(amount)
 	if self:removeMoney(amount) then
 		return self:setBalance(self:getBalance() + amount)
@@ -120,7 +152,7 @@ function Player:depositMoney(amount)
 	return false
 end
 
-function Player:withDrawMoney(amount)
+function Player:withdrawMoney(amount)
 	if self:getBalance() < amount then
 		return false
 	end

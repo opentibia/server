@@ -104,6 +104,10 @@ void Manager::registerClasses() {
 	registerEnum<ZoneType>();
 	registerEnum<WorldType>();
 	registerEnum<Script::ListenerType>();
+	
+	registerEnum<ConditionType>();
+	registerEnum<ConditionEnd>();
+	registerEnum<ConditionAttribute>();
 
 	// Classes...
 	registerClass("Event");
@@ -179,8 +183,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getBaseSpeed()", &Manager::lua_Creature_getBaseSpeed);
 	registerMemberFunction("Creature", "isPushable()", &Manager::lua_Creature_isPushable);
 	registerMemberFunction("Creature", "getTarget()", &Manager::lua_Creature_getTarget);
-	registerMemberFunction("Creature", "isImmuneToCondition(int conditiontype)", &Manager::lua_Creature_isImmuneToCondition);
-	registerMemberFunction("Creature", "isImmuneToCombat(int combattype)", &Manager::lua_Creature_isImmuneToCombat);
+	registerMemberFunction("Creature", "isImmuneToCondition(ConditionType conditiontype)", &Manager::lua_Creature_isImmuneToCondition);
+	registerMemberFunction("Creature", "isImmuneToCombat(CombatType combattype)", &Manager::lua_Creature_isImmuneToCombat);
 	registerMemberFunction("Creature", "getConditionImmunities()", &Manager::lua_Creature_getConditionImmunities);
 	registerMemberFunction("Creature", "getDamageImmunities()", &Manager::lua_Creature_getDamageImmunities);
 
@@ -266,9 +270,9 @@ void Manager::registerClasses() {
 
 	registerMemberFunction("Player", "addItem(Item item)", &Manager::lua_Player_addItem);
 	registerMemberFunction("Player", "removeItem(int id [, int type [,int count]])", &Manager::lua_Player_removeItem);
-	registerMemberFunction("Player", "getInventoryItem(int slot)", &Manager::lua_Player_getInventoryItem);
+	registerMemberFunction("Player", "getInventoryItem(SlotType slot)", &Manager::lua_Player_getInventoryItem);
 	registerMemberFunction("Player", "addExperience(int experience)", &Manager::lua_Player_addExperience);
-	registerMemberFunction("Player", "setTown(int townid)", &Manager::lua_Player_setTown);
+	registerMemberFunction("Player", "setTown(Town town)", &Manager::lua_Player_setTown);
 	registerMemberFunction("Player", "setVocation(int vocationid)", &Manager::lua_Player_setVocation);
 	registerMemberFunction("Player", "hasGroupFlag(integer flag)", &Manager::lua_Player_hasGroupFlag);
 
@@ -382,10 +386,6 @@ void Manager::registerClasses() {
 	registerMemberFunction("Channel", "addUser(Player player)", &Manager::lua_Channel_addUser);
 	registerMemberFunction("Channel", "removeUser(Player player)", &Manager::lua_Channel_removeUser);
 	registerMemberFunction("Channel", "talk(Player speaker, int type, string msg)", &Manager::lua_Channel_talk);
-
-	registerGlobalFunction("getWorldType()", &Manager::lua_getWorldType);
-	registerGlobalFunction("getWorldTime()", &Manager::lua_getWorldTime);
-	registerGlobalFunction("getWorldUpTime()", &Manager::lua_getWorldUpTime);
 }
 
 void Manager::registerFunctions() {
@@ -405,16 +405,16 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnUseItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
 
 	registerGlobalFunction("registerOnCreatureMove(Creature who, function callback)", &Manager::lua_registerSpecificEvent_CreatureMove);
-	registerGlobalFunction("registerOnCreatureMoveIn(Creature who, string method, int filter, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveIn);
-	registerGlobalFunction("registerOnCreatureMoveOut(Creature who, string method, int filter, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveOut);
-	registerGlobalFunction("registerOnAnyCreatureMoveIn(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_CreatureMoveIn);
-	registerGlobalFunction("registerOnAnyCreatureMoveOut(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_CreatureMoveOut);
+	registerGlobalFunction("registerOnCreatureMoveIn(Creature who, string method, int itemid, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveIn);
+	registerGlobalFunction("registerOnCreatureMoveOut(Creature who, string method, int itemid, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveOut);
+	registerGlobalFunction("registerOnAnyCreatureMoveIn(string method, int itemid, function callback)", &Manager::lua_registerGenericEvent_CreatureMoveIn);
+	registerGlobalFunction("registerOnAnyCreatureMoveOut(string method, int itemid, function callback)", &Manager::lua_registerGenericEvent_CreatureMoveOut);
 
 	registerGlobalFunction("registerOnAnyCreatureTurn(function callback)", &Manager::lua_registerGenericEvent_OnCreatureTurn);
 	registerGlobalFunction("registerOnCreatureTurn(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnCreatureTurn);
 
-	registerGlobalFunction("registerOnEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
-	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, string slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
+	registerGlobalFunction("registerOnEquipItem(string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
+	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
 	
 	registerGlobalFunction("registerOnServerLoad(function callback)", &Manager::lua_registerGenericEvent_OnServerLoad);
 
@@ -441,15 +441,22 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnLookAtCreature(Creature creature, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
 	registerGlobalFunction("registerOnPlayerLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
 	
-	registerGlobalFunction("registerOnAdvance([int skillid = nil], function callback)", &Manager::lua_registerGenericEvent_OnAdvance);
-	registerGlobalFunction("registerOnPlayerAdvance(Player player [, int skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
+	registerGlobalFunction("registerOnAdvance([LevelType skillid = nil], function callback)", &Manager::lua_registerGenericEvent_OnAdvance);
+	registerGlobalFunction("registerOnPlayerAdvance(Player player [, LevelType skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
-	// Map functions
+	// Game/Map functions
 	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
 	registerGlobalFunction("sendMagicEffect(position where, int type)", &Manager::lua_sendMagicEffect);
+	
+	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
 
+	registerGlobalFunction("getWorldType()", &Manager::lua_getWorldType);
+	registerGlobalFunction("getWorldTime()", &Manager::lua_getWorldTime);
+	registerGlobalFunction("getWorldUpTime()", &Manager::lua_getWorldUpTime);
+
+	// Register the bitlib
 	luaL_register(state, "bit", lua_BitReg);
 }
 
@@ -947,17 +954,13 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	// Store callback
 	insert(-4);
 
-	std::string slot = popString();
+	SlotPosition slot = popEnum<SlotPosition>();
 	int32_t id = popInteger();
 	std::string method = popString();
 
 	OnEquipItem::ScriptInformation si_onequip;
-
-	try {
-		si_onequip.slot = SlotPosition::fromString(slot);
-	} catch(enum_conversion_error& e) {
-		throw Error(std::string("Invalid slot position (") + e.what() + ")");
-	}
+	
+	si_onequip.slot = slot;
 	
 	if(method == "itemid") {
 		si_onequip.method = OnEquipItem::FILTER_ITEMID;
@@ -991,53 +994,13 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	// Store callback
 	insert(-4);
 
-	std::string slot = popString();
+	SlotPosition slot = popEnum<SlotPosition>();
 	int32_t id = popInteger();
 	std::string method = popString();
 
 	OnEquipItem::ScriptInformation si_ondeequip;
-
-	if(slot == "head") {
-		si_ondeequip.slot = SLOTPOSITION_HEAD;
-	}
-	else if(slot == "neck") {
-		si_ondeequip.slot = SLOTPOSITION_NECKLACE;
-	}
-	else if(slot == "backpack") {
-		si_ondeequip.slot = SLOTPOSITION_BACKPACK;
-	}
-	else if(slot == "armor") {
-		si_ondeequip.slot = SLOTPOSITION_ARMOR;
-	}
-	else if(slot == "right-hand") {
-		si_ondeequip.slot = SLOTPOSITION_RIGHT;
-	}
-	else if(slot == "left-hand") {
-		si_ondeequip.slot = SLOTPOSITION_LEFT;
-	}
-	else if(slot == "legs") {
-		si_ondeequip.slot = SLOTPOSITION_LEGS;
-	}
-	else if(slot == "feet") {
-		si_ondeequip.slot = SLOTPOSITION_FEET;
-	}
-	else if(slot == "ring") {
-		si_ondeequip.slot = SLOTPOSITION_RING;
-	}
-	else if(slot == "ammo") {
-		si_ondeequip.slot = SLOTPOSITION_AMMO;
-	}
-	else if(slot == "hand") {
-		si_ondeequip.slot = (SLOTPOSITION_LEFT | SLOTPOSITION_RIGHT);
-	}
-	else if(slot == "any") {
-		si_ondeequip.slot = (SLOTPOSITION_HEAD | SLOTPOSITION_NECKLACE | SLOTPOSITION_BACKPACK |
-			SLOTPOSITION_ARMOR | SLOTPOSITION_RIGHT | SLOTPOSITION_LEFT | SLOTPOSITION_LEGS |
-			SLOTPOSITION_FEET | SLOTPOSITION_RING | SLOTPOSITION_AMMO);
-	}
-	else{
-		throw Error("Invalid argument (3) 'slot'");
-	}
+	
+	si_ondeequip.slot = slot;
 
 	if(method == "itemid") {
 		si_ondeequip.method = OnEquipItem::FILTER_ITEMID;
@@ -1431,12 +1394,7 @@ int LuaState::lua_registerGenericEvent_OnAdvance() {
 	}
 	else{
 		si_onadvance.method = OnAdvance::FILTER_SKILL;
-
-		try {
-			si_onadvance.skill = LevelType::fromString(popString());
-		} catch(enum_conversion_error& e) {
-			throw Error(std::string("Invalid argument (1) level type '") + e.what() + "'.");
-		}
+		si_onadvance.skill = popEnum<LevelType>();
 	}
 	// Pop the nil
 	pop();
@@ -1469,12 +1427,7 @@ int LuaState::lua_registerSpecificEvent_OnAdvance() {
 	}
 	else{
 		si_onadvance.method = OnAdvance::FILTER_SKILL;
-
-		try {
-			si_onadvance.skill = LevelType::fromString(popString());
-		} catch(enum_conversion_error& e) {
-			throw Error(std::string("Invalid argument (2) level type '") + e.what() + "'.");
-		}
+		si_onadvance.skill = popEnum<LevelType>();
 	}
 	// Pop the nil
 	pop();
@@ -1957,18 +1910,18 @@ int LuaState::lua_Creature_getTarget()
 int LuaState::lua_Creature_isImmuneToCondition()
 {
 	Creature* creature = popCreature();
-	int32_t conditionType = popInteger();
+	ConditionType conditionType = popEnum<ConditionType>();
 
-	pushBoolean(creature->isImmune(ConditionType(conditionType)));
+	pushBoolean(creature->isImmune(conditionType));
 	return 1;
 }
 
 int LuaState::lua_Creature_isImmuneToCombat()
 {
 	Creature* creature = popCreature();
-	int32_t combatType = popInteger();
+	CombatType combatType = popEnum<CombatType>();
 
-	pushBoolean(creature->isImmune(CombatType(combatType)));
+	pushBoolean(creature->isImmune(combatType));
 	return 1;
 }
 
@@ -2668,13 +2621,10 @@ int LuaState::lua_Player_addExperience()
 
 int LuaState::lua_Player_getInventoryItem()
 {
-	SlotType slot(popInteger());
+	SlotType slot(popEnum<SlotType>());
 	Player* player = popPlayer();
 
-	if(!slot.exists())
-		throw Error("Player.getInventoryItem: slot out of range!");
-
-	Item* i = player->getInventoryItem((SlotType)slot);
+	Item* i = player->getInventoryItem(slot);
 	if(i)
 		pushThing(i);
 	else

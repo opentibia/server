@@ -33,6 +33,9 @@ function Map:getTowns()
 end
 
 function Map:getTown(name)
+	if typeof(name, "Town") then
+		return name
+	end
 	name = name:lower()
 	towns = getAllTowns()
 	for _, town in ipairs(towns) do

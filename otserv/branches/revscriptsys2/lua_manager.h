@@ -553,24 +553,16 @@ template <> inline std::string LuaState::popValue<std::string>() {return popStri
 template <> inline uint64_t LuaState::popValue<uint64_t>() {return (uint64_t)popFloat();}
 
 template <class ET> inline ET LuaState::popEnum(Script::ErrorMode mode){
-	ET e;
-	if(isNumber(-1)){
-		int32_t i = popInteger();
-		e = ET(i);
-		if(!e.exists()){
-			std::ostringstream os;
-			os << "Integer value " << i << " cannot be interpreted as enum of type " << ET::name() << ".";
-			HandleError(mode, os.str());
-		}
-	} else if(isString(-1)){
-		std::string s = popString();
-		try{
-			e = ET::fromString(s);
-		} catch(enum_conversion_error&){
-			HandleError(mode, "Can not construct enum of type " + ET::name() + " from value the string '" + s + "'.");
-		}
+	if(!isTable(-1)){
+		HandleError(mode, "Can not construct enum from " + typeName());
 	}
-	return e;
+	else{
+		getField(-1, "__intValue");
+		int i = popInteger();
+		pop(); // pop enum value
+		return ET(i);
+	}
+	return ET();
 }
 
 template<class E, int size_>

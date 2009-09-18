@@ -1,7 +1,7 @@
 local conjure_arrows = Spell:new("Conjure Arrows")
 
 conjure_arrows.words       = "exevo con"
-conjure_arrows.vocation    = "any"
+conjure_arrows.vocation    = Player.isPaladin
 conjure_arrows.level       = 8
 conjure_arrows.mana        = 30
 conjure_arrows.health      = 3

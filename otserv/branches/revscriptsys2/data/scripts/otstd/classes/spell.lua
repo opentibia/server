@@ -108,8 +108,11 @@ function otstd.onSaySpell(event)
 	local spell = event.spell
 	
 	if otstd.onSpellCheck(event) then
-		if not spell.onBeginCast or spell:onBeginCast(event) then
+		-- Check extra conditions
+		if (not spell.internalBeginCast or spell:internalBeginCast(event)) and (not spell.onBeginCast or spell:onBeginCast(event)) then
+			-- Cast the spell!
 			if spell.onCast then
+				-- Normal cast function has been overridden
 				spell:onCast(event)
 			else
 				otstd.onCastSpell(event)
@@ -124,11 +127,43 @@ function otstd.onSaySpell(event)
 	end
 end
 
-function otstd.onCastConjureSpell(spell, event)
+-------------------------------------------------------------------------------
+-- Conjure spells
+
+function otstd.onBeginCastConjureSpell(spell, event)
 	local caster = event.caster
 	
 	if spell.reagent ~= 0 then -- Reagents! => Rune spell
 		local reagents = {}
+		for _, item in ipairs(caster:getHandContents()) do
+			if type(spell.reagent) == "table" then
+				if table.find(spell.reagent, item:getItemID()) then
+					table.append(reagents, item)
+				end
+			else
+				-- Only one reagent
+				if spell.reagent == item:getItemID() then
+					table.append(reagents, item)
+				end
+			end
+		end
+		if #reagents == 0 then
+			caster:sendCancel("You need a magic item to cast this spell.")
+			return false
+		end
+		event.reagents = reagents
+	end
+	return true
+end
+
+function otstd.onCastConjureSpell(spell, event)
+	local caster = event.caster
+	
+	if event.reagents then -- Reagents! => Rune spell
+		for _, item in ipairs(event.reagents) do
+			item:setItemID(spell.product.id, spell.product.count)
+			break -- Only make one rune
+		end
 	else -- Conjure item simply
 		local count = spell.product.count
 		repeat
@@ -137,6 +172,8 @@ function otstd.onCastConjureSpell(spell, event)
 		until count <= 0
 	end
 end
+
+-------------------------------------------------------------------------------
 
 function Spell:register()
 	self:unregister()
@@ -158,6 +195,7 @@ function Spell:register()
 			else
 				self.product.count = 1
 			end
+			self.internalBeginCast  = otstd.onBeginCastConjureSpell
 			self.internalFinishCast = otstd.onCastConjureSpell
 		end
 		
@@ -190,6 +228,10 @@ function Spell:register()
 end
 
 function Spell:unregister()
+	if self.onSayHandler then
+		stopListener(self.onSayHandler)
+		self.onSayHandler = nil
+	end
 end
 
 function Player:hasLearnedSpell(spellname)

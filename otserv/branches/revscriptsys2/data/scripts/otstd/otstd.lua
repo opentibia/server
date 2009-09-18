@@ -11,6 +11,7 @@ require("otstd/functions")
 require("otstd/itemids")
 
 require("otstd/classes/classes")
+require("otstd/game")
 
 require("otstd/commands")
 require("otstd/actions/actions")

@@ -1,3 +1,4 @@
+--[[
 local energyWave = Spell:new("Energy Wave")
 
 energyWave.words       = "exevo mort hur"
@@ -24,3 +25,4 @@ energyWave.formula =
 	end
 
 energyWave:register()
+]]--

@@ -127,32 +127,34 @@ int Manager::luaCreateEnum(lua_State* L)
 		// Push the class table from upvalue
 		lua_pushvalue(L, lua_upvalueindex(1));
 
-		// Iterator over the table values
-		lua_pushnil(L);
-		while(lua_next(L, -2) != 0){
-			// Get int value
-			lua_getfield(L, 4, "__intValue");
-			// int value is at top of stack
-			if(lua_equal(L, 1, -1) == 1){
-				// pop __intValue
+		if(lua_istable(L, -1)){
+			// Iterator over the table values
+			lua_pushnil(L);
+			while(lua_next(L, -2) != 0){
+				// Get int value
+				lua_getfield(L, 4, "__intValue");
+				// int value is at top of stack
+				if(lua_equal(L, 1, -1) == 1){
+					// pop __intValue
+					lua_pop(L, 1);
+
+					// We want this value, move to top of stack
+					lua_insert(L, 1);
+
+					// Pop enum key, class table and name str
+					lua_pop(L, 2);
+
+					// Only thing left is the enum value
+					return 1;
+				}
+				// Pop __intValue
 				lua_pop(L, 1);
-
-				// We want this value, move to top of stack
-				lua_insert(L, 1);
-
-				// Pop enum key, class table and name str
-				lua_pop(L, 2);
-
-				// Only thing left is the enum value
-				return 1;
+				// Pop value, keep key for next iteration
+				lua_pop(L, 1);
 			}
-			// Pop __intValue
-			lua_pop(L, 1);
-			// Pop value, keep key for next iteration
-			lua_pop(L, 1);
 		}
 		// Pop enum table, string
-		lua_pop(L, -2);
+		lua_pop(L, 2);
 
 		// Not found, we return nil
 		lua_pushnil(L);
@@ -160,51 +162,56 @@ int Manager::luaCreateEnum(lua_State* L)
 	}
 	else if(lua_isstring(L, -1)){
 		// Construct from string
-		const char* name = lua_tostring(L, -1);
+		//const char* name = lua_tostring(L, -1);
 
 		// Push the class table from upvalue
 		lua_pushvalue(L, lua_upvalueindex(1));
 		
-		// Iterator over the table values
-		lua_pushnil(L);
-		while(lua_next(L, -2) != 0){
-			// name str at 1
-			// class table at 2
-			// enum key is at 3
-			// enum value at 4
-
-			// Get strings
-			lua_getfield(L, 4, "__strValues");
-			// str value array is at top of stack, all indexes -1
-			// iterator over that array
+		if(lua_istable(L, -1)){
+			// Iterator over the table values
 			lua_pushnil(L);
-			while(lua_next(L, -2)){
-				// __strValues at 5
-				// str key at 6
-				// str value at 7
-				if(lua_equal(L, 1, 7) == 1){
-					// Pop value, key, __strValues
-					lua_pop(L, 3);
+			while(lua_next(L, -2) != 0){
+				// name str at -4
+				// class table at -3
+				// enum key is at -2
+				// enum value at -1
 
-					// We want this value, move to top of stack
-					lua_insert(L, 1);
+				// Get strings
+				lua_getfield(L, -1, "__strValues");
+				// str value array is at top of stack, all indexes -1
+				if(lua_istable(L, -1)){
+					lua_pushnil(L);
+					while(lua_next(L, -2) != 0){
+						// __strValues at -3
+						// str key at -2
+						// str value at -1
+						
+						std::cout << lua_tostring(L, -1) << " == " << lua_tostring(L, -7) << std::endl;
+						if(lua_equal(L, -1, -7) == 1){
+							// Pop value, key, __strValues
+							lua_pop(L, 3);
 
-					// Pop enum key, class table and name str
-					lua_pop(L, 3);
+							// We want this value, move to top of stack
+							lua_insert(L, -4);
 
-					// Only thing left is the enum value
-					return 1;
+							// Pop enum key, class table and name str
+							lua_pop(L, 3);
+
+							// Only thing left is the enum value
+							return 1;
+						}
+						// Pop value, leave key for next iteration
+						lua_pop(L, 1);
+					}
 				}
-				// Pop key / value
-				lua_pop(L, 2);
+				// Pop __strValues
+				lua_pop(L, 1);
+				// Pop value, keep key for next iteration
+				lua_pop(L, 1);
 			}
-			// Pop __strValues
-			lua_pop(L, 1);
-			// Pop value, keep key for next iteration
-			lua_pop(L, 1);
 		}
 		// Pop enum table, string
-		lua_pop(L, -2);
+		lua_pop(L, 2);
 
 		// Not found, we return nil
 		lua_pushnil(L);

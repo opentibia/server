@@ -1,3 +1,3 @@
-require("spells/conjure/conjure_arrows")
-require("spells/support/magic_rope")
-require("spells/support/levitate")
+require_directory("spells/conjure")
+require_directory("spells/support")
+require_directory("spells/attack")

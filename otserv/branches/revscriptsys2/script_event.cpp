@@ -604,7 +604,6 @@ OnMoveItem::Event::~Event()
 
 bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 {
-
 	if(info.addItem != addItem){
 		return false;
 	}

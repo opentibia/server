@@ -4616,7 +4616,7 @@ bool Game::combatChangeHealth(CombatType combatType,
 	Creature* attacker, Creature* target, int32_t healthChange, 
 	bool showeffect /*= true*/)
 {
-	return combatChangeHealth(combatType, NM_ME_UNK, TEXTCOLOR_UNK, attacker, target, healthChange);
+	return combatChangeHealth(combatType, NM_ME_UNK, TEXTCOLOR_UNK, attacker, target, healthChange, showeffect);
 }
 
 bool Game::combatChangeHealth(CombatType combatType, 
