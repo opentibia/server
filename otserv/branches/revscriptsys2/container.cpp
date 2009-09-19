@@ -858,21 +858,27 @@ bool ContainerIterator::operator==(const ContainerIterator& rhs)
 bool ContainerIterator::operator!=(const ContainerIterator& rhs)
 {
 	assert(super);
+	// iterators that belong to different container are never equal
 	if(super != rhs.super)
 		return true;
 
+	// If both are empty, we are equal (end iterators)
 	if(over.empty() && rhs.over.empty())
 		return false;
 
+	// if we are empty, but the other is not, we are not equal
 	if(over.empty())
 		return true;
 
+	// if the other is empty, but we are not, we are not equal
 	if(rhs.over.empty())
 		return true;
 
+	// If we don't point to the same sub-container, we are not equal
 	if(over.front() != rhs.over.front())
 		return true;
 
+	// We both iterator over the same container, compare our iterators
 	return cur != rhs.cur;
 }
 
@@ -898,23 +904,32 @@ Item* ContainerIterator::operator->()
 ContainerIterator& ContainerIterator::operator++()
 {
 	assert(super);
+	// Does the iterator point to an item
 	if(Item* i = *cur){
 		Container* c = i->getContainer();
+		// If so, is it a container and non-empty?
 		if(c && !c->empty()){
+			// Add it as a sub-container
 			over.push(c);
 		}
 	}
 
+	// increment internal iterator
 	++cur;
+	// If we point to the end of the current sub-container
 	if(cur == over.front()->itemlist.end()){
+		// pop that sub-container
 		over.pop();
+		// If there are no sub-containers left, return ourselves (end iterator)
 		if(over.empty()){
 			return *this;
 		}
 
+		// Else, start iterating over the first item in the next sub-container
 		cur = over.front()->itemlist.begin();
 	}
 
+	// return ourselves
 	return *this;
 }
 
