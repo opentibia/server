@@ -4,10 +4,10 @@ function Tile:new(position)
 end
 
 function Tile:type() return "Tile" end
-function Tile:getX() return self.__x end
-function Tile:getY() return self.__y end
-function Tile:getZ() return self.__z end
-function Tile:getPosition() return {x = self.__x, y = self.__y, z = self.__z} end
+function Tile:getX() return self.x end
+function Tile:getY() return self.y end
+function Tile:getZ() return self.z end
+function Tile:getPosition() return {x = self.x, y = self.y, z = self.z} end
 
 function Tile:getGround()
 	return self:getThing(0)

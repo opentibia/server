@@ -426,9 +426,9 @@ void LuaState::pushTile(Tile* tile)
 {
 	if(tile) {
 		pushClassTableInstance("Tile");
-		setField(-1, "__x", tile->getPosition().x);
-		setField(-1, "__y", tile->getPosition().y);
-		setField(-1, "__z", tile->getPosition().z);
+		setField(-1, "x", tile->getPosition().x);
+		setField(-1, "y", tile->getPosition().y);
+		setField(-1, "z", tile->getPosition().z);
 	} else {
 		pushNil();
 	}
@@ -529,15 +529,16 @@ Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 		return NULL;
 	}
 
-	getField(-1, "__x");
+	getField(-1, "x");
 	int32_t x = popInteger();
-	getField(-1, "__y");
+	getField(-1, "y");
 	int32_t y = popInteger();
-	getField(-1, "__z");
+	getField(-1, "z");
 	int32_t z = popInteger();
 
 	Tile* tile = g_game.getTile(x, y, z);
-	if(!tile) HandleError(mode, "Tile position is invalid.");
+	if(!tile)
+		HandleError(mode, "Tile position is invalid.");
 	return tile;
 }
 
