@@ -25,6 +25,11 @@
 #include "cylinder.h"
 #include "item.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/mem_fun.hpp>
+#include <boost/multi_index/random_access_index.hpp>
 
 typedef std::vector<Creature*> CreatureVector;
 typedef std::list<Creature*> SpectatorVec;
@@ -32,55 +37,236 @@ typedef std::list<Player*> PlayerList;
 typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
 typedef std::vector<Item*> ItemVector;
 
-class TileItemVector
-{
+typedef boost::multi_index::multi_index_container<
+		Item*,
+		boost::multi_index::indexed_by<
+			boost::multi_index::random_access<>,
+
+			//item id
+			boost::multi_index::ordered_non_unique<
+			  BOOST_MULTI_INDEX_CONST_MEM_FUN(Item,uint16_t,getID)
+			>,
+
+			//action id
+			boost::multi_index::ordered_non_unique<
+			  BOOST_MULTI_INDEX_CONST_MEM_FUN(Item,int32_t,getActionId)
+			>,
+
+			//item type
+			boost::multi_index::ordered_non_unique<
+			  BOOST_MULTI_INDEX_CONST_MEM_FUN(Item,ItemTypes_t,getType)
+			>
+
+			/*
+			//top order
+			boost::multi_index::ordered_non_unique<
+			  BOOST_MULTI_INDEX_CONST_MEM_FUN(Item,int32_t,getTopOrder)
+			>
+			*/
+		>
+> ItemMultiIndex;
+
+typedef boost::multi_index::nth_index<ItemMultiIndex, 0>::type ItemMultiIndexRnd;
+typedef ItemMultiIndexRnd::iterator ItemMultiIndexRndIterator;
+
+typedef boost::multi_index::nth_index<ItemMultiIndex, 1>::type ItemMultiIndexItemId;
+typedef ItemMultiIndexItemId::iterator ItemMultiIndexItemIdIterator;
+
+typedef boost::multi_index::nth_index<ItemMultiIndex, 2>::type ItemMultiIndexActionId;
+typedef ItemMultiIndexActionId::iterator ItemMultiIndexActionIdIterator;
+
+typedef boost::multi_index::nth_index<ItemMultiIndex, 3>::type ItemMultiIndexType;
+typedef ItemMultiIndexType::iterator ItemMultiIndexTypeIterator;
+
+template<class T, class T_iter, class E, class E_iter, class C>
+class TileItemBaseIterator : public std::iterator<std::bidirectional_iterator_tag, C*> {
 public:
-	TileItemVector() : downItemCount(0) {};
-	~TileItemVector() {};
+	TileItemBaseIterator() : 
+	  vector(NULL), multiIndex(NULL) {}
+	TileItemBaseIterator(T _vector, T_iter pos)
+	{
+		vector = _vector;
+		vector_pos = pos;
+		multiIndex = NULL;
+	}
 
-	ItemVector::iterator begin() {return items.begin();}
-	ItemVector::const_iterator begin() const {return items.begin();}
-	ItemVector::reverse_iterator rbegin() {return items.rbegin();}
-	ItemVector::const_reverse_iterator rbegin() const {return items.rbegin();}
+	TileItemBaseIterator(T _vector)
+	{
+		vector = _vector;
+		vector_pos = vector->begin();
+		multiIndex = NULL;
+	}
 
-	ItemVector::iterator end() {return items.end();}
-	ItemVector::const_iterator end() const {return items.end();}
-	ItemVector::reverse_iterator rend() {return items.rend();}
-	ItemVector::const_reverse_iterator rend() const {return items.rend();}
+	TileItemBaseIterator(E _multiindex)
+	{
+		vector = NULL;
+		multiIndex = _multiindex;
+		multiIndex_pos = multiIndex->begin();
+	}
 
-	size_t size() {return items.size();}
-	size_t size() const {return items.size();}
-	bool empty() {return items.empty();}
-	bool empty() const {return items.empty();}
+	TileItemBaseIterator(E _multiindex, E_iter pos)
+	{
+		vector = NULL;
+		multiIndex = _multiindex;
+		multiIndex_pos = pos;
+	}
 
-	ItemVector::iterator insert(ItemVector::iterator _where, Item* item) {return items.insert(_where, item);}
-	ItemVector::iterator erase(ItemVector::iterator _pos) {return items.erase(_pos);}
-	Item* at(size_t _pos) {return items.at(_pos);}
-	Item* at(size_t _pos) const {return items.at(_pos);}
-	Item* back() {return items.back();}
-	const Item* back() const {return items.back();}
-	void push_back(Item* item) {return items.push_back(item);}
+	TileItemBaseIterator(const TileItemBaseIterator& rhs)
+	{
+		vector = rhs.vector;
+		vector_pos = rhs.vector_pos;
 
-	ItemVector::iterator getBeginDownItem() {return items.begin();}
-	ItemVector::const_iterator getBeginDownItem() const {return items.begin();}
-	ItemVector::iterator getEndDownItem() {return items.begin() + downItemCount;}
-	ItemVector::const_iterator getEndDownItem() const {return items.begin() + downItemCount;}
+		multiIndex = rhs.multiIndex;
+		multiIndex_pos = rhs.multiIndex_pos;
+	}
 
-	ItemVector::iterator getBeginTopItem() {return items.begin() + downItemCount;}
-	ItemVector::const_iterator getBeginTopItem() const {return items.begin() + downItemCount;}
-	ItemVector::iterator getEndTopItem() {return items.end();}
-	ItemVector::const_iterator getEndTopItem() const {return items.end();}
+	const TileItemBaseIterator& operator=(const TileItemBaseIterator& rhs)
+	{
+		vector = rhs.vector;
+		vector_pos = rhs.vector_pos;
 
-	uint32_t getTopItemCount() const {return std::distance(getBeginTopItem(), getEndTopItem() );}
-	uint32_t getDownItemCount() const {return std::distance(getBeginDownItem(), getEndDownItem() );}
-	Item* getTopTopItem();
-	Item* getTopDownItem();
+		multiIndex = rhs.multiIndex;
+		multiIndex_pos = rhs.multiIndex_pos;
+
+		return(*this);
+	}
+
+	template<class T, class T_iter, class E, class E_iter, class C>
+	bool operator==(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	{
+		return !(*this != rhs);
+	}
+
+	template<class T, class T_iter, class E, class E_iter, class C>
+	bool operator!=(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	{
+		if(vector){
+			if(vector != rhs.vector){
+				return true;
+			}
+
+			return vector_pos != rhs.vector_pos;
+		}
+		else{
+			if(multiIndex != rhs.multiIndex){
+				return true;
+			}
+
+			return multiIndex_pos != rhs.multiIndex_pos;
+		}
+	}
+
+	template<class T, class T_iter, class E, class E_iter, class C>
+	bool operator>=(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	{
+		if(vector){
+			return vector_pos >= rhs.vector_pos;
+		}
+		else{
+			return multiIndex_pos >= rhs.multiIndex_pos;
+		}
+	}
+
+	C* operator*() const
+	{
+		if(vector){
+			if(vector_pos != vector->end()){
+				return *vector_pos;
+			}
+
+			return NULL;
+		}
+		else{
+			if(multiIndex_pos != multiIndex->end()){
+				return *multiIndex_pos;
+			}
+
+			return NULL;
+		}
+	}
+
+	C* operator->() const
+	{
+		return *(*this);
+	}
+
+	const TileItemBaseIterator& operator++()
+	{
+		if(vector){
+			++vector_pos;
+		}
+		else{
+			++multiIndex_pos;
+		}
+
+		return(*this);
+	}
+
+	TileItemBaseIterator operator++(int)
+	{
+		TileItemIterator tmp(*this);
+		++(*this);
+		return(tmp);
+	}
+
+	const TileItemBaseIterator& operator+=(const int32_t& rhs)
+	{
+		if(vector){
+			vector_pos += rhs;
+		}
+		else{
+			multiIndex_pos += rhs;
+		}
+		return *this;
+	}
+
+	TileItemBaseIterator operator+(const int32_t& rhs) const
+	{
+		TileItemBaseIterator tmp(*this);
+		return (tmp += rhs);
+	}
+
+	const TileItemBaseIterator& operator--()
+	{
+		(*this)+= -1;
+		return *this;
+	}
+
+	TileItemBaseIterator operator--(int)
+	{
+		TileItemIterator tmp(*this);
+		--(*this);
+		return(tmp);
+	}
+
+	const TileItemBaseIterator& operator-=(const int32_t& rhs)
+	{
+		return (*this += -rhs);
+	}
+
+	TileItemBaseIterator operator-(const int32_t& rhs) const
+	{
+		TileItemBaseIterator tmp(*this);
+		return (tmp -= rhs);
+	}
+
+	const T_iter& getVectorPos() const {return vector_pos;}
+	const E_iter& getMultiIndexPos() const {return multiIndex_pos;}
 
 private:
-	ItemVector items;
-	uint16_t downItemCount;
+	T vector;
+	T_iter vector_pos;
+
+	E multiIndex;
+	E_iter multiIndex_pos;
+
 	friend class Tile;
 };
+
+typedef TileItemBaseIterator<ItemVector*, ItemVector::iterator, ItemMultiIndex*, ItemMultiIndex::iterator, Item> TileItemIterator;
+typedef TileItemBaseIterator<const ItemVector*, ItemVector::const_iterator, const ItemMultiIndex*, ItemMultiIndex::const_iterator, const Item> TileItemConstIterator;
+//typedef std::reverse_iterator<TileItemIterator> TileItemReverseIterator;
+//typedef std::reverse_iterator<TileItemConstIterator> TileItemConstReverseIterator;
 
 class Tile : public Cylinder
 {
@@ -89,9 +275,38 @@ public:
 	Tile(uint16_t x, uint16_t y, uint16_t z);
 	virtual ~Tile();
 
-	TileItemVector* getItemList();
-	const TileItemVector* getItemList() const;
-	TileItemVector* makeItemList();
+	//
+	TileItemIterator items_begin();
+	TileItemConstIterator items_begin() const;
+	TileItemIterator items_end();
+	TileItemConstIterator items_end() const;
+
+	ItemVector items_getListWithItemId(uint16_t itemId) const;
+	ItemVector items_getListWithActionId(int32_t actionId) const;
+	ItemVector items_getListWithType(ItemTypes_t type) const;
+	ItemVector items_getListWithProps(ItemProp props) const;
+
+	TileItemIterator items_insert(TileItemIterator _where, Item* item);
+	TileItemIterator items_erase(TileItemIterator _pos);
+	void items_push_back(Item* item);
+
+	Item* items_get(size_t _pos);
+	Item* items_get(size_t _pos) const;
+	uint32_t items_count() const;
+
+	TileItemIterator items_downBegin(){return items_begin();}
+	TileItemConstIterator items_downBegin() const {return items_begin();}
+	TileItemIterator items_downEnd() {return items_begin() + downItemCount;}
+	TileItemConstIterator items_downEnd() const {return items_begin() + downItemCount; }
+	TileItemIterator items_topBegin() {return items_begin() + downItemCount;}
+	TileItemConstIterator items_topBegin() const {return items_begin() + downItemCount;}
+	TileItemIterator items_topEnd() {return items_end();}
+	TileItemConstIterator items_topEnd() const {return items_end();}
+	uint32_t items_topCount() const  {return std::distance(items_topBegin(), items_topEnd()); }
+	uint32_t items_downCount() const {return std::distance(items_downBegin(), items_downEnd());}
+	Item* items_firstDown() {return *items_downBegin();}
+	Item* items_firstTop() {return *(items_topEnd() - 1);}
+	//
 
 	CreatureVector* getCreatures();
 	const CreatureVector* getCreatures() const;
@@ -108,20 +323,14 @@ public:
 	BedItem* getBedItem() const;
 
 	Creature* getTopCreature();
-	Item* getTopTopItem();
-	Item* getTopDownItem();
 	bool isMoveableBlocking() const;
 	Thing* getTopVisibleThing(const Creature* creature);
 	Creature* getTopVisibleCreature(const Creature* creature);
 	const Creature* getTopVisibleCreature(const Creature* creature) const;
 	Item* getItemByTopOrder(uint32_t topOrder);
 
-	uint32_t getThingCount() const {return thingCount;}
-	// If these return != 0 the associated vectors are guaranteed to exists
+	uint32_t getThingCount() const {return (ground ? 1 : 0) + items_count() + getCreatureCount();}
 	uint32_t getCreatureCount() const;
-	uint32_t getItemCount() const;
-	uint32_t getTopItemCount() const;
-	uint32_t getDownItemCount() const;
 
 	bool hasItemWithProperty(uint32_t props) const;
 	bool hasItemWithProperty(Item* exclude, uint32_t props) const;
@@ -136,7 +345,7 @@ public:
 	void setFlag(TileProp flag) {m_flags |= (uint32_t)flag.value();}
 	void resetFlag(TileProp flag) {m_flags &= ~(uint32_t)flag.value();}
 
-	bool positionChange() const {return hasFlag(TILEPROP_TELEPORT);}
+	bool positionChange() const {return hasFlag(TILEPROP_POSITIONCHANGE);}
 	bool floorChange() const {return hasFlag(TILEPROP_FLOORCHANGE);}
 	bool floorChangeDown() const {return hasFlag(TILEPROP_FLOORCHANGE_DOWN);}
 	bool floorChange(Direction direction) const
@@ -220,6 +429,7 @@ private:
 	void updateTileFlags(Item* item, bool removed);
 
  protected:
+	bool is_indexed() const {return hasFlag(TILEPROP_INDEXED_TILE);}
 	bool is_dynamic() const {return hasFlag(TILEPROP_DYNAMIC_TILE);}
 
 public:
@@ -227,7 +437,7 @@ public:
 	Item* ground;
 
 protected:
-	uint32_t thingCount;
+	uint16_t downItemCount;
 	Position tilePos;
 	uint32_t m_flags;
 };
@@ -237,17 +447,81 @@ protected:
 class DynamicTile : public Tile
 {
 	// By allocating the vectors in-house, we avoid some memory fragmentation
-	TileItemVector	items;
-	//TileItemVector	scriptItems;
-	CreatureVector	creatures;
+	CreatureVector creatures;
+	ItemVector items;
 
 public:
 	DynamicTile(uint16_t x, uint16_t y, uint16_t z);
 	~DynamicTile();
 
-	TileItemVector* getItemList() {return &items;}
-	const TileItemVector* getItemList() const {return &items;}
-	TileItemVector* makeItemList() {return &items;}
+	TileItemIterator items_begin() {return TileItemIterator(&items);}
+	TileItemConstIterator items_begin() const {return TileItemConstIterator(&items);}
+	TileItemIterator items_end() {return TileItemIterator(&items, items.end());}
+	TileItemConstIterator items_end() const {return TileItemConstIterator(&items, items.end());}
+
+	ItemVector items_getListWithItemId(uint16_t itemId) const
+	{
+		ItemVector vector;
+		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+			if((*it)->getID() == itemId){
+				vector.push_back(const_cast<Item*>(*it));
+			}
+		}
+		return vector;
+	}
+	ItemVector items_getListWithActionId(int32_t actionId) const
+	{
+		ItemVector vector;
+		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+			if((*it)->getActionId() == actionId){
+				vector.push_back(const_cast<Item*>(*it));
+			}
+		}
+		return vector;
+	}
+	ItemVector items_getListWithType(ItemTypes_t type) const
+	{
+		ItemVector vector;
+		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+			if((*it)->getType() == type){
+				vector.push_back(const_cast<Item*>(*it));
+			}
+		}
+		return vector;
+	}
+	ItemVector items_getListWithProps(ItemProp props) const
+	{
+		ItemVector vector;
+		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+			if((*it)->hasProperty(props)){
+				vector.push_back(const_cast<Item*>(*it));
+			}
+		}
+		return vector;
+	}
+	TileItemIterator items_insert(TileItemIterator _where, Item* item)
+	{
+		ItemVector::iterator it = items.insert(_where.getVectorPos(), item);
+		return TileItemIterator(&items, it);
+	}
+	TileItemIterator items_erase(TileItemIterator _pos)
+	{
+		ItemVector::iterator it = items.erase(_pos.getVectorPos());
+		return TileItemIterator(&items, it);
+	}
+	void items_push_back(Item* item)
+	{
+		items.push_back(item);
+	}
+	Item* items_get(size_t _pos)
+	{
+		return items.at(_pos);
+	}
+	Item* items_get(size_t _pos) const
+	{
+		return items.at(_pos);
+	}
+	uint32_t items_count() const {return items.size();}
 
 	CreatureVector* getCreatures() {return &creatures;}
 	const CreatureVector* getCreatures() const {return &creatures;}
@@ -258,26 +532,200 @@ public:
 class StaticTile : public Tile
 {
 	// We very rarely even need the vectors, so don't keep them in memory
-	TileItemVector* items;
+	ItemVector* items;
 	CreatureVector*	creatures;
+
+	static ItemVector null_items;
 
 public:
 	StaticTile(uint16_t x, uint16_t y, uint16_t z);
 	~StaticTile();
 
-	TileItemVector* getItemList() {return items;}
-	const TileItemVector* getItemList() const {return items;}
-	TileItemVector* makeItemList() {return (items)? (items) : (items = new TileItemVector);}
+	TileItemIterator items_begin() {return (items ? TileItemIterator(items) : TileItemIterator(&null_items));}
+	TileItemConstIterator items_begin() const {return (items ? TileItemConstIterator(items) : TileItemConstIterator(&null_items));}
+	TileItemIterator items_end() {return (items ? TileItemIterator(items, items->end()) : TileItemIterator(&null_items, null_items.end()));}
+	TileItemConstIterator items_end() const {return (items ? TileItemConstIterator(items, items->end()) : TileItemConstIterator(&null_items, null_items.end()));}
+
+	ItemVector items_getListWithItemId(uint16_t itemId) const
+	{
+		ItemVector vector;
+		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+			if((*it)->getID() == itemId){
+				vector.push_back(const_cast<Item*>(*it));
+			}
+		}
+		return vector;
+	}
+	ItemVector items_getListWithActionId(int32_t actionId) const
+	{
+		ItemVector vector;
+		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+			if((*it)->getActionId() == actionId){
+				vector.push_back(const_cast<Item*>(*it));
+			}
+		}
+		return vector;
+	}
+	ItemVector items_getListWithType(ItemTypes_t type) const
+	{
+		ItemVector vector;
+		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+			if((*it)->getType() == type){
+				vector.push_back(const_cast<Item*>(*it));
+			}
+		}
+		return vector;
+	}	
+	ItemVector items_getListWithProps(ItemProp props) const
+	{
+		ItemVector vector;
+		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+			if((*it)->hasProperty(props)){
+				vector.push_back(const_cast<Item*>(*it));
+			}
+		}
+		return vector;
+	}
+	TileItemIterator items_insert(TileItemIterator _where, Item* item)
+	{
+		if(!items){
+			items = new ItemVector();
+			ItemVector::iterator it = items->insert(items->begin(), item);
+			return TileItemIterator(items, it);
+		}
+		else{
+			ItemVector::iterator it = items->insert(_where.getVectorPos(), item);
+			return TileItemIterator(items, it);
+		}
+	}
+	TileItemIterator items_erase(TileItemIterator _pos)
+	{
+		assert(items);
+		ItemVector::iterator it = items->erase(_pos.getVectorPos());
+		return TileItemIterator(items, it);
+	}
+	void items_push_back(Item* item)
+	{
+		if(!items){
+			items = new ItemVector();
+		}
+		items->push_back(item);
+	}
+	Item* items_get(size_t _pos)
+	{
+		assert(items);
+		return items->at(_pos);
+	}
+	Item* items_get(size_t _pos) const
+	{
+		assert(items);
+		return items->at(_pos);
+	}
+
+	uint32_t items_count() const {return (items ? (uint32_t)items->size() : 0);}
 
 	CreatureVector* getCreatures() {return creatures;}
 	const CreatureVector* getCreatures() const {return creatures;}
 	CreatureVector* makeCreatures() {return (creatures)? (creatures) : (creatures = new CreatureVector);}
 };
 
+// For tiles with alot of items on them for quicker searching
+// DynamicTile/StaticTile can be changed to IndexedTile dynamically
+class IndexedTile : public Tile
+{
+	// By allocating the vectors in-house, we avoid some memory fragmentation
+	ItemMultiIndex	items;
+	CreatureVector	creatures;
+
+public:
+	IndexedTile(uint16_t x, uint16_t y, uint16_t z);
+	~IndexedTile();
+
+	TileItemIterator items_begin() {return TileItemIterator(&items);}
+	TileItemConstIterator items_begin() const {return TileItemConstIterator(&items);}
+	TileItemIterator items_end() {return TileItemIterator(&items, items.end());}
+	TileItemConstIterator items_end() const {return TileItemConstIterator(&items, items.end());}
+
+	ItemVector items_getListWithItemId(uint16_t itemId) const
+	{
+		ItemVector vector;
+		ItemMultiIndexItemIdIterator ic0,ic1;
+		boost::tuples::tie(ic0,ic1) = items.get<1>().equal_range(itemId);
+		while(ic0!=ic1){
+			vector.push_back(*ic0);
+			++ic0;
+		}
+		return vector;
+	}
+	ItemVector items_getListWithActionId(int32_t actionId) const
+	{
+		ItemVector vector;
+		ItemMultiIndexActionIdIterator ic0,ic1;
+		boost::tuples::tie(ic0,ic1) = items.get<2>().equal_range(actionId);
+		while(ic0!=ic1){
+			vector.push_back(*ic0);
+			++ic0;
+		}
+		return vector;
+	}
+	ItemVector items_getListWithType(ItemTypes_t type) const
+	{
+		ItemVector vector;
+		ItemMultiIndexTypeIterator ic0,ic1;
+		boost::tuples::tie(ic0,ic1) = items.get<3>().equal_range(type);
+		while(ic0!=ic1){
+			vector.push_back(*ic0);
+			++ic0;
+		}
+		return vector;
+	}
+	ItemVector items_getListWithProps(ItemProp props) const
+	{
+		ItemVector vector;
+		/*
+		ItemMultiIndexPropIterator ic0,ic1;
+		boost::tuples::tie(ic0,ic1) = ItemMultiIndexProp(items).equal_range(type);
+		while(ic0!=ic1){
+			vector.push_back(*ic0);
+			++ic0;
+		}
+		*/
+		return vector;
+	}
+
+	TileItemIterator items_insert(TileItemIterator _where, Item* item)
+	{
+		std::pair<ItemMultiIndexRndIterator, bool> it = items.insert(_where.getMultiIndexPos(), item);
+		return TileItemIterator(&items, it.first);
+	}
+	TileItemIterator items_erase(TileItemIterator _pos)
+	{
+		ItemMultiIndex::iterator it = items.erase(_pos.getMultiIndexPos());
+		return TileItemIterator(&items, it);
+	}
+	void items_push_back(Item* item)
+	{
+		items.push_back(item);
+	}
+	Item* items_get(size_t _pos)
+	{
+		return items.at(_pos);
+	}
+	Item* items_get(size_t _pos) const
+	{
+		return items.at(_pos);
+	}
+	uint32_t items_count() const {return items.size();}
+
+	CreatureVector* getCreatures() {return &creatures;}
+	const CreatureVector* getCreatures() const {return &creatures;}
+	CreatureVector* makeCreatures() {return &creatures;}
+};
+
 inline Tile::Tile(uint16_t x, uint16_t y, uint16_t z) :
 	qt_node(NULL),
 	ground(NULL),
-	thingCount(0),
+	downItemCount(0),
 	tilePos(x, y, z),
 	m_flags(0)
 {
@@ -293,6 +741,8 @@ inline CreatureVector* Tile::getCreatures()
 {
 	if(is_dynamic())
 		return static_cast<DynamicTile*>(this)->DynamicTile::getCreatures();
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::getCreatures();
 
 	return static_cast<StaticTile*>(this)->StaticTile::getCreatures();
 }
@@ -301,6 +751,8 @@ inline const CreatureVector* Tile::getCreatures() const
 {
 	if(is_dynamic())
 		return static_cast<const DynamicTile*>(this)->DynamicTile::getCreatures();
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::getCreatures();
 
 	return static_cast<const StaticTile*>(this)->StaticTile::getCreatures();
 }
@@ -309,32 +761,150 @@ inline CreatureVector* Tile::makeCreatures()
 {
 	if(is_dynamic())
 		return static_cast<DynamicTile*>(this)->DynamicTile::makeCreatures();
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::makeCreatures();
 
 	return static_cast<StaticTile*>(this)->StaticTile::makeCreatures();
 }
 
-inline TileItemVector* Tile::getItemList()
+inline TileItemIterator Tile::items_begin()
 {
 	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::getItemList();
+		return static_cast<DynamicTile*>(this)->DynamicTile::items_begin();
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::items_begin();
 
-	return static_cast<StaticTile*>(this)->StaticTile::getItemList();
+	return static_cast<StaticTile*>(this)->StaticTile::items_begin();
 }
 
-inline const TileItemVector* Tile::getItemList() const
+inline TileItemConstIterator Tile::items_begin() const
 {
 	if(is_dynamic())
-		return static_cast<const DynamicTile*>(this)->DynamicTile::getItemList();
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_begin();
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_begin();
 
-	return static_cast<const StaticTile*>(this)->StaticTile::getItemList();
+	return static_cast<const StaticTile*>(this)->StaticTile::items_begin();
 }
 
-inline TileItemVector* Tile::makeItemList()
+inline TileItemIterator Tile::items_end()
 {
 	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::makeItemList();
+		return static_cast<DynamicTile*>(this)->DynamicTile::items_end();
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::items_end();
 
-	return static_cast<StaticTile*>(this)->StaticTile::makeItemList();
+	return static_cast<StaticTile*>(this)->StaticTile::items_end();
+}
+
+inline ItemVector Tile::items_getListWithItemId(uint16_t itemId) const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithItemId(itemId);
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithItemId(itemId);
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithItemId(itemId);
+}
+
+inline ItemVector Tile::items_getListWithActionId(int32_t actionId) const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithActionId(actionId);
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithActionId(actionId);
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithActionId(actionId);
+}
+
+inline ItemVector Tile::items_getListWithType(ItemTypes_t type) const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithType(type);
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithType(type);
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithType(type);
+}
+
+inline ItemVector Tile::items_getListWithProps(ItemProp props) const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithProps(props);
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithProps(props);
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithProps(props);
+}
+
+inline TileItemConstIterator Tile::items_end() const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_end();
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_end();
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_end();
+}
+
+inline TileItemIterator Tile::items_insert(TileItemIterator _where, Item* item)
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::items_insert(_where, item);
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::items_insert(_where, item);
+
+	return static_cast<StaticTile*>(this)->StaticTile::items_insert(_where, item);
+}
+
+inline TileItemIterator Tile::items_erase(TileItemIterator _pos)
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::items_erase(_pos);
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::items_erase(_pos);
+
+	return static_cast<StaticTile*>(this)->StaticTile::items_erase(_pos);
+}
+
+inline void Tile::items_push_back(Item* item)
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::items_push_back(item);
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::items_push_back(item);
+
+	return static_cast<StaticTile*>(this)->StaticTile::items_push_back(item);
+}
+
+inline Item* Tile::items_get(size_t _pos)
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::items_get(_pos);
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::items_get(_pos);
+
+	return static_cast<StaticTile*>(this)->StaticTile::items_get(_pos);
+}
+
+inline Item* Tile::items_get(size_t _pos) const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_get(_pos);
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_get(_pos);
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_get(_pos);
+}
+
+inline uint32_t Tile::items_count() const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_count();
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_count();
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_count();
 }
 
 inline StaticTile::StaticTile(uint16_t x, uint16_t y, uint16_t z) :
@@ -353,6 +923,15 @@ inline DynamicTile::DynamicTile(uint16_t x, uint16_t y, uint16_t z) :
 }
 
 inline DynamicTile::~DynamicTile()
+{}
+
+inline IndexedTile::IndexedTile(uint16_t x, uint16_t y, uint16_t z) :
+	Tile(x, y, z)
+{
+	m_flags |= enums::TILEPROP_INDEXED_TILE;
+}
+
+inline IndexedTile::~IndexedTile()
 {}
 
 #endif

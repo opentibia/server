@@ -229,16 +229,15 @@ bool House::transferToDepot()
 	Item* item = NULL;
 
 	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-		if(const TileItemVector* items = (*it)->getItemList()){
-			for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-				item = (*it);
-				if(item->isPickupable()){
-					moveItemList.push_back(item);
-				}
-				else if((tmpContainer = item->getContainer())){
-					for(ItemList::const_iterator it = tmpContainer->getItems(); it != tmpContainer->getEnd(); ++it){
-						moveItemList.push_back(*it);
-					}
+		Tile* tile = *it;
+		for(TileItemIterator iit = tile->items_begin(); iit != tile->items_end(); ++iit){
+			item = (*iit);
+			if(item->isPickupable()){
+				moveItemList.push_back(item);
+			}
+			else if((tmpContainer = item->getContainer())){
+				for(ItemList::const_iterator cit = tmpContainer->getItems(); cit != tmpContainer->getEnd(); ++cit){
+					moveItemList.push_back(*cit);
 				}
 			}
 		}

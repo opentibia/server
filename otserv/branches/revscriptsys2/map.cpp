@@ -175,14 +175,16 @@ void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
 	}
 
 	if(newtile->hasFlag(TILEPROP_REFRESH)){
+		/*
 		RefreshBlock_t rb;
 		rb.lastRefresh = OTSYS_TIME();
 		if(TileItemVector* newtileItems = newtile->getItemList()){
-			for(ItemVector::iterator it = newtileItems->getBeginDownItem(); it != newtileItems->getEndDownItem(); ++it){
+			for(TileItemIterator it = newtileItems->getBeginDownItem(); it != newtileItems->getEndDownItem(); ++it){
 				rb.list.push_back((*it)->clone());
 			}
 		}
 		refreshTileMap[newtile] = rb;
+		*/
 	}
 }
 

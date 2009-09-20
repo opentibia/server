@@ -265,7 +265,7 @@ protected:
 	QTreeNode root;
 
 	struct RefreshBlock_t{
-		TileItemVector list;
+		ItemVector list;
 		uint64_t lastRefresh;
 	};
 

@@ -332,16 +332,14 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 	for(; *map_iter != end_here && (clean_max == 0? true : (cleaned < clean_max)); ++*map_iter, ++cleaned){
 		tile = (*map_iter)->first;
 
-		if(TileItemVector* items = tile->getItemList()){
-			//remove garbage
-			int32_t downItemSize = tile->getDownItemCount();
-			for(int32_t i = downItemSize - 1; i >= 0; --i){
-				item = items->at(i);
-				if(item){
-					ReturnValue ret = internalRemoveItem(NULL, item);
-					if(ret != RET_NOERROR){
-						std::cout << "Could not refresh item: " << item->getID() << "pos: " << tile->getPosition() << std::endl;
-					}
+		//remove garbage
+		int32_t downItemSize = tile->items_downCount();
+		for(int32_t i = downItemSize - 1; i >= 0; --i){
+			item = tile->items_get(i);
+			if(item){
+				ReturnValue ret = internalRemoveItem(NULL, item);
+				if(ret != RET_NOERROR){
+					std::cout << "Could not refresh item: " << item->getID() << "pos: " << tile->getPosition() << std::endl;
 				}
 			}
 		}
@@ -349,8 +347,9 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 		cleanup();
 
 		//restore to original state
+		/*
 		TileItemVector list = (*map_iter)->second.list;
-		for(ItemVector::reverse_iterator it = list.rbegin(); it != list.rend(); ++it){
+		for(TileItemReverseIterator it = list.rbegin(); it != list.rend(); ++it){
 			Item* item = (*it)->clone();
 			ReturnValue ret = internalAddItem(NULL, tile, item , INDEX_WHEREEVER, FLAG_NOLIMIT);
 			if(ret == RET_NOERROR){
@@ -365,6 +364,7 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 				delete item;
 			}
 		}
+		*/
 	}
 }
 
@@ -731,7 +731,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 
 			/*for move operations*/
 			if(type == STACKPOS_MOVE){
-				Item* item = tile->getTopDownItem();
+				Item* item = tile->items_firstDown();
 				if(item && item->isMoveable())
 					thing = item;
 				else
@@ -739,7 +739,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			}
 			/*use item*/
 			else if(type == STACKPOS_USE){
-				thing = tile->getTopDownItem();
+				thing = tile->items_firstDown();
 			}
 			else if(type == STACKPOS_USEITEM){
 				//First check items with topOrder 2 (ladders, signs, splashes)
@@ -749,10 +749,10 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 				}
 				else{
 					//then down items
-					thing = tile->getTopDownItem();
+					thing = tile->items_firstDown();
 					if(thing == NULL){
 						//then last we check items with topOrder 3 (doors etc)
-						thing = tile->getTopTopItem();
+						thing = tile->items_firstTop();
 					}
 
 					if(thing == NULL){

@@ -30,7 +30,7 @@ HouseTile::HouseTile(int x, int y, int z, House* _house) :
 	DynamicTile(x, y, z)
 {
 	house = _house;
-	setFlag(TILEPROP_HOUSE);
+	setFlag(TILEPROP_HOUSE_TILE);
 }
 
 HouseTile::~HouseTile()

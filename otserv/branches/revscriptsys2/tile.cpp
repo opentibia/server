@@ -33,6 +33,7 @@ extern Game g_game;
 
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 Tile& Tile::null_tile = real_null_tile;
+ItemVector StaticTile::null_items;
 
 HouseTile* Tile::getHouseTile()
 {
@@ -50,7 +51,7 @@ const HouseTile* Tile::getHouseTile() const
 
 bool Tile::isHouseTile() const
 {
-	return hasFlag(TILEPROP_HOUSE);
+	return hasFlag(TILEPROP_HOUSE_TILE);
 }
 
 bool Tile::hasHeight(uint32_t n) const
@@ -67,15 +68,13 @@ bool Tile::hasHeight(uint32_t n) const
 		}
 	}
 
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-			if((*it)->hasHeight()){
-				++height;
-			}
+	for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if((*it)->hasHeight()){
+			++height;
+		}
 
-			if(n == height){
-				return true;
-			}
+		if(n == height){
+			return true;
 		}
 	}
 
@@ -89,64 +88,20 @@ uint32_t Tile::getCreatureCount() const
 	return 0;
 }
 
-uint32_t Tile::getItemCount() const
-{
-	if(const TileItemVector* items = getItemList()){
-		return (uint32_t)items->size();
-	}
-
-	return 0;
-}
-
-uint32_t Tile::getTopItemCount() const
-{
-	if(const TileItemVector* items = getItemList()){
-		return items->getTopItemCount();
-	}
-
-	return 0;
-}
-
-uint32_t Tile::getDownItemCount() const
-{
-	if(const TileItemVector* items =getItemList()){
-		return items->getDownItemCount();
-	}
-
-	return 0;
-}
-
 Teleport* Tile::getTeleportItem() const
 {
-	if(!hasFlag(TILEPROP_TELEPORT)){
-		return NULL;
+	ItemVector vector = items_getListWithType(ITEM_TYPE_TELEPORT);
+	if(!vector.empty()){
+		return vector[0]->getTeleport();
 	}
-
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
-			if((*it)->getTeleport())
-				return (*it)->getTeleport();
-		}
-	}
-
 	return NULL;
 }
 
 MagicField* Tile::getFieldItem() const
 {
-	if(!hasFlag(TILEPROP_MAGICFIELD)){
-		return NULL;
-	}
-
-	if(ground && ground->getMagicField()){
-		return ground->getMagicField();
-	}
-
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
-			if((*it)->getMagicField())
-				return (*it)->getMagicField();
-		}
+	ItemVector vector = items_getListWithType(ITEM_TYPE_MAGICFIELD);
+	if(!vector.empty()){
+		return vector[0]->getMagicField();
 	}
 
 	return NULL;
@@ -154,19 +109,9 @@ MagicField* Tile::getFieldItem() const
 
 TrashHolder* Tile::getTrashHolder() const
 {
-	if(!hasFlag(TILEPROP_TRASHHOLDER)){
-		return NULL;
-	}
-
-	if(ground && ground->getTrashHolder()){
-		return ground->getTrashHolder();
-	}
-
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
-			if((*it)->getTrashHolder())
-				return (*it)->getTrashHolder();
-		}
+	ItemVector vector = items_getListWithType(ITEM_TYPE_TRASHHOLDER);
+	if(!vector.empty()){
+		return vector[0]->getTrashHolder();
 	}
 
 	return NULL;
@@ -174,19 +119,9 @@ TrashHolder* Tile::getTrashHolder() const
 
 Mailbox* Tile::getMailbox() const
 {
-	if(!hasFlag(TILEPROP_MAILBOX)){
-		return NULL;
-	}
-
-	if(ground && ground->getMailbox()){
-		return ground->getMailbox();
-	}
-
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
-			if((*it)->getMailbox())
-				return (*it)->getMailbox();
-		}
+	ItemVector vector = items_getListWithType(ITEM_TYPE_MAILBOX);
+	if(!vector.empty()){
+		return vector[0]->getMailbox();
 	}
 
 	return NULL;
@@ -194,19 +129,9 @@ Mailbox* Tile::getMailbox() const
 
 BedItem* Tile::getBedItem() const
 {
-	if(!hasFlag(TILEPROP_BED)){
-		return NULL;
-	}
-
-	if(ground && ground->getBed()){
-		return ground->getBed();
-	}
-
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_reverse_iterator it = items->rbegin(); it != items->rend(); ++it){
-			if((*it)->getBed())
-				return (*it)->getBed();
-		}
+	ItemVector vector = items_getListWithType(ITEM_TYPE_BED);
+	if(!vector.empty()){
+		return vector[0]->getBed();
 	}
 
 	return NULL;
@@ -223,28 +148,6 @@ Creature* Tile::getTopCreature()
 	return NULL;
 }
 
-Item* Tile::getTopDownItem()
-{
-	if(TileItemVector* items = getItemList()){
-		if(items->getDownItemCount() > 0){
-			return *items->getBeginDownItem();
-		}
-	}
-
-	return NULL;
-}
-
-Item* Tile::getTopTopItem()
-{
-	if(TileItemVector* items = getItemList()){
-		if(items->getTopItemCount() > 0){
-			return *(items->getEndTopItem() - 1);
-		}
-	}
-
-	return NULL;
-}
-
 Item* Tile::getItemByTopOrder(uint32_t topOrder)
 {
 	//topOrder:
@@ -253,12 +156,16 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	//3: doors etc
 	//4: creatures
 
-	if(TileItemVector* items = getItemList()){
-		ItemVector::reverse_iterator itEnd = ItemVector::reverse_iterator(items->getBeginTopItem());
-		for(ItemVector::reverse_iterator it = ItemVector::reverse_iterator(items->getEndTopItem()); it != itEnd; ++it){
-			if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
-				return (*it);
-			}
+	/*
+	Might not return the right item?
+	ItemVector vector = items_getItemWithTopOrder(topOrder);
+	if(!vector.empty()){
+		return vector.back();
+	}
+	*/
+	for(TileItemIterator it = items_topEnd() - 1; it >= items_topBegin(); --it){
+		if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
+			return (*it);
 		}
 	}
 
@@ -275,22 +182,17 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 		}
 	}
 
-	TileItemVector* items = getItemList();
-
-	if(items){
-		for(ItemVector::iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
-			const ItemType& iit = Item::items[(*it)->getID()];
-			if(!iit.lookThrough){
-				return (*it);
-			}
+	for(TileItemIterator it = items_downBegin(); it != items_downEnd(); ++it){
+		const ItemType& iit = Item::items[(*it)->getID()];
+		if(!iit.lookThrough){
+			return (*it);
 		}
+	}
 
-		ItemVector::reverse_iterator itEnd = ItemVector::reverse_iterator(items->getBeginTopItem());
-		for(ItemVector::reverse_iterator it = ItemVector::reverse_iterator(items->getEndTopItem()); it != itEnd; ++it){
-			const ItemType& iit = Item::items[(*it)->getID()];
-			if(!iit.lookThrough){
-				return (*it);
-			}
+	for(TileItemIterator it = items_topEnd() - 1; it >= items_topBegin(); --it){
+		const ItemType& iit = Item::items[(*it)->getID()];
+		if(!iit.lookThrough){
+			return (*it);
 		}
 	}
 
@@ -488,7 +390,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {
 	const CreatureVector* creatures = getCreatures();
-	const TileItemVector* items = getItemList();
 
 	if(const Creature* creature = thing->getCreature()){
 		if(hasBitSet(FLAG_NOLIMIT, flags)){
@@ -615,31 +516,27 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		if(items){
-			if(!hasBitSet(FLAG_IGNOREBLOCKITEM, flags)){
-				//If the FLAG_IGNOREBLOCKITEM bit isn't set we dont have to iterate every single item
-				if(hasFlag(TILEPROP_BLOCKSOLID)){
-					return RET_NOTENOUGHROOM;
+		if(!hasBitSet(FLAG_IGNOREBLOCKITEM, flags)){
+			//If the FLAG_IGNOREBLOCKITEM bit isn't set we dont have to iterate every single item
+			if(hasFlag(TILEPROP_BLOCKSOLID)){
+				return RET_NOTENOUGHROOM;
+			}
+		}
+		else{
+			//FLAG_IGNOREBLOCKITEM is set
+			if(ground){
+				const ItemType& iiType = Item::items[ground->getID()];
+				if(iiType.blockSolid && (!iiType.moveable || ground->getUniqueId() != 0)){
+					return RET_NOTPOSSIBLE;
 				}
 			}
-			else{
-				//FLAG_IGNOREBLOCKITEM is set
-				if(ground){
-					const ItemType& iiType = Item::items[ground->getID()];
-					if(iiType.blockSolid && (!iiType.moveable || ground->getUniqueId() != 0)){
-						return RET_NOTPOSSIBLE;
-					}
-				}
 
-				if(const TileItemVector* items = getItemList()){
-					Item* iitem;
-					for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-						iitem = (*it);
-						const ItemType& iiType = Item::items[iitem->getID()];
-						if(iiType.blockSolid && (!iiType.moveable || iitem->getUniqueId() != 0)){
-							return RET_NOTPOSSIBLE;
-						}
-					}
+			const Item* iitem;
+			for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+				iitem = (*it);
+				const ItemType& iiType = Item::items[iitem->getID()];
+				if(iiType.blockSolid && (!iiType.moveable || iitem->getUniqueId() != 0)){
+					return RET_NOTPOSSIBLE;
 				}
 			}
 		}
@@ -650,7 +547,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
 		}
 #endif
-		if(items && items->size() >= 0xFFFF){
+		if(items_count() >= 0xFFFF){
 			return RET_NOTPOSSIBLE;
 		}
 
@@ -672,10 +569,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		bool hasHangable = false;
-		bool supportHangable = false;
+		if(hasFlag(TILEPROP_VERTICAL) || hasFlag(TILEPROP_HORIZONTAL)){
+			bool hasHangable = false;
+			bool supportHangable = false;
 
-		if(items){
 			Thing* iithing = NULL;
 			for(uint32_t i = 0; i < getThingCount(); ++i){
 				iithing = __getThing(i);
@@ -709,12 +606,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					}
 				}
 			}
-		}
 
-		if(itemIsHangable && hasHangable && supportHangable){
-			return RET_NEEDEXCHANGE;
+			if(itemIsHangable && hasHangable && supportHangable){
+				return RET_NEEDEXCHANGE;
+			}
 		}
-
 	}
 
 	return RET_NOERROR;
@@ -800,7 +696,7 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 	}
 
 	if(destTile){
-		Thing* destThing = destTile->getTopDownItem();
+		Thing* destThing = destTile->items_firstDown();
 		if(destThing)
 			*destItem = destThing->getItem();
 	}
@@ -821,7 +717,6 @@ void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 		creature->setParent(this);
 		CreatureVector* creatures = makeCreatures();
 		creatures->insert(creatures->begin(), creature);
-		++thingCount;
 	}
 	else{
 		Item* item = thing->getItem();
@@ -833,9 +728,7 @@ void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 			return /*RET_NOTPOSSIBLE*/;
 		}
 
-		TileItemVector* items = getItemList();
-
-		if(items && items->size() > 0xFFFF){
+		if(items_count() > 0xFFFF){
 			return /*RET_NOTPOSSIBLE*/;
 		}
 
@@ -844,7 +737,6 @@ void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 		if(item->isGroundTile()){
 			if(ground == NULL){
 				ground = item;
-				++thingCount;
 				onAddTileItem(item);
 			}
 			else{
@@ -866,41 +758,32 @@ void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 		else if(item->isAlwaysOnTop()){
 			if(item->isSplash()){
 				//remove old splash if exists
-				if(items){
-					for(ItemVector::iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
-						if((*it)->isSplash()){
-							int32_t oldSplashIndex = __getIndexOfThing(*it);
-							Item* oldSplash = *it;
-							__removeThing(actor, oldSplash, 1);
-							oldSplash->setParent(NULL);
-							g_game.FreeThing(oldSplash);
-							postRemoveNotification(actor, oldSplash, NULL, oldSplashIndex, true);
-							break;
-						}
+				for(TileItemIterator it = items_topBegin(); it != items_topEnd(); ++it){
+					if((*it)->isSplash()){
+						int32_t oldSplashIndex = __getIndexOfThing(*it);
+						Item* oldSplash = *it;
+						__removeThing(actor, oldSplash, 1);
+						oldSplash->setParent(NULL);
+						g_game.FreeThing(oldSplash);
+						postRemoveNotification(actor, oldSplash, NULL, oldSplashIndex, true);
+						break;
 					}
 				}
 			}
 
 			bool isInserted = false;
 
-			if(items){
-				for(ItemVector::iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
-					//Note: this is different from internalAddThing
-					if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*it)->getID()].alwaysOnTopOrder){
-						items->insert(it, item);
-						++thingCount;
-						isInserted = true;
-						break;
-					}
+			for(TileItemIterator it = items_topBegin(); it != items_topEnd(); ++it){
+				//Note: this is different from internalAddThing
+				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*it)->getID()].alwaysOnTopOrder){
+					items_insert(it, item);
+					isInserted = true;
+					break;
 				}
-			}
-			else{
-				items = makeItemList();
 			}
 
 			if(!isInserted){
-				items->push_back(item);
-				++thingCount;
+				items_push_back(item);
 			}
 
 			onAddTileItem(item);
@@ -908,35 +791,28 @@ void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 		else{
 			if(item->isMagicField()){
 				//remove old field item if exists
-				if(items){
-					MagicField* oldField = NULL;
-					for(ItemVector::iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
-						if((oldField = (*it)->getMagicField())){
-							if(oldField->isReplaceable()){
-								int32_t oldFieldIndex = __getIndexOfThing(*it);
-								__removeThing(actor, oldField, 1);
+				ItemVector vector = items_getListWithType(ITEM_TYPE_MAGICFIELD);
+				if(!vector.empty()){
+					MagicField* oldField = vector[0]->getMagicField();
+					if(oldField->isReplaceable()){
+						int32_t oldFieldIndex = __getIndexOfThing(oldField);
+						__removeThing(actor, oldField, 1);
 
-								oldField->setParent(NULL);
-								g_game.FreeThing(oldField);
-								postRemoveNotification(actor, oldField, NULL, oldFieldIndex, true);
-								break;
-							}
-							else{
-								//This magic field cannot be replaced.
-								item->setParent(NULL);
-								g_game.FreeThing(item);
-								return;
-							}
-						}
+						oldField->setParent(NULL);
+						g_game.FreeThing(oldField);
+						postRemoveNotification(actor, oldField, NULL, oldFieldIndex, true);
+					}
+					else{
+						//This magic field cannot be replaced.
+						item->setParent(NULL);
+						g_game.FreeThing(item);
+						return;
 					}
 				}
-
 			}
 
-			items = makeItemList();
-			items->insert(items->getBeginDownItem(), item);
-			++items->downItemCount;
-			++thingCount;
+			items_insert(items_downBegin(), item);
+			++downItemCount;
 			onAddTileItem(item);
 		}
 	}
@@ -1001,16 +877,15 @@ void Tile::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 		--pos;
 	}
 
-	TileItemVector* items = getItemList();
-	if(items && !isInserted){
-		int32_t topItemSize = getTopItemCount();
+	if(items_count() > 0 && !isInserted){
+		int32_t topItemSize = items_topCount();
 		if(pos < topItemSize){
-			ItemVector::iterator it = items->getBeginTopItem();
+			TileItemIterator it = items_topBegin();
 			it += pos;
 
 			oldItem = (*it);
-			it = items->erase(it);
-			items->insert(it, item);
+			it = items_erase(it);
+			items_insert(it, item);
 			isInserted = true;
 		}
 
@@ -1030,16 +905,16 @@ void Tile::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 		pos -= (uint32_t)creatures->size();
 	}
 
-	if(items && !isInserted){
-		int32_t downItemSize = getDownItemCount();
+	if(items_count() > 0 && !isInserted){
+		int32_t downItemSize = items_downCount();
 		if(pos < downItemSize){
-			ItemVector::iterator it = items->begin();
+			TileItemIterator it = items_begin();
 			it += pos;
 			pos = 0;
 
 			oldItem = (*it);
-			it = items->erase(it);
-			items->insert(it, item);
+			it = items_erase(it);
+			items_insert(it, item);
 			isInserted = true;
 		}
 	}
@@ -1081,7 +956,6 @@ void Tile::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 
 			g_game.clearSpectatorCache();
 			creatures->erase(it);
-			--thingCount;
 			return;
 		}
 		else{
@@ -1123,17 +997,43 @@ void Tile::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 			}
 			ground->setParent(NULL);
 			ground = NULL;
-			--thingCount;
 			onRemoveTileItem(list, oldStackPosVector, item);
 
 			return /*RET_NOERROR*/;
 		}
 
 		if(item->isAlwaysOnTop()){
-			TileItemVector* items = getItemList();
-			if(items){
-				for(ItemVector::iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
-					if(*it == item){
+			for(TileItemIterator it = items_topBegin(); it != items_topEnd(); ++it){
+				if(*it == item){
+					const SpectatorVec& list = g_game.getSpectators(getPosition());
+					std::vector<uint32_t> oldStackPosVector;
+
+					Player* tmpPlayer = NULL;
+					for(SpectatorVec::const_iterator iit = list.begin(); iit != list.end(); ++iit){
+						if((tmpPlayer = (*iit)->getPlayer())){
+							oldStackPosVector.push_back(getClientIndexOfThing(tmpPlayer, *it));
+						}
+					}
+					(*it)->setParent(NULL);
+					items_erase(it);
+					onRemoveTileItem(list, oldStackPosVector, item);
+					return /*RET_NOERROR*/;
+				}
+			}
+		}
+		else{
+			for(TileItemIterator it = items_downBegin(); it != items_downEnd(); ++it){
+				if((*it) == item){
+					if(item->isStackable() && count != item->getItemCount()){
+						uint8_t newCount = (uint8_t)std::max((int32_t)0, (int32_t)(item->getItemCount() - count));
+						updateTileFlags(item, true);
+						item->setItemCount(newCount);
+						updateTileFlags(item, false);
+
+						const ItemType& it = Item::items[item->getID()];
+						onUpdateTileItem(item, it, item, it);
+					}
+					else{
 						const SpectatorVec& list = g_game.getSpectators(getPosition());
 						std::vector<uint32_t> oldStackPosVector;
 
@@ -1143,49 +1043,14 @@ void Tile::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 								oldStackPosVector.push_back(getClientIndexOfThing(tmpPlayer, *it));
 							}
 						}
+
 						(*it)->setParent(NULL);
-						items->erase(it);
-						--thingCount;
+						items_erase(it);
+						--downItemCount;
 						onRemoveTileItem(list, oldStackPosVector, item);
-						return /*RET_NOERROR*/;
 					}
-				}
-			}
-		}
-		else{
-			TileItemVector* items = getItemList();
-			if(items){
-				for(ItemVector::iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
-					if((*it) == item){
-						if(item->isStackable() && count != item->getItemCount()){
-							uint8_t newCount = (uint8_t)std::max((int32_t)0, (int32_t)(item->getItemCount() - count));
-							updateTileFlags(item, true);
-							item->setItemCount(newCount);
-							updateTileFlags(item, false);
 
-							const ItemType& it = Item::items[item->getID()];
-							onUpdateTileItem(item, it, item, it);
-						}
-						else{
-							const SpectatorVec& list = g_game.getSpectators(getPosition());
-							std::vector<uint32_t> oldStackPosVector;
-
-							Player* tmpPlayer = NULL;
-							for(SpectatorVec::const_iterator iit = list.begin(); iit != list.end(); ++iit){
-								if((tmpPlayer = (*iit)->getPlayer())){
-									oldStackPosVector.push_back(getClientIndexOfThing(tmpPlayer, *it));
-								}
-							}
-
-							(*it)->setParent(NULL);
-							items->erase(it);
-							--items->downItemCount;
-							--thingCount;
-							onRemoveTileItem(list, oldStackPosVector, item);
-						}
-
-						return /*RET_NOERROR*/;
-					}
+					return /*RET_NOERROR*/;
 				}
 			}
 		}
@@ -1208,18 +1073,15 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 		++n;
 	}
 
-	const TileItemVector* items = getItemList();
-	if(items){
-		if(thing->getItem()){
-			for(ItemVector::const_iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
-				++n;
-				if((*it) == thing)
-					return n;
-			}
+	if(thing->getItem()){
+		for(TileItemConstIterator it = items_topBegin(); it != items_topEnd(); ++it){
+			++n;
+			if((*it) == thing)
+				return n;
 		}
-		else{
-			n += items->getTopItemCount();
-		}
+	}
+	else{
+		n += items_topCount();
 	}
 
 	if(const CreatureVector* creatures = getCreatures()){
@@ -1232,17 +1094,15 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 		}
 	}
 
-	if(items){
-		if(thing->getItem()){
-			for(ItemVector::const_iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
-				++n;
-				if((*it) == thing)
-					return n;
-			}
+	if(thing->getItem()){
+		for(TileItemConstIterator it = items_downBegin(); it != items_downEnd(); ++it){
+			++n;
+			if((*it) == thing)
+				return n;
 		}
-		else{
-			n += items->getDownItemCount();
-		}
+	}
+	else{
+		n += items_downCount();
 	}
 
 	return -1;
@@ -1260,18 +1120,15 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 		++n;
 	}
 
-	const TileItemVector* items = getItemList();
-	if(items){
-		if(thing->getItem()){
-			for(ItemVector::const_iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
-				++n;
-				if((*it) == thing)
-					return n;
-			}
+	if(thing->getItem()){
+		for(TileItemConstIterator it = items_topBegin(); it != items_topEnd(); ++it){
+			++n;
+			if((*it) == thing)
+				return n;
 		}
-		else{
-			n += items->getTopItemCount();
-		}
+	}
+	else{
+		n += items_topCount();
 	}
 
 	if(const CreatureVector* creatures = getCreatures()){
@@ -1282,17 +1139,15 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 		}
 	}
 
-	if(items){
-		if(thing->getItem()){
-			for(ItemVector::const_iterator it = items->getBeginDownItem(); it != items->getEndDownItem(); ++it){
-				++n;
-				if((*it) == thing)
-					return n;
-			}
+	if(thing->getItem()){
+		for(TileItemConstIterator it = items_downBegin(); it != items_downEnd(); ++it){
+			++n;
+			if((*it) == thing)
+				return n;
 		}
-		else{
-			n += items->getDownItemCount();
-		}
+	}
+	else{
+		n += items_downCount();
 	}
 
 	return -1;
@@ -1346,14 +1201,11 @@ Thing* Tile::__getThing(uint32_t index) const
 		--index;
 	}
 
-	const TileItemVector* items = getItemList();
-	if(items){
-		uint32_t topItemSize = items->getTopItemCount();
-		if(index < topItemSize)
-			return items->at(items->downItemCount + index);
+	uint32_t topItemSize = items_topCount();
+	if(index < topItemSize)
+		return items_get(items_downCount() + index);
 
-		index -= topItemSize;
-	}
+	index -= topItemSize;
 
 	if(const CreatureVector* creatures = getCreatures()){
 		if(index < (uint32_t)creatures->size())
@@ -1362,10 +1214,8 @@ Thing* Tile::__getThing(uint32_t index) const
 		index -= (uint32_t)creatures->size();
 	}
 
-	if(items){
-		if(index < items->getDownItemCount())
-			return items->at(index);
-	}
+	if(index < items_downCount())
+		return items_get(index);
 
 	return NULL;
 }
@@ -1403,23 +1253,14 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, const Cylinder* ol
 			}
 		}
 
-		if(hasFlag(TILEPROP_TELEPORT)){
-			Teleport* teleport = getTeleportItem();
-			if(teleport){
-				teleport->__addThing(actor, thing);
-			}
+		if(Teleport* teleport = getTeleportItem()){
+			teleport->__addThing(actor, thing);
 		}
-		else if(hasFlag(TILEPROP_TRASHHOLDER)){
-			TrashHolder* trashholder = getTrashHolder();
-			if(trashholder){
-				trashholder->__addThing(actor, thing);
-			}
+		else if(TrashHolder* trashholder = getTrashHolder()){
+			trashholder->__addThing(actor, thing);
 		}
-		else if(hasFlag(TILEPROP_MAILBOX)){
-			Mailbox* mailbox = getMailbox();
-			if(mailbox){
-				mailbox->__addThing(actor, thing);
-			}
+		else if(Mailbox* mailbox = getMailbox()){
+			mailbox->__addThing(actor, thing);
 		}
 	}
 
@@ -1475,7 +1316,6 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 		g_game.clearSpectatorCache();
 		CreatureVector* creatures = makeCreatures();
 		creatures->insert(creatures->begin(), creature);
-		++thingCount;
 	}
 	else{
 		Item* item = thing->getItem();
@@ -1483,38 +1323,32 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 		if(item == NULL)
 			return;
 
-		TileItemVector* items = makeItemList();
-
-		if(items && items->size() >= 0xFFFF){
+		if(items_count() >= 0xFFFF){
 			return /*RET_NOTPOSSIBLE*/;
 		}
 
 		if(item->isGroundTile()){
 			if(ground == NULL){
 				ground = item;
-				++thingCount;
 			}
 		}
 		else if(item->isAlwaysOnTop()){
 			bool isInserted = false;
-			for(ItemVector::iterator it = items->getBeginTopItem(); it != items->getEndTopItem(); ++it){
+			for(TileItemIterator it = items_topBegin(); it != items_topEnd(); ++it){
 				if(Item::items[(*it)->getID()].alwaysOnTopOrder > Item::items[item->getID()].alwaysOnTopOrder){
-					items->insert(it, item);
-					++thingCount;
+					items_insert(it, item);
 					isInserted = true;
 					break;
 				}
 			}
 
 			if(!isInserted){
-				items->push_back(item);
-				++thingCount;
+				items_push_back(item);
 			}
 		}
 		else{
-			items->insert(items->getBeginDownItem(), item);
-			++items->downItemCount;
-			++thingCount;
+			items_insert(items_downBegin(), item);
+			++downItemCount;
 		}
 
 		updateTileFlags(item, false);
@@ -1527,11 +1361,9 @@ bool Tile::hasItemWithProperty(uint32_t props) const
 		return true;
 	}
 
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-			if((*it)->hasProperty(props))
-				return true;
-		}
+	for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if((*it)->hasProperty(props))
+			return true;
 	}
 
 	return false;
@@ -1544,12 +1376,10 @@ bool Tile::hasItemWithProperty(Item* exclude, uint32_t props) const
 		return true;
 	}
 
-	if(const TileItemVector* items = getItemList()){
-		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-			Item* item = *it;
-			if(item != exclude && item->hasProperty(props))
-				return true;
-		}
+	for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		const Item* item = *it;
+		if(item != exclude && item->hasProperty(props))
+			return true;
 	}
 
 	return false;
@@ -1609,19 +1439,7 @@ void Tile::updateTileFlags(Item* item, bool removed)
 			setFlag(TILEPROP_HORIZONTAL);
 		}
 		if(item->getTeleport()){
-			setFlag(TILEPROP_TELEPORT);
-		}
-		if(item->getMagicField()){
-			setFlag(TILEPROP_MAGICFIELD);
-		}
-		if(item->getMailbox()){
-			setFlag(TILEPROP_MAILBOX);
-		}
-		if(item->getTrashHolder()){
-			setFlag(TILEPROP_TRASHHOLDER);
-		}
-		if(item->getBed()){
-			setFlag(TILEPROP_BED);
+			setFlag(TILEPROP_POSITIONCHANGE);
 		}
 	}
 	else{
@@ -1674,19 +1492,7 @@ void Tile::updateTileFlags(Item* item, bool removed)
 			resetFlag(TILEPROP_HORIZONTAL);
 		}
 		if(item->getTeleport()){
-			resetFlag(TILEPROP_TELEPORT);
-		}
-		if(item->getMagicField()){
-			resetFlag(TILEPROP_MAGICFIELD);
-		}
-		if(item->getMailbox()){
-			resetFlag(TILEPROP_MAILBOX);
-		}
-		if(item->getTrashHolder()){
-			resetFlag(TILEPROP_TRASHHOLDER);
-		}
-		if(item->getBed()){
-			resetFlag(TILEPROP_BED);
+			resetFlag(TILEPROP_POSITIONCHANGE);
 		}
 	}
 }

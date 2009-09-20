@@ -698,15 +698,12 @@ void ProtocolGame::GetTileDescription(const Tile* tile, NetworkMessage_ptr msg)
 			count++;
 		}
 
-		const TileItemVector* items = tile->getItemList();
 		const CreatureVector* creatures = tile->getCreatures();
 
-		ItemVector::const_iterator it;
-		if(items){
-			for(it = items->getBeginTopItem(); ((it != items->getEndTopItem()) && (count < 10)); ++it){
-				msg->AddItem(*it);
-				count++;
-			}
+		TileItemConstIterator it;
+		for(it = tile->items_topBegin(); ((it != tile->items_topEnd()) && (count < 10)); ++it){
+			msg->AddItem(*it);
+			count++;
 		}
 
 		if(creatures){
@@ -722,11 +719,9 @@ void ProtocolGame::GetTileDescription(const Tile* tile, NetworkMessage_ptr msg)
 			}
 		}
 
-		if(items){
-			for(it = items->getBeginDownItem(); ((it != items->getEndDownItem()) && (count < 10)); ++it){
-				msg->AddItem(*it);
-				count++;
-			}
+		for(it = tile->items_downBegin(); ((it != tile->items_downEnd()) && (count < 10)); ++it){
+			msg->AddItem(*it);
+			count++;
 		}
 	}
 }

@@ -1644,12 +1644,13 @@ int LuaState::lua_Tile_getCreatures()
 
 	newTable();
 	int n = 1;
-	for(CreatureVector::iterator iter = tile->getCreatures()->begin(),
-		end_iter = tile->getCreatures()->end();
-		iter != end_iter; ++iter, ++n)
-	{
-		pushThing(*iter);
-		setField(-2, n);
+	if(CreatureVector* creatures = tile->getCreatures()){
+		for(CreatureVector::iterator iter = creatures->begin(), end_iter = creatures->end();
+			iter != end_iter; ++iter, ++n)
+		{
+			pushThing(*iter);
+			setField(-2, n);
+		}
 	}
 	return 1;
 }
@@ -1660,15 +1661,10 @@ int LuaState::lua_Tile_getMoveableItems()
 
 	newTable();
 	int n = 1;
-	if(tile->getItemList()){
-		for(ItemVector::iterator iter = tile->getItemList()->begin(),
-			end_iter = tile->getItemList()->end();
-			iter != end_iter; ++iter)
-		{
-			if((*iter)->isMoveable()) {
-				pushThing(*iter);
-				setField(-2, n++);
-			}
+	for(TileItemIterator iter = tile->items_begin(), end_iter = tile->items_end(); iter != end_iter; ++iter){
+		if((*iter)->isMoveable()) {
+			pushThing(*iter);
+			setField(-2, n++);
 		}
 	}
 	return 1;
@@ -1685,14 +1681,9 @@ int LuaState::lua_Tile_getItems()
 		setField(-2, n++);
 	}
 
-	if(tile->getItemList()){
-		for(ItemVector::iterator iter = tile->getItemList()->begin(),
-			end_iter = tile->getItemList()->end();
-			iter != end_iter; ++iter, ++n)
-		{
-			pushThing(*iter);
-			setField(-2, n);
-		}
+	for(TileItemIterator iter = tile->items_begin(), end_iter = tile->items_end(); iter != end_iter; ++iter, ++n){
+		pushThing(*iter);
+		setField(-2, n);
 	}
 
 	return 1;

@@ -212,30 +212,50 @@ public:
 	void setDecaying(ItemDecayState_t decayState);
 	ItemDecayState_t getDecaying() const;
 
-	//
-	WeaponType_t getWeaponType() const {return items[id].weaponType;}
-	Weapon* getWeapon() const {return items[id].weaponInstance;}
-	Ammo_t	getAmmoType() const {return items[id].ammoType;}
-	int32_t	getShootRange() const {return items[id].shootRange;}
-
 	virtual double getWeight() const;
 	int getAttack() const;
 	int getArmor() const;
 	int getDefense() const;
 	int getExtraDef() const;
 	int getHitChance() const;
-	SlotPosition getSlotPosition() const {return items[id].slotPosition;}
-	SlotType getWieldPosition() const {return items[id].wieldPosition;}
-
-	bool isReadable() const {return items[id].canReadText;}
-	bool canWriteText() const {return items[id].canWriteText;}
-	uint16_t getMaxWriteLength() const {return items[id].maxTextLen;}
 
 	uint32_t getWorth() const;
 	void getLight(LightInfo& lightInfo);
 
-	// Item properties
+	const std::string& getName() const;
+	const std::string& getPluralName() const;
+	const std::string& getArticle() const;
+	std::string getLongName() const;
+
+	// get the number of items
+	uint16_t getItemCount() const {return count;}
+	void setItemCount(uint8_t n) {count = n;}
+
+	static uint32_t countByType(const Item* i, int checkType, bool multiCount);
+
+	void setDefaultSubtype();
+	bool hasSubType() const;
+	uint16_t getSubType() const;
+	void setSubType(uint16_t n);
+
+	void setDefaultDuration(){
+		uint32_t duration = getDefaultDuration();
+		if(duration != 0){
+			setDuration(duration);
+		}
+	}
+
+	bool canDecay();
+
+	virtual bool canRemove() const {return true;}
+	virtual bool canTransform() const {return true;}
+	virtual void onRemoved();
+	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;}
+
 	bool hasProperty(uint32_t props) const;
+
+	// "const" properties
+	ItemTypes_t getType() const {return items[id].type;}
 	bool blockSolid() const {return items[id].blockSolid;}
 	bool blockPathFind() const {return items[id].blockPathFind;}
 	bool blockProjectile() const {return items[id].blockProjectile;}
@@ -261,36 +281,19 @@ public:
 	bool floorChangeSouth() const {return items[id].floorChangeSouth;}
 	bool floorChangeEast() const {return items[id].floorChangeEast;}
 	bool floorChangeWest() const {return items[id].floorChangeWest;}
-
-	const std::string& getName() const;
-	const std::string& getPluralName() const;
-	const std::string& getArticle() const;
-	std::string getLongName() const;
-
-	// get the number of items
-	uint16_t getItemCount() const {return count;}
-	void setItemCount(uint8_t n) {count = n;}
-
-	static uint32_t countByType(const Item* i, int checkType, bool multiCount);
-
-	void setDefaultSubtype();
-	bool hasSubType() const;
-	uint16_t getSubType() const;
-	void setSubType(uint16_t n);
-
-	void setDefaultDuration(){
-		uint32_t duration = getDefaultDuration();
-		if(duration != 0){
-			setDuration(duration);
-		}
-	}
+	
+	int32_t getTopOrder() const {return items[id].alwaysOnTopOrder;}
+	SlotPosition getSlotPosition() const {return items[id].slotPosition;}
+	SlotType getWieldPosition() const {return items[id].wieldPosition;}
+	bool isReadable() const {return items[id].canReadText;}
+	bool canWriteText() const {return items[id].canWriteText;}
+	uint16_t getMaxWriteLength() const {return items[id].maxTextLen;}
 	uint32_t getDefaultDuration() const {return items[id].decayTime * 1000;}
-	bool canDecay();
 
-	virtual bool canRemove() const {return true;}
-	virtual bool canTransform() const {return true;}
-	virtual void onRemoved();
-	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;}
+	WeaponType_t getWeaponType() const {return items[id].weaponType;}
+	Weapon* getWeapon() const {return items[id].weaponInstance;}
+	Ammo_t	getAmmoType() const {return items[id].ammoType;}
+	int32_t	getShootRange() const {return items[id].shootRange;}
 
 protected:
 	// If weight description is needed from outside of item class
