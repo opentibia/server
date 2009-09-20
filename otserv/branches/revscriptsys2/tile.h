@@ -440,6 +440,8 @@ protected:
 	uint16_t downItemCount;
 	Position tilePos;
 	uint32_t m_flags;
+
+	friend class Map;
 };
 
 // Used for walkable tiles, where there is high likeliness of

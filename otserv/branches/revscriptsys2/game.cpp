@@ -5127,11 +5127,16 @@ void Game::shutdown()
 void Game::cleanup()
 {
 	//free memory
-	for(std::vector<Thing*>::iterator it = ToReleaseThings.begin(); it != ToReleaseThings.end(); ++it){
+	for(std::vector<Thing*>::iterator it = toReleaseThings.begin(); it != toReleaseThings.end(); ++it){
 		(*it)->unRef();
 	}
 
-	ToReleaseThings.clear();
+	toReleaseThings.clear();
+
+	//turn tiles into faster IndexedTiles (but takes more memory)
+	for(std::vector<Tile*>::iterator it = toIndexTiles.begin(); it != toIndexTiles.end(); ++it){
+		map->makeTileIndexed(*it);
+	}
 
 	for(DecayList::iterator it = toDecayItems.begin(); it != toDecayItems.end(); ++it){
 		int32_t dur = (*it)->getDuration();
@@ -5145,9 +5150,14 @@ void Game::cleanup()
 	toDecayItems.clear();
 }
 
+void Game::makeTileIndexed(Tile* tile)
+{
+	toIndexTiles.push_back(tile);
+}
+
 void Game::FreeThing(Thing* thing)
 {
-	ToReleaseThings.push_back(thing);
+	toReleaseThings.push_back(thing);
 }
 
 void Game::showUseHotkeyMessage(Player* player, Item* item)

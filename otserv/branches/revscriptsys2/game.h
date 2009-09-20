@@ -528,6 +528,7 @@ public:
 	void cleanup();
 	void shutdown();
 	void FreeThing(Thing* thing);
+	void makeTileIndexed(Tile* tile);
 	void unscriptThing(Thing* thing);
 	void unscript(void* v);
 
@@ -643,7 +644,8 @@ protected:
 
 	bool checkReload(Player* player, const std::string& text);
 
-	std::vector<Thing*> ToReleaseThings;
+	std::vector<Thing*> toReleaseThings;
+	std::vector<Tile*> toIndexTiles;
 
 	uint32_t checkLightEvent;
 	uint32_t checkCreatureEvent;

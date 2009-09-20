@@ -24,11 +24,10 @@
 #include "classes.h"
 #include "tile.h"
 
-// House tiles are almost always dynamic
-class HouseTile : public DynamicTile
+class HouseTile : public IndexedTile
 {
 public:
-	HouseTile(int x, int y, int z, House* _house);
+	HouseTile(uint16_t x, uint16_t y, uint16_t z, House* _house);
 	~HouseTile();
 
 	//cylinder implementations

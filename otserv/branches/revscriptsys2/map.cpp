@@ -24,6 +24,7 @@
 #include "iomapotbm.h"
 #include "creature.h"
 #include "combat.h"
+#include "housetile.h"
 #include "configmanager.h"
 
 extern ConfigManager g_config;
@@ -128,7 +129,7 @@ Tile* Map::getTile(const Position& pos)
 	return getTile(pos.x, pos.y, pos.z);
 }
 
-void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
+void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile, bool overwrite /*= false*/)
 {
 	if(x < 0 || x >= 0xFFFF || y < 0 || y >= 0xFFFF || z  < 0 || z >= MAP_MAX_LAYERS){
 		std::cout << "ERROR: Attempt to set tile on invalid coordinate " << Position(x, y, z) << "!" << std::endl;
@@ -166,7 +167,7 @@ void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
 	Floor* floor = leaf->createFloor(z);
 	uint32_t offsetX = x & FLOOR_MASK;
 	uint32_t offsetY = y & FLOOR_MASK;
-	if(!floor->tiles[offsetX][offsetY]){
+	if(overwrite || !floor->tiles[offsetX][offsetY]){
 		floor->tiles[offsetX][offsetY] = newtile;
 		newtile->qt_node = leaf;
 	}
@@ -186,6 +187,39 @@ void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
 		refreshTileMap[newtile] = rb;
 		*/
 	}
+}
+
+void Map::makeTileIndexed(Tile* tile)
+{
+	const Position& pos = tile->getPosition();
+
+	assert(tile->isHouseTile());
+	IndexedTile* indexedTile = new IndexedTile(pos.x, pos.y, pos.z);
+	indexedTile->downItemCount = tile->downItemCount;
+	indexedTile->m_flags = (tile->m_flags & ~(uint32_t)enums::TILEPROP_DYNAMIC_TILE);
+
+	if(tile->ground){
+		tile->ground->setParent(indexedTile);
+		indexedTile->ground = tile->ground;
+		tile->ground = NULL;
+	}
+
+	for(TileItemIterator it = tile->items_begin(); it != tile->items_end(); ++it){
+		(*it)->setParent(indexedTile);
+		indexedTile->items_push_back(*it);
+	}
+
+	if(CreatureVector* creatures = tile->getCreatures()){
+		CreatureVector* index_creatures = indexedTile->makeCreatures();
+
+		for(CreatureVector::iterator it = creatures->begin(); it != creatures->end(); ++it){
+			(*it)->setParent(indexedTile);
+			index_creatures->push_back(*it);
+		}
+	}
+
+	setTile(pos.x, pos.y, pos.z, indexedTile, true);
+	delete tile;
 }
 
 bool Map::placeCreature(const Position& centerPos, Creature* creature, bool extendedPos /*=false*/, bool forceLogin /*=false*/)

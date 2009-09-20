@@ -26,8 +26,8 @@
 
 extern Game g_game;
 
-HouseTile::HouseTile(int x, int y, int z, House* _house) :
-	DynamicTile(x, y, z)
+HouseTile::HouseTile(uint16_t x, uint16_t y, uint16_t z, House* _house) :
+	IndexedTile(x, y, z)
 {
 	house = _house;
 	setFlag(TILEPROP_HOUSE_TILE);
