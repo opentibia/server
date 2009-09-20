@@ -531,6 +531,7 @@ protected:
 		items.push_back(item);
 	}
 
+	friend class Map;
 	friend class Tile;
 };
 
@@ -636,6 +637,7 @@ protected:
 		items->push_back(item);
 	}
 
+	friend class Map;
 	friend class Tile;
 };
 
@@ -732,6 +734,7 @@ protected:
 		items.push_back(item);
 	}
 
+	friend class Map;
 	friend class Tile;
 };
 
