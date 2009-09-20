@@ -129,7 +129,7 @@ Tile* Map::getTile(const Position& pos)
 	return getTile(pos.x, pos.y, pos.z);
 }
 
-void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile, bool overwrite /*= false*/)
+void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
 {
 	if(x < 0 || x >= 0xFFFF || y < 0 || y >= 0xFFFF || z  < 0 || z >= MAP_MAX_LAYERS){
 		std::cout << "ERROR: Attempt to set tile on invalid coordinate " << Position(x, y, z) << "!" << std::endl;
@@ -167,7 +167,7 @@ void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile, bool overwrite
 	Floor* floor = leaf->createFloor(z);
 	uint32_t offsetX = x & FLOOR_MASK;
 	uint32_t offsetY = y & FLOOR_MASK;
-	if(overwrite || !floor->tiles[offsetX][offsetY]){
+	if(!floor->tiles[offsetX][offsetY]){
 		floor->tiles[offsetX][offsetY] = newtile;
 		newtile->qt_node = leaf;
 	}
@@ -189,37 +189,55 @@ void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile, bool overwrite
 	}
 }
 
-void Map::makeTileIndexed(Tile* tile)
+void Map::reAssignTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
 {
-	const Position& pos = tile->getPosition();
-
-	assert(tile->isHouseTile());
-	IndexedTile* indexedTile = new IndexedTile(pos.x, pos.y, pos.z);
-	indexedTile->downItemCount = tile->downItemCount;
-	indexedTile->m_flags = (tile->m_flags & ~(uint32_t)enums::TILEPROP_DYNAMIC_TILE);
-
-	if(tile->ground){
-		tile->ground->setParent(indexedTile);
-		indexedTile->ground = tile->ground;
-		tile->ground = NULL;
+	if(x < 0 || x >= 0xFFFF || y < 0 || y >= 0xFFFF || z  < 0 || z >= MAP_MAX_LAYERS){
+		return;
 	}
 
-	for(TileItemIterator it = tile->items_begin(); it != tile->items_end(); ++it){
-		(*it)->setParent(indexedTile);
-		indexedTile->items_push_back(*it);
-	}
-
-	if(CreatureVector* creatures = tile->getCreatures()){
-		CreatureVector* index_creatures = indexedTile->makeCreatures();
-
-		for(CreatureVector::iterator it = creatures->begin(); it != creatures->end(); ++it){
-			(*it)->setParent(indexedTile);
-			index_creatures->push_back(*it);
+	QTreeLeafNode* leaf = QTreeNode::getLeafStatic(&root, x, y);
+	if(leaf){
+		Floor* floor = leaf->getFloor(z);
+		if(floor){
+			floor->tiles[x & FLOOR_MASK][y & FLOOR_MASK] = newtile;
 		}
 	}
+}
 
-	setTile(pos.x, pos.y, pos.z, indexedTile, true);
-	delete tile;
+
+void Map::makeTileIndexed(Tile* tile)
+{
+	if(!tile->hasFlag(TILEPROP_INDEXED_TILE)){
+		const Position& pos = tile->getPosition();
+
+		IndexedTile* indexedTile = new IndexedTile(pos.x, pos.y, pos.z);
+		indexedTile->downItemCount = tile->downItemCount;
+		indexedTile->m_flags = (tile->m_flags & ~(uint32_t)enums::TILEPROP_DYNAMIC_TILE);
+		indexedTile->setFlag(TILEPROP_INDEXED_TILE);
+
+		if(tile->ground){
+			tile->ground->setParent(indexedTile);
+			indexedTile->ground = tile->ground;
+			tile->ground = NULL;
+		}
+
+		for(TileItemIterator it = tile->items_begin(); it != tile->items_end(); ++it){
+			(*it)->setParent(indexedTile);
+			indexedTile->items_push_back(*it);
+		}
+
+		if(CreatureVector* creatures = tile->getCreatures()){
+			CreatureVector* index_creatures = indexedTile->makeCreatures();
+
+			for(CreatureVector::iterator it = creatures->begin(); it != creatures->end(); ++it){
+				(*it)->setParent(indexedTile);
+				index_creatures->push_back(*it);
+			}
+		}
+
+		reAssignTile(pos.x, pos.y, pos.z, indexedTile);
+		delete tile;
+	}
 }
 
 bool Map::placeCreature(const Position& centerPos, Creature* creature, bool extendedPos /*=false*/, bool forceLogin /*=false*/)

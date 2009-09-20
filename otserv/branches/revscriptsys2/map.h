@@ -173,10 +173,9 @@ public:
 	* Set a single tile.
 	* \param a tile to set for the position
 	*/
-	void setTile(int32_t _x, int32_t _y, int32_t _z, Tile* newtile, bool overwrite = false);
-	void setTile(const Position& pos, Tile* newtile) {
-		setTile(pos.x, pos.y, pos.z, newtile);
-	}
+	void setTile(int32_t _x, int32_t _y, int32_t _z, Tile* newtile);
+	void setTile(const Position& pos, Tile* newtile) {setTile(pos.x, pos.y, pos.z, newtile);}
+	void reAssignTile(int32_t x, int32_t y, int32_t z, Tile* newtile);
 
 	void makeTileIndexed(Tile* tile);
 
