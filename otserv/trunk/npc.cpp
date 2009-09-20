@@ -2820,6 +2820,7 @@ std::string Npc::formatResponse(Creature* creature, const NpcState* npcState, co
 	replaceString(responseString, "|S2|", npcState->scriptVars.s2);
 	replaceString(responseString, "|S3|", npcState->scriptVars.s3);
 
+	replaceString(responseString, "|TEXT|", npcState->respondToText);
 
 	replaceString(responseString, "|SPELLNAME|", npcState->spellName);
 	if(npcState->spellName != ""){
