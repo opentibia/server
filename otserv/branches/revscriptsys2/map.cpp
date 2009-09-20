@@ -211,6 +211,7 @@ void Map::makeTileIndexed(Tile* tile)
 		const Position& pos = tile->getPosition();
 
 		IndexedTile* indexedTile = new IndexedTile(pos.x, pos.y, pos.z);
+		indexedTile->qt_node = tile->qt_node;
 		indexedTile->downItemCount = tile->downItemCount;
 		indexedTile->m_flags = (tile->m_flags & ~(uint32_t)enums::TILEPROP_DYNAMIC_TILE);
 		indexedTile->setFlag(TILEPROP_INDEXED_TILE);

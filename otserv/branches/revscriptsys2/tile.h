@@ -286,10 +286,6 @@ public:
 	ItemVector items_getListWithType(ItemTypes_t type) const;
 	ItemVector items_getListWithProps(ItemProp props) const;
 
-	TileItemIterator items_insert(TileItemIterator _where, Item* item);
-	TileItemIterator items_erase(TileItemIterator _pos);
-	void items_push_back(Item* item);
-
 	Item* items_get(size_t _pos);
 	Item* items_get(size_t _pos) const;
 	uint32_t items_count() const;
@@ -432,6 +428,10 @@ private:
 	bool is_indexed() const {return hasFlag(TILEPROP_INDEXED_TILE);}
 	bool is_dynamic() const {return hasFlag(TILEPROP_DYNAMIC_TILE);}
 
+	TileItemIterator items_insert(TileItemIterator _where, Item* item);
+	TileItemIterator items_erase(TileItemIterator _pos);
+	void items_push_back(Item* item);
+
 public:
 	QTreeLeafNode*	qt_node;
 	Item* ground;
@@ -501,6 +501,21 @@ public:
 		}
 		return vector;
 	}
+	Item* items_get(size_t _pos)
+	{
+		return items.at(_pos);
+	}
+	Item* items_get(size_t _pos) const
+	{
+		return items.at(_pos);
+	}
+	uint32_t items_count() const {return items.size();}
+
+	CreatureVector* getCreatures() {return &creatures;}
+	const CreatureVector* getCreatures() const {return &creatures;}
+	CreatureVector* makeCreatures() {return &creatures;}
+
+protected:
 	TileItemIterator items_insert(TileItemIterator _where, Item* item)
 	{
 		ItemVector::iterator it = items.insert(_where.getVectorPos(), item);
@@ -515,19 +530,8 @@ public:
 	{
 		items.push_back(item);
 	}
-	Item* items_get(size_t _pos)
-	{
-		return items.at(_pos);
-	}
-	Item* items_get(size_t _pos) const
-	{
-		return items.at(_pos);
-	}
-	uint32_t items_count() const {return items.size();}
 
-	CreatureVector* getCreatures() {return &creatures;}
-	const CreatureVector* getCreatures() const {return &creatures;}
-	CreatureVector* makeCreatures() {return &creatures;}
+	friend class Tile;
 };
 
 // For blocking tiles, where we very rarely actually have items
@@ -588,6 +592,24 @@ public:
 		}
 		return vector;
 	}
+	Item* items_get(size_t _pos)
+	{
+		assert(items);
+		return items->at(_pos);
+	}
+	Item* items_get(size_t _pos) const
+	{
+		assert(items);
+		return items->at(_pos);
+	}
+
+	uint32_t items_count() const {return (items ? (uint32_t)items->size() : 0);}
+
+	CreatureVector* getCreatures() {return creatures;}
+	const CreatureVector* getCreatures() const {return creatures;}
+	CreatureVector* makeCreatures() {return (creatures)? (creatures) : (creatures = new CreatureVector);}
+
+protected:
 	TileItemIterator items_insert(TileItemIterator _where, Item* item)
 	{
 		if(!items){
@@ -613,22 +635,8 @@ public:
 		}
 		items->push_back(item);
 	}
-	Item* items_get(size_t _pos)
-	{
-		assert(items);
-		return items->at(_pos);
-	}
-	Item* items_get(size_t _pos) const
-	{
-		assert(items);
-		return items->at(_pos);
-	}
 
-	uint32_t items_count() const {return (items ? (uint32_t)items->size() : 0);}
-
-	CreatureVector* getCreatures() {return creatures;}
-	const CreatureVector* getCreatures() const {return creatures;}
-	CreatureVector* makeCreatures() {return (creatures)? (creatures) : (creatures = new CreatureVector);}
+	friend class Tile;
 };
 
 // For tiles with alot of items on them for quicker searching
@@ -694,7 +702,21 @@ public:
 		*/
 		return vector;
 	}
+	Item* items_get(size_t _pos)
+	{
+		return items.at(_pos);
+	}
+	Item* items_get(size_t _pos) const
+	{
+		return items.at(_pos);
+	}
+	uint32_t items_count() const {return items.size();}
 
+	CreatureVector* getCreatures() {return &creatures;}
+	const CreatureVector* getCreatures() const {return &creatures;}
+	CreatureVector* makeCreatures() {return &creatures;}
+
+protected:
 	TileItemIterator items_insert(TileItemIterator _where, Item* item)
 	{
 		std::pair<ItemMultiIndexRndIterator, bool> it = items.insert(_where.getMultiIndexPos(), item);
@@ -709,19 +731,8 @@ public:
 	{
 		items.push_back(item);
 	}
-	Item* items_get(size_t _pos)
-	{
-		return items.at(_pos);
-	}
-	Item* items_get(size_t _pos) const
-	{
-		return items.at(_pos);
-	}
-	uint32_t items_count() const {return items.size();}
 
-	CreatureVector* getCreatures() {return &creatures;}
-	const CreatureVector* getCreatures() const {return &creatures;}
-	CreatureVector* makeCreatures() {return &creatures;}
+	friend class Tile;
 };
 
 inline Tile::Tile(uint16_t x, uint16_t y, uint16_t z) :
