@@ -465,7 +465,7 @@ public:
 	{
 		ItemVector vector;
 		if(ground && ground->getID() == itemId){
-			vector.push_back(const_cast<Item*>(ground));
+			vector.push_back(ground);
 		}
 
 		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
@@ -479,7 +479,7 @@ public:
 	{
 		ItemVector vector;
 		if(ground && ground->getActionId() == actionId){
-			vector.push_back(const_cast<Item*>(ground));
+			vector.push_back(ground);
 		}
 
 		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
@@ -493,7 +493,7 @@ public:
 	{
 		ItemVector vector;
 		if(ground && ground->getType() == type){
-			vector.push_back(const_cast<Item*>(ground));
+			vector.push_back(ground);
 		}
 
 		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
@@ -507,7 +507,7 @@ public:
 	{
 		ItemVector vector;
 		if(ground && ground->hasProperty(props)){
-			vector.push_back(const_cast<Item*>(ground));
+			vector.push_back(ground);
 		}
 
 		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
@@ -573,7 +573,7 @@ public:
 	{
 		ItemVector vector;
 		if(ground && ground->getID() == itemId){
-			vector.push_back(const_cast<Item*>(ground));
+			vector.push_back(ground);
 		}
 
 		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
@@ -587,7 +587,7 @@ public:
 	{
 		ItemVector vector;
 		if(ground && ground->getActionId() == actionId){
-			vector.push_back(const_cast<Item*>(ground));
+			vector.push_back(ground);
 		}
 		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->getActionId() == actionId){
@@ -600,7 +600,7 @@ public:
 	{
 		ItemVector vector;
 		if(ground && ground->getType() == type){
-			vector.push_back(const_cast<Item*>(ground));
+			vector.push_back(ground);
 		}
 
 		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
@@ -614,7 +614,7 @@ public:
 	{
 		ItemVector vector;
 		if(ground && ground->hasProperty(props)){
-			vector.push_back(const_cast<Item*>(ground));
+			vector.push_back(ground);
 		}
 
 		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
@@ -692,7 +692,7 @@ public:
 	ItemVector items_getListWithItemId(uint16_t itemId, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		if(ground && ground->getActionId() == itemId){
+		if(ground && ground->getID() == itemId){
 			vector.push_back(ground);
 		}
 
@@ -739,7 +739,7 @@ public:
 		ItemVector vector;
 		/*
 		if(ground && ground->hasProperty(props)){
-			vector.push_back(ground);
+			vector.push_back(const_cast<Item*>ground);
 		}
 		ItemMultiIndexPropIterator ic0,ic1;
 		boost::tuples::tie(ic0,ic1) = ItemMultiIndexProp(items).equal_range(type);
