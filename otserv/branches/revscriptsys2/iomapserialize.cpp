@@ -212,24 +212,15 @@ bool IOMapSerialize::loadItems(Database* db, DBResult* result, Cylinder* parent,
 		}
 		else{
 			if(tile){
-				//find this type in the tile
-				for(uint32_t i = 0; i < tile->getThingCount(); ++i){
-					Item* findItem = tile->__getThing(i)->getItem();
-
-					if(!findItem)
-						continue;
-
-					if(findItem->getID() == id){
-						item = findItem;
-						break;
-					}
-					else if(iType.isDoor() && findItem->getDoor()){
-						item = findItem;
-						break;
-					}
-					else if(iType.isBed() && findItem->getBed()){
-						item = findItem;
-						break;
+				ItemVector vector;
+				vector = tile->items_getListWithItemId(id, 1);
+				if(!vector.empty()){
+					item = vector[0];
+				}
+				else if(iType.type != ITEM_TYPE_NONE){
+					vector = tile->items_getListWithType(iType.type, 1);
+					if(!vector.empty()){
+						item = vector[0];
 					}
 				}
 			}
@@ -544,23 +535,15 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent, bool dep
 	else{
 		if(tile){
 			// Stationary items like doors/beds/blackboards/bookcases
-			for(uint32_t i = 0; i < tile->getThingCount(); ++i){
-				Item* findItem = tile->__getThing(i)->getItem();
-
-				if(!findItem)
-					continue;
-
-				if(findItem->getID() == id){
-					item = findItem;
-					break;
-				}
-				else if(iType.isDoor() && findItem->getDoor()){
-					item = findItem;
-					break;
-				}
-				else if(iType.isBed() && findItem->getBed()) {
-					item = findItem;
-					break;
+			ItemVector vector;
+			vector = tile->items_getListWithItemId(id, 1);
+			if(!vector.empty()){
+				item = vector[0];
+			}
+			else if(iType.type != ITEM_TYPE_NONE){
+				vector = tile->items_getListWithType(iType.type, 1);
+				if(!vector.empty()){
+					item = vector[0];
 				}
 			}
 		}

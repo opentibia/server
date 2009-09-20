@@ -489,21 +489,42 @@ bool OnMoveCreature::Event::check_match(const ScriptInformation& info)
 bool OnMoveCreature::Event::isMatch(const ScriptInformation& info, Tile* tile)
 {
 	if(tile){
-		int32_t j = tile->__getLastIndex();
-		Item* item = NULL;
-		for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
-			Thing* thing = tile->__getThing(i);
-			if(thing && (item = thing->getItem())){
-				switch(info.method) {
-					case FILTER_ITEMID:
-						return item->getID() == info.id;
-					case FILTER_ACTIONID:
-						return item->getActionId() == info.id;
-					case FILTER_UNIQUEID:
-						return item->getUniqueId() == info.id;
-					default: break;
+		switch(info.method){
+			case FILTER_ITEMID:
+			{
+				ItemVector vector = tile->items_getListWithItemId(info.id, 1);
+				return !vector.empty();
+				break;
+			}
+			case FILTER_ACTIONID:
+			{
+				ItemVector vector = tile->items_getListWithActionId(info.id, 1);
+				return !vector.empty();
+				break;
+			}
+			case FILTER_UNIQUEID:
+			{
+				//TODO: Remove? (merged with actionId)
+				int32_t j = tile->__getLastIndex();
+				Item* item = NULL;
+				for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
+					Thing* thing = tile->__getThing(i);
+					if(thing && (item = thing->getItem())){
+						switch(info.method) {
+							case FILTER_ITEMID:
+								return item->getID() == info.id;
+							case FILTER_ACTIONID:
+								return item->getActionId() == info.id;
+							case FILTER_UNIQUEID:
+								return item->getUniqueId() == info.id;
+							default: break;
+						}
+					}
 				}
 			}
+
+			default:
+				break;
 		}
 	}
 
@@ -609,27 +630,48 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 	}
 
 	if(info.isItemOnTile){
-		int32_t j = tile->__getLastIndex();
-		Item* itemOnTile = NULL;
-		for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
-			Thing* thing = tile->__getThing(i);
-			if(thing && (itemOnTile = thing->getItem()) && itemOnTile != item){
-				switch(info.method) {
-					case FILTER_ITEMID:
-						if(itemOnTile->getID() == info.id)
-							return true;
-						break;
-					case FILTER_ACTIONID:
-						if(itemOnTile->getActionId() == info.id)
-							return true;
-						break;
-					case FILTER_UNIQUEID:
-						if(itemOnTile->getUniqueId() == info.id)
-							return true;
-						break;
-					default: break;
+		switch(info.method){
+			case FILTER_ITEMID:
+			{
+				ItemVector vector = tile->items_getListWithItemId(info.id, 1);
+				return !vector.empty();
+				break;
+			}
+			case FILTER_ACTIONID:
+			{
+				ItemVector vector = tile->items_getListWithActionId(info.id, 1);
+				return !vector.empty();
+				break;
+			}
+			case FILTER_UNIQUEID:
+			{
+				//TODO: Remove? (merged with actionId)
+				int32_t j = tile->__getLastIndex();
+				Item* itemOnTile = NULL;
+				for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
+					Thing* thing = tile->__getThing(i);
+					if(thing && (itemOnTile = thing->getItem()) && itemOnTile != item){
+						switch(info.method) {
+							case FILTER_ITEMID:
+								if(itemOnTile->getID() == info.id)
+									return true;
+								break;
+							case FILTER_ACTIONID:
+								if(itemOnTile->getActionId() == info.id)
+									return true;
+								break;
+							case FILTER_UNIQUEID:
+								if(itemOnTile->getUniqueId() == info.id)
+									return true;
+								break;
+							default: break;
+						}
+					}
 				}
 			}
+
+			default:
+				break;
 		}
 	}
 	else{

@@ -281,10 +281,10 @@ public:
 	TileItemIterator items_end();
 	TileItemConstIterator items_end() const;
 
-	ItemVector items_getListWithItemId(uint16_t itemId) const;
-	ItemVector items_getListWithActionId(int32_t actionId) const;
-	ItemVector items_getListWithType(ItemTypes_t type) const;
-	ItemVector items_getListWithProps(ItemProp props) const;
+	ItemVector items_getListWithItemId(uint16_t itemId, int32_t max_result = -1) const;
+	ItemVector items_getListWithActionId(int32_t actionId, int32_t max_result = -1) const;
+	ItemVector items_getListWithType(ItemTypes_t type, int32_t max_result = -1) const;
+	ItemVector items_getListWithProps(ItemProp props, int32_t max_result = -1) const;
 
 	Item* items_get(size_t _pos);
 	Item* items_get(size_t _pos) const;
@@ -461,40 +461,56 @@ public:
 	TileItemIterator items_end() {return TileItemIterator(&items, items.end());}
 	TileItemConstIterator items_end() const {return TileItemConstIterator(&items, items.end());}
 
-	ItemVector items_getListWithItemId(uint16_t itemId) const
+	ItemVector items_getListWithItemId(uint16_t itemId, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if(ground && ground->getID() == itemId){
+			vector.push_back(const_cast<Item*>(ground));
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->getID() == itemId){
 				vector.push_back(const_cast<Item*>(*it));
 			}
 		}
 		return vector;
 	}
-	ItemVector items_getListWithActionId(int32_t actionId) const
+	ItemVector items_getListWithActionId(int32_t actionId, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if(ground && ground->getActionId() == actionId){
+			vector.push_back(const_cast<Item*>(ground));
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->getActionId() == actionId){
 				vector.push_back(const_cast<Item*>(*it));
 			}
 		}
 		return vector;
 	}
-	ItemVector items_getListWithType(ItemTypes_t type) const
+	ItemVector items_getListWithType(ItemTypes_t type, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if(ground && ground->getType() == type){
+			vector.push_back(const_cast<Item*>(ground));
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->getType() == type){
 				vector.push_back(const_cast<Item*>(*it));
 			}
 		}
 		return vector;
 	}
-	ItemVector items_getListWithProps(ItemProp props) const
+	ItemVector items_getListWithProps(ItemProp props, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if(ground && ground->hasProperty(props)){
+			vector.push_back(const_cast<Item*>(ground));
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->hasProperty(props)){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -553,40 +569,55 @@ public:
 	TileItemIterator items_end() {return (items ? TileItemIterator(items, items->end()) : TileItemIterator(&null_items, null_items.end()));}
 	TileItemConstIterator items_end() const {return (items ? TileItemConstIterator(items, items->end()) : TileItemConstIterator(&null_items, null_items.end()));}
 
-	ItemVector items_getListWithItemId(uint16_t itemId) const
+	ItemVector items_getListWithItemId(uint16_t itemId, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if(ground && ground->getID() == itemId){
+			vector.push_back(const_cast<Item*>(ground));
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->getID() == itemId){
 				vector.push_back(const_cast<Item*>(*it));
 			}
 		}
 		return vector;
 	}
-	ItemVector items_getListWithActionId(int32_t actionId) const
+	ItemVector items_getListWithActionId(int32_t actionId, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if(ground && ground->getActionId() == actionId){
+			vector.push_back(const_cast<Item*>(ground));
+		}
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->getActionId() == actionId){
 				vector.push_back(const_cast<Item*>(*it));
 			}
 		}
 		return vector;
 	}
-	ItemVector items_getListWithType(ItemTypes_t type) const
+	ItemVector items_getListWithType(ItemTypes_t type, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if(ground && ground->getType() == type){
+			vector.push_back(const_cast<Item*>(ground));
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->getType() == type){
 				vector.push_back(const_cast<Item*>(*it));
 			}
 		}
 		return vector;
 	}	
-	ItemVector items_getListWithProps(ItemProp props) const
+	ItemVector items_getListWithProps(ItemProp props, int32_t max_result = -1) const
 	{
 		ItemVector vector;
-		for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+		if(ground && ground->hasProperty(props)){
+			vector.push_back(const_cast<Item*>(ground));
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
 			if((*it)->hasProperty(props)){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -658,46 +689,61 @@ public:
 	TileItemIterator items_end() {return TileItemIterator(&items, items.end());}
 	TileItemConstIterator items_end() const {return TileItemConstIterator(&items, items.end());}
 
-	ItemVector items_getListWithItemId(uint16_t itemId) const
+	ItemVector items_getListWithItemId(uint16_t itemId, int32_t max_result = -1) const
 	{
 		ItemVector vector;
+		if(ground && ground->getActionId() == itemId){
+			vector.push_back(ground);
+		}
+
 		ItemMultiIndexItemIdIterator ic0,ic1;
 		boost::tuples::tie(ic0,ic1) = items.get<1>().equal_range(itemId);
-		while(ic0!=ic1){
+		while( (max_result == -1 || max_result < (int32_t)vector.size()) && ic0 != ic1){
 			vector.push_back(*ic0);
 			++ic0;
 		}
 		return vector;
 	}
-	ItemVector items_getListWithActionId(int32_t actionId) const
+	ItemVector items_getListWithActionId(int32_t actionId, int32_t max_result = -1) const
 	{
 		ItemVector vector;
+		if(ground && ground->getActionId() == actionId){
+			vector.push_back(ground);
+		}
+
 		ItemMultiIndexActionIdIterator ic0,ic1;
 		boost::tuples::tie(ic0,ic1) = items.get<2>().equal_range(actionId);
-		while(ic0!=ic1){
+		while( (max_result == -1 || max_result < (int32_t)vector.size()) && ic0 != ic1){
 			vector.push_back(*ic0);
 			++ic0;
 		}
 		return vector;
 	}
-	ItemVector items_getListWithType(ItemTypes_t type) const
+	ItemVector items_getListWithType(ItemTypes_t type, int32_t max_result = -1) const
 	{
 		ItemVector vector;
+		if(ground && ground->getType() == type){
+			vector.push_back(ground);
+		}
+
 		ItemMultiIndexTypeIterator ic0,ic1;
 		boost::tuples::tie(ic0,ic1) = items.get<3>().equal_range(type);
-		while(ic0!=ic1){
+		while( (max_result == -1 || max_result < (int32_t)vector.size()) && ic0 != ic1){
 			vector.push_back(*ic0);
 			++ic0;
 		}
 		return vector;
 	}
-	ItemVector items_getListWithProps(ItemProp props) const
+	ItemVector items_getListWithProps(ItemProp props, int32_t max_result = -1) const
 	{
 		ItemVector vector;
 		/*
+		if(ground && ground->hasProperty(props)){
+			vector.push_back(ground);
+		}
 		ItemMultiIndexPropIterator ic0,ic1;
 		boost::tuples::tie(ic0,ic1) = ItemMultiIndexProp(items).equal_range(type);
-		while(ic0!=ic1){
+		while( (max_result == -1 || max_result < (int32_t)vector.size()) && ic0 != ic1){
 			vector.push_back(*ic0);
 			++ic0;
 		}
@@ -813,44 +859,44 @@ inline TileItemIterator Tile::items_end()
 	return static_cast<StaticTile*>(this)->StaticTile::items_end();
 }
 
-inline ItemVector Tile::items_getListWithItemId(uint16_t itemId) const
+inline ItemVector Tile::items_getListWithItemId(uint16_t itemId, int32_t max_result /*= -1*/) const
 {
 	if(is_dynamic())
-		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithItemId(itemId);
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithItemId(itemId, max_result);
 	else if(is_indexed())
-		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithItemId(itemId);
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithItemId(itemId, max_result);
 
-	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithItemId(itemId);
+	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithItemId(itemId, max_result);
 }
 
-inline ItemVector Tile::items_getListWithActionId(int32_t actionId) const
+inline ItemVector Tile::items_getListWithActionId(int32_t actionId, int32_t max_result /*= -1*/) const
 {
 	if(is_dynamic())
-		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithActionId(actionId);
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithActionId(actionId, max_result);
 	else if(is_indexed())
-		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithActionId(actionId);
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithActionId(actionId, max_result);
 
-	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithActionId(actionId);
+	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithActionId(actionId, max_result);
 }
 
-inline ItemVector Tile::items_getListWithType(ItemTypes_t type) const
+inline ItemVector Tile::items_getListWithType(ItemTypes_t type, int32_t max_result /*= -1*/) const
 {
 	if(is_dynamic())
-		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithType(type);
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithType(type, max_result);
 	else if(is_indexed())
-		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithType(type);
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithType(type, max_result);
 
-	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithType(type);
+	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithType(type, max_result);
 }
 
-inline ItemVector Tile::items_getListWithProps(ItemProp props) const
+inline ItemVector Tile::items_getListWithProps(ItemProp props, int32_t max_result /*= -1*/) const
 {
 	if(is_dynamic())
-		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithProps(props);
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_getListWithProps(props, max_result);
 	else if(is_indexed())
-		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithProps(props);
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithProps(props, max_result);
 
-	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithProps(props);
+	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithProps(props, max_result);
 }
 
 inline TileItemConstIterator Tile::items_end() const

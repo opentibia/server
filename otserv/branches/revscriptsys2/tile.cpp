@@ -90,7 +90,7 @@ uint32_t Tile::getCreatureCount() const
 
 Teleport* Tile::getTeleportItem() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_TELEPORT);
+	ItemVector vector = items_getListWithType(ITEM_TYPE_TELEPORT, 1);
 	if(!vector.empty()){
 		return vector[0]->getTeleport();
 	}
@@ -99,7 +99,7 @@ Teleport* Tile::getTeleportItem() const
 
 MagicField* Tile::getFieldItem() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_MAGICFIELD);
+	ItemVector vector = items_getListWithType(ITEM_TYPE_MAGICFIELD, 1);
 	if(!vector.empty()){
 		return vector[0]->getMagicField();
 	}
@@ -109,7 +109,7 @@ MagicField* Tile::getFieldItem() const
 
 TrashHolder* Tile::getTrashHolder() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_TRASHHOLDER);
+	ItemVector vector = items_getListWithType(ITEM_TYPE_TRASHHOLDER, 1);
 	if(!vector.empty()){
 		return vector[0]->getTrashHolder();
 	}
@@ -119,7 +119,7 @@ TrashHolder* Tile::getTrashHolder() const
 
 Mailbox* Tile::getMailbox() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_MAILBOX);
+	ItemVector vector = items_getListWithType(ITEM_TYPE_MAILBOX, 1);
 	if(!vector.empty()){
 		return vector[0]->getMailbox();
 	}
@@ -129,7 +129,7 @@ Mailbox* Tile::getMailbox() const
 
 BedItem* Tile::getBedItem() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_BED);
+	ItemVector vector = items_getListWithType(ITEM_TYPE_BED, 1);
 	if(!vector.empty()){
 		return vector[0]->getBed();
 	}
@@ -791,7 +791,7 @@ void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 		else{
 			if(item->isMagicField()){
 				//remove old field item if exists
-				ItemVector vector = items_getListWithType(ITEM_TYPE_MAGICFIELD);
+				ItemVector vector = items_getListWithType(ITEM_TYPE_MAGICFIELD, 1);
 				if(!vector.empty()){
 					MagicField* oldField = vector[0]->getMagicField();
 					if(oldField->isReplaceable()){
