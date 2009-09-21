@@ -177,7 +177,7 @@ public:
 	void setTile(const Position& pos, Tile* newtile) {setTile(pos.x, pos.y, pos.z, newtile);}
 	void reAssignTile(int32_t x, int32_t y, int32_t z, Tile* newtile);
 
-	void makeTileIndexed(Tile* tile);
+	void makeTileIndexed(const Position& pos);
 
 	/**
 	* Place a creature on the map

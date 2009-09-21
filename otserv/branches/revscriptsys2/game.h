@@ -645,7 +645,7 @@ protected:
 	bool checkReload(Player* player, const std::string& text);
 
 	std::vector<Thing*> toReleaseThings;
-	std::vector<Tile*> toIndexTiles;
+	std::vector<Position> toIndexTiles;
 
 	uint32_t checkLightEvent;
 	uint32_t checkCreatureEvent;

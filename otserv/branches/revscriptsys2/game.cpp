@@ -5134,7 +5134,7 @@ void Game::cleanup()
 	toReleaseThings.clear();
 
 	//turn tiles into faster IndexedTiles (but takes more memory)
-	for(std::vector<Tile*>::iterator it = toIndexTiles.begin(); it != toIndexTiles.end(); ++it){
+	for(std::vector<Position>::iterator it = toIndexTiles.begin(); it != toIndexTiles.end(); ++it){
 		map->makeTileIndexed(*it);
 	}
 
@@ -5152,7 +5152,7 @@ void Game::cleanup()
 
 void Game::makeTileIndexed(Tile* tile)
 {
-	toIndexTiles.push_back(tile);
+	toIndexTiles.push_back(tile->getPosition());
 }
 
 void Game::FreeThing(Thing* thing)

@@ -205,9 +205,10 @@ void Map::reAssignTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
 }
 
 
-void Map::makeTileIndexed(Tile* tile)
+void Map::makeTileIndexed(const Position& pos)
 {
-	if(!tile->hasFlag(TILEPROP_INDEXED_TILE)){
+	Tile* tile = getTile(pos);
+	if(tile && !tile->hasFlag(TILEPROP_INDEXED_TILE)){
 		const Position& pos = tile->getPosition();
 
 		IndexedTile* indexedTile = new IndexedTile(pos.x, pos.y, pos.z);
