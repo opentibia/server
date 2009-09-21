@@ -156,16 +156,11 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	//3: doors etc
 	//4: creatures
 
-	/*
-	Might not return the right item?
-	ItemVector vector = items_getItemWithTopOrder(topOrder);
-	if(!vector.empty()){
-		return vector.back();
-	}
-	*/
-	for(TileItemIterator it = items_topEnd() - 1; it >= items_topBegin(); --it){
-		if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
-			return (*it);
+	if(items_topCount() > 0){
+		for(TileItemIterator it = items_topEnd() - 1; it >= items_topBegin(); --it){
+			if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
+				return (*it);
+			}
 		}
 	}
 
@@ -189,10 +184,12 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 		}
 	}
 
-	for(TileItemIterator it = items_topEnd() - 1; it >= items_topBegin(); --it){
-		const ItemType& iit = Item::items[(*it)->getID()];
-		if(!iit.lookThrough){
-			return (*it);
+	if(items_topCount() > 0){
+		for(TileItemIterator it = items_topEnd() - 1; it >= items_topBegin(); --it){
+			const ItemType& iit = Item::items[(*it)->getID()];
+			if(!iit.lookThrough){
+				return (*it);
+			}
 		}
 	}
 
