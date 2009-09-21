@@ -31,6 +31,8 @@
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/random_access_index.hpp>
 
+#define INDEXED_TILE_ITEM_COUNT 50
+
 typedef std::vector<Creature*> CreatureVector;
 typedef std::list<Creature*> SpectatorVec;
 typedef std::list<Player*> PlayerList;
@@ -483,7 +485,7 @@ public:
 			vector.push_back(ground);
 		}
 
-		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)vector.size() < max_result) ); ++it){
 			if((*it)->getID() == itemId){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -497,7 +499,7 @@ public:
 			vector.push_back(ground);
 		}
 
-		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)vector.size() < max_result) ); ++it){
 			if((*it)->getActionId() == actionId){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -511,7 +513,7 @@ public:
 			vector.push_back(ground);
 		}
 
-		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)vector.size() < max_result) ); ++it){
 			if((*it)->getType() == type){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -525,7 +527,7 @@ public:
 			vector.push_back(ground);
 		}
 
-		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)vector.size() < max_result) ); ++it){
 			if((*it)->hasProperty(props)){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -591,7 +593,7 @@ public:
 			vector.push_back(ground);
 		}
 
-		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)vector.size() < max_result) ); ++it){
 			if((*it)->getID() == itemId){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -604,7 +606,7 @@ public:
 		if(ground && ground->getActionId() == actionId){
 			vector.push_back(ground);
 		}
-		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)vector.size() < max_result) ); ++it){
 			if((*it)->getActionId() == actionId){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -618,7 +620,7 @@ public:
 			vector.push_back(ground);
 		}
 
-		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)vector.size() < max_result) ); ++it){
 			if((*it)->getType() == type){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -632,7 +634,7 @@ public:
 			vector.push_back(ground);
 		}
 
-		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)vector.size() < max_result) ); ++it){
 			if((*it)->hasProperty(props)){
 				vector.push_back(const_cast<Item*>(*it));
 			}
@@ -713,7 +715,7 @@ public:
 
 		ItemMultiIndexItemIdIterator ic0,ic1;
 		boost::tuples::tie(ic0,ic1) = items.get<1>().equal_range(itemId);
-		while( (max_result == -1 || max_result < (int32_t)vector.size()) && ic0 != ic1){
+		while( (max_result == -1 || (int32_t)vector.size() < max_result) && ic0 != ic1){
 			vector.push_back(*ic0);
 			++ic0;
 		}
@@ -728,7 +730,7 @@ public:
 
 		ItemMultiIndexActionIdIterator ic0,ic1;
 		boost::tuples::tie(ic0,ic1) = items.get<2>().equal_range(actionId);
-		while( (max_result == -1 || max_result < (int32_t)vector.size()) && ic0 != ic1){
+		while( (max_result == -1 || (int32_t)vector.size() < max_result) && ic0 != ic1){
 			vector.push_back(*ic0);
 			++ic0;
 		}
@@ -743,7 +745,7 @@ public:
 
 		ItemMultiIndexTypeIterator ic0,ic1;
 		boost::tuples::tie(ic0,ic1) = items.get<3>().equal_range(type);
-		while( (max_result == -1 || max_result < (int32_t)vector.size()) && ic0 != ic1){
+		while( (max_result == -1 || (int32_t)vector.size() < max_result) && ic0 != ic1){
 			vector.push_back(*ic0);
 			++ic0;
 		}

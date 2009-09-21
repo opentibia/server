@@ -1264,6 +1264,10 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, const Cylinder* ol
 
 	//release the reference to this item onces we are finished
 	g_game.FreeThing(thing);
+
+	if(!hasFlag(TILEPROP_INDEXED_TILE) && items_count() >= INDEXED_TILE_ITEM_COUNT){
+		g_game.makeTileIndexed(this);
+	}
 }
 
 void Tile::postRemoveNotification(Creature* actor, Thing* thing,  const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
