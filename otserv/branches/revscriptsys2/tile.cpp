@@ -1165,24 +1165,28 @@ int32_t Tile::__getLastIndex() const
 
 uint32_t Tile::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
 {
+	ItemVector vector = items_getListWithItemId(itemId);
+
+	const ItemType& it = Item::items[itemId];
+	if(!it.stackable && itemCount){
+		return vector.size();
+	}
+	
 	uint32_t count = 0;
-	Thing* thing = NULL;
-	for(uint32_t i = 0; i < getThingCount(); ++i){
-		thing = __getThing(i);
+	Item* item = NULL;
+	for(ItemVector::iterator it = vector.begin(); it != vector.end(); ++it){
+		item = *it;
+		if(subType == -1 || subType == item->getSubType()){
 
-		if(const Item* item = thing->getItem()){
-			if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
-
-				if(itemCount){
-					count+= item->getItemCount();
+			if(itemCount){
+				count+= item->getItemCount();
+			}
+			else{
+				if(item->isRune()){
+					count+= item->getCharges();
 				}
 				else{
-					if(item->isRune()){
-						count+= item->getCharges();
-					}
-					else{
-						count+= item->getItemCount();
-					}
+					count+= item->getItemCount();
 				}
 			}
 		}

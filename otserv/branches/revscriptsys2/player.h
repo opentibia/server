@@ -66,9 +66,6 @@ typedef std::list<Party*> PartyList;
 const int32_t MAX_STAMINA = 42 * 60 * 60 * 1000;
 const int32_t MAX_STAMINA_MINUTES = MAX_STAMINA / 60000;
 
-//////////////////////////////////////////////////////////////////////
-// Defines a player...
-
 class Player : public Creature, public Cylinder
 {
 public:
@@ -584,6 +581,9 @@ public:
 	virtual Creature* getCreature() {return this;}
 	virtual const Creature* getCreature() const {return this;}
 
+	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
+	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap, bool itemCount = true) const;
+
 protected:
 	void checkTradeState(const Item* item);
 	bool hasCapacity(const Item* item, uint32_t count) const;
@@ -621,8 +621,6 @@ protected:
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual int32_t __getFirstIndex() const;
 	virtual int32_t __getLastIndex() const;
-	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
-	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap, bool itemCount = true) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void __internalAddThing(Thing* thing);

@@ -1692,7 +1692,7 @@ int LuaState::lua_Tile_getItems()
 int LuaState::lua_Tile_getItemTypeCount() {
 	int32_t type = popInteger();
 	Tile* tile = popTile();
-	push(((Cylinder*)tile)->__getItemTypeCount(type));
+	push(tile->__getItemTypeCount(type));
 	return 1;
 }
 
@@ -2587,8 +2587,8 @@ int LuaState::lua_Player_getInventoryItem()
 int LuaState::lua_Player_getItemTypeCount()
 {
 	int32_t type = popInteger();
-	Player* p = popPlayer();
-	push(((Cylinder*)p)->__getItemTypeCount(type));
+	Player* player = popPlayer();
+	push(player->__getItemTypeCount(type));
 	return 1;
 }
 
