@@ -157,7 +157,7 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	//4: creatures
 
 	if(items_topCount() > 0){
-		for(TileItemIterator it = items_topEnd() - 1; it >= items_topBegin(); --it){
+		for(TileItemIterator it = items_topEnd() - 1; it > items_topBegin(); --it){
 			if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
 				return (*it);
 			}
@@ -185,7 +185,7 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 	}
 
 	if(items_topCount() > 0){
-		for(TileItemIterator it = items_topEnd() - 1; it >= items_topBegin(); --it){
+		for(TileItemIterator it = items_topEnd() - 1; it > items_topBegin(); --it){
 			const ItemType& iit = Item::items[(*it)->getID()];
 			if(!iit.lookThrough){
 				return (*it);
@@ -552,12 +552,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 
-		bool itemIsHangable = item->isHangable();
-
-		if(ground == NULL && !itemIsHangable){
-			return RET_NOTPOSSIBLE;
-		}
-
 		if(creatures && !creatures->empty() && item->blockSolid() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
 				if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
@@ -566,46 +560,39 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		if(hasFlag(TILEPROP_VERTICAL) || hasFlag(TILEPROP_HORIZONTAL)){
-			bool hasHangable = false;
-			bool supportHangable = false;
+		//TODO: Move to scripts(?)
+		if(item->isHangable() && (hasFlag(TILEPROP_VERTICAL) || hasFlag(TILEPROP_HORIZONTAL)) ){
+			for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
+				if((*it)->isHangable()){
+					return RET_NEEDEXCHANGE;
+				}
+			}
+		}
+		else{
+			if(ground == NULL){
+				return RET_NOTPOSSIBLE;
+			}
 
-			Thing* iithing = NULL;
-			for(uint32_t i = 0; i < getThingCount(); ++i){
-				iithing = __getThing(i);
-				if(const Item* iitem = iithing->getItem()){
-					const ItemType& iiType = Item::items[iitem->getID()];
-
-					if(iiType.isHangable){
-						hasHangable = true;
+			if(hasFlag(TILEPROP_BLOCKSOLID)){
+				if(item->isPickupable()){
+					ItemVector vector = items_getListWithProps(ITEMPROP_BLOCKSOLID);
+					if(ground->blockSolid()){
+						vector.push_back(ground);
 					}
-
-					if(iiType.isHorizontal || iiType.isVertical){
-						supportHangable = true;
-					}
-
-					if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
-						//
-					}
-					else if(iiType.blockSolid){
-						if(item->isPickupable()){
-							if(iiType.allowPickupable){
-								continue;
-							}
-
-							if(!iiType.hasHeight || iiType.pickupable || iiType.isBed()){
-								return RET_NOTENOUGHROOM;
-							}
+					for(ItemVector::iterator it = vector.begin(); it != vector.end(); ++it){
+						const ItemType& iType = Item::items[(*it)->getID()];
+						if(iType.allowPickupable){
+							continue;
 						}
-						else{
+
+						if(!iType.hasHeight || iType.pickupable || iType.isBed()){
 							return RET_NOTENOUGHROOM;
 						}
 					}
 				}
-			}
-
-			if(itemIsHangable && hasHangable && supportHangable){
-				return RET_NEEDEXCHANGE;
+				else{
+					return RET_NOTENOUGHROOM;
+				}
 			}
 		}
 	}
@@ -1075,6 +1062,11 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 			++n;
 			if((*it) == thing)
 				return n;
+
+			if(n >= 10){
+				//client cannot see items above stackpos 9 anyway
+				return std::numeric_limits<int32_t>::max();
+			}
 		}
 	}
 	else{
@@ -1096,6 +1088,11 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 			++n;
 			if((*it) == thing)
 				return n;
+
+			if(n >= 10){
+				//client cannot see items above stackpos 10 anyway
+				return std::numeric_limits<int32_t>::max();
+			}
 		}
 	}
 	else{

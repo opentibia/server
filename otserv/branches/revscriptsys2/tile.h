@@ -167,6 +167,23 @@ public:
 		}
 	}
 
+	template<class T, class T_iter, class E, class E_iter, class C>
+	bool operator>(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	{
+		if(vector){
+			return vector_pos > rhs.vector_pos;
+		}
+		else{
+			return multiIndex_pos > rhs.multiIndex_pos;
+		}
+	}
+
+	template<class T, class T_iter, class E, class E_iter, class C>
+	bool operator<(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	{
+		return !(*this > rhs);
+	}
+
 	C* operator*() const
 	{
 		if(vector){
@@ -265,8 +282,6 @@ private:
 
 typedef TileItemBaseIterator<ItemVector*, ItemVector::iterator, ItemMultiIndex*, ItemMultiIndex::iterator, Item> TileItemIterator;
 typedef TileItemBaseIterator<const ItemVector*, ItemVector::const_iterator, const ItemMultiIndex*, ItemMultiIndex::const_iterator, const Item> TileItemConstIterator;
-//typedef std::reverse_iterator<TileItemIterator> TileItemReverseIterator;
-//typedef std::reverse_iterator<TileItemConstIterator> TileItemConstReverseIterator;
 
 class Tile : public Cylinder
 {
@@ -736,18 +751,17 @@ public:
 	}
 	ItemVector items_getListWithProps(ItemProp props, int32_t max_result = -1) const
 	{
+		//TODO: Optimize if possible
 		ItemVector vector;
-		/*
 		if(ground && ground->hasProperty(props)){
-			vector.push_back(const_cast<Item*>ground);
+			vector.push_back(ground);
 		}
-		ItemMultiIndexPropIterator ic0,ic1;
-		boost::tuples::tie(ic0,ic1) = ItemMultiIndexProp(items).equal_range(type);
-		while( (max_result == -1 || max_result < (int32_t)vector.size()) && ic0 != ic1){
-			vector.push_back(*ic0);
-			++ic0;
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || max_result < (int32_t)vector.size()) ); ++it){
+			if((*it)->hasProperty(props)){
+				vector.push_back(const_cast<Item*>(*it));
+			}
 		}
-		*/
 		return vector;
 	}
 	Item* items_get(size_t _pos)
