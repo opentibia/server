@@ -57,6 +57,7 @@ extern Npcs g_npcs;
 extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
 extern CreatureEvents* g_creatureEvents;
+extern TalkActions* g_talkactions;
 
 TalkActions::TalkActions() :
 m_scriptInterface("TalkAction Interface")
@@ -325,8 +326,13 @@ bool TalkAction::executeSay(Player* player, const std::string& words, const std:
 
 bool TalkAction::placeNpc(Player* player, const std::string& words, const std::string& param)
 {
+	if(!player){
+		return false;
+	}
+	
 	Npc* npc = Npc::createNpc(param);
 	if(!npc){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "This NPC does not exist.");
 		return false;
 	}
 
@@ -338,10 +344,8 @@ bool TalkAction::placeNpc(Player* player, const std::string& words, const std::s
 	}
 	else{
 		delete npc;
-		if(player){
-			player->sendCancelMessage(RET_NOTENOUGHROOM);
-			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
-		}
+		player->sendCancelMessage(RET_NOTENOUGHROOM);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 	}
 
 	return false;
@@ -349,50 +353,50 @@ bool TalkAction::placeNpc(Player* player, const std::string& words, const std::s
 
 bool TalkAction::reloadInfo(Player* player, const std::string& words, const std::string& param)
 {
-	if(!player->hasFlag(PlayerFlag_CanReloadContent)){
+	if(!player || !player->hasFlag(PlayerFlag_CanReloadContent)){
 		return false;
 	}
 
 	if(param == "actions" || param == "action"){
 		g_actions->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded actions.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded actions.");
 	}
 	else if(param == "monsters" || param == "monster"){
 		g_monsters.reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded monsters.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded monsters.");
 	}
 	else if(param == "npc"){
 		g_npcs.reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded npcs.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded npcs.");
 	}
 	else if(param == "config"){
 		g_config.reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
 	}
-	/*else if(param == "talk" || param == "talkactions" || param == "talk actions" || param == "ta"){
+	else if(param == "talk" || param == "talkactions" || param == "talk actions" || param == "ta"){
 		g_talkactions->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded talk actions.");
-	}*/
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded talk actions.");
+	}
 	else if(param == "move" || param == "movement" || param == "movement actions"){
 		g_moveEvents->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded movement actions.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded movement actions.");
 	}
 	else if(param == "spells" || param == "spell"){
 		g_spells->reload();
 		g_monsters.reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded spells and monsters.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded spells and monsters.");
 	}
 	else if(param == "raids" || param == "raid"){
 		Raids::getInstance()->reload();
 		Raids::getInstance()->startup();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded raids.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded raids.");
 	}
 	else if(param == "creaturescripts" || param == "creature scripts" || param == "cs"){
 		g_creatureEvents->reload();
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded creature scripts.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded creature scripts.");
 	}
 	else{
-		if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Option not found.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Option not found.");
 	}
 
 	return true;
@@ -400,6 +404,10 @@ bool TalkAction::reloadInfo(Player* player, const std::string& words, const std:
 
 bool TalkAction::closeServer(Player* player, const std::string& words, const std::string& param)
 {
+	if(!player){
+		return false;
+	}
+	
 	g_game.setGameState(GAME_STATE_CLOSED);
 
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
@@ -416,84 +424,89 @@ bool TalkAction::closeServer(Player* player, const std::string& words, const std
 
 	bool payHouses = (param == "serversave");
 	g_game.saveServer(payHouses);
-
-	if(player){
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now closed.");
-	}
+	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now closed.");
 
 	return true;
 }
 
 bool TalkAction::openServer(Player* player, const std::string& words, const std::string& param)
 {
-	g_game.setGameState(GAME_STATE_NORMAL);
-	if(player){
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now open.");
+	if(!player){
+		return false;
 	}
+	
+	g_game.setGameState(GAME_STATE_NORMAL);
+	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now open.");
 
 	return true;
 }
 
 bool TalkAction::shutdownServer(Player* player, const std::string& words, const std::string& param)
 {
+	if(!player){
+		return false;
+	}
+	
 	g_game.setGameState(GAME_STATE_SHUTDOWN);
 	return true;
 }
 
 bool TalkAction::sellHouse(Player* player, const std::string& words, const std::string& param)
 {
-	if(player){
-		House* house = Houses::getInstance().getHouseByPlayerId(player->getGUID());
+	if(!player){
+		return false;
+	}
+	
+	House* house = Houses::getInstance().getHouseByPlayerId(player->getGUID());
 
-		if(!house){
-			player->sendCancel("You do not own any house.");
-			return false;
-		}
+	if(!house){
+		player->sendCancel("You do not own any house.");
+		return false;
+	}
 
-		if(!Houses::getInstance().payRent(player, house)){
-			player->sendCancel("You have to pay the rent before selling your house and you do not have enough money.");
-			return false;
-		}
+	if(!Houses::getInstance().payRent(player, house)){
+		player->sendCancel("You have to pay the rent before selling your house and you do not have enough money.");
+		return false;
+	}
+	
+	Player* tradePartner = g_game.getPlayerByName(param);
+	if(!(tradePartner && tradePartner != player)){
+		player->sendCancel("Trade player not found.");
+		return false;
+	}
 
-		Player* tradePartner = g_game.getPlayerByName(param);
-		if(!(tradePartner && tradePartner != player)){
-			player->sendCancel("Trade player not found.");
-			return false;
-		}
+	if(!tradePartner->isPremium() && g_config.getNumber(ConfigManager::HOUSE_ONLY_PREMIUM)){
+		player->sendCancel("Trade player doesn't have a premium account.");
+		return false;
+	}
 
-		if(!tradePartner->isPremium() && g_config.getNumber(ConfigManager::HOUSE_ONLY_PREMIUM)){
-			player->sendCancel("Trade player doesn't have a premium account.");
-			return false;
-		}
+	if(tradePartner->getPlayerInfo(PLAYERINFO_LEVEL) < g_config.getNumber(ConfigManager::HOUSE_LEVEL)){
+		player->sendCancel("Trade player level is too low.");
+		return false;
+	}
+	
+	if(Houses::getInstance().getHouseByPlayerId(tradePartner->getGUID())){
+		player->sendCancel("Trade player already owns a house.");
+		return false;
+	}
 
-		if(tradePartner->getPlayerInfo(PLAYERINFO_LEVEL) < g_config.getNumber(ConfigManager::HOUSE_LEVEL)){
-			player->sendCancel("Trade player level is too low.");
-			return false;
-		}
+	if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
+		player->sendCancel("Trade player is too far away.");
+		return false;
+	}
 
-		if(Houses::getInstance().getHouseByPlayerId(tradePartner->getGUID())){
-			player->sendCancel("Trade player already owns a house.");
-			return false;
-		}
+	Item* transferItem = house->getTransferItem();
+	if(!transferItem){
+		player->sendCancel("You can not trade this house.");
+		return false;
+	}
 
-		if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
-			player->sendCancel("Trade player is too far away.");
-			return false;
-		}
-
-		Item* transferItem = house->getTransferItem();
-		if(!transferItem){
-			player->sendCancel("You can not trade this house.");
-			return false;
-		}
-
-		transferItem->getParent()->setParent(player);
-		if(g_game.internalStartTrade(player, tradePartner, transferItem)){
-			return true;
-		}
-		else{
-			house->resetTransferItem();
-		}
+	transferItem->getParent()->setParent(player);
+	if(g_game.internalStartTrade(player, tradePartner, transferItem)){
+		return true;
+	}
+	else{
+		house->resetTransferItem();
 	}
 
 	return false;
@@ -502,8 +515,9 @@ bool TalkAction::sellHouse(Player* player, const std::string& words, const std::
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 bool TalkAction::serverDiag(Player* player, const std::string& words, const std::string& param)
 {
-	if(!player)
+	if(!player){
 		return false;
+	}
 
 	std::stringstream text;
 	text << "Server diagonostic:\n";
@@ -574,7 +588,6 @@ bool TalkAction::forceRaid(Player* player, const std::string& words, const std::
 	else{
 		g_dispatcher.addTask(createTask(
 		boost::bind(&Raid::executeRaidEvent, raid, event)));
-
 	}
 
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
@@ -589,6 +602,6 @@ bool TalkAction::refreshMap(Player* player, const std::string& words, const std:
 
 	g_game.proceduralRefresh();
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Refreshed map.");
-
+	
 	return true;
 }
