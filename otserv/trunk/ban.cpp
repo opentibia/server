@@ -159,8 +159,12 @@ bool BanManager::isPlayerBanished(const std::string& name) const
 bool BanManager::isAccountBanished(uint32_t accountId) const
 {
 	Database* db = Database::instance();
-
 	DBQuery query;
+	DBResult* result;
+
+	int32_t t = 0;
+
+	//Check for banishments
 	query <<
 		"SELECT "
 			"COUNT(*) AS `count` "
@@ -172,12 +176,27 @@ bool BanManager::isAccountBanished(uint32_t accountId) const
 			"`active` = 1 AND "
 			"(`expires` >= " << std::time(NULL) << " OR `expires` <= 0)";
 
-	DBResult* result;
-	if(!(result = db->storeQuery(query.str())))
-		return false;
+	if((result = db->storeQuery(query.str()))){
+		t += result->getDataInt("count");
+		db->freeResult(result);
+	}
+	
+	//Check if account is blocked
+	query.str("");
+	query <<
+		"SELECT "
+			"COUNT(*) AS `count` "
+		"FROM "
+			"`accounts` "
+		"WHERE "
+			"`id` = " << accountId << " AND "
+			"`blocked` = 1";
 
-	int t = result->getDataInt("count");
-	db->freeResult(result);
+	if((result = db->storeQuery(query.str()))){
+		t += result->getDataInt("count");
+		db->freeResult(result);
+	}
+	
 	return t > 0;
 }
 
