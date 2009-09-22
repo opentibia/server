@@ -90,50 +90,46 @@ uint32_t Tile::getCreatureCount() const
 
 Teleport* Tile::getTeleportItem() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_TELEPORT, 1);
-	if(!vector.empty()){
-		return vector[0]->getTeleport();
+	Item* item = items_getItemWithType(ITEM_TYPE_TELEPORT);
+	if(item){
+		return item->getTeleport();
 	}
 	return NULL;
 }
 
 MagicField* Tile::getFieldItem() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_MAGICFIELD, 1);
-	if(!vector.empty()){
-		return vector[0]->getMagicField();
+	Item* item = items_getItemWithType(ITEM_TYPE_MAGICFIELD);
+	if(item){
+		return item->getMagicField();
 	}
-
 	return NULL;
 }
 
 TrashHolder* Tile::getTrashHolder() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_TRASHHOLDER, 1);
-	if(!vector.empty()){
-		return vector[0]->getTrashHolder();
+	Item* item = items_getItemWithType(ITEM_TYPE_TRASHHOLDER);
+	if(item){
+		return item->getTrashHolder();
 	}
-
 	return NULL;
 }
 
 Mailbox* Tile::getMailbox() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_MAILBOX, 1);
-	if(!vector.empty()){
-		return vector[0]->getMailbox();
+	Item* item = items_getItemWithType(ITEM_TYPE_MAILBOX);
+	if(item){
+		return item->getMailbox();
 	}
-
 	return NULL;
 }
 
 BedItem* Tile::getBedItem() const
 {
-	ItemVector vector = items_getListWithType(ITEM_TYPE_BED, 1);
-	if(!vector.empty()){
-		return vector[0]->getBed();
+	Item* item = items_getItemWithType(ITEM_TYPE_BED);
+	if(item){
+		return item->getBed();
 	}
-
 	return NULL;
 }
 
@@ -576,9 +572,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(hasFlag(TILEPROP_BLOCKSOLID)){
 				if(item->isPickupable()){
 					ItemVector vector = items_getListWithProps(ITEMPROP_BLOCKSOLID);
-					if(ground->blockSolid()){
-						vector.push_back(ground);
-					}
 					for(ItemVector::iterator it = vector.begin(); it != vector.end(); ++it){
 						const ItemType& iType = Item::items[(*it)->getID()];
 						if(iType.allowPickupable){
@@ -775,9 +768,8 @@ void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 		else{
 			if(item->isMagicField()){
 				//remove old field item if exists
-				ItemVector vector = items_getListWithType(ITEM_TYPE_MAGICFIELD, 1);
-				if(!vector.empty()){
-					MagicField* oldField = vector[0]->getMagicField();
+				MagicField* oldField = getFieldItem();
+				if(oldField){
 					if(oldField->isReplaceable()){
 						int32_t oldFieldIndex = __getIndexOfThing(oldField);
 						__removeThing(actor, oldField, 1);
@@ -829,6 +821,8 @@ void Tile::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_
 
 	item->setID(itemId);
 	item->setSubType(count);
+
+	items_onItemModified(item);
 
 	updateTileFlags(item, false);
 

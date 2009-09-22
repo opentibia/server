@@ -492,14 +492,12 @@ bool OnMoveCreature::Event::isMatch(const ScriptInformation& info, Tile* tile)
 		switch(info.method){
 			case FILTER_ITEMID:
 			{
-				ItemVector vector = tile->items_getListWithItemId(info.id, 1);
-				return !vector.empty();
+				return (tile->items_getItemWithItemId(info.id) != NULL);
 				break;
 			}
 			case FILTER_ACTIONID:
 			{
-				ItemVector vector = tile->items_getListWithActionId(info.id, 1);
-				return !vector.empty();
+				return (tile->items_getItemWithActionId(info.id) != NULL);
 				break;
 			}
 			case FILTER_UNIQUEID:
@@ -633,14 +631,12 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 		switch(info.method){
 			case FILTER_ITEMID:
 			{
-				ItemVector vector = tile->items_getListWithItemId(info.id, 1);
-				return !vector.empty();
+				return (tile->items_getItemWithItemId(info.id) != NULL);
 				break;
 			}
 			case FILTER_ACTIONID:
 			{
-				ItemVector vector = tile->items_getListWithActionId(info.id, 1);
-				return !vector.empty();
+				return (tile->items_getItemWithActionId(info.id) != NULL);
 				break;
 			}
 			case FILTER_UNIQUEID:

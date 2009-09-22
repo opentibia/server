@@ -212,16 +212,9 @@ bool IOMapSerialize::loadItems(Database* db, DBResult* result, Cylinder* parent,
 		}
 		else{
 			if(tile){
-				ItemVector vector;
-				vector = tile->items_getListWithItemId(id, 1);
-				if(!vector.empty()){
-					item = vector[0];
-				}
-				else if(iType.type != ITEM_TYPE_NONE){
-					vector = tile->items_getListWithType(iType.type, 1);
-					if(!vector.empty()){
-						item = vector[0];
-					}
+				item = tile->items_getItemWithItemId(id);
+				if(!item && iType.type != ITEM_TYPE_NONE){
+					item = tile->items_getItemWithType(iType.type);
 				}
 			}
 		}
@@ -535,16 +528,9 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent, bool dep
 	else{
 		if(tile){
 			// Stationary items like doors/beds/blackboards/bookcases
-			ItemVector vector;
-			vector = tile->items_getListWithItemId(id, 1);
-			if(!vector.empty()){
-				item = vector[0];
-			}
-			else if(iType.type != ITEM_TYPE_NONE){
-				vector = tile->items_getListWithType(iType.type, 1);
-				if(!vector.empty()){
-					item = vector[0];
-				}
+			item = tile->items_getItemWithItemId(id);
+			if(!item && iType.type != ITEM_TYPE_NONE){
+				item = tile->items_getItemWithType(iType.type);
 			}
 		}
 
