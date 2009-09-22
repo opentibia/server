@@ -3388,9 +3388,6 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 		return 1;
 	}
 
-	//Close any eventual other shop window currently open.
-	player->closeShopWindow();
-
 	if(!npc){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
