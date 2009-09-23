@@ -3009,7 +3009,7 @@
 		<attribute key="slotType" value="necklace"/>
 		<attribute key="charges" value="200"/>
 		<attribute key="showcharges" value="1"/>
-		<attribute key="absorbPercentPoison" value="10"/>
+		<attribute key="absorbPercentEarth" value="10"/>
 	</item>
 	<item id="2171" article="a" name="platinum amulet">
 		<attribute key="description" value="It is an amulet of protection."/>
@@ -3135,7 +3135,7 @@
 	<item id="2194" article="a" name="mysterious fetish">
 		<attribute key="weight" value="490"/>
 	</item>
-	<item id="2195" name="boots of haste (speed +20)">
+	<item id="2195" name="boots of haste">
 		<attribute key="weight" value="750"/>
 		<attribute key="slotType" value="feet"/>
 		<attribute key="speed" value="20"/>
@@ -3186,7 +3186,7 @@
 		<attribute key="showcharges" value="1"/>
 		<attribute key="absorbPercentFire" value="8"/>
 	</item>
-	<item id="2202" article="a" name="stealth ring (invisibility)">
+	<item id="2202" article="a" name="stealth ring">
 		<attribute key="weight" value="100"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3195,7 +3195,7 @@
 		<attribute key="showduration" value="1"/>
 		<attribute key="invisible" value="1"/>
 	</item>
-	<item id="2203" article="a" name="power ring (fist fighting +6)">
+	<item id="2203" article="a" name="power ring">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3204,7 +3204,7 @@
 		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2204" article="an" name="energy ring (magic shield)">
+	<item id="2204" article="an" name="energy ring">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3213,7 +3213,7 @@
 		<attribute key="showduration" value="1"/>
 		<attribute key="manashield" value="1"/>
 	</item>
-	<item id="2205" article="a" name="life ring (faster regeneration)">
+	<item id="2205" article="a" name="life ring">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3222,10 +3222,10 @@
 		<attribute key="healthGain" value="2"/>
 		<attribute key="healthTicks" value="6000"/>
 		<attribute key="manaGain" value="8"/>
-		<attribute key="manaTicks" value="3000"/>
+		<attribute key="manaTicks" value="6000"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2206" article="a" name="time ring (speed +30)">
+	<item id="2206" article="a" name="time ring">
 		<attribute key="weight" value="90"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3273,7 +3273,7 @@
 		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2212" article="a" name="club ring (club fighting +4)">
+	<item id="2212" article="a" name="club ring">
 		<attribute key="weight" value="90"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3296,25 +3296,25 @@
 		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2215" article="a" name="dwarven ring (hard drinking)">
+	<item id="2215" article="a" name="dwarven ring">
 		<attribute key="weight" value="110"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2213"/>
 		<attribute key="suppressDrunk" value="1"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="3600"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2216" article="a" name="ring of healing (faster regeneration)">
+	<item id="2216" article="a" name="ring of healing">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="transformDeEquipTo" value="2214"/>
 		<attribute key="duration" value="480"/>
-		<attribute key="healthGain" value="1"/>
-		<attribute key="healthTicks" value="1000"/>
-		<attribute key="manaGain" value="4"/>
-		<attribute key="manaTicks" value="1000"/>
+		<attribute key="healthGain" value="6"/>
+		<attribute key="healthTicks" value="6000"/>
+		<attribute key="manaGain" value="24"/>
+		<attribute key="manaTicks" value="6000"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 	<item id="2217" article="a" name="book">
@@ -3382,7 +3382,7 @@
 		<attribute key="weight" value="500"/>
 	</item>
 	<item id="2238" name="worn leather boots">
-		<attribute key="weight" value="400"/>
+		<attribute key="weight" value="900"/>
 	</item>
 	<item id="2239" article="a" name="burnt scroll">
 		<attribute key="weight" value="40"/>
@@ -3721,7 +3721,7 @@
 		<attribute key="attack" value="24"/>
 		<attribute key="weaponType" value="club"/>
 	</item>
-	<item id="2322" article="a" name="voodoo doll (king)">
+	<item id="2322" article="a" name="voodoo doll">
 		<attribute key="description" value="It looks like a little king."/>
 		<attribute key="weight" value="650"/>
 	</item>
@@ -3766,7 +3766,7 @@
 	<item id="2333" article="a" name="letter to Markwin">
 		<attribute key="weight" value="50"/>
 	</item>
-	<item id="2334" article="a" name="Santa's Mailbox"/>
+	<item id="2334" name="Santa's Mailbox"/>
 	<item id="2335" article="a" name="helmet ornament">
 		<attribute key="description" value="This item seems to be a single part of a bigger object."/>
 		<attribute key="weight" value="160"/>
@@ -4386,6 +4386,7 @@
 		<attribute key="defense" value="12"/>
 		<attribute key="attack" value="21"/>
 		<attribute key="weaponType" value="club"/>
+		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="2440" article="a" name="daramanian waraxe">
 		<attribute key="weight" value="5250"/>
@@ -4566,7 +4567,7 @@
 		<attribute key="slotType" value="legs"/>
 	</item>
 	<item id="2470" name="golden legs">
-		<attribute key="weight" value="5600"/>
+		<attribute key="weight" value="65000"/>
 		<attribute key="armor" value="9"/>
 		<attribute key="slotType" value="legs"/>
 	</item>
@@ -4694,7 +4695,7 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="2495" name="demon legs">
-		<attribute key="weight" value="7000"/>
+		<attribute key="weight" value="70000"/>
 		<attribute key="armor" value="9"/>
 		<attribute key="slotType" value="legs"/>
 	</item>
@@ -4739,6 +4740,7 @@
 		<attribute key="weight" value="13000"/>
 		<attribute key="armor" value="10"/>
 		<attribute key="slotType" value="body"/>
+		<attribute key="absorbPercentPhysical" value="5"/>
 	</item>
 	<item id="2504" name="dwarven legs">
 		<attribute key="weight" value="4900"/>
@@ -5229,7 +5231,7 @@
 	<item id="2639" article="a" name="tic-tac-toe token" plural="o tic-tac-toe tokens">
 		<attribute key="weight" value="500"/>
 	</item>
-	<item id="2640" article="a" name="pair of soft boots (faster regeneration)">
+	<item id="2640" article="a" name="pair of soft boots">
 		<attribute key="weight" value="800"/>
 		<attribute key="slotType" value="feet"/>
 		<attribute key="decayTo" value="10021"/>
@@ -5265,7 +5267,7 @@
 		<attribute key="slotType" value="feet"/>
 	</item>
 	<item id="2646" name="golden boots">
-		<attribute key="weight" value="3200"/>
+		<attribute key="weight" value="31000"/>
 		<attribute key="armor" value="4"/>
 		<attribute key="slotType" value="feet"/>
 	</item>
@@ -5322,11 +5324,11 @@
 	</item>
 	<item id="2657" article="a" name="simple dress">
 		<attribute key="weight" value="2400"/>
-		<attribute key="armor" value="1"/>
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="2658" article="a" name="white dress">
 		<attribute key="weight" value="2400"/>
+		<attribute key="armor" value="1"/>
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="2659" article="a" name="ball gown">
@@ -5511,7 +5513,7 @@
 	</item>
 	<item id="2739" name="wheat"/>
 	<item id="2740" name="moonflowers"/>
-	<item id="2741" article="a" name="moonflower">
+	<item id="2741" article="a" name="moon flower">
 		<attribute key="weight" value="10"/>
 	</item>
 	<item id="2742" article="a" name="white flower"/>
@@ -5547,7 +5549,7 @@
 	<item id="2760" article="a" name="goat grass">
 		<attribute key="weight" value="80"/>
 	</item>
-	<item id="2761" article="an" name="holy orchid">
+	<item id="2761" article="a" name="holy orchid">
 		<attribute key="weight" value="250"/>
 	</item>
 	<item id="2762" article="a" name="rosebush"/>
@@ -5590,10 +5592,10 @@
 	<item id="2789" article="a" name="brown mushroom" plural="brown mushrooms">
 		<attribute key="weight" value="20"/>
 	</item>
-	<item id="2790" article="a" name="orange mushroom" plural="orange mushrooms">
+	<item id="2790" article="an" name="orange mushroom" plural="orange mushrooms">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="2791" article="a" name="wood mushroom" plural="wood mushrooms">
+	<item id="2791" article="an" name="wood mushroom" plural="wood mushrooms">
 		<attribute key="weight" value="30"/>
 	</item>
 	<item id="2792" article="a" name="dark mushroom" plural="dark mushrooms">
@@ -8984,7 +8986,7 @@
 	<item id="4006" article="an" name="orange tree"/>
 	<item id="4007" article="a" name="thread tree"/>
 	<item id="4008" article="a" name="jungle dweller bush"/>
-	<item id="4009" article="an" name="tower fern"/>
+	<item id="4009" article="a" name="tower fern"/>
 	<item id="4010" article="a" name="snake nest bush"/>
 	<item id="4011" article="a" name="green wig bush"/>
 	<item id="4012" article="a" name="lizards tongue bush"/>
@@ -10096,7 +10098,7 @@
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
-	<item id="4648" name="shallow water">	
+	<item id="4648" name="shallow water">
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
@@ -10161,14 +10163,19 @@
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4664" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4665" name="shallow water">
+		<attribute key="type" value="trashholder"/>
+		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
 	</item>
 	<item id="4666" name="shallow water">
+		<attribute key="type" value="trashholder"/>
 		<attribute key="effect" value="bluebubble"/>
 		<attribute key="allowpickupable" value="1"/>
 		<attribute key="fluidSource" value="water"/>
@@ -10508,7 +10515,7 @@
 	<item id="4837" name="stairs">
 		<attribute key="floorchange" value="down"/>
 	</item>
-	<item id="4838" name="whisper moss" plural="whisper moss">
+	<item id="4838" article="a" name="stone herb" plural="stone herbs">
 		<attribute key="weight" value="20"/>
 	</item>
 	<item id="4839" article="a" name="flask of cough syrup">
@@ -11974,12 +11981,9 @@
 	<item id="5669" article="a" name="voodoo skull">
 		<attribute key="weight" value="1000"/>
 	</item>
-	<item id="5669" article="a" name="mysterious voodoo skull">
-		<attribute key="weight" value="1000"/>
-	</item>
 	<item id="5670" article="an" name="enigmatic voodoo skull">
 		<attribute key="weight" value="1400"/>
-		<attribute key="decayTo" value="5791"/>
+		<attribute key="decayTo" value="5669"/>
 		<attribute key="duration" value="86400"/>
 		<attribute key="description" value="It is not time yet."/>
 	</item>
@@ -12208,8 +12212,8 @@
 	</item>
 	<item id="5787" article="a" name="training dummy"/>
 	<item id="5788" article="a" name="training dummy"/>
-	<item id="5789" article="an" name="stuck axe"/>
-	<item id="5790" article="an" name="stuck axe"/>
+	<item id="5789" article="a" name="stuck axe"/>
+	<item id="5790" article="a" name="stuck axe"/>
 	<item id="5791" article="a" name="stuffed dragon">
 		<attribute key="weight" value="850"/>
 	</item>
@@ -12239,13 +12243,12 @@
 		<attribute key="weight" value="1500"/>
 	</item>
 	<item id="5800" article="a" name="grappling hook"/>
-	<item id="5801" article="a" name="key ring"/>
 	<item id="5801" article="a" name="key ring">
 		<attribute key="weight" value="50"/>
 		<attribute key="containerSize" value="20"/>
 	</item>
 	<item id="5802" article="a" name="message in a bottle"  editorsuffix=" (Unknown weight)"/>
-	<item id="5803" article="an" name="arbalest (Range:6, Atk+2, Hit%+2)">
+	<item id="5803" article="an" name="arbalest">
 		<attribute key="description" value="It is a bit heavy due to the iron mounting, but very precise."/>
 		<attribute key="weight" value="9500"/>
 		<attribute key="weaponType" value="distance"/>
@@ -14772,7 +14775,7 @@
 		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>
-	<item id="6530" name="worn soft boots">
+	<item id="6530" article="a" name="worn soft boots">
 		<attribute key="description" value="Someone specialised in shoes might be able to repair them for you."/>
 		<attribute key="weight" value="800"/>
 	</item>
