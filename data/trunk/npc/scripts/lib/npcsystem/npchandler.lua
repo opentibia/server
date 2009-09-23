@@ -330,6 +330,26 @@ if(NpcHandler == nil) then
 		end
 	end
 
+	-- Makes sure the npc un-focuses the currently focused player
+	function NpcHandler:onExceedIdleTime(cid)
+		if(not self:isFocused(cid)) then
+			return
+		end
+
+		local callback = self:getCallback(CALLBACK_FAREWELL)
+		if(callback == nil or callback()) then
+			if(self:processModuleCallback(CALLBACK_FAREWELL)) then
+				if(self.queue == nil or not self.queue:greetNext()) then
+					local msg = self:getMessage(MESSAGE_IDLETIMEOUT)
+					local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
+					msg = self:parseMessage(msg, parseInfo)
+					self:say(msg, cid)
+					self:releaseFocus(cid)
+				end
+			end
+		end
+	end
+
 	-- Greets a new player.
 	function NpcHandler:greet(cid)
 		if(cid ~= 0) then
@@ -482,7 +502,7 @@ if(NpcHandler == nil) then
 							if(not self:isInRange(focus)) then
 								self:onWalkAway(focus)
 							elseif(os.time()-self.talkStart[focus] > self.idleTime) then
-								self:unGreet(focus)
+								self:onExceedIdleTime(focus)
 							else
 								self:updateFocus()
 							end
