@@ -3135,7 +3135,7 @@
 	<item id="2194" article="a" name="mysterious fetish">
 		<attribute key="weight" value="490"/>
 	</item>
-	<item id="2195" name="boots of haste">
+	<item id="2195" name="boots of haste (speed +20)">
 		<attribute key="weight" value="750"/>
 		<attribute key="slotType" value="feet"/>
 		<attribute key="speed" value="20"/>
@@ -3186,7 +3186,7 @@
 		<attribute key="showcharges" value="1"/>
 		<attribute key="absorbPercentFire" value="8"/>
 	</item>
-	<item id="2202" article="a" name="stealth ring">
+	<item id="2202" article="a" name="stealth ring (invisibility)">
 		<attribute key="weight" value="100"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3195,7 +3195,7 @@
 		<attribute key="showduration" value="1"/>
 		<attribute key="invisible" value="1"/>
 	</item>
-	<item id="2203" article="a" name="power ring">
+	<item id="2203" article="a" name="power ring (fist fighting +6)">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3204,7 +3204,7 @@
 		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2204" article="an" name="energy ring">
+	<item id="2204" article="an" name="energy ring (magic shield)">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3213,7 +3213,7 @@
 		<attribute key="showduration" value="1"/>
 		<attribute key="manashield" value="1"/>
 	</item>
-	<item id="2205" article="a" name="life ring">
+	<item id="2205" article="a" name="life ring (faster regeneration)">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3225,7 +3225,7 @@
 		<attribute key="manaTicks" value="6000"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2206" article="a" name="time ring">
+	<item id="2206" article="a" name="time ring (speed +30)">
 		<attribute key="weight" value="90"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3273,7 +3273,7 @@
 		<attribute key="duration" value="1800"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2212" article="a" name="club ring">
+	<item id="2212" article="a" name="club ring (club fighting +4)">
 		<attribute key="weight" value="90"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3296,7 +3296,7 @@
 		<attribute key="stopduration" value="1"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2215" article="a" name="dwarven ring">
+	<item id="2215" article="a" name="dwarven ring (hard drinking)">
 		<attribute key="weight" value="110"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -3305,7 +3305,7 @@
 		<attribute key="duration" value="3600"/>
 		<attribute key="showduration" value="1"/>
 	</item>
-	<item id="2216" article="a" name="ring of healing">
+	<item id="2216" article="a" name="ring of healing (faster regeneration)">
 		<attribute key="weight" value="80"/>
 		<attribute key="slotType" value="ring"/>
 		<attribute key="decayTo" value="0"/>
@@ -5231,7 +5231,7 @@
 	<item id="2639" article="a" name="tic-tac-toe token" plural="o tic-tac-toe tokens">
 		<attribute key="weight" value="500"/>
 	</item>
-	<item id="2640" article="a" name="pair of soft boots">
+	<item id="2640" article="a" name="pair of soft boots (faster regeneration)">
 		<attribute key="weight" value="800"/>
 		<attribute key="slotType" value="feet"/>
 		<attribute key="decayTo" value="10021"/>
