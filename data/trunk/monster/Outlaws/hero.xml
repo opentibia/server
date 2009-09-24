@@ -29,13 +29,13 @@
 		</defense>
 	</defenses>
 	<elements>
-		<element energyPercent="25"/>
-		<element icePercent="20"/>
-		<element firePercent="20"/>
-		<element holyPercent="20"/>
-		<element earthPercent="20"/>
-		<element physicalPercent="15"/>
-		<element deathPercent="-37"/>
+		<element energyPercent="45"/>
+		<element icePercent="10"/>
+		<element firePercent="30"/>
+		<element holyPercent="50"/>
+		<element earthPercent="50"/>
+		<element physicalPercent="30"/>
+		<element deathPercent="-20"/>
 	</elements>
 	<immunities>
 		<immunity paralyze="1"/>

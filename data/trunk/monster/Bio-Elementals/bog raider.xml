@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<monster name="Bog Raider" nameDescription="a bog raider" race="venom" experience="1300" speed="300" manacost="0">
-	<health now="800" max="800"/>
+<monster name="Bog Raider" nameDescription="a bog raider" race="venom" experience="800" speed="300" manacost="0">
+	<health now="1300" max="1300"/>
 	<look type="299" corpse="8951"/>
 	<targetchange interval="60000" chance="0"/>
 	<strategy attack="100" defense="0"/>
