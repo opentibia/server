@@ -228,13 +228,9 @@ void Map::makeTileIndexed(const Position& pos)
 			indexedTile->items_push_back(*it);
 		}
 
-		if(CreatureVector* creatures = tile->getCreatures()){
-			CreatureVector* index_creatures = indexedTile->makeCreatures();
-
-			for(CreatureVector::iterator it = creatures->begin(); it != creatures->end(); ++it){
-				(*it)->setParent(indexedTile);
-				index_creatures->push_back(*it);
-			}
+		for(CreatureIterator it = tile->creatures_begin(); it != tile->creatures_end(); ++it){
+			(*it)->setParent(indexedTile);
+			indexedTile->creatures_push_back(*it);
 		}
 
 		reAssignTile(pos.x, pos.y, pos.z, indexedTile);

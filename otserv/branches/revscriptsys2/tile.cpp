@@ -34,6 +34,7 @@ extern Game g_game;
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 Tile& Tile::null_tile = real_null_tile;
 ItemVector StaticTile::null_items;
+CreatureVector StaticTile::null_creatures;
 
 HouseTile* Tile::getHouseTile()
 {
@@ -79,13 +80,6 @@ bool Tile::hasHeight(uint32_t n) const
 	}
 
 	return false;
-}
-
-uint32_t Tile::getCreatureCount() const
-{
-	if(const CreatureVector* creatures = getCreatures())
-		return creatures->size();
-	return 0;
 }
 
 Teleport* Tile::getTeleportItem() const
@@ -135,13 +129,7 @@ BedItem* Tile::getBedItem() const
 
 Creature* Tile::getTopCreature()
 {
-	if(CreatureVector* creatures = getCreatures()){
-		if(!creatures->empty()){
-			return *creatures->begin();
-		}
-	}
-
-	return NULL;
+	return *creatures_begin();
 }
 
 Item* Tile::getItemByTopOrder(uint32_t topOrder)
@@ -165,11 +153,9 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 
 Thing* Tile::getTopVisibleThing(const Creature* creature)
 {
-	if(const CreatureVector* creatures = getCreatures()){
-		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-			if(creature->canSeeCreature(*cit)){
-				return (*cit);
-			}
+	for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
+		if(creature->canSeeCreature(*cit)){
+			return (*cit);
 		}
 	}
 
@@ -197,13 +183,11 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 
 Creature* Tile::getTopVisibleCreature(const Creature* creature)
 {
-	if(CreatureVector* creatures = getCreatures()){
-		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-			if((*cit)->getPlayer() && (*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
-				continue;
+	for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
+		if((*cit)->getPlayer() && (*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+			continue;
 
-			return (*cit);
-		}
+		return (*cit);
 	}
 
 	return NULL;
@@ -211,13 +195,11 @@ Creature* Tile::getTopVisibleCreature(const Creature* creature)
 
 const Creature* Tile::getTopVisibleCreature(const Creature* creature) const
 {
-	if(const CreatureVector* creatures = getCreatures()){
-		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-			if((*cit)->getPlayer() && (*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
-				continue;
+	for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
+		if((*cit)->getPlayer() && (*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+			continue;
 
-			return (*cit);
-		}
+		return (*cit);
 	}
 
 	return NULL;
@@ -382,8 +364,6 @@ void Tile::moveCreature(Creature* actor, Creature* creature, Cylinder* toCylinde
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {
-	const CreatureVector* creatures = getCreatures();
-
 	if(const Creature* creature = thing->getCreature()){
 		if(hasBitSet(FLAG_NOLIMIT, flags)){
 			return RET_NOERROR;
@@ -407,24 +387,22 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 
 			if(monster->canPushCreatures() && !monster->isSummon()){
-				if(creatures){
-					Creature* creature;
-					for(uint32_t i = 0; i < creatures->size(); ++i){
-						creature = creatures->at(i);
-						if(creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
-							continue;
+				Creature* creature;
+				for(uint32_t i = 0; i < creatures_count(); ++i){
+					creature = creatures_get(i);
+					if(creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+						continue;
 
-						if( !creature->getActor() ||
-							!creature->isPushable() ||
-							(creature->getActor()->isPlayerSummon()))
-						{
-							return RET_NOTPOSSIBLE;
-						}
+					if( !creature->getActor() ||
+						!creature->isPushable() ||
+						(creature->getActor()->isPlayerSummon()))
+					{
+						return RET_NOTPOSSIBLE;
 					}
 				}
 			}
-			else if(creatures && !creatures->empty()){
-				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			else if(!creatures_empty()){
+				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 						return RET_NOTENOUGHROOM;
 					}
@@ -452,7 +430,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				//1) Actor is immune
 				if(!monster->isImmune(combatType)){
 					//1) Actor is "strong" enough to handle the damage
-					//2) Actor is already afflicated by this type of condition
+					//3) Actor is already afflicated by this type of condition
 					if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
 						if( !(monster->canPushItems() ||
 							monster->hasCondition(Combat::DamageToConditionType(combatType), false)) ){
@@ -468,8 +446,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
-			if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
-				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			if(!creatures_empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 						return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 					}
@@ -500,8 +478,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 		else{
-			if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
-				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			if(!creatures_empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 						return RET_NOTENOUGHROOM;
 					}
@@ -548,8 +526,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 
-		if(creatures && !creatures->empty() && item->blockSolid() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
-			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+		if(!creatures_empty() && item->blockSolid() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+			for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 				if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 					return RET_NOTENOUGHROOM;
 				}
@@ -692,8 +670,7 @@ void Tile::__addThing(Creature* actor, int32_t index, Thing* thing)
 	if(creature){
 		g_game.clearSpectatorCache();
 		creature->setParent(this);
-		CreatureVector* creatures = makeCreatures();
-		creatures->insert(creatures->begin(), creature);
+		creatures_insert(creatures_begin(), creature);
 	}
 	else{
 		Item* item = thing->getItem();
@@ -855,7 +832,7 @@ void Tile::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 		--pos;
 	}
 
-	if(items_count() > 0 && !isInserted){
+	if(!isInserted && items_count() > 0){
 		int32_t topItemSize = items_topCount();
 		if(pos < topItemSize){
 			TileItemIterator it = items_topBegin();
@@ -870,20 +847,20 @@ void Tile::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 		pos -= topItemSize;
 	}
 
-	CreatureVector* creatures = getCreatures();
-	if(creatures){
-		if(!isInserted && pos < (int32_t)creatures->size()){
-	#ifdef __DEBUG__MOVESYS__
+	if(!isInserted && creatures_count() > 0){
+		if(pos >= (int32_t)creatures_count()){
+			pos -= (uint32_t)creatures_count();
+		}
+		else{
+#ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
 			DEBUG_REPORT
-	#endif
+#endif
 			return /*RET_NOTPOSSIBLE*/;
 		}
-
-		pos -= (uint32_t)creatures->size();
 	}
 
-	if(items_count() > 0 && !isInserted){
+	if(!isInserted && items_count() > 0){
 		int32_t downItemSize = items_downCount();
 		if(pos < downItemSize){
 			TileItemIterator it = items_begin();
@@ -918,23 +895,11 @@ void Tile::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 
 void Tile::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
-	Creature* creature = thing->getCreature();
-	if(creature){
-		CreatureVector* creatures = getCreatures();
-		if(creatures){
-			CreatureVector::iterator it = std::find(creatures->begin(), creatures->end(), thing);
-
-			if(it == creatures->end()){
-#ifdef __DEBUG__MOVESYS__
-				std::cout << "Failure: [Tile::__removeThing] creature not found" << std::endl;
-				DEBUG_REPORT
-#endif
-				return; //RET_NOTPOSSIBLE;
-			}
-
+	if(Creature* creature = thing->getCreature()){
+		CreatureIterator it = std::find(creatures_begin(), creatures_end(), thing);
+		if(it != creatures_end()){
 			g_game.clearSpectatorCache();
-			creatures->erase(it);
-			return;
+			creatures_erase(it);
 		}
 		else{
 #ifdef __DEBUG__MOVESYS__
@@ -944,8 +909,7 @@ void Tile::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 			return; //RET_NOTPOSSIBLE;
 		}
 	}
-	else{
-		Item* item = thing->getItem();
+	else if(Item* item = thing->getItem()){
 		if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__removeThing] item == NULL" << std::endl;
@@ -1033,10 +997,12 @@ void Tile::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 			}
 		}
 	}
+	else{
 #ifdef __DEBUG__MOVESYS__
-	std::cout << "Failure: [Tile::__removeThing] thing not found" << std::endl;
-	DEBUG_REPORT
+		std::cout << "Failure: [Tile::__removeThing] thing not found" << std::endl;
+		DEBUG_REPORT
 #endif
+	}
 }
 
 int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) const
@@ -1067,14 +1033,12 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 		n += items_topCount();
 	}
 
-	if(const CreatureVector* creatures = getCreatures()){
-		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-			if((*cit) == thing || player->canSeeCreature(*cit)){
-				++n;
-			}
-			if((*cit) == thing)
-				return n;
+	for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
+		if((*cit) == thing || player->canSeeCreature(*cit)){
+			++n;
 		}
+		if((*cit) == thing)
+			return n;
 	}
 
 	if(thing->getItem()){
@@ -1119,12 +1083,15 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 		n += items_topCount();
 	}
 
-	if(const CreatureVector* creatures = getCreatures()){
-		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+	if(thing->getCreature()){
+		for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 			++n;
 			if((*cit) == thing)
 				return n;
 		}
+	}
+	else{
+		n += creatures_count();
 	}
 
 	if(thing->getItem()){
@@ -1199,12 +1166,10 @@ Thing* Tile::__getThing(uint32_t index) const
 
 	index -= topItemSize;
 
-	if(const CreatureVector* creatures = getCreatures()){
-		if(index < (uint32_t)creatures->size())
-			return creatures->at(index);
+	if(index < (uint32_t)creatures_count())
+		return creatures_get(index);
 
-		index -= (uint32_t)creatures->size();
-	}
+	index -= (uint32_t)creatures_count();
 
 	if(index < items_downCount())
 		return items_get(index);
@@ -1310,8 +1275,7 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 	Creature* creature = thing->getCreature();
 	if(creature){
 		g_game.clearSpectatorCache();
-		CreatureVector* creatures = makeCreatures();
-		creatures->insert(creatures->begin(), creature);
+		creatures_insert(creatures_begin(), creature);
 	}
 	else{
 		Item* item = thing->getItem();

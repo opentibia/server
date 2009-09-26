@@ -734,39 +734,37 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 		bool bContinue = true;
 
 		if(canDoCombat(caster, iter_tile, params.isAggressive) == RET_NOERROR){
-			if(iter_tile->getCreatures()){
-				for(CreatureVector::iterator cit = iter_tile->getCreatures()->begin(),
-					cend = iter_tile->getCreatures()->end();
-					bContinue && cit != cend; ++cit)
-				{
-					if(params.targetCasterOrTopMost){
-						if(caster && caster->getTile() == iter_tile){
-							if(*cit == caster){
-								bContinue = false;
-							}
-						}
-						else if(*cit == iter_tile->getTopCreature()){
+			CreatureIterator cit, cend;
+			for(cit = iter_tile->creatures_begin(), cend = iter_tile->creatures_end();
+				bContinue && cit != cend; ++cit)
+			{
+				if(params.targetCasterOrTopMost){
+					if(caster && caster->getTile() == iter_tile){
+						if(*cit == caster){
 							bContinue = false;
 						}
-
-						if(bContinue){
-							continue;
-						}
+					}
+					else if(*cit == iter_tile->getTopCreature()){
+						bContinue = false;
 					}
 
-					if(!params.isAggressive || (caster != *cit && Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
-						func(caster, *cit, params, data);
+					if(bContinue){
+						continue;
 					}
-
-					// REVSCRIPT TODO EVENT CALL
-					//if(params.targetCallback){
-					//	params.targetCallback->onTargetCombat(caster, *cit);
-					//}
 				}
-			}
 
-			combatTileEffects(list, caster, iter_tile, params);
+				if(!params.isAggressive || (caster != *cit && Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
+					func(caster, *cit, params, data);
+				}
+
+				// REVSCRIPT TODO EVENT CALL
+				//if(params.targetCallback){
+				//	params.targetCallback->onTargetCombat(caster, *cit);
+				//}
+			}
 		}
+
+		combatTileEffects(list, caster, iter_tile, params);
 	}
 
 	postCombatEffects(caster, pos, params);

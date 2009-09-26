@@ -190,15 +190,13 @@ void House::setAccessList(uint32_t listId, const std::string& textlist)
 	typedef std::list<Player*> KickPlayerList;
 	KickPlayerList kickList;
 	HouseTileList::iterator it;
+	HouseTile* houseTile;
 	for(it = houseTiles.begin(); it != houseTiles.end(); ++it){
-		HouseTile* hTile = *it;
-		if(CreatureVector* creatures = hTile->getCreatures()){
-			CreatureVector::iterator cit;
-			for(cit = creatures->begin(); cit != creatures->end(); ++cit){
-				Player* player = (*cit)->getPlayer();
-				if(player && isInvited(player) == false){
-					kickList.push_back(player);
-				}
+		houseTile = (*it);
+		for(CreatureIterator cit = houseTile->creatures_begin(); cit != houseTile->creatures_end(); ++cit){
+			Player* player = (*cit)->getPlayer();
+			if(player && isInvited(player) == false){
+				kickList.push_back(player);
 			}
 		}
 	}
@@ -265,12 +263,12 @@ void House::cleanHouse()
 	transferToDepot();
 
 	PlayerVector to_kick;
+	HouseTile* houseTile;
 	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-		if(const CreatureVector* creatures = (*it)->getCreatures()){
-			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				if((*cit)->getPlayer()){
-					to_kick.push_back((*cit)->getPlayer());
-				}
+		houseTile = (*it);
+		for(CreatureConstIterator cit = houseTile->creatures_begin(); cit != houseTile->creatures_end(); ++cit){
+			if((*cit)->getPlayer()){
+				to_kick.push_back((*cit)->getPlayer());
 			}
 		}
 	}

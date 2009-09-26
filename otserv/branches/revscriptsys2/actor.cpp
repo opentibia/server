@@ -966,10 +966,10 @@ void Actor::pushItems(Tile* tile)
 	//start from the end to minimize the amount of traffic
 	uint32_t moveCount = 0;
 	uint32_t removeCount = 0;
-	int32_t downItemSize = tile->items_downCount();
+	int32_t downItemCount = tile->items_downCount();
 
-	for(int32_t i = downItemSize - 1; i >= 0; --i){
-		assert(i >= 0 && i < downItemSize);
+	for(int32_t i = downItemCount - 1; i >= 0; --i){
+		assert(i >= 0 && i < downItemCount);
 		Item* item = tile->items_get(i);
 		if(item && item->isMoveable() && (item->blockPathFind() || item->blockSolid() ) ){
 				if(moveCount < 20 && pushItem(item, 1)){
@@ -979,10 +979,6 @@ void Actor::pushItems(Tile* tile)
 					++removeCount;
 				}
 		}
-	}
-
-	if(removeCount > 0){
-		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 	}
 
 	if(removeCount > 0){
@@ -1020,11 +1016,13 @@ void Actor::pushCreatures(Tile* tile)
 {
 	//We can not use iterators here since we can push a creature to another tile
 	//which will invalidate the iterator.
-	if(CreatureVector* creatures = tile->getCreatures()){
-		uint32_t removeCount = 0;
+	uint32_t removeCount = 0;
+	int32_t creaturesCount = tile->creatures_count();
 
-		for(uint32_t i = 0; i < creatures->size();){
-			Actor* actor = creatures->at(i)->getActor();
+	for(int32_t i = creaturesCount - 1; i >= 0; --i){
+
+		for(uint32_t i = 0; i < tile->creatures_count();){
+			Actor* actor = tile->creatures_get(i)->getActor();
 
 			if(actor && actor->isPushable()){
 				if(pushCreature(actor)){

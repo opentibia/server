@@ -1644,13 +1644,9 @@ int LuaState::lua_Tile_getCreatures()
 
 	newTable();
 	int n = 1;
-	if(CreatureVector* creatures = tile->getCreatures()){
-		for(CreatureVector::iterator iter = creatures->begin(), end_iter = creatures->end();
-			iter != end_iter; ++iter, ++n)
-		{
-			pushThing(*iter);
-			setField(-2, n);
-		}
+	for(CreatureIterator it = tile->creatures_begin(), end_iter = tile->creatures_end(); it != end_iter; ++it, ++n){
+		pushThing(*it);
+		setField(-2, n);
 	}
 	return 1;
 }

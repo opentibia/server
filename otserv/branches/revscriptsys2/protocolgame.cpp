@@ -698,17 +698,15 @@ void ProtocolGame::GetTileDescription(const Tile* tile, NetworkMessage_ptr msg)
 			count++;
 		}
 
-		const CreatureVector* creatures = tile->getCreatures();
-
 		TileItemConstIterator it;
 		for(it = tile->items_topBegin(); ((it != tile->items_topEnd()) && (count < 10)); ++it){
 			msg->AddItem(*it);
 			count++;
 		}
 
-		if(creatures){
-			CreatureVector::const_iterator cit;
-			for(cit = creatures->begin(); ((cit != creatures->end()) && (count < 10)); ++cit){
+		if(!tile->creatures_empty()){
+			CreatureConstIterator cit;
+			for(cit = tile->creatures_begin(); ((cit != tile->creatures_end()) && (count < 10)); ++cit){
 				if(player->canSeeCreature(*cit)){
 					bool known;
 					uint32_t removedKnown;

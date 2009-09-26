@@ -34,8 +34,9 @@
 #define INDEXED_TILE_ITEM_COUNT 50
 
 typedef std::vector<Creature*> CreatureVector;
+typedef CreatureVector::iterator CreatureIterator;
+typedef CreatureVector::const_iterator CreatureConstIterator;
 typedef std::list<Creature*> SpectatorVec;
-typedef std::list<Player*> PlayerList;
 typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
 typedef std::vector<Item*> ItemVector;
 
@@ -307,9 +308,9 @@ public:
 	Item* items_getItemWithProps(ItemProp props) const;
 	ItemVector items_getListWithProps(ItemProp props, int32_t max_result = -1) const;
 
-	Item* items_get(size_t _pos);
-	Item* items_get(size_t _pos) const;
+	Item* items_get(size_t _pos) const {return const_cast<Item*>(*(items_begin() + _pos));}
 	uint32_t items_count() const;
+	bool items_empty() const {return items_count() == 0;}
 
 	TileItemIterator items_downBegin(){return items_begin();}
 	TileItemConstIterator items_downBegin() const {return items_begin();}
@@ -325,9 +326,16 @@ public:
 	Item* items_firstTop() { return (items_topCount() > 0 ? *(items_topEnd() - 1) : NULL);}
 	//
 
-	CreatureVector* getCreatures();
-	const CreatureVector* getCreatures() const;
-	CreatureVector* makeCreatures();
+	//
+	CreatureIterator creatures_begin();
+	CreatureConstIterator creatures_begin() const;
+	CreatureIterator creatures_end();
+	CreatureConstIterator creatures_end() const;
+
+	Creature* creatures_get(size_t _pos) const {return const_cast<Creature*>(*(creatures_begin() + _pos));}
+	uint32_t creatures_count() const;
+	bool creatures_empty() const {return creatures_count() == 0;}
+	//
 
 	HouseTile* getHouseTile();
 	const HouseTile* getHouseTile() const;
@@ -346,7 +354,7 @@ public:
 	const Creature* getTopVisibleCreature(const Creature* creature) const;
 	Item* getItemByTopOrder(uint32_t topOrder);
 
-	uint32_t getThingCount() const {return (ground ? 1 : 0) + items_count() + getCreatureCount();}
+	uint32_t getThingCount() const {return (ground ? 1 : 0) + items_count() + creatures_count();}
 	uint32_t getCreatureCount() const;
 
 	bool hasItemWithProperty(uint32_t props) const;
@@ -451,7 +459,11 @@ private:
 
 	TileItemIterator items_insert(TileItemIterator _where, Item* item);
 	TileItemIterator items_erase(TileItemIterator _pos);
-	void items_push_back(Item* item);
+	void items_push_back(Item* item) {items_insert(items_end(), item);}
+
+	CreatureIterator creatures_insert(CreatureIterator _where, Creature* creature);
+	CreatureIterator creatures_erase(CreatureIterator _pos);
+	void creatures_push_back(Creature* creature) {creatures_insert(creatures_end(), creature);}
 
 	//Should be called when itemId/actionId or any other data associated with ItemMultiIndex is modified.
 	void items_onItemModified(Item* item);
@@ -593,19 +605,14 @@ public:
 		}
 		return vector;
 	}
-	Item* items_get(size_t _pos)
-	{
-		return items.at(_pos);
-	}
-	Item* items_get(size_t _pos) const
-	{
-		return items.at(_pos);
-	}
 	uint32_t items_count() const {return items.size();}
 
-	CreatureVector* getCreatures() {return &creatures;}
-	const CreatureVector* getCreatures() const {return &creatures;}
-	CreatureVector* makeCreatures() {return &creatures;}
+	CreatureIterator creatures_begin() {return creatures.begin();}
+	CreatureConstIterator creatures_begin() const {return creatures.begin();}
+	CreatureIterator creatures_end() {return creatures.end();}
+	CreatureConstIterator creatures_end() const {return creatures.end();}
+
+	uint32_t creatures_count() const {return creatures.size();}
 
 protected:
 	TileItemIterator items_insert(TileItemIterator _where, Item* item)
@@ -618,10 +625,10 @@ protected:
 		ItemVector::iterator it = items.erase(_pos.getVectorPos());
 		return TileItemIterator(&items, it);
 	}
-	void items_push_back(Item* item)
-	{
-		items.push_back(item);
-	}
+
+	CreatureIterator creatures_insert(CreatureIterator _where, Creature* creature) {return creatures.insert(_where, creature);}
+	CreatureIterator creatures_erase(CreatureIterator _pos) {return creatures.erase(_pos);}
+
 	void items_onItemModified(Item* item){}
 
 	friend class Map;
@@ -636,6 +643,7 @@ class StaticTile : public Tile
 	CreatureVector*	creatures;
 
 	static ItemVector null_items;
+	static CreatureVector null_creatures;
 
 public:
 	StaticTile(uint16_t x, uint16_t y, uint16_t z);
@@ -753,22 +761,15 @@ public:
 		}
 		return vector;
 	}
-	Item* items_get(size_t _pos)
-	{
-		assert(items);
-		return items->at(_pos);
-	}
-	Item* items_get(size_t _pos) const
-	{
-		assert(items);
-		return items->at(_pos);
-	}
 
 	uint32_t items_count() const {return (items ? (uint32_t)items->size() : 0);}
 
-	CreatureVector* getCreatures() {return creatures;}
-	const CreatureVector* getCreatures() const {return creatures;}
-	CreatureVector* makeCreatures() {return (creatures)? (creatures) : (creatures = new CreatureVector);}
+	CreatureIterator creatures_begin() {return (creatures ? creatures->begin() : null_creatures.begin());}
+	CreatureConstIterator creatures_begin() const {return (creatures ? creatures->begin() : null_creatures.begin());}
+	CreatureIterator creatures_end() {return (creatures ? creatures->end() : null_creatures.end());}
+	CreatureConstIterator creatures_end() const {return (creatures ? creatures->end() : null_creatures.end());}
+
+	uint32_t creatures_count() const {return (creatures ? (uint32_t)creatures->size() : 0);}
 
 protected:
 	TileItemIterator items_insert(TileItemIterator _where, Item* item)
@@ -790,13 +791,22 @@ protected:
 		return TileItemIterator(items, it);
 	}
 
-	void items_push_back(Item* item)
+	CreatureIterator creatures_insert(CreatureIterator _where, Creature* creature)
 	{
-		if(!items){
-			items = new ItemVector();
+		if(!creatures){
+			creatures = new CreatureVector();
+			return creatures->insert(creatures->begin(), creature);
 		}
-		items->push_back(item);
+		else{
+			return creatures->insert(_where, creature);
+		}
 	}
+	CreatureIterator creatures_erase(CreatureIterator _pos)
+	{
+		assert(creatures);
+		return creatures->erase(_pos);
+	}
+
 	void items_onItemModified(Item* item){}
 
 	friend class Map;
@@ -928,19 +938,14 @@ public:
 		}
 		return vector;
 	}
-	Item* items_get(size_t _pos)
-	{
-		return items.at(_pos);
-	}
-	Item* items_get(size_t _pos) const
-	{
-		return items.at(_pos);
-	}
 	uint32_t items_count() const {return items.size();}
 
-	CreatureVector* getCreatures() {return &creatures;}
-	const CreatureVector* getCreatures() const {return &creatures;}
-	CreatureVector* makeCreatures() {return &creatures;}
+	CreatureIterator creatures_begin() {return creatures.begin();}
+	CreatureConstIterator creatures_begin() const {return creatures.begin();}
+	CreatureIterator creatures_end() {return creatures.end();}
+	CreatureConstIterator creatures_end() const {return creatures.end();}
+
+	uint32_t creatures_count() const {return creatures.size();}
 
 protected:
 	TileItemIterator items_insert(TileItemIterator _where, Item* item)
@@ -952,10 +957,6 @@ protected:
 	{
 		ItemMultiIndex::iterator it = items.erase(_pos.getMultiIndexPos());
 		return TileItemIterator(&items, it);
-	}
-	void items_push_back(Item* item)
-	{
-		items.push_back(item);
 	}
 
 	//Basically, we call NoOperationFunctor to make the MultiIndex think we are modifying the item
@@ -975,6 +976,9 @@ protected:
 		}
 	}
 
+	CreatureIterator creatures_insert(CreatureIterator _where, Creature* creature) {return creatures.insert(_where, creature);}
+	CreatureIterator creatures_erase(CreatureIterator _pos) {return creatures.erase(_pos);}
+
 	friend class Map;
 	friend class Tile;
 };
@@ -992,36 +996,6 @@ inline Tile::~Tile()
 {
 	// We don't need to free any memory as tiles are always deallocated
 	// and OS will free up anything left when the server is shutdown
-}
-
-inline CreatureVector* Tile::getCreatures()
-{
-	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::getCreatures();
-	else if(is_indexed())
-		return static_cast<IndexedTile*>(this)->IndexedTile::getCreatures();
-
-	return static_cast<StaticTile*>(this)->StaticTile::getCreatures();
-}
-
-inline const CreatureVector* Tile::getCreatures() const
-{
-	if(is_dynamic())
-		return static_cast<const DynamicTile*>(this)->DynamicTile::getCreatures();
-	else if(is_indexed())
-		return static_cast<const IndexedTile*>(this)->IndexedTile::getCreatures();
-
-	return static_cast<const StaticTile*>(this)->StaticTile::getCreatures();
-}
-
-inline CreatureVector* Tile::makeCreatures()
-{
-	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::makeCreatures();
-	else if(is_indexed())
-		return static_cast<IndexedTile*>(this)->IndexedTile::makeCreatures();
-
-	return static_cast<StaticTile*>(this)->StaticTile::makeCreatures();
 }
 
 inline TileItemIterator Tile::items_begin()
@@ -1164,16 +1138,6 @@ inline TileItemIterator Tile::items_erase(TileItemIterator _pos)
 	return static_cast<StaticTile*>(this)->StaticTile::items_erase(_pos);
 }
 
-inline void Tile::items_push_back(Item* item)
-{
-	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::items_push_back(item);
-	else if(is_indexed())
-		return static_cast<IndexedTile*>(this)->IndexedTile::items_push_back(item);
-
-	return static_cast<StaticTile*>(this)->StaticTile::items_push_back(item);
-}
-
 inline void Tile::items_onItemModified(Item* item)
 {
 	if(is_dynamic())
@@ -1182,26 +1146,6 @@ inline void Tile::items_onItemModified(Item* item)
 		return static_cast<IndexedTile*>(this)->IndexedTile::items_onItemModified(item);
 
 	return static_cast<StaticTile*>(this)->StaticTile::items_onItemModified(item);
-}
-
-inline Item* Tile::items_get(size_t _pos)
-{
-	if(is_dynamic())
-		return static_cast<DynamicTile*>(this)->DynamicTile::items_get(_pos);
-	else if(is_indexed())
-		return static_cast<IndexedTile*>(this)->IndexedTile::items_get(_pos);
-
-	return static_cast<StaticTile*>(this)->StaticTile::items_get(_pos);
-}
-
-inline Item* Tile::items_get(size_t _pos) const
-{
-	if(is_dynamic())
-		return static_cast<const DynamicTile*>(this)->DynamicTile::items_get(_pos);
-	else if(is_indexed())
-		return static_cast<const IndexedTile*>(this)->IndexedTile::items_get(_pos);
-
-	return static_cast<const StaticTile*>(this)->StaticTile::items_get(_pos);
 }
 
 inline uint32_t Tile::items_count() const
@@ -1213,6 +1157,78 @@ inline uint32_t Tile::items_count() const
 
 	return static_cast<const StaticTile*>(this)->StaticTile::items_count();
 }
+
+//
+inline CreatureIterator Tile::creatures_begin()
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::creatures_begin();
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::creatures_begin();
+
+	return static_cast<StaticTile*>(this)->StaticTile::creatures_begin();
+}
+
+inline CreatureConstIterator Tile::creatures_begin() const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::creatures_begin();
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::creatures_begin();
+
+	return static_cast<const StaticTile*>(this)->StaticTile::creatures_begin();
+}
+
+inline CreatureIterator Tile::creatures_end()
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::creatures_end();
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::creatures_end();
+
+	return static_cast<StaticTile*>(this)->StaticTile::creatures_end();
+}
+
+inline CreatureConstIterator Tile::creatures_end() const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::creatures_end();
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::creatures_end();
+
+	return static_cast<const StaticTile*>(this)->StaticTile::creatures_end();
+}
+
+inline uint32_t Tile::creatures_count() const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::creatures_count();
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::creatures_count();
+
+	return static_cast<const StaticTile*>(this)->StaticTile::creatures_count();
+}
+
+inline CreatureIterator Tile::creatures_insert(CreatureIterator _where, Creature* creature)
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::creatures_insert(_where, creature);
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::creatures_insert(_where, creature);
+
+	return static_cast<StaticTile*>(this)->StaticTile::creatures_insert(_where, creature);
+}
+
+inline CreatureIterator Tile::creatures_erase(CreatureIterator _pos)
+{
+	if(is_dynamic())
+		return static_cast<DynamicTile*>(this)->DynamicTile::creatures_erase(_pos);
+	else if(is_indexed())
+		return static_cast<IndexedTile*>(this)->IndexedTile::creatures_erase(_pos);
+
+	return static_cast<StaticTile*>(this)->StaticTile::creatures_erase(_pos);
+}
+//
 
 inline StaticTile::StaticTile(uint16_t x, uint16_t y, uint16_t z) :
 	Tile(x, y, z),
