@@ -833,9 +833,9 @@ void ProtocolGame::checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &remo
 	knownCreatureList.push_back(id);
 
 	// to many known creatures?
-	if(knownCreatureList.size() > 150){
+	if(knownCreatureList.size() > 250){
 		// lets try to remove one from the end of the list
-		for (int n = 0; n < 150; n++){
+		for (int n = 0; n < 250; n++){
 			removedKnown = knownCreatureList.front();
 
 			Creature* c = g_game.getCreatureByID(removedKnown);
