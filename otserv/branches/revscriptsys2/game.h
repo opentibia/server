@@ -524,6 +524,8 @@ public:
 	void onLoseCreature(Creature* creature, Creature* lost);
 	void onCreatureHear(Creature* listener, Creature* speaker, const SpeakClass& sclass, const std::string& text);
 	void onCreatureThink(Creature* creature, int interval);
+	bool onCreatureKill(Creature* creature, Creature* killer);
+	bool onCreatureDeath(Creature* creature, Item* corpse, Creature* killer);
 
 	void cleanup();
 	void shutdown();

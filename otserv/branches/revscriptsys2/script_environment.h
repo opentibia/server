@@ -93,6 +93,10 @@ namespace Script {
 			ListenerStringMap OnSpawn;
 			ListenerList OnAdvance;
 			ListenerItemMap OnMoveItem;
+			ListenerList OnKilled;
+			ListenerList OnKill;
+			ListenerList OnDeathBy;
+			ListenerList OnDeath;
 		} Generic;
 		SpecificListenerMap specific_listeners;
 

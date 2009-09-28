@@ -688,11 +688,15 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 
 bool OnMoveItem::Event::dispatch(Manager& state, Environment& environment)
 {
-	Script::ListenerMap::iterator list_iter = environment.Generic.OnMoveItem.ItemId.find(item->getID());
-	if(list_iter != environment.Generic.OnMoveItem.ItemId.end()){
-		if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
-			(this, state, environment, list_iter->second)){
-				return true;
+	Script::ListenerMap::iterator list_iter;
+
+	if(item->getUniqueId() != 0){
+		list_iter = environment.Generic.OnMoveItem.UniqueId.find(item->getUniqueId());
+		if(list_iter != environment.Generic.OnMoveItem.UniqueId.end()){
+			if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
+				(this, state, environment, list_iter->second)){
+					return true;
+			}
 		}
 	}
 
@@ -706,13 +710,11 @@ bool OnMoveItem::Event::dispatch(Manager& state, Environment& environment)
 		}
 	}
 
-	if(item->getUniqueId() != 0){
-		list_iter = environment.Generic.OnMoveItem.UniqueId.find(item->getUniqueId());
-		if(list_iter != environment.Generic.OnMoveItem.UniqueId.end()){
-			if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
-				(this, state, environment, list_iter->second)){
-					return true;
-			}
+	list_iter = environment.Generic.OnMoveItem.ItemId.find(item->getID());
+	if(list_iter != environment.Generic.OnMoveItem.ItemId.end()){
+		if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
+			(this, state, environment, list_iter->second)){
+				return true;
 		}
 	}
 
@@ -1187,4 +1189,161 @@ void OnAdvance::Event::update_instance(Manager& state, Environment& environment,
 	;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// OnKill Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature reaches 0 health
 
+
+OnKill::Event::Event(Creature* creature, Creature* killer) :
+	creature(creature),
+	killer(killer)
+{
+	propagate_by_default = true;
+}
+
+OnKill::Event::~Event()
+{
+}
+
+bool OnKill::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_ALL:
+			return true;
+		case FILTER_NAME:
+			return creature->getPlayer() == NULL && creature->getName() == info.name;
+		case FILTER_PLAYER:
+			return creature->getPlayer() != NULL;
+		case FILTER_KILLER_NAME:
+			return killer->getPlayer() == NULL && killer->getName() == info.name;
+		case FILTER_KILLER_PLAYER:
+			return killer->getPlayer() != NULL;
+		default: break;
+	}
+	return false;
+}
+
+bool OnKill::Event::dispatch(Manager& state, Environment& environment)
+{
+	ListenerList list;
+	
+	// Tied to killer
+	if(killer){
+		list = killer->getListeners(ON_KILL_LISTENER);
+		if(dispatchEvent<OnKill::Event, ScriptInformation>
+				(this, state, environment, list))
+			return true;
+	}
+
+	if(dispatchEvent<OnKill::Event, ScriptInformation>
+			(this, state, environment, environment.Generic.OnKill))
+		return true;
+	
+	// Tied to dying creature
+	list = creature->getListeners(ON_KILLED_LISTENER);
+	if(dispatchEvent<OnKill::Event, ScriptInformation>
+			(this, state, environment, list))
+		return true;
+
+	if(dispatchEvent<OnKill::Event, ScriptInformation>
+			(this, state, environment, environment.Generic.OnKilled))
+		return true;
+
+	return false;
+}
+
+void OnKill::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnKillEvent");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	state.pushThing(killer);
+	state.setField(-2, "killer");
+}
+
+void OnKill::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// OnDeath Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature dies (after death-delay)
+
+
+OnDeath::Event::Event(Creature* creature, Item* corpse, Creature* killer) :
+	creature(creature),
+	corpse(corpse),
+	killer(killer)
+{
+	propagate_by_default = true;
+}
+
+OnDeath::Event::~Event()
+{
+}
+
+bool OnDeath::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_ALL:
+			return true;
+		case FILTER_NAME:
+			return creature->getPlayer() == NULL && creature->getName() == info.name;
+		case FILTER_PLAYER:
+			return creature->getPlayer() != NULL;
+		case FILTER_KILLER_NAME:
+			return killer->getPlayer() == NULL && killer->getName() == info.name;
+		case FILTER_KILLER_PLAYER:
+			return killer->getPlayer() != NULL;
+		default: break;
+	}
+	return false;
+}
+
+bool OnDeath::Event::dispatch(Manager& state, Environment& environment)
+{
+	ListenerList list;
+	
+	// Tied to killer
+	if(killer){
+		list = killer->getListeners(ON_DEATH_BY_LISTENER);
+		if(dispatchEvent<OnDeath::Event, ScriptInformation>
+				(this, state, environment, list))
+			return true;
+	}
+
+	if(dispatchEvent<OnDeath::Event, ScriptInformation>
+			(this, state, environment, environment.Generic.OnDeathBy))
+		return true;
+	
+	// Tied to dying creature
+	list = creature->getListeners(ON_DEATH_LISTENER);
+	if(dispatchEvent<OnDeath::Event, ScriptInformation>
+			(this, state, environment, list))
+		return true;
+
+	if(dispatchEvent<OnDeath::Event, ScriptInformation>
+			(this, state, environment, environment.Generic.OnDeath))
+		return true;
+
+	return false;
+}
+
+void OnDeath::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnDeathEvent");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	state.pushThing(corpse);
+	state.setField(-2, "corpse");
+	state.pushThing(killer);
+	state.setField(-2, "killer");
+}
+
+void OnDeath::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}

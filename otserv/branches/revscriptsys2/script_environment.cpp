@@ -152,6 +152,18 @@ bool Environment::stopListener(ListenerType type, uint32_t id) {
 		case enums::ON_ADVANCE_LISTENER:
 			if(stopListener(Generic.OnAdvance, id))
 				return true;
+		case enums::ON_KILLED_LISTENER:
+			if(stopListener(Generic.OnKilled, id))
+				return true;
+		case enums::ON_KILL_LISTENER:
+			if(stopListener(Generic.OnKill, id))
+				return true;
+		case enums::ON_DEATH_BY_LISTENER:
+			if(stopListener(Generic.OnDeathBy, id))
+				return true;
+		case enums::ON_DEATH_LISTENER:
+			if(stopListener(Generic.OnDeath, id))
+				return true;
 		default:
 			break;
 	}

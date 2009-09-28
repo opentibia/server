@@ -127,6 +127,8 @@ void Manager::registerClasses() {
 	registerClass("OnSpawnEvent", "Event");
 	registerClass("OnThinkEvent", "Event");
 	registerClass("OnAdvanceEvent", "Event");
+	registerClass("OnKillEvent", "Event");
+	registerClass("OnDeathEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -294,7 +296,7 @@ void Manager::registerClasses() {
 	registerGlobalFunction("getPlayersByNameWildcard(string wild)", &Manager::lua_getPlayersByNameWildcard);
 
 	// Item
-	registerGlobalFunction("createItem(int newid[, int count])", &Manager::lua_createItem);
+	registerGlobalFunction("createItem(int newid[, int count = nil])", &Manager::lua_createItem);
 	registerMemberFunction("Item", "getItemID()", &Manager::lua_Item_getItemID);
 	registerMemberFunction("Item", "getLongName()", &Manager::lua_Item_getLongName);
 	registerMemberFunction("Item", "getCount()", &Manager::lua_Item_getCount);
@@ -393,57 +395,85 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("getConfigValue(string key)", &Manager::lua_getConfigValue);
 
 	// Register different events
+
+	// OnSay/OnHear
 	registerGlobalFunction("registerOnSay(string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerGenericEvent_OnSay);
 	registerGlobalFunction("registerOnCreatureSay(Creature who, string method, boolean case_sensitive, string filter, function callback)", &Manager::lua_registerSpecificEvent_OnSay);
 	registerGlobalFunction("registerOnHear(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnHear);
 
+	// OnUse
 	registerGlobalFunction("registerOnUseItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
 
+	// OnMove
 	registerGlobalFunction("registerOnCreatureMove(Creature who, function callback)", &Manager::lua_registerSpecificEvent_CreatureMove);
 	registerGlobalFunction("registerOnCreatureMoveIn(Creature who, string method, int itemid, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveIn);
 	registerGlobalFunction("registerOnCreatureMoveOut(Creature who, string method, int itemid, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveOut);
 	registerGlobalFunction("registerOnAnyCreatureMoveIn(string method, int itemid, function callback)", &Manager::lua_registerGenericEvent_CreatureMoveIn);
 	registerGlobalFunction("registerOnAnyCreatureMoveOut(string method, int itemid, function callback)", &Manager::lua_registerGenericEvent_CreatureMoveOut);
 
+	// OnTurn
 	registerGlobalFunction("registerOnAnyCreatureTurn(function callback)", &Manager::lua_registerGenericEvent_OnCreatureTurn);
 	registerGlobalFunction("registerOnCreatureTurn(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnCreatureTurn);
 
+	// On(De)Equip
 	registerGlobalFunction("registerOnEquipItem(string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
 	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
 	
+	// OnServerLoad
 	registerGlobalFunction("registerOnServerLoad(function callback)", &Manager::lua_registerGenericEvent_OnServerLoad);
 
+	// OnMoveItem
 	// Registering other OnMoveItem events are done through lua
 	registerGlobalFunction("registerOnMoveItem(string method, int filter, boolean isadd, boolean isontile, function callback)", &Manager::lua_registerGenericEvent_OnMoveItem);
 
+	// OnSpot / OnLose
 	registerGlobalFunction("registerOnSpotCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnSpotCreature);
 	registerGlobalFunction("registerOnLoseCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLoseCreature);
 	
+	// OnThink
 	registerGlobalFunction("registerOnCreatureThink(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnCreatureThink);
 	
+	// OnSpawn
 	registerGlobalFunction("registerOnSpawn(string cname, function callback)", &Manager::lua_registerGenericEvent_OnSpawn);
 
+	// OnJoin / OnLeave (channel)
 	registerGlobalFunction("registerOnJoinChannel(function callback)", &Manager::lua_registerGenericEvent_OnJoinChannel);
 	registerGlobalFunction("registerOnPlayerJoinChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnJoinChannel);
 	registerGlobalFunction("registerOnLeaveChannel(function callback)", &Manager::lua_registerGenericEvent_OnLeaveChannel);
 	registerGlobalFunction("registerOnPlayerLeaveChannel(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLeaveChannel);
 
+	// OnLogin / OnLogout
 	registerGlobalFunction("registerOnLogin(function callback)", &Manager::lua_registerGenericEvent_OnLogin);
 	registerGlobalFunction("registerOnLogout(function callback)", &Manager::lua_registerGenericEvent_OnLogout);
 	registerGlobalFunction("registerOnPlayerLogout(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLogout);
 
+	// OnLook
 	registerGlobalFunction("registerOnLookAtItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtItem);
 	registerGlobalFunction("registerOnLookAtCreature(Creature creature, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
 	registerGlobalFunction("registerOnPlayerLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
 	
+	// OnAdvance
 	registerGlobalFunction("registerOnAdvance([LevelType skillid = nil], function callback)", &Manager::lua_registerGenericEvent_OnAdvance);
 	registerGlobalFunction("registerOnPlayerAdvance(Player player [, LevelType skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
+
+	// OnKill
+	registerGlobalFunction("registerOnKill([string what = nil], function callback)", &Manager::lua_registerGenericEvent_OnKill);
+	registerGlobalFunction("registerOnCreatureKill(Creature killer, function callback)", &Manager::lua_registerSpecificEvent_OnKill);
+	registerGlobalFunction("registerOnKilled([string what = nil], function callback)", &Manager::lua_registerGenericEvent_OnKilled);
+	registerGlobalFunction("registerOnCreatureKilled(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnKilled);
+
+	registerGlobalFunction("registerOnDeathBy([string what = nil], function callback)", &Manager::lua_registerGenericEvent_OnDeathBy);
+	registerGlobalFunction("registerOnCreatureDeathBy(Creature killer, function callback)", &Manager::lua_registerSpecificEvent_OnDeathBy);
+	registerGlobalFunction("registerOnDeath([string what = nil], function callback)", &Manager::lua_registerGenericEvent_OnDeath);
+	registerGlobalFunction("registerOnCreatureDeath(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnDeath);
+
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
 	// Game/Map functions
 	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
 	registerGlobalFunction("sendMagicEffect(position where, int type)", &Manager::lua_sendMagicEffect);
+	registerGlobalFunction("sendAnimatedText(position where, int color, string text)", &Manager::lua_sendAnimatedText);
 	
 	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
 
@@ -1447,6 +1477,254 @@ int LuaState::lua_registerSpecificEvent_OnAdvance() {
 	return 1;
 }
 
+int LuaState::lua_registerGenericEvent_OnKill()
+{
+	// Tied to killing creature, either by name or to all kills
+	// Store callback
+	insert(-2);
+
+	OnKill::ScriptInformation si_onkill;
+
+	if(isNil(-1)){
+		si_onkill.method = OnKill::FILTER_ALL;
+		pop();
+	}
+	else{
+		std::string name = popString();
+		if(name == "Player"){
+			si_onkill.method = OnKill::FILTER_KILLER_PLAYER;
+		}
+		else{
+			si_onkill.method = OnKill::FILTER_KILLER_NAME;
+			si_onkill.name = name;
+		}
+	}
+
+	boost::any p(si_onkill);
+	Listener_ptr listener(new Listener(ON_KILL_LISTENER, p, *manager));
+
+	environment->Generic.OnKill.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnKill()
+{
+	// Tied to a specific creature, and run each time that creature kills something
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	OnKill::ScriptInformation si_onkill;
+	si_onkill.method = OnKill::FILTER_ALL;
+
+	boost::any p(si_onkill);
+	Listener_ptr listener(
+		new Listener(ON_KILL_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnKilled()
+{
+	// Tied to any dying creature, by name (or all dying creatures)
+	// Store callback
+	insert(-2);
+
+	OnKill::ScriptInformation si_onkill;
+
+	if(isNil(-1)){
+		si_onkill.method = OnKill::FILTER_ALL;
+		pop();
+	}
+	else{
+		std::string name = popString();
+		if(name == "Player"){
+			si_onkill.method = OnKill::FILTER_PLAYER;
+		}
+		else{
+			si_onkill.method = OnKill::FILTER_NAME;
+			si_onkill.name = name;
+		}
+	}
+
+	boost::any p(si_onkill);
+	Listener_ptr listener(new Listener(ON_KILLED_LISTENER, p, *manager));
+
+	environment->Generic.OnKilled.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnKilled()
+{
+	// Tied to a specific dying creature
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	OnKill::ScriptInformation si_onkill;
+	si_onkill.method = OnKill::FILTER_ALL;
+
+	boost::any p(si_onkill);
+	Listener_ptr listener(
+		new Listener(ON_KILLED_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnDeathBy()
+{
+	// Store callback
+	insert(-2);
+
+	OnDeath::ScriptInformation si_ondeath;
+	
+	if(isNil(-1)){
+		si_ondeath.method = OnDeath::FILTER_ALL;
+		pop();
+	}
+	else{
+		std::string name = popString();
+		if(name == "Player"){
+			si_ondeath.method = OnDeath::FILTER_KILLER_PLAYER;
+		}
+		else{
+			si_ondeath.method = OnDeath::FILTER_KILLER_NAME;
+			si_ondeath.name = name;
+		}
+	}
+
+	boost::any p(si_ondeath);
+	Listener_ptr listener(new Listener(ON_DEATH_BY_LISTENER, p, *manager));
+
+	environment->Generic.OnDeathBy.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnDeathBy()
+{
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	OnDeath::ScriptInformation si_ondeath;
+	si_ondeath.method = OnDeath::FILTER_ALL;
+
+	boost::any p(si_ondeath);
+	Listener_ptr listener(
+		new Listener(ON_DEATH_BY_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnDeath()
+{
+	// Store callback
+	insert(-2);
+
+	OnDeath::ScriptInformation si_ondeath;
+
+	if(isNil(-1)){
+		si_ondeath.method = OnDeath::FILTER_ALL;
+		pop();
+	}
+	else{
+		std::string name = popString();
+		if(name == "Player"){
+			si_ondeath.method = OnDeath::FILTER_PLAYER;
+		}
+		else{
+			si_ondeath.method = OnDeath::FILTER_NAME;
+			si_ondeath.name = name;
+		}
+	}
+
+	boost::any p(si_ondeath);
+	Listener_ptr listener(new Listener(ON_DEATH_LISTENER, p, *manager));
+
+	environment->Generic.OnDeath.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnDeath()
+{
+	// Store callback
+	insert(-2);
+
+	Creature* who = popCreature();
+
+	OnDeath::ScriptInformation si_ondeath;
+	si_ondeath.method = OnDeath::FILTER_ALL;
+
+	boost::any p(si_ondeath);
+	Listener_ptr listener(
+		new Listener(ON_DEATH_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stop listener function
 
@@ -2349,7 +2627,7 @@ int LuaState::lua_Actor_getManaCost()
 
 int LuaState::lua_Actor_setTarget()
 {
-	Creature* target = popCreature();
+	Creature* target = popCreature(ERROR_PASS);
 	Actor* actor = popActor();
 	pushBoolean(actor->setAttackedCreature(target));
 	return 1;
@@ -2795,7 +3073,10 @@ int LuaState::lua_createItem()
 {
 	int32_t count = -1;
 	if(getStackSize() > 1) {
-		count = popInteger();
+		if(!isNil(-1))
+			count = popInteger();
+		else
+			pop();
 	}
 	int32_t id = popUnsignedInteger();
 
@@ -4494,6 +4775,20 @@ int LuaState::lua_sendMagicEffect()
 	g_game.addMagicEffect(pos, type);
 	pushBoolean(true);
 	return 1;
+}
+
+int LuaState::lua_sendAnimatedText()
+{
+	std::string text = popString();
+	uint32_t color = popUnsignedInteger();
+	Position pos = popPosition();
+
+	if(text.length() > 8)
+		throw Error("Invalid value for parameter 'text': Animated text must be less than 8 characters long.");
+	if(color > 255)
+		throw Error("Invalid value for parameter 'color': Color is an unsigned integer between 0 and 255.");
+
+	g_game.addAnimatedText(pos, color, text);
 }
 
 int LuaState::lua_getTile()

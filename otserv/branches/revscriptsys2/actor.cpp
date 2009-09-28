@@ -1380,10 +1380,6 @@ void Actor::dropLoot(Container* corpse)
 {
 	if(corpse && lootDrop){
 		cType.createLoot(corpse);
-		Player* killer = g_game.getPlayerByID(corpse->getCorpseOwner());
-		if(killer){
-			killer->broadcastLoot(this, corpse->getContainer());
-		}
 	}
 }
 

@@ -718,6 +718,89 @@ namespace Script {
 			uint32_t newSkillLevel;
 		};
 	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnKill event
+	// Triggered when a creature reaches 0 health.
+
+	namespace OnKill {
+		enum FilterType {
+			FILTER_ALL,
+			FILTER_NAME,
+			FILTER_PLAYER,
+			FILTER_KILLER_NAME,
+			FILTER_KILLER_PLAYER
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			std::string name;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, Creature* killer);
+			~Event();
+
+			std::string getName() const {return "OnKill";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			Creature* killer;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnDeath event
+	// Triggered when a creature reaches dies
+
+	namespace OnDeath {
+		enum FilterType {
+			FILTER_ALL,
+			FILTER_NAME,
+			FILTER_PLAYER,
+			FILTER_KILLER_NAME,
+			FILTER_KILLER_PLAYER
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			std::string name;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, Item* corpse, Creature* killer);
+			~Event();
+
+			std::string getName() const {return "OnDeath";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			Item* corpse;
+			Creature* killer;
+		};
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

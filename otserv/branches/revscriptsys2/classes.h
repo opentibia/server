@@ -75,9 +75,9 @@ class Commands;
 class ChatChannel;
 struct OutfitType;
 class Waypoint;
-class Quest;
 struct FindPathParams;
 class QTreeLeafNode;
 struct LootBlock;
+struct Quest;
 
 #endif

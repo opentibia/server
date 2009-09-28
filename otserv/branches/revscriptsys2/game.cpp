@@ -1447,6 +1447,22 @@ void Game::onCreatureHear(Creature* listener, Creature* speaker, const SpeakClas
 	}
 }
 
+bool Game::onCreatureKill(Creature* creature, Creature* killer)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnKill::Event evt(creature, killer);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onCreatureDeath(Creature* creature, Item* corpse, Creature* killer)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnDeath::Event evt(creature, corpse, killer);
+	return script_system->dispatchEvent(evt);
+}
+
 ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Direction direction, uint32_t flags /*= 0*/)
 {
 	Cylinder* fromTile = creature->getTile();
@@ -4661,9 +4677,16 @@ bool Game::combatChangeHealth(CombatType combatType,
 
 			damage = std::min(target->getHealth(), damage);
 			if(damage > 0){
-				target->drainHealth(attacker, combatType, damage, showeffect);
-				addCreatureHealth(list, target);
+				if(target->getHealth() - damage <= 0){
+					// If event handler changes health we shouldn't
+					int ohealth = target->getHealth();
+					if(onCreatureKill(target, attacker)){
+						//prevent death
+						damage = ohealth - 1;
+					}
+				}
 
+				target->drainHealth(attacker, combatType, damage, showeffect);
 
 				if(showeffect){
 					TextColor_t textColor = TEXTCOLOR_NONE;

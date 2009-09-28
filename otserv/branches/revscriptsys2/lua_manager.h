@@ -257,6 +257,14 @@ public:
 	int lua_registerSpecificEvent_OnCreatureThink();
 	int lua_registerGenericEvent_OnCreatureTurn();
 	int lua_registerGenericEvent_OnServerLoad();
+	int lua_registerGenericEvent_OnKill();
+	int lua_registerSpecificEvent_OnKill();
+	int lua_registerGenericEvent_OnKilled();
+	int lua_registerSpecificEvent_OnKilled();
+	int lua_registerGenericEvent_OnDeathBy();
+	int lua_registerSpecificEvent_OnDeathBy();
+	int lua_registerGenericEvent_OnDeath();
+	int lua_registerSpecificEvent_OnDeath();
 
 	int lua_stopListener();
 
@@ -518,6 +526,7 @@ public:
 
 	// - Game
 	int lua_sendMagicEffect();
+	int lua_sendAnimatedText();
 	int lua_getTile();
 	int lua_getTowns();
 	int lua_sendMailTo();

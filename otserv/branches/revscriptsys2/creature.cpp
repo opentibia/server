@@ -758,8 +758,17 @@ void Creature::onDie()
 		}
 	}
 
-	dropCorpse();
+	Item* corpse = dropCorpse();
 	die();
+
+	g_game.onCreatureDeath(this, corpse, (killers.front().isCreatureKill()? killers.front().getKillerCreature() : NULL));
+
+	if(corpse){
+		Player* killer = g_game.getPlayerByID(corpse->getCorpseOwner());
+		if(killer){
+			killer->broadcastLoot(this, corpse->getContainer());
+		}
+	}
 
 	if(getMaster()){
 		getMaster()->removeSummon(this);
@@ -791,12 +800,6 @@ Item* Creature::dropCorpse()
 		dropLoot(corpse->getContainer());
 		g_game.startDecay(corpse);
 	}
-
-	//scripting event - onDie
-	// REVSCRIPT TODO EVENT CALL
-	//CreatureEventList dieEvents = getCreatureEvents(CREATURE_EVENT_DIE);
-	//for(CreatureEventList::iterator it = dieEvents.begin(); it != dieEvents.end(); ++it)
-	//	(*it)->executeOnDie(this, corpse);
 	
 	return corpse;
 }
@@ -1303,11 +1306,6 @@ void Creature::onKilledCreature(Creature* target)
 	if(getMaster()){
 		getMaster()->onKilledCreature(target);
 	}
-
-	// REVSCRIPT TODO EVENT CALL
-	//CreatureEventList killEvents = getCreatureEvents(CREATURE_EVENT_KILL);
-	//for(CreatureEventList::iterator it = killEvents.begin(); it != killEvents.end(); ++it)
-	//	(*it)->executeOnKill(this, target);
 }
 
 void Creature::onGainExperience(uint64_t gainExp, bool fromMonster)

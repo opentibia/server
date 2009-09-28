@@ -223,6 +223,8 @@ uint32_t LuaState::popUnsignedInteger()
 {
 	double d = lua_tonumber(state, -1);
 	pop();
+	if(d < 0)
+		throw Script::Error("Expected unsigned number, got negative number.");
 	return uint32_t(d);
 }
 
@@ -651,7 +653,7 @@ Actor* LuaState::popActor(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 	Creature* c = popCreature(mode);
 	if(c) {
 		Actor* a = c->getActor();
-		if(!a) HandleError(mode, "Object is not a player.");
+		if(!a) HandleError(mode, "Object is not an actor.");
 		return a;
 	}
 	return NULL;
