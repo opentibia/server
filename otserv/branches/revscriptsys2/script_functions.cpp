@@ -324,6 +324,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Container", "size()", &Manager::lua_Container_getSize);
 	registerMemberFunction("Container", "capacity()", &Manager::lua_Container_getCapacity);
 	registerMemberFunction("Container", "getItems()", &Manager::lua_Container_getItems);
+	registerMemberFunction("Container", "getContentDescription()", &Manager::lua_Container_getContentDescription);
 
 	registerGlobalFunction("getItemType(int itemid)", &Manager::lua_getItemType);
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
@@ -3265,6 +3266,7 @@ int LuaState::lua_Item_setSubtype()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Class Container
+
 int LuaState::lua_Container_addItem()
 {
 	Item* item = popItem(ERROR_PASS);
@@ -3318,6 +3320,14 @@ int LuaState::lua_Container_getItems()
 		pushThing(*it);
 		setField(-2, n++);
 	}
+	return 1;
+}
+
+int LuaState::lua_Container_getContentDescription()
+{
+	Container* container = popContainer();
+
+	pushString(container->getContentDescription());
 	return 1;
 }
 

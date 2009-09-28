@@ -474,6 +474,7 @@ public:
 	int lua_Container_getSize();
 	int lua_Container_getCapacity();
 	int lua_Container_getItems();
+	int lua_Container_getContentDescription();
 
 	// - Tile
 	int lua_Tile_getThing();
