@@ -140,11 +140,10 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	//3: doors etc
 	//4: creatures
 
-	if(items_topCount() > 0){
-		for(TileItemIterator it = items_topEnd() - 1; it > items_topBegin(); --it){
-			if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
-				return (*it);
-			}
+	for(TileItemIterator reverse_it = items_topEnd(); reverse_it != items_topBegin();){
+		--reverse_it;
+		if(Item::items[(*reverse_it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
+			return (*reverse_it);
 		}
 	}
 
@@ -166,12 +165,11 @@ Thing* Tile::getTopVisibleThing(const Creature* creature)
 		}
 	}
 
-	if(items_topCount() > 0){
-		for(TileItemIterator it = items_topEnd() - 1; it > items_topBegin(); --it){
-			const ItemType& iit = Item::items[(*it)->getID()];
-			if(!iit.lookThrough){
-				return (*it);
-			}
+	for(TileItemIterator reverse_it = items_topEnd(); reverse_it != items_topBegin();){
+		--reverse_it;
+		const ItemType& iit = Item::items[(*reverse_it)->getID()];
+		if(!iit.lookThrough){
+			return (*reverse_it);
 		}
 	}
 
