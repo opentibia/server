@@ -797,8 +797,6 @@ void Tile::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_
 	item->setID(itemId);
 	item->setSubType(count);
 
-	items_onItemModified(item);
-
 	updateTileFlags(item, false);
 
 	onUpdateTileItem(item, oldType, item, newType);

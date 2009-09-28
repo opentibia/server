@@ -60,12 +60,8 @@ typedef boost::multi_index::multi_index_container<
 			  BOOST_MULTI_INDEX_CONST_MEM_FUN(Item,ItemTypes_t,getType)
 			>
 
-			/*
-			//top order
-			boost::multi_index::ordered_non_unique<
-			  BOOST_MULTI_INDEX_CONST_MEM_FUN(Item,int32_t,getTopOrder)
-			>
-			*/
+			//Notice: When adding new attributes, make sure items_onItemModified is called whenever you change
+			//that attribute so that the item is re-indexed.
 		>
 > ItemMultiIndex;
 
@@ -445,6 +441,9 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
+	//Should be called when itemId/actionId or any other data associated with ItemMultiIndex is modified.
+	void items_onItemModified(Item* item);
+
 private:
 	void onAddTileItem(Item* item);
 	void onUpdateTileItem(Item* oldItem, const ItemType& oldType, Item* newItem, const ItemType& newType);
@@ -464,9 +463,6 @@ private:
 	CreatureIterator creatures_insert(CreatureIterator _where, Creature* creature);
 	CreatureIterator creatures_erase(CreatureIterator _pos);
 	void creatures_push_back(Creature* creature) {creatures_insert(creatures_end(), creature);}
-
-	//Should be called when itemId/actionId or any other data associated with ItemMultiIndex is modified.
-	void items_onItemModified(Item* item);
 
 public:
 	QTreeLeafNode*	qt_node;

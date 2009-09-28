@@ -15,7 +15,7 @@ function Item:setAttribute(key, value)
 		return self:setBooleanAttribute(value)
 	elseif type(value) == "string" or type(value) == "number" then
 		if tonumber(value) ~= nil then
-			if value:find(".", 1, true) then
+			if tostring(value):find(".", 1, true) then
 				return self:setFloatAttribute(key, value)
 			else
 				return self:setIntegerAttribute(key, value)

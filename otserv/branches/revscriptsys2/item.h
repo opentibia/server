@@ -438,10 +438,6 @@ inline std::string Item::getWriter() const {
 	return "";
 }
 
-inline void Item::setActionId(int32_t n) {
-	setAttribute("aid", n);
-}
-
 inline int32_t Item::getActionId() const {
 	const int32_t* aid = getIntegerAttribute("aid");
 	if(aid)

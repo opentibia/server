@@ -20,6 +20,7 @@
 #include "otpch.h"
 
 #include "item.h"
+#include "tile.h"
 #include "creature.h"
 #include "weapons.h"
 #include "house.h"
@@ -245,6 +246,23 @@ void Item::setID(uint16_t newid)
 	if(newDuration > 0 && (!prevIt.stopTime || getIntegerAttribute("duration") == NULL) ){
 		setDecaying(DECAYING_FALSE);
 		setDuration(newDuration);
+	}
+
+	if(getParent()){
+		if(Tile* tile = getParent()->getTile()){
+			tile->items_onItemModified(this);
+		}
+	}
+}
+
+void Item::setActionId(int32_t n)
+{
+	setAttribute("aid", n);
+
+	if(getParent()){
+		if(Tile* tile = getParent()->getTile()){
+			tile->items_onItemModified(this);
+		}
 	}
 }
 

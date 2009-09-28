@@ -3143,6 +3143,14 @@ int LuaState::lua_Item_isPickupable()
 
 // Template function to prevent code duplication
 template<typename T>
+void updateActionID(Item* item, T value) {}
+
+template<> void updateActionID<int32_t>(Item* item, int32_t value)
+{
+	item->setActionId(value);
+}
+
+template<typename T>
 int setItemAttribute(LuaState* state)
 {
 	T value = state->popValue<T>();
@@ -3150,6 +3158,11 @@ int setItemAttribute(LuaState* state)
 	Item* item = state->popItem();
 
 	item->setAttribute(key, value);
+
+	if(key == "aid"){
+		//This is to re-index the item if the item is placed on an IndexedTile.
+		updateActionID<T>(item, value);
+	}
 
 	state->pushBoolean(true);
 	return 1;
