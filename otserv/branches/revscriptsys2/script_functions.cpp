@@ -4799,6 +4799,8 @@ int LuaState::lua_sendAnimatedText()
 		throw Error("Invalid value for parameter 'color': Color is an unsigned integer between 0 and 255.");
 
 	g_game.addAnimatedText(pos, color, text);
+	pushBoolean(1);
+	return 1;
 }
 
 int LuaState::lua_getTile()

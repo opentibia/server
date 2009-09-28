@@ -289,7 +289,7 @@ int Manager::luaFunctionCallback(lua_State* L) {
 			const ComposedTypeDeclaration& ctd = *ctditer;
 
 			bool ignoreTypeCheck = false;
-			if(argument_count < cc->parameters.size() && required_arguments - parsed_argument_count > 0 && !ctd.default_value.empty() && ctd.optional_level > 0) {
+			if((size_t)argument_count < cc->parameters.size() && required_arguments - parsed_argument_count > 0 && !ctd.default_value.empty() && ctd.optional_level > 0) {
 				// We got an optional argument, and one is missing on this spot!
 				// Push our default argument onto the stack
 				if(ctd.default_value.type() == typeid(std::string))
