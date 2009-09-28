@@ -70,7 +70,7 @@ function foldl(f, list)
     return r
 end
 
-function filter(f, list)
+function filter(list, f)
 	local rlist = {}
 	for k, v in ipairs(list) do
 		if f(v) then

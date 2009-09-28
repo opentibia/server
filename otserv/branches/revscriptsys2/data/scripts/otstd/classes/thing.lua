@@ -1,6 +1,6 @@
 
 function Thing:type()
-	return "Thing"
+	return self.__name
 end
 
 

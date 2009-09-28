@@ -1,7 +1,4 @@
 
-function Item:type()
-	return "Item"
-end
 
 function Item:setRawAttribute(key, value)
 	if type(value) == "string" or type(value) == "number" then

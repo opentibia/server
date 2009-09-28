@@ -1,6 +1,10 @@
 
 
 function typeof(val, t)
+	if type(t) == "table" then
+		t = t:type()
+	end
+	
 	if val == nil then
 		if t == nil or t == "nil" then
 			return true

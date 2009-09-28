@@ -1,7 +1,4 @@
 
-function Creature:type()
-	return "Creature"
-end
 
 function Creature:setCustomValue(key, value)
 	local t = type(value)

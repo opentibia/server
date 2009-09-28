@@ -1,10 +1,6 @@
 
 otstd.Player = {}
 
-function Player:type()
-	return "Player"
-end
-
 function Player:sendNote(msg)
 	self:sendMessage(MESSAGE_STATUS_CONSOLE_BLUE, msg)
 end
