@@ -149,6 +149,9 @@ bool Environment::stopListener(ListenerType type, uint32_t id) {
 		case enums::ON_ATTACK:
 			if(stopListener(Generic.OnAttack, id))
 				return true;
+		case enums::ON_DAMAGE:
+			if(stopListener(Generic.OnDamage, id))
+				return true;
 		case enums::ON_KILLED_LISTENER:
 			if(stopListener(Generic.OnKilled, id))
 				return true;

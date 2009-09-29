@@ -103,27 +103,32 @@ void Combat::doCombat(Creature* caster, const Position& pos,
 bool Combat::internalCombat(Creature* caster, const std::list<Creature*>& targetList,
 	const CombatParams& params, const SpectatorVec* spectators /*= NULL*/) const
 {
-	std::list<Creature*> _targetList;
+	std::list<std::pair<Creature*, int32_t> > damageList;
 	for(std::list<Creature*>::const_iterator it = targetList.begin(); it != targetList.end(); ++it){
 		Creature* target = *it;
 		if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
-			_targetList.push_back(*it);
+			if(params.combatType != COMBAT_NONE){
+				int32_t minChange = 0;
+				int32_t maxChange = 0;
+				//getMinMaxValues(caster, target, minChange, maxChange);
+				int32_t value = random_range(minChange, maxChange, DISTRO_NORMAL);
+				damageList.push_back(std::make_pair(*it, value));
+			}
+			else{
+				damageList.push_back(std::make_pair(*it, 0));
+			}
 		}
 	}
 
 	bool result = false;
 	if(params.combatType != COMBAT_NONE){
-		int32_t minChange = 0;
-		int32_t maxChange = 0;
-		//getMinMaxValues(caster, target, minChange, maxChange);
-		int32_t value = random_range(minChange, maxChange, DISTRO_NORMAL);
-
-		if(!g_game.onCreatureAttack(caster, params.combatType, value, _targetList)){
+		if(!g_game.onCreatureDamage(caster, params.combatType, damageList)){
 			return false;
 		}
 	
-		for(std::list<Creature*>::iterator it = _targetList.begin(); it != _targetList.end(); ++it){
-			Creature* target = *it;
+		for(std::list<std::pair<Creature*, int32_t> >::iterator it = damageList.begin(); it != damageList.end(); ++it){
+			Creature* target = it->first;
+			int32_t value = it->second;
 			if(params.combatType != COMBAT_MANADRAIN){
 				if(changeHealth(caster, target, value, params)){
 					applyCondition(caster, target, params);
@@ -143,18 +148,20 @@ bool Combat::internalCombat(Creature* caster, const std::list<Creature*>& target
 		}
 	}
 	//TODO: Still needed?
+	/*
 	else{
-		if(!g_game.onCreatureAttack(caster, params.combatType, 0, _targetList)){
+		if(!g_game.onCreatureDamage(caster, params.combatType, damageList)){
 			return false;
 		}
-		for(std::list<Creature*>::iterator it = _targetList.begin(); it != _targetList.end(); ++it){
-			Creature* target = *it;
+		for(std::list<std::pair<Creature*, int32_t> >::iterator it = damageList.begin(); it != damageList.end(); ++it){
+			Creature* target = it->first;
 			applyCondition(caster, target, params);
 			applyDispel(caster, target, params);
 			defaultCombat(caster, target, params, spectators);
 			result = true;
 		}
 	}
+	*/
 
 	return result;
 }

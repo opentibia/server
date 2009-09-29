@@ -1136,12 +1136,9 @@ void OnAdvance::Event::update_instance(Manager& state, Environment& environment,
 // Triggered when a creature makes an attack
 
 
-OnAttack::Event::Event(Creature* creature, CombatType combatType,
-	int32_t value, const std::list<Creature*>& targetList) :
+OnAttack::Event::Event(Creature* creature, Creature* attacked) :
 	creature(creature),
-	combatType(combatType),
-	value(value),
-	targetList(targetList)
+	attacked(attacked)
 {
 	propagate_by_default = true;
 }
@@ -1171,22 +1168,83 @@ void OnAttack::Event::push_instance(LuaState& state, Environment& environment)
 	state.pushClassTableInstance("OnAttackEvent");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
-	state.pushEnum(combatType);
-	state.setField(-2, "combatType");
-	state.pushInteger(value);
-	state.setField(-2, "value");
-
-	state.newTable();
-	int n = 1;
-	for(std::list<Creature*>::iterator it = targetList.begin(); it != targetList.end(); ++it){
-		state.pushThing(*it);
-		state.setField(-2, n);
-	}
+	state.pushThing(attacked);
+	state.setField(-2, "attacked");
 }
 
 void OnAttack::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
 	;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// OnDamage Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when damage is dealt to a creature
+
+
+OnDamage::Event::Event(Creature* creature, CombatType& combatType,
+	std::list<std::pair<Creature*, int32_t> >& damageList) :
+	creature(creature),
+	combatType(combatType),
+	damageList(damageList)
+{
+	propagate_by_default = true;
+}
+
+OnDamage::Event::~Event()
+{
+}
+
+bool OnDamage::Event::dispatch(Manager& state, Environment& environment)
+{
+	if(creature){
+		ListenerList list = creature->getListeners(ON_DAMAGE);
+		if(dispatchEvent<OnDamage::Event>
+				(this, state, environment, list))
+			return true;
+	}
+
+	if(dispatchEvent<OnDamage::Event>
+			(this, state, environment, environment.Generic.OnDamage))
+		return true;
+
+	return false;
+}
+
+void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnDamageEvent");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	state.pushEnum(combatType);
+	state.setField(-2, "combatType");
+
+	/*
+	TODO:
+	state.newTable();
+	int n = 1;
+	for(std::list<Creature*>::iterator it = damageList.begin(); it != damageList.end(); ++it){
+		state.pushThing(*it);
+		state.setField(-2, n);
+	}
+	*/
+}
+
+void OnDamage::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	thread->getField(-1, "combatType");
+	if(thread->isTable()) {
+		combatType = thread->popEnum<CombatType>();
+	}
+	else {
+		thread->HandleError("Event 'OnDamage' invalid value of 'combatType'");
+		thread->pop();
+	}
+
+	/*
+	TODO:
+	*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////

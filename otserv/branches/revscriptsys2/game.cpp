@@ -1447,12 +1447,20 @@ void Game::onCreatureHear(Creature* listener, Creature* speaker, const SpeakClas
 	}
 }
 
-bool Game::onCreatureAttack(Creature* creature, CombatType combatType,
-	int32_t value, const std::list<Creature*>& targetList)
+bool Game::onCreatureAttack(Creature* creature, Creature* attacked)
 {
 	if(!script_system)
 		return false; // Not handled
-	Script::OnAttack::Event evt(creature, combatType, value, targetList);
+	Script::OnAttack::Event evt(creature, attacked);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onCreatureDamage(Creature* creature, CombatType combatType,
+	std::list<std::pair<Creature*, int32_t> >& damageList)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnDamage::Event evt(creature, combatType, damageList);
 	return script_system->dispatchEvent(evt);
 }
 

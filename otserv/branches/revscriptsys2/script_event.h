@@ -688,13 +688,12 @@ namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnAttack event
-	// Triggered when a creature makes an attack.
+	// Triggered when a creature attacks a creature.
 
 	namespace OnAttack {
 		class Event : public Script::Event {
 		public:
-			Event(Creature* creature, CombatType combatType,
-				int32_t value, const std::list<Creature*>& targetList);
+			Event(Creature* creature, Creature* attacked);
 			~Event();
 
 			std::string getName() const {return "OnAttack";}
@@ -708,9 +707,34 @@ namespace Script {
 
 		protected:
 			Creature* creature;
-			CombatType combatType;
-			int32_t value;
-			std::list<Creature*> targetList;
+			Creature* attacked;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnDamage event
+	// Triggered when damage is dealt to a creature.
+
+	namespace OnDamage {
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, CombatType& combatType,
+				std::list<std::pair<Creature*, int32_t> >& damageList);
+			~Event();
+
+			std::string getName() const {return "OnDamage";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			CombatType& combatType;
+			std::list<std::pair<Creature*, int32_t> >& damageList;
 		};
 	}
 
@@ -757,7 +781,7 @@ namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnDeath event
-	// Triggered when a creature reaches dies
+	// Triggered when a creature dies (after death-delay)
 
 	namespace OnDeath {
 		enum FilterType {
