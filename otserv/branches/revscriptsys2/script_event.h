@@ -201,7 +201,6 @@ namespace Script {
 			const SpeakClass& speak_class;
 		};
 	}
-	
 
 	////////////////////////////////////////////////////////////////
 	// OnUseItem event
@@ -506,33 +505,6 @@ namespace Script {
 		};
 	}
 
-
-	///////////////////////////////////////////////////////////////////////////////
-	// OnCombatDamage event
-	// Triggered when a creature is damaged b
-
-	namespace OnCombatDamage {
-		class Event : public Script::Event {
-		public:
-			Event(Creature* castor, int32_t& min, int32_t& max, bool useCharges);
-			~Event();
-
-			std::string getName() const {return "OnCombatDamage";}
-			
-			// Runs the event
-			bool dispatch(Manager& state, Environment& environment);
-
-			// Lua stack manipulation
-			void push_instance(LuaState& state, Environment& environment);
-			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
-
-		protected:
-			Player* chatter;
-			ChatChannel* channel;
-		};
-	}
-
-
 	///////////////////////////////////////////////////////////////////////////////
 	// OnLook event
 	// Triggered when a looks at an object
@@ -711,6 +683,34 @@ namespace Script {
 			LevelType skill;
 			uint32_t oldSkillLevel;
 			uint32_t newSkillLevel;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnAttack event
+	// Triggered when a creature makes an attack.
+
+	namespace OnAttack {
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, CombatType combatType,
+				int32_t value, const std::list<Creature*>& targetList);
+			~Event();
+
+			std::string getName() const {return "OnAttack";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Creature* creature;
+			CombatType combatType;
+			int32_t value;
+			std::list<Creature*> targetList;
 		};
 	}
 

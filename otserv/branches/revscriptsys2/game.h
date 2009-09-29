@@ -524,6 +524,8 @@ public:
 	void onLoseCreature(Creature* creature, Creature* lost);
 	void onCreatureHear(Creature* listener, Creature* speaker, const SpeakClass& sclass, const std::string& text);
 	void onCreatureThink(Creature* creature, int interval);
+	bool onCreatureAttack(Creature* creature, CombatType combatType,
+		int32_t value, const std::list<Creature*>& targetList);
 	bool onCreatureKill(Creature* creature, Creature* killer);
 	bool onCreatureDeath(Creature* creature, Item* corpse, Creature* killer);
 
@@ -614,7 +616,7 @@ public:
 	void addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor, const std::string& text);
 	void addMagicEffect(const Position& pos, uint8_t effect);
 	void addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t effect);
-	void addDistanceEffect(const Position& fromPos, const Position& toPos, uint8_t effect);
+	void addDistanceEffect(Creature* creature, const Position& fromPos, const Position& toPos, uint8_t effect);
 
 	std::string getTradeErrorDescription(ReturnValue ret, Item* item);
 

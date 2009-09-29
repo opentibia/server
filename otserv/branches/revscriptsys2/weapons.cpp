@@ -309,7 +309,8 @@ bool Weapon::useFist(Player* player, Creature* target)
 		params.combatType = COMBAT_PHYSICALDAMAGE;
 		params.blockedByArmor = true;
 		params.blockedByShield = true;
-		Combat::doCombatHealth(player, target, damage, damage, params);
+		//TODO:
+		//Combat::doCombatHealth(player, target, damage, damage, params);
 
 		if(!player->hasFlag(PlayerFlag_NotGainSkill)){
 			if(player->getAddAttackSkill()){
@@ -336,7 +337,8 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 	}
 	else{
 		int32_t damage = (getWeaponDamage(player, target, item) * damageModifier) / 100;
-		Combat::doCombatHealth(player, target, damage, damage, params);
+		//TODO:
+		//Combat::doCombatHealth(player, target, damage, damage, params);
 	}
 
 	if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION)){
@@ -358,7 +360,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 		*/
 	}
 	else{
-		Combat::postCombatEffects(player, tile->getPosition(), params);
+		g_game.addDistanceEffect(player, player->getPosition(), tile->getPosition(), params.distanceEffect);
 		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 	}
 
@@ -507,7 +509,8 @@ bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
 		eParams.combatType = elementType;
 		eParams.isAggressive = true;
 		eParams.useCharges = true;
-		Combat::doCombatHealth(player, target, damage, damage, eParams);
+		//TODO:
+		//Combat::doCombatHealth(player, target, damage, damage, eParams);
 	}
 
 	return true;

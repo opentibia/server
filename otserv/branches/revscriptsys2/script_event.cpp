@@ -1131,6 +1131,65 @@ void OnAdvance::Event::update_instance(Manager& state, Environment& environment,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// OnAttack Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a creature makes an attack
+
+
+OnAttack::Event::Event(Creature* creature, CombatType combatType,
+	int32_t value, const std::list<Creature*>& targetList) :
+	creature(creature),
+	combatType(combatType),
+	value(value),
+	targetList(targetList)
+{
+	propagate_by_default = true;
+}
+
+OnAttack::Event::~Event()
+{
+}
+
+bool OnAttack::Event::dispatch(Manager& state, Environment& environment)
+{
+	if(creature){
+		ListenerList list = creature->getListeners(ON_ATTACK);
+		if(dispatchEvent<OnAttack::Event>
+				(this, state, environment, list))
+			return true;
+	}
+
+	if(dispatchEvent<OnAttack::Event>
+			(this, state, environment, environment.Generic.OnAttack))
+		return true;
+
+	return false;
+}
+
+void OnAttack::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnAttackEvent");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	state.pushEnum(combatType);
+	state.setField(-2, "combatType");
+	state.pushInteger(value);
+	state.setField(-2, "value");
+
+	state.newTable();
+	int n = 1;
+	for(std::list<Creature*>::iterator it = targetList.begin(); it != targetList.end(); ++it){
+		state.pushThing(*it);
+		state.setField(-2, n);
+	}
+}
+
+void OnAttack::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // OnKill Event
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature reaches 0 health

@@ -1447,6 +1447,15 @@ void Game::onCreatureHear(Creature* listener, Creature* speaker, const SpeakClas
 	}
 }
 
+bool Game::onCreatureAttack(Creature* creature, CombatType combatType,
+	int32_t value, const std::list<Creature*>& targetList)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnAttack::Event evt(creature, combatType, value, targetList);
+	return script_system->dispatchEvent(evt);
+}
+
 bool Game::onCreatureKill(Creature* creature, Creature* killer)
 {
 	if(!script_system)
@@ -4869,18 +4878,32 @@ void Game::addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t
 	}
 }
 
-void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
+void Game::addDistanceEffect(Creature* creature, const Position& fromPos, const Position& toPos,
 	uint8_t effect)
 {
-	SpectatorVec list;
-	getSpectators(list, fromPos, false);
-	getSpectators(list, toPos, true);
+	if(creature){
+		if(effect == NM_SHOOT_WEAPONTYPE){
+			switch(creature->getWeaponType()){
+				case WEAPON_AXE: effect = NM_SHOOT_WHIRLWINDAXE; break;
+				case WEAPON_SWORD: effect = NM_SHOOT_WHIRLWINDSWORD; break;
+				case WEAPON_CLUB: effect = NM_SHOOT_WHIRLWINDCLUB; break;
 
-	//send to client
-	Player* tmpPlayer = NULL;
-	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
-		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendDistanceShoot(fromPos, toPos, effect);
+				default: effect = NM_ME_NONE; break;
+			}
+		}
+	}
+
+	if(effect != NM_ME_NONE){
+		SpectatorVec list;
+		getSpectators(list, fromPos, false);
+		getSpectators(list, toPos, true);
+
+		//send to client
+		Player* tmpPlayer = NULL;
+		for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
+			if((tmpPlayer = (*it)->getPlayer())){
+				tmpPlayer->sendDistanceShoot(fromPos, toPos, effect);
+			}
 		}
 	}
 }
