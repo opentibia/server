@@ -34,7 +34,6 @@ namespace Script {
 	typedef struct{
 		ListenerMap ItemId;
 		ListenerMap ActionId;
-		ListenerMap UniqueId;
 	} ListenerItemMap;
 	typedef std::map<uint32_t, Listener_ptr> SpecificListenerMap;
 	typedef std::map<std::string, ListenerList> ListenerStringMap;
@@ -93,6 +92,7 @@ namespace Script {
 			ListenerStringMap OnSpawn;
 			ListenerList OnAdvance;
 			ListenerItemMap OnMoveItem;
+			ListenerList OnMoveItemOnItem;
 			ListenerList OnKilled;
 			ListenerList OnKill;
 			ListenerList OnDeathBy;

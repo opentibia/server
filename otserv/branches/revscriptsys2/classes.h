@@ -37,7 +37,6 @@ class Container;
 class Depot;
 class Teleport;
 class TrashHolder;
-class Mailbox;
 class Door;
 class MagicField;
 class BedItem;

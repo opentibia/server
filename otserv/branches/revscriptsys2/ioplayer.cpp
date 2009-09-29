@@ -870,10 +870,6 @@ bool IOPlayer::sendMail(Creature* actor, const std::string name, uint32_t depotI
 		if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
 			item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
 		{
-			if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
-				g_game.transformItem(actor, item, item->getID() + 1);
-			}
-
 			result = true;
 		}
 	}

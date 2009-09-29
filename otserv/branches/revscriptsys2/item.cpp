@@ -27,7 +27,6 @@
 #include "beds.h"
 #include "container.h"
 #include "depot.h"
-#include "mailbox.h"
 #include "teleport.h"
 #include "trashholder.h"
 #include <iomanip>
@@ -65,9 +64,6 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 1*/)
 		}
 		else if(it.isTrashHolder()){
 			newItem = new TrashHolder(_type, it.magicEffect);
-		}
-		else if(it.isMailbox()){
-			newItem = new Mailbox(_type);
 		}
 		else if(it.isBed()){
 			newItem = new BedItem(_type);
@@ -350,7 +346,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 				return ATTR_READ_ERROR;
 			}
 
-			setUniqueId(_uniqueid);
+			setAttribute("uid", (int32_t)_uniqueid);
 			break;
 		}
 
@@ -626,7 +622,7 @@ bool Item::hasProperty(uint32_t props) const
 		return false;
 	}
 
-	if(hasBitSet(ITEMPROP_MOVEABLE, props) && !(it.moveable && getUniqueId() == 0) ){
+	if(hasBitSet(ITEMPROP_MOVEABLE, props) && !it.moveable){
 		return false;
 	}
 
@@ -1004,7 +1000,9 @@ bool Item::canDecay()
 		return false;
 	}
 
-	if(getUniqueId() != 0 || getActionId() != 0){
+	const bool* candecay = getBooleanAttribute("canDecay");
+
+	if(candecay && *candecay == false){
 		return false;
 	}
 

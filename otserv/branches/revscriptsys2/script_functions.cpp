@@ -746,9 +746,6 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 	else if(method == "actionid") {
 		si_onuse.method = OnUseItem::FILTER_ACTIONID;
 	}
-	else if(method == "uniqueid") {
-		si_onuse.method = OnUseItem::FILTER_UNIQUEID;
-	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
@@ -903,9 +900,6 @@ int LuaState::lua_registerGenericEvent_OnLookAtItem() {
 	else if(method == "actionid") {
 		si_onlook.method = OnLook::FILTER_ACTIONID;
 	}
-	else if(method == "uniqueid") {
-		si_onlook.method = OnLook::FILTER_UNIQUEID;
-	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
@@ -994,9 +988,6 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	else if(method == "actionid") {
 		si_onequip.method = OnEquipItem::FILTER_ACTIONID;
 	}
-	else if(method == "uniqueid") {
-		si_onequip.method = OnEquipItem::FILTER_UNIQUEID;
-	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
@@ -1033,9 +1024,6 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	}
 	else if(method == "actionid") {
 		si_ondeequip.method = OnEquipItem::FILTER_ACTIONID;
-	}
-	else if(method == "uniqueid") {
-		si_ondeequip.method = OnEquipItem::FILTER_UNIQUEID;
 	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
@@ -1099,9 +1087,6 @@ int LuaState::lua_registerSpecificEvent_CreatureMoveIn() {
 	else if(method == "actionid") {
 		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
 	}
-	else if(method == "uniqueid") {
-		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
-	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
@@ -1140,9 +1125,6 @@ int LuaState::lua_registerSpecificEvent_CreatureMoveOut() {
 	else if(method == "actionid") {
 		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
 	}
-	else if(method == "uniqueid") {
-		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
-	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
@@ -1180,9 +1162,6 @@ int LuaState::lua_registerGenericEvent_CreatureMoveIn() {
 	else if(method == "actionid") {
 		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
 	}
-	else if(method == "uniqueid") {
-		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
-	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
@@ -1216,9 +1195,6 @@ int LuaState::lua_registerGenericEvent_CreatureMoveOut() {
 	}
 	else if(method == "actionid") {
 		si_onmovecreature.method = OnMoveCreature::FILTER_ACTIONID;
-	}
-	else if(method == "uniqueid") {
-		si_onmovecreature.method = OnMoveCreature::FILTER_UNIQUEID;
 	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
@@ -1313,9 +1289,6 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	else if(method == "actionid") {
 		si_onmoveitem.method = OnMoveItem::FILTER_ACTIONID;
 	}
-	else if(method == "uniqueid") {
-		si_onmoveitem.method = OnMoveItem::FILTER_UNIQUEID;
-	}
 	else {
 		throw Error("Invalid argument (1) 'method'");
 	}
@@ -1326,14 +1299,18 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	boost::any p(si_onmoveitem);
 	Listener_ptr listener(new Listener(ON_MOVE_ITEM_LISTENER, p, *manager));
 
-	switch(si_onmoveitem.method){
-		case OnMoveItem::FILTER_ITEMID: environment->Generic.OnMoveItem.ItemId[id].push_back(listener); break;
-		case OnMoveItem::FILTER_ACTIONID: environment->Generic.OnMoveItem.ActionId[id].push_back(listener); break;
-		case OnMoveItem::FILTER_UNIQUEID: environment->Generic.OnMoveItem.UniqueId[id].push_back(listener); break;
-
-		default:
-			break;
+	ListenerList* list = NULL;
+	if(isItemOnTile){
+		list = &environment->Generic.OnMoveItemOnItem;
 	}
+	else{
+		switch(si_onmoveitem.method){
+			case OnMoveItem::FILTER_ITEMID:   list = &environment->Generic.OnMoveItem.ItemId[id]; break;
+			case OnMoveItem::FILTER_ACTIONID: list = &environment->Generic.OnMoveItem.ActionId[id]; break;
+			default: break;
+		}
+	}
+	list->push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -3141,6 +3118,12 @@ int LuaState::lua_Item_isPickupable()
 
 // Attributes!
 
+template<typename T> void updateActionID(const std::string& key, Item* item) {}
+template<> void updateActionID<int32_t>(const std::string& key, Item* item)
+{
+	// ...
+}
+
 // Template function to prevent code duplication
 template<typename T>
 void updateActionID(Item* item, T value) {}
@@ -3158,6 +3141,8 @@ int setItemAttribute(LuaState* state)
 	Item* item = state->popItem();
 
 	item->setAttribute(key, value);
+	
+	updateActionID<T>(key, item);
 
 	if(key == "aid"){
 		//This is to re-index the item if the item is placed on an IndexedTile.
@@ -3189,13 +3174,13 @@ int LuaState::lua_Item_getRawAttribute()
 
 	if(value.empty())
 		pushNil();
-	if(value.type() == typeid(std::string))
+	else if(value.type() == typeid(std::string))
 		push(boost::any_cast<std::string>(value));
-	if(value.type() == typeid(int32_t))
+	else if(value.type() == typeid(int32_t))
 		push(boost::any_cast<int32_t>(value));
-	if(value.type() == typeid(float))
+	else if(value.type() == typeid(float))
 		push(boost::any_cast<float>(value));
-	if(value.type() == typeid(bool))
+	else if(value.type() == typeid(bool))
 		push(boost::any_cast<bool>(value));
 	else
 		pushNil();

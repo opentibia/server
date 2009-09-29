@@ -15,6 +15,8 @@ function Map:type() return "Map" end
 __internal_getTile = getTile
 getTile = nil
 
+map.towns = getAllTowns()
+
 -- Get a tile on the map!
 function Map:getTile(x, y, z)
 	if y == nil and z == nil then
@@ -33,13 +35,17 @@ function Map:getTowns()
 end
 
 function Map:getTown(name)
-	if typeof(name, "Town") then
+	if typeof(name, Town) then
 		return name
 	end
+	if typeof(name, nil) then
+		return nil
+	end
+	
 	name = name:lower()
-	towns = getAllTowns()
+	local towns = map.towns
 	for _, town in ipairs(towns) do
-		if town:getName():lower() == name or town:getTownID() == name then
+		if town:getName():lower() == name or town:getID() == name then
 			return town
 		end
 	end
@@ -56,7 +62,7 @@ function Map:getTownWildcard(name)
 	end
 	name = name:lower()
 	
-	towns = getAllTowns()
+	local towns = map.towns
 	for _, town in ipairs(towns) do
 		--print(town:getName():sub(1, #name - 1):lower() .. " == " .. name:sub(1, #name - 1))
 		if town:getName():sub(1, #name - 1):lower() == name:sub(1, #name - 1) then

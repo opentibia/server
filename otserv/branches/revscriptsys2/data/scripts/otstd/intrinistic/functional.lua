@@ -1,37 +1,5 @@
 
-_1 = {1}
-_2 = {2}
-_3 = {3}
-_4 = {4}
-_5 = {5}
-_6 = {6}
-_7 = {7}
-_8 = {8}
-_9 = {9}
-_ps = {_1, _2, _3, _4, _5, _6, _7, _8, _9}
-
-function bind(f, ...)
-	prp = {...}
-	return function(...)
-		local pp = {}
-		local lp = {...}
-		local n = 1
-		for i, v in ipairs(prp) do
-			local d = false
-			for _, p in ipairs(_ps) do
-				if v == p then
-					d = true
-					pp[p[1]] = lp[i] 
-					n = n + 1
-				end
-			end
-			if d then
-				pp[n] = v
-			end
-		end
-		f(unpack(pp))
-	end
-end
+functional = {}
 
 --
 
@@ -70,7 +38,7 @@ function foldl(f, list)
     return r
 end
 
-function filter(list, f)
+function filter(f, list)
 	local rlist = {}
 	for k, v in ipairs(list) do
 		if f(v) then
@@ -81,4 +49,3 @@ function filter(list, f)
 end
 
 --
-

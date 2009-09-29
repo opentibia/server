@@ -340,7 +340,6 @@ public:
 	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
-	Mailbox* getMailbox() const;
 	BedItem* getBedItem() const;
 
 	Creature* getTopCreature();

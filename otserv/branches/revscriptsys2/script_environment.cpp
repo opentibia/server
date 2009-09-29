@@ -93,12 +93,6 @@ bool Environment::stopListener(ListenerItemMap& item_map, uint32_t id) {
 		}
 	}
 
-	for(list_iter = item_map.UniqueId.begin(); list_iter != item_map.UniqueId.end(); ++list_iter){
-		if(stopListener(list_iter->second, id)){
-			return true;
-		}
-	}
-
 	return false;
 }
 

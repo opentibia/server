@@ -324,8 +324,6 @@ bool OnUseItem::Event::check_match(const ScriptInformation& info)
 			return item->getID() == info.id;
 		case FILTER_ACTIONID:
 			return item->getActionId() == info.id;
-		case FILTER_UNIQUEID:
-			return item->getUniqueId() == info.id;
 		default: break;
 	}
 	return false;
@@ -410,8 +408,6 @@ bool OnEquipItem::Event::check_match(const ScriptInformation& info)
 			return item->getID() == info.id;
 		case FILTER_ACTIONID:
 			return item->getActionId() == info.id;
-		case FILTER_UNIQUEID:
-			return item->getUniqueId() == info.id;
 		default: break;
 	}
 	return false;
@@ -499,26 +495,6 @@ bool OnMoveCreature::Event::isMatch(const ScriptInformation& info, Tile* tile)
 			{
 				return (tile->items_getItemWithActionId(info.id) != NULL);
 				break;
-			}
-			case FILTER_UNIQUEID:
-			{
-				//TODO: Remove? (merged with actionId)
-				int32_t j = tile->__getLastIndex();
-				Item* item = NULL;
-				for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
-					Thing* thing = tile->__getThing(i);
-					if(thing && (item = thing->getItem())){
-						switch(info.method) {
-							case FILTER_ITEMID:
-								return item->getID() == info.id;
-							case FILTER_ACTIONID:
-								return item->getActionId() == info.id;
-							case FILTER_UNIQUEID:
-								return item->getUniqueId() == info.id;
-							default: break;
-						}
-					}
-				}
 			}
 
 			default:
@@ -639,32 +615,6 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 				return (tile->items_getItemWithActionId(info.id) != NULL);
 				break;
 			}
-			case FILTER_UNIQUEID:
-			{
-				//TODO: Remove? (merged with actionId)
-				int32_t j = tile->__getLastIndex();
-				Item* itemOnTile = NULL;
-				for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
-					Thing* thing = tile->__getThing(i);
-					if(thing && (itemOnTile = thing->getItem()) && itemOnTile != item){
-						switch(info.method) {
-							case FILTER_ITEMID:
-								if(itemOnTile->getID() == info.id)
-									return true;
-								break;
-							case FILTER_ACTIONID:
-								if(itemOnTile->getActionId() == info.id)
-									return true;
-								break;
-							case FILTER_UNIQUEID:
-								if(itemOnTile->getUniqueId() == info.id)
-									return true;
-								break;
-							default: break;
-						}
-					}
-				}
-			}
 
 			default:
 				break;
@@ -676,8 +626,6 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 				return item->getID() == info.id;
 			case FILTER_ACTIONID:
 				return item->getActionId() == info.id;
-			case FILTER_UNIQUEID:
-				return item->getUniqueId() == info.id;
 			default: break;
 		}
 	}
@@ -690,22 +638,12 @@ bool OnMoveItem::Event::dispatch(Manager& state, Environment& environment)
 {
 	Script::ListenerMap::iterator list_iter;
 
-	if(item->getUniqueId() != 0){
-		list_iter = environment.Generic.OnMoveItem.UniqueId.find(item->getUniqueId());
-		if(list_iter != environment.Generic.OnMoveItem.UniqueId.end()){
-			if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
-				(this, state, environment, list_iter->second)){
-					return true;
-			}
-		}
-	}
-
 	if(item->getActionId() != 0){
 		list_iter = environment.Generic.OnMoveItem.ActionId.find(item->getActionId());
 		if(list_iter != environment.Generic.OnMoveItem.ActionId.end()){
 			if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
-				(this, state, environment, list_iter->second)){
-					return true;
+					(this, state, environment, list_iter->second)){
+				return true;
 			}
 		}
 	}
@@ -713,9 +651,14 @@ bool OnMoveItem::Event::dispatch(Manager& state, Environment& environment)
 	list_iter = environment.Generic.OnMoveItem.ItemId.find(item->getID());
 	if(list_iter != environment.Generic.OnMoveItem.ItemId.end()){
 		if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
-			(this, state, environment, list_iter->second)){
-				return true;
+				(this, state, environment, list_iter->second)){
+			return true;
 		}
+	}
+
+	if(dispatchEvent<OnMoveItem::Event, ScriptInformation>
+			(this, state, environment, environment.Generic.OnMoveItemOnItem)){
+		return true;
 	}
 
 	return false;
@@ -927,8 +870,6 @@ bool OnLook::Event::check_match(const ScriptInformation& info)
 				return item && item->getID() == info.id;
 			case FILTER_ACTIONID:
 				return item && item->getActionId() == info.id;
-			case FILTER_UNIQUEID:
-				return item && item->getUniqueId() == info.id;
 			case FILTER_CREATUREID:
 				return creature && (int32_t)creature->getID() == info.id;
 			default: break;

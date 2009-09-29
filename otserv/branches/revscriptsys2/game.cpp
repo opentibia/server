@@ -1644,7 +1644,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		return false;
 	}
 
-	if(!item->isPushable() || item->getUniqueId() != 0){
+	if(!item->isPushable()){
 		player->sendCancelMessage(RET_NOTMOVEABLE);
 		return false;
 	}
@@ -3097,7 +3097,7 @@ bool Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 	}
 
 	Item* item = thing->getItem();
-	if(!item || item->getClientID() != spriteId || !item->isRotateable() || item->getUniqueId() != 0){
+	if(!item || item->getClientID() != spriteId || !item->isRotateable()){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
@@ -3219,7 +3219,7 @@ bool Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 	}
 
 	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, stackPos, spriteId, STACKPOS_USE));
-	if(!tradeItem || tradeItem->getClientID() != spriteId || !tradeItem->isPickupable() || tradeItem->getUniqueId() != 0) {
+	if(!tradeItem || tradeItem->getClientID() != spriteId || !tradeItem->isPickupable() || !tradeItem->isTradeable()) {
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}

@@ -29,8 +29,8 @@
 #include "house.h"
 #include "ban.h"
 #include "tools.h"
+#include "town.h"
 #include "rsa.h"
-#include "mailbox.h"
 #include "logger.h"
 #include "configmanager.h"
 
@@ -496,9 +496,10 @@ Item* ProtocolAdmin::createMail(const std::string xmlData, std::string& name, ui
 	}
 
 	if(readXMLString(root, "town", strValue)){
-		if(!Mailbox::getDepotId(strValue, depotId)){
+		Town* town = Towns::getInstance().getTown(strValue);
+		if(!town)
 			return false;
-		}
+		depotId = town->getTownID();
 	}
 	else{
 		//use the players default town

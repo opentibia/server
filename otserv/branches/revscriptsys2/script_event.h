@@ -210,7 +210,6 @@ namespace Script {
 	namespace OnUseItem {
 		enum FilterType {
 			FILTER_ITEMID,
-			FILTER_UNIQUEID,
 			FILTER_ACTIONID,
 		};
 
@@ -251,7 +250,6 @@ namespace Script {
 	namespace OnEquipItem {
 		enum FilterType {
 			FILTER_ITEMID,
-			FILTER_UNIQUEID,
 			FILTER_ACTIONID,
 		};
 
@@ -294,7 +292,6 @@ namespace Script {
 	namespace OnMoveCreature {
 		enum FilterType {
 			FILTER_ITEMID,
-			FILTER_UNIQUEID,
 			FILTER_ACTIONID,
 			FILTER_NONE,
 		};
@@ -373,7 +370,6 @@ namespace Script {
 	namespace OnMoveItem {
 		enum FilterType {
 			FILTER_ITEMID,
-			FILTER_UNIQUEID,
 			FILTER_ACTIONID,
 		};
 
@@ -545,7 +541,6 @@ namespace Script {
 		enum FilterType {
 			FILTER_NONE,
 			FILTER_ITEMID,
-			FILTER_UNIQUEID,
 			FILTER_ACTIONID,
 			FILTER_CREATUREID,
 		};

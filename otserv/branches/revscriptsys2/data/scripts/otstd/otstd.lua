@@ -15,7 +15,7 @@ require("otstd/classes/classes")
 require("otstd/game")
 
 require("otstd/commands")
-require("otstd/actions/actions")
+require_directory("otstd/actions")
 require("otstd/npc/npc")
 
 require("otstd/misc/gm_xray")

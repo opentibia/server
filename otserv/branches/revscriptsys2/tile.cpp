@@ -27,7 +27,6 @@
 #include "player.h"
 #include "teleport.h"
 #include "trashholder.h"
-#include "mailbox.h"
 
 extern Game g_game;
 
@@ -105,15 +104,6 @@ TrashHolder* Tile::getTrashHolder() const
 	Item* item = items_getItemWithType(ITEM_TYPE_TRASHHOLDER);
 	if(item){
 		return item->getTrashHolder();
-	}
-	return NULL;
-}
-
-Mailbox* Tile::getMailbox() const
-{
-	Item* item = items_getItemWithType(ITEM_TYPE_MAILBOX);
-	if(item){
-		return item->getMailbox();
 	}
 	return NULL;
 }
@@ -494,8 +484,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		else{
 			//FLAG_IGNOREBLOCKITEM is set
 			if(ground){
-				const ItemType& iiType = Item::items[ground->getID()];
-				if(iiType.blockSolid && (!iiType.moveable || ground->getUniqueId() != 0)){
+				if(ground->blockSolid() && !ground->isMoveable()){
 					return RET_NOTPOSSIBLE;
 				}
 			}
@@ -503,8 +492,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			const Item* iitem;
 			for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
 				iitem = (*it);
-				const ItemType& iiType = Item::items[iitem->getID()];
-				if(iiType.blockSolid && (!iiType.moveable || iitem->getUniqueId() != 0)){
+				if(iitem->blockSolid() && !iitem->isMoveable()){
 					return RET_NOTPOSSIBLE;
 				}
 			}
@@ -1187,7 +1175,7 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, const Cylinder* ol
 		}
 	}
 
-	//add a reference to this item, it may be deleted after being added (mailbox for example)
+	//add a reference to this item, it may be deleted after being added (trashholder for example)
 	thing->addRef();
 
 	if(link == LINK_OWNER){
@@ -1211,9 +1199,6 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, const Cylinder* ol
 		}
 		else if(TrashHolder* trashholder = getTrashHolder()){
 			trashholder->__addThing(actor, thing);
-		}
-		else if(Mailbox* mailbox = getMailbox()){
-			mailbox->__addThing(actor, thing);
 		}
 	}
 

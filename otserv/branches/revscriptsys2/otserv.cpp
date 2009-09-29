@@ -195,16 +195,13 @@ int main(int argc, char *argv[])
 	std::cout << ":: ============================================================================" << std::endl;
 	std::cout << "::" << std::endl;
 
-#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ \
+#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ \
 	|| defined __DEBUG_LUASCRIPTS__ || defined __DEBUG_RAID__ || defined __DEBUG_NET__ \
 	|| defined __DEBUG_SQL__
 
 	std::cout << ":: Debugging:";
 	#ifdef __DEBUG__MOVESYS__
 	std::cout << " MOVESYS";
-	#endif
-	#ifdef __DEBUG_MAILBOX__
-	std::cout << " MAILBOX";
 	#endif
 	#ifdef __DEBUG_HOUSES__
 	std::cout << " HOUSES";

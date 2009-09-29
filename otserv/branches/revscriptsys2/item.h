@@ -135,8 +135,6 @@ public:
 	virtual const Teleport* getTeleport() const {return NULL;}
 	virtual TrashHolder* getTrashHolder() {return NULL;}
 	virtual const TrashHolder* getTrashHolder() const {return NULL;}
-	virtual Mailbox* getMailbox() {return NULL;}
-	virtual const Mailbox* getMailbox() const {return NULL;}
 	virtual Door* getDoor() {return NULL;}
 	virtual const Door* getDoor() const {return NULL;}
 	virtual MagicField* getMagicField() {return NULL;}
@@ -189,9 +187,6 @@ public:
 
 	void setActionId(int32_t n);
 	int32_t getActionId() const;
-
-	void setUniqueId(int32_t n);
-	int32_t getUniqueId() const;
 
 	void setCharges(uint16_t n);
 	uint16_t getCharges() const;
@@ -246,6 +241,7 @@ public:
 	}
 
 	bool canDecay();
+	bool isTradeable() const {return true;}
 
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
@@ -266,7 +262,7 @@ public:
 	bool isGroundTile() const {return items[id].isGroundTile();}
 	bool isSplash() const {return items[id].isSplash();}
 	bool isMagicField() const {return items[id].isMagicField();}
-	bool isMoveable() const {return items[id].moveable && getUniqueId() == 0;}
+	bool isMoveable() const {return items[id].moveable;}
 	bool isPickupable() const {return items[id].pickupable;}
 	bool isWeapon() const {return (items[id].weaponType != WEAPON_NONE);}
 	bool isUseable() const {return items[id].useable;}
@@ -442,17 +438,6 @@ inline int32_t Item::getActionId() const {
 	const int32_t* aid = getIntegerAttribute("aid");
 	if(aid)
 		return *aid;
-	return 0;
-}
-
-inline void Item::setUniqueId(int32_t n) {
-	setAttribute("uid", n);
-}
-
-inline int32_t Item::getUniqueId() const {
-	const int32_t* uid = getIntegerAttribute("uid");
-	if(uid)
-		return *uid;
 	return 0;
 }
 
