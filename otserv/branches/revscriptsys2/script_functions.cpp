@@ -3118,19 +3118,14 @@ int LuaState::lua_Item_isPickupable()
 
 // Attributes!
 
-template<typename T> void updateActionID(const std::string& key, Item* item) {}
-template<> void updateActionID<int32_t>(const std::string& key, Item* item)
-{
-	// ...
-}
-
 // Template function to prevent code duplication
-template<typename T>
-void updateActionID(Item* item, T value) {}
+template<typename T> inline void updateActionID(const std::string& key, Item* item, T value) {}
 
-template<> void updateActionID<int32_t>(Item* item, int32_t value)
+template<> inline void updateActionID<int32_t>(const std::string& key, Item* item, int32_t value)
 {
-	item->setActionId(value);
+	//This is to re-index the item if the item is placed on an IndexedTile.
+	if(key == "aid")
+		item->setActionId(value);
 }
 
 template<typename T>
@@ -3141,13 +3136,8 @@ int setItemAttribute(LuaState* state)
 	Item* item = state->popItem();
 
 	item->setAttribute(key, value);
-	
-	updateActionID<T>(key, item);
-
-	if(key == "aid"){
-		//This is to re-index the item if the item is placed on an IndexedTile.
-		updateActionID<T>(item, value);
-	}
+	// Update any intrinistic attributes
+	updateActionID<T>(key, item, value);
 
 	state->pushBoolean(true);
 	return 1;
