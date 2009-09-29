@@ -7,7 +7,7 @@ function otstd.mailbox.handler(event)
 	local label = nil
 	
 	if mail:getItemID() == 2595 then
-		label = filter((\i -> i:getItemID() == 2599), mail:getItems())
+		label = filter((function(i) return i:getItemID() == 2599 end), mail:getItems())
 		if #label == 0 then
 			event.creature:sendNote("No label found")
 			return
