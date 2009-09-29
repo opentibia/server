@@ -481,6 +481,10 @@ public:
 	int lua_Tile_getCreatures();
 	int lua_Tile_getMoveableItems();
 	int lua_Tile_getItems();
+	int lua_Tile_getItemsWithActionID();
+	int lua_Tile_getItemsWithItemID();
+	int lua_Tile_getItemWithActionID();
+	int lua_Tile_getItemWithItemID();
 	int lua_Tile_addItem();
 	int lua_Tile_getItemTypeCount();
 	int lua_Tile_hasProperty();

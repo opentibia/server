@@ -335,6 +335,10 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "getCreatures()", &Manager::lua_Tile_getCreatures);
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
+	registerMemberFunction("Tile", "getItemsWithItemID()", &Manager::lua_Tile_getItemsWithItemID);
+	registerMemberFunction("Tile", "getItemsWithActionID()", &Manager::lua_Tile_getItemsWithActionID);
+	registerMemberFunction("Tile", "getItemWithItemID()", &Manager::lua_Tile_getItemWithItemID);
+	registerMemberFunction("Tile", "getItemWithActionID()", &Manager::lua_Tile_getItemWithActionID);
 	registerMemberFunction("Tile", "queryAdd()", &Manager::lua_Tile_queryAdd);
 	registerMemberFunction("Tile", "hasProperty(TileProp prop)", &Manager::lua_Tile_hasProperty);
 
@@ -1938,6 +1942,56 @@ int LuaState::lua_Tile_getItems()
 		setField(-2, n);
 	}
 
+	return 1;
+}
+
+int LuaState::lua_Tile_getItemsWithActionID()
+{
+	int32_t aid = popInteger();
+	Tile* tile = popTile();
+
+	newTable();
+	int n = 1;
+	ItemVector v = tile->items_getListWithActionId(aid);
+	for(ItemVector::iterator iter = v.begin(), end_iter = v.end(); iter != end_iter; ++iter, ++n){
+		pushThing(*iter);
+		setField(-2, n);
+	}
+
+	return 1;
+}
+
+int LuaState::lua_Tile_getItemsWithItemID()
+{
+	int32_t id = popInteger();
+	Tile* tile = popTile();
+
+	newTable();
+	int n = 1;
+	ItemVector v = tile->items_getListWithItemId(id);
+	for(ItemVector::iterator iter = v.begin(), end_iter = v.end(); iter != end_iter; ++iter, ++n){
+		pushThing(*iter);
+		setField(-2, n);
+	}
+
+	return 1;
+}
+
+int LuaState::lua_Tile_getItemWithActionID()
+{
+	int32_t aid = popInteger();
+	Tile* tile = popTile();
+
+	pushThing(tile->items_getItemWithActionId(aid));
+	return 1;
+}
+
+int LuaState::lua_Tile_getItemWithItemID()
+{
+	int32_t id = popInteger();
+	Tile* tile = popTile();
+
+	pushThing(tile->items_getItemWithItemId(id));
 	return 1;
 }
 
