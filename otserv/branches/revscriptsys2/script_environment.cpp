@@ -146,10 +146,10 @@ bool Environment::stopListener(ListenerType type, uint32_t id) {
 		case enums::ON_ADVANCE_LISTENER:
 			if(stopListener(Generic.OnAdvance, id))
 				return true;
-		case enums::ON_ATTACK:
+		case enums::ON_ATTACK_LISTENER:
 			if(stopListener(Generic.OnAttack, id))
 				return true;
-		case enums::ON_DAMAGE:
+		case enums::ON_DAMAGE_LISTENER:
 			if(stopListener(Generic.OnDamage, id))
 				return true;
 		case enums::ON_KILLED_LISTENER:

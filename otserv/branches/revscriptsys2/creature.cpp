@@ -224,8 +224,14 @@ void Creature::onThink(uint32_t interval)
 void Creature::onAttacking(uint32_t interval)
 {
 	if(attackedCreature){
+
 		onAttacked();
 		attackedCreature->onAttacked();
+
+		if(!g_game.onCreatureAttack(this, attackedCreature)){
+			//script interfered
+			return;
+		}
 
 		if(g_game.isSightClear(getPosition(), attackedCreature->getPosition(), true)){
 			doAttacking(interval);

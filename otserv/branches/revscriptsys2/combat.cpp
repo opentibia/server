@@ -112,6 +112,11 @@ bool Combat::internalCombat(Creature* caster, const std::list<Creature*>& target
 				int32_t maxChange = 0;
 				//getMinMaxValues(caster, target, minChange, maxChange);
 				int32_t value = random_range(minChange, maxChange, DISTRO_NORMAL);
+
+				if(g_game.combatBlockHit(params.combatType, caster, target, value, params.blockedByShield, params.blockedByArmor)){
+					continue;
+				}
+
 				damageList.push_back(std::make_pair(*it, value));
 			}
 			else{
@@ -120,15 +125,16 @@ bool Combat::internalCombat(Creature* caster, const std::list<Creature*>& target
 		}
 	}
 
+	if(!g_game.onCreatureDamage(caster, params.combatType, damageList)){
+		return false;
+	}
+
 	bool result = false;
-	if(params.combatType != COMBAT_NONE){
-		if(!g_game.onCreatureDamage(caster, params.combatType, damageList)){
-			return false;
-		}
-	
-		for(std::list<std::pair<Creature*, int32_t> >::iterator it = damageList.begin(); it != damageList.end(); ++it){
-			Creature* target = it->first;
-			int32_t value = it->second;
+	for(std::list<std::pair<Creature*, int32_t> >::iterator it = damageList.begin(); it != damageList.end(); ++it){
+		Creature* target = it->first;
+		int32_t value = it->second;
+
+		if(params.combatType != COMBAT_NONE){
 			if(params.combatType != COMBAT_MANADRAIN){
 				if(changeHealth(caster, target, value, params)){
 					applyCondition(caster, target, params);
@@ -146,22 +152,13 @@ bool Combat::internalCombat(Creature* caster, const std::list<Creature*>& target
 
 			defaultCombat(caster, target, params, spectators);
 		}
-	}
-	//TODO: Still needed?
-	/*
-	else{
-		if(!g_game.onCreatureDamage(caster, params.combatType, damageList)){
-			return false;
-		}
-		for(std::list<std::pair<Creature*, int32_t> >::iterator it = damageList.begin(); it != damageList.end(); ++it){
-			Creature* target = it->first;
+		else{
 			applyCondition(caster, target, params);
 			applyDispel(caster, target, params);
 			defaultCombat(caster, target, params, spectators);
 			result = true;
 		}
 	}
-	*/
 
 	return result;
 }
@@ -184,10 +181,6 @@ bool Combat::defaultCombat(Creature* caster, Creature* target, const CombatParam
 bool Combat::changeHealth(Creature* caster, Creature* target,
 	int32_t healthChange, const CombatParams& params) const
 {
-	if(g_game.combatBlockHit(params.combatType, caster, target, healthChange, params.blockedByShield, params.blockedByArmor)){
-		return false;
-	}
-
 	if(healthChange < 0){
 #ifdef __SKULLSYSTEM__
 		if(caster && caster->getPlayer() && target->getPlayer() && target->getPlayer()->getSkull() != SKULL_BLACK){

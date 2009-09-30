@@ -515,8 +515,8 @@ template<> void Script::ListenerType__Base::initialize()
 	initAddValue(Script::enums::ON_KILL_LISTENER, "ON_KILL_LISTENER", true);
 	initAddValue(Script::enums::ON_DEATH_LISTENER, "ON_DEATH_LISTENER", true);
 	initAddValue(Script::enums::ON_ADVANCE_LISTENER, "ON_ADVANCE_LISTENER", true);
-	initAddValue(Script::enums::ON_ATTACK, "ON_ATTACK", true);
-	initAddValue(Script::enums::ON_DAMAGE, "ON_DAMAGE", true);
+	initAddValue(Script::enums::ON_ATTACK_LISTENER, "ON_ATTACK_LISTENER", true);
+	initAddValue(Script::enums::ON_DAMAGE_LISTENER, "ON_DAMAGE_LISTENER", true);
 	initAddValue(Script::enums::ON_THINK_LISTENER, "ON_THINK_LISTENER", true);
 	initAddValue(Script::enums::ON_HEAR_LISTENER, "ON_HEAR_LISTENER", true);
 	initAddValue(Script::enums::ON_SPOT_CREATURE_LISTENER, "ON_SPOT_CREATURE_LISTENER", true);

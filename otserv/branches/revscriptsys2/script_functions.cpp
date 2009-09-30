@@ -461,8 +461,12 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnAdvance([LevelType skillid = nil], function callback)", &Manager::lua_registerGenericEvent_OnAdvance);
 	registerGlobalFunction("registerOnPlayerAdvance(Player player [, LevelType skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
 
+	// OnAttack
+	registerGlobalFunction("registerOnAttack([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnAttack);
+	registerGlobalFunction("registerOnCreatureAttack(Creature creature, string method, function callback)", &Manager::lua_registerSpecificEvent_OnAttack);
+
 	// OnKill
-	registerGlobalFunction("registerOnKill([string what = nil], function callback)", &Manager::lua_registerGenericEvent_OnKill);
+	registerGlobalFunction("registerOnKill([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnKill);
 	registerGlobalFunction("registerOnCreatureKill(Creature killer, function callback)", &Manager::lua_registerSpecificEvent_OnKill);
 	registerGlobalFunction("registerOnKilled([string what = nil], function callback)", &Manager::lua_registerGenericEvent_OnKilled);
 	registerGlobalFunction("registerOnCreatureKilled(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnKilled);
@@ -1459,27 +1463,169 @@ int LuaState::lua_registerSpecificEvent_OnAdvance() {
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_OnKill()
-{
+int LuaState::lua_registerGenericEvent_OnAttack() {
 	// Tied to killing creature, either by name or to all kills
 	// Store callback
-	insert(-2);
+	insert(-3);
 
-	OnKill::ScriptInformation si_onkill;
-
+	std::string method = popString();
+	std::string name = "";
 	if(isNil(-1)){
-		si_onkill.method = OnKill::FILTER_ALL;
 		pop();
 	}
 	else{
-		std::string name = popString();
-		if(name == "Player"){
-			si_onkill.method = OnKill::FILTER_KILLER_PLAYER;
-		}
-		else{
-			si_onkill.method = OnKill::FILTER_KILLER_NAME;
-			si_onkill.name = name;
-		}
+		name = popString();
+	}
+
+	OnAttack::ScriptInformation si_onattack;
+	si_onattack.method = OnAttack::FILTER_ALL;
+
+	if(method == "all"){
+		si_onattack.method = OnAttack::FILTER_ALL;
+	}
+	else if(method == "name"){
+		si_onattack.method = OnAttack::FILTER_NAME;
+		si_onattack.name = name;
+	}
+	else if(method == "player"){
+		si_onattack.method = OnAttack::FILTER_PLAYER;
+	}
+	else if(method == "attacked_name"){
+		si_onattack.method = OnAttack::FILTER_ATTACKED_NAME;
+		si_onattack.name = name;
+	}
+	else if(method == "attacked_player"){
+		si_onattack.method = OnAttack::FILTER_ATTACKED_PLAYER;
+	}
+	else if(method == "player_vs_actor"){
+		si_onattack.method = OnAttack::FILTER_PLAYER_VS_ACTOR;
+	}
+	else if(method == "player_vs_player"){
+		si_onattack.method = OnAttack::FILTER_PLAYER_VS_PLAYER;
+	}
+	else if(method == "actor_vs_player"){
+		si_onattack.method = OnAttack::FILTER_ACTOR_VS_PLAYER;
+	}
+	else if(method == "actor_vs_actor"){
+		si_onattack.method = OnAttack::FILTER_ACTOR_VS_ACTOR;
+	}
+	else {
+		throw Error("Invalid argument (2) 'method'");
+	}
+
+	boost::any p(si_onattack);
+	Listener_ptr listener(new Listener(ON_ATTACK_LISTENER, p, *manager));
+
+	environment->Generic.OnAttack.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnAttack() {
+	// Tied to a specific creature, and run each time that creature attacks something
+	// Store callback
+	insert(-3);
+
+	std::string method = popString();
+	Creature* who = popCreature();
+
+	OnAttack::ScriptInformation si_onattack;
+	si_onattack.method = OnAttack::FILTER_ALL;
+
+	if(method == "all"){
+		si_onattack.method = OnAttack::FILTER_ALL;
+	}
+	else if(method == "player"){
+		si_onattack.method = OnAttack::FILTER_PLAYER;
+	}
+	else if(method == "attacked_player"){
+		si_onattack.method = OnAttack::FILTER_ATTACKED_PLAYER;
+	}
+	else if(method == "player_vs_actor"){
+		si_onattack.method = OnAttack::FILTER_PLAYER_VS_ACTOR;
+	}
+	else if(method == "player_vs_player"){
+		si_onattack.method = OnAttack::FILTER_PLAYER_VS_PLAYER;
+	}
+	else if(method == "actor_vs_player"){
+		si_onattack.method = OnAttack::FILTER_ACTOR_VS_PLAYER;
+	}
+	else if(method == "actor_vs_actor"){
+		si_onattack.method = OnAttack::FILTER_ACTOR_VS_ACTOR;
+	}
+	else {
+		throw Error("Invalid argument (2) 'method'");
+	}
+
+	boost::any p(si_onattack);
+	Listener_ptr listener(
+		new Listener(ON_ATTACK_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnKill() {
+	// Tied to killing creature, either by name or to all kills
+	// Store callback
+	insert(-3);
+
+	std::string method = popString();
+	std::string name = "";
+	if(isNil(-1)){
+		pop();
+	}
+	else{
+		name = popString();
+	}
+
+	OnKill::ScriptInformation si_onkill;
+	si_onkill.method = OnKill::FILTER_ALL;
+
+	if(method == "all"){
+		si_onkill.method = OnKill::FILTER_ALL;
+	}
+	else if(method == "name"){
+		si_onkill.method = OnKill::FILTER_NAME;
+		si_onkill.name = name;
+	}
+	else if(method == "player"){
+		si_onkill.method = OnKill::FILTER_PLAYER;
+	}
+	else if(method == "killer_name"){
+		si_onkill.method = OnKill::FILTER_KILLER_NAME;
+		si_onkill.name = name;
+	}
+	else if(method == "killer_player"){
+		si_onkill.method = OnKill::FILTER_KILLER_PLAYER;
+	}
+	else if(method == "player_vs_actor"){
+		si_onkill.method = OnKill::FILTER_PLAYER_VS_ACTOR;
+	}
+	else if(method == "player_vs_player"){
+		si_onkill.method = OnKill::FILTER_PLAYER_VS_PLAYER;
+	}
+	else if(method == "actor_vs_player"){
+		si_onkill.method = OnKill::FILTER_ACTOR_VS_PLAYER;
+	}
+	else if(method == "actor_vs_actor"){
+		si_onkill.method = OnKill::FILTER_ACTOR_VS_ACTOR;
+	}
+	else {
+		throw Error("Invalid argument (2) 'method'");
 	}
 
 	boost::any p(si_onkill);
@@ -1495,8 +1641,7 @@ int LuaState::lua_registerGenericEvent_OnKill()
 	return 1;
 }
 
-int LuaState::lua_registerSpecificEvent_OnKill()
-{
+int LuaState::lua_registerSpecificEvent_OnKill() {
 	// Tied to a specific creature, and run each time that creature kills something
 	// Store callback
 	insert(-2);
@@ -1522,8 +1667,7 @@ int LuaState::lua_registerSpecificEvent_OnKill()
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_OnKilled()
-{
+int LuaState::lua_registerGenericEvent_OnKilled() {
 	// Tied to any dying creature, by name (or all dying creatures)
 	// Store callback
 	insert(-2);
@@ -1558,8 +1702,7 @@ int LuaState::lua_registerGenericEvent_OnKilled()
 	return 1;
 }
 
-int LuaState::lua_registerSpecificEvent_OnKilled()
-{
+int LuaState::lua_registerSpecificEvent_OnKilled() {
 	// Tied to a specific dying creature
 	// Store callback
 	insert(-2);
@@ -1585,8 +1728,7 @@ int LuaState::lua_registerSpecificEvent_OnKilled()
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_OnDeathBy()
-{
+int LuaState::lua_registerGenericEvent_OnDeathBy() {
 	// Store callback
 	insert(-2);
 
@@ -1620,8 +1762,7 @@ int LuaState::lua_registerGenericEvent_OnDeathBy()
 	return 1;
 }
 
-int LuaState::lua_registerSpecificEvent_OnDeathBy()
-{
+int LuaState::lua_registerSpecificEvent_OnDeathBy() {
 	// Store callback
 	insert(-2);
 
@@ -1646,8 +1787,7 @@ int LuaState::lua_registerSpecificEvent_OnDeathBy()
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_OnDeath()
-{
+int LuaState::lua_registerGenericEvent_OnDeath() {
 	// Store callback
 	insert(-2);
 
@@ -1681,8 +1821,7 @@ int LuaState::lua_registerGenericEvent_OnDeath()
 	return 1;
 }
 
-int LuaState::lua_registerSpecificEvent_OnDeath()
-{
+int LuaState::lua_registerSpecificEvent_OnDeath() {
 	// Store callback
 	insert(-2);
 

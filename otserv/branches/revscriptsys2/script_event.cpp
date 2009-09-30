@@ -1147,16 +1147,43 @@ OnAttack::Event::~Event()
 {
 }
 
+bool OnAttack::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_ALL:
+			return true;
+		case FILTER_NAME:
+			return creature->getPlayer() == NULL && creature->getName() == info.name;
+		case FILTER_PLAYER:
+			return creature->getPlayer() != NULL;
+		case FILTER_ATTACKED_NAME:
+			return attacked->getPlayer() == NULL && attacked->getName() == info.name;
+		case FILTER_ATTACKED_PLAYER:
+			return attacked->getPlayer() != NULL;
+		case FILTER_PLAYER_VS_ACTOR:
+			return creature->getPlayer() && !attacked->getPlayer();
+		case FILTER_PLAYER_VS_PLAYER:
+			return creature->getPlayer() && attacked->getPlayer();
+		case FILTER_ACTOR_VS_PLAYER:
+			return !creature->getPlayer() && attacked->getPlayer();
+		case FILTER_ACTOR_VS_ACTOR:
+			return !creature->getPlayer() && !attacked->getPlayer();
+
+		default: break;
+	}
+	return false;
+}
+
 bool OnAttack::Event::dispatch(Manager& state, Environment& environment)
 {
 	if(creature){
-		ListenerList list = creature->getListeners(ON_ATTACK);
-		if(dispatchEvent<OnAttack::Event>
+		ListenerList list = creature->getListeners(ON_ATTACK_LISTENER);
+		if(dispatchEvent<OnAttack::Event, ScriptInformation>
 				(this, state, environment, list))
 			return true;
 	}
 
-	if(dispatchEvent<OnAttack::Event>
+	if(dispatchEvent<OnAttack::Event, ScriptInformation>
 			(this, state, environment, environment.Generic.OnAttack))
 		return true;
 
@@ -1199,7 +1226,7 @@ OnDamage::Event::~Event()
 bool OnDamage::Event::dispatch(Manager& state, Environment& environment)
 {
 	if(creature){
-		ListenerList list = creature->getListeners(ON_DAMAGE);
+		ListenerList list = creature->getListeners(ON_DAMAGE_LISTENER);
 		if(dispatchEvent<OnDamage::Event>
 				(this, state, environment, list))
 			return true;
@@ -1308,6 +1335,14 @@ bool OnKill::Event::check_match(const ScriptInformation& info)
 			return killer->getPlayer() == NULL && killer->getName() == info.name;
 		case FILTER_KILLER_PLAYER:
 			return killer->getPlayer() != NULL;
+		case FILTER_PLAYER_VS_ACTOR:
+			return creature->getPlayer() && !killer->getPlayer();
+		case FILTER_PLAYER_VS_PLAYER:
+			return creature->getPlayer() && killer->getPlayer();
+		case FILTER_ACTOR_VS_PLAYER:
+			return !creature->getPlayer() && killer->getPlayer();
+		case FILTER_ACTOR_VS_ACTOR:
+			return !creature->getPlayer() && !killer->getPlayer();
 		default: break;
 	}
 	return false;

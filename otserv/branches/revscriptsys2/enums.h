@@ -749,8 +749,8 @@ namespace enums {
 		ON_KILL_LISTENER,
 		ON_DEATH_LISTENER,
 		ON_ADVANCE_LISTENER,
-		ON_ATTACK,
-		ON_DAMAGE,
+		ON_ATTACK_LISTENER,
+		ON_DAMAGE_LISTENER,
 		ON_THINK_LISTENER,
 		ON_HEAR_LISTENER,
 		ON_SPOT_CREATURE_LISTENER,
@@ -782,8 +782,8 @@ typedef Enum<Script::enums::ListenerType, Script::enums::ON_LOSE_CREATURE_LISTEN
 	const ListenerType ON_KILL_LISTENER(enums::ON_KILL_LISTENER);
 	const ListenerType ON_DEATH_LISTENER(enums::ON_DEATH_LISTENER);
 	const ListenerType ON_ADVANCE_LISTENER(enums::ON_ADVANCE_LISTENER);
-	const ListenerType ON_ATTACK(enums::ON_ATTACK);
-	const ListenerType ON_DAMAGE(enums::ON_DAMAGE);
+	const ListenerType ON_ATTACK_LISTENER(enums::ON_ATTACK_LISTENER);
+	const ListenerType ON_DAMAGE_LISTENER(enums::ON_DAMAGE_LISTENER);
 	const ListenerType ON_THINK_LISTENER(enums::ON_THINK_LISTENER);
 	const ListenerType ON_HEAR_LISTENER(enums::ON_HEAR_LISTENER);
 	const ListenerType ON_SPOT_CREATURE_LISTENER(enums::ON_SPOT_CREATURE_LISTENER);

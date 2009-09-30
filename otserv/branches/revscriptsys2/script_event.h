@@ -691,6 +691,23 @@ namespace Script {
 	// Triggered when a creature attacks a creature.
 
 	namespace OnAttack {
+		enum FilterType {
+			FILTER_ALL,
+			FILTER_NAME,
+			FILTER_PLAYER,
+			FILTER_ATTACKED_NAME,
+			FILTER_ATTACKED_PLAYER,
+			FILTER_PLAYER_VS_ACTOR,
+			FILTER_PLAYER_VS_PLAYER,
+			FILTER_ACTOR_VS_PLAYER,
+			FILTER_ACTOR_VS_ACTOR
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			std::string name;
+		};
+
 		class Event : public Script::Event {
 		public:
 			Event(Creature* creature, Creature* attacked);
@@ -700,6 +717,9 @@ namespace Script {
 
 			// Runs the event
 			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
 			void push_instance(LuaState& state, Environment& environment);
@@ -748,7 +768,11 @@ namespace Script {
 			FILTER_NAME,
 			FILTER_PLAYER,
 			FILTER_KILLER_NAME,
-			FILTER_KILLER_PLAYER
+			FILTER_KILLER_PLAYER,
+			FILTER_PLAYER_VS_ACTOR,
+			FILTER_PLAYER_VS_PLAYER,
+			FILTER_ACTOR_VS_PLAYER,
+			FILTER_ACTOR_VS_ACTOR
 		};
 
 		struct ScriptInformation {
