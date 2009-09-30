@@ -94,9 +94,20 @@ void LuaState::newTable()
 	lua_newtable(state);
 }
 
+bool LuaState::iterateTable(int32_t index)
+{
+	return lua_next(state, index) != 0;
+}
+
 void LuaState::getField(int32_t index, const std::string& field_name)
 {
 	lua_getfield(state, index, field_name.c_str());
+}
+
+void LuaState::getField(int32_t index, int field_index)
+{
+	lua_pushnumber(state, field_index);
+	lua_gettable(state, (index < 0? index - 1 : index));
 }
 
 void LuaState::setField(int32_t index, const std::string& field_name)

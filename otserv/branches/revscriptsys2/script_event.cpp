@@ -244,7 +244,7 @@ void OnSay::Event::update_instance(Manager& state, Environment& environment, Lua
 		speak_class = (SpeakClass)thread->popInteger();
 	}
 	else {
-		thread->HandleError("Event 'OnSay' invalid value of 'class'");
+		thread->HandleError(ERROR_WARN, "Event 'OnSay' invalid value of 'class'");
 		thread->pop();
 	}
 
@@ -253,7 +253,7 @@ void OnSay::Event::update_instance(Manager& state, Environment& environment, Lua
 		text = thread->popString();
 	}
 	else {
-		thread->HandleError("Event 'OnSay' invalid value of 'text'");
+		thread->HandleError(ERROR_WARN, "Event 'OnSay' invalid value of 'text'");
 		thread->pop();
 	}
 }
@@ -360,7 +360,7 @@ void OnUseItem::Event::update_instance(Manager& state, Environment& environment,
 		retval = (ReturnValue)thread->popInteger();
 	}
 	else {
-		thread->HandleError("Event 'OnUseItem' invalid value of 'retval'");
+		thread->HandleError(ERROR_WARN, "Event 'OnUseItem' invalid value of 'retval'");
 		thread->pop();
 	}
 }
@@ -909,7 +909,7 @@ void OnLook::Event::update_instance(Manager& state, Environment& environment, Lu
 		desc = thread->popString();
 	}
 	else {
-		thread->HandleError("Event 'OnLook' invalid value of 'description'");
+		thread->HandleError(ERROR_WARN, "Event 'OnLook' invalid value of 'description'");
 		thread->pop();
 	}
 }
@@ -1220,15 +1220,18 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 	state.pushEnum(combatType);
 	state.setField(-2, "combatType");
 
-	/*
-	TODO:
 	state.newTable();
 	int n = 1;
-	for(std::list<Creature*>::iterator it = damageList.begin(); it != damageList.end(); ++it){
-		state.pushThing(*it);
+	for(std::list<std::pair<Creature*, int32_t> >::iterator it = damageList.begin(); it != damageList.end(); ++it, ++n){
+		state.newTable();
+		state.pushThing(it->first);
+		state.setField(-2, 1);
+		state.pushInteger(it->second);
+		state.setField(-2, 1);
+
 		state.setField(-2, n);
 	}
-	*/
+	state.setField(-2, "targets");
 }
 
 void OnDamage::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
@@ -1236,6 +1239,34 @@ void OnDamage::Event::update_instance(Manager& state, Environment& environment, 
 	thread->getField(-1, "combatType");
 	if(thread->isTable()) {
 		combatType = thread->popEnum<CombatType>();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of 'combatType'");
+		thread->pop();
+	}
+
+	thread->getField(-1, "targets");
+	if(thread->isTable()) {
+		thread->pushNil();
+		std::list<std::pair<Creature*, int32_t> >::iterator iter = damageList.begin();
+		while (thread->iterateTable(-2) && iter != damageList.end()){
+			if(thread->isTable()) {
+				thread->getField(-1, 2);
+				if(thread->isNumber()) {
+					iter->second = thread->popInteger();
+				}
+				else{
+					thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of damage in 'targets'");
+					thread->pop();
+				}
+			}
+			else{
+				thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of field in 'targets'");
+				thread->pop();
+			}
+			++iter;
+		}
+		thread->pop();
 	}
 	else {
 		thread->HandleError("Event 'OnDamage' invalid value of 'combatType'");

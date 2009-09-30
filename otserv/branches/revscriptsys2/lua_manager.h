@@ -101,6 +101,12 @@ public:
 	}
 	// Pushes value onto the stack
 	void getField(int32_t index, const std::string& field_name);
+	void getField(int32_t index, int field_index);
+	
+	// Iterator over table
+	// Make sure to push nil before calling
+	bool iterateTable(int32_t index);
+
 
 	// Top value as value
 	void setGlobal(const std::string& gname) {setField(LUA_GLOBALSINDEX, gname);}
