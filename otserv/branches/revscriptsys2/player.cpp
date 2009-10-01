@@ -1930,9 +1930,9 @@ void Player::removeMessageBuffer()
 	}
 }
 
-void Player::drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext /*= true*/)
+void Player::drainHealth(CombatType combatType, const CombatSource& combatSource, int32_t damage, bool showtext /*= true*/)
 {
-	Creature::drainHealth(attacker, combatType, damage, showtext);
+	Creature::drainHealth(combatType, combatSource, damage, showtext);
 
 	sendStats();
 
@@ -1944,8 +1944,8 @@ void Player::drainHealth(Creature* attacker, CombatType combatType, int32_t dama
 		else
 			ss << "You lose " << damage << " hitpoints";
 
-		if(attacker){
-			ss << " due to an attack by " << attacker->getNameDescription();
+		if(combatSource.isSourceCreature()){
+			ss << " due to an attack by " << combatSource.getSourceCreature()->getNameDescription();
 		}
 
 		ss << ".";
@@ -1954,16 +1954,16 @@ void Player::drainHealth(Creature* attacker, CombatType combatType, int32_t dama
 	}
 }
 
-void Player::drainMana(Creature* attacker, int32_t points, bool showtext /*= true*/)
+void Player::drainMana(const CombatSource& combatSource, int32_t points, bool showtext /*= true*/)
 {
-	Creature::drainMana(attacker, points, showtext);
+	Creature::drainMana(combatSource, points, showtext);
 
 	sendStats();
 
 	if(showtext){
 		std::stringstream ss;
-		if(attacker){
-			ss << "You lose " << points << " mana blocking an attack by " << attacker->getNameDescription() << ".";
+		if(combatSource.isSourceCreature()){
+			ss << "You lose " << points << " mana blocking an attack by " << combatSource.getSourceCreature()->getNameDescription() << ".";
 		}
 		else{
 			ss << "You lose " << points << " mana.";
@@ -2167,13 +2167,15 @@ bool Player::hasShield() const
 
 	return result;
 }
-BlockType Player::blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
-							 bool checkDefense /* = false*/, bool checkArmor /* = false*/)
+BlockType Player::blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
+	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
-	BlockType blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+	BlockType blockType = Creature::blockHit(combatType, combatSource, damage, checkDefense, checkArmor);
 
-	if(attacker)
+	Creature* attacker = combatSource.getSourceCreature();
+	if(attacker){
 		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
+	}
 
 	if(blockType != BLOCK_NONE)
 		return blockType;

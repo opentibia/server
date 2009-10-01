@@ -208,7 +208,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 					spread = std::max(0, intValue);
 				}
 
-				AreaCombat* area = new AreaCombat();
+				CombatArea* area = new CombatArea();
 				area->setupArea(length, spread);
 				combat->setArea(area);
 
@@ -224,7 +224,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 				needTarget = (intValue != 0);
 			}
 
-			AreaCombat* area = new AreaCombat();
+			CombatArea* area = new CombatArea();
 			area->setupArea(radius);
 			combat->setArea(area);
 		}

@@ -39,23 +39,23 @@ Combat::~Combat()
 	//
 }
 
-void Combat::doCombat(Creature* caster, Creature* target, CombatParams& params) const
+void Combat::combatToTarget(CombatSource& combatSource, CombatParams& params, Creature* target) const
 {
-	//target combat callback function
-	bool result = internalCombat(caster, target, params);
+	bool result = internalCombat(combatSource, params, target);
 	if(result){
-		if(params.impactEffect != NM_ME_NONE){
-			g_game.addMagicEffect(target->getPosition(), params.impactEffect);
+		if(params.effects.impactEffect != NM_ME_NONE){
+			g_game.addMagicEffect(target->getPosition(), params.effects.impactEffect);
 		}
 
-		if(caster && params.distanceEffect != NM_ME_NONE){
-			g_game.addDistanceEffect(caster, caster->getPosition(), target->getPosition(), params.distanceEffect);
+		Creature* attacker = combatSource.getSourceCreature();
+		if(attacker && params.effects.distanceEffect != NM_ME_NONE){
+			g_game.addDistanceEffect(attacker, attacker->getPosition(), target->getPosition(), params.effects.distanceEffect);
 		}
 	}
 }
 
-void Combat::doCombat(Creature* caster, const Position& pos,
-	const AreaCombat* area, CombatParams& params) const
+void Combat::combatToArea(CombatSource& combatSource, CombatParams& params,
+	const Position& pos, const CombatArea* area) const
 {
 	std::list<Tile*> tileList;
 	getCombatArea(pos, pos, area, tileList);
@@ -63,18 +63,20 @@ void Combat::doCombat(Creature* caster, const Position& pos,
 	SpectatorVec spectators;
 	getSpectators(pos, tileList, spectators);
 
+	Creature* attacker = combatSource.getSourceCreature();
+
 	Tile* iter_tile;
 	for(std::list<Tile*>::iterator it = tileList.begin(); it != tileList.end(); ++it){
 		iter_tile = *it;
 		bool bContinue = true;
 
-		if(canDoCombat(caster, iter_tile, params.isAggressive) == RET_NOERROR){
+		if(canDoCombat(attacker, iter_tile, params.isAggressive) == RET_NOERROR){
 			CreatureIterator cit;
 			CreatureIterator cend = iter_tile->creatures_end();
 			for(cit = iter_tile->creatures_begin(); bContinue && cit != cend; ++cit){
 				if(params.targetCasterOrTopMost){
-					if(caster && caster->getTile() == iter_tile){
-						if(*cit == caster){
+					if(attacker && attacker->getTile() == iter_tile){
+						if(*cit == attacker){
 							bContinue = false;
 						}
 					}
@@ -87,49 +89,52 @@ void Combat::doCombat(Creature* caster, const Position& pos,
 					}
 				}
 
-				internalCombat(caster, *cit, params, &spectators);
+				internalCombat(combatSource, params, *cit, &spectators);
 			}
 		}
 	}
 
-	g_game.addDistanceEffect(caster, caster->getPosition(), pos, params.distanceEffect);
+	if(attacker){
+		g_game.addDistanceEffect(attacker, attacker->getPosition(), pos, params.effects.distanceEffect);
+	}
 }
 
-bool Combat::internalCombat(Creature* caster, Creature* target, CombatParams& params,
+bool Combat::internalCombat(CombatSource& combatSource, CombatParams& params, Creature* target,
 	const SpectatorVec* spectators /*= NULL*/) const
 {
-	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	Creature* attacker = combatSource.getSourceCreature();
+	if(!params.isAggressive || (attacker != target && Combat::canDoCombat(attacker, target) == RET_NOERROR)){
 		if(params.combatType != COMBAT_NONE){
 			int32_t minChange = 0;
 			int32_t maxChange = 0;
-			//getMinMaxValues(caster, target, minChange, maxChange);
+			//getMinMaxValues(attacker, target, minChange, maxChange);
 			int32_t value = random_range(minChange, maxChange, DISTRO_NORMAL);
 
-			if(g_game.combatBlockHit(params.combatType, caster, target, value, params.blockedByShield, params.blockedByArmor)){
+			if(g_game.combatBlockHit(params.combatType, combatSource, target, value, params.blockedByShield, params.blockedByArmor)){
 				return true;
 			}
 
 			if(params.combatType != COMBAT_MANADRAIN){
-				if(changeHealth(caster, target, value, params)){
-					applyCondition(caster, target, params);
-					applyDispel(caster, target, params);
+				if(changeHealth(combatSource, params, target, value)){
+					applyCondition(combatSource, params, target);
+					applyDispel(combatSource, params, target);
 					return true;
 				}
 			}
 			else{
-				if(changeMana(caster, target, value, params)){
-					applyCondition(caster, target, params);
-					applyDispel(caster, target, params);
+				if(changeMana(combatSource, params, target, value)){
+					applyCondition(combatSource, params, target);
+					applyDispel(combatSource, params, target);
 					return true;
 				}
 			}
 
-			defaultCombat(caster, target, params, spectators);
+			defaultCombat(combatSource, params, target, spectators);
 		}
 		else{
-			applyCondition(caster, target, params);
-			applyDispel(caster, target, params);
-			defaultCombat(caster, target, params, spectators);
+			applyCondition(combatSource, params, target);
+			applyDispel(combatSource, params, target);
+			defaultCombat(combatSource, params, target, spectators);
 			return true;
 		}
 	}
@@ -137,62 +142,64 @@ bool Combat::internalCombat(Creature* caster, Creature* target, CombatParams& pa
 	return false;
 }
 
-bool Combat::defaultCombat(Creature* caster, Creature* target, CombatParams& params, 
+bool Combat::defaultCombat(CombatSource& combatSource, CombatParams& params, Creature* target, 
 	const SpectatorVec* spectators) const
 {
 	if(params.itemId != 0){
+		Creature* attacker = combatSource.getSourceCreature();
 		if(spectators){
-			addTileItem(*spectators, caster, target->getTile(), params);
+			addTileItem(*spectators, attacker, target->getTile(), params);
 		}
 		else{
 			const SpectatorVec& list = g_game.getSpectators(target->getTile()->getPosition());
-			addTileItem(list, caster, target->getTile(), params);
+			addTileItem(list, attacker, target->getTile(), params);
 		}
 	}
 	return true;
 }
 
-bool Combat::changeHealth(Creature* caster, Creature* target,
-	int32_t healthChange, CombatParams& params) const
+bool Combat::changeHealth(CombatSource& combatSource, CombatParams& params, Creature* target, int32_t healthChange) const
 {
+	Creature* attacker = combatSource.getSourceCreature();
 	if(healthChange < 0){
 #ifdef __SKULLSYSTEM__
-		if(caster && caster->getPlayer() && target->getPlayer() && target->getPlayer()->getSkull() != SKULL_BLACK){
+		if(attacker && attacker->getPlayer() && target->getPlayer() && target->getPlayer()->getSkull() != SKULL_BLACK){
 #else
-	if(caster && caster->getPlayer() && target->getPlayer()){
+	if(attacker && attacker->getPlayer() && target->getPlayer()){
 #endif
 			healthChange = healthChange/2;
 		}
 	}
 
-	return g_game.combatChangeHealth(params.combatType, params.hitEffect, params.hitTextColor, caster, target, healthChange);
+	return g_game.combatChangeHealth(params.combatType, combatSource, params.effects, target, healthChange);  
 }
 
-bool Combat::changeMana(Creature* caster, Creature* target,
-	int32_t manaChange, CombatParams& params) const
+bool Combat::changeMana(CombatSource& combatSource, CombatParams& params, Creature* target, int32_t manaChange) const
 {
+	Creature* attacker = combatSource.getSourceCreature();
 	if(manaChange < 0){
 #ifdef __SKULLSYSTEM__
-		if(caster && caster->getPlayer() && target->getPlayer() && target->getPlayer()->getSkull() != SKULL_BLACK){
+		if(attacker && attacker->getPlayer() && target->getPlayer() && target->getPlayer()->getSkull() != SKULL_BLACK){
 #else
-		if(caster && caster->getPlayer() && target->getPlayer()){
+		if(attacker && attacker->getPlayer() && target->getPlayer()){
 #endif
 			manaChange = manaChange/2;
 		}
 	}
 
-	return g_game.combatChangeMana(caster, target, manaChange);
+	return g_game.combatChangeMana(combatSource, params.effects, target, manaChange);
 }
 
-bool Combat::applyCondition(Creature* caster, Creature* target, CombatParams& params) const
+bool Combat::applyCondition(CombatSource& combatSource, CombatParams& params, Creature* target) const
 {
+	Creature* attacker = combatSource.getSourceCreature();
 	for(std::list<const Condition*>::const_iterator it = params.conditionList.begin(); it != params.conditionList.end(); ++it){
 		const Condition* condition = *it;
 
-		if(caster == target || !target->isImmune(condition->getType())){
+		if(attacker == target || !target->isImmune(condition->getType())){
 			Condition* conditionCopy = condition->clone();
-			if(caster){
-				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
+			if(attacker){
+				conditionCopy->setParam(CONDITIONPARAM_OWNER, attacker->getID());
 			}
 
 			//TODO: infight condition until all aggressive conditions has ended
@@ -203,29 +210,27 @@ bool Combat::applyCondition(Creature* caster, Creature* target, CombatParams& pa
 	return true;
 }
 
-bool Combat::applyDispel(Creature* caster, Creature* target, CombatParams& params) const
+bool Combat::applyDispel(CombatSource& combatSource, CombatParams& params, Creature* target) const
 {
+	Creature* attacker = combatSource.getSourceCreature();
 	if(target->hasCondition(params.dispelType)){
-		target->removeCondition(caster, params.dispelType);
+		target->removeCondition(attacker, params.dispelType);
 		return true;
 	}
 
 	return false;
 }
 
-void Combat::addTileItem(const SpectatorVec& list, Creature* caster, Tile* tile, CombatParams& params) const
+void Combat::addTileItem(const SpectatorVec& list, Creature* attacker, Tile* tile, CombatParams& params) const
 {
 	if(params.itemId != 0){
 		uint32_t itemId = params.itemId;
-		Player* p_caster = NULL;
-		if(caster){
-			if(caster->getPlayer()){
-				p_caster = caster->getPlayer();
-			}else if(caster->isPlayerSummon()){
-				p_caster = caster->getPlayerMaster();
+		if(attacker && (attacker->getPlayer() || attacker->isPlayerSummon())){
+			Player* player = attacker->getPlayer();
+			if(!player){
+				player = attacker->getPlayerMaster();
 			}
-		}
-		if(p_caster){
+
 			if(g_game.getWorldType() == WORLD_TYPE_NOPVP || tile->hasFlag(TILEPROP_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD_PVP){
 					itemId = ITEM_FIREFIELD_NOPVP;
@@ -239,20 +244,20 @@ void Combat::addTileItem(const SpectatorVec& list, Creature* caster, Tile* tile,
 			} else if(params.isAggressive){
 				const ItemType& it = Item::items[itemId];
 				if(!it.blockSolid){
-					p_caster->addInFightTicks(g_game.getInFightTicks(), true);
+					player->addInFightTicks(g_game.getInFightTicks(), true);
 				}
 				else{
-					p_caster->addInFightTicks(g_game.getInFightTicks());
+					player->addInFightTicks(g_game.getInFightTicks());
 				}
 			}
 		}
 		Item* item = Item::CreateItem(itemId);
 
-		if(caster){
-			item->setOwner(caster->getID());
+		if(attacker){
+			item->setOwner(attacker->getID());
 		}
 
-		ReturnValue ret = g_game.internalAddItem(caster, tile, item);
+		ReturnValue ret = g_game.internalAddItem(attacker, tile, item);
 		if(ret == RET_NOERROR){
 			g_game.startDecay(item);
 		}
@@ -262,7 +267,7 @@ void Combat::addTileItem(const SpectatorVec& list, Creature* caster, Tile* tile,
 	}
 }
 
-void Combat::getCombatArea(const Position& centerPos, const Position& targetPos, const AreaCombat* area,
+void Combat::getCombatArea(const Position& centerPos, const Position& targetPos, const CombatArea* area,
 	std::list<Tile*>& list) const
 {
 	if(area){
@@ -398,7 +403,7 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 	return Combat::canDoCombat(player, target);
 }
 
-ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive)
+ReturnValue Combat::canDoCombat(const Creature* attacker, const Tile* tile, bool isAggressive)
 {
 	if(tile->blockProjectile()){
 		return RET_NOTENOUGHROOM;
@@ -412,16 +417,16 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 		return RET_NOTENOUGHROOM;
 	}
 
-	if(caster){
-		if(caster->getPosition().z < tile->getPosition().z){
+	if(attacker){
+		if(attacker->getPosition().z < tile->getPosition().z){
 			return RET_FIRSTGODOWNSTAIRS;
 		}
 
-		if(caster->getPosition().z > tile->getPosition().z){
+		if(attacker->getPosition().z > tile->getPosition().z){
 			return RET_FIRSTGOUPSTAIRS;
 		}
 
-		if(const Player* player = caster->getPlayer()){
+		if(const Player* player = attacker->getPlayer()){
 			if(player->hasFlag(PlayerFlag_IgnoreProtectionZone)){
 				return RET_NOERROR;
 			}
@@ -608,25 +613,25 @@ void Combat::getSpectators(const Position& pos, const std::list<Tile*>& tile_lis
 		maxY + Map::maxViewportY, maxY + Map::maxViewportY);
 }
 
-void AreaCombat::clear()
+void CombatArea::clear()
 {
-	for(AreaCombatMap::iterator it = areas.begin(); it != areas.end(); ++it){
+	for(CombatAreaMap::iterator it = areas.begin(); it != areas.end(); ++it){
 		delete it->second;
 	}
 
 	areas.clear();
 }
 
-AreaCombat::AreaCombat(const AreaCombat& rhs)
+CombatArea::CombatArea(const CombatArea& rhs)
 {
 	hasExtArea = rhs.hasExtArea;
 
-	for(AreaCombatMap::const_iterator it = rhs.areas.begin(); it != rhs.areas.end(); ++it){
+	for(CombatAreaMap::const_iterator it = rhs.areas.begin(); it != rhs.areas.end(); ++it){
 		areas[it->first] = new MatrixArea(*it->second);
 	}
 }
 
-bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const
+bool CombatArea::getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const
 {
 	Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 
@@ -690,7 +695,7 @@ int32_t round(float v)
 	}
 }
 
-void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOperation_t op) const
+void CombatArea::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOperation_t op) const
 {
 	uint32_t centerY, centerX;
 	input->getCenter(centerY, centerX);
@@ -776,7 +781,7 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 	}
 }
 
-MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, uint32_t rows)
+MatrixArea* CombatArea::createArea(const std::list<uint32_t>& list, uint32_t rows)
 {
 	unsigned int cols = list.size() / rows;
 	MatrixArea* area = new MatrixArea(rows, cols);
@@ -804,7 +809,7 @@ MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, uint32_t row
 	return area;
 }
 
-void AreaCombat::setupArea(const std::list<uint32_t>& list, uint32_t rows)
+void CombatArea::setupArea(const std::list<uint32_t>& list, uint32_t rows)
 {
 	MatrixArea* area = createArea(list, rows);
 
@@ -829,7 +834,7 @@ void AreaCombat::setupArea(const std::list<uint32_t>& list, uint32_t rows)
 	areas[WEST] = westArea;
 }
 
-void AreaCombat::setupArea(int32_t length, int32_t spread)
+void CombatArea::setupArea(int32_t length, int32_t spread)
 {
 	std::list<uint32_t> list;
 
@@ -865,7 +870,7 @@ void AreaCombat::setupArea(int32_t length, int32_t spread)
 	setupArea(list, rows);
 }
 
-void AreaCombat::setupArea(int32_t radius)
+void CombatArea::setupArea(int32_t radius)
 {
 	int32_t area[13][13] = {
 		{0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0},
@@ -902,7 +907,7 @@ void AreaCombat::setupArea(int32_t radius)
 	setupArea(list, 13);
 }
 
-void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
+void CombatArea::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 {
 	if(list.empty()){
 		return;

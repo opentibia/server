@@ -26,6 +26,7 @@
 #include "templates.h"
 #include "enums.h"
 #include "const.h"
+#include "combat.h"
 
 enum stackPosType_t{
 	STACKPOS_NORMAL,
@@ -526,7 +527,7 @@ public:
 	void onCreatureHear(Creature* listener, Creature* speaker, const SpeakClass& sclass, const std::string& text);
 	void onCreatureThink(Creature* creature, int interval);
 	bool onCreatureAttack(Creature* creature, Creature* attacked);
-	bool onCreatureDamage(Creature* creature, CombatType& combatType, int32_t& value, Creature* attacker);
+	bool onCreatureDamage(CombatType& combatType, CombatSource& combatSource, Creature* creature, int32_t& value);
 	bool onCreatureKill(Creature* creature, Creature* killer);
 	bool onCreatureDeath(Creature* creature, Item* corpse, Creature* killer);
 
@@ -576,12 +577,26 @@ public:
 	void checkLight();
 	bool kickPlayer(uint32_t playerId);
 
-	bool combatBlockHit(CombatType combatType, Creature* attacker, Creature* target,
-		int32_t& healthChange, bool checkDefense, bool checkArmor);
+	void combatToTarget(Creature* attacker, CombatParams& params, Creature* target);
+	void combatToTarget(CombatSource combatSource, CombatParams& params, Creature* target);
+	void combatToArea(Creature* attacker, CombatParams& params, const Position& pos, const CombatArea* area);
+	void combatToArea(CombatSource combatSource, CombatParams& params, const Position& pos, const CombatArea* area);
 
-	bool combatChangeHealth(CombatType combatType, MagicEffectClasses hitEffect, TextColor_t customTextColor, Creature* attacker, Creature* target, int32_t healthChange, bool showeffect = true);
-	bool combatChangeHealth(CombatType combatType, Creature* attacker, Creature* target, int32_t healthChange, bool showeffect = true);
-	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange, bool showeffect = true);
+	bool combatBlockHit(CombatType combatType, CombatSource combatSource, Creature* target,
+		int32_t& healthChange, bool checkDefense, bool checkArmor);
+	bool combatChangeHealth(CombatType combatType, Creature* attacker,
+		Creature* target, int32_t healthChange, bool showEffect = true);
+	bool combatChangeHealth(CombatType combatType, CombatSource combatSource,
+		Creature* target, int32_t healthChange, bool showEffect = true);
+	bool combatChangeHealth(CombatType combatType, CombatSource combatSource, CombatEffect combatEffect,
+		Creature* target, int32_t healthChange);
+
+	bool combatChangeMana(Creature* attacker, Creature* target,
+		int32_t manaChange, bool showEffect = true);
+	bool combatChangeMana(CombatSource combatSource, Creature* target,
+		int32_t manaChange, bool showEffect = true);
+	bool combatChangeMana(CombatSource combatSource, CombatEffect combatEffect,
+		Creature* target, int32_t manaChange);
 
 	// Action helper function
 public:
@@ -713,6 +728,7 @@ protected:
 
 	ServiceManager* service_manager;
 	Map* map;
+	Combat combat;
 
 	std::vector<std::string> commandTags;
 

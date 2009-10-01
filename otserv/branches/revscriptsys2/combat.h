@@ -25,6 +25,48 @@
 #include "map.h"
 #include "otsystem.h"
 
+struct CombatSource{
+	CombatSource(Creature* creature, Item* item, bool sourceCondition) : creature(creature), item(item), sourceCondition(sourceCondition) {}
+	CombatSource(Creature* creature) : creature(creature), item(NULL), sourceCondition(false) {}
+	CombatSource(Item* item) : creature(NULL), item(item), sourceCondition(false) {}
+
+	bool isSourceCreature() const {return creature != NULL;}
+	bool isSourceItem() const {return item != NULL;}
+	bool isSourceCondition() const {return sourceCondition;}
+
+	Creature* getSourceCreature() const {return creature;}
+	Item* getSourceItem() const {return item;}
+
+private:
+	Creature* creature;
+	Item* item;
+	bool sourceCondition;
+};
+
+struct CombatEffect{
+	CombatEffect(bool showEffect) : showEffect(showEffect)
+	{
+		hitEffect = NM_ME_UNK;
+		hitTextColor = TEXTCOLOR_UNK;
+		impactEffect = NM_ME_NONE;
+		distanceEffect = NM_ME_NONE;
+	}
+
+	CombatEffect() {
+		hitEffect = NM_ME_UNK;
+		hitTextColor = TEXTCOLOR_UNK;
+		impactEffect = NM_ME_NONE;
+		distanceEffect = NM_ME_NONE;
+		showEffect = true;
+	}
+
+	MagicEffectClasses hitEffect;
+	TextColor_t hitTextColor;
+	uint8_t impactEffect;
+	uint8_t distanceEffect;
+	bool showEffect;
+};
+
 struct CombatParams{
 	CombatParams() {
 		combatType = COMBAT_NONE;
@@ -33,10 +75,6 @@ struct CombatParams{
 		targetCasterOrTopMost = false;
 		isAggressive = true;
 		itemId = 0;
-		hitEffect = NM_ME_UNK;
-		hitTextColor = TEXTCOLOR_UNK;
-		impactEffect = NM_ME_NONE;
-		distanceEffect = NM_ME_NONE;
 		dispelType = CONDITION_NONE;
 		useCharges = false;
 	}
@@ -49,22 +87,21 @@ struct CombatParams{
 	bool targetCasterOrTopMost;
 	bool isAggressive;
 	uint32_t itemId;
-	MagicEffectClasses hitEffect;
-	TextColor_t hitTextColor;
-	uint8_t impactEffect;
-	uint8_t distanceEffect;
 	bool useCharges;
+
+	CombatEffect effects;
 };
 
-class AreaCombat;
+class CombatArea;
 
 class Combat {
 public:
 	Combat();
 	~Combat();
 
-	void doCombat(Creature* caster, Creature* target, CombatParams& params) const;
-	void doCombat(Creature* caster, const Position& pos, const AreaCombat* area, CombatParams& params) const;
+	void combatToTarget(CombatSource& combatSource, CombatParams& params, Creature* target) const;
+	void combatToArea(CombatSource& combatSource, CombatParams& params,
+		const Position& pos, const CombatArea* area) const;
 
 	static bool isInPvpZone(const Creature* attacker, const Creature* target);
 	static bool isUnjustKill(const Creature* attacker, const Creature* target);
@@ -72,26 +109,26 @@ public:
 	static CombatType ConditionToDamageType(ConditionType type);
 	static ConditionType DamageToConditionType(CombatType type);
 	static ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
-	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
+	static ReturnValue canDoCombat(const Creature* attacker, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
 	static Position getCasterPosition(const Creature* creature, Direction dir);
 
 protected:
-	bool internalCombat(Creature* caster, Creature* target, CombatParams& params,
+	bool internalCombat(CombatSource& combatSource, CombatParams& params, Creature* target,
 		const SpectatorVec* spectators = NULL) const;
 
+	bool defaultCombat(CombatSource& combatSource, CombatParams& params, Creature* target,
+		const SpectatorVec* spectators) const;
+
 	void getCombatArea(const Position& centerPos, const Position& targetPos,
-		const AreaCombat* area, std::list<Tile*>& list) const;
+		const CombatArea* area, std::list<Tile*>& list) const;
 
-	bool changeHealth(Creature* caster, Creature* target,
-		int32_t healthChange, CombatParams& params) const;	
-	bool changeMana(Creature* caster, Creature* target,
-		int32_t manaChange, CombatParams& params) const;
-	bool applyCondition(Creature* caster, Creature* target, CombatParams& params) const;
-	bool applyDispel(Creature* caster, Creature* target, CombatParams& params) const;
-	bool defaultCombat(Creature* caster, Creature* target, CombatParams& params, const SpectatorVec* spectators) const;
+	bool changeHealth(CombatSource& combatSource, CombatParams& params, Creature* target, int32_t healthChange) const;	
+	bool changeMana(CombatSource& combatSource, CombatParams& params, Creature* target, int32_t manaChange) const;
+	bool applyCondition(CombatSource& combatSource, CombatParams& params, Creature* target) const;
+	bool applyDispel(CombatSource& combatSource, CombatParams& params, Creature* target) const;
 
-	void addTileItem(const SpectatorVec& list, Creature* caster, Tile* tile, CombatParams& params) const;
+	void addTileItem(const SpectatorVec& list, Creature* attacker, Tile* tile, CombatParams& params) const;
 	void getSpectators(const Position& pos, const std::list<Tile*>& tile_list, SpectatorVec& spectators) const;
 };
 
@@ -184,14 +221,14 @@ protected:
 	bool** data_;
 };
 
-typedef std::map<Direction, MatrixArea* > AreaCombatMap;
+typedef std::map<Direction, MatrixArea* > CombatAreaMap;
 
-class AreaCombat{
+class CombatArea{
 public:
-	AreaCombat() {hasExtArea = false;}
-	~AreaCombat() {clear();}
+	CombatArea() {hasExtArea = false;}
+	~CombatArea() {clear();}
 
-	AreaCombat(const AreaCombat& rhs);
+	CombatArea(const CombatArea& rhs);
 
 	ReturnValue doCombat(Creature* attacker, const Position& pos, const Combat& combat) const;
 	bool getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const;
@@ -246,7 +283,7 @@ protected:
 				dir = SOUTHEAST;
 		}
 
-		AreaCombatMap::const_iterator it = areas.find(dir);
+		CombatAreaMap::const_iterator it = areas.find(dir);
 		if(it != areas.end()){
 			return it->second;
 		}
@@ -254,7 +291,7 @@ protected:
 		return NULL;
 	}
 
-	AreaCombatMap areas;
+	CombatAreaMap areas;
 	bool hasExtArea;
 };
 

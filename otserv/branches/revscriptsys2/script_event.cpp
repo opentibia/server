@@ -27,6 +27,7 @@
 #include "player.h"
 #include "creature.h"
 #include "actor.h"
+#include "combat.h"
 #include "item.h"
 
 uint32_t Script::Event::eventID_counter = 0;
@@ -1261,11 +1262,11 @@ void OnAttack::Event::update_instance(Manager& state, Environment& environment, 
 // Triggered when a creature is taking damage (or heals)
 
 
-OnDamage::Event::Event(Creature* creature, CombatType& combatType, int32_t& value, Creature* attacker) :
-	creature(creature),
+OnDamage::Event::Event(CombatType& combatType, CombatSource& combatSource, Creature* creature, int32_t& value) :
 	combatType(combatType),
-	value(value),
-	attacker(attacker)
+	combatSource(combatSource),
+	creature(creature),
+	value(value)
 {
 	propagate_by_default = true;
 }
@@ -1277,6 +1278,7 @@ OnDamage::Event::~Event()
 bool OnDamage::Event::check_match(const ScriptInformation& info)
 {
 	//TODO: Decide if player summon is handled as actors or players
+	Creature* attacker = combatSource.getSourceCreature();
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
@@ -1328,10 +1330,14 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "creature");
 	state.pushEnum(combatType);
 	state.setField(-2, "combatType");
+	state.pushThing(combatSource.getSourceCreature());
+	state.setField(-2, "attacker");
+	state.pushThing(combatSource.getSourceItem());
+	state.setField(-2, "field");
+	state.pushBoolean(combatSource.isSourceCondition());
+	state.setField(-2, "condition");
 	state.pushInteger(value);
 	state.setField(-2, "value");
-	state.pushThing(attacker);
-	state.setField(-2, "attacker");
 }
 
 void OnDamage::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)

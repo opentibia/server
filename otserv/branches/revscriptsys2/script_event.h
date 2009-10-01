@@ -784,7 +784,7 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* creature, CombatType& combatType, int32_t& value, Creature* attacker);
+			Event(CombatType& combatType, CombatSource& combatSource, Creature* creature, int32_t& value);
 			~Event();
 
 			std::string getName() const {return "OnDamage";}
@@ -802,8 +802,8 @@ namespace Script {
 		protected:
 			Creature* creature;
 			CombatType& combatType;
+			CombatSource& combatSource;
 			int32_t& value;
-			Creature* attacker;
 		};
 	}
 

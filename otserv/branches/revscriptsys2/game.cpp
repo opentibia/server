@@ -1463,11 +1463,11 @@ bool Game::onCreatureAttack(Creature* creature, Creature* attacked)
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onCreatureDamage(Creature* creature, CombatType& combatType, int32_t& value, Creature* attacker)
+bool Game::onCreatureDamage(CombatType& combatType, CombatSource& combatSource, Creature* creature, int32_t& value)
 {
 	if(!script_system)
 		return false; // Not handled
-	Script::OnDamage::Event evt(creature, combatType, value, attacker);
+	Script::OnDamage::Event evt(combatType, combatSource, creature, value);
 	return script_system->dispatchEvent(evt);
 }
 
@@ -4595,7 +4595,29 @@ void Game::changeLight(const Creature* creature)
 	}
 }
 
-bool Game::combatBlockHit(CombatType combatType, Creature* attacker, Creature* target,
+void Game::combatToTarget(Creature* attacker, CombatParams& params, Creature* target)
+{
+	CombatSource combatSource(attacker);
+	combat.combatToTarget(combatSource, params, target);
+}
+
+void Game::combatToTarget(CombatSource combatSource, CombatParams& params, Creature* target)
+{
+	combat.combatToTarget(combatSource, params, target);
+}
+
+void Game::combatToArea(Creature* attacker, CombatParams& params, const Position& pos, const CombatArea* area)
+{
+	CombatSource combatSource(attacker);
+	combat.combatToArea(combatSource, params, pos, area);
+}
+
+void Game::combatToArea(CombatSource combatSource, CombatParams& params, const Position& pos, const CombatArea* area)
+{
+	combat.combatToArea(combatSource, params, pos, area);
+}
+
+bool Game::combatBlockHit(CombatType combatType, CombatSource combatSource, Creature* target,
 	int32_t& healthChange, bool checkDefense, bool checkArmor)
 {
 	if(target->getPlayer() && target->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
@@ -4607,16 +4629,15 @@ bool Game::combatBlockHit(CombatType combatType, Creature* attacker, Creature* t
 	}
 
 	const Position& targetPos = target->getPosition();
-
 	const SpectatorVec& list = getSpectators(targetPos);
 
-	if(!target->isAttackable() || Combat::canDoCombat(attacker, target) != RET_NOERROR){
+	if(!target->isAttackable() || Combat::canDoCombat(combatSource.getSourceCreature(), target) != RET_NOERROR){
 		addMagicEffect(list, targetPos, NM_ME_PUFF);
 		return true;
 	}
 
 	int32_t damage = -healthChange;
-	BlockType blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+	BlockType blockType = target->blockHit(combatType, combatSource, damage, checkDefense, checkArmor);
 	healthChange = -damage;
 
 	if(blockType == BLOCK_DEFENSE){
@@ -4653,36 +4674,42 @@ bool Game::combatBlockHit(CombatType combatType, Creature* attacker, Creature* t
 	return false;
 }
 
-bool Game::combatChangeHealth(CombatType combatType, 
-	Creature* attacker, Creature* target, int32_t healthChange, 
-	bool showeffect /*= true*/)
+bool Game::combatChangeHealth(CombatType combatType, Creature* attacker,
+	Creature* target, int32_t healthChange, bool showEffect /*= true*/)
 {
-	return combatChangeHealth(combatType, NM_ME_UNK, TEXTCOLOR_UNK, attacker, target, healthChange, showeffect);
+	CombatSource combatSource(attacker);
+	CombatEffect combatEffect(showEffect);
+	return combatChangeHealth(combatType, combatSource, combatEffect, target, healthChange);
 }
 
-bool Game::combatChangeHealth(CombatType combatType, 
-	MagicEffectClasses customHitEffect, TextColor_t customTextColor, 
-	Creature* attacker, Creature* target, int32_t healthChange, 
-	bool showeffect)
+bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource,
+	Creature* target, int32_t healthChange, bool showEffect /*= true*/)
 {
-	const Position& targetPos = target->getPosition();
+	CombatEffect combatEffect(showEffect);
+	return combatChangeHealth(combatType, combatSource, combatEffect, target, healthChange);
+}
 
-	if(!g_game.onCreatureDamage(target, combatType, healthChange, attacker)){
+bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, CombatEffect combatEffect,
+	Creature* target, int32_t healthChange)
+{
+	if(!g_game.onCreatureDamage(combatType, combatSource, target, healthChange)){
 		return true;
 	}
+
+	const Position& targetPos = target->getPosition();
 
 	if(healthChange > 0){
 		if(target->getHealth() <= 0){
 			return false;
 		}
 
-		target->gainHealth(attacker, healthChange);
+		target->gainHealth(combatSource, healthChange);
 	}
 	else{
 		const SpectatorVec& list = getSpectators(targetPos);
 
-		if(!target->isAttackable() || Combat::canDoCombat(attacker, target) != RET_NOERROR){
-			if(showeffect)
+		if(!target->isAttackable() || Combat::canDoCombat(combatSource.getSourceCreature(), target) != RET_NOERROR){
+			if(combatEffect.showEffect)
 				addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return true;
 		}
@@ -4694,11 +4721,11 @@ bool Game::combatChangeHealth(CombatType combatType,
 				damage = std::max((int32_t)0, damage - manaDamage);
 
 				if(manaDamage != 0){
-					target->drainMana(attacker, manaDamage, showeffect);
+					target->drainMana(combatSource, manaDamage, combatEffect.showEffect);
 
 					std::stringstream ss;
 					ss << manaDamage;
-					if(showeffect){
+					if(combatEffect.showEffect){
 						addMagicEffect(list, targetPos, NM_ME_LOSE_ENERGY);
 						addAnimatedText(list, targetPos, TEXTCOLOR_BLUE, ss.str());
 					}
@@ -4710,15 +4737,15 @@ bool Game::combatChangeHealth(CombatType combatType,
 				if(target->getHealth() - damage <= 0){
 					// If event handler changes health we shouldn't
 					int ohealth = target->getHealth();
-					if(onCreatureKill(target, attacker)){
+					if(onCreatureKill(target, combatSource.getSourceCreature())){
 						//prevent death
 						damage = ohealth - 1;
 					}
 				}
 
-				target->drainHealth(attacker, combatType, damage, showeffect);
+				target->drainHealth(combatType, combatSource, damage, combatEffect.showEffect);
 
-				if(showeffect){
+				if(combatEffect.showEffect){
 					TextColor_t textColor = TEXTCOLOR_NONE;
 					uint8_t hitEffect = 0;
 
@@ -4788,18 +4815,18 @@ bool Game::combatChangeHealth(CombatType combatType,
 						hitEffect = NM_ME_MAGIC_BLOOD;
 					}
 
+					if(combatEffect.hitEffect != NM_ME_UNK)
+						hitEffect = combatEffect.hitEffect;
+
+					if(combatEffect.hitTextColor != TEXTCOLOR_UNK)
+						textColor = combatEffect.hitTextColor;
+
 					if(textColor != TEXTCOLOR_NONE){
 						std::stringstream ss;
 						ss << damage;
 						addMagicEffect(list, targetPos, hitEffect);
 						addAnimatedText(list, targetPos, textColor, ss.str());
 					}
-
-					if(customHitEffect != NM_ME_UNK)
-						hitEffect = customHitEffect;
-
-					if(customTextColor != TEXTCOLOR_UNK)
-						textColor = customTextColor;
 				}
 			}
 		}
@@ -4808,35 +4835,55 @@ bool Game::combatChangeHealth(CombatType combatType,
 	return true;
 }
 
-bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange, bool showeffect /*= true*/)
+bool Game::combatChangeMana(Creature* attacker, Creature* target,
+	int32_t manaChange, bool showEffect /*= true*/)
 {
-	const Position& targetPos = target->getPosition();
+	CombatSource combatSource(attacker);
+	CombatEffect combatEffect(showEffect);
+	return combatChangeMana(combatSource, combatEffect, target, manaChange);
+}
 
+bool Game::combatChangeMana(CombatSource combatSource, Creature* target,
+	int32_t manaChange, bool showEffect /*= true*/)
+{
+	CombatEffect combatEffect(showEffect);
+	return combatChangeMana(combatSource, combatEffect, target, manaChange);
+}
+
+bool Game::combatChangeMana(CombatSource combatSource, CombatEffect combatEffect,
+	Creature* target, int32_t manaChange)
+{
+	CombatType combatType = COMBAT_MANADRAIN;
+	if(!g_game.onCreatureDamage(combatType, combatSource, target, manaChange) || combatType != COMBAT_MANADRAIN){
+		return true;
+	}
+
+	const Position& targetPos = target->getPosition();
 	const SpectatorVec& list = getSpectators(targetPos);
 
 	if(manaChange > 0){
 		target->changeMana(manaChange);
 	}
 	else{
-		if(!target->isAttackable() || Combat::canDoCombat(attacker, target) != RET_NOERROR){
-			if(showeffect)
+		if(!target->isAttackable() || Combat::canDoCombat(combatSource.getSourceCreature(), target) != RET_NOERROR){
+			if(combatEffect.showEffect)
 				addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
 
 		int32_t manaLoss = std::min(target->getMana(), -manaChange);
-		BlockType blockType = target->blockHit(attacker, COMBAT_MANADRAIN, manaLoss);
+		BlockType blockType = target->blockHit(COMBAT_MANADRAIN, combatSource, manaLoss);
 
 		if(blockType != BLOCK_NONE){
-			if(showeffect)
+			if(combatEffect.showEffect)
 				addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
 
 		if(manaLoss > 0){
-			target->drainMana(attacker, manaLoss, showeffect);
+			target->drainMana(combatSource, manaLoss, combatEffect.showEffect);
 
-			if(showeffect){
+			if(combatEffect.showEffect){
 				std::stringstream ss;
 				ss << manaLoss;
 				addAnimatedText(list, targetPos, TEXTCOLOR_BLUE, ss.str());

@@ -3883,7 +3883,7 @@ int LuaState::lua_CombatArea_create()
 	//createCombatArea( {area}, <optional> {extArea} )
 	int32_t parameters = lua_gettop(m_luaState);
 
-	AreaCombat* area = new AreaCombat;
+	CombatArea* area = new CombatArea;
 
 	if(parameters > 1)
 	{
@@ -3922,10 +3922,10 @@ int LuaState::lua_Condition_create()
 
 int LuaState::lua_Combat_setArea()
 {
-	AreaCombat* area = popCombatArea();
+	CombatArea* area = popCombatArea();
 	Combat* combat = popCombat();
 
-	combat->setArea(new AreaCombat(*area));
+	combat->setArea(new CombatArea(*area));
 
 	pushBoolean(true);
 	return 1;
@@ -4206,9 +4206,9 @@ int LuaState::luaDoCombat(lua_State *L)
 	return 1;
 }
 
-int LuaState::luaDoAreaCombatHealth(lua_State *L)
+int LuaState::luaDoCombatAreaHealth(lua_State *L)
 {
-	//doAreaCombatHealth(cid, type, pos, area, min, max, effect)
+	//doCombatAreaHealth(cid, type, pos, area, min, max, effect)
 	uint8_t effect = (uint8_t)popNumber(L);
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
@@ -4234,7 +4234,7 @@ int LuaState::luaDoAreaCombatHealth(lua_State *L)
 		}
 	}
 
-	const AreaCombat* area = env->getCombatArea(areaId);
+	const CombatArea* area = env->getCombatArea(areaId);
 	if(area || areaId == 0){
 		CombatParams params;
 		params.combatType = combatType;
@@ -4291,9 +4291,9 @@ int LuaState::luaDoTargetCombatHealth(lua_State *L)
 	return 1;
 }
 
-int LuaState::luaDoAreaCombatMana(lua_State *L)
+int LuaState::luaDoCombatAreaMana(lua_State *L)
 {
-	//doAreaCombatMana(cid, pos, area, min, max, effect)
+	//doCombatAreaMana(cid, pos, area, min, max, effect)
 	uint8_t effect = (uint8_t)popNumber(L);
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
@@ -4318,7 +4318,7 @@ int LuaState::luaDoAreaCombatMana(lua_State *L)
 		}
 	}
 
-	const AreaCombat* area = env->getCombatArea(areaId);
+	const CombatArea* area = env->getCombatArea(areaId);
 	if(area || areaId == 0){
 		CombatParams params;
 		params.impactEffect = effect;
@@ -4371,9 +4371,9 @@ int LuaState::luaDoTargetCombatMana(lua_State *L)
 	return 1;
 }
 
-int LuaState::luaDoAreaCombatCondition(lua_State *L)
+int LuaState::luaDoCombatAreaCondition(lua_State *L)
 {
-	//doAreaCombatCondition(cid, pos, area, condition, effect)
+	//doCombatAreaCondition(cid, pos, area, condition, effect)
 	uint8_t effect = (uint8_t)popNumber(L);
 	uint32_t conditionId = popNumber(L);
 	uint32_t areaId = popNumber(L);
@@ -4397,7 +4397,7 @@ int LuaState::luaDoAreaCombatCondition(lua_State *L)
 	const Condition* condition = env->getConditionObject(conditionId);
 	if(condition){
 
-		const AreaCombat* area = env->getCombatArea(areaId);
+		const CombatArea* area = env->getCombatArea(areaId);
 
 		if(area || areaId == 0){
 			CombatParams params;
@@ -4464,9 +4464,9 @@ int LuaState::luaDoTargetCombatCondition(lua_State *L)
 	return 1;
 }
 
-int LuaState::luaDoAreaCombatDispel(lua_State *L)
+int LuaState::luaDoCombatAreaDispel(lua_State *L)
 {
-	//doAreaCombatDispel(cid, pos, area, type, effect)
+	//doCombatAreaDispel(cid, pos, area, type, effect)
 	uint8_t effect = (uint8_t)popNumber(L);
 	ConditionType dispelType = (ConditionType)popNumber(L);
 	uint32_t areaId = popNumber(L);
@@ -4488,7 +4488,7 @@ int LuaState::luaDoAreaCombatDispel(lua_State *L)
 		}
 	}
 
-	const AreaCombat* area = env->getCombatArea(areaId);
+	const CombatArea* area = env->getCombatArea(areaId);
 	if(area || areaId == 0){
 		CombatParams params;
 		params.impactEffect = effect;

@@ -504,10 +504,10 @@ void Actor::onFollowCreatureComplete(const Creature* creature)
 	}
 }
 
-BlockType Actor::blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
+BlockType Actor::blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
 	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
-	BlockType blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
+	BlockType blockType = Creature::blockHit(combatType, combatSource, damage, checkDefense, checkArmor);
 
 	if(damage != 0){
 		int32_t elementMod = 0;
@@ -1401,9 +1401,9 @@ void Actor::setNormalCreatureLight()
 	internalLight.color = cType.lightColor();
 }
 
-void Actor::drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext)
+void Actor::drainHealth(CombatType combatType, const CombatSource& combatSource, int32_t damage, bool showtext)
 {
-	Creature::drainHealth(attacker, combatType, damage, showtext);
+	Creature::drainHealth(combatType, combatSource, damage, showtext);
 
 	if(isInvisible()){
 		removeCondition(CONDITION_INVISIBLE);

@@ -278,7 +278,7 @@ public:
 	void changeSoul(int32_t soulChange);
 
 	bool isPzLocked() const { return pzLocked; }
-	virtual BlockType blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
+	virtual BlockType blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
 	virtual bool hasExtraSwing() {return lastAttack > 0 && ((OTSYS_TIME() - lastAttack) >= getAttackSpeed());}
@@ -293,8 +293,8 @@ public:
 	int32_t getWeaponSkill(const Item* item) const;
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
 
-	virtual void drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext = true);
-	virtual void drainMana(Creature* attacker, int32_t point, bool showtext = true);
+	virtual void drainHealth(CombatType combatType, const CombatSource& combatSource, int32_t damage, bool showtext = true);
+	virtual void drainMana(const CombatSource& combatSource, int32_t point, bool showtext = true);
 	void addManaSpent(uint32_t amount, bool useMultiplier = true);
 	void addSkillAdvance(SkillType skill, uint32_t count, bool useMultiplier = true);
 

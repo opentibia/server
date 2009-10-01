@@ -309,6 +309,7 @@ bool Weapon::useFist(Player* player, Creature* target)
 		params.combatType = COMBAT_PHYSICALDAMAGE;
 		params.blockedByArmor = true;
 		params.blockedByShield = true;
+		//g_game.combatToTarget(player, params, target);
 		//TODO:
 		//Combat::doCombatHealth(player, target, damage, damage, params);
 
@@ -339,7 +340,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 		//int32_t damage = (getWeaponDamage(player, target, item) * damageModifier) / 100;
 		//TODO:
 		//Combat::doCombatHealth(player, target, damage, damage, params);
-	}
+		}
 
 	if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION)){
 		onUsedAmmo(player, item, target->getTile());
@@ -360,7 +361,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 		*/
 	}
 	else{
-		g_game.addDistanceEffect(player, player->getPosition(), tile->getPosition(), params.distanceEffect);
+		g_game.addDistanceEffect(player, player->getPosition(), tile->getPosition(), params.effects.distanceEffect);
 		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 	}
 
@@ -673,7 +674,7 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 		maxHitChance = 75;
 	}
 
-	params.distanceEffect = it.shootType;
+	params.effects.distanceEffect = it.shootType;
 	range = it.shootRange;
 	ammuAttackValue = it.attack;
 
@@ -954,7 +955,7 @@ bool WeaponWand::configureWeapon(const ItemType& it)
 {
 	scripted = false;
 	range = it.shootRange;
-	params.distanceEffect = it.shootType;
+	params.effects.distanceEffect = it.shootType;
 
 	return Weapon::configureWeapon(it);
 }

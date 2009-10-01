@@ -956,15 +956,15 @@ void Creature::changeMana(int32_t manaChange)
 	}
 }
 
-void Creature::gainHealth(Creature* caster, int32_t healthGain)
+void Creature::gainHealth(const CombatSource& combatSource, int32_t healthGain)
 {
 	if(healthGain > 0){
 		int32_t prevHealth = getHealth();
 		changeHealth(healthGain);
 
 		int32_t effectiveGain = getHealth() - prevHealth;
-		if(caster){
-			caster->onTargetCreatureGainHealth(this, effectiveGain);
+		if(combatSource.isSourceCreature()){
+			combatSource.getSourceCreature()->onTargetCreatureGainHealth(this, effectiveGain);
 		}
 	}
 	else{
@@ -972,23 +972,23 @@ void Creature::gainHealth(Creature* caster, int32_t healthGain)
 	}
 }
 
-void Creature::drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext)
+void Creature::drainHealth(CombatType combatType, const CombatSource& combatSource, int32_t damage, bool showtext)
 {
 	lastDamageSource = combatType;
 	changeHealth(-damage);
 	
-	if(attacker){
-		attacker->onAttackedCreatureDrainHealth(this, damage);
+	if(combatSource.isSourceCreature()){
+		combatSource.getSourceCreature()->onAttackedCreatureDrainHealth(this, damage);
 	}
 }
 
-void Creature::drainMana(Creature* attacker, int32_t points, bool showtext)
+void Creature::drainMana(const CombatSource& combatSource, int32_t points, bool showtext)
 {
 	onAttacked();
 	changeMana(-points);
 
-	if(attacker){
-		attacker->onAttackedCreatureDrainMana(this, points);
+	if(combatSource.isSourceCreature()){
+		combatSource.getSourceCreature()->onAttackedCreatureDrainMana(this, points);
 	}
 }
 
@@ -1003,10 +1003,11 @@ Position Creature::getPosition() const
 	return _tile->getPosition();
 }
 
-BlockType Creature::blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
+BlockType Creature::blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
 	bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
 	BlockType blockType = BLOCK_NONE;
+	Creature* attacker = combatSource.getSourceCreature();
 
 	if(isImmune(combatType)){
 		damage = 0;

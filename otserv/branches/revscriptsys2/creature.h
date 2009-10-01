@@ -211,7 +211,7 @@ public:
 	//combat functions
 	Creature* getAttackedCreature() { return attackedCreature; }
 	virtual bool setAttackedCreature(Creature* creature);
-	virtual BlockType blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
+	virtual BlockType blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 
 	void setMaster(Creature* creature) {master = creature;}
@@ -251,9 +251,9 @@ public:
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 
-	virtual void gainHealth(Creature* caster, int32_t healthGain);
-	virtual void drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showtext);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss, bool showtext);
+	virtual void gainHealth(const CombatSource& combatSource, int32_t healthGain);
+	virtual void drainHealth(CombatType combatType, const CombatSource& combatSource, int32_t damage, bool showtext);
+	virtual void drainMana(const CombatSource& combatSource, int32_t manaLoss, bool showtext);
 
 	virtual bool challengeCreature(Creature* creature) {return false;}
 	virtual bool convinceCreature(Creature* creature) {return false;}

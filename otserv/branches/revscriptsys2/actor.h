@@ -100,7 +100,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
 		const Tile* oldTile, const Position& oldPos, bool teleport);
 
-	virtual void drainHealth(Creature* attacker, CombatType combatType, int32_t damage, bool showeffect);
+	virtual void drainHealth(CombatType combatType, const CombatSource& combatSource, int32_t damage, bool showeffect);
 	virtual void changeHealth(int32_t healthChange);
 
 	virtual void onWalk();
@@ -128,7 +128,7 @@ public:
 	bool isFleeing() const {return getHealth() <= cType.fleeHealth();}
 
 	bool isImmune(CombatType type) const;
-	BlockType blockHit(Creature* attacker, CombatType combatType, int32_t& damage,
+	BlockType blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 
 private:
