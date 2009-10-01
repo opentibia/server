@@ -1455,12 +1455,11 @@ bool Game::onCreatureAttack(Creature* creature, Creature* attacked)
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onCreatureDamage(Creature* creature, CombatType combatType,
-	std::list<std::pair<Creature*, int32_t> >& damageList)
+bool Game::onCreatureDamage(Creature* creature, CombatType& combatType, int32_t& value, Creature* attacker)
 {
 	if(!script_system)
 		return false; // Not handled
-	Script::OnDamage::Event evt(creature, combatType, damageList);
+	Script::OnDamage::Event evt(creature, combatType, value, attacker);
 	return script_system->dispatchEvent(evt);
 }
 

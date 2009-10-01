@@ -63,8 +63,8 @@ public:
 	Combat();
 	~Combat();
 
-	void doCombat(Creature* caster, Creature* target, const CombatParams& params) const;
-	void doCombat(Creature* caster, const Position& pos, const AreaCombat* area, const CombatParams& params) const;
+	void doCombat(Creature* caster, Creature* target, CombatParams& params) const;
+	void doCombat(Creature* caster, const Position& pos, const AreaCombat* area, CombatParams& params) const;
 
 	static bool isInPvpZone(const Creature* attacker, const Creature* target);
 	static bool isUnjustKill(const Creature* attacker, const Creature* target);
@@ -77,21 +77,21 @@ public:
 	static Position getCasterPosition(const Creature* creature, Direction dir);
 
 protected:
-	bool internalCombat(Creature* caster, const std::list<Creature*>& targetList, const CombatParams& params,
+	bool internalCombat(Creature* caster, Creature* target, CombatParams& params,
 		const SpectatorVec* spectators = NULL) const;
 
 	void getCombatArea(const Position& centerPos, const Position& targetPos,
 		const AreaCombat* area, std::list<Tile*>& list) const;
 
 	bool changeHealth(Creature* caster, Creature* target,
-		int32_t healthChange, const CombatParams& params) const;	
+		int32_t healthChange, CombatParams& params) const;	
 	bool changeMana(Creature* caster, Creature* target,
-		int32_t manaChange, const CombatParams& params) const;
-	bool applyCondition(Creature* caster, Creature* target, const CombatParams& params) const;
-	bool applyDispel(Creature* caster, Creature* target, const CombatParams& params) const;
-	bool defaultCombat(Creature* caster, Creature* target, const CombatParams& params, const SpectatorVec* spectators) const;
+		int32_t manaChange, CombatParams& params) const;
+	bool applyCondition(Creature* caster, Creature* target, CombatParams& params) const;
+	bool applyDispel(Creature* caster, Creature* target, CombatParams& params) const;
+	bool defaultCombat(Creature* caster, Creature* target, CombatParams& params, const SpectatorVec* spectators) const;
 
-	void addTileItem(const SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params) const;
+	void addTileItem(const SpectatorVec& list, Creature* caster, Tile* tile, CombatParams& params) const;
 	void getSpectators(const Position& pos, const std::list<Tile*>& tile_list, SpectatorVec& spectators) const;
 };
 

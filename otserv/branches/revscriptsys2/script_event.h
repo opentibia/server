@@ -688,7 +688,7 @@ namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnAttack event
-	// Triggered when a creature attacks a creature.
+	// Triggered when a creature attacks another creature (usually every 2 seconds).
 
 	namespace OnAttack {
 		enum FilterType {
@@ -733,13 +733,26 @@ namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnDamage event
-	// Triggered when damage is dealt to a creature.
+	// Triggered when a creature is taking damage (or heals).
 
 	namespace OnDamage {
+		enum FilterType {
+			FILTER_ALL,
+			FILTER_NAME,
+			FILTER_PLAYER,
+			FILTER_ATTACKER_NAME,
+			FILTER_ATTACKER_PLAYER,
+			FILTER_TYPE
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			std::string name;
+		};
+
 		class Event : public Script::Event {
 		public:
-			Event(Creature* creature, CombatType& combatType,
-				std::list<std::pair<Creature*, int32_t> >& damageList);
+			Event(Creature* creature, CombatType& combatType, int32_t& value, Creature* attacker);
 			~Event();
 
 			std::string getName() const {return "OnDamage";}
@@ -754,7 +767,8 @@ namespace Script {
 		protected:
 			Creature* creature;
 			CombatType& combatType;
-			std::list<std::pair<Creature*, int32_t> >& damageList;
+			int32_t& value;
+			Creature* attacker;
 		};
 	}
 

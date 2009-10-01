@@ -1133,7 +1133,7 @@ void OnAdvance::Event::update_instance(Manager& state, Environment& environment,
 ///////////////////////////////////////////////////////////////////////////////
 // OnAttack Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when a creature makes an attack
+// Triggered when a creature attacks another creature (usually every 2 seconds)
 
 
 OnAttack::Event::Event(Creature* creature, Creature* attacked) :
@@ -1207,14 +1207,14 @@ void OnAttack::Event::update_instance(Manager& state, Environment& environment, 
 ///////////////////////////////////////////////////////////////////////////////
 // OnDamage Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when damage is dealt to a creature
+// Triggered when a creature is taking damage (or heals)
 
 
-OnDamage::Event::Event(Creature* creature, CombatType& combatType,
-	std::list<std::pair<Creature*, int32_t> >& damageList) :
+OnDamage::Event::Event(Creature* creature, CombatType& combatType, int32_t& value, Creature* attacker) :
 	creature(creature),
 	combatType(combatType),
-	damageList(damageList)
+	value(value),
+	attacker(attacker)
 {
 	propagate_by_default = true;
 }
@@ -1246,19 +1246,10 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "creature");
 	state.pushEnum(combatType);
 	state.setField(-2, "combatType");
-
-	state.newTable();
-	int n = 1;
-	for(std::list<std::pair<Creature*, int32_t> >::iterator it = damageList.begin(); it != damageList.end(); ++it, ++n){
-		state.newTable();
-		state.pushThing(it->first);
-		state.setField(-2, 1);
-		state.pushInteger(it->second);
-		state.setField(-2, 1);
-
-		state.setField(-2, n);
-	}
-	state.setField(-2, "targets");
+	state.pushInteger(value);
+	state.setField(-2, "value");
+	state.pushThing(attacker);
+	state.setField(-2, "attacker");
 }
 
 void OnDamage::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
@@ -1272,37 +1263,14 @@ void OnDamage::Event::update_instance(Manager& state, Environment& environment, 
 		thread->pop();
 	}
 
-	thread->getField(-1, "targets");
-	if(thread->isTable()) {
-		thread->pushNil();
-		std::list<std::pair<Creature*, int32_t> >::iterator iter = damageList.begin();
-		while (thread->iterateTable(-2) && iter != damageList.end()){
-			if(thread->isTable()) {
-				thread->getField(-1, 2);
-				if(thread->isNumber()) {
-					iter->second = thread->popInteger();
-				}
-				else{
-					thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of damage in 'targets'");
-					thread->pop();
-				}
-			}
-			else{
-				thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of field in 'targets'");
-				thread->pop();
-			}
-			++iter;
-		}
-		thread->pop();
+	thread->getField(-1, "value");
+	if(thread->isNumber()) {
+		value = thread->popInteger();
 	}
 	else {
-		thread->HandleError("Event 'OnDamage' invalid value of 'combatType'");
+		thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of 'value'");
 		thread->pop();
 	}
-
-	/*
-	TODO:
-	*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////

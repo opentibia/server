@@ -39,12 +39,10 @@ Combat::~Combat()
 	//
 }
 
-void Combat::doCombat(Creature* caster, Creature* target, const CombatParams& params) const
+void Combat::doCombat(Creature* caster, Creature* target, CombatParams& params) const
 {
 	//target combat callback function
-	std::list<Creature*> targetList;
-	targetList.push_back(target);
-	bool result = internalCombat(caster, targetList, params);
+	bool result = internalCombat(caster, target, params);
 	if(result){
 		if(params.impactEffect != NM_ME_NONE){
 			g_game.addMagicEffect(target->getPosition(), params.impactEffect);
@@ -57,7 +55,7 @@ void Combat::doCombat(Creature* caster, Creature* target, const CombatParams& pa
 }
 
 void Combat::doCombat(Creature* caster, const Position& pos,
-	const AreaCombat* area, const CombatParams& params) const
+	const AreaCombat* area, CombatParams& params) const
 {
 	std::list<Tile*> tileList;
 	getCombatArea(pos, pos, area, tileList);
@@ -65,7 +63,6 @@ void Combat::doCombat(Creature* caster, const Position& pos,
 	SpectatorVec spectators;
 	getSpectators(pos, tileList, spectators);
 
-	std::list<Creature*> targetList;
 	Tile* iter_tile;
 	for(std::list<Tile*>::iterator it = tileList.begin(); it != tileList.end(); ++it){
 		iter_tile = *it;
@@ -90,63 +87,44 @@ void Combat::doCombat(Creature* caster, const Position& pos,
 					}
 				}
 
-				targetList.push_back(*cit);
+				internalCombat(caster, *cit, params, &spectators);
 			}
 		}
 	}
-
-	internalCombat(caster, targetList, params, &spectators);
 
 	g_game.addDistanceEffect(caster, caster->getPosition(), pos, params.distanceEffect);
 }
 
-bool Combat::internalCombat(Creature* caster, const std::list<Creature*>& targetList,
-	const CombatParams& params, const SpectatorVec* spectators /*= NULL*/) const
+bool Combat::internalCombat(Creature* caster, Creature* target, CombatParams& params,
+	const SpectatorVec* spectators /*= NULL*/) const
 {
-	std::list<std::pair<Creature*, int32_t> > damageList;
-	for(std::list<Creature*>::const_iterator it = targetList.begin(); it != targetList.end(); ++it){
-		Creature* target = *it;
-		if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
-			if(params.combatType != COMBAT_NONE){
-				int32_t minChange = 0;
-				int32_t maxChange = 0;
-				//getMinMaxValues(caster, target, minChange, maxChange);
-				int32_t value = random_range(minChange, maxChange, DISTRO_NORMAL);
-
-				if(g_game.combatBlockHit(params.combatType, caster, target, value, params.blockedByShield, params.blockedByArmor)){
-					continue;
-				}
-
-				damageList.push_back(std::make_pair(*it, value));
-			}
-			else{
-				damageList.push_back(std::make_pair(*it, 0));
-			}
-		}
-	}
-
-	if(!g_game.onCreatureDamage(caster, params.combatType, damageList)){
-		return false;
-	}
-
-	bool result = false;
-	for(std::list<std::pair<Creature*, int32_t> >::iterator it = damageList.begin(); it != damageList.end(); ++it){
-		Creature* target = it->first;
-		int32_t value = it->second;
-
+	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		if(params.combatType != COMBAT_NONE){
+			int32_t minChange = 0;
+			int32_t maxChange = 0;
+			//getMinMaxValues(caster, target, minChange, maxChange);
+			int32_t value = random_range(minChange, maxChange, DISTRO_NORMAL);
+
+			if(g_game.combatBlockHit(params.combatType, caster, target, value, params.blockedByShield, params.blockedByArmor)){
+				return true;
+			}
+
+			if(!g_game.onCreatureDamage(target, params.combatType, value, caster)){
+				return true;
+			}
+
 			if(params.combatType != COMBAT_MANADRAIN){
 				if(changeHealth(caster, target, value, params)){
 					applyCondition(caster, target, params);
 					applyDispel(caster, target, params);
-					result = true;
+					return true;
 				}
 			}
 			else{
 				if(changeMana(caster, target, value, params)){
 					applyCondition(caster, target, params);
 					applyDispel(caster, target, params);
-					result = true;
+					return true;
 				}
 			}
 
@@ -156,14 +134,14 @@ bool Combat::internalCombat(Creature* caster, const std::list<Creature*>& target
 			applyCondition(caster, target, params);
 			applyDispel(caster, target, params);
 			defaultCombat(caster, target, params, spectators);
-			result = true;
+			return true;
 		}
 	}
 
-	return result;
+	return false;
 }
 
-bool Combat::defaultCombat(Creature* caster, Creature* target, const CombatParams& params, 
+bool Combat::defaultCombat(Creature* caster, Creature* target, CombatParams& params, 
 	const SpectatorVec* spectators) const
 {
 	if(params.itemId != 0){
@@ -179,7 +157,7 @@ bool Combat::defaultCombat(Creature* caster, Creature* target, const CombatParam
 }
 
 bool Combat::changeHealth(Creature* caster, Creature* target,
-	int32_t healthChange, const CombatParams& params) const
+	int32_t healthChange, CombatParams& params) const
 {
 	if(healthChange < 0){
 #ifdef __SKULLSYSTEM__
@@ -195,7 +173,7 @@ bool Combat::changeHealth(Creature* caster, Creature* target,
 }
 
 bool Combat::changeMana(Creature* caster, Creature* target,
-	int32_t manaChange, const CombatParams& params) const
+	int32_t manaChange, CombatParams& params) const
 {
 	if(manaChange < 0){
 #ifdef __SKULLSYSTEM__
@@ -210,7 +188,7 @@ bool Combat::changeMana(Creature* caster, Creature* target,
 	return g_game.combatChangeMana(caster, target, manaChange);
 }
 
-bool Combat::applyCondition(Creature* caster, Creature* target, const CombatParams& params) const
+bool Combat::applyCondition(Creature* caster, Creature* target, CombatParams& params) const
 {
 	for(std::list<const Condition*>::const_iterator it = params.conditionList.begin(); it != params.conditionList.end(); ++it){
 		const Condition* condition = *it;
@@ -229,7 +207,7 @@ bool Combat::applyCondition(Creature* caster, Creature* target, const CombatPara
 	return true;
 }
 
-bool Combat::applyDispel(Creature* caster, Creature* target, const CombatParams& params) const
+bool Combat::applyDispel(Creature* caster, Creature* target, CombatParams& params) const
 {
 	if(target->hasCondition(params.dispelType)){
 		target->removeCondition(caster, params.dispelType);
@@ -239,7 +217,7 @@ bool Combat::applyDispel(Creature* caster, Creature* target, const CombatParams&
 	return false;
 }
 
-void Combat::addTileItem(const SpectatorVec& list, Creature* caster, Tile* tile, const CombatParams& params) const
+void Combat::addTileItem(const SpectatorVec& list, Creature* caster, Tile* tile, CombatParams& params) const
 {
 	if(params.itemId != 0){
 		uint32_t itemId = params.itemId;
