@@ -121,7 +121,7 @@ inline void Script::Manager::registerEnum()
 	//std::cout << "Global " << ET::name() << " table is " << lua_topointer(state, 1) << std::endl;
 	// Expose members
 	int n = 1;
-	for(ET::iterator ei = ET::begin(); ei != ET::end(); ++ei, ++n){
+	for(typename ET::iterator ei = ET::begin(); ei != ET::end(); ++ei, ++n){
 
 		// Push class instance
 		pushClassTableInstance(ET::name()); // index 2

@@ -1393,7 +1393,7 @@ bool OnKill::Event::check_match(const ScriptInformation& info)
 		case FILTER_PLAYER_KILL_ACTOR:
 			return killer != NULL && creature->getPlayer() != NULL && killer->getActor() != NULL;
 		case FILTER_ACTOR_KILL_ACTOR:
-			return killer != NULL && !creature->getActor() != NULL && killer->getActor() != NULL;
+			return killer != NULL && creature->getActor() == NULL && killer->getActor() != NULL;
 		case FILTER_ACTOR_KILL_PLAYER:
 			return killer != NULL && creature->getActor() != NULL && killer->getPlayer() != NULL;
 		default: break;

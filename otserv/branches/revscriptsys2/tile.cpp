@@ -879,7 +879,7 @@ void Tile::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 
 void Tile::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
-	if(Creature* creature = thing->getCreature()){
+	if(thing->getCreature()){
 		CreatureIterator it = std::find(creatures_begin(), creatures_end(), thing);
 		if(it != creatures_end()){
 			g_game.clearSpectatorCache();

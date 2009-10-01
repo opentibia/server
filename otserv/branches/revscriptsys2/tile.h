@@ -80,6 +80,8 @@ typedef ItemMultiIndexType::iterator ItemMultiIndexTypeIterator;
 template<class T, class T_iter, class E, class E_iter, class C>
 class TileItemBaseIterator : public std::iterator<std::bidirectional_iterator_tag, C*> {
 public:
+	typedef TileItemBaseIterator<T, T_iter, E, E_iter, C> this_type;
+
 	TileItemBaseIterator() : 
 	  vector(NULL), multiIndex(NULL) {}
 	TileItemBaseIterator(T _vector, T_iter pos)
@@ -110,7 +112,7 @@ public:
 		multiIndex_pos = pos;
 	}
 
-	TileItemBaseIterator(const TileItemBaseIterator& rhs)
+	TileItemBaseIterator(const this_type& rhs)
 	{
 		vector = rhs.vector;
 		vector_pos = rhs.vector_pos;
@@ -119,7 +121,7 @@ public:
 		multiIndex_pos = rhs.multiIndex_pos;
 	}
 
-	const TileItemBaseIterator& operator=(const TileItemBaseIterator& rhs)
+	const this_type& operator=(const this_type& rhs)
 	{
 		vector = rhs.vector;
 		vector_pos = rhs.vector_pos;
@@ -130,14 +132,12 @@ public:
 		return(*this);
 	}
 
-	template<class T, class T_iter, class E, class E_iter, class C>
-	bool operator==(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	bool operator==(const this_type& rhs)
 	{
 		return !(*this != rhs);
 	}
 
-	template<class T, class T_iter, class E, class E_iter, class C>
-	bool operator!=(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	bool operator!=(const this_type& rhs)
 	{
 		if(vector){
 			if(vector != rhs.vector){
@@ -155,8 +155,7 @@ public:
 		}
 	}
 
-	template<class T, class T_iter, class E, class E_iter, class C>
-	bool operator>=(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	bool operator>=(const this_type& rhs)
 	{
 		if(vector){
 			return vector_pos >= rhs.vector_pos;
@@ -166,8 +165,7 @@ public:
 		}
 	}
 
-	template<class T, class T_iter, class E, class E_iter, class C>
-	bool operator>(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	bool operator>(const this_type& rhs)
 	{
 		if(vector){
 			return vector_pos > rhs.vector_pos;
@@ -177,8 +175,7 @@ public:
 		}
 	}
 
-	template<class T, class T_iter, class E, class E_iter, class C>
-	bool operator<(const TileItemBaseIterator<T, T_iter, E, E_iter, C>& rhs)
+	bool operator<(const this_type& rhs)
 	{
 		return !(*this > rhs);
 	}
@@ -206,7 +203,7 @@ public:
 		return *(*this);
 	}
 
-	const TileItemBaseIterator& operator++()
+	this_type& operator++()
 	{
 		if(vector){
 			++vector_pos;
@@ -218,14 +215,14 @@ public:
 		return(*this);
 	}
 
-	TileItemBaseIterator operator++(int)
+	this_type operator++(int)
 	{
-		TileItemIterator tmp(*this);
+		this_type tmp(*this);
 		++(*this);
 		return(tmp);
 	}
 
-	const TileItemBaseIterator& operator+=(const int32_t& rhs)
+	this_type& operator+=(const int32_t& rhs)
 	{
 		if(vector){
 			vector_pos += rhs;
@@ -236,31 +233,31 @@ public:
 		return *this;
 	}
 
-	TileItemBaseIterator operator+(const int32_t& rhs) const
+	this_type operator+(const int32_t& rhs) const
 	{
-		TileItemBaseIterator tmp(*this);
+		this_type tmp(*this);
 		return (tmp += rhs);
 	}
 
-	const TileItemBaseIterator& operator--()
+	this_type& operator--()
 	{
-		(*this)+= -1;
+		(*this) += -1;
 		return *this;
 	}
 
-	TileItemBaseIterator operator--(int)
+	this_type operator--(int)
 	{
-		TileItemIterator tmp(*this);
+		this_type tmp(*this);
 		--(*this);
 		return(tmp);
 	}
 
-	const TileItemBaseIterator& operator-=(const int32_t& rhs)
+	this_type& operator-=(const int32_t& rhs)
 	{
 		return (*this += -rhs);
 	}
 
-	TileItemBaseIterator operator-(const int32_t& rhs) const
+	this_type operator-(const int32_t& rhs) const
 	{
 		TileItemBaseIterator tmp(*this);
 		return (tmp -= rhs);

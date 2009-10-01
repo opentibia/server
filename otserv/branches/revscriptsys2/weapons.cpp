@@ -303,7 +303,7 @@ bool Weapon::useFist(Player* player, Creature* target)
 			maxDamage = int32_t(maxDamage * vocation->getMeleeBaseDamage(WEAPON_NONE));
 		}
 
-		int32_t damage = -random_range(0, maxDamage, DISTRO_NORMAL);
+		//int32_t damage = -random_range(0, maxDamage, DISTRO_NORMAL);
 
 		CombatParams params;
 		params.combatType = COMBAT_PHYSICALDAMAGE;
@@ -336,7 +336,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 		*/
 	}
 	else{
-		int32_t damage = (getWeaponDamage(player, target, item) * damageModifier) / 100;
+		//int32_t damage = (getWeaponDamage(player, target, item) * damageModifier) / 100;
 		//TODO:
 		//Combat::doCombatHealth(player, target, damage, damage, params);
 	}
@@ -504,7 +504,7 @@ bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
 	}
 
 	if(elementDamage != 0){
-		int32_t damage = getElementDamage(player, item);
+		//int32_t damage = getElementDamage(player, item);
 		CombatParams eParams;
 		eParams.combatType = elementType;
 		eParams.isAggressive = true;

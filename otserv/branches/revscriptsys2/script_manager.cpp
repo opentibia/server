@@ -122,8 +122,6 @@ int Manager::luaCreateEnum(lua_State* L)
 {
 	// Upvalue contains the Enum table
 	if(lua_isnumber(L, -1)){
-		int en = lua_tonumber(L, -1);
-		
 		// Push the class table from upvalue
 		lua_pushvalue(L, lua_upvalueindex(1));
 

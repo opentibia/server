@@ -69,11 +69,11 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	configmanager.cpp  iomapserialize.cpp  player.cpp          thing.cpp \
 	connection.cpp     position.cpp	       tile.cpp \
 	container.cpp      ioplayer.cpp        protocol.cpp        tools.cpp \
-	creature.cpp       item.cpp	       protocolgame.cpp    trashholder.cpp \
+	creature.cpp       item.cpp	       protocolgame.cpp \
 	items.cpp          protocollogin.cpp   vocation.cpp \
 	cylinder.cpp       logger.cpp	       protocolold.cpp     waitlist.cpp \
 	database.cpp       weapons.cpp         script_environment.cpp \
-	mailbox.cpp        script_manager.cpp \
+	script_manager.cpp item_attributes.cpp trashholder.cpp \
 	script_event.cpp   script_listener.cpp script_functions.cpp \
 	creature_type.cpp  creature_manager.cpp actor.cpp
 

@@ -42,6 +42,8 @@ enum cylinderlink_t{
 
 class Cylinder{
 public:
+	virtual ~Cylinder() {}
+
 	virtual Cylinder* getParent() = 0;
 	virtual const Cylinder* getParent() const = 0;
 	virtual bool isRemoved() const = 0;
@@ -220,6 +222,7 @@ public:
 class VirtualCylinder : public Cylinder
 {
 public:
+	virtual ~VirtualCylinder() {}
 	static VirtualCylinder* virtualCylinder;
 
 	//cylinder implementations

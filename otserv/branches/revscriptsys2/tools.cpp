@@ -307,7 +307,7 @@ void hexdump(unsigned char *_data, int _len) {
 
 		fprintf(stderr, " ");
 		for(i = 0; i < 16 && i < _len; i++)
-			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '�' : _data[i]);
+			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '?' : _data[i]);
 
 		fprintf(stderr, "\n");
 	}
