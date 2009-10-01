@@ -1333,9 +1333,9 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 	state.pushThing(combatSource.getSourceCreature());
 	state.setField(-2, "attacker");
 	state.pushThing(combatSource.getSourceItem());
-	state.setField(-2, "field");
+	state.setField(-2, "item");
 	state.pushBoolean(combatSource.isSourceCondition());
-	state.setField(-2, "condition");
+	state.setField(-2, "isCondition");
 	state.pushInteger(value);
 	state.setField(-2, "value");
 }
@@ -1367,9 +1367,9 @@ void OnDamage::Event::update_instance(Manager& state, Environment& environment, 
 // Triggered when a creature reaches 0 health
 
 
-OnKill::Event::Event(Creature* creature, Creature* killer) :
+OnKill::Event::Event(Creature* creature, CombatSource& combatSource) :
 	creature(creature),
-	killer(killer)
+	combatSource(combatSource)
 {
 	propagate_by_default = true;
 }
@@ -1381,6 +1381,7 @@ OnKill::Event::~Event()
 bool OnKill::Event::check_match(const ScriptInformation& info)
 {
 	//TODO: Decide if player summon is handled as actors or players
+	Creature* killer = combatSource.getSourceCreature();
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
@@ -1412,6 +1413,7 @@ bool OnKill::Event::dispatch(Manager& state, Environment& environment)
 	ListenerList list;
 	
 	// Tied to killer
+	Creature* killer = combatSource.getSourceCreature();
 	if(killer){
 		list = killer->getListeners(ON_KILL_LISTENER);
 		if(dispatchEvent<OnKill::Event, ScriptInformation>
@@ -1441,8 +1443,12 @@ void OnKill::Event::push_instance(LuaState& state, Environment& environment)
 	state.pushClassTableInstance("OnKillEvent");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
-	state.pushThing(killer);
+	state.pushThing(combatSource.getSourceCreature());
 	state.setField(-2, "killer");
+	state.pushThing(combatSource.getSourceItem());
+	state.setField(-2, "item");
+	state.pushBoolean(combatSource.isSourceCondition());
+	state.setField(-2, "isCondition");
 }
 
 void OnKill::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
@@ -1482,6 +1488,14 @@ bool OnDeath::Event::check_match(const ScriptInformation& info)
 			return killer != NULL && killer->getPlayer() == NULL && strcasecmp(killer->getName(), info.name) == 0;
 		case FILTER_KILLER_PLAYER:
 			return killer != NULL && killer->getPlayer() != NULL;
+		case FILTER_PLAYER_DEATH_BY_PLAYER:
+			return killer != NULL && creature->getPlayer() != NULL && killer->getPlayer() != NULL;
+		case FILTER_PLAYER_DEATH_BY_ACTOR:
+			return killer != NULL && creature->getPlayer() != NULL && killer->getActor() != NULL;
+		case FILTER_ACTOR_DEATH_BY_ACTOR:
+			return killer != NULL && creature->getActor() == NULL && killer->getActor() != NULL;
+		case FILTER_ACTOR_DEATH_BY_PLAYER:
+			return killer != NULL && creature->getActor() != NULL && killer->getPlayer() != NULL;
 		default: break;
 	}
 	return false;

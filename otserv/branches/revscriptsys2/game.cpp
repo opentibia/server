@@ -1471,11 +1471,11 @@ bool Game::onCreatureDamage(CombatType& combatType, CombatSource& combatSource, 
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onCreatureKill(Creature* creature, Creature* killer)
+bool Game::onCreatureKill(Creature* creature, CombatSource& combatSource)
 {
 	if(!script_system)
 		return false; // Not handled
-	Script::OnKill::Event evt(creature, killer);
+	Script::OnKill::Event evt(creature, combatSource);
 	return script_system->dispatchEvent(evt);
 }
 
@@ -4737,7 +4737,7 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, 
 				if(target->getHealth() - damage <= 0){
 					// If event handler changes health we shouldn't
 					int ohealth = target->getHealth();
-					if(onCreatureKill(target, combatSource.getSourceCreature())){
+					if(onCreatureKill(target, combatSource)){
 						//prevent death
 						damage = ohealth - 1;
 					}

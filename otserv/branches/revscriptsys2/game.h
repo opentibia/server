@@ -528,7 +528,7 @@ public:
 	void onCreatureThink(Creature* creature, int interval);
 	bool onCreatureAttack(Creature* creature, Creature* attacked);
 	bool onCreatureDamage(CombatType& combatType, CombatSource& combatSource, Creature* creature, int32_t& value);
-	bool onCreatureKill(Creature* creature, Creature* killer);
+	bool onCreatureKill(Creature* creature, CombatSource& combatSource);
 	bool onCreatureDeath(Creature* creature, Item* corpse, Creature* killer);
 
 	void cleanup();

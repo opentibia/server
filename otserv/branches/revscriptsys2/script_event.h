@@ -832,7 +832,7 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* creature, Creature* killer);
+			Event(Creature* creature, CombatSource& combatSource);
 			~Event();
 
 			std::string getName() const {return "OnKill";}
@@ -849,7 +849,7 @@ namespace Script {
 
 		protected:
 			Creature* creature;
-			Creature* killer;
+			CombatSource& combatSource;
 		};
 	}
 
@@ -864,7 +864,11 @@ namespace Script {
 			FILTER_PLAYER,
 			FILTER_KILLER_NAME,
 			FILTER_KILLER_PLAYER,
-			FILTER_KILLER_ACTOR
+			FILTER_KILLER_ACTOR,
+			FILTER_PLAYER_DEATH_BY_PLAYER,
+			FILTER_PLAYER_DEATH_BY_ACTOR,
+			FILTER_ACTOR_DEATH_BY_ACTOR,
+			FILTER_ACTOR_DEATH_BY_PLAYER
 		};
 
 		struct ScriptInformation {
