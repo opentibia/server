@@ -135,6 +135,10 @@ bool Environment::stopListener(ListenerType type, uint32_t id) {
 			if(stopListener(Generic.OnLogout, id))
 				return true;
 			break;
+		case enums::ON_CHANGE_OUTFIT_LISTENER:
+			if(stopListener(Generic.OnChangeOutfit, id))
+				return true;
+			break;
 		case enums::ON_TURN_LISTENER:
 			if(stopListener(Generic.OnTurn, id))
 				return true;

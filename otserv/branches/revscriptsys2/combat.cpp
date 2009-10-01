@@ -109,10 +109,6 @@ bool Combat::internalCombat(Creature* caster, Creature* target, CombatParams& pa
 				return true;
 			}
 
-			if(!g_game.onCreatureDamage(target, params.combatType, value, caster)){
-				return true;
-			}
-
 			if(params.combatType != COMBAT_MANADRAIN){
 				if(changeHealth(caster, target, value, params)){
 					applyCondition(caster, target, params);

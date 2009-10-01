@@ -506,6 +506,31 @@ namespace Script {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
+	// OnChangeOut event
+	// Triggered when a player changes outfit through the outfit dialog
+
+	namespace OnChangeOutfit {
+		class Event : public Script::Event {
+		public:
+			Event(Player* player, OutfitType& outfit);
+			~Event();
+
+			std::string getName() const {return "OnChangeOutfit";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
+			OutfitType& outfit;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
 	// OnLook event
 	// Triggered when a looks at an object
 
@@ -688,7 +713,7 @@ namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnAttack event
-	// Triggered when a creature attacks another creature (usually every 2 seconds).
+	// Triggered when a creature attacks another creature (usually every 2 seconds)
 
 	namespace OnAttack {
 		enum FilterType {
@@ -697,10 +722,11 @@ namespace Script {
 			FILTER_PLAYER,
 			FILTER_ATTACKED_NAME,
 			FILTER_ATTACKED_PLAYER,
-			FILTER_PLAYER_VS_ACTOR,
-			FILTER_PLAYER_VS_PLAYER,
-			FILTER_ACTOR_VS_PLAYER,
-			FILTER_ACTOR_VS_ACTOR
+			FILTER_ATTACKED_ACTOR,
+			FILTER_PLAYER_ATTACK_ACTOR,
+			FILTER_PLAYER_ATTACK_PLAYER,
+			FILTER_ACTOR_ATTACK_ACTOR,
+			FILTER_ACTOR_ATTACK_PLAYER
 		};
 
 		struct ScriptInformation {
@@ -733,7 +759,7 @@ namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnDamage event
-	// Triggered when a creature is taking damage (or heals).
+	// Triggered when a creature is taking damage (or heals)
 
 	namespace OnDamage {
 		enum FilterType {
@@ -742,12 +768,18 @@ namespace Script {
 			FILTER_PLAYER,
 			FILTER_ATTACKER_NAME,
 			FILTER_ATTACKER_PLAYER,
+			FILTER_ATTACKER_ACTOR,
+			FILTER_PLAYER_DAMAGE_PLAYER,
+			FILTER_PLAYER_DAMAGE_ACTOR,
+			FILTER_ACTOR_DAMAGE_ACTOR,
+			FILTER_ACTOR_DAMAGE_PLAYER,
 			FILTER_TYPE
 		};
 
 		struct ScriptInformation {
 			FilterType method;
 			std::string name;
+			CombatType combatType;
 		};
 
 		class Event : public Script::Event {
@@ -759,6 +791,9 @@ namespace Script {
 
 			// Runs the event
 			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
 			void push_instance(LuaState& state, Environment& environment);
@@ -774,7 +809,7 @@ namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnKill event
-	// Triggered when a creature reaches 0 health.
+	// Triggered when a creature reaches 0 health
 
 	namespace OnKill {
 		enum FilterType {
@@ -783,10 +818,11 @@ namespace Script {
 			FILTER_PLAYER,
 			FILTER_KILLER_NAME,
 			FILTER_KILLER_PLAYER,
-			FILTER_PLAYER_VS_ACTOR,
-			FILTER_PLAYER_VS_PLAYER,
-			FILTER_ACTOR_VS_PLAYER,
-			FILTER_ACTOR_VS_ACTOR
+			FILTER_KILLER_ACTOR,
+			FILTER_PLAYER_KILL_PLAYER,
+			FILTER_PLAYER_KILL_ACTOR,
+			FILTER_ACTOR_KILL_ACTOR,
+			FILTER_ACTOR_KILL_PLAYER
 		};
 
 		struct ScriptInformation {
@@ -827,7 +863,8 @@ namespace Script {
 			FILTER_NAME,
 			FILTER_PLAYER,
 			FILTER_KILLER_NAME,
-			FILTER_KILLER_PLAYER
+			FILTER_KILLER_PLAYER,
+			FILTER_KILLER_ACTOR
 		};
 
 		struct ScriptInformation {

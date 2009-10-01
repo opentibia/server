@@ -243,6 +243,10 @@ public:
 	int lua_registerGenericEvent_OnLogin();
 	int lua_registerGenericEvent_OnLogout();
 	int lua_registerSpecificEvent_OnLogout();
+
+	int lua_registerGenericEvent_OnChangeOutfit();
+	int lua_registerSpecificEvent_OnChangeOutfit();
+
 	int lua_registerGenericEvent_OnLookAtItem();
 	int lua_registerGenericEvent_OnLookAtCreature();
 	int lua_registerSpecificEvent_OnLook();
@@ -265,6 +269,8 @@ public:
 	int lua_registerGenericEvent_OnServerLoad();
 	int lua_registerGenericEvent_OnAttack();
 	int lua_registerSpecificEvent_OnAttack();
+	int lua_registerGenericEvent_OnDamage();
+	int lua_registerSpecificEvent_OnDamage();
 	int lua_registerGenericEvent_OnKill();
 	int lua_registerSpecificEvent_OnKill();
 	int lua_registerGenericEvent_OnKilled();

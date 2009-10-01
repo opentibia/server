@@ -85,6 +85,7 @@ namespace Script {
 			ListenerList OnLeaveChannel;
 			ListenerList OnLogin;
 			ListenerList OnLogout;
+			ListenerList OnChangeOutfit;
 			ListenerList OnLook;
 			ListenerList OnTurn;
 			ListenerList OnLoad;

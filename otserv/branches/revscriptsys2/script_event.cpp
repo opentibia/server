@@ -840,6 +840,55 @@ void OnLogout::Event::update_instance(Manager& state, Environment& environment, 
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// OnChangeOutfit Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player changes outfit through the outfit dialog
+
+OnChangeOutfit::Event::Event(Player* player, OutfitType& outfit) :
+	player(player),
+	outfit(outfit)
+{
+	propagate_by_default = true;
+}
+
+OnChangeOutfit::Event::~Event()
+{
+}
+
+bool OnChangeOutfit::Event::dispatch(Manager& state, Environment& environment)
+{
+	ListenerList list = player->getListeners(ON_CHANGE_OUTFIT_LISTENER);
+	if(dispatchEvent<OnChangeOutfit::Event>
+			(this, state, environment, list)
+		)
+		return true;
+	return dispatchEvent<OnChangeOutfit::Event>
+		(this, state, environment, environment.Generic.OnChangeOutfit);
+}
+
+void OnChangeOutfit::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnChangeOutfit");
+	state.pushThing(player);
+	state.setField(-2, "player");
+	state.pushOutfit(outfit);
+	state.setField(-2, "outfit");
+}
+
+void OnChangeOutfit::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	thread->getField(-1, "outfit");
+	if(thread->isTable()) {
+		outfit = thread->popOutfit();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnChangeOutfit' invalid value of 'outfit'");
+		thread->pop();
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // OnLook Event
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a player looks at something
@@ -1149,26 +1198,28 @@ OnAttack::Event::~Event()
 
 bool OnAttack::Event::check_match(const ScriptInformation& info)
 {
+	//TODO: Decide if player summon is handled as actors or players
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
 		case FILTER_NAME:
-			return creature->getPlayer() == NULL && creature->getName() == info.name;
+			return creature->getPlayer() == NULL && strcasecmp(creature->getName(), info.name) == 0;
 		case FILTER_PLAYER:
 			return creature->getPlayer() != NULL;
 		case FILTER_ATTACKED_NAME:
-			return attacked->getPlayer() == NULL && attacked->getName() == info.name;
+			return attacked != NULL && attacked->getPlayer() == NULL && strcasecmp(attacked->getName(), info.name) == 0;
 		case FILTER_ATTACKED_PLAYER:
-			return attacked->getPlayer() != NULL;
-		case FILTER_PLAYER_VS_ACTOR:
-			return creature->getPlayer() && !attacked->getPlayer();
-		case FILTER_PLAYER_VS_PLAYER:
-			return creature->getPlayer() && attacked->getPlayer();
-		case FILTER_ACTOR_VS_PLAYER:
-			return !creature->getPlayer() && attacked->getPlayer();
-		case FILTER_ACTOR_VS_ACTOR:
-			return !creature->getPlayer() && !attacked->getPlayer();
-
+			return attacked != NULL && attacked->getPlayer() != NULL;
+		case FILTER_ATTACKED_ACTOR:
+			return attacked != NULL && attacked->getActor() != NULL;
+		case FILTER_PLAYER_ATTACK_PLAYER:
+			return attacked != NULL && creature->getPlayer() != NULL && attacked->getPlayer() != NULL;
+		case FILTER_PLAYER_ATTACK_ACTOR:
+			return attacked != NULL && creature->getPlayer() != NULL && attacked->getActor() != NULL;
+		case FILTER_ACTOR_ATTACK_PLAYER:
+			return attacked != NULL && creature->getActor() != NULL && attacked->getPlayer() != NULL;
+		case FILTER_ACTOR_ATTACK_ACTOR:
+			return attacked != NULL && creature->getActor() != NULL && attacked->getActor() != NULL;
 		default: break;
 	}
 	return false;
@@ -1223,16 +1274,47 @@ OnDamage::Event::~Event()
 {
 }
 
+bool OnDamage::Event::check_match(const ScriptInformation& info)
+{
+	//TODO: Decide if player summon is handled as actors or players
+	switch(info.method) {
+		case FILTER_ALL:
+			return true;
+		case FILTER_NAME:
+			return creature->getPlayer() == NULL && strcasecmp(creature->getName(), info.name) == 0;
+		case FILTER_PLAYER:
+			return creature->getPlayer() != NULL;
+		case FILTER_ATTACKER_NAME:
+			return attacker != NULL && strcasecmp(attacker->getName(), info.name) == 0;
+		case FILTER_ATTACKER_PLAYER:
+			return attacker != NULL && attacker->getPlayer() != NULL;
+		case FILTER_ATTACKER_ACTOR:
+			return attacker != NULL && attacker->getActor() != NULL;
+		case FILTER_PLAYER_DAMAGE_PLAYER:
+			return attacker != NULL && attacker->getPlayer() != NULL && creature->getPlayer() != NULL;
+		case FILTER_PLAYER_DAMAGE_ACTOR:
+			return attacker != NULL && attacker->getPlayer() != NULL && creature->getActor() != NULL;
+		case FILTER_ACTOR_DAMAGE_ACTOR:
+			return attacker != NULL && attacker->getActor() != NULL && creature->getActor() != NULL;
+		case FILTER_ACTOR_DAMAGE_PLAYER:
+			return attacker != NULL && attacker->getActor() != NULL && creature->getPlayer() != NULL;
+		case FILTER_TYPE:
+			return combatType == info.combatType;
+		default: break;
+	}
+	return false;
+}
+
 bool OnDamage::Event::dispatch(Manager& state, Environment& environment)
 {
 	if(creature){
 		ListenerList list = creature->getListeners(ON_DAMAGE_LISTENER);
-		if(dispatchEvent<OnDamage::Event>
+		if(dispatchEvent<OnDamage::Event, ScriptInformation>
 				(this, state, environment, list))
 			return true;
 	}
 
-	if(dispatchEvent<OnDamage::Event>
+	if(dispatchEvent<OnDamage::Event, ScriptInformation>
 			(this, state, environment, environment.Generic.OnDamage))
 		return true;
 
@@ -1292,25 +1374,28 @@ OnKill::Event::~Event()
 
 bool OnKill::Event::check_match(const ScriptInformation& info)
 {
+	//TODO: Decide if player summon is handled as actors or players
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
 		case FILTER_NAME:
-			return creature->getPlayer() == NULL && creature->getName() == info.name;
+			return creature->getPlayer() == NULL && strcasecmp(creature->getName(), info.name) == 0;
 		case FILTER_PLAYER:
 			return creature->getPlayer() != NULL;
 		case FILTER_KILLER_NAME:
-			return killer->getPlayer() == NULL && killer->getName() == info.name;
+			return killer != NULL && killer->getPlayer() == NULL && strcasecmp(killer->getName(), info.name) == 0;
 		case FILTER_KILLER_PLAYER:
-			return killer->getPlayer() != NULL;
-		case FILTER_PLAYER_VS_ACTOR:
-			return creature->getPlayer() && !killer->getPlayer();
-		case FILTER_PLAYER_VS_PLAYER:
-			return creature->getPlayer() && killer->getPlayer();
-		case FILTER_ACTOR_VS_PLAYER:
-			return !creature->getPlayer() && killer->getPlayer();
-		case FILTER_ACTOR_VS_ACTOR:
-			return !creature->getPlayer() && !killer->getPlayer();
+			return killer != NULL && killer->getPlayer() != NULL;
+		case FILTER_KILLER_ACTOR:
+			return killer != NULL && killer->getActor() != NULL;
+		case FILTER_PLAYER_KILL_PLAYER:
+			return killer != NULL && creature->getPlayer() != NULL && killer->getPlayer() != NULL;
+		case FILTER_PLAYER_KILL_ACTOR:
+			return killer != NULL && creature->getPlayer() != NULL && killer->getActor() != NULL;
+		case FILTER_ACTOR_KILL_ACTOR:
+			return killer != NULL && !creature->getActor() != NULL && killer->getActor() != NULL;
+		case FILTER_ACTOR_KILL_PLAYER:
+			return killer != NULL && creature->getActor() != NULL && killer->getPlayer() != NULL;
 		default: break;
 	}
 	return false;
@@ -1379,17 +1464,18 @@ OnDeath::Event::~Event()
 
 bool OnDeath::Event::check_match(const ScriptInformation& info)
 {
+	//TODO: Decide if player summon is handled as actors or players
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
 		case FILTER_NAME:
-			return creature->getPlayer() == NULL && creature->getName() == info.name;
+			return creature->getPlayer() == NULL && strcasecmp(creature->getName(), info.name) == 0;
 		case FILTER_PLAYER:
 			return creature->getPlayer() != NULL;
 		case FILTER_KILLER_NAME:
-			return killer->getPlayer() == NULL && killer->getName() == info.name;
+			return killer != NULL && killer->getPlayer() == NULL && strcasecmp(killer->getName(), info.name) == 0;
 		case FILTER_KILLER_PLAYER:
-			return killer->getPlayer() != NULL;
+			return killer != NULL && killer->getPlayer() != NULL;
 		default: break;
 	}
 	return false;

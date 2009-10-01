@@ -515,6 +515,7 @@ public:
 	// Script event callbacks, all are in the game class so we don't have to include the script files
 	bool onPlayerLogout(Player* player, bool forced, bool timeout);
 	bool onPlayerLogin(Player* player);
+	bool onPlayerChangeOutfit(Player* player, OutfitType& outfit);
 	bool onPlayerEquipItem(Player* player, Item* item, SlotType slot, bool equip);
 	bool onPlayerAdvance(Player* player, LevelType skill, uint32_t oldLevel, uint32_t newLevel);
 	bool onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);

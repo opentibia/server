@@ -505,6 +505,7 @@ template<> void Script::ListenerType__Base::initialize()
 	initAddValue(Script::enums::ON_CLOSE_CHANNEL_LISTENER, "ON_CLOSE_CHANNEL_LISTENER", true);
 	initAddValue(Script::enums::ON_LOGIN_LISTENER, "ON_LOGIN_LISTENER", true);
 	initAddValue(Script::enums::ON_LOGOUT_LISTENER, "ON_LOGOUT_LISTENER", true);
+	initAddValue(Script::enums::ON_CHANGE_OUTFIT_LISTENER, "ON_CHANGE_OUTFIT_LISTENER", true);
 	initAddValue(Script::enums::ON_LOOK_LISTENER, "ON_LOOK_LISTENER", true);
 	initAddValue(Script::enums::ON_TURN_LISTENER, "ON_TURN_LISTENER", true);
 	initAddValue(Script::enums::ON_LOAD_LISTENER, "ON_LOAD_LISTENER", true);

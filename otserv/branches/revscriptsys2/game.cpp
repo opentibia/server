@@ -1373,6 +1373,14 @@ bool Game::onPlayerLogout(Player* player, bool forced, bool timeout)
 	return script_system->dispatchEvent(evt);
 }
 
+bool Game::onPlayerChangeOutfit(Player* player, OutfitType& outfit)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnChangeOutfit::Event evt(player, outfit);
+	return script_system->dispatchEvent(evt);
+}
+
 bool Game::onPlayerEquipItem(Player* player, Item* item, SlotType slot, bool equip)
 {
 	if(!script_system)
@@ -3986,14 +3994,16 @@ bool Game::playerChangeOutfit(uint32_t playerId, OutfitType outfit)
 		return false;
 
 	uint32_t outfitId = Outfits::getInstance()->getOutfitId(outfit.lookType);
-	if(player->canWearOutfit(outfitId, outfit.lookAddons)){
-		player->defaultOutfit = outfit;
+	if(player->canWearOutfit(outfitId, outfit.lookAddons)){		
+		if(onPlayerChangeOutfit(player, outfit)){
+			player->defaultOutfit = outfit;
 
-		if(player->hasCondition(CONDITION_OUTFIT)){
-			return false;
+			if(player->hasCondition(CONDITION_OUTFIT)){
+				return false;
+			}
+
+			internalCreatureChangeOutfit(player, outfit);
 		}
-
-		internalCreatureChangeOutfit(player, outfit);
 	}
 
 	return true;
@@ -4656,6 +4666,10 @@ bool Game::combatChangeHealth(CombatType combatType,
 	bool showeffect)
 {
 	const Position& targetPos = target->getPosition();
+
+	if(!g_game.onCreatureDamage(target, combatType, healthChange, attacker)){
+		return true;
+	}
 
 	if(healthChange > 0){
 		if(target->getHealth() <= 0){

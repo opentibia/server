@@ -40,6 +40,7 @@ void toUpperCaseString(std::string& source);
 std::string asLowerCaseString(const std::string& source);
 std::string asUpperCaseString(const std::string& source);
 bool utf8ToLatin1(char* intext, std::string& outtext);
+int strcasecmp(const std::string& s1, const std::string& s2);
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
 #if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value);

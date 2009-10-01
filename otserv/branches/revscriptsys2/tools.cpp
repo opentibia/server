@@ -89,6 +89,11 @@ std::string asUpperCaseString(const std::string& source)
 	return s;
 }
 
+int strcasecmp(const std::string& s1, const std::string& s2)
+{
+	return strcasecmp(s1.c_str(), s2.c_str());
+}
+
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);

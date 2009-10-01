@@ -452,6 +452,10 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnLogout(function callback)", &Manager::lua_registerGenericEvent_OnLogout);
 	registerGlobalFunction("registerOnPlayerLogout(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnLogout);
 
+	// OnChangeOutfit
+	registerGlobalFunction("registerOnChangeOutfit(function callback)", &Manager::lua_registerGenericEvent_OnChangeOutfit);
+	registerGlobalFunction("registerOnPlayerChangeOutfit(Player player, function callback)", &Manager::lua_registerSpecificEvent_OnChangeOutfit);
+
 	// OnLook
 	registerGlobalFunction("registerOnLookAtItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtItem);
 	registerGlobalFunction("registerOnLookAtCreature(Creature creature, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
@@ -464,6 +468,10 @@ void Manager::registerFunctions() {
 	// OnAttack
 	registerGlobalFunction("registerOnAttack([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnAttack);
 	registerGlobalFunction("registerOnCreatureAttack(Creature creature, string method, function callback)", &Manager::lua_registerSpecificEvent_OnAttack);
+
+	// OnDamage
+	registerGlobalFunction("registerOnDamage([mixed what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnDamage);
+	registerGlobalFunction("registerOnCreatureDamage(Creature creature, [mixed what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDamage);
 
 	// OnKill
 	registerGlobalFunction("registerOnKill([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnKill);
@@ -881,6 +889,42 @@ int LuaState::lua_registerSpecificEvent_OnLogout() {
 	boost::any p(0);
 	Listener_ptr listener(
 		new Listener(ON_LOGOUT_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnChangeOutfit() {
+	boost::any p(0);
+	Listener_ptr listener(new Listener(ON_CHANGE_OUTFIT_LISTENER, p, *manager));
+
+	environment->Generic.OnChangeOutfit.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnChangeOutfit() {
+	// Store callback
+	insert(-2);
+
+	Player* who = popPlayer();
+
+	boost::any p(0);
+	Listener_ptr listener(
+		new Listener(ON_CHANGE_OUTFIT_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
 	environment->registerSpecificListener(listener);
@@ -1464,7 +1508,7 @@ int LuaState::lua_registerSpecificEvent_OnAdvance() {
 }
 
 int LuaState::lua_registerGenericEvent_OnAttack() {
-	// Tied to killing creature, either by name or to all kills
+	// Tied to attacked creature, either by name, creature type or all attacks
 	// Store callback
 	insert(-3);
 
@@ -1478,7 +1522,6 @@ int LuaState::lua_registerGenericEvent_OnAttack() {
 	}
 
 	OnAttack::ScriptInformation si_onattack;
-	si_onattack.method = OnAttack::FILTER_ALL;
 
 	if(method == "all"){
 		si_onattack.method = OnAttack::FILTER_ALL;
@@ -1497,17 +1540,20 @@ int LuaState::lua_registerGenericEvent_OnAttack() {
 	else if(method == "attacked_player"){
 		si_onattack.method = OnAttack::FILTER_ATTACKED_PLAYER;
 	}
-	else if(method == "player_vs_actor"){
-		si_onattack.method = OnAttack::FILTER_PLAYER_VS_ACTOR;
+	else if(method == "attacked_actor"){
+		si_onattack.method = OnAttack::FILTER_ATTACKED_ACTOR;
 	}
-	else if(method == "player_vs_player"){
-		si_onattack.method = OnAttack::FILTER_PLAYER_VS_PLAYER;
+	else if(method == "player_attack_player"){
+		si_onattack.method = OnAttack::FILTER_PLAYER_ATTACK_PLAYER;
 	}
-	else if(method == "actor_vs_player"){
-		si_onattack.method = OnAttack::FILTER_ACTOR_VS_PLAYER;
+	else if(method == "player_attack_actor"){
+		si_onattack.method = OnAttack::FILTER_PLAYER_ATTACK_ACTOR;
 	}
-	else if(method == "actor_vs_actor"){
-		si_onattack.method = OnAttack::FILTER_ACTOR_VS_ACTOR;
+	else if(method == "actor_attack_actor"){
+		si_onattack.method = OnAttack::FILTER_ACTOR_ATTACK_ACTOR;
+	}
+	else if(method == "actor_attack_player"){
+		si_onattack.method = OnAttack::FILTER_ACTOR_ATTACK_PLAYER;
 	}
 	else {
 		throw Error("Invalid argument (2) 'method'");
@@ -1546,17 +1592,20 @@ int LuaState::lua_registerSpecificEvent_OnAttack() {
 	else if(method == "attacked_player"){
 		si_onattack.method = OnAttack::FILTER_ATTACKED_PLAYER;
 	}
-	else if(method == "player_vs_actor"){
-		si_onattack.method = OnAttack::FILTER_PLAYER_VS_ACTOR;
+	else if(method == "attacked_actor"){
+		si_onattack.method = OnAttack::FILTER_ATTACKED_ACTOR;
 	}
-	else if(method == "player_vs_player"){
-		si_onattack.method = OnAttack::FILTER_PLAYER_VS_PLAYER;
+	else if(method == "player_attack_player"){
+		si_onattack.method = OnAttack::FILTER_PLAYER_ATTACK_PLAYER;
 	}
-	else if(method == "actor_vs_player"){
-		si_onattack.method = OnAttack::FILTER_ACTOR_VS_PLAYER;
+	else if(method == "player_attack_actor"){
+		si_onattack.method = OnAttack::FILTER_PLAYER_ATTACK_ACTOR;
 	}
-	else if(method == "actor_vs_actor"){
-		si_onattack.method = OnAttack::FILTER_ACTOR_VS_ACTOR;
+	else if(method == "actor_attack_actor"){
+		si_onattack.method = OnAttack::FILTER_ACTOR_ATTACK_ACTOR;
+	}
+	else if(method == "actor_attack_player"){
+		si_onattack.method = OnAttack::FILTER_ACTOR_ATTACK_PLAYER;
 	}
 	else {
 		throw Error("Invalid argument (2) 'method'");
@@ -1578,8 +1627,150 @@ int LuaState::lua_registerSpecificEvent_OnAttack() {
 	return 1;
 }
 
+int LuaState::lua_registerGenericEvent_OnDamage() {
+	// Tied to damaged creature, either by name, damage type, creature type or all damage
+	// Store callback
+	insert(-3);
+
+	std::string method = popString();
+	std::string name;
+	CombatType combatType;
+
+	if(isNil(-1)) {
+		pop();
+	}
+	if(isString(-1)){
+		name = popString();
+	}
+	else if(isTable(-1)){
+		combatType = popEnum<CombatType>();
+	}
+	else{
+		throw Error("Raw creature custom value must be either string or table (was " + typeName() + ").");
+	}
+
+	OnDamage::ScriptInformation si_ondamage;
+	si_ondamage.combatType = COMBAT_NONE;
+
+	if(method == "all"){
+		si_ondamage.method = OnDamage::FILTER_ALL;
+	}
+	else if(method == "name"){
+		si_ondamage.method = OnDamage::FILTER_NAME;
+		si_ondamage.name = name;
+	}
+	else if(method == "player"){
+		si_ondamage.method = OnDamage::FILTER_PLAYER;
+	}
+	else if(method == "attacker_name"){
+		si_ondamage.method = OnDamage::FILTER_ATTACKER_NAME;
+		si_ondamage.name = name;
+	}
+	else if(method == "attacker_player"){
+		si_ondamage.method = OnDamage::FILTER_ATTACKER_PLAYER;
+	}
+	else if(method == "attacker_actor"){
+		si_ondamage.method = OnDamage::FILTER_ATTACKER_ACTOR;
+	}
+	else if(method == "player_damage_player"){
+		si_ondamage.method = OnDamage::FILTER_PLAYER_DAMAGE_PLAYER;
+	}
+	else if(method == "player_damage_actor"){
+		si_ondamage.method = OnDamage::FILTER_PLAYER_DAMAGE_ACTOR;
+	}
+	else if(method == "actor_damage_actor"){
+		si_ondamage.method = OnDamage::FILTER_ACTOR_DAMAGE_ACTOR;
+	}
+	else if(method == "actor_damage_player"){
+		si_ondamage.method = OnDamage::FILTER_ACTOR_DAMAGE_PLAYER;
+	}
+	else if(method == "type"){
+		si_ondamage.method = OnDamage::FILTER_TYPE;
+		si_ondamage.combatType = combatType;
+	}
+	else {
+		throw Error("Invalid argument (2) 'method'");
+	}
+
+	boost::any p(si_ondamage);
+	Listener_ptr listener(new Listener(ON_DAMAGE_LISTENER, p, *manager));
+
+	environment->Generic.OnDamage.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnDamage() {
+	// Tied to a specific creature, and run each time that creature is taking damage (or heals)
+	// Store callback
+	insert(-4);
+
+	std::string method = popString();
+	std::string name;
+	CombatType combatType;
+
+	if(isNil(-1)) {
+		pop();
+	}
+	if(isString(-1)){
+		name = popString();
+	}
+	else if(isTable(-1)){
+		combatType = popEnum<CombatType>();
+	}
+	else{
+		throw Error("Raw creature custom value must be either string or table (was " + typeName() + ").");
+	}
+
+	Creature* who = popCreature();
+
+	OnDamage::ScriptInformation si_ondamage;
+	si_ondamage.combatType = COMBAT_NONE;
+
+	if(method == "all"){
+		si_ondamage.method = OnDamage::FILTER_ALL;
+	}
+	else if(method == "attacker_name"){
+		si_ondamage.method = OnDamage::FILTER_ATTACKER_NAME;
+		si_ondamage.name = name;
+	}
+	else if(method == "attacker_player"){
+		si_ondamage.method = OnDamage::FILTER_ATTACKER_PLAYER;
+	}
+	else if(method == "attacker_actor"){
+		si_ondamage.method = OnDamage::FILTER_ATTACKER_ACTOR;
+	}
+	else if(method == "type"){
+		si_ondamage.method = OnDamage::FILTER_TYPE;
+		si_ondamage.combatType = combatType;
+	}
+	else {
+		throw Error("Invalid argument (2) 'method'");
+	}
+
+	boost::any p(si_ondamage);
+	Listener_ptr listener(
+		new Listener(ON_DAMAGE_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
 int LuaState::lua_registerGenericEvent_OnKill() {
-	// Tied to killing creature, either by name or to all kills
+	// Tied to killing creature, either by name, creature type or all kills
 	// Store callback
 	insert(-3);
 
@@ -1593,7 +1784,6 @@ int LuaState::lua_registerGenericEvent_OnKill() {
 	}
 
 	OnKill::ScriptInformation si_onkill;
-	si_onkill.method = OnKill::FILTER_ALL;
 
 	if(method == "all"){
 		si_onkill.method = OnKill::FILTER_ALL;
@@ -1612,17 +1802,20 @@ int LuaState::lua_registerGenericEvent_OnKill() {
 	else if(method == "killer_player"){
 		si_onkill.method = OnKill::FILTER_KILLER_PLAYER;
 	}
-	else if(method == "player_vs_actor"){
-		si_onkill.method = OnKill::FILTER_PLAYER_VS_ACTOR;
+	else if(method == "killer_actor"){
+		si_onkill.method = OnKill::FILTER_KILLER_ACTOR;
 	}
-	else if(method == "player_vs_player"){
-		si_onkill.method = OnKill::FILTER_PLAYER_VS_PLAYER;
+	else if(method == "player_kill_player"){
+		si_onkill.method = OnKill::FILTER_PLAYER_KILL_PLAYER;
 	}
-	else if(method == "actor_vs_player"){
-		si_onkill.method = OnKill::FILTER_ACTOR_VS_PLAYER;
+	else if(method == "player_kill_actor"){
+		si_onkill.method = OnKill::FILTER_PLAYER_KILL_ACTOR;
 	}
-	else if(method == "actor_vs_actor"){
-		si_onkill.method = OnKill::FILTER_ACTOR_VS_ACTOR;
+	else if(method == "actor_kill_player"){
+		si_onkill.method = OnKill::FILTER_ACTOR_KILL_PLAYER;
+	}
+	else if(method == "actor_kill_actor"){
+		si_onkill.method = OnKill::FILTER_ACTOR_KILL_ACTOR;
 	}
 	else {
 		throw Error("Invalid argument (2) 'method'");
