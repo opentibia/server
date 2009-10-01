@@ -158,9 +158,9 @@ function enum(params, ...)
 	-- Write the .implementation declarations
 	implementation:write("template<> bool " .. nameprefix .. name .. "__Base::initialized = false;\n")
 	implementation:write("template<> std::string " .. nameprefix .. name .. "__Base::enum_name = \"" .. name .. "\";\n")
-	implementation:write("template<> " .. nameprefix .. name .. "__Base::EnumToString " .. nameprefix .. name .. "__Base::enum_to_string;\n")
-	implementation:write("template<> " .. nameprefix .. name .. "__Base::StringToEnum " .. nameprefix .. name .. "__Base::string_to_enum;\n")
-	implementation:write("template<> " .. nameprefix .. name .. "__Base::StringToEnum " .. nameprefix .. name .. "__Base::lstring_to_enum;\n")
+	implementation:write("template<> " .. nameprefix .. name .. "__Base::EnumToString " .. nameprefix .. name .. "__Base::enum_to_string = " .. nameprefix .. name .. "__Base::EnumToString();\n")
+	implementation:write("template<> " .. nameprefix .. name .. "__Base::StringToEnum " .. nameprefix .. name .. "__Base::string_to_enum = " .. nameprefix .. name .. "__Base::StringToEnum();\n")
+	implementation:write("template<> " .. nameprefix .. name .. "__Base::StringToEnum " .. nameprefix .. name .. "__Base::lstring_to_enum= " .. nameprefix .. name .. "__Base::StringToEnum();\n")
 	
 	-- Init function
 	implementation:write("template<> void " .. nameprefix .. name .. "__Base::initialize()\n")

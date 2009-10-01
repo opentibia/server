@@ -8,9 +8,9 @@
 
 template<> bool RaceType__Base::initialized = false;
 template<> std::string RaceType__Base::enum_name = "RaceType";
-template<> RaceType__Base::EnumToString RaceType__Base::enum_to_string;
-template<> RaceType__Base::StringToEnum RaceType__Base::string_to_enum;
-template<> RaceType__Base::StringToEnum RaceType__Base::lstring_to_enum;
+template<> RaceType__Base::EnumToString RaceType__Base::enum_to_string = RaceType__Base::EnumToString();
+template<> RaceType__Base::StringToEnum RaceType__Base::string_to_enum = RaceType__Base::StringToEnum();
+template<> RaceType__Base::StringToEnum RaceType__Base::lstring_to_enum= RaceType__Base::StringToEnum();
 template<> void RaceType__Base::initialize()
 {
 	initAddValue(enums::RACE_NONE, "RACE_NONE", true);
@@ -28,9 +28,9 @@ template<> void RaceType__Base::initialize()
 
 template<> bool Direction__Base::initialized = false;
 template<> std::string Direction__Base::enum_name = "Direction";
-template<> Direction__Base::EnumToString Direction__Base::enum_to_string;
-template<> Direction__Base::StringToEnum Direction__Base::string_to_enum;
-template<> Direction__Base::StringToEnum Direction__Base::lstring_to_enum;
+template<> Direction__Base::EnumToString Direction__Base::enum_to_string = Direction__Base::EnumToString();
+template<> Direction__Base::StringToEnum Direction__Base::string_to_enum = Direction__Base::StringToEnum();
+template<> Direction__Base::StringToEnum Direction__Base::lstring_to_enum= Direction__Base::StringToEnum();
 template<> void Direction__Base::initialize()
 {
 	initAddValue(enums::NORTH, "NORTH", true);
@@ -45,9 +45,9 @@ template<> void Direction__Base::initialize()
 
 template<> bool CombatType__Base::initialized = false;
 template<> std::string CombatType__Base::enum_name = "CombatType";
-template<> CombatType__Base::EnumToString CombatType__Base::enum_to_string;
-template<> CombatType__Base::StringToEnum CombatType__Base::string_to_enum;
-template<> CombatType__Base::StringToEnum CombatType__Base::lstring_to_enum;
+template<> CombatType__Base::EnumToString CombatType__Base::enum_to_string = CombatType__Base::EnumToString();
+template<> CombatType__Base::StringToEnum CombatType__Base::string_to_enum = CombatType__Base::StringToEnum();
+template<> CombatType__Base::StringToEnum CombatType__Base::lstring_to_enum= CombatType__Base::StringToEnum();
 template<> void CombatType__Base::initialize()
 {
 	initAddValue(enums::COMBAT_NONE, "COMBAT_NONE", true);
@@ -80,9 +80,9 @@ template<> void CombatType__Base::initialize()
 
 template<> bool CombatParam__Base::initialized = false;
 template<> std::string CombatParam__Base::enum_name = "CombatParam";
-template<> CombatParam__Base::EnumToString CombatParam__Base::enum_to_string;
-template<> CombatParam__Base::StringToEnum CombatParam__Base::string_to_enum;
-template<> CombatParam__Base::StringToEnum CombatParam__Base::lstring_to_enum;
+template<> CombatParam__Base::EnumToString CombatParam__Base::enum_to_string = CombatParam__Base::EnumToString();
+template<> CombatParam__Base::StringToEnum CombatParam__Base::string_to_enum = CombatParam__Base::StringToEnum();
+template<> CombatParam__Base::StringToEnum CombatParam__Base::lstring_to_enum= CombatParam__Base::StringToEnum();
 template<> void CombatParam__Base::initialize()
 {
 	initAddValue(enums::COMBATPARAM_COMBATTYPE, "COMBATPARAM_COMBATTYPE", true);
@@ -101,9 +101,9 @@ template<> void CombatParam__Base::initialize()
 
 template<> bool CallBackParam__Base::initialized = false;
 template<> std::string CallBackParam__Base::enum_name = "CallBackParam";
-template<> CallBackParam__Base::EnumToString CallBackParam__Base::enum_to_string;
-template<> CallBackParam__Base::StringToEnum CallBackParam__Base::string_to_enum;
-template<> CallBackParam__Base::StringToEnum CallBackParam__Base::lstring_to_enum;
+template<> CallBackParam__Base::EnumToString CallBackParam__Base::enum_to_string = CallBackParam__Base::EnumToString();
+template<> CallBackParam__Base::StringToEnum CallBackParam__Base::string_to_enum = CallBackParam__Base::StringToEnum();
+template<> CallBackParam__Base::StringToEnum CallBackParam__Base::lstring_to_enum= CallBackParam__Base::StringToEnum();
 template<> void CallBackParam__Base::initialize()
 {
 	initAddValue(enums::CALLBACKPARAM_LEVELMAGICVALUE, "CALLBACKPARAM_LEVELMAGICVALUE", true);
@@ -114,9 +114,9 @@ template<> void CallBackParam__Base::initialize()
 
 template<> bool ConditionParam__Base::initialized = false;
 template<> std::string ConditionParam__Base::enum_name = "ConditionParam";
-template<> ConditionParam__Base::EnumToString ConditionParam__Base::enum_to_string;
-template<> ConditionParam__Base::StringToEnum ConditionParam__Base::string_to_enum;
-template<> ConditionParam__Base::StringToEnum ConditionParam__Base::lstring_to_enum;
+template<> ConditionParam__Base::EnumToString ConditionParam__Base::enum_to_string = ConditionParam__Base::EnumToString();
+template<> ConditionParam__Base::StringToEnum ConditionParam__Base::string_to_enum = ConditionParam__Base::StringToEnum();
+template<> ConditionParam__Base::StringToEnum ConditionParam__Base::lstring_to_enum= ConditionParam__Base::StringToEnum();
 template<> void ConditionParam__Base::initialize()
 {
 	initAddValue(enums::CONDITIONPARAM_OWNER, "CONDITIONPARAM_OWNER", true);
@@ -168,9 +168,9 @@ template<> void ConditionParam__Base::initialize()
 
 template<> bool BlockType__Base::initialized = false;
 template<> std::string BlockType__Base::enum_name = "BlockType";
-template<> BlockType__Base::EnumToString BlockType__Base::enum_to_string;
-template<> BlockType__Base::StringToEnum BlockType__Base::string_to_enum;
-template<> BlockType__Base::StringToEnum BlockType__Base::lstring_to_enum;
+template<> BlockType__Base::EnumToString BlockType__Base::enum_to_string = BlockType__Base::EnumToString();
+template<> BlockType__Base::StringToEnum BlockType__Base::string_to_enum = BlockType__Base::StringToEnum();
+template<> BlockType__Base::StringToEnum BlockType__Base::lstring_to_enum= BlockType__Base::StringToEnum();
 template<> void BlockType__Base::initialize()
 {
 	initAddValue(enums::BLOCK_NONE, "BLOCK_NONE", true);
@@ -181,9 +181,9 @@ template<> void BlockType__Base::initialize()
 
 template<> bool ViolationAction__Base::initialized = false;
 template<> std::string ViolationAction__Base::enum_name = "ViolationAction";
-template<> ViolationAction__Base::EnumToString ViolationAction__Base::enum_to_string;
-template<> ViolationAction__Base::StringToEnum ViolationAction__Base::string_to_enum;
-template<> ViolationAction__Base::StringToEnum ViolationAction__Base::lstring_to_enum;
+template<> ViolationAction__Base::EnumToString ViolationAction__Base::enum_to_string = ViolationAction__Base::EnumToString();
+template<> ViolationAction__Base::StringToEnum ViolationAction__Base::string_to_enum = ViolationAction__Base::StringToEnum();
+template<> ViolationAction__Base::StringToEnum ViolationAction__Base::lstring_to_enum= ViolationAction__Base::StringToEnum();
 template<> void ViolationAction__Base::initialize()
 {
 	initAddValue(enums::ACTION_NOTATION, "ACTION_NOTATION", true);
@@ -198,9 +198,9 @@ template<> void ViolationAction__Base::initialize()
 
 template<> bool SkillType__Base::initialized = false;
 template<> std::string SkillType__Base::enum_name = "SkillType";
-template<> SkillType__Base::EnumToString SkillType__Base::enum_to_string;
-template<> SkillType__Base::StringToEnum SkillType__Base::string_to_enum;
-template<> SkillType__Base::StringToEnum SkillType__Base::lstring_to_enum;
+template<> SkillType__Base::EnumToString SkillType__Base::enum_to_string = SkillType__Base::EnumToString();
+template<> SkillType__Base::StringToEnum SkillType__Base::string_to_enum = SkillType__Base::StringToEnum();
+template<> SkillType__Base::StringToEnum SkillType__Base::lstring_to_enum= SkillType__Base::StringToEnum();
 template<> void SkillType__Base::initialize()
 {
 	initAddValue(enums::SKILL_FIST, "SKILL_FIST", true);
@@ -226,9 +226,9 @@ template<> void SkillType__Base::initialize()
 
 template<> bool LevelType__Base::initialized = false;
 template<> std::string LevelType__Base::enum_name = "LevelType";
-template<> LevelType__Base::EnumToString LevelType__Base::enum_to_string;
-template<> LevelType__Base::StringToEnum LevelType__Base::string_to_enum;
-template<> LevelType__Base::StringToEnum LevelType__Base::lstring_to_enum;
+template<> LevelType__Base::EnumToString LevelType__Base::enum_to_string = LevelType__Base::EnumToString();
+template<> LevelType__Base::StringToEnum LevelType__Base::string_to_enum = LevelType__Base::StringToEnum();
+template<> LevelType__Base::StringToEnum LevelType__Base::lstring_to_enum= LevelType__Base::StringToEnum();
 template<> void LevelType__Base::initialize()
 {
 	initAddValue(enums::LEVEL_FIST, "LEVEL_FIST", true);
@@ -244,9 +244,9 @@ template<> void LevelType__Base::initialize()
 
 template<> bool PlayerStatType__Base::initialized = false;
 template<> std::string PlayerStatType__Base::enum_name = "PlayerStatType";
-template<> PlayerStatType__Base::EnumToString PlayerStatType__Base::enum_to_string;
-template<> PlayerStatType__Base::StringToEnum PlayerStatType__Base::string_to_enum;
-template<> PlayerStatType__Base::StringToEnum PlayerStatType__Base::lstring_to_enum;
+template<> PlayerStatType__Base::EnumToString PlayerStatType__Base::enum_to_string = PlayerStatType__Base::EnumToString();
+template<> PlayerStatType__Base::StringToEnum PlayerStatType__Base::string_to_enum = PlayerStatType__Base::StringToEnum();
+template<> PlayerStatType__Base::StringToEnum PlayerStatType__Base::lstring_to_enum= PlayerStatType__Base::StringToEnum();
 template<> void PlayerStatType__Base::initialize()
 {
 	initAddValue(enums::STAT_MAXHITPOINTS, "STAT_MAXHITPOINTS", true);
@@ -257,9 +257,9 @@ template<> void PlayerStatType__Base::initialize()
 
 template<> bool LossType__Base::initialized = false;
 template<> std::string LossType__Base::enum_name = "LossType";
-template<> LossType__Base::EnumToString LossType__Base::enum_to_string;
-template<> LossType__Base::StringToEnum LossType__Base::string_to_enum;
-template<> LossType__Base::StringToEnum LossType__Base::lstring_to_enum;
+template<> LossType__Base::EnumToString LossType__Base::enum_to_string = LossType__Base::EnumToString();
+template<> LossType__Base::StringToEnum LossType__Base::string_to_enum = LossType__Base::StringToEnum();
+template<> LossType__Base::StringToEnum LossType__Base::lstring_to_enum= LossType__Base::StringToEnum();
 template<> void LossType__Base::initialize()
 {
 	initAddValue(enums::LOSS_EXPERIENCE, "LOSS_EXPERIENCE", true);
@@ -271,9 +271,9 @@ template<> void LossType__Base::initialize()
 
 template<> bool FormulaType__Base::initialized = false;
 template<> std::string FormulaType__Base::enum_name = "FormulaType";
-template<> FormulaType__Base::EnumToString FormulaType__Base::enum_to_string;
-template<> FormulaType__Base::StringToEnum FormulaType__Base::string_to_enum;
-template<> FormulaType__Base::StringToEnum FormulaType__Base::lstring_to_enum;
+template<> FormulaType__Base::EnumToString FormulaType__Base::enum_to_string = FormulaType__Base::EnumToString();
+template<> FormulaType__Base::StringToEnum FormulaType__Base::string_to_enum = FormulaType__Base::StringToEnum();
+template<> FormulaType__Base::StringToEnum FormulaType__Base::lstring_to_enum= FormulaType__Base::StringToEnum();
 template<> void FormulaType__Base::initialize()
 {
 	initAddValue(enums::FORMULA_UNDEFINED, "FORMULA_UNDEFINED", true);
@@ -284,9 +284,9 @@ template<> void FormulaType__Base::initialize()
 
 template<> bool ConditionID__Base::initialized = false;
 template<> std::string ConditionID__Base::enum_name = "ConditionID";
-template<> ConditionID__Base::EnumToString ConditionID__Base::enum_to_string;
-template<> ConditionID__Base::StringToEnum ConditionID__Base::string_to_enum;
-template<> ConditionID__Base::StringToEnum ConditionID__Base::lstring_to_enum;
+template<> ConditionID__Base::EnumToString ConditionID__Base::enum_to_string = ConditionID__Base::EnumToString();
+template<> ConditionID__Base::StringToEnum ConditionID__Base::string_to_enum = ConditionID__Base::StringToEnum();
+template<> ConditionID__Base::StringToEnum ConditionID__Base::lstring_to_enum= ConditionID__Base::StringToEnum();
 template<> void ConditionID__Base::initialize()
 {
 	initAddValue(enums::CONDITIONID_DEFAULT, "CONDITIONID_DEFAULT", true);
@@ -305,9 +305,9 @@ template<> void ConditionID__Base::initialize()
 
 template<> bool PlayerSex__Base::initialized = false;
 template<> std::string PlayerSex__Base::enum_name = "PlayerSex";
-template<> PlayerSex__Base::EnumToString PlayerSex__Base::enum_to_string;
-template<> PlayerSex__Base::StringToEnum PlayerSex__Base::string_to_enum;
-template<> PlayerSex__Base::StringToEnum PlayerSex__Base::lstring_to_enum;
+template<> PlayerSex__Base::EnumToString PlayerSex__Base::enum_to_string = PlayerSex__Base::EnumToString();
+template<> PlayerSex__Base::StringToEnum PlayerSex__Base::string_to_enum = PlayerSex__Base::StringToEnum();
+template<> PlayerSex__Base::StringToEnum PlayerSex__Base::lstring_to_enum= PlayerSex__Base::StringToEnum();
 template<> void PlayerSex__Base::initialize()
 {
 	initAddValue(enums::SEX_FEMALE, "SEX_FEMALE", true);
@@ -330,9 +330,9 @@ template<> void PlayerSex__Base::initialize()
 
 template<> bool ChaseMode__Base::initialized = false;
 template<> std::string ChaseMode__Base::enum_name = "ChaseMode";
-template<> ChaseMode__Base::EnumToString ChaseMode__Base::enum_to_string;
-template<> ChaseMode__Base::StringToEnum ChaseMode__Base::string_to_enum;
-template<> ChaseMode__Base::StringToEnum ChaseMode__Base::lstring_to_enum;
+template<> ChaseMode__Base::EnumToString ChaseMode__Base::enum_to_string = ChaseMode__Base::EnumToString();
+template<> ChaseMode__Base::StringToEnum ChaseMode__Base::string_to_enum = ChaseMode__Base::StringToEnum();
+template<> ChaseMode__Base::StringToEnum ChaseMode__Base::lstring_to_enum= ChaseMode__Base::StringToEnum();
 template<> void ChaseMode__Base::initialize()
 {
 	initAddValue(enums::CHASEMODE_STANDSTILL, "CHASEMODE_STANDSTILL", true);
@@ -341,9 +341,9 @@ template<> void ChaseMode__Base::initialize()
 
 template<> bool FightMode__Base::initialized = false;
 template<> std::string FightMode__Base::enum_name = "FightMode";
-template<> FightMode__Base::EnumToString FightMode__Base::enum_to_string;
-template<> FightMode__Base::StringToEnum FightMode__Base::string_to_enum;
-template<> FightMode__Base::StringToEnum FightMode__Base::lstring_to_enum;
+template<> FightMode__Base::EnumToString FightMode__Base::enum_to_string = FightMode__Base::EnumToString();
+template<> FightMode__Base::StringToEnum FightMode__Base::string_to_enum = FightMode__Base::StringToEnum();
+template<> FightMode__Base::StringToEnum FightMode__Base::lstring_to_enum= FightMode__Base::StringToEnum();
 template<> void FightMode__Base::initialize()
 {
 	initAddValue(enums::FIGHTMODE_ATTACK, "FIGHTMODE_ATTACK", true);
@@ -353,9 +353,9 @@ template<> void FightMode__Base::initialize()
 
 template<> bool TradeState__Base::initialized = false;
 template<> std::string TradeState__Base::enum_name = "TradeState";
-template<> TradeState__Base::EnumToString TradeState__Base::enum_to_string;
-template<> TradeState__Base::StringToEnum TradeState__Base::string_to_enum;
-template<> TradeState__Base::StringToEnum TradeState__Base::lstring_to_enum;
+template<> TradeState__Base::EnumToString TradeState__Base::enum_to_string = TradeState__Base::EnumToString();
+template<> TradeState__Base::StringToEnum TradeState__Base::string_to_enum = TradeState__Base::StringToEnum();
+template<> TradeState__Base::StringToEnum TradeState__Base::lstring_to_enum= TradeState__Base::StringToEnum();
 template<> void TradeState__Base::initialize()
 {
 	initAddValue(enums::TRADE_NONE, "TRADE_NONE", true);
@@ -367,9 +367,9 @@ template<> void TradeState__Base::initialize()
 
 template<> bool SlotType__Base::initialized = false;
 template<> std::string SlotType__Base::enum_name = "SlotType";
-template<> SlotType__Base::EnumToString SlotType__Base::enum_to_string;
-template<> SlotType__Base::StringToEnum SlotType__Base::string_to_enum;
-template<> SlotType__Base::StringToEnum SlotType__Base::lstring_to_enum;
+template<> SlotType__Base::EnumToString SlotType__Base::enum_to_string = SlotType__Base::EnumToString();
+template<> SlotType__Base::StringToEnum SlotType__Base::string_to_enum = SlotType__Base::StringToEnum();
+template<> SlotType__Base::StringToEnum SlotType__Base::lstring_to_enum= SlotType__Base::StringToEnum();
 template<> void SlotType__Base::initialize()
 {
 	initAddValue(enums::SLOT_WHEREEVER, "SLOT_WHEREEVER", true);
@@ -391,9 +391,9 @@ template<> void SlotType__Base::initialize()
 
 template<> bool SlotPosition__Base::initialized = false;
 template<> std::string SlotPosition__Base::enum_name = "SlotPosition";
-template<> SlotPosition__Base::EnumToString SlotPosition__Base::enum_to_string;
-template<> SlotPosition__Base::StringToEnum SlotPosition__Base::string_to_enum;
-template<> SlotPosition__Base::StringToEnum SlotPosition__Base::lstring_to_enum;
+template<> SlotPosition__Base::EnumToString SlotPosition__Base::enum_to_string = SlotPosition__Base::EnumToString();
+template<> SlotPosition__Base::StringToEnum SlotPosition__Base::string_to_enum = SlotPosition__Base::StringToEnum();
+template<> SlotPosition__Base::StringToEnum SlotPosition__Base::lstring_to_enum= SlotPosition__Base::StringToEnum();
 template<> void SlotPosition__Base::initialize()
 {
 	initAddValue(enums::SLOTPOSITION_NONE, "SLOTPOSITION_NONE", true);
@@ -431,9 +431,9 @@ template<> void SlotPosition__Base::initialize()
 
 template<> bool TileProp__Base::initialized = false;
 template<> std::string TileProp__Base::enum_name = "TileProp";
-template<> TileProp__Base::EnumToString TileProp__Base::enum_to_string;
-template<> TileProp__Base::StringToEnum TileProp__Base::string_to_enum;
-template<> TileProp__Base::StringToEnum TileProp__Base::lstring_to_enum;
+template<> TileProp__Base::EnumToString TileProp__Base::enum_to_string = TileProp__Base::EnumToString();
+template<> TileProp__Base::StringToEnum TileProp__Base::string_to_enum = TileProp__Base::StringToEnum();
+template<> TileProp__Base::StringToEnum TileProp__Base::lstring_to_enum= TileProp__Base::StringToEnum();
 template<> void TileProp__Base::initialize()
 {
 	initAddValue(enums::TILEPROP_NONE, "TILEPROP_NONE", true);
@@ -465,9 +465,9 @@ template<> void TileProp__Base::initialize()
 
 template<> bool ZoneType__Base::initialized = false;
 template<> std::string ZoneType__Base::enum_name = "ZoneType";
-template<> ZoneType__Base::EnumToString ZoneType__Base::enum_to_string;
-template<> ZoneType__Base::StringToEnum ZoneType__Base::string_to_enum;
-template<> ZoneType__Base::StringToEnum ZoneType__Base::lstring_to_enum;
+template<> ZoneType__Base::EnumToString ZoneType__Base::enum_to_string = ZoneType__Base::EnumToString();
+template<> ZoneType__Base::StringToEnum ZoneType__Base::string_to_enum = ZoneType__Base::StringToEnum();
+template<> ZoneType__Base::StringToEnum ZoneType__Base::lstring_to_enum= ZoneType__Base::StringToEnum();
 template<> void ZoneType__Base::initialize()
 {
 	initAddValue(enums::ZONE_PROTECTION, "ZONE_PROTECTION", true);
@@ -479,9 +479,9 @@ template<> void ZoneType__Base::initialize()
 
 template<> bool WorldType__Base::initialized = false;
 template<> std::string WorldType__Base::enum_name = "WorldType";
-template<> WorldType__Base::EnumToString WorldType__Base::enum_to_string;
-template<> WorldType__Base::StringToEnum WorldType__Base::string_to_enum;
-template<> WorldType__Base::StringToEnum WorldType__Base::lstring_to_enum;
+template<> WorldType__Base::EnumToString WorldType__Base::enum_to_string = WorldType__Base::EnumToString();
+template<> WorldType__Base::StringToEnum WorldType__Base::string_to_enum = WorldType__Base::StringToEnum();
+template<> WorldType__Base::StringToEnum WorldType__Base::lstring_to_enum= WorldType__Base::StringToEnum();
 template<> void WorldType__Base::initialize()
 {
 	initAddValue(enums::WORLD_TYPE_NOPVP, "WORLD_TYPE_NOPVP", true);
@@ -491,9 +491,9 @@ template<> void WorldType__Base::initialize()
 
 template<> bool Script::ListenerType__Base::initialized = false;
 template<> std::string Script::ListenerType__Base::enum_name = "ListenerType";
-template<> Script::ListenerType__Base::EnumToString Script::ListenerType__Base::enum_to_string;
-template<> Script::ListenerType__Base::StringToEnum Script::ListenerType__Base::string_to_enum;
-template<> Script::ListenerType__Base::StringToEnum Script::ListenerType__Base::lstring_to_enum;
+template<> Script::ListenerType__Base::EnumToString Script::ListenerType__Base::enum_to_string = Script::ListenerType__Base::EnumToString();
+template<> Script::ListenerType__Base::StringToEnum Script::ListenerType__Base::string_to_enum = Script::ListenerType__Base::StringToEnum();
+template<> Script::ListenerType__Base::StringToEnum Script::ListenerType__Base::lstring_to_enum= Script::ListenerType__Base::StringToEnum();
 template<> void Script::ListenerType__Base::initialize()
 {
 	initAddValue(Script::enums::ON_SAY_LISTENER, "ON_SAY_LISTENER", true);

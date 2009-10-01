@@ -8,9 +8,9 @@
 
 template<> bool ConditionType__Base::initialized = false;
 template<> std::string ConditionType__Base::enum_name = "ConditionType";
-template<> ConditionType__Base::EnumToString ConditionType__Base::enum_to_string;
-template<> ConditionType__Base::StringToEnum ConditionType__Base::string_to_enum;
-template<> ConditionType__Base::StringToEnum ConditionType__Base::lstring_to_enum;
+template<> ConditionType__Base::EnumToString ConditionType__Base::enum_to_string = ConditionType__Base::EnumToString();
+template<> ConditionType__Base::StringToEnum ConditionType__Base::string_to_enum = ConditionType__Base::StringToEnum();
+template<> ConditionType__Base::StringToEnum ConditionType__Base::lstring_to_enum= ConditionType__Base::StringToEnum();
 template<> void ConditionType__Base::initialize()
 {
 	initAddValue(enums::CONDITION_NONE, "CONDITION_NONE", true);
@@ -44,9 +44,9 @@ template<> void ConditionType__Base::initialize()
 
 template<> bool ConditionEnd__Base::initialized = false;
 template<> std::string ConditionEnd__Base::enum_name = "ConditionEnd";
-template<> ConditionEnd__Base::EnumToString ConditionEnd__Base::enum_to_string;
-template<> ConditionEnd__Base::StringToEnum ConditionEnd__Base::string_to_enum;
-template<> ConditionEnd__Base::StringToEnum ConditionEnd__Base::lstring_to_enum;
+template<> ConditionEnd__Base::EnumToString ConditionEnd__Base::enum_to_string = ConditionEnd__Base::EnumToString();
+template<> ConditionEnd__Base::StringToEnum ConditionEnd__Base::string_to_enum = ConditionEnd__Base::StringToEnum();
+template<> ConditionEnd__Base::StringToEnum ConditionEnd__Base::lstring_to_enum= ConditionEnd__Base::StringToEnum();
 template<> void ConditionEnd__Base::initialize()
 {
 	initAddValue(enums::CONDITIONEND_CLEANUP, "CONDITIONEND_CLEANUP", true);
@@ -57,9 +57,9 @@ template<> void ConditionEnd__Base::initialize()
 
 template<> bool ConditionAttribute__Base::initialized = false;
 template<> std::string ConditionAttribute__Base::enum_name = "ConditionAttribute";
-template<> ConditionAttribute__Base::EnumToString ConditionAttribute__Base::enum_to_string;
-template<> ConditionAttribute__Base::StringToEnum ConditionAttribute__Base::string_to_enum;
-template<> ConditionAttribute__Base::StringToEnum ConditionAttribute__Base::lstring_to_enum;
+template<> ConditionAttribute__Base::EnumToString ConditionAttribute__Base::enum_to_string = ConditionAttribute__Base::EnumToString();
+template<> ConditionAttribute__Base::StringToEnum ConditionAttribute__Base::string_to_enum = ConditionAttribute__Base::StringToEnum();
+template<> ConditionAttribute__Base::StringToEnum ConditionAttribute__Base::lstring_to_enum= ConditionAttribute__Base::StringToEnum();
 template<> void ConditionAttribute__Base::initialize()
 {
 	initAddValue(enums::CONDITIONATTRIBUTE_TYPE, "CONDITIONATTRIBUTE_TYPE", true);
