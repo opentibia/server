@@ -64,19 +64,31 @@ CombatSource::CombatSource(const CombatSource& rhs)
 
 void CombatSource::setSourceCreature(Creature* _creature)
 {
-	if(creature){
-		creature->unRef();
+	if(_creature != creature){
+		if(creature){
+			creature->unRef();
+		}
+		creature = _creature;
+
+		if(creature){
+			creature->addRef();
+		}
 	}
-	creature = _creature;
 }
 
 void CombatSource::setSourceItem(Item* _item)
 {
-	if(item){
-		item->unRef();
-	}
+	if(_item != item){
+		if(item){
+			item->unRef();
+		}
 
-	item = _item;
+		item = _item;
+
+		if(item){
+			item->addRef();
+		}
+	}
 }
 
 Combat::Combat()
