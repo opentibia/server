@@ -1181,6 +1181,101 @@ void OnAdvance::Event::update_instance(Manager& state, Environment& environment,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// OnCondition Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a condition is added/removed or ticks
+
+
+OnCondition::Event::Event(Creature* creature, Condition* condition) :
+	creature(creature),
+	condition(condition),
+	eventType(EVENT_BEGIN)
+{
+	propagate_by_default = true;
+}
+
+OnCondition::Event::Event(Creature* creature, Condition* condition, ConditionEnd reason) :
+	creature(creature),
+	condition(condition),
+	reason(reason),
+	eventType(EVENT_END)
+{
+	propagate_by_default = true;
+}
+
+OnCondition::Event::Event(Creature* creature, Condition* condition, uint32_t ticks) :
+	creature(creature),
+	condition(condition),
+	reason(reason),
+	eventType(EVENT_TICK)
+{
+	propagate_by_default = true;
+}
+
+OnCondition::Event::~Event()
+{
+}
+
+bool OnCondition::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_ID:
+			return condition->getId() == info.id;
+		case FILTER_BEGIN:
+			return eventType == EVENT_BEGIN;
+		case FILTER_END:
+			return eventType == EVENT_END;
+		case FILTER_TICK:
+			return eventType == EVENT_TICK;
+	}
+
+	return false;
+}
+
+bool OnCondition::Event::dispatch(Manager& state, Environment& environment)
+{
+	if(creature){
+		ListenerList list = creature->getListeners(ON_CONDITION_LISTENER);
+		if(dispatchEvent<OnCondition::Event, ScriptInformation>
+				(this, state, environment, list))
+			return true;
+	}
+
+	if(dispatchEvent<OnCondition::Event>
+			(this, state, environment, environment.Generic.OnCondition))
+		return true;
+
+	return false;
+}
+
+void OnCondition::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnCondition");
+	state.pushThing(creature);
+	state.setField(-2, "creature");
+	//TODO:
+	//state.pushCondition(condition);
+	//state.setField(-2, "condition");
+
+	if(eventType == EVENT_BEGIN){
+		//
+	}
+	else if(eventType == EVENT_END){
+		state.pushEnum(reason);
+		state.setField(-2, "reason");
+	}
+	else if(eventType == EVENT_TICK){
+		state.pushInteger(ticks);
+		state.setField(-2, "ticks");
+	}
+}
+
+void OnCondition::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // OnAttack Event
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a creature attacks another creature (usually every 2 seconds)

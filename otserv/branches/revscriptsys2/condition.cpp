@@ -609,7 +609,9 @@ bool Condition::Effect::onBegin(Creature* creature)
 
 		case EFFECT_SCRIPT:
 		{
-			//TODO:
+			if(!g_game.onConditionBegin(creature, owner_condition)){
+				return false;
+			}
 			break;
 		}
 		default:
@@ -670,7 +672,9 @@ bool Condition::Effect::onEnd(Creature* creature, ConditionEnd reason)
 
 		case EFFECT_SCRIPT:
 		{
-			//TODO:
+			if(!g_game.onConditionEnd(creature, owner_condition, reason)){
+				return false;
+			}
 			break;
 		}
 
@@ -856,7 +860,9 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 
 		case EFFECT_SCRIPT:
 		{
-			//TODO:
+			if(!g_game.onConditionTick(creature, owner_condition, ticks)){
+				return false;
+			}
 			break;
 		}
 

@@ -462,6 +462,10 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnAdvance([LevelType skillid = nil], function callback)", &Manager::lua_registerGenericEvent_OnAdvance);
 	registerGlobalFunction("registerOnPlayerAdvance(Player player [, LevelType skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
 
+	// OnCondition
+	registerGlobalFunction("registerOnCondition(mixed what, function callback)", &Manager::lua_registerGenericEvent_OnCondition);
+	registerGlobalFunction("registerOnCreatureCondition(Creature creature, mixed what, function callback)", &Manager::lua_registerSpecificEvent_OnCondition);
+
 	// OnAttack
 	registerGlobalFunction("registerOnAttack([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnAttack);
 	registerGlobalFunction("registerOnCreatureAttack(Creature creature, string method, function callback)", &Manager::lua_registerSpecificEvent_OnAttack);
@@ -1492,6 +1496,108 @@ int LuaState::lua_registerSpecificEvent_OnAdvance() {
 	boost::any p(si_onadvance);
 	Listener_ptr listener(
 		new Listener(ON_ADVANCE_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnCondition() {
+
+	// Tied to a condition, either by id, or condition event (begin/end/tick)
+	// Store callback
+	insert(-2);
+
+	OnCondition::ScriptInformation si_oncondition;
+	si_oncondition.id = 0;
+
+	if(isTable(-1)){
+		si_oncondition.method = OnCondition::FILTER_ID;
+		si_oncondition.id = popEnum<ConditionType>().value();
+	}
+	else if(isNumber(-1)){
+		si_oncondition.method = OnCondition::FILTER_ID;
+		si_oncondition.id = popInteger();
+	}
+	else if(isString(-1)){
+		std::string method = popString();
+		if(method == "begin"){
+			si_oncondition.method = OnCondition::FILTER_BEGIN;
+		}
+		else if(method == "end"){
+			si_oncondition.method = OnCondition::FILTER_END;
+		}
+		else if(method == "tick"){
+			si_oncondition.method = OnCondition::FILTER_TICK;
+		}
+		else{
+			throw Error("Invalid argument (1) 'what'");
+		}
+	}
+	else {
+		throw Error("Invalid argument (1) 'what'");
+	}
+
+	boost::any p(si_oncondition);
+	Listener_ptr listener(new Listener(ON_CONDITION_LISTENER, p, *manager));
+
+	environment->Generic.OnCondition.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnCondition(){
+	// Tied to a specific creature, either by id, or condition event (begin/end/tick)
+	// Store callback
+	insert(-3);
+
+	OnCondition::ScriptInformation si_oncondition;
+	si_oncondition.id = 0;
+
+	if(isTable(-1)){
+		si_oncondition.method = OnCondition::FILTER_ID;
+		si_oncondition.id = popEnum<ConditionType>().value();
+	}
+	else if(isNumber(-1)){
+		si_oncondition.method = OnCondition::FILTER_ID;
+		si_oncondition.id = popInteger();
+	}
+	else if(isString(-1)){
+		std::string method = popString();
+		if(method == "begin"){
+			si_oncondition.method = OnCondition::FILTER_BEGIN;
+		}
+		else if(method == "end"){
+			si_oncondition.method = OnCondition::FILTER_END;
+		}
+		else if(method == "tick"){
+			si_oncondition.method = OnCondition::FILTER_TICK;
+		}
+		else{
+			throw Error("Invalid argument (1) 'what'");
+		}
+	}
+	else {
+		throw Error("Invalid argument (1) 'what'");
+	}
+
+	Creature* who = popCreature();
+
+	boost::any p(si_oncondition);
+	Listener_ptr listener(
+		new Listener(ON_CONDITION_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
 	environment->registerSpecificListener(listener);

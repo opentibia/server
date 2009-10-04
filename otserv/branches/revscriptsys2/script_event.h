@@ -22,6 +22,7 @@
 #include "classes.h"
 #include "script_environment.h"
 #include "script_listener.h"
+#include "condition_attributes.h"
 #include "chat.h"
 #include "const.h"
 #include "boost/any.hpp"
@@ -708,6 +709,55 @@ namespace Script {
 			LevelType skill;
 			uint32_t oldSkillLevel;
 			uint32_t newSkillLevel;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnCondition event
+	// Triggered when a condition is added/removed or tick
+
+	namespace OnCondition {
+		enum FilterType {
+			FILTER_ID,
+			FILTER_BEGIN,
+			FILTER_END,
+			FILTER_TICK,
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			uint32_t id;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Creature* creature, Condition* condition);
+			Event(Creature* creature, Condition* condition, ConditionEnd reason);
+			Event(Creature* creature, Condition* condition, uint32_t ticks);
+			~Event();
+
+			std::string getName() const {return "OnCondition";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			enum EventType{
+				EVENT_BEGIN,
+				EVENT_END,
+				EVENT_TICK
+			} eventType;
+			Creature* creature;
+			Condition* condition;
+			ConditionEnd reason;
+			uint32_t ticks;
 		};
 	}
 

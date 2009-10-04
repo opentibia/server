@@ -267,6 +267,8 @@ public:
 	int lua_registerSpecificEvent_OnCreatureThink();
 	int lua_registerGenericEvent_OnCreatureTurn();
 	int lua_registerGenericEvent_OnServerLoad();
+	int lua_registerGenericEvent_OnCondition();
+	int lua_registerSpecificEvent_OnCondition();
 	int lua_registerGenericEvent_OnAttack();
 	int lua_registerSpecificEvent_OnAttack();
 	int lua_registerGenericEvent_OnDamage();

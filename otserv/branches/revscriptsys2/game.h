@@ -525,6 +525,9 @@ public:
 	void onSpotCreature(Creature* creature, Creature* spotted);
 	void onLoseCreature(Creature* creature, Creature* lost);
 	void onCreatureHear(Creature* listener, Creature* speaker, const SpeakClass& sclass, const std::string& text);
+	bool onConditionBegin(Creature* creature, Condition* condition);
+	bool onConditionEnd(Creature* creature, Condition* condition, ConditionEnd reason);
+	bool onConditionTick(Creature* creature, Condition* condition, uint32_t ticks);
 	void onCreatureThink(Creature* creature, int interval);
 	bool onCreatureAttack(Creature* creature, Creature* attacked);
 	bool onCreatureDamage(CombatType& combatType, CombatSource& combatSource, Creature* creature, int32_t& value);

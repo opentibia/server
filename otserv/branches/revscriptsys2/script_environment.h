@@ -94,6 +94,7 @@ namespace Script {
 			ListenerList OnAdvance;
 			ListenerItemMap OnMoveItem;
 			ListenerList OnMoveItemOnItem;
+			ListenerList OnCondition;
 			ListenerList OnAttack;
 			ListenerList OnDamage;
 			ListenerList OnKilled;

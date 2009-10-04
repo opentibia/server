@@ -1455,6 +1455,30 @@ void Game::onCreatureHear(Creature* listener, Creature* speaker, const SpeakClas
 	}
 }
 
+bool Game::onConditionBegin(Creature* creature, Condition* condition)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnCondition::Event evt(creature, condition);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onConditionEnd(Creature* creature, Condition* condition, ConditionEnd reason)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnCondition::Event evt(creature, condition, reason);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onConditionTick(Creature* creature, Condition* condition, uint32_t ticks)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnCondition::Event evt(creature, condition, ticks);
+	return script_system->dispatchEvent(evt);
+}
+
 bool Game::onCreatureAttack(Creature* creature, Creature* attacked)
 {
 	if(!script_system)

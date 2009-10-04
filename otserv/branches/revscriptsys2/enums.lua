@@ -279,6 +279,7 @@ enum ("Script::ListenerType",
 	"ON_ADVANCE_LISTENER",
 	"ON_ATTACK_LISTENER",
 	"ON_DAMAGE_LISTENER",
+	"ON_CONDITION_LISTENER",
 	-- Creature specific only
 	"ON_THINK_LISTENER",
 	"ON_HEAR_LISTENER",

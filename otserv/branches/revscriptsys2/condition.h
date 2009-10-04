@@ -100,7 +100,7 @@ public:
 	bool onBegin(Creature* creature);
 	void onEnd(Creature* creature, ConditionEnd reason);
 	bool onUpdate(Creature* creature, const Condition* addCondition);
-	bool onTick(Creature* creature, uint32_t interval);
+	bool onTick(Creature* creature, uint32_t ticks);
 
 	void addEffect(Condition::Effect* effect);
 
