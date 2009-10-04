@@ -11,10 +11,10 @@ function KillTest.simpleKillHandler(event)
 			stopListener(listener)
 		end
 		
-		listener = registerOnCreatureKill(event.killer, KillAgain)
+		listener = registerOnCreatureKill(event.killer, "all", KillAgain)
 	end
 end
-KillTest.simpleKillListener = registerOnKill(KillTest.simpleKillHandler)
+KillTest.simpleKillListener = registerOnKill("all", KillTest.simpleKillHandler)
 
 
 KillTest.watchList = {}
@@ -33,15 +33,15 @@ function KillTest.ratDeathHandler(event)
 	end
 	
 	if not table.find(KillTest.watchList, event.killer) then
-		registerOnCreatureKilled(event.killer, KillerKilled)
-		registerOnCreatureDeathBy(event.killer, KillerKillsSomething)
+		registerOnCreatureKilled(event.killer, "all", KillerKilled)
+		registerOnCreatureDeathBy(event.killer, "all", KillerKillsSomething)
 		table.append(KillTest.watchList, event.killer)
 	end
 	
 	event:skip()
 end
 
-registerOnKilled("Rat", KillTest.ratDeathHandler)
+registerOnKilled("rat", "name", KillTest.ratDeathHandler)
 
 function KillTest.playerKillHandler(event)
 	local tag = createItem(2599)
@@ -49,9 +49,9 @@ function KillTest.playerKillHandler(event)
 	event.corpse:addItem(tag)
 end
 
-KillTest.playerKillListener = registerOnDeathBy("Player", KillTest.playerKillHandler)
+KillTest.playerKillListener = registerOnDeathBy("killer_player", KillTest.playerKillHandler)
 
 --[[
-registerOnDeath([string what = nil], function callback)
-registerOnCreatureDeath(Creature creature, function callback)
+registerOnDeath([string what = nil], string method, function callback)
+registerOnCreatureDeath(Creature creature [, string what = nil], string method, function callback)
 ]]--
