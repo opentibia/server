@@ -64,7 +64,9 @@ enum ConditionFlag{
 class Condition{
 public:
 	static Condition* createPeriodDamageCondition(ConditionType type,
-		uint32_t interval, int32_t value, int32_t total = 0, ConditionSource source = CONDITION_SOURCE_NONE);
+		uint32_t interval, int32_t value, uint32_t rounds, ConditionSource source = CONDITION_SOURCE_NONE);
+	static Condition* createPeriodAverageDamageCondition(ConditionType type,
+		uint32_t interval, int32_t value, int32_t total, ConditionSource source = CONDITION_SOURCE_NONE);
 	static Condition* createCondition(ConditionType type, uint32_t ticks,
 		ConditionSource source = CONDITION_SOURCE_NONE);
 	static Condition* createCondition(MechanicType mechanicType, CombatType combatType, ConditionSource source,
@@ -112,8 +114,7 @@ public:
 	//serialization
 	bool isPersistent() const;
 	bool unserialize(PropStream& propStream);
-	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
+	bool serialize(PropWriteStream& propWriteStream);
 
 	//class Effect
 	class Effect{
@@ -140,7 +141,7 @@ public:
 		bool onUpdate(Creature* creature, const Condition::Effect* addEffect);
 		
 		bool onTick(Creature* creature, uint32_t ticks);
-		bool onCombat(const CombatSource& combatSource, Creature* creature, CombatType type, int32_t& amount);
+		//bool onCombat(const CombatSource& combatSource, Creature* creature, CombatType type, int32_t& amount);
 		void setOwner(Condition* condition) {owner_condition = condition;}
 
 		EffectType getEffectType() const {return effectType;}

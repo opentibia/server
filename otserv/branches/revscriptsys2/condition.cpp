@@ -29,6 +29,22 @@ extern Game g_game;
 extern ConfigManager g_config;
 
 Condition* Condition::createPeriodDamageCondition(ConditionType type,
+	uint32_t interval, int32_t value, uint32_t rounds, ConditionSource source /*= CONDITION_SOURCE_NONE*/)
+{
+	Condition* condition = Condition::createCondition(type, 0, source);
+	if(condition){
+		value = std::abs(value);
+		Condition::Effect* effect = NULL;
+		effect = new Condition::Effect(EFFECT_PERIODIC_DAMAGE, condition->getCombatType().value(), value, rounds, 0, interval);
+		
+		condition->addEffect(effect);
+		return condition;
+	}
+
+	return NULL;
+}
+
+Condition* Condition::createPeriodAverageDamageCondition(ConditionType type,
 	uint32_t interval, int32_t value, int32_t total /*= 0*/, ConditionSource source /*= CONDITION_SOURCE_NONE*/)
 {
 	Condition* condition = Condition::createCondition(type, 0, source);
@@ -36,13 +52,7 @@ Condition* Condition::createPeriodDamageCondition(ConditionType type,
 		value = std::abs(value);
 		total = std::abs(total);
 		Condition::Effect* effect = NULL;
-		if(total > 0){
-			effect = new Condition::Effect(EFFECT_PERIODIC_DAMAGE, condition->getCombatType().value(), value, total, total / value, interval);
-		}
-		else{
-			effect = new Condition::Effect(EFFECT_PERIODIC_DAMAGE, condition->getCombatType().value(), value, 0, 0, interval);
-		}
-		
+		effect = new Condition::Effect(EFFECT_PERIODIC_DAMAGE, condition->getCombatType().value(), value, total, total / value, interval);		
 		condition->addEffect(effect);
 		return condition;
 	}
@@ -95,15 +105,15 @@ Condition* Condition::createCondition(ConditionType type, uint32_t ticks,
 		}
 
 		case enums::CONDITION_INFIGHT:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value(), ICON_SWORDS);
+			return Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value());
 		case enums::CONDITION_HASTE:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value(), ICON_HASTE);
+			return Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value());
 		case enums::CONDITION_PARALYZE:
-			return Condition::createCondition(MECHANIC_PARALYZED, COMBAT_NONE, source, ticks, type.value(), ICON_PARALYZE);
+			return Condition::createCondition(MECHANIC_PARALYZED, COMBAT_NONE, source, ticks, type.value());
 		case enums::CONDITION_DRUNK:
-			return Condition::createCondition(MECHANIC_DRUNK, COMBAT_NONE, source, ticks, type.value(), ICON_DRUNK);
+			return Condition::createCondition(MECHANIC_DRUNK, COMBAT_NONE, source, ticks, type.value());
 		case enums::CONDITION_MANASHIELD:
-			return createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value(), ICON_MANASHIELD);
+			return createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value());
 
 		case enums::CONDITION_SILENCED:
 		case enums::CONDITION_MUTED_CHAT:
@@ -237,14 +247,16 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 	flags = addCondition->flags;
 	ownerId = ownerId;
 
-	bool fullUpdate = false;
-	if(effectList.size() == addCondition->effectList.size()){
+	bool fullUpdate = (effectList.size() != addCondition->effectList.size());
+	if(!fullUpdate){
 		std::list<Effect*>::iterator curIt = effectList.begin();
 		for(std::list<Effect*>::const_iterator it = addCondition->effectList.begin(); it != addCondition->effectList.end(); ++it){
 			if(!(*curIt)->onUpdate(creature, *it)){
 				fullUpdate = true;
 				break;
 			}
+
+			++curIt;
 		}
 	}
 
@@ -303,160 +315,151 @@ bool Condition::unserialize(PropStream& propStream)
 {
 	uint8_t attr_type;
 	while(propStream.GET_UCHAR(attr_type) && attr_type != CONDITIONATTR_END.value()){
-		if(!unserializeProp(ConditionAttribute(attr_type), propStream)){
-			return false;
-			break;
-		}
-	}
-
-	return true;
-}
-
-bool Condition::unserializeProp(ConditionAttribute attr, PropStream& propStream)
-{
-	if(attr == CONDITIONATTRIBUTE_MECHANIC)
-	{
-		int32_t value = 0;
-		if(!propStream.GET_VALUE(value)){
-			return false;
-		}
-
-		mechanicType = (MechanicType)value;
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_COMBAT)
-	{
-		int32_t value = 0;
-		if(!propStream.GET_VALUE(value)){
-			return false;
-		}
-
-		combatType = (CombatType)value;
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_TICKS)
-	{
-		uint32_t value = 0;
-		if(!propStream.GET_VALUE(value)){
-			return false;
-		}
-
-		ticks = value;
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_ID)
-	{
-		uint32_t value = 0;
-		if(!propStream.GET_VALUE(value)){
-			return false;
-		}
-
-		id = value;
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_FLAGS)
-	{
-		uint32_t value = 0;
-		if(!propStream.GET_VALUE(value)){
-			return false;
-		}
-
-		flags = value;
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_EFFECT_TYPE)
-	{
-		uint32_t value = 0;
-		if(!propStream.GET_VALUE(value)){
-			return false;
-		}
-
-		Condition::Effect* effect = new Condition::Effect(EffectType(value), 0, 0, 0, 0, 0);
-		effectList.push_back(effect);
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_EFFECT_MODTYPE)
-	{
-		Condition::Effect* currEffect = effectList.back();
-		if(!propStream.GET_VALUE(currEffect->mod_type)){
-			return false;
-		}
-
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_EFFECT_MODVALUE)
-	{
-		Condition::Effect* currEffect = effectList.back();
-		if(!propStream.GET_VALUE(currEffect->mod_value)){
-			return false;
-		}
-
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_EFFECT_MODTOTAL)
-	{
-		Condition::Effect* currEffect = effectList.back();
-		if(!propStream.GET_VALUE(currEffect->mod_total)){
-			return false;
-		}
-
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_EFFECT_MODPERCENT)
-	{
-		Condition::Effect* currEffect = effectList.back();
-		if(!propStream.GET_VALUE(currEffect->mod_percent)){
-			return false;
-		}
-
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_EFFECT_MODTICKS)
-	{
-		Condition::Effect* currEffect = effectList.back();
-		if(!propStream.GET_VALUE(currEffect->mod_percent)){
-			return false;
-		}
-
-		return true;
-	}
-
-	if(attr == CONDITIONATTRIBUTE_EFFECT_MODPOD)
-	{
-		Condition::Effect* currEffect = effectList.back();
-		if(currEffect->effectType == EFFECT_SHAPESHIFT){
-			OutfitType outfit;
-			if(!propStream.GET_VALUE(outfit)){
+		
+		if(attr_type == enums::CONDITIONATTRIBUTE_MECHANIC)
+		{
+			int32_t value = 0;
+			if(!propStream.GET_VALUE(value)){
 				return false;
 			}
-			currEffect->mod_pod = outfit;
+
+			mechanicType = (MechanicType)value;
+			return true;
 		}
-		else if(currEffect->effectType == EFFECT_LIGHT){
-			LightInfo lightInfo;
-			if(!propStream.GET_VALUE(lightInfo)){
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_COMBAT)
+		{
+			int32_t value = 0;
+			if(!propStream.GET_VALUE(value)){
 				return false;
 			}
-			currEffect->mod_pod = lightInfo;
-		}
-		else{
-			return false;
+
+			combatType = (CombatType)value;
+			return true;
 		}
 
-		return true;
+		if(attr_type == enums::CONDITIONATTRIBUTE_TICKS)
+		{
+			uint32_t value = 0;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			ticks = value;
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_ID)
+		{
+			uint32_t value = 0;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			id = value;
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_FLAGS)
+		{
+			uint32_t value = 0;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			flags = value;
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_TYPE)
+		{
+			uint32_t value = 0;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			Condition::Effect* effect = new Condition::Effect(EffectType(value), 0, 0, 0, 0, 0);
+			effectList.push_back(effect);
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODTYPE)
+		{
+			Condition::Effect* currEffect = effectList.back();
+			if(!propStream.GET_VALUE(currEffect->mod_type)){
+				return false;
+			}
+
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODVALUE)
+		{
+			Condition::Effect* currEffect = effectList.back();
+			if(!propStream.GET_VALUE(currEffect->mod_value)){
+				return false;
+			}
+
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODTOTAL)
+		{
+			Condition::Effect* currEffect = effectList.back();
+			if(!propStream.GET_VALUE(currEffect->mod_total)){
+				return false;
+			}
+
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODPERCENT)
+		{
+			Condition::Effect* currEffect = effectList.back();
+			if(!propStream.GET_VALUE(currEffect->mod_percent)){
+				return false;
+			}
+
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODTICKS)
+		{
+			Condition::Effect* currEffect = effectList.back();
+			if(!propStream.GET_VALUE(currEffect->mod_percent)){
+				return false;
+			}
+
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODPOD)
+		{
+			Condition::Effect* currEffect = effectList.back();
+			if(currEffect->effectType == EFFECT_SHAPESHIFT){
+				OutfitType outfit;
+				if(!propStream.GET_VALUE(outfit)){
+					return false;
+				}
+				currEffect->mod_pod = outfit;
+			}
+			else if(currEffect->effectType == EFFECT_LIGHT){
+				LightInfo lightInfo;
+				if(!propStream.GET_VALUE(lightInfo)){
+					return false;
+				}
+				currEffect->mod_pod = lightInfo;
+			}
+			else{
+				return false;
+			}
+
+			return true;
+		}
+
+		if(attr_type == enums::CONDITIONATTR_END)
+			return true;
 	}
-
-	if(attr == CONDITIONATTR_END)
-		return true;
 
 	return false;
 }
@@ -732,16 +735,17 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 					g_game.combatChangeHealth(combatType, combatSource, creature, damage);
 				}
 
-				if(mod_total != 0){
-					bool skip = false;
-					if(const MagicField* field = creature->getTile()->getFieldItem()){
-						if(field->getCombatType() == combatType){
-							//The creature is still standing in the field so the damage should
-							//not be counted towards the total damage.
-							skip = true;
-						}
+				bool skip = false;
+				if(const MagicField* field = creature->getTile()->getFieldItem()){
+					if(field->getCombatType() == combatType){
+						//The creature is still standing in the field so the damage should
+						//not be counted towards the total damage.
+						skip = true;
 					}
+				}
 
+				if(mod_total != 0){
+					//average damage
 					if(!skip){
 						//total damage done
 						j += mod_value;
@@ -754,6 +758,15 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 						}
 
 						if(j >= mod_total || mod_value == 0){
+							return false;
+						}
+					}
+				}
+				else{
+					//number of rounds
+					if(!skip){
+						++j;
+						if(j >= /*rounds*/ mod_percent){
 							return false;
 						}
 					}
@@ -830,6 +843,8 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 	return true;
 }
 
+/*
+TODO: Use EFFECT_SCRIPT instead?
 bool Condition::Effect::onCombat(const CombatSource& combatSource, Creature* creature, CombatType type, int32_t& amount)
 {
 	switch(effectType){
@@ -872,3 +887,4 @@ bool Condition::Effect::onCombat(const CombatSource& combatSource, Creature* cre
 
 	return true;
 }
+*/
