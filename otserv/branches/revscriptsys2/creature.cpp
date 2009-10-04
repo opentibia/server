@@ -89,7 +89,7 @@ Creature::~Creature()
 	destroySummons();
 
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		(*it)->endCondition(this, CONDITIONEND_CLEANUP);
+		(*it)->onEnd(this, CONDITIONEND_CLEANUP);
 		delete *it;
 	}
 
@@ -1234,42 +1234,28 @@ void Creature::addHealPoints(Creature* caster, int32_t healthPoints)
 	}
 }
 
-void Creature::onAddCondition(ConditionType type, bool hadCondition)
+void Creature::onAddCondition(const Condition* condition, bool preAdd /*= true*/)
 {
-	if(type == CONDITION_INVISIBLE && !hadCondition){
+	if(preAdd && condition->getId() == enums::CONDITION_INVISIBLE && !hasCondition(CONDITION_INVISIBLE)){
 		g_game.internalCreatureChangeVisible(this, false);
 	}
-	else if(type == CONDITION_PARALYZE && hasCondition(CONDITION_HASTE)){
+	else if(condition->getMechanicType() == MECHANIC_PARALYZED){
 		removeCondition(CONDITION_HASTE);
 	}
-	else if(type == CONDITION_HASTE && hasCondition(CONDITION_PARALYZE)){
+	else if(condition->getId() == enums::CONDITION_HASTE){
 		removeCondition(CONDITION_PARALYZE);
 	}
 }
 
-void Creature::onAddCombatCondition(ConditionType type, bool hadCondition)
+void Creature::onAddCombatCondition(const Condition* condition, bool preAdd /*= true*/)
 {
 	//
 }
 
-void Creature::onEndCondition(ConditionType type, bool lastCondition)
+void Creature::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 {
-	if(type == CONDITION_INVISIBLE && lastCondition){
+	if(!preEnd && condition->getId() == enums::CONDITION_INVISIBLE && !hasCondition(CONDITION_INVISIBLE)){
 		g_game.internalCreatureChangeVisible(this, true);
-	}
-}
-
-void Creature::onTickCondition(ConditionType type, int32_t interval, bool& bRemove)
-{
-	if(const MagicField* field = getTile()->getFieldItem()){
-		if(type == CONDITION_FIRE)
-			bRemove = (field->getCombatType() != COMBAT_FIREDAMAGE);
-		else if(type == CONDITION_ENERGY)
-			bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE);
-		else if(type == CONDITION_POISON)
-			bRemove = (field->getCombatType() != COMBAT_EARTHDAMAGE);
-		else if(type == CONDITION_DROWN)
-			bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE);
 	}
 }
 
@@ -1388,54 +1374,78 @@ void Creature::destroySummons()
 
 bool Creature::addCondition(Condition* condition)
 {
-	if(condition == NULL){
+	if(condition == NULL || isImmune(condition)){
+		delete condition;
 		return false;
 	}
 
-	bool hadCondition = hasCondition(condition->getType(), false);
-	Condition* prevCond = getCondition(condition->getType(), condition->getId(), condition->getSubId());
-
-	if(prevCond){
-		prevCond->addCondition(this, condition);
-		delete condition;
-		return true;
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->onUpdate(this, condition)){
+			delete condition;
+			return true;
+		}
 	}
 
-	if(condition->startCondition(this)){
+	if(condition->onBegin(this)){
+		onAddCondition(condition);
 		conditions.push_back(condition);
-		onAddCondition(condition->getType(), hadCondition);
+		onAddCondition(condition, false);
 		return true;
 	}
 
-	delete condition;
 	return false;
 }
 
 bool Creature::addCombatCondition(Condition* condition)
 {
-	bool hadCondition = hasCondition(condition->getType(), false);
-
-	//Caution: condition variable could be deleted after the call to addCondition
-	ConditionType type = condition->getType();
-	if(!addCondition(condition)){
+	if(condition == NULL){
 		return false;
 	}
 
-	onAddCombatCondition(type, hadCondition);
-	return true;
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->onUpdate(this, condition)){
+			delete condition;
+			return true;
+		}
+	}
+
+	if(condition->onBegin(this)){
+		onAddCondition(condition);
+		onAddCombatCondition(condition);
+		conditions.push_back(condition);
+		onAddCondition(condition, false);
+		onAddCombatCondition(condition, false);
+		return true;
+	}
+
+	return false;
 }
 
-void Creature::removeCondition(ConditionType type)
+void Creature::removeCondition(Condition* condition)
+{
+	ConditionList::iterator it = std::find(conditions.begin(), conditions.end(), condition);
+
+	if(it != conditions.end()){
+		Condition* condition = *it;
+
+		onEndCondition(condition);
+		it = conditions.erase(it);
+		condition->onEnd(this, CONDITIONEND_REMOVED);
+		onEndCondition(condition, false);
+		delete condition;
+	}
+}
+
+void Creature::removeCondition(CombatType type)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		if((*it)->getType() == type){
+		if((*it)->getCombatType() == type){
 			Condition* condition = *it;
+
+			onEndCondition(condition);
 			it = conditions.erase(it);
-
-			condition->endCondition(this, CONDITIONEND_ABORT);
-			bool lastCondition = !hasCondition(condition->getType(), false);
-			onEndCondition(type, lastCondition);
-
+			condition->onEnd(this, CONDITIONEND_REMOVED);
+			onEndCondition(condition, false);
 			delete condition;
 		}
 		else{
@@ -1444,17 +1454,34 @@ void Creature::removeCondition(ConditionType type)
 	}
 }
 
-void Creature::removeCondition(ConditionType type, ConditionID id)
+void Creature::removeCondition(ConditionType type)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		if((*it)->getType() == type && (*it)->getId() == id){
+		if((*it)->getId() == type.value()){
 			Condition* condition = *it;
+
+			onEndCondition(condition);
 			it = conditions.erase(it);
+			condition->onEnd(this, CONDITIONEND_REMOVED);
+			onEndCondition(condition, false);
+			delete condition;
+		}
+		else{
+			++it;
+		}
+	}
+}
 
-			condition->endCondition(this, CONDITIONEND_ABORT);
-			bool lastCondition = !hasCondition(condition->getType(), false);
-			onEndCondition(type, lastCondition);
+void Creature::removeCondition(ConditionType type, ConditionSource source)
+{
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
+		if((*it)->getId() == type.value() && (*it)->getSource() == source){
+			Condition* condition = *it;
 
+			onEndCondition(condition);
+			it = conditions.erase(it);
+			condition->onEnd(this, CONDITIONEND_REMOVED);
+			onEndCondition(condition, false);
 			delete condition;
 		}
 		else{
@@ -1468,32 +1495,16 @@ void Creature::removeCondition(const Creature* attacker, ConditionType type)
 	ConditionList tmpList = conditions;
 
 	for(ConditionList::iterator it = tmpList.begin(); it != tmpList.end(); ++it){
-		if((*it)->getType() == type){
+		if((*it)->getId() == type.value()){
 			onCombatRemoveCondition(attacker, *it);
 		}
 	}
 }
 
-void Creature::removeCondition(Condition* condition)
-{
-	ConditionList::iterator it = std::find(conditions.begin(), conditions.end(), condition);
-
-	if(it != conditions.end()){
-		Condition* condition = *it;
-		it = conditions.erase(it);
-
-		condition->endCondition(this, CONDITIONEND_ABORT);
-		bool lastCondition = !hasCondition(condition->getType(), false);
-		onEndCondition(condition->getType(), lastCondition);
-
-		delete condition;
-	}
-}
-
-Condition* Creature::getCondition(ConditionType type, ConditionID id, uint32_t subId) const
+Condition* Creature::getCondition(ConditionType type) const
 {
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type && (*it)->getId() == id && (*it)->getSubId() == subId){
+		if((*it)->getId() == type.value()){
 			return *it;
 		}
 	}
@@ -1501,11 +1512,10 @@ Condition* Creature::getCondition(ConditionType type, ConditionID id, uint32_t s
 	return NULL;
 }
 
-Condition* Creature::getCondition(ConditionType type) const
+Condition* Creature::getCondition(ConditionType type, ConditionSource source) const
 {
-	//This one just returns the first one found.
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type){
+		if((*it)->getId() == type.value() && (*it)->getSource() == source){
 			return *it;
 		}
 	}
@@ -1516,17 +1526,13 @@ Condition* Creature::getCondition(ConditionType type) const
 void Creature::executeConditions(uint32_t interval)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		//(*it)->executeCondition(this, newticks);
-		//if((*it)->getTicks() <= 0){
-
-		if(!(*it)->executeCondition(this, interval)){
+		if(!(*it)->onTick(this, interval)){
 			Condition* condition = *it;
+
+			onEndCondition(condition);
 			it = conditions.erase(it);
-
-			condition->endCondition(this, ConditionEndICKS);
-			bool lastCondition = !hasCondition(condition->getType(), false);
-			onEndCondition(condition->getType(), lastCondition);
-
+			condition->onEnd(this, CONDITIONEND_DURATION);
+			onEndCondition(condition, false);
 			delete condition;
 		}
 		else{
@@ -1535,14 +1541,10 @@ void Creature::executeConditions(uint32_t interval)
 	}
 }
 
-bool Creature::hasCondition(ConditionType type, bool checkTime /*= true*/) const
+bool Creature::hasCondition(CombatType type) const
 {
-	if(isSuppress(type)){
-		return false;
-	}
-
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type && (!checkTime || ((*it)->getEndTime() == 0 || (*it)->getEndTime() >= OTSYS_TIME())) ){
+		if((*it)->getCombatType() == type && !isCured(*it) ){
 			return true;
 		}
 	}
@@ -1550,19 +1552,30 @@ bool Creature::hasCondition(ConditionType type, bool checkTime /*= true*/) const
 	return false;
 }
 
+bool Creature::hasCondition(ConditionType type) const
+{
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getId() == type.value() && !isCured(*it) ){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Creature::isImmune(const Condition* condition) const
+{
+	return isImmune(condition->getMechanicType()) || isImmune(condition->getCombatType());
+}
+
 bool Creature::isImmune(CombatType type) const
 {
 	return getDamageImmunities() & type;
 }
 
-bool Creature::isImmune(ConditionType type) const
+bool Creature::isImmune(MechanicType type) const
 {
-	return (getConditionImmunities() & type);
-}
-
-bool Creature::isSuppress(ConditionType type) const
-{
-	return (getConditionSuppressions() & type);
+	return (getMechanicImmunities() & type);
 }
 
 std::string Creature::getDescription(int32_t lookDistance) const

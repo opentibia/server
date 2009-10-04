@@ -58,7 +58,7 @@ public:
 
 	OutfitType outfit;
 	int32_t corpseId;
-	ConditionType conditionImmunities;
+	MechanicType mechanicImmunities;
 	CombatType damageImmunities;
 	RaceType race;
 	bool isSummonable;
@@ -124,7 +124,7 @@ void InternalCreatureType::reset()
 	outfit.lookAddons = 0;
 	corpseId = 0;
 
-	conditionImmunities = CONDITION_NONE;
+	mechanicImmunities = MECHANIC_NONE;
 	damageImmunities = COMBAT_NONE;
 	race = RACE_BLOOD;
 	isSummonable = false;
@@ -313,7 +313,7 @@ DEFINE_PROPERTY(int32_t, health)
 DEFINE_PROPERTY(int32_t, health_max)
 DEFINE_PROPERTY(OutfitType, outfit)
 DEFINE_PROPERTY(int32_t, corpseId)
-DEFINE_PROPERTY(ConditionType, conditionImmunities)
+DEFINE_PROPERTY(MechanicType, mechanicImmunities)
 DEFINE_PROPERTY(CombatType, damageImmunities)
 DEFINE_PROPERTY(RaceType, race)
 DEFINE_PROPERTY(bool, isSummonable)

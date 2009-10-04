@@ -118,7 +118,7 @@ public:
 	
 	DECLARE_PROPERTY(OutfitType, outfit)
 	DECLARE_PROPERTY(int32_t, corpseId)
-	DECLARE_PROPERTY(ConditionType, conditionImmunities)
+	DECLARE_PROPERTY(MechanicType, mechanicImmunities)
 	DECLARE_PROPERTY(CombatType, damageImmunities)
 	DECLARE_PROPERTY(RaceType, race)
 	

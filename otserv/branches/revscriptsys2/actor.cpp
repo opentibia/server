@@ -623,24 +623,30 @@ void Actor::updateIdleStatus()
 	setIdle(idle);
 }
 
-void Actor::onAddCondition(ConditionType type, bool hadCondition)
+void Actor::onAddCondition(const Condition* condition, bool preAdd /*= true*/)
 {
-	Creature::onAddCondition(type, hadCondition);
+	Creature::onAddCondition(condition, preAdd);
 
 	//the walkCache need to be updated if the monster becomes "resistent" to the damage, see Tile::__queryAdd()
-	if(type == CONDITION_FIRE || type == CONDITION_ENERGY || type == CONDITION_POISON){
+	if(!preAdd && (	condition->getCombatType() == COMBAT_FIREDAMAGE ||
+					condition->getCombatType() == COMBAT_ENERGYDAMAGE ||
+					condition->getCombatType() == COMBAT_EARTHDAMAGE))
+	{
 		updateMapCache();
 	}
 
 	updateIdleStatus();
 }
 
-void Actor::onEndCondition(ConditionType type, bool lastCondition)
+void Actor::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 {
-	Creature::onEndCondition(type, lastCondition);
+	Creature::onEndCondition(condition, preEnd);
 
 	//the walkCache need to be updated if the monster loose the "resistent" to the damage, see Tile::__queryAdd()
-	if(type == CONDITION_FIRE || type == CONDITION_ENERGY || type == CONDITION_POISON){
+	if(!preEnd && (	condition->getCombatType() == COMBAT_FIREDAMAGE ||
+					condition->getCombatType() == COMBAT_ENERGYDAMAGE ||
+					condition->getCombatType() == COMBAT_EARTHDAMAGE))
+	{
 		updateMapCache();
 	}
 

@@ -14,45 +14,35 @@ template<> ConditionType__Base::StringToEnum ConditionType__Base::lstring_to_enu
 template<> void ConditionType__Base::initialize()
 {
 	initAddValue(enums::CONDITION_NONE, "CONDITION_NONE", true);
-	initAddValue(enums::CONDITION_POISON, "CONDITION_POISON", true);
-	initAddValue(enums::CONDITION_FIRE, "CONDITION_FIRE", true);
+	initAddValue(enums::CONDITION_PHYSICAL, "CONDITION_PHYSICAL", true);
 	initAddValue(enums::CONDITION_ENERGY, "CONDITION_ENERGY", true);
+	initAddValue(enums::CONDITION_EARTH, "CONDITION_EARTH", true);
+	initAddValue(enums::CONDITION_FIRE, "CONDITION_FIRE", true);
 	initAddValue(enums::CONDITION_LIFEDRAIN, "CONDITION_LIFEDRAIN", true);
-	initAddValue(enums::CONDITION_HASTE, "CONDITION_HASTE", true);
-	initAddValue(enums::CONDITION_PARALYZE, "CONDITION_PARALYZE", true);
-	initAddValue(enums::CONDITION_OUTFIT, "CONDITION_OUTFIT", true);
-	initAddValue(enums::CONDITION_INVISIBLE, "CONDITION_INVISIBLE", true);
-	initAddValue(enums::CONDITION_LIGHT, "CONDITION_LIGHT", true);
-	initAddValue(enums::CONDITION_MANASHIELD, "CONDITION_MANASHIELD", true);
-	initAddValue(enums::CONDITION_INFIGHT, "CONDITION_INFIGHT", true);
-	initAddValue(enums::CONDITION_DRUNK, "CONDITION_DRUNK", true);
-	initAddValue(enums::CONDITION_EXHAUSTED, "CONDITION_EXHAUSTED", true);
-	initAddValue(enums::CONDITION_REGENERATION, "CONDITION_REGENERATION", true);
-	initAddValue(enums::CONDITION_SOUL, "CONDITION_SOUL", true);
+	initAddValue(enums::CONDITION_MANADRAIN, "CONDITION_MANADRAIN", true);
 	initAddValue(enums::CONDITION_DROWN, "CONDITION_DROWN", true);
-	initAddValue(enums::CONDITION_MUTED, "CONDITION_MUTED", true);
-	initAddValue(enums::CONDITION_ATTRIBUTES, "CONDITION_ATTRIBUTES", true);
-	initAddValue(enums::CONDITION_FREEZING, "CONDITION_FREEZING", true);
-	initAddValue(enums::CONDITION_DAZZLED, "CONDITION_DAZZLED", true);
-	initAddValue(enums::CONDITION_CURSED, "CONDITION_CURSED", true);
-	initAddValue(enums::CONDITION_EXHAUST_COMBAT, "CONDITION_EXHAUST_COMBAT", true);
+	initAddValue(enums::CONDITION_ICE, "CONDITION_ICE", true);
+	initAddValue(enums::CONDITION_HOLY, "CONDITION_HOLY", true);
+	initAddValue(enums::CONDITION_DEATH, "CONDITION_DEATH", true);
+	initAddValue(enums::CONDITION_INFIGHT, "CONDITION_INFIGHT", true);
+	initAddValue(enums::CONDITION_INVISIBLE, "CONDITION_INVISIBLE", true);
+	initAddValue(enums::CONDITION_MANASHIELD, "CONDITION_MANASHIELD", true);
+	initAddValue(enums::CONDITION_PARALYZE, "CONDITION_PARALYZE", true);
+	initAddValue(enums::CONDITION_SHAPESHIFT, "CONDITION_SHAPESHIFT", true);
+	initAddValue(enums::CONDITION_HASTE, "CONDITION_HASTE", true);
+	initAddValue(enums::CONDITION_DRUNK, "CONDITION_DRUNK", true);
+	initAddValue(enums::CONDITION_LIGHT, "CONDITION_LIGHT", true);
+	initAddValue(enums::CONDITION_REGENERATION, "CONDITION_REGENERATION", true);
+	initAddValue(enums::CONDITION_SOULREGEN, "CONDITION_SOULREGEN", true);
+	initAddValue(enums::CONDITION_EXHAUST_DAMAGE, "CONDITION_EXHAUST_DAMAGE", true);
 	initAddValue(enums::CONDITION_EXHAUST_HEAL, "CONDITION_EXHAUST_HEAL", true);
+	initAddValue(enums::CONDITION_EXHAUST_YELL, "CONDITION_EXHAUST_YELL", true);
+	initAddValue(enums::CONDITION_DISARMED, "CONDITION_DISARMED", true);
 	initAddValue(enums::CONDITION_PACIFIED, "CONDITION_PACIFIED", true);
+	initAddValue(enums::CONDITION_SILENCED, "CONDITION_SILENCED", true);
+	initAddValue(enums::CONDITION_MUTED_CHAT, "CONDITION_MUTED_CHAT", true);
+	initAddValue(enums::CONDITION_MUTED_TRADECHAT, "CONDITION_MUTED_TRADECHAT", true);
 	initAddValue(enums::CONDITION_HUNTING, "CONDITION_HUNTING", true);
-	initAddValue(enums::CONDITION_TRADE_MUTED, "CONDITION_TRADE_MUTED", true);
-}
-
-template<> bool ConditionEnd__Base::initialized = false;
-template<> std::string ConditionEnd__Base::enum_name = "ConditionEnd";
-template<> ConditionEnd__Base::EnumToString ConditionEnd__Base::enum_to_string = ConditionEnd__Base::EnumToString();
-template<> ConditionEnd__Base::StringToEnum ConditionEnd__Base::string_to_enum = ConditionEnd__Base::StringToEnum();
-template<> ConditionEnd__Base::StringToEnum ConditionEnd__Base::lstring_to_enum= ConditionEnd__Base::StringToEnum();
-template<> void ConditionEnd__Base::initialize()
-{
-	initAddValue(enums::CONDITIONEND_CLEANUP, "CONDITIONEND_CLEANUP", true);
-	initAddValue(enums::CONDITIONEND_DIE, "CONDITIONEND_DIE", true);
-	initAddValue(enums::ConditionEndICKS, "ConditionEndICKS", true);
-	initAddValue(enums::CONDITIONEND_ABORT, "CONDITIONEND_ABORT", true);
 }
 
 template<> bool ConditionAttribute__Base::initialized = false;
@@ -62,34 +52,51 @@ template<> ConditionAttribute__Base::StringToEnum ConditionAttribute__Base::stri
 template<> ConditionAttribute__Base::StringToEnum ConditionAttribute__Base::lstring_to_enum= ConditionAttribute__Base::StringToEnum();
 template<> void ConditionAttribute__Base::initialize()
 {
-	initAddValue(enums::CONDITIONATTRIBUTE_TYPE, "CONDITIONATTRIBUTE_TYPE", true);
-	initAddValue(enums::CONDITIONATTR_ID, "CONDITIONATTR_ID", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_MECHANIC, "CONDITIONATTRIBUTE_MECHANIC", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_COMBAT, "CONDITIONATTRIBUTE_COMBAT", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_SOURCE, "CONDITIONATTRIBUTE_SOURCE", true);
 	initAddValue(enums::CONDITIONATTRIBUTE_TICKS, "CONDITIONATTRIBUTE_TICKS", true);
-	initAddValue(enums::CONDITIONATTR_HEALTHTICKS, "CONDITIONATTR_HEALTHTICKS", true);
-	initAddValue(enums::CONDITIONATTR_HEALTHGAIN, "CONDITIONATTR_HEALTHGAIN", true);
-	initAddValue(enums::CONDITIONATTR_MANATICKS, "CONDITIONATTR_MANATICKS", true);
-	initAddValue(enums::CONDITIONATTR_MANAGAIN, "CONDITIONATTR_MANAGAIN", true);
-	initAddValue(enums::CONDITIONATTR_DELAYED, "CONDITIONATTR_DELAYED", true);
-	initAddValue(enums::CONDITIONATTR_OWNER, "CONDITIONATTR_OWNER", true);
-	initAddValue(enums::CONDITIONATTR_INTERVALDATA, "CONDITIONATTR_INTERVALDATA", true);
-	initAddValue(enums::CONDITIONATTR_SPEEDDELTA, "CONDITIONATTR_SPEEDDELTA", true);
-	initAddValue(enums::CONDITIONATTR_FORMULA_MINA, "CONDITIONATTR_FORMULA_MINA", true);
-	initAddValue(enums::CONDITIONATTR_FORMULA_MINB, "CONDITIONATTR_FORMULA_MINB", true);
-	initAddValue(enums::CONDITIONATTR_FORMULA_MAXA, "CONDITIONATTR_FORMULA_MAXA", true);
-	initAddValue(enums::CONDITIONATTR_FORMULA_MAXB, "CONDITIONATTR_FORMULA_MAXB", true);
-	initAddValue(enums::CONDITIONATTR_LIGHTCOLOR, "CONDITIONATTR_LIGHTCOLOR", true);
-	initAddValue(enums::CONDITIONATTR_LIGHTLEVEL, "CONDITIONATTR_LIGHTLEVEL", true);
-	initAddValue(enums::CONDITIONATTR_LIGHTTICKS, "CONDITIONATTR_LIGHTTICKS", true);
-	initAddValue(enums::CONDITIONATTR_LIGHTINTERVAL, "CONDITIONATTR_LIGHTINTERVAL", true);
-	initAddValue(enums::CONDITIONATTR_SOULTICKS, "CONDITIONATTR_SOULTICKS", true);
-	initAddValue(enums::CONDITIONATTR_SOULGAIN, "CONDITIONATTR_SOULGAIN", true);
-	initAddValue(enums::CONDITIONATTR_SKILLS, "CONDITIONATTR_SKILLS", true);
-	initAddValue(enums::CONDITIONATTR_STATS, "CONDITIONATTR_STATS", true);
-	initAddValue(enums::CONDITIONATTR_OUTFIT, "CONDITIONATTR_OUTFIT", true);
-	initAddValue(enums::CONDITIONATTR_PERIODDAMAGE, "CONDITIONATTR_PERIODDAMAGE", true);
-	initAddValue(enums::CONDITIONATTR_SKILLSPERCENT, "CONDITIONATTR_SKILLSPERCENT", true);
-	initAddValue(enums::CONDITIONATTR_ISBUFF, "CONDITIONATTR_ISBUFF", true);
-	initAddValue(enums::CONDITIONATTR_SUBID, "CONDITIONATTR_SUBID", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_ID, "CONDITIONATTRIBUTE_ID", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_FLAGS, "CONDITIONATTRIBUTE_FLAGS", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_EFFECT_TYPE, "CONDITIONATTRIBUTE_EFFECT_TYPE", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_EFFECT_MODTYPE, "CONDITIONATTRIBUTE_EFFECT_MODTYPE", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_EFFECT_MODVALUE, "CONDITIONATTRIBUTE_EFFECT_MODVALUE", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_EFFECT_MODTOTAL, "CONDITIONATTRIBUTE_EFFECT_MODTOTAL", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_EFFECT_MODPERCENT, "CONDITIONATTRIBUTE_EFFECT_MODPERCENT", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_EFFECT_MODTICKS, "CONDITIONATTRIBUTE_EFFECT_MODTICKS", true);
+	initAddValue(enums::CONDITIONATTRIBUTE_EFFECT_MODPOD, "CONDITIONATTRIBUTE_EFFECT_MODPOD", true);
 	initAddValue(enums::CONDITIONATTR_END, "CONDITIONATTR_END", true);
+}
+
+template<> bool MechanicType__Base::initialized = false;
+template<> std::string MechanicType__Base::enum_name = "MechanicType";
+template<> MechanicType__Base::EnumToString MechanicType__Base::enum_to_string = MechanicType__Base::EnumToString();
+template<> MechanicType__Base::StringToEnum MechanicType__Base::string_to_enum = MechanicType__Base::StringToEnum();
+template<> MechanicType__Base::StringToEnum MechanicType__Base::lstring_to_enum= MechanicType__Base::StringToEnum();
+template<> void MechanicType__Base::initialize()
+{
+	initAddValue(enums::MECHANIC_NONE, "MECHANIC_NONE", true);
+	initAddValue(enums::MECHANIC_SHAPESHIFT, "MECHANIC_SHAPESHIFT", true);
+	initAddValue(enums::MECHANIC_PACIFIED, "MECHANIC_PACIFIED", true);
+	initAddValue(enums::MECHANIC_DISARMED, "MECHANIC_DISARMED", true);
+	initAddValue(enums::MECHANIC_SHIELDED, "MECHANIC_SHIELDED", true);
+	initAddValue(enums::MECHANIC_SILENCED, "MECHANIC_SILENCED", true);
+	initAddValue(enums::MECHANIC_PARALYZED, "MECHANIC_PARALYZED", true);
+	initAddValue(enums::MECHANIC_DRUNK, "MECHANIC_DRUNK", true);
+	initAddValue(enums::MECHANIC_INVISIBLE, "MECHANIC_INVISIBLE", true);
+}
+
+template<> bool ConditionEnd__Base::initialized = false;
+template<> std::string ConditionEnd__Base::enum_name = "ConditionEnd";
+template<> ConditionEnd__Base::EnumToString ConditionEnd__Base::enum_to_string = ConditionEnd__Base::EnumToString();
+template<> ConditionEnd__Base::StringToEnum ConditionEnd__Base::string_to_enum = ConditionEnd__Base::StringToEnum();
+template<> ConditionEnd__Base::StringToEnum ConditionEnd__Base::lstring_to_enum= ConditionEnd__Base::StringToEnum();
+template<> void ConditionEnd__Base::initialize()
+{
+	initAddValue(enums::CONDITIONEND_DURATION, "CONDITIONEND_DURATION", true);
+	initAddValue(enums::CONDITIONEND_DEATH, "CONDITIONEND_DEATH", true);
+	initAddValue(enums::CONDITIONEND_REMOVED, "CONDITIONEND_REMOVED", true);
+	initAddValue(enums::CONDITIONEND_UPDATE, "CONDITIONEND_UPDATE", true);
+	initAddValue(enums::CONDITIONEND_CLEANUP, "CONDITIONEND_CLEANUP", true);
 }
 

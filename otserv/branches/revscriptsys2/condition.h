@@ -38,302 +38,147 @@ struct LightInfo{
 	};
 };
 
-struct IntervalInfo{
-	int32_t timeLeft;
-	int32_t value;
-	int32_t interval;
+enum EffectType{
+	EFFECT_PERIODIC_HEAL,
+	EFFECT_PERIODIC_DAMAGE,
+	EFFECT_PERIODIC_MOD_STAMINA,
+	EFFECT_MOD_HEAL,
+	EFFECT_MOD_DAMAGE,
+	EFFECT_MOD_SPEED,
+	EFFECT_REGEN_HEALTH,
+	EFFECT_REGEN_MANA,
+	EFFECT_REGEN_SOUL,
+	EFFECT_MOD_STAT,
+	EFFECT_MOD_SKILL,
+	EFFECT_SHAPESHIFT,
+	EFFECT_SHIELD,
+	EFFECT_MANASHIELD,
+	EFFECT_LIGHT,
+	EFFECT_SCRIPT
+};
+
+enum ConditionFlag{
+	CONDITION_FLAG_PARTYBUFF = 1
 };
 
 class Condition{
 public:
-	Condition(ConditionID _id, ConditionType _type, int32_t _ticks);
-	virtual ~Condition(){};
-
-	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, ConditionEnd reason) = 0;
-	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
-	virtual uint16_t getIcons() const;
-	ConditionID getId() const {return id;}
-	uint32_t getSubId() const {return subId;}
-
-	virtual Condition* clone() const = 0;
-
-	ConditionType getType() const { return conditionType;}
-	int64_t getEndTime() const {return ticks == -1? 0 : endTime;}
-	int32_t getTicks() const { return ticks; }
-	void setTicks(int32_t newTicks);
-
-	static Condition* createCondition(ConditionID _id, ConditionType _type, int32_t ticks, int32_t param = 0);
+	static Condition* createPeriodDamageCondition(ConditionType type,
+		uint32_t interval, int32_t value, int32_t total = 0, ConditionSource source = CONDITION_SOURCE_NONE);
+	static Condition* createCondition(ConditionType type, uint32_t ticks,
+		ConditionSource source = CONDITION_SOURCE_NONE);
+	static Condition* createCondition(MechanicType mechanicType, CombatType combatType, ConditionSource source,
+		uint32_t ticks, uint32_t categoryId, uint32_t flags = 0);
 	static Condition* createCondition(PropStream& propStream);
 
-	virtual bool setParam(ConditionParam param, int32_t value);
+	class Effect;
+
+	Condition(MechanicType mechanicType, CombatType combatType, ConditionSource source,
+		uint32_t ticks, uint32_t id, uint32_t flags) :
+		mechanicType(mechanicType),
+		combatType(combatType),
+		source(source),
+		ticks(ticks),
+		id(id),
+		flags(flags)
+		{}
+	Condition(const Condition& rhs);
+	~Condition()
+	{
+		for(std::list<Condition::Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
+			delete *it;
+		}
+		effectList.clear();
+	}
+
+	uint16_t getIcon() const;
+	MechanicType getMechanicType() const { return mechanicType;}
+	CombatType getCombatType() const { return combatType;}
+	ConditionSource getSource() const { return source;}
+	uint32_t getId() const {return id;}
+	uint32_t getTicks() const {return ticks;}
+	void setTicks(uint32_t newTicks) {ticks = newTicks;}
+	void setOwner(uint32_t _ownerId) {ownerId = _ownerId;}
+
+	bool onBegin(Creature* creature);
+	void onEnd(Creature* creature, ConditionEnd reason);
+	bool onUpdate(Creature* creature, const Condition* addCondition);
+	bool onTick(Creature* creature, uint32_t interval);
+
+	void addEffect(Condition::Effect* effect);
+
+	Condition* clone()  const { return new Condition(*this); }
 
 	//serialization
+	bool isPersistent() const;
 	bool unserialize(PropStream& propStream);
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
 
-	bool isPersistent() const;
+	//class Effect
+	class Effect{
+	public:
+		Effect(EffectType type,
+			int32_t mod_type,
+			int32_t mod_value,
+			int32_t mod_total,
+			int32_t mod_percent,
+			int32_t mod_ticks,
+			boost::any mod_pod = boost::any()) :
+		  effectType(type),
+		  mod_type(mod_type),
+		  mod_value(mod_value),
+		  mod_total(mod_total),
+		  mod_percent(mod_percent),
+		  mod_ticks(mod_ticks),
+		  mod_pod(mod_pod),
+		  n(0), i(0), j(0), owner_condition(NULL) {}
+
+		~Effect(){};
+		bool onBegin(Creature* creature);
+		bool onEnd(Creature* creature, ConditionEnd reason);
+		bool onUpdate(Creature* creature, const Condition::Effect* addEffect);
+		
+		bool onTick(Creature* creature, uint32_t ticks);
+		bool onCombat(const CombatSource& combatSource, Creature* creature, CombatType type, int32_t& amount);
+		void setOwner(Condition* condition) {owner_condition = condition;}
+
+		EffectType getEffectType() const {return effectType;}
+
+	protected:
+		int32_t getStatValue(Creature* creature);
+		int32_t getSkillValue(Creature* creature);
+
+		EffectType effectType;
+
+		uint32_t mod_type;		//hp/mana/soul etc.
+		int32_t mod_value;		//flat amount
+		int32_t mod_total;		//total amount
+		int32_t mod_percent;	//percent amount
+		int32_t mod_ticks;
+		boost::any mod_pod;
+
+		//misc values, depending on effect
+		int32_t n, i, j;
+
+		Condition* owner_condition;
+
+		friend Condition;
+	};
 
 protected:
-	ConditionID id;
-	uint32_t subId;
-	int32_t ticks;
-	int64_t endTime;
-	ConditionType conditionType;
-	bool isBuff;
+	MechanicType mechanicType;
+	CombatType combatType;
+	ConditionSource source;
+	uint32_t ticks;
+	uint32_t id;
+	uint32_t flags;
+	std::list<Effect*> effectList;
 
-	virtual bool updateCondition(const Condition* addCondition);
-};
+	//variables that should not be serialized
+	uint32_t ownerId;
 
-class ConditionGeneric: public Condition
-{
-public:
-	ConditionGeneric(ConditionID _id, ConditionType _type, int32_t _ticks);
-	virtual ~ConditionGeneric(){};
-
-	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, ConditionEnd reason);
-	virtual void addCondition(Creature* creature, const Condition* condition);
-	virtual uint16_t getIcons() const;
-
-	virtual ConditionGeneric* clone()  const { return new ConditionGeneric(*this); }
-};
-
-class ConditionManaShield : public ConditionGeneric
-{
-public:
-	ConditionManaShield(ConditionID _id, ConditionType _type, int32_t _ticks) : ConditionGeneric(_id, _type, _ticks) {};
-	virtual ~ConditionManaShield(){};
-
-	virtual ConditionManaShield* clone()  const { return new ConditionManaShield(*this); }
-};
-
-class ConditionAttributes : public ConditionGeneric
-{
-public:
-	ConditionAttributes(ConditionID _id, ConditionType _type, int32_t _ticks);
-	virtual ~ConditionAttributes(){};
-
-	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, ConditionEnd reason);
-	virtual void addCondition(Creature* creature, const Condition* condition);
-
-	virtual ConditionAttributes* clone()  const { return new ConditionAttributes(*this); }
-
-	virtual bool setParam(ConditionParam param, int32_t value);
-
-	//serialization
-	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
-
-protected:
-	int32_t skills[SkillType::size];
-	int32_t skillsPercent[SkillType::size];
-	int32_t stats[PlayerStatType::size];
-	int32_t statsPercent[PlayerStatType::size];
-	int32_t currentSkill;
-	int32_t currentStat;
-
-	void updatePercentStats(Player* player);
-	void updateStats(Player* player);
-	void updatePercentSkills(Player* player);
-	void updateSkills(Player* player);
-};
-
-class ConditionRegeneration : public ConditionGeneric
-{
-public:
-	ConditionRegeneration(ConditionID _id, ConditionType _type, int32_t _ticks);
-	virtual ~ConditionRegeneration(){};
-	virtual void addCondition(Creature* creature, const Condition* addCondition);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-
-	virtual ConditionRegeneration* clone()  const { return new ConditionRegeneration(*this); }
-
-	virtual bool setParam(ConditionParam param, int32_t value);
-
-	//serialization
-	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
-
-protected:
-	uint32_t internalHealthTicks;
-	uint32_t internalManaTicks;
-
-	uint32_t healthTicks;
-	uint32_t manaTicks;
-	uint32_t healthGain;
-	uint32_t manaGain;
-};
-
-class ConditionSoul : public ConditionGeneric
-{
-public:
-	ConditionSoul(ConditionID _id, ConditionType _type, int32_t _ticks);
-	virtual ~ConditionSoul(){};
-	virtual void addCondition(Creature* creature, const Condition* addCondition);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-
-	virtual ConditionSoul* clone()  const { return new ConditionSoul(*this); }
-
-	virtual bool setParam(ConditionParam param, int32_t value);
-
-	//serialization
-	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
-
-protected:
-	uint32_t internalSoulTicks;
-	uint32_t soulTicks;
-	uint32_t soulGain;
-};
-
-class ConditionInvisible: public ConditionGeneric
-{
-public:
-	ConditionInvisible(ConditionID _id, ConditionType _type, int32_t _ticks);
-	virtual ~ConditionInvisible(){};
-
-	virtual bool startCondition(Creature* creature);
-	virtual void endCondition(Creature* creature, ConditionEnd reason);
-
-	virtual ConditionInvisible* clone()  const { return new ConditionInvisible(*this); }
-};
-
-class ConditionDamage: public Condition
-{
-public:
-	ConditionDamage(ConditionID _id, ConditionType _type);
-	virtual ~ConditionDamage(){};
-
-	static void generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list);
-
-	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, ConditionEnd reason);
-	virtual void addCondition(Creature* creature, const Condition* condition);
-	virtual uint16_t getIcons() const;
-
-	virtual ConditionDamage* clone()  const { return new ConditionDamage(*this); }
-
-	virtual bool setParam(ConditionParam param, int32_t value);
-
-	bool addDamage(int32_t rounds, int32_t time, int32_t value);
-	bool doForceUpdate() const { return forceUpdate;}
-	int32_t getTotalDamage() const;
-
-	//serialization
-	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
-
-protected:
-	int32_t maxDamage;
-	int32_t minDamage;
-	int32_t startDamage;
-	int32_t periodDamage;
-	int32_t periodDamageTick;
-	int32_t tickInterval;
-
-	bool forceUpdate;
-	bool delayed;
-	uint32_t owner;
-
-	bool init();
-
-	typedef std::list<IntervalInfo> DamageList;
-	DamageList damageList;
-
-	bool getNextDamage(int32_t& damage);
-	bool doDamage(Creature* creature, int32_t damage);
-	bool updateCondition(const ConditionDamage* addCondition);
-};
-
-class ConditionSpeed: public Condition
-{
-public:
-	ConditionSpeed(ConditionID _id, ConditionType _type, int32_t _ticks, int32_t changeSpeed);
-	virtual ~ConditionSpeed(){};
-
-	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, ConditionEnd reason);
-	virtual void addCondition(Creature* creature, const Condition* condition);
-	virtual uint16_t getIcons() const;
-
-	virtual ConditionSpeed* clone()  const { return new ConditionSpeed(*this); }
-
-	virtual bool setParam(ConditionParam param, int32_t value);
-
-	void setFormulaVars(float _mina, float _minb, float _maxa, float _maxb);
-
-	//serialization
-	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
-
-protected:
-	void getFormulaValues(int32_t var, int32_t& min, int32_t& max) const;
-
-	int32_t speedDelta;
-
-	//formula variables
-	float mina;
-	float minb;
-	float maxa;
-	float maxb;
-};
-
-class ConditionOutfit: public Condition
-{
-public:
-	ConditionOutfit(ConditionID _id, ConditionType _type, int32_t _ticks);
-	virtual ~ConditionOutfit(){};
-
-	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, ConditionEnd reason);
-	virtual void addCondition(Creature* creature, const Condition* condition);
-
-	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
-
-	void addOutfit(OutfitType outfit);
-
-	//serialization
-	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
-
-protected:
-	std::vector<OutfitType> outfits;
-
-	void changeOutfit(Creature* creature, int32_t index = -1);
-};
-
-class ConditionLight: public Condition
-{
-public:
-	ConditionLight(ConditionID _id, ConditionType _type, int32_t _ticks, int32_t _lightlevel, int32_t _lightcolor);
-	virtual ~ConditionLight(){};
-
-	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, ConditionEnd reason);
-	virtual void addCondition(Creature* creature, const Condition* addCondition);
-
-	virtual ConditionLight* clone()  const { return new ConditionLight(*this); }
-
-	virtual bool setParam(ConditionParam param, int32_t value);
-
-	//serialization
-	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(ConditionAttribute attr, PropStream& propStream);
-
-protected:
-	LightInfo lightInfo;
-	uint32_t internalLightTicks;
-	uint32_t lightChangeInterval;
+	friend Effect;
 };
 
 #endif

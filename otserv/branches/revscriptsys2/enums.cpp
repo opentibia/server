@@ -99,73 +99,6 @@ template<> void CombatParam__Base::initialize()
 	initAddValue(enums::COMBATPARAM_HITTEXTCOLOR, "COMBATPARAM_HITTEXTCOLOR", true);
 }
 
-template<> bool CallBackParam__Base::initialized = false;
-template<> std::string CallBackParam__Base::enum_name = "CallBackParam";
-template<> CallBackParam__Base::EnumToString CallBackParam__Base::enum_to_string = CallBackParam__Base::EnumToString();
-template<> CallBackParam__Base::StringToEnum CallBackParam__Base::string_to_enum = CallBackParam__Base::StringToEnum();
-template<> CallBackParam__Base::StringToEnum CallBackParam__Base::lstring_to_enum= CallBackParam__Base::StringToEnum();
-template<> void CallBackParam__Base::initialize()
-{
-	initAddValue(enums::CALLBACKPARAM_LEVELMAGICVALUE, "CALLBACKPARAM_LEVELMAGICVALUE", true);
-	initAddValue(enums::CALLBACKPARAM_SKILLVALUE, "CALLBACKPARAM_SKILLVALUE", true);
-	initAddValue(enums::CALLBACKPARAM_TARGETTILECALLBACK, "CALLBACKPARAM_TARGETTILECALLBACK", true);
-	initAddValue(enums::CALLBACKPARAM_TARGETCREATURECALLBACK, "CALLBACKPARAM_TARGETCREATURECALLBACK", true);
-}
-
-template<> bool ConditionParam__Base::initialized = false;
-template<> std::string ConditionParam__Base::enum_name = "ConditionParam";
-template<> ConditionParam__Base::EnumToString ConditionParam__Base::enum_to_string = ConditionParam__Base::EnumToString();
-template<> ConditionParam__Base::StringToEnum ConditionParam__Base::string_to_enum = ConditionParam__Base::StringToEnum();
-template<> ConditionParam__Base::StringToEnum ConditionParam__Base::lstring_to_enum= ConditionParam__Base::StringToEnum();
-template<> void ConditionParam__Base::initialize()
-{
-	initAddValue(enums::CONDITIONPARAM_OWNER, "CONDITIONPARAM_OWNER", true);
-	initAddValue(enums::CONDITIONPARAM_TICKS, "CONDITIONPARAM_TICKS", true);
-	initAddValue(enums::CONDITIONPARAM_OUTFIT, "CONDITIONPARAM_OUTFIT", true);
-	initAddValue(enums::CONDITIONPARAM_HEALTHGAIN, "CONDITIONPARAM_HEALTHGAIN", true);
-	initAddValue(enums::CONDITIONPARAM_HEALTHTICKS, "CONDITIONPARAM_HEALTHTICKS", true);
-	initAddValue(enums::CONDITIONPARAM_MANAGAIN, "CONDITIONPARAM_MANAGAIN", true);
-	initAddValue(enums::CONDITIONPARAM_MANATICKS, "CONDITIONPARAM_MANATICKS", true);
-	initAddValue(enums::CONDITIONPARAM_DELAYED, "CONDITIONPARAM_DELAYED", true);
-	initAddValue(enums::CONDITIONPARAM_SPEED, "CONDITIONPARAM_SPEED", true);
-	initAddValue(enums::CONDITIONPARAM_LIGHT_LEVEL, "CONDITIONPARAM_LIGHT_LEVEL", true);
-	initAddValue(enums::CONDITIONPARAM_LIGHT_COLOR, "CONDITIONPARAM_LIGHT_COLOR", true);
-	initAddValue(enums::CONDITIONPARAM_SOULGAIN, "CONDITIONPARAM_SOULGAIN", true);
-	initAddValue(enums::CONDITIONPARAM_SOULTICKS, "CONDITIONPARAM_SOULTICKS", true);
-	initAddValue(enums::CONDITIONPARAM_MINVALUE, "CONDITIONPARAM_MINVALUE", true);
-	initAddValue(enums::CONDITIONPARAM_MAXVALUE, "CONDITIONPARAM_MAXVALUE", true);
-	initAddValue(enums::CONDITIONPARAM_STARTVALUE, "CONDITIONPARAM_STARTVALUE", true);
-	initAddValue(enums::CONDITIONPARAM_TICKINTERVAL, "CONDITIONPARAM_TICKINTERVAL", true);
-	initAddValue(enums::CONDITIONPARAM_FORCEUPDATE, "CONDITIONPARAM_FORCEUPDATE", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_MELEE, "CONDITIONPARAM_SKILL_MELEE", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_FIST, "CONDITIONPARAM_SKILL_FIST", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_CLUB, "CONDITIONPARAM_SKILL_CLUB", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_SWORD, "CONDITIONPARAM_SKILL_SWORD", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_AXE, "CONDITIONPARAM_SKILL_AXE", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_DISTANCE, "CONDITIONPARAM_SKILL_DISTANCE", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_SHIELD, "CONDITIONPARAM_SKILL_SHIELD", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_FISHING, "CONDITIONPARAM_SKILL_FISHING", true);
-	initAddValue(enums::CONDITIONPARAM_STAT_MAXHITPOINTS, "CONDITIONPARAM_STAT_MAXHITPOINTS", true);
-	initAddValue(enums::CONDITIONPARAM_STAT_MAXMANAPOINTS, "CONDITIONPARAM_STAT_MAXMANAPOINTS", true);
-	initAddValue(enums::CONDITIONPARAM_STAT_SOULPOINTS, "CONDITIONPARAM_STAT_SOULPOINTS", true);
-	initAddValue(enums::CONDITIONPARAM_STAT_MAGICPOINTS, "CONDITIONPARAM_STAT_MAGICPOINTS", true);
-	initAddValue(enums::CONDITIONPARAM_STAT_MAXHITPOINTSPERCENT, "CONDITIONPARAM_STAT_MAXHITPOINTSPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_STAT_MAXMANAPOINTSPERCENT, "CONDITIONPARAM_STAT_MAXMANAPOINTSPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_STAT_SOULPOINTSPERCENT, "CONDITIONPARAM_STAT_SOULPOINTSPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_STAT_MAGICPOINTSPERCENT, "CONDITIONPARAM_STAT_MAGICPOINTSPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_PERIODICDAMAGE, "CONDITIONPARAM_PERIODICDAMAGE", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_MELEEPERCENT, "CONDITIONPARAM_SKILL_MELEEPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_FISTPERCENT, "CONDITIONPARAM_SKILL_FISTPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_CLUBPERCENT, "CONDITIONPARAM_SKILL_CLUBPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_SWORDPERCENT, "CONDITIONPARAM_SKILL_SWORDPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_AXEPERCENT, "CONDITIONPARAM_SKILL_AXEPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_DISTANCEPERCENT, "CONDITIONPARAM_SKILL_DISTANCEPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_SHIELDPERCENT, "CONDITIONPARAM_SKILL_SHIELDPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_SKILL_FISHINGPERCENT, "CONDITIONPARAM_SKILL_FISHINGPERCENT", true);
-	initAddValue(enums::CONDITIONPARAM_BUFF_SPELL, "CONDITIONPARAM_BUFF_SPELL", true);
-	initAddValue(enums::CONDITIONPARAM_SUBID, "CONDITIONPARAM_SUBID", true);
-}
-
 template<> bool BlockType__Base::initialized = false;
 template<> std::string BlockType__Base::enum_name = "BlockType";
 template<> BlockType__Base::EnumToString BlockType__Base::enum_to_string = BlockType__Base::EnumToString();
@@ -269,38 +202,24 @@ template<> void LossType__Base::initialize()
 	initAddValue(enums::LOSS_CONTAINERS, "LOSS_CONTAINERS", true);
 }
 
-template<> bool FormulaType__Base::initialized = false;
-template<> std::string FormulaType__Base::enum_name = "FormulaType";
-template<> FormulaType__Base::EnumToString FormulaType__Base::enum_to_string = FormulaType__Base::EnumToString();
-template<> FormulaType__Base::StringToEnum FormulaType__Base::string_to_enum = FormulaType__Base::StringToEnum();
-template<> FormulaType__Base::StringToEnum FormulaType__Base::lstring_to_enum= FormulaType__Base::StringToEnum();
-template<> void FormulaType__Base::initialize()
+template<> bool ConditionSource__Base::initialized = false;
+template<> std::string ConditionSource__Base::enum_name = "ConditionSource";
+template<> ConditionSource__Base::EnumToString ConditionSource__Base::enum_to_string = ConditionSource__Base::EnumToString();
+template<> ConditionSource__Base::StringToEnum ConditionSource__Base::string_to_enum = ConditionSource__Base::StringToEnum();
+template<> ConditionSource__Base::StringToEnum ConditionSource__Base::lstring_to_enum= ConditionSource__Base::StringToEnum();
+template<> void ConditionSource__Base::initialize()
 {
-	initAddValue(enums::FORMULA_UNDEFINED, "FORMULA_UNDEFINED", true);
-	initAddValue(enums::FORMULA_LEVELMAGIC, "FORMULA_LEVELMAGIC", true);
-	initAddValue(enums::FORMULA_SKILL, "FORMULA_SKILL", true);
-	initAddValue(enums::FORMULA_VALUE, "FORMULA_VALUE", true);
-}
-
-template<> bool ConditionID__Base::initialized = false;
-template<> std::string ConditionID__Base::enum_name = "ConditionID";
-template<> ConditionID__Base::EnumToString ConditionID__Base::enum_to_string = ConditionID__Base::EnumToString();
-template<> ConditionID__Base::StringToEnum ConditionID__Base::string_to_enum = ConditionID__Base::StringToEnum();
-template<> ConditionID__Base::StringToEnum ConditionID__Base::lstring_to_enum= ConditionID__Base::StringToEnum();
-template<> void ConditionID__Base::initialize()
-{
-	initAddValue(enums::CONDITIONID_DEFAULT, "CONDITIONID_DEFAULT", true);
-	initAddValue(enums::CONDITIONID_COMBAT, "CONDITIONID_COMBAT", true);
-	initAddValue(enums::CONDITIONID_HEAD, "CONDITIONID_HEAD", true);
-	initAddValue(enums::CONDITIONID_NECKLACE, "CONDITIONID_NECKLACE", true);
-	initAddValue(enums::CONDITIONID_BACKPACK, "CONDITIONID_BACKPACK", true);
-	initAddValue(enums::CONDITIONID_ARMOR, "CONDITIONID_ARMOR", true);
-	initAddValue(enums::CONDITIONID_RIGHT, "CONDITIONID_RIGHT", true);
-	initAddValue(enums::CONDITIONID_LEFT, "CONDITIONID_LEFT", true);
-	initAddValue(enums::CONDITIONID_LEGS, "CONDITIONID_LEGS", true);
-	initAddValue(enums::CONDITIONID_FEET, "CONDITIONID_FEET", true);
-	initAddValue(enums::CONDITIONID_RING, "CONDITIONID_RING", true);
-	initAddValue(enums::CONDITIONID_AMMO, "CONDITIONID_AMMO", true);
+	initAddValue(enums::CONDITION_SOURCE_NONE, "CONDITION_SOURCE_NONE", true);
+	initAddValue(enums::CONDITION_SOURCE_HEAD, "CONDITION_SOURCE_HEAD", true);
+	initAddValue(enums::CONDITION_SOURCE_NECKLACE, "CONDITION_SOURCE_NECKLACE", true);
+	initAddValue(enums::CONDITION_SOURCE_BACKPACK, "CONDITION_SOURCE_BACKPACK", true);
+	initAddValue(enums::CONDITION_SOURCE_ARMOR, "CONDITION_SOURCE_ARMOR", true);
+	initAddValue(enums::CONDITION_SOURCE_RIGHT, "CONDITION_SOURCE_RIGHT", true);
+	initAddValue(enums::CONDITION_SOURCE_LEFT, "CONDITION_SOURCE_LEFT", true);
+	initAddValue(enums::CONDITION_SOURCE_LEGS, "CONDITION_SOURCE_LEGS", true);
+	initAddValue(enums::CONDITION_SOURCE_FEET, "CONDITION_SOURCE_FEET", true);
+	initAddValue(enums::CONDITION_SOURCE_RING, "CONDITION_SOURCE_RING", true);
+	initAddValue(enums::CONDITION_SOURCE_AMMO, "CONDITION_SOURCE_AMMO", true);
 }
 
 template<> bool PlayerSex__Base::initialized = false;

@@ -187,7 +187,7 @@ public:
 	const OutfitType getCurrentOutfit() const {return currentOutfit;}
 	const void setCurrentOutfit(OutfitType outfit) {currentOutfit = outfit;}
 	const OutfitType getDefaultOutfit() const {return defaultOutfit;}
-	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
+	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
 	ZoneType getZone() const;
 
 	//walk functions
@@ -233,20 +233,22 @@ public:
 
 	bool addCondition(Condition* condition);
 	bool addCombatCondition(Condition* condition);
-	void removeCondition(ConditionType type, ConditionID id);
-	void removeCondition(ConditionType type);
 	void removeCondition(Condition* condition);
+	void removeCondition(CombatType type);
+	void removeCondition(ConditionType type);
+	void removeCondition(ConditionType type, ConditionSource source);
 	void removeCondition(const Creature* attacker, ConditionType type);
-	Condition* getCondition(ConditionType type, ConditionID id, uint32_t subId) const;
 	Condition* getCondition(ConditionType type) const;
+	Condition* getCondition(ConditionType type, ConditionSource source) const;
 	void executeConditions(uint32_t interval);
-	bool hasCondition(ConditionType type, bool checkTime = true) const;
-	virtual bool isImmune(ConditionType type) const;
+	bool hasCondition(CombatType type) const;
+	bool hasCondition(ConditionType type) const;
+	virtual bool isImmune(const Condition* condition) const;
+	virtual bool isImmune(MechanicType type) const;
 	virtual bool isImmune(CombatType type) const;
-	virtual bool isSuppress(ConditionType type) const;
+	virtual bool isCured(Condition* condition) const {return false;}
+	virtual MechanicType getMechanicImmunities() const {return MECHANIC_NONE;}
 	virtual CombatType getDamageImmunities() const { return COMBAT_NONE; }
-	virtual ConditionType getConditionImmunities() const { return CONDITION_NONE; }
-	virtual ConditionType getConditionSuppressions() const { return CONDITION_NONE; }
 	virtual bool isAttackable() const { return true;}
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
@@ -267,10 +269,9 @@ public:
 	bool hasBeenAttacked(uint32_t attackerId) const;
 
 	//combat event functions
-	virtual void onAddCondition(ConditionType type, bool hadCondition);
-	virtual void onAddCombatCondition(ConditionType type, bool hadCondition);
-	virtual void onEndCondition(ConditionType type, bool lastCondition);
-	virtual void onTickCondition(ConditionType type, int32_t interval, bool& bRemove);
+	virtual void onAddCondition(const Condition* condition, bool preAdd = true);
+	virtual void onAddCombatCondition(const Condition* condition, bool preAdd = true);
+	virtual void onEndCondition(const Condition* condition, bool preEnd = true);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onAttackedCreature(Creature* target) {};
 	virtual void onSummonAttackedCreature(Creature* summon, Creature* target) {};
@@ -292,7 +293,7 @@ public:
 
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
-	void setCreatureLight(LightInfo& light) {internalLight = light;}
+	void setCreatureLight(const LightInfo& light) {internalLight = light;}
 
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t interval);

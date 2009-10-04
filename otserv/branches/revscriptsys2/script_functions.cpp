@@ -85,16 +85,13 @@ void Manager::registerClasses() {
 	registerEnum<Direction>();
 	registerEnum<CombatType>();
 	registerEnum<CombatParam>();
-	registerEnum<CallBackParam>();
-	registerEnum<ConditionParam>();
 	registerEnum<BlockType>();
 	registerEnum<ViolationAction>();
 	registerEnum<SkillType>();
 	registerEnum<LevelType>();
 	registerEnum<PlayerStatType>();
 	registerEnum<LossType>();
-	registerEnum<FormulaType>();
-	registerEnum<ConditionID>();
+	registerEnum<ConditionSource>();
 	registerEnum<PlayerSex>();
 	registerEnum<ChaseMode>();
 	registerEnum<FightMode>();
@@ -105,7 +102,7 @@ void Manager::registerClasses() {
 	registerEnum<ZoneType>();
 	registerEnum<WorldType>();
 	registerEnum<Script::ListenerType>();
-	
+	registerEnum<MechanicType>();
 	registerEnum<ConditionType>();
 	registerEnum<ConditionEnd>();
 	registerEnum<ConditionAttribute>();
@@ -186,9 +183,9 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getBaseSpeed()", &Manager::lua_Creature_getBaseSpeed);
 	registerMemberFunction("Creature", "isPushable()", &Manager::lua_Creature_isPushable);
 	registerMemberFunction("Creature", "getTarget()", &Manager::lua_Creature_getTarget);
-	registerMemberFunction("Creature", "isImmuneToCondition(ConditionType conditiontype)", &Manager::lua_Creature_isImmuneToCondition);
 	registerMemberFunction("Creature", "isImmuneToCombat(CombatType combattype)", &Manager::lua_Creature_isImmuneToCombat);
-	registerMemberFunction("Creature", "getConditionImmunities()", &Manager::lua_Creature_getConditionImmunities);
+	registerMemberFunction("Creature", "isImmuneToMechanic(MechanicType conditiontype)", &Manager::lua_Creature_isImmuneToMechanic);
+	registerMemberFunction("Creature", "getMechanicImmunities()", &Manager::lua_Creature_getMechanicImmunities);
 	registerMemberFunction("Creature", "getDamageImmunities()", &Manager::lua_Creature_getDamageImmunities);
 
 	registerGlobalFunction("getCreatureByName(string name)", &Manager::lua_getCreatureByName);
@@ -238,7 +235,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "getLightColor()", &Manager::lua_Actor_getLightColor);
 	registerMemberFunction("Actor", "getManaCost()", &Manager::lua_Actor_getManaCost);
 	registerMemberFunction("Actor", "setTarget(Creature target)", &Manager::lua_Actor_setTarget);
-	registerMemberFunction("Actor", "setConditionImmunities(table immunities)", &Manager::lua_Actor_setConditionImmunities);
+	registerMemberFunction("Actor", "setMechanicImmunities(table immunities)", &Manager::lua_Actor_setMechanicImmunities);
 	registerMemberFunction("Actor", "setDamageImmunities(table immunities)", &Manager::lua_Actor_setDamageImmunities);
 
 	registerGlobalFunction("createMonster(string monstertypename, table pos)", &Manager::lua_createMonster);
@@ -471,19 +468,19 @@ void Manager::registerFunctions() {
 
 	// OnDamage
 	registerGlobalFunction("registerOnDamage([mixed what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnDamage);
-	registerGlobalFunction("registerOnCreatureDamage(Creature creature, [mixed what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDamage);
+	registerGlobalFunction("registerOnCreatureDamage(Creature creature [, mixed what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDamage);
 
 	// OnKill
 	registerGlobalFunction("registerOnKill([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnKill);
-	registerGlobalFunction("registerOnCreatureKill(Creature killer, [string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnKill);
+	registerGlobalFunction("registerOnCreatureKill(Creature killer [, string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnKill);
 	registerGlobalFunction("registerOnKilled([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnKilled);
-	registerGlobalFunction("registerOnCreatureKilled(Creature creature, [string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnKilled);
+	registerGlobalFunction("registerOnCreatureKilled(Creature creature [, string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnKilled);
 
 	// OnDeath
 	registerGlobalFunction("registerOnDeathBy([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnDeathBy);
-	registerGlobalFunction("registerOnCreatureDeathBy(Creature killer, [string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDeathBy);
+	registerGlobalFunction("registerOnCreatureDeathBy(Creature killer [, string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDeathBy);
 	registerGlobalFunction("registerOnDeath([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnDeath);
-	registerGlobalFunction("registerOnCreatureDeath(Creature creature, [string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDeath);
+	registerGlobalFunction("registerOnCreatureDeath(Creature creature [, string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDeath);
 
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
@@ -2691,12 +2688,12 @@ int LuaState::lua_Creature_getTarget()
 	return 1;
 }
 
-int LuaState::lua_Creature_isImmuneToCondition()
+int LuaState::lua_Creature_isImmuneToMechanic()
 {
 	Creature* creature = popCreature();
-	ConditionType conditionType = popEnum<ConditionType>();
+	MechanicType mechanicType = popEnum<MechanicType>();
 
-	pushBoolean(creature->isImmune(conditionType));
+	pushBoolean(creature->isImmune(mechanicType));
 	return 1;
 }
 
@@ -2709,12 +2706,12 @@ int LuaState::lua_Creature_isImmuneToCombat()
 	return 1;
 }
 
-int LuaState::lua_Creature_getConditionImmunities()
+int LuaState::lua_Creature_getMechanicImmunities()
 {
 	Creature* creature = popCreature();
 
 	newTable();
-	for(ConditionType::iterator i = CONDITION_POISON; i != ConditionType::end(); ++i){
+	for(MechanicType::iterator i = MechanicType::begin(); i != MechanicType::end(); ++i){
 		pushBoolean(creature->isImmune(*i));
 		setField(-2, i->toString());
 	}
@@ -2965,7 +2962,7 @@ int LuaState::lua_Actor_setTargetDistance()
 	return Actor_modAttribute(this, &CreatureType::targetDistance);
 }
 
-int LuaState::lua_Actor_setConditionImmunities()
+int LuaState::lua_Actor_setMechanicImmunities()
 {
 	if(!isTable(-1)) {
 		HandleError(Script::ERROR_THROW, "Attempt to treat non-table value as an immunity-table.");
@@ -2974,16 +2971,17 @@ int LuaState::lua_Actor_setConditionImmunities()
 		return 1;
 	}
 
-	ConditionType immunities = CONDITION_NONE;
-	for(ConditionType::iterator i = CONDITION_POISON; i != ConditionType::end(); ++i){
+	MechanicType immunities = MECHANIC_NONE;
+	for(MechanicType::iterator i = MechanicType::begin(); i != MechanicType::end(); ++i){
 		getField(-1, i->toString());
-		immunities |= (ConditionType)popInteger();		
+		immunities |= (MechanicType)popInteger();		
 	}
 
 	pop();
 
 	Actor* actor = popActor();
-	actor->getType().conditionImmunities(immunities);
+	actor->getType().mechanicImmunities(immunities);
+	//TODO:
 	//actor->updateMapCache();
 
 	pushBoolean(true);
@@ -3198,13 +3196,7 @@ int LuaState::lua_Actor_setTarget()
 int LuaState::lua_Player_getFood()
 {
 	Player* p = popPlayer();
-	Condition* condition = p->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
-	if(condition){
-		push(condition->getTicks() / 1000);
-	}
-	else{
-		pushInteger(0);
-	}
+	pushInteger(p->getFood());
 	return 1;
 }
 

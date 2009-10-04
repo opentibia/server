@@ -1039,47 +1039,52 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "suppressdrunk"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.conditionSuppressions |= CONDITION_DRUNK;
+									it.abilities.cure[CONDITION_DRUNK.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressenergy"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.conditionSuppressions |= CONDITION_ENERGY;
+									it.abilities.cure[CONDITION_ENERGY.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressfire"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.conditionSuppressions |= CONDITION_FIRE;
+									it.abilities.cure[CONDITION_FIRE.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppresspoison"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.conditionSuppressions |= CONDITION_POISON;
+									it.abilities.cure[CONDITION_EARTH.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppresslifedrain"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.conditionSuppressions |= CONDITION_LIFEDRAIN;
+									it.abilities.cure[CONDITION_LIFEDRAIN.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressdrown"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.conditionSuppressions |= CONDITION_DROWN;
+									it.abilities.cure[CONDITION_DROWN.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressfreeze"){
-								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
-									it.abilities.conditionSuppressions |= CONDITION_FREEZING;
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.cure[CONDITION_ICE.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressdazzle"){
-								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
-									it.abilities.conditionSuppressions |= CONDITION_DAZZLED;
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.cure[CONDITION_HOLY.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppresscurse"){
-								if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
-									it.abilities.conditionSuppressions |= CONDITION_CURSED;
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.cure[CONDITION_DEATH.value()] = intValue != 0;
+								}
+							}
+							else if(asLowerCaseString(strValue) == "suppressmanadrain"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.cure[CONDITION_MANADRAIN.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "preventitemloss"){
@@ -1092,16 +1097,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.preventSkillLoss = (intValue != 0);
 								}
 							}
-							/*else if(asLowerCaseString(strValue) == "suppressmanadrain"){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.conditionSuppressions |= CONDITION_MANADRAIN;
-								}
-							}
-							else if(asLowerCaseString(strValue) == "suppressphysical"){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.conditionSuppressions |= CONDITION_PHYSICAL;
-								}
-							}*/
+							/*
 							else if(asLowerCaseString(strValue) == "field"){
 								it.group = ITEM_GROUP_MAGICFIELD;
 								it.type = ITEM_TYPE_MAGICFIELD;
@@ -1203,6 +1199,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									}
 								}
 							}
+							*/
 							else if(asLowerCaseString(strValue) == "replaceable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.replaceable = (intValue != 0);
@@ -1443,6 +1440,7 @@ const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
 Abilities::Abilities()
 {
 	memset(&absorb, 0, sizeof(absorb));
+	memset(&cure, 0, sizeof(cure));
 
 	elementType = COMBAT_NONE;
 	elementDamage = 0;
@@ -1454,8 +1452,7 @@ Abilities::Abilities()
 	speed = 0;
 	manaShield = false;
 	invisible = false;
-	conditionImmunities = CONDITION_NONE;
-	conditionSuppressions = CONDITION_NONE;
+	mechanicImmunities = MECHANIC_NONE;
 
 	regeneration = false;
 	healthGain = 0;

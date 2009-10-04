@@ -50,7 +50,6 @@ class Spawn;
 class RSA;
 class Party;
 class Condition;
-class ConditionDamage;
 class Position;
 class PositionEx;
 class Combat;

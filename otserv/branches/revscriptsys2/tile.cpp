@@ -421,7 +421,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					//3) Actor is already afflicated by this type of condition
 					if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
 						if( !(monster->canPushItems() ||
-							monster->hasCondition(Combat::DamageToConditionType(combatType), false)) ){
+							monster->hasCondition(combatType)) ){
 							return RET_NOTPOSSIBLE;
 						}
 					}

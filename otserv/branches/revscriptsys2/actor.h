@@ -84,7 +84,7 @@ public:
 	bool canPushItems() const {return cType.canPushItems();}
 	bool canPushCreatures() const {return cType.canPushCreatures();}
 	bool isHostile() const { return cType.isHostile();}
-	virtual bool canSeeInvisibility() const { return Creature::isImmune(CONDITION_INVISIBLE);}
+	virtual bool canSeeInvisibility() const { return Creature::isImmune(MECHANIC_INVISIBLE);}
 	uint32_t getManaCost() const {return cType.manaCost();}	
 	void setSpawn(Spawn* _spawn) {spawn = _spawn;}
 
@@ -176,8 +176,8 @@ private:
 	void updateIdleStatus();
 	bool getIdleStatus() const {return isIdle;}
 
-	virtual void onAddCondition(ConditionType type, bool hadCondition);
-	virtual void onEndCondition(ConditionType type, bool lastCondition);
+	virtual void onAddCondition(const Condition* condition, bool preAdd = true);
+	virtual void onEndCondition(const Condition* condition, bool preEnd = true);
 	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature);
 
 	bool canUseAttack(const Position& pos, const Creature* target) const;
@@ -201,10 +201,10 @@ private:
 	bool isFriend(const Creature* creature);
 	bool isOpponent(const Creature* creature);
 
-	virtual uint64_t getLostExperience() const { return ((skillLoss ? cType.experience(): 0)); }
+	virtual uint64_t getLostExperience() const {return ((skillLoss ? cType.experience(): 0));}
 	virtual void dropLoot(Container* corpse);
-	virtual CombatType getDamageImmunities() const { return cType.damageImmunities(); }
-	virtual ConditionType getConditionImmunities() const { return cType.conditionImmunities(); }
+	virtual MechanicType getMechanicImmunities() const {return cType.mechanicImmunities();}
+	virtual CombatType getDamageImmunities() const {return cType.damageImmunities();}
 	virtual uint16_t getCorpseId() const { return cType.corpseId(); }
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 	virtual bool useCacheMap() const {return true;}

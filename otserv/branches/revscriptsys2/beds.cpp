@@ -218,35 +218,32 @@ void BedItem::wakeUp()
 
 void BedItem::regeneratePlayer(Player* player) const
 {
-	// Note: time_t is in seconds
-	int32_t sleptTime = int32_t(std::time(NULL) - sleepStart);
+	int32_t sleepDuration = int32_t(std::time(NULL) - sleepStart);
 
-	Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
+	Condition* condition = player->getCondition(CONDITION_REGENERATION);
+	int32_t regenAmount = 0;
 	if(condition){
 		// regenerate 1 health and 1 mana every 30 seconds that the player had food for
-		int32_t regen;
+		int32_t regenDuration = std::min(player->getFood(), sleepDuration);
+		regenAmount = regenDuration / 30;
 
-		if(condition->getTicks() != -1){
-			regen = std::min((condition->getTicks()/1000), sleptTime) / 30;
-			int32_t newRegenTicks = condition->getTicks() - (regen*30000);
-			if(newRegenTicks <= 0){
-				player->removeCondition(condition);
-				condition = NULL;
-			}
-			else{
-				condition->setTicks(newRegenTicks);
-			}
+		int32_t newTicks = condition->getTicks() - regenDuration * 1000;
+		if(newTicks <= 0){
+			player->removeCondition(condition);
 		}
 		else{
-			regen = sleptTime / 30;
+			condition->setTicks(newTicks);
 		}
-
-		player->changeHealth(regen);
-		player->changeMana(regen);
+	}
+	else{
+		regenAmount = sleepDuration / 30;
 	}
 
+	player->changeHealth(regenAmount);
+	player->changeMana(regenAmount);
+
 	// regenerate 1 soul every 15 minutes
-	int32_t soulRegen = (int32_t)std::max((float)0, ((float)sleptTime/(60*15)));
+	int32_t soulRegen = (int32_t)( ((float)sleepDuration) /60*15);
 	player->changeSoul(soulRegen);
 }
 

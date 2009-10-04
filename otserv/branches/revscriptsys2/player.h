@@ -43,7 +43,8 @@ enum playerinfo_t {
 	PLAYERINFO_MAXMANA,
 	PLAYERINFO_MAGICLEVEL,
 	PLAYERINFO_MAGICLEVELPERCENT,
-	PLAYERINFO_SOUL
+	PLAYERINFO_SOUL,
+	PLAYERINFO_MAXSOUL
 };
 
 enum freeslot_t {
@@ -199,6 +200,11 @@ public:
 
 	virtual int32_t getMaxHealth() const {return getPlayerInfo(PLAYERINFO_MAXHEALTH);}
 	virtual int32_t getMaxMana() const {return getPlayerInfo(PLAYERINFO_MAXMANA);}
+	virtual int32_t getMaxSoul() const {return getPlayerInfo(PLAYERINFO_MAXSOUL);}
+	virtual int32_t getFood() const {
+		Condition* condition = getCondition(CONDITION_REGENERATION);
+		return (condition ? condition->getTicks() / 1000 : 0);
+	}
 
 	// Reurns the inventory item in the slot position
 	Item* getInventoryItem(SlotType slot) const;
@@ -214,8 +220,6 @@ public:
 	int32_t getVarStats(PlayerStatType stat) const {return varStats[stat.value()];}
 	void setVarStats(PlayerStatType stat, int32_t modifier);
 	int32_t getDefaultStats(PlayerStatType stat);
-
-	void setConditionSuppressions(ConditionType conditions, bool remove);
 
 	double getRateValue(LevelType rateType) const {return rateValue[rateType.value()];}
 	void setRateValue(LevelType rateType, double value){rateValue[rateType.value()] = value;}
@@ -269,7 +273,8 @@ public:
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);
 	bool isImmune(CombatType type) const;
-	bool isImmune(ConditionType type) const;
+	bool isImmune(MechanicType type) const;
+	bool isCured(Condition* condition) const;
 	bool hasShield() const;
 	virtual bool isAttackable() const;
 
@@ -312,11 +317,10 @@ public:
 	void getGainExperience(uint64_t& gainExp, bool fromMonster);
 
 	//combat event functions
-	virtual void onAddCondition(ConditionType type, bool hadCondition);
-	virtual void onAddCombatCondition(ConditionType type, bool hadCondition);
-	virtual void onEndCondition(ConditionType type, bool lastCondition);
+	virtual void onAddCondition(const Condition* condition, bool preAdd = true);
+	virtual void onAddCombatCondition(const Condition* condition, bool preAdd = true);
+	virtual void onEndCondition(const Condition* condition, bool preEnd = true);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
-	virtual void onTickCondition(ConditionType type, int32_t interval, bool& bRemove);
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onSummonAttackedCreature(Creature* summon, Creature* target);
 	virtual void onAttacked();
@@ -638,8 +642,8 @@ protected:
 	std::string groupName;
 	uint64_t experience;
 	CombatType damageImmunities;
-	ConditionType conditionImmunities;
-	ConditionType conditionSuppressions;
+	MechanicType mechanicImmunities;
+	MechanicType mechanicSuppressions;
 	uint32_t condition;
 	int32_t stamina;
 	uint32_t manaSpent;
@@ -760,8 +764,7 @@ protected:
 
 	virtual void dropLoot(Container* corpse);
 	virtual CombatType getDamageImmunities() const { return damageImmunities; }
-	virtual ConditionType getConditionImmunities() const { return conditionImmunities; }
-	virtual ConditionType getConditionSuppressions() const { return conditionSuppressions; }
+	virtual MechanicType getMechanicImmunities() const {return mechanicImmunities;}
 	virtual uint16_t getCorpseId() const;
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 

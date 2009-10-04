@@ -196,10 +196,10 @@ bool Combat::applyCondition(CombatSource& combatSource, CombatParams& params, Cr
 	for(std::list<const Condition*>::const_iterator it = params.conditionList.begin(); it != params.conditionList.end(); ++it){
 		const Condition* condition = *it;
 
-		if(attacker == target || !target->isImmune(condition->getType())){
+		if(attacker == target || !target->isImmune(condition)){
 			Condition* conditionCopy = condition->clone();
 			if(attacker){
-				conditionCopy->setParam(CONDITIONPARAM_OWNER, attacker->getID());
+				conditionCopy->setOwner(attacker->getID());
 			}
 
 			//TODO: infight condition until all aggressive conditions has ended
@@ -285,51 +285,6 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 		}
 		list.push_back(tile);
 	}
-}
-
-CombatType Combat::ConditionToDamageType(ConditionType type)
-{
-	if(type == CONDITION_FIRE)
-		return COMBAT_FIREDAMAGE;
-	
-	if(type == CONDITION_ENERGY)
-		return COMBAT_ENERGYDAMAGE;
-	
-	if(type == CONDITION_DROWN)
-		return COMBAT_DROWNDAMAGE;
-	
-	if(type == CONDITION_POISON)
-		return COMBAT_EARTHDAMAGE;
-	
-	if(type == CONDITION_FREEZING)
-		return COMBAT_ICEDAMAGE;
-	
-	if(type == CONDITION_DAZZLED)
-		return COMBAT_HOLYDAMAGE;
-	
-	if(type == CONDITION_CURSED)
-		return COMBAT_DEATHDAMAGE;
-	
-	return COMBAT_NONE;
-}
-
-ConditionType Combat::DamageToConditionType(CombatType type)
-{
-	if(type == COMBAT_FIREDAMAGE)
-		return CONDITION_FIRE;
-	if(type == COMBAT_ENERGYDAMAGE)
-		return CONDITION_ENERGY;
-	if(type == COMBAT_DROWNDAMAGE)
-		return CONDITION_DROWN;
-	if(type == COMBAT_EARTHDAMAGE)
-		return CONDITION_POISON;
-	if(type == COMBAT_ICEDAMAGE)
-		return CONDITION_FREEZING;
-	if(type == COMBAT_HOLYDAMAGE)
-		return CONDITION_DAZZLED;
-	if(type == COMBAT_DEATHDAMAGE)
-		return CONDITION_CURSED;
-	return CONDITION_NONE;
 }
 
 bool Combat::isPlayerCombat(const Creature* target)
@@ -964,7 +919,7 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 					  (OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
 						creature->hasBeenAttacked(owner))
 				{
-					conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);
+					conditionCopy->setOwner(owner);
 				}
 			}
 

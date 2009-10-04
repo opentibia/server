@@ -20,7 +20,7 @@
 #include "otpch.h"
 
 #include "player.h"
-//#include "tasks.h"
+#include "tasks.h"
 #include "scheduler.h"
 #include "enums.h"
 #include "ioplayer.h"
@@ -76,9 +76,9 @@ Creature()
 	magLevelPercent = 0;
 	magLevel   = 0;
 	experience = 0;
+	mechanicImmunities = MECHANIC_NONE;
+	mechanicSuppressions = MECHANIC_NONE;
 	damageImmunities = COMBAT_NONE;
-	conditionImmunities = CONDITION_NONE;
-	conditionSuppressions = CONDITION_NONE;
 	accessLevel = 0;
 	violationLevel = 0;
 	lastip = 0;
@@ -201,20 +201,15 @@ Player::~Player()
 
 void Player::setVocation(Vocation* voc)
 {
-	if(voc)
+	if(voc){
 		vocation = voc;
-	else
+	}
+	else{
 		// No vocation is always 0
 		vocation = g_vocations.getVocation(0);
-
-	//Update health/mana gain condition
-	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
-	if(condition){
-		condition->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
-		condition->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
-		condition->setParam(CONDITIONPARAM_MANAGAIN, vocation->getManaGainAmount());
-		condition->setParam(CONDITIONPARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
 	}
+
+	removeCondition(CONDITION_REGENERATION);
 
 	//Set the player's max soul according to their vocation
 	soulMax = vocation->getSoulMax();
@@ -316,16 +311,6 @@ Item* Player::getEquippedItem(SlotType slot) const
 	}
 
 	return NULL;
-}
-
-void Player::setConditionSuppressions(ConditionType conditions, bool remove)
-{
-	if(!remove){
-		conditionSuppressions |= conditions;
-	}
-	else{
-		conditionSuppressions &= ~conditions;
-	}
 }
 
 Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
@@ -536,8 +521,8 @@ uint16_t Player::getIcons() const
 
 	ConditionList::const_iterator it;
 	for(it = conditions.begin(); it != conditions.end(); ++it){
-		if(!isSuppress((*it)->getType())){
-			icons |= (*it)->getIcons();
+		if(!isCured(*it)){
+			icons |= (*it)->getIcon();
 		}
 	}
 
@@ -696,6 +681,7 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 		case PLAYERINFO_MANA: return mana; break;
 		case PLAYERINFO_MAXMANA: return std::max((int32_t)0, ((int32_t)manaMax + varStats[*STAT_MAXMANAPOINTS])); break;
 		case PLAYERINFO_SOUL: return std::max((int32_t)0, ((int32_t)soul + varStats[*STAT_SOULPOINTS])); break;
+		case PLAYERINFO_MAXSOUL: return soulMax; break;
 		default:
 			return 0; break;
 	}
@@ -1679,10 +1665,8 @@ void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const
 		}
 
 		if(teleport || (oldPos.z != newPos.z)){
-			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED,
-				g_game.getStairhopExhaustion()));
-			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT,
-				g_game.getStairhopExhaustion()));
+			addCondition(Condition::createCondition(CONDITION_DISARMED, g_game.getStairhopExhaustion()));
+			addCondition(Condition::createCondition(CONDITION_EXHAUST_DAMAGE, g_game.getStairhopExhaustion()));
 		}
 	}
 }
@@ -1889,14 +1873,12 @@ uint32_t Player::getMuteTime()
 		return 0;
 	}
 
-	int32_t muteTicks = 0;
-	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == CONDITION_MUTED && (*it)->getTicks() > muteTicks){
-			muteTicks = (*it)->getTicks();
-		}
+	Condition* condition = getCondition(CONDITION_MUTED_CHAT);
+	if(condition){
+		return (uint32_t)condition->getTicks() / 1000;
 	}
 
-	return ((uint32_t)muteTicks / 1000);
+	return 0;
 }
 
 void Player::addMessageBuffer()
@@ -1920,7 +1902,7 @@ void Player::removeMessageBuffer()
 
 			uint32_t muteTime = 5 * muteCount * muteCount;
 			muteCountMap[getGUID()] = muteCount + 1;
-			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_MUTED, muteTime * 1000, 0);
+			Condition* condition = Condition::createCondition(CONDITION_MUTED_CHAT, muteTime * 1000);
 			addCondition(condition);
 
 			std::stringstream ss;
@@ -2274,20 +2256,19 @@ void Player::onDie()
 
 void Player::die()
 {
-	ConditionEnd conditionEndReason = CONDITIONEND_DIE;
+	ConditionEnd conditionEnd = CONDITIONEND_DEATH;
 	if(getZone() == ZONE_PVP){
-		conditionEndReason = CONDITIONEND_ABORT;
+		conditionEnd = CONDITIONEND_REMOVED;
 	}
 
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		if((*it)->isPersistent()){
 			Condition* condition = *it;
+
+			onEndCondition(condition);
 			it = conditions.erase(it);
-
-			condition->endCondition(this, conditionEndReason);
-
-			bool lastCondition = !hasCondition(condition->getType(), false);
-			onEndCondition(condition->getType(), lastCondition);
+			condition->onEnd(this, conditionEnd);
+			onEndCondition(condition, false);
 			delete condition;
 		}
 		else{
@@ -2429,8 +2410,7 @@ void Player::preSave()
 void Player::addCombatExhaust(uint32_t ticks)
 {
 	if(!hasFlag(PlayerFlag_HasNoExhaustion)){
-		// Add exhaust condition
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT, ticks, 0);
+		Condition* condition = Condition::createCondition(CONDITION_EXHAUST_DAMAGE, ticks);
 		addCondition(condition);
 	}
 }
@@ -2438,7 +2418,7 @@ void Player::addCombatExhaust(uint32_t ticks)
 void Player::addHealExhaust(uint32_t ticks)
 {
 	if(!hasFlag(PlayerFlag_HasNoExhaustion)){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_HEAL, ticks, 0);
+		Condition* condition = Condition::createCondition(CONDITION_EXHAUST_HEAL, ticks);
 		addCondition(condition);
 	}
 }
@@ -2450,26 +2430,29 @@ void Player::addInFightTicks(uint32_t ticks, bool pzlock /*= false*/)
 			pzLocked = true;
 			sendIcons();
 		}
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, ticks, 0);
+		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, ticks);
 		addCondition(condition);
 	}
 }
 
 void Player::addDefaultRegeneration(uint32_t addTicks)
 {
-	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
-
+	Condition* condition = getCondition(CONDITION_REGENERATION);
 	if(condition){
 		condition->setTicks(condition->getTicks() + addTicks);
 	}
 	else{
-		condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_REGENERATION, addTicks, 0);
-		condition->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
-		condition->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
-		condition->setParam(CONDITIONPARAM_MANAGAIN, vocation->getManaGainAmount());
-		condition->setParam(CONDITIONPARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
+		condition = Condition::createCondition(CONDITION_REGENERATION, addTicks);
+		if(condition){
+			Condition::Effect* effect = new Condition::Effect(EFFECT_REGEN_HEALTH, 0, vocation->getHealthGainAmount(), 0, 0,
+				vocation->getHealthGainTicks() * 1000);
+			condition->addEffect(effect);
+			effect = new Condition::Effect(EFFECT_REGEN_MANA, 0, vocation->getManaGainAmount(), 0, 0,
+				vocation->getManaGainTicks() * 1000);
+			condition->addEffect(effect);
 
-		addCondition(condition);
+			addCondition(condition);
+		}
 	}
 }
 
@@ -3406,7 +3389,7 @@ void Player::doAttacking(uint32_t interval)
 	}
 
 	// Can't attack while pacified
-	if(hasCondition(CONDITION_PACIFIED))
+	if(hasCondition(CONDITION_DISARMED))
 	{
 		return;
 	}
@@ -3428,7 +3411,7 @@ void Player::doAttacking(uint32_t interval)
 			else {
 				// If the player is not exhausted OR if the player's weapon
 				// does not have hasExhaust, use the weapon.
-				if(!hasCondition(CONDITION_EXHAUST_COMBAT))
+				if(!hasCondition(CONDITION_EXHAUST_DAMAGE))
 				{
 					result = weapon->useWeapon(this, tool, attackedCreature);
 				}
@@ -3552,33 +3535,33 @@ void Player::updateItemsLight(bool internal /*=false*/)
 	}
 }
 
-void Player::onAddCondition(ConditionType type, bool hadCondition)
+void Player::onAddCondition(const Condition* condition, bool preAdd /*= true*/)
 {
-	Creature::onAddCondition(type, hadCondition);
+	Creature::onAddCondition(condition, preAdd);
 	sendIcons();
 }
 
-void Player::onAddCombatCondition(ConditionType type, bool hadCondition)
+void Player::onAddCombatCondition(const Condition* condition, bool preAdd /*= true*/)
 {
-	if(type == CONDITION_POISON){
+	if(condition->getCombatType() == COMBAT_EARTHDAMAGE){
 		sendTextMessage(MSG_STATUS_DEFAULT, "You are poisoned.");
 	}
-	else if(type == CONDITION_DROWN){
+	else if(condition->getCombatType() == COMBAT_DROWNDAMAGE){
 		sendTextMessage(MSG_STATUS_DEFAULT, "You are drowning.");
 	}
-	else if(type == CONDITION_PARALYZE){
+	else if(condition->getMechanicType() == MECHANIC_PARALYZED){
 		sendTextMessage(MSG_STATUS_DEFAULT, "You are paralyzed.");
 	}
-	else if(type == CONDITION_DRUNK){
+	else if(condition->getMechanicType() == MECHANIC_DRUNK){
 		sendTextMessage(MSG_STATUS_DEFAULT, "You are drunk.");
 	}
 }
 
-void Player::onEndCondition(ConditionType type, bool lastCondition)
+void Player::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 {
-	Creature::onEndCondition(type, lastCondition);
+	Creature::onEndCondition(condition, preEnd);
 
-	if(type == CONDITION_INFIGHT){
+	if(condition->getId() == enums::CONDITION_INFIGHT){
 		onIdleStatus();
 		pzLocked = false;
 
@@ -3597,14 +3580,11 @@ void Player::onEndCondition(ConditionType type, bool lastCondition)
 void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condition)
 {
 	//Creature::onCombatRemoveCondition(attacker, condition);
-	bool remove = true;
 
-	if(condition->getId() > CONDITIONID_COMBAT){
-		remove = false;
-
-		//Means the condition is from an item, id == slot
+	if(condition->getSource() != CONDITION_SOURCE_NONE){
+		//Means the condition is from an item
 		if(g_game.getWorldType() == WORLD_TYPE_PVPE){
-			SlotType slot = SlotType::fromInteger(condition->getId().value());
+			SlotType slot = SlotType::fromInteger(condition->getSource().value());
 			Item* item = getInventoryItem(slot);
 			if(item){
 				//25% chance to destroy the item
@@ -3614,8 +3594,10 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 			}
 		}
 	}
+	else{
+		removeCondition(condition);
 
-	if(remove){
+		/*
 		if(!canDoAction()){
 			int32_t delay = getNextActionTime();
 			delay -= (delay % EVENT_CREATURE_THINK_INTERVAL);
@@ -3629,16 +3611,8 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 		else{
 			removeCondition(condition);
 		}
+		*/
 	}
-}
-
-void Player::onTickCondition(ConditionType type, int32_t interval, bool& bRemove)
-{
-	if(type == CONDITION_HUNTING){
-		removeStamina(interval * g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS));
-	}
-
-	Creature::onTickCondition(type, interval, bRemove);
 }
 
 void Player::onAttackedCreature(Creature* target)
@@ -3799,7 +3773,7 @@ void Player::onKilledCreature(Creature* target)
 	}
 
 	if(target->getActor() && !target->isPlayerSummon()){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_HUNTING, g_config.getNumber(ConfigManager::HUNTING_KILL_DURATION), 0);
+		Condition* condition = Condition::createCondition(CONDITION_HUNTING, g_config.getNumber(ConfigManager::HUNTING_KILL_DURATION));
 		addCondition(condition);
 	}
 
@@ -3812,12 +3786,14 @@ void Player::gainExperience(uint64_t& gainExp, bool fromMonster)
 		if(gainExp > 0){
 			//soul regeneration
 			if((uint32_t)gainExp >= getLevel()){
+				/*
 				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
 				//Soul regeneration rate is defined by the vocation
 				uint32_t vocSoulTicks = vocation->getSoulGainTicks();
 				condition->setParam(CONDITIONPARAM_SOULGAIN, 1);
 				condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
 				addCondition(condition);
+				*/
 			}
 
 			//check stamina, player rate and other values
@@ -3884,13 +3860,29 @@ bool Player::isImmune(CombatType type) const
 	return Creature::isImmune(type);
 }
 
-bool Player::isImmune(ConditionType type) const
+bool Player::isImmune(MechanicType type) const
 {
 	if(hasFlag(PlayerFlag_CannotBeAttacked)){
 		return true;
 	}
 
 	return Creature::isImmune(type);
+}
+
+bool Player::isCured(Condition* condition) const
+{
+	Item* item;
+	for(SlotType::iterator slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
+		if(!(item = getEquippedItem(*slot)))
+			continue;
+
+		const ItemType& it = Item::items[item->getID()];
+		if(it.abilities.cure[condition->getId()]){
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool Player::isAttackable() const

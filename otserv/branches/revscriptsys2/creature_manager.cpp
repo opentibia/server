@@ -88,18 +88,6 @@ bool CreatureManager::reload()
 	return loadFromXml(datadir, true);
 }
 
-ConditionDamage* CreatureManager::getDamageCondition(ConditionType conditionType,
-	int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval)
-{
-	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, 0, 0));
-	condition->setParam(CONDITIONPARAM_TICKINTERVAL, tickInterval);
-	condition->setParam(CONDITIONPARAM_MINVALUE, minDamage);
-	condition->setParam(CONDITIONPARAM_MAXVALUE, maxDamage);
-	condition->setParam(CONDITIONPARAM_STARTVALUE, startDamage);
-	condition->setParam(CONDITIONPARAM_DELAYED, 1);
-
-	return condition;
-}
 /*
 bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description)
 {
@@ -839,51 +827,54 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 
 							if(strValue == "physical"){
 								mType->damageImmunities() |= COMBAT_PHYSICALDAMAGE;
-								//mType->conditionImmunities |= CONDITION_PHYSICAL;
 							}
 							else if(strValue == "energy"){
 								mType->damageImmunities() |= COMBAT_ENERGYDAMAGE;
-								mType->conditionImmunities() |= CONDITION_ENERGY;
 							}
 							else if(strValue == "fire"){
 								mType->damageImmunities() |= COMBAT_FIREDAMAGE;
-								mType->conditionImmunities() |= CONDITION_FIRE;
 							}
 							else if(strValue == "poison" || strValue == "earth"){
 								mType->damageImmunities() |= COMBAT_EARTHDAMAGE;
-								mType->conditionImmunities() |= CONDITION_POISON;
 							}
 							else if(strValue == "drown"){
 								mType->damageImmunities() |= COMBAT_DROWNDAMAGE;
-								mType->conditionImmunities() |= CONDITION_DROWN;
 							}
 							else if(strValue == "ice"){
 								mType->damageImmunities() |= COMBAT_ICEDAMAGE;
-								mType->conditionImmunities() |= CONDITION_FREEZING;
 							}
 							else if(strValue == "holy"){
 								mType->damageImmunities() |= COMBAT_HOLYDAMAGE;
-								mType->conditionImmunities() |= CONDITION_DAZZLED;
 							}
 							else if(strValue == "death"){
 								mType->damageImmunities() |= COMBAT_DEATHDAMAGE;
-								mType->conditionImmunities() |= CONDITION_CURSED;
 							}
 							else if(strValue == "lifedrain"){
 								mType->damageImmunities() |= COMBAT_LIFEDRAIN;
-								mType->conditionImmunities() |= CONDITION_LIFEDRAIN;
-							}
-							else if(strValue == "paralyze"){
-								mType->conditionImmunities() |= CONDITION_PARALYZE;
 							}
 							else if(strValue == "outfit"){
-								mType->conditionImmunities() |= CONDITION_OUTFIT;
+								mType->mechanicImmunities() |= MECHANIC_SHAPESHIFT;
 							}
-							else if(strValue == "drunk"){
-								mType->conditionImmunities() |= CONDITION_DRUNK;
+							else if(strValue == "pacify"){
+								mType->mechanicImmunities() |= MECHANIC_PACIFIED;
+							}
+							else if(strValue == "disarm"){
+								mType->mechanicImmunities() |= MECHANIC_DISARMED;
+							}
+							else if(strValue == "shield"){
+								mType->mechanicImmunities() |= MECHANIC_SHIELDED;
+							}
+							else if(strValue == "silence"){
+								mType->mechanicImmunities() |= MECHANIC_SILENCED;
+							}
+							else if(strValue == "paralyze"){
+								mType->mechanicImmunities() |= MECHANIC_PARALYZED;
 							}
 							else if(strValue == "invisible"){
-								mType->conditionImmunities() |= CONDITION_INVISIBLE;
+								mType->mechanicImmunities() |= MECHANIC_INVISIBLE;
+							}
+							else if(strValue == "drunk"){
+								mType->mechanicImmunities() |= MECHANIC_DRUNK;
 							}
 							else{
 								SHOW_XML_WARNING("Unknown immunity name " << strValue);
@@ -893,76 +884,67 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 						else if(readXMLInteger(tmpNode, "physical", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_PHYSICALDAMAGE;
-								//mType->conditionImmunities |= CONDITION_PHYSICAL;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "energy", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_ENERGYDAMAGE;
-								mType->conditionImmunities() |= CONDITION_ENERGY;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "fire", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_FIREDAMAGE;
-								mType->conditionImmunities() |= CONDITION_FIRE;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "poison", intValue) ||
 								readXMLInteger(tmpNode, "earth", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_EARTHDAMAGE;
-								mType->conditionImmunities() |= CONDITION_POISON;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "drown", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_DROWNDAMAGE;
-								mType->conditionImmunities() |= CONDITION_DROWN;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "ice", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_ICEDAMAGE;
-								mType->conditionImmunities() |= CONDITION_FREEZING;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "holy", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_HOLYDAMAGE;
-								mType->conditionImmunities() |= CONDITION_DAZZLED;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "death", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_DEATHDAMAGE;
-								mType->conditionImmunities() |= CONDITION_CURSED;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "lifedrain", intValue)){
 							if(intValue != 0){
 								mType->damageImmunities() |= COMBAT_LIFEDRAIN;
-								mType->conditionImmunities() |= CONDITION_LIFEDRAIN;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "paralyze", intValue)){
 							if(intValue != 0){
-								mType->conditionImmunities() |= CONDITION_PARALYZE;
+								mType->mechanicImmunities() |= MECHANIC_PARALYZED;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "outfit", intValue)){
 							if(intValue != 0){
-								mType->conditionImmunities() |= CONDITION_OUTFIT;
+								mType->mechanicImmunities() |= MECHANIC_SHAPESHIFT;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "drunk", intValue)){
 							if(intValue != 0){
-								mType->conditionImmunities() |= CONDITION_DRUNK;
+								mType->mechanicImmunities() |= MECHANIC_DRUNK;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "invisible", intValue)){
 							if(intValue != 0){
-								mType->conditionImmunities() |= CONDITION_INVISIBLE;
+								mType->mechanicImmunities() |= MECHANIC_INVISIBLE;
 							}
 						}
 						else{

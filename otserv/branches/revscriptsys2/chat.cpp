@@ -160,7 +160,7 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& t
 
 	// Add trade muted condition
 	if(getId() == CHANNEL_TRADE || getId() == CHANNEL_TRADE_ROOK){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_TRADE_MUTED, 120000, 0);
+		Condition* condition = Condition::createCondition(CONDITION_MUTED_TRADECHAT, 120000);
 		fromPlayer->addCondition(condition);
 	}
 
@@ -428,7 +428,7 @@ bool Chat::talkToChannel(Player* player, SpeakClass type, const std::string& tex
 					return true;
 					break;
 				}
-				else if((channelId == CHANNEL_TRADE || channelId == CHANNEL_TRADE_ROOK) && player->hasCondition(CONDITION_TRADE_MUTED)){
+				else if((channelId == CHANNEL_TRADE || channelId == CHANNEL_TRADE_ROOK) && player->hasCondition(CONDITION_MUTED_TRADECHAT)){
 					player->sendCancel("You may only place one offer in two minutes.");
 					return true;
 					break;

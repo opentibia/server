@@ -38,8 +38,6 @@ public:
 	static uint32_t getLootRandom();
 
 private:
-	ConditionDamage* getDamageCondition(ConditionType conditionType,
-		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
 	//bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "");
 
 	bool loadMonsterType(const std::string& file, const std::string& monster_name, bool reloading = false);

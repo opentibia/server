@@ -106,8 +106,6 @@ public:
 	static bool isInPvpZone(const Creature* attacker, const Creature* target);
 	static bool isUnjustKill(const Creature* attacker, const Creature* target);
 	static bool isPlayerCombat(const Creature* target);
-	static CombatType ConditionToDamageType(ConditionType type);
-	static ConditionType DamageToConditionType(CombatType type);
 	static ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
 	static ReturnValue canDoCombat(const Creature* attacker, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);

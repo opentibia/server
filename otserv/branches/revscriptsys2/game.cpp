@@ -3998,7 +3998,7 @@ bool Game::playerChangeOutfit(uint32_t playerId, OutfitType outfit)
 		if(onPlayerChangeOutfit(player, outfit)){
 			player->defaultOutfit = outfit;
 
-			if(player->hasCondition(CONDITION_OUTFIT)){
+			if(player->hasCondition(CONDITION_SHAPESHIFT)){
 				return false;
 			}
 
@@ -4175,7 +4175,7 @@ bool Game::playerYell(Player* player, const std::string& text)
 {
 	uint32_t addExhaustion = 0;
 	bool isExhausted = false;
-	if(!player->hasCondition(CONDITION_EXHAUSTED)){
+	if(!player->hasCondition(CONDITION_EXHAUST_YELL)){
 		addExhaustion = getExhaustionTicks();
 		internalCreatureSay(player, SPEAK_YELL, asUpperCaseString(text));
 	}
@@ -4186,7 +4186,7 @@ bool Game::playerYell(Player* player, const std::string& text)
 	}
 
 	if(addExhaustion > 0){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, addExhaustion, 0);
+		Condition* condition = Condition::createCondition(CONDITION_EXHAUST_YELL, addExhaustion);
 		player->addCondition(condition);
 	}
 
