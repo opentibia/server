@@ -149,6 +149,16 @@ Condition* Condition::createCondition(PropStream& propStream)
 	return createCondition(MECHANIC_NONE, COMBAT_NONE, CONDITION_SOURCE_NONE, 0, 0);
 }
 
+Condition::~Condition()
+{
+	for(std::list<Condition::Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
+		delete *it;
+	}
+	effectList.clear();
+
+	delete combatSource;
+}
+
 Condition::Condition(const Condition& rhs)
 {
 	mechanicType = rhs.mechanicType;
@@ -157,11 +167,19 @@ Condition::Condition(const Condition& rhs)
 	ticks = rhs.ticks;
 	id = rhs.id;
 	flags = rhs.flags;
-	ownerId = rhs.ownerId;
+	if(rhs.combatSource){
+		combatSource = new CombatSource(*rhs.combatSource);
+	}
 
 	for(std::list<Effect*>::const_iterator it = rhs.effectList.begin(); it != rhs.effectList.end(); ++it){
 		addEffect(new Condition::Effect(*(*it)));
 	}
+}
+
+void Condition::setSource(const CombatSource& _combatSource)
+{
+	delete combatSource;
+	combatSource = new CombatSource(_combatSource);
 }
 
 uint16_t Condition::getIcon() const
@@ -245,7 +263,7 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 	ticks = addCondition->ticks;
 	id = addCondition->id;
 	flags = addCondition->flags;
-	ownerId = ownerId;
+	combatSource = new CombatSource(*addCondition->combatSource);
 
 	bool fullUpdate = (effectList.size() != addCondition->effectList.size());
 	if(!fullUpdate){
@@ -716,10 +734,6 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 {
 	switch(effectType){
 		case EFFECT_PERIODIC_HEAL:
-		{
-			break;
-		}
-
 		case EFFECT_PERIODIC_DAMAGE:
 		{
 			n += ticks;
@@ -727,12 +741,22 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 				n = 0;
 
 				CombatType combatType = CombatType::fromInteger(mod_type);
-				int32_t damage = -mod_value;
-				Creature* attacker = g_game.getCreatureByID(owner_condition->ownerId);
-				CombatSource combatSource(attacker, NULL, true);
-				//std::cout << "Dealing " << mod_value << " "  << combatType.toString() << " to " << creature->getName() << std::endl;
-				if(!g_game.combatBlockHit(combatType, combatSource, creature, damage, false, false)){
-					g_game.combatChangeHealth(combatType, combatSource, creature, damage);
+				CombatSource combatSource = *owner_condition->combatSource;
+				combatSource.setSourceIsCondition(true);
+
+				if(effectType == EFFECT_PERIODIC_HEAL){
+					int32_t heal = mod_value;
+					//std::cout << "Healing " << mod_value << " "  << combatType.toString() << " to " << creature->getName() << std::endl;
+					if(!g_game.combatBlockHit(combatType, combatSource, creature, heal, false, false)){
+						g_game.combatChangeHealth(combatType, combatSource, creature, heal);
+					}
+				}
+				else{
+					int32_t damage = -mod_value;
+					//std::cout << "Dealing " << mod_value << " "  << combatType.toString() << " to " << creature->getName() << std::endl;
+					if(!g_game.combatBlockHit(combatType, combatSource, creature, damage, false, false)){
+						g_game.combatChangeHealth(combatType, combatSource, creature, damage);
+					}
 				}
 
 				bool skip = false;

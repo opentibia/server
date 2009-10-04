@@ -82,16 +82,11 @@ public:
 		source(source),
 		ticks(ticks),
 		id(id),
-		flags(flags)
+		flags(flags),
+		combatSource(NULL)
 		{}
 	Condition(const Condition& rhs);
-	~Condition()
-	{
-		for(std::list<Condition::Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
-			delete *it;
-		}
-		effectList.clear();
-	}
+	~Condition();
 
 	uint16_t getIcon() const;
 	MechanicType getMechanicType() const { return mechanicType;}
@@ -100,7 +95,7 @@ public:
 	uint32_t getId() const {return id;}
 	uint32_t getTicks() const {return ticks;}
 	void setTicks(uint32_t newTicks) {ticks = newTicks;}
-	void setOwner(uint32_t _ownerId) {ownerId = _ownerId;}
+	void setSource(const CombatSource& _combatSource);
 
 	bool onBegin(Creature* creature);
 	void onEnd(Creature* creature, ConditionEnd reason);
@@ -177,7 +172,7 @@ protected:
 	std::list<Effect*> effectList;
 
 	//variables that should not be serialized
-	uint32_t ownerId;
+	CombatSource* combatSource;
 
 	friend Effect;
 };

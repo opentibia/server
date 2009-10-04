@@ -29,6 +29,56 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
+CombatSource::CombatSource(Creature* creature, Item* item, bool sourceCondition) :
+	creature(creature), item(item), sourceCondition(sourceCondition)
+{
+	if(creature) creature->addRef();
+	if(item) item->addRef();
+}
+
+CombatSource::CombatSource(Creature* creature) :
+	creature(creature), item(NULL), sourceCondition(false)
+{
+	if(creature) creature->addRef();
+}
+
+CombatSource::CombatSource(Item* item) :
+	creature(NULL), item(item), sourceCondition(false)
+{
+	if(item) item->addRef();
+}
+
+CombatSource::~CombatSource()
+{
+	if(creature) creature->unRef();
+	if(item) item->unRef();
+}
+
+CombatSource::CombatSource(const CombatSource& rhs)
+{
+	creature = rhs.creature;
+	if(creature) creature->addRef();
+	item = rhs.item;
+	if(item) item->addRef();
+}
+
+void CombatSource::setSourceCreature(Creature* _creature)
+{
+	if(creature){
+		creature->unRef();
+	}
+	creature = _creature;
+}
+
+void CombatSource::setSourceItem(Item* _item)
+{
+	if(item){
+		item->unRef();
+	}
+
+	item = _item;
+}
+
 Combat::Combat()
 {
 	//
@@ -198,11 +248,7 @@ bool Combat::applyCondition(CombatSource& combatSource, CombatParams& params, Cr
 
 		if(attacker == target || !target->isImmune(condition)){
 			Condition* conditionCopy = condition->clone();
-			if(attacker){
-				conditionCopy->setOwner(attacker->getID());
-			}
-
-			//TODO: infight condition until all aggressive conditions has ended
+			conditionCopy->setSource(combatSource);
 			target->addCombatCondition(conditionCopy);
 		}
 	}
@@ -905,21 +951,23 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 		if(it.condition){
 			Condition* conditionCopy = it.condition->clone();
 			uint32_t owner = getOwner();
+			Creature* creature = g_game.getCreatureByID(owner);
 			if(owner != 0 && purposeful){
 				bool harmfulField = true;
 				if(g_game.getWorldType() == WORLD_TYPE_NOPVP || getTile()->hasFlag(TILEPROP_NOPVPZONE) ){
-					Creature* creature = g_game.getCreatureByID(owner);
 					if(creature){
 						if(creature->getPlayer() || creature->isPlayerSummon()){
 							harmfulField = false;
 						}
 					}
 				}
+
 				if(   !harmfulField ||
 					  (OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
 						creature->hasBeenAttacked(owner))
 				{
-					conditionCopy->setOwner(owner);
+					CombatSource combatSource(creature, this, true);
+					conditionCopy->setSource(combatSource);
 				}
 			}
 

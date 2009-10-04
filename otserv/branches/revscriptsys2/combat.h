@@ -26,9 +26,11 @@
 #include "otsystem.h"
 
 struct CombatSource{
-	CombatSource(Creature* creature, Item* item, bool sourceCondition) : creature(creature), item(item), sourceCondition(sourceCondition) {}
-	CombatSource(Creature* creature) : creature(creature), item(NULL), sourceCondition(false) {}
-	CombatSource(Item* item) : creature(NULL), item(item), sourceCondition(false) {}
+	CombatSource(Creature* creature, Item* item, bool sourceCondition);
+	CombatSource(Creature* creature);
+	CombatSource(Item* item);
+	~CombatSource();
+	CombatSource(const CombatSource& rhs);
 
 	bool isSourceCreature() const {return creature != NULL;}
 	bool isSourceItem() const {return item != NULL;}
@@ -36,6 +38,10 @@ struct CombatSource{
 
 	Creature* getSourceCreature() const {return creature;}
 	Item* getSourceItem() const {return item;}
+
+	void setSourceCreature(Creature* _creature);
+	void setSourceItem(Item* _item);
+	void setSourceIsCondition(bool b) {sourceCondition = b;}
 
 private:
 	Creature* creature;
