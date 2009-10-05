@@ -81,12 +81,12 @@ struct CombatParams{
 		targetCasterOrTopMost = false;
 		isAggressive = true;
 		itemId = 0;
-		dispelType = CONDITION_NONE;
+		dispelName = "";
 		useCharges = false;
 	}
 
 	std::list<const Condition*> conditionList;
-	ConditionType dispelType;
+	std::string dispelName;
 	CombatType combatType;
 	bool blockedByArmor;
 	bool blockedByShield;

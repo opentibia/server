@@ -91,7 +91,6 @@ void Manager::registerClasses() {
 	registerEnum<LevelType>();
 	registerEnum<PlayerStatType>();
 	registerEnum<LossType>();
-	registerEnum<ConditionSource>();
 	registerEnum<PlayerSex>();
 	registerEnum<ChaseMode>();
 	registerEnum<FightMode>();
@@ -103,7 +102,7 @@ void Manager::registerClasses() {
 	registerEnum<WorldType>();
 	registerEnum<Script::ListenerType>();
 	registerEnum<MechanicType>();
-	registerEnum<ConditionType>();
+	registerEnum<ConditionId>();
 	registerEnum<ConditionEnd>();
 	registerEnum<ConditionAttribute>();
 
@@ -463,8 +462,8 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnPlayerAdvance(Player player [, LevelType skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
 
 	// OnCondition
-	registerGlobalFunction("registerOnCondition(mixed what, function callback)", &Manager::lua_registerGenericEvent_OnCondition);
-	registerGlobalFunction("registerOnCreatureCondition(Creature creature, mixed what, function callback)", &Manager::lua_registerSpecificEvent_OnCondition);
+	registerGlobalFunction("registerOnCondition(string name, string method, function callback)", &Manager::lua_registerGenericEvent_OnCondition);
+	registerGlobalFunction("registerOnCreatureCondition(Creature creature, string name, string method, function callback)", &Manager::lua_registerSpecificEvent_OnCondition);
 
 	// OnAttack
 	registerGlobalFunction("registerOnAttack([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnAttack);
@@ -1511,38 +1510,27 @@ int LuaState::lua_registerSpecificEvent_OnAdvance() {
 
 int LuaState::lua_registerGenericEvent_OnCondition() {
 
-	// Tied to a condition, either by id, or condition event (begin/end/tick)
+	// Tied to a condition by name and type (begin/tick/end)
 	// Store callback
-	insert(-2);
+	insert(-3);
+
+	std::string method = popString();
+	std::string name = popString();
 
 	OnCondition::ScriptInformation si_oncondition;
-	si_oncondition.id = 0;
+	si_oncondition.name = name;
 
-	if(isTable(-1)){
-		si_oncondition.method = OnCondition::FILTER_ID;
-		si_oncondition.id = popEnum<ConditionType>().value();
+	if(method == "begin"){
+		si_oncondition.method = OnCondition::FILTER_BEGIN;
 	}
-	else if(isNumber(-1)){
-		si_oncondition.method = OnCondition::FILTER_ID;
-		si_oncondition.id = popInteger();
+	else if(method == "end"){
+		si_oncondition.method = OnCondition::FILTER_END;
 	}
-	else if(isString(-1)){
-		std::string method = popString();
-		if(method == "begin"){
-			si_oncondition.method = OnCondition::FILTER_BEGIN;
-		}
-		else if(method == "end"){
-			si_oncondition.method = OnCondition::FILTER_END;
-		}
-		else if(method == "tick"){
-			si_oncondition.method = OnCondition::FILTER_TICK;
-		}
-		else{
-			throw Error("Invalid argument (1) 'what'");
-		}
+	else if(method == "tick"){
+		si_oncondition.method = OnCondition::FILTER_TICK;
 	}
-	else {
-		throw Error("Invalid argument (1) 'what'");
+	else{
+		throw Error("Invalid argument (2) 'method'");
 	}
 
 	boost::any p(si_oncondition);
@@ -1559,38 +1547,27 @@ int LuaState::lua_registerGenericEvent_OnCondition() {
 }
 
 int LuaState::lua_registerSpecificEvent_OnCondition(){
-	// Tied to a specific creature, either by id, or condition event (begin/end/tick)
+	// Tied to a specific creature, with condition name and type (begin/tick/end)
 	// Store callback
-	insert(-3);
+	insert(-4);
+
+	std::string method = popString();
+	std::string name = popString();
 
 	OnCondition::ScriptInformation si_oncondition;
-	si_oncondition.id = 0;
+	si_oncondition.name = name;
 
-	if(isTable(-1)){
-		si_oncondition.method = OnCondition::FILTER_ID;
-		si_oncondition.id = popEnum<ConditionType>().value();
+	if(method == "begin"){
+		si_oncondition.method = OnCondition::FILTER_BEGIN;
 	}
-	else if(isNumber(-1)){
-		si_oncondition.method = OnCondition::FILTER_ID;
-		si_oncondition.id = popInteger();
+	else if(method == "end"){
+		si_oncondition.method = OnCondition::FILTER_END;
 	}
-	else if(isString(-1)){
-		std::string method = popString();
-		if(method == "begin"){
-			si_oncondition.method = OnCondition::FILTER_BEGIN;
-		}
-		else if(method == "end"){
-			si_oncondition.method = OnCondition::FILTER_END;
-		}
-		else if(method == "tick"){
-			si_oncondition.method = OnCondition::FILTER_TICK;
-		}
-		else{
-			throw Error("Invalid argument (1) 'what'");
-		}
+	else if(method == "tick"){
+		si_oncondition.method = OnCondition::FILTER_TICK;
 	}
-	else {
-		throw Error("Invalid argument (1) 'what'");
+	else{
+		throw Error("Invalid argument (3) 'method'");
 	}
 
 	Creature* who = popCreature();

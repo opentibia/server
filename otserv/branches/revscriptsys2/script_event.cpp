@@ -1219,14 +1219,13 @@ OnCondition::Event::~Event()
 bool OnCondition::Event::check_match(const ScriptInformation& info)
 {
 	switch(info.method) {
-		case FILTER_ID:
-			return condition->getId() == info.id;
 		case FILTER_BEGIN:
-			return eventType == EVENT_BEGIN;
+			return eventType == EVENT_BEGIN && (condition->getName() == info.name);
 		case FILTER_END:
-			return eventType == EVENT_END;
+			return eventType == EVENT_END && (condition->getName() == info.name);
 		case FILTER_TICK:
-			return eventType == EVENT_TICK;
+			return eventType == EVENT_TICK && (condition->getName() == info.name);
+		default: break;
 	}
 
 	return false;

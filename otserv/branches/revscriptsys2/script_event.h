@@ -718,7 +718,6 @@ namespace Script {
 
 	namespace OnCondition {
 		enum FilterType {
-			FILTER_ID,
 			FILTER_BEGIN,
 			FILTER_END,
 			FILTER_TICK,
@@ -726,7 +725,7 @@ namespace Script {
 
 		struct ScriptInformation {
 			FilterType method;
-			uint32_t id;
+			std::string name;
 		};
 
 		class Event : public Script::Event {

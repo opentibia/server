@@ -58,30 +58,43 @@ enum EffectType{
 };
 
 enum ConditionFlag{
-	CONDITION_FLAG_PARTYBUFF = 1
+	FLAG_INFIGHT	= 1,
+	FLAG_SLOW		= 2,
+	FLAG_HASTE		= 4,
+	FLAG_PARTYBUFF	= 8,
+	FLAG_MANASHIELD = 16,
+	FLAG_DRUNK		= 32
 };
 
 class Condition{
 public:
-	static Condition* createPeriodDamageCondition(ConditionType type,
-		uint32_t interval, int32_t value, uint32_t rounds, ConditionSource source = CONDITION_SOURCE_NONE);
-	static Condition* createPeriodAverageDamageCondition(ConditionType type,
-		uint32_t interval, int32_t value, int32_t total, ConditionSource source = CONDITION_SOURCE_NONE);
-	static Condition* createCondition(ConditionType type, uint32_t ticks,
-		ConditionSource source = CONDITION_SOURCE_NONE);
-	static Condition* createCondition(MechanicType mechanicType, CombatType combatType, ConditionSource source,
-		uint32_t ticks, uint32_t categoryId, uint32_t flags = 0);
-	static Condition* createCondition(PropStream& propStream);
+	static Condition* createPeriodDamageCondition(ConditionId id, uint32_t interval,
+		int32_t value, uint32_t rounds);
+
+	static Condition* createPeriodAverageDamageCondition(ConditionId id, uint32_t interval,
+		int32_t value, int32_t total);
+
+	static Condition* createCondition(ConditionId id, uint32_t ticks, uint32_t sourceId = 0, uint32_t flags = 0);
+
+	static Condition* createCondition(const std::string& name, uint32_t ticks,
+		MechanicType mechanicType = MECHANIC_NONE, CombatType combatType = COMBAT_NONE,
+		uint32_t sourceId = 0, uint32_t flags = 0);
+
+	static Condition* Condition::createCondition(PropStream& propStream);
 
 	class Effect;
 
-	Condition(MechanicType mechanicType, CombatType combatType, ConditionSource source,
-		uint32_t ticks, uint32_t id, uint32_t flags) :
-		mechanicType(mechanicType),
+	Condition(const std::string& name,
+			CombatType combatType,
+			MechanicType mechanicType,
+			uint32_t sourceId,
+			uint32_t ticks,
+			uint32_t flags) :
+		name(name),
 		combatType(combatType),
-		source(source),
+		mechanicType(mechanicType),
+		sourceId(sourceId),
 		ticks(ticks),
-		id(id),
 		flags(flags),
 		combatSource(NULL)
 		{}
@@ -91,8 +104,8 @@ public:
 	uint16_t getIcon() const;
 	MechanicType getMechanicType() const { return mechanicType;}
 	CombatType getCombatType() const { return combatType;}
-	ConditionSource getSource() const { return source;}
-	uint32_t getId() const {return id;}
+	uint32_t getSourceId() const { return sourceId;}
+	const std::string& getName() const {return name;}
 	uint32_t getTicks() const {return ticks;}
 	void setTicks(uint32_t newTicks) {ticks = newTicks;}
 	void setSource(const CombatSource& _combatSource);
@@ -163,11 +176,11 @@ public:
 	};
 
 protected:
-	MechanicType mechanicType;
+	std::string name;
 	CombatType combatType;
-	ConditionSource source;
+	MechanicType mechanicType;
+	uint32_t sourceId;
 	uint32_t ticks;
-	uint32_t id;
 	uint32_t flags;
 	std::list<Effect*> effectList;
 

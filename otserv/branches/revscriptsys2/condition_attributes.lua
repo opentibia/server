@@ -18,39 +18,39 @@
 
 BeginEnumFile("condition_attributes")
 
-enum ("ConditionType",
-	"CONDITION_NONE",
-	
-	"CONDITION_PHYSICAL",
-	"CONDITION_ENERGY",
-	"CONDITION_EARTH",
-	"CONDITION_FIRE",
-	"CONDITION_LIFEDRAIN",
-	"CONDITION_MANADRAIN",
-	"CONDITION_DROWN",
-	"CONDITION_ICE",
-	"CONDITION_HOLY",
-	"CONDITION_DEATH",
-	
-	"CONDITION_INFIGHT",
-	"CONDITION_INVISIBLE",
-	"CONDITION_MANASHIELD",
-	"CONDITION_PARALYZE",
-	"CONDITION_SHAPESHIFT",
-	"CONDITION_HASTE",
-	"CONDITION_DRUNK",
-	"CONDITION_LIGHT",
-	"CONDITION_REGENERATION",
-	"CONDITION_SOULREGEN",
-	"CONDITION_EXHAUST_DAMAGE",
-	"CONDITION_EXHAUST_HEAL",
-	"CONDITION_EXHAUST_YELL",
-	"CONDITION_DISARMED",
-	"CONDITION_PACIFIED",
-	"CONDITION_SILENCED",
-	"CONDITION_MUTED_CHAT",
-	"CONDITION_MUTED_TRADECHAT",
-	"CONDITION_HUNTING"
+-- These are the default ids to make sure you only have one of each of these conditions types
+-- You can however use your own ids
+
+enum ("ConditionId",
+	-- special conditions
+	{"CONDITION_POISONED", "poisoned"},
+	{"CONDITION_BURNING", "burning"},
+	{"CONDITION_ELECTRIFIED", "electrified"},
+	{"CONDITION_DROWNING", "drowning"},
+	{"CONDITION_FREEZING", "freezing"},
+	{"CONDITION_DAZZLED", "dazzled"},
+	{"CONDITION_CURSED", "cursed"},	
+	{"CONDITION_PARALYZED", "paralyzed"},
+	{"CONDITION_INVISIBLE", "invisible"},
+	{"CONDITION_DRUNK", "drunk"},
+	{"CONDITION_HASTE", "haste"},	
+	{"CONDITION_INFIGHT", "infight"},
+	{"CONDITION_SHAPESHIFT", "shapeshift"},
+	{"CONDITION_MANASHIELD", "manashield"},
+
+	-- used internal, not actually sent to the client
+	{"CONDITION_PACIFIED", "pacified"},
+	{"CONDITION_DISARMED", "disarmed"},
+	{"CONDITION_SILENCED", "silenced"},
+	{"CONDITION_LIGHT", "light"},
+	{"CONDITION_REGENERATION", "regeneration"},
+	{"CONDITION_REGENSOUL", "regensoul"},
+	{"CONDITION_MUTED_CHAT", "muted_chat"},
+	{"CONDITION_MUTED_CHAT_TRADE", "muted_chat_trade"},
+	{"CONDITION_EXHAUST_DAMAGE", "exhaust_damage"},
+	{"CONDITION_EXHAUST_HEAL", "exhaust_heal"},
+	{"CONDITION_EXHAUST_YELL", "exhaust_yell"},
+	{"CONDITION_HUNTING", "hunting"}
 )
 
 enum ("ConditionAttribute", 
@@ -58,7 +58,7 @@ enum ("ConditionAttribute",
 	"CONDITIONATTRIBUTE_COMBAT = 2",
 	"CONDITIONATTRIBUTE_SOURCE = 3",
 	"CONDITIONATTRIBUTE_TICKS = 4",
-	"CONDITIONATTRIBUTE_ID = 5",
+	"CONDITIONATTRIBUTE_NAME = 5",
 	"CONDITIONATTRIBUTE_FLAGS = 6",
 	"CONDITIONATTRIBUTE_EFFECT_TYPE = 7",
 	"CONDITIONATTRIBUTE_EFFECT_MODTYPE = 8",

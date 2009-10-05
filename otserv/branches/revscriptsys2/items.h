@@ -53,7 +53,7 @@ struct Abilities{
 	protected:
 			std::ostream& getDescription(std::ostream& os, bool& first, CombatType combat_type) const;
 	} absorb;
-	bool cure[ConditionType::size];
+	bool cure[ConditionId::size];
 
 	//elemental damage
 	CombatType elementType;

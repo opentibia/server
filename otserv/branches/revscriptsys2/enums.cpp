@@ -202,26 +202,6 @@ template<> void LossType__Base::initialize()
 	initAddValue(enums::LOSS_CONTAINERS, "LOSS_CONTAINERS", true);
 }
 
-template<> bool ConditionSource__Base::initialized = false;
-template<> std::string ConditionSource__Base::enum_name = "ConditionSource";
-template<> ConditionSource__Base::EnumToString ConditionSource__Base::enum_to_string = ConditionSource__Base::EnumToString();
-template<> ConditionSource__Base::StringToEnum ConditionSource__Base::string_to_enum = ConditionSource__Base::StringToEnum();
-template<> ConditionSource__Base::StringToEnum ConditionSource__Base::lstring_to_enum= ConditionSource__Base::StringToEnum();
-template<> void ConditionSource__Base::initialize()
-{
-	initAddValue(enums::CONDITION_SOURCE_NONE, "CONDITION_SOURCE_NONE", true);
-	initAddValue(enums::CONDITION_SOURCE_HEAD, "CONDITION_SOURCE_HEAD", true);
-	initAddValue(enums::CONDITION_SOURCE_NECKLACE, "CONDITION_SOURCE_NECKLACE", true);
-	initAddValue(enums::CONDITION_SOURCE_BACKPACK, "CONDITION_SOURCE_BACKPACK", true);
-	initAddValue(enums::CONDITION_SOURCE_ARMOR, "CONDITION_SOURCE_ARMOR", true);
-	initAddValue(enums::CONDITION_SOURCE_RIGHT, "CONDITION_SOURCE_RIGHT", true);
-	initAddValue(enums::CONDITION_SOURCE_LEFT, "CONDITION_SOURCE_LEFT", true);
-	initAddValue(enums::CONDITION_SOURCE_LEGS, "CONDITION_SOURCE_LEGS", true);
-	initAddValue(enums::CONDITION_SOURCE_FEET, "CONDITION_SOURCE_FEET", true);
-	initAddValue(enums::CONDITION_SOURCE_RING, "CONDITION_SOURCE_RING", true);
-	initAddValue(enums::CONDITION_SOURCE_AMMO, "CONDITION_SOURCE_AMMO", true);
-}
-
 template<> bool PlayerSex__Base::initialized = false;
 template<> std::string PlayerSex__Base::enum_name = "PlayerSex";
 template<> PlayerSex__Base::EnumToString PlayerSex__Base::enum_to_string = PlayerSex__Base::EnumToString();

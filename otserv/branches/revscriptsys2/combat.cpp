@@ -271,8 +271,8 @@ bool Combat::applyCondition(CombatSource& combatSource, CombatParams& params, Cr
 bool Combat::applyDispel(CombatSource& combatSource, CombatParams& params, Creature* target) const
 {
 	Creature* attacker = combatSource.getSourceCreature();
-	if(target->hasCondition(params.dispelType)){
-		target->removeCondition(attacker, params.dispelType);
+	if(target->hasCondition(params.dispelName)){
+		target->removeCondition(params.dispelName, attacker);
 		return true;
 	}
 

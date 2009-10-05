@@ -1495,6 +1495,7 @@ bool Game::onCreatureDamage(CombatType& combatType, CombatSource& combatSource, 
 	return script_system->dispatchEvent(evt);
 }
 
+
 bool Game::onCreatureKill(Creature* creature, CombatSource& combatSource)
 {
 	if(!script_system)
@@ -4035,6 +4036,26 @@ bool Game::playerChangeOutfit(uint32_t playerId, OutfitType outfit)
 
 bool Game::checkReload(Player* player, const std::string& text)
 {
+	/*
+	Condition* condition = Condition::createPeriodDamageCondition(CONDITION_POISONED, 2000, -5, -100);
+	player->addCondition(condition);
+
+	Condition* condition = Condition::createPeriodDamageCondition(CONDITION_EARTH, 2000, -5, -100);
+	player->addCondition(condition);
+	
+	Condition* outfitCondition = Condition::createCondition(CONDITION_SHAPESHIFT, 10000); 
+	OutfitType outfit;
+	outfit.lookTypeEx = 1998;
+	Condition::Effect* effectOutfit = new Condition::Effect(EFFECT_SHAPESHIFT, 0, 0, 0, 0, 0, outfit);
+	outfitCondition->addEffect(effectOutfit);
+	player->addCondition(outfitCondition);
+	
+	Condition* outfitAttr = Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, CONDITION_SOURCE_NONE, 10000, 999);
+	Condition::Effect* effectModStat = new Condition::Effect(EFFECT_MOD_STAT, STAT_MAXHITPOINTS.value(), 2000, 0, 0, 0);
+	outfitAttr->addEffect(effectModStat);
+	player->addCondition(outfitAttr);
+	*/
+
 	if(text.length() > 7 && text.substr(0, 7) == "/reload" && player->hasFlag(PlayerFlag_CanReloadContent)){
 		std::string param = text.substr(7);
 

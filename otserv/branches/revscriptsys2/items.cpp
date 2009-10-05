@@ -1044,47 +1044,37 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "suppressenergy"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_ENERGY.value()] = intValue != 0;
+									it.abilities.cure[CONDITION_ELECTRIFIED.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressfire"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_FIRE.value()] = intValue != 0;
+									it.abilities.cure[CONDITION_BURNING.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppresspoison"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_EARTH.value()] = intValue != 0;
-								}
-							}
-							else if(asLowerCaseString(strValue) == "suppresslifedrain"){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_LIFEDRAIN.value()] = intValue != 0;
+									it.abilities.cure[CONDITION_POISONED.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressdrown"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_DROWN.value()] = intValue != 0;
+									it.abilities.cure[CONDITION_DROWNING.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressfreeze"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_ICE.value()] = intValue != 0;
+									it.abilities.cure[CONDITION_FREEZING.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppressdazzle"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_HOLY.value()] = intValue != 0;
+									it.abilities.cure[CONDITION_DAZZLED.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "suppresscurse"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_DEATH.value()] = intValue != 0;
-								}
-							}
-							else if(asLowerCaseString(strValue) == "suppressmanadrain"){
-								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.cure[CONDITION_MANADRAIN.value()] = intValue != 0;
+									it.abilities.cure[CONDITION_CURSED.value()] = intValue != 0;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "preventitemloss"){

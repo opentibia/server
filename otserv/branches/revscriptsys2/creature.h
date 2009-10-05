@@ -233,16 +233,26 @@ public:
 
 	bool addCondition(Condition* condition);
 	bool addCombatCondition(Condition* condition);
+
 	void removeCondition(Condition* condition);
+	void removeCondition(const std::string& name);
+	void removeCondition(ConditionId id);
+	void removeCondition(const std::string& name, uint32_t sourceId);
+	void removeCondition(const std::string& name, const Creature* attacker);
 	void removeCondition(CombatType type);
-	void removeCondition(ConditionType type);
-	void removeCondition(ConditionType type, ConditionSource source);
-	void removeCondition(const Creature* attacker, ConditionType type);
-	Condition* getCondition(ConditionType type) const;
-	Condition* getCondition(ConditionType type, ConditionSource source) const;
-	void executeConditions(uint32_t interval);
+	void removeCondition(MechanicType type);
+
+	Condition* getCondition(const std::string& name) const;
+	Condition* getCondition(ConditionId id) const;
+	Condition* getCondition(const std::string& name, uint32_t sourceId) const;
+
+	bool hasCondition(const std::string& name) const;
+	bool hasCondition(ConditionId id) const;
 	bool hasCondition(CombatType type) const;
-	bool hasCondition(ConditionType type) const;
+	bool hasCondition(MechanicType type) const;
+
+	void executeConditions(uint32_t interval);
+
 	virtual bool isImmune(const Condition* condition) const;
 	virtual bool isImmune(MechanicType type) const;
 	virtual bool isImmune(CombatType type) const;

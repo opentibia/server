@@ -280,40 +280,6 @@ typedef Enum<enums::LossType, enums::LOSS_CONTAINERS + 1> LossType__Base;
 //end enum definitions
 
 namespace enums {
-	enum ConditionSource {
-		CONDITION_SOURCE_NONE = 0,
-		CONDITION_SOURCE_HEAD = 1,
-		CONDITION_SOURCE_NECKLACE = 2,
-		CONDITION_SOURCE_BACKPACK = 3,
-		CONDITION_SOURCE_ARMOR = 4,
-		CONDITION_SOURCE_RIGHT = 5,
-		CONDITION_SOURCE_LEFT = 6,
-		CONDITION_SOURCE_LEGS = 7,
-		CONDITION_SOURCE_FEET = 8,
-		CONDITION_SOURCE_RING = 9,
-		CONDITION_SOURCE_AMMO = 10,
-	}; // end enum
-} // end namespace
-
-typedef Enum<enums::ConditionSource, enums::CONDITION_SOURCE_AMMO + 1> ConditionSource;
-
-typedef Enum<enums::ConditionSource, enums::CONDITION_SOURCE_AMMO + 1> ConditionSource__Base;
-
-//begin enum definitions
-	const ConditionSource CONDITION_SOURCE_NONE(enums::CONDITION_SOURCE_NONE);
-	const ConditionSource CONDITION_SOURCE_HEAD(enums::CONDITION_SOURCE_HEAD);
-	const ConditionSource CONDITION_SOURCE_NECKLACE(enums::CONDITION_SOURCE_NECKLACE);
-	const ConditionSource CONDITION_SOURCE_BACKPACK(enums::CONDITION_SOURCE_BACKPACK);
-	const ConditionSource CONDITION_SOURCE_ARMOR(enums::CONDITION_SOURCE_ARMOR);
-	const ConditionSource CONDITION_SOURCE_RIGHT(enums::CONDITION_SOURCE_RIGHT);
-	const ConditionSource CONDITION_SOURCE_LEFT(enums::CONDITION_SOURCE_LEFT);
-	const ConditionSource CONDITION_SOURCE_LEGS(enums::CONDITION_SOURCE_LEGS);
-	const ConditionSource CONDITION_SOURCE_FEET(enums::CONDITION_SOURCE_FEET);
-	const ConditionSource CONDITION_SOURCE_RING(enums::CONDITION_SOURCE_RING);
-	const ConditionSource CONDITION_SOURCE_AMMO(enums::CONDITION_SOURCE_AMMO);
-//end enum definitions
-
-namespace enums {
 	enum PlayerSex {
 		SEX_FEMALE = 0,
 		SEX_MALE = 1,

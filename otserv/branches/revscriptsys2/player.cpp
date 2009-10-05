@@ -3561,7 +3561,7 @@ void Player::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 {
 	Creature::onEndCondition(condition, preEnd);
 
-	if(condition->getId() == enums::CONDITION_INFIGHT){
+	if(condition->getName() == CONDITION_INFIGHT.toString()){
 		onIdleStatus();
 		pzLocked = false;
 
@@ -3581,10 +3581,10 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 {
 	//Creature::onCombatRemoveCondition(attacker, condition);
 
-	if(condition->getSource() != CONDITION_SOURCE_NONE){
+	if(condition->getSourceId() != 0){
 		//Means the condition is from an item
 		if(g_game.getWorldType() == WORLD_TYPE_PVPE){
-			SlotType slot = SlotType::fromInteger(condition->getSource().value());
+			SlotType slot = SlotType::fromInteger(condition->getSourceId());
 			Item* item = getInventoryItem(slot);
 			if(item){
 				//25% chance to destroy the item
@@ -3877,8 +3877,21 @@ bool Player::isCured(Condition* condition) const
 			continue;
 
 		const ItemType& it = Item::items[item->getID()];
-		if(it.abilities.cure[condition->getId()]){
-			return true;
+		switch(condition->getCombatType().value()){
+			case enums::COMBAT_ENERGYDAMAGE: return it.abilities.cure[CONDITION_ELECTRIFIED.value()];
+			case enums::COMBAT_EARTHDAMAGE: return it.abilities.cure[CONDITION_POISONED.value()];
+			case enums::COMBAT_FIREDAMAGE: return it.abilities.cure[CONDITION_BURNING.value()];
+			case enums::COMBAT_DROWNDAMAGE: return it.abilities.cure[CONDITION_DROWNING.value()];
+			case enums::COMBAT_ICEDAMAGE: return it.abilities.cure[CONDITION_FREEZING.value()];
+			case enums::COMBAT_HOLYDAMAGE: return it.abilities.cure[CONDITION_DAZZLED.value()];
+			case enums::COMBAT_DEATHDAMAGE: return it.abilities.cure[CONDITION_CURSED.value()];
+
+			default:
+				break;
+		}
+
+		if(condition->getMechanicType() == MECHANIC_DRUNK){
+			return it.abilities.cure[CONDITION_DRUNK.value()];
 		}
 	}
 

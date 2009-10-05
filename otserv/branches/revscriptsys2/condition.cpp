@@ -28,10 +28,10 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
-Condition* Condition::createPeriodDamageCondition(ConditionType type,
-	uint32_t interval, int32_t value, uint32_t rounds, ConditionSource source /*= CONDITION_SOURCE_NONE*/)
+Condition* Condition::createPeriodDamageCondition(ConditionId id, uint32_t interval,
+	int32_t value, uint32_t rounds)
 {
-	Condition* condition = Condition::createCondition(type, 0, source);
+	Condition* condition = Condition::createCondition(id, 0);
 	if(condition){
 		value = std::abs(value);
 		Condition::Effect* effect = NULL;
@@ -44,10 +44,10 @@ Condition* Condition::createPeriodDamageCondition(ConditionType type,
 	return NULL;
 }
 
-Condition* Condition::createPeriodAverageDamageCondition(ConditionType type,
-	uint32_t interval, int32_t value, int32_t total /*= 0*/, ConditionSource source /*= CONDITION_SOURCE_NONE*/)
+Condition* Condition::createPeriodAverageDamageCondition(ConditionId id, uint32_t interval,
+	int32_t value, int32_t total)
 {
-	Condition* condition = Condition::createCondition(type, 0, source);
+	Condition* condition = Condition::createCondition(id, 0);
 	if(condition){
 		value = std::abs(value);
 		total = std::abs(total);
@@ -60,43 +60,36 @@ Condition* Condition::createPeriodAverageDamageCondition(ConditionType type,
 	return NULL;
 }
 
-Condition* Condition::createCondition(ConditionType type, uint32_t ticks,
-	ConditionSource source /*= CONDITION_SOURCE_NONE*/)
+Condition* Condition::createCondition(ConditionId id, uint32_t ticks, uint32_t sourceId /*= 0*/, uint32_t flags /*= 0*/)
 {
-	switch(type.value()){
-		case enums::CONDITION_PHYSICAL:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_PHYSICALDAMAGE, source, ticks, type.value());
-		case enums::CONDITION_ENERGY:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_ENERGYDAMAGE, source, ticks, type.value());
-		case enums::CONDITION_EARTH:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_EARTHDAMAGE, source, ticks, type.value());
-		case enums::CONDITION_FIRE:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_FIREDAMAGE, source, ticks, type.value());
-		case enums::CONDITION_LIFEDRAIN:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_LIFEDRAIN, source, ticks, type.value());
-		case enums::CONDITION_MANADRAIN:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_MANADRAIN, source, ticks, type.value());
-		case enums::CONDITION_DROWN:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_DROWNDAMAGE, source, ticks, type.value());
-		case enums::CONDITION_ICE:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_ICEDAMAGE, source, ticks, type.value());
-		case enums::CONDITION_HOLY:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_HOLYDAMAGE, source, ticks, type.value());
-		case enums::CONDITION_DEATH:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_DEATHDAMAGE, source, ticks, type.value());
+	switch(id.value()){
+		case enums::CONDITION_POISONED:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_EARTHDAMAGE, sourceId);
+		case enums::CONDITION_ELECTRIFIED:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_ENERGYDAMAGE, sourceId);
+		case enums::CONDITION_BURNING:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_FIREDAMAGE, sourceId);
+		case enums::CONDITION_DROWNING:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_DROWNDAMAGE, sourceId);
+		case enums::CONDITION_FREEZING:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_ICEDAMAGE, sourceId);
+		case enums::CONDITION_DAZZLED:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_HOLYDAMAGE, sourceId);
+		case enums::CONDITION_CURSED:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_DEATHDAMAGE, sourceId);
 
 		case enums::CONDITION_INVISIBLE:
 		case enums::CONDITION_LIGHT:
 		case enums::CONDITION_REGENERATION:
-		case enums::CONDITION_SOULREGEN:
+		case enums::CONDITION_REGENSOUL:
 		case enums::CONDITION_EXHAUST_DAMAGE:
 		case enums::CONDITION_EXHAUST_HEAL:
 		case enums::CONDITION_EXHAUST_YELL:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value());
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId);
 
 		case enums::CONDITION_HUNTING:
 		{
-			Condition* condition = Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value());
+			Condition* condition = Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId);
 			if(condition){
 				Condition::Effect* effect = new Condition::Effect(EFFECT_PERIODIC_MOD_STAMINA, 0, -g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS), 0, 0, 1000);
 				condition->addEffect(effect);
@@ -105,27 +98,27 @@ Condition* Condition::createCondition(ConditionType type, uint32_t ticks,
 		}
 
 		case enums::CONDITION_INFIGHT:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value());
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, FLAG_INFIGHT);
 		case enums::CONDITION_HASTE:
-			return Condition::createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value());
-		case enums::CONDITION_PARALYZE:
-			return Condition::createCondition(MECHANIC_PARALYZED, COMBAT_NONE, source, ticks, type.value());
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, FLAG_HASTE);
+		case enums::CONDITION_PARALYZED:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_PARALYZED, COMBAT_NONE, sourceId, FLAG_SLOW);
 		case enums::CONDITION_DRUNK:
-			return Condition::createCondition(MECHANIC_DRUNK, COMBAT_NONE, source, ticks, type.value());
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_DRUNK, COMBAT_NONE, sourceId, FLAG_DRUNK);
 		case enums::CONDITION_MANASHIELD:
-			return createCondition(MECHANIC_NONE, COMBAT_NONE, source, ticks, type.value());
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, FLAG_MANASHIELD);
 
 		case enums::CONDITION_SILENCED:
 		case enums::CONDITION_MUTED_CHAT:
-		case enums::CONDITION_MUTED_TRADECHAT:
-			return Condition::createCondition(MECHANIC_SILENCED, COMBAT_NONE, source, ticks, type.value());
+		case enums::CONDITION_MUTED_CHAT_TRADE:
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_SILENCED, COMBAT_NONE, sourceId);
 
 		case enums::CONDITION_SHAPESHIFT:
-			return Condition::createCondition(MECHANIC_SHAPESHIFT, COMBAT_NONE, source, ticks, type.value());
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_SHAPESHIFT, COMBAT_NONE, sourceId);
 		case enums::CONDITION_PACIFIED:
-			return Condition::createCondition(MECHANIC_PACIFIED, COMBAT_NONE, source, ticks, type.value());
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_PACIFIED, COMBAT_NONE, sourceId);
 		case enums::CONDITION_DISARMED:
-			return Condition::createCondition(MECHANIC_DISARMED, COMBAT_NONE, source, ticks, type.value());
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_DISARMED, COMBAT_NONE, sourceId);
 
 		default:
 			break;
@@ -134,10 +127,11 @@ Condition* Condition::createCondition(ConditionType type, uint32_t ticks,
 	return NULL;
 }
 
-Condition* Condition::createCondition(MechanicType mechanicType, CombatType combatType, ConditionSource source,
-	uint32_t ticks, uint32_t categoryId, uint32_t flags /*= 0*/)
+Condition* Condition::createCondition(const std::string& name, uint32_t ticks,
+	MechanicType mechanicType /*= MECHANIC_NONE*/, CombatType combatType /*= MECHANIC_NONE*/,
+	uint32_t sourceId /*= 0*/, uint32_t flags /*= 0*/)
 {
-	return new Condition(mechanicType, combatType, source, ticks, categoryId, flags);
+	return new Condition(name, combatType, mechanicType, sourceId, ticks, flags);
 }
 
 Condition* Condition::createCondition(PropStream& propStream)
@@ -146,7 +140,7 @@ Condition* Condition::createCondition(PropStream& propStream)
 		return NULL;
 	}
 
-	return createCondition(MECHANIC_NONE, COMBAT_NONE, CONDITION_SOURCE_NONE, 0, 0);
+	return createCondition("", 0);
 }
 
 Condition::~Condition()
@@ -163,9 +157,9 @@ Condition::Condition(const Condition& rhs)
 {
 	mechanicType = rhs.mechanicType;
 	combatType = rhs.combatType;
-	source = rhs.source;
+	sourceId = rhs.sourceId;
 	ticks = rhs.ticks;
-	id = rhs.id;
+	name = rhs.name;
 	flags = rhs.flags;
 	if(rhs.combatSource){
 		combatSource = new CombatSource(*rhs.combatSource);
@@ -186,30 +180,10 @@ uint16_t Condition::getIcon() const
 {
 	uint16_t icons = 0;
 
-	if(hasBitSet(CONDITION_FLAG_PARTYBUFF, flags)){
-		icons |= ICON_PARTY_BUFF;
-	}
-
-	switch(getId()){
-		case enums::CONDITION_PHYSICAL: icons |= ICON_BURN; break;
-		case enums::CONDITION_ENERGY: icons |= ICON_ENERGY; break;
-		case enums::CONDITION_EARTH: icons |= ICON_POISON; break;
-		case enums::CONDITION_FIRE: icons |= ICON_BURN; break;
-		case enums::CONDITION_DROWN: icons |= ICON_DROWNING; break;
-		case enums::CONDITION_ICE: icons |= ICON_FREEZING; break;
-		case enums::CONDITION_HOLY: icons |= ICON_DAZZLED; break;
-		case enums::CONDITION_DEATH: icons |= ICON_CURSED; break;
-
-		case enums::CONDITION_DRUNK: icons |= ICON_DRUNK; break;
-		case enums::CONDITION_MANASHIELD: icons |= ICON_MANASHIELD; break;
-		case enums::CONDITION_PARALYZE: icons |= ICON_PARALYZE; break;
-		case enums::CONDITION_HASTE: icons |= ICON_HASTE; break;
-	}
-
-	/*
 	switch(combatType.value()){
-		case enums::COMBAT_FIREDAMAGE: icons |= ICON_BURN; break;
 		case enums::COMBAT_ENERGYDAMAGE: icons |= ICON_ENERGY; break;
+		case enums::COMBAT_EARTHDAMAGE: icons |= ICON_POISON; break;
+		case enums::COMBAT_FIREDAMAGE: icons |= ICON_BURN; break;
 		case enums::COMBAT_DROWNDAMAGE: icons |= ICON_DROWNING; break;
 		case enums::COMBAT_ICEDAMAGE: icons |= ICON_FREEZING; break;
 		case enums::COMBAT_HOLYDAMAGE: icons |= ICON_DAZZLED; break;
@@ -218,7 +192,22 @@ uint16_t Condition::getIcon() const
 		default:
 			break;
 	}
-	*/
+
+	if(hasBitSet(FLAG_INFIGHT, flags)){
+		icons |= ICON_SWORDS;
+	}
+
+	if(hasBitSet(FLAG_PARTYBUFF, flags)){
+		icons |= ICON_PARTY_BUFF;
+	}
+
+	if(hasBitSet(FLAG_HASTE, flags)){
+		icons |= ICON_HASTE;
+	}
+
+	if(hasBitSet(FLAG_MANASHIELD, flags)){
+		icons |= ICON_MANASHIELD;
+	}
 
 	return icons;
 }
@@ -243,12 +232,12 @@ void Condition::onEnd(Creature* creature, ConditionEnd reason)
 
 bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 {
-	if(getId() != addCondition->getId()){
+	if(getName() != addCondition->getName()){
 		//different condition
 		return false;
 	}
 
-	if(getSource() != addCondition->getSource()){
+	if(getSourceId() != addCondition->getSourceId()){
 		//different source (SlotType)
 		return false;
 	}
@@ -259,9 +248,9 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 
 	mechanicType = addCondition->mechanicType;
 	combatType = addCondition->combatType;
-	source = addCondition->source;
+	sourceId = addCondition->sourceId;
 	ticks = addCondition->ticks;
-	id = addCondition->id;
+	name = addCondition->name;
 	flags = addCondition->flags;
 	combatSource = new CombatSource(*addCondition->combatSource);
 
@@ -326,7 +315,7 @@ bool Condition::isPersistent() const
 	}
 
 	//Other sources should not be saved
-	return (source == CONDITION_SOURCE_NONE);
+	return (sourceId == 0);
 }
 
 bool Condition::unserialize(PropStream& propStream)
@@ -367,14 +356,14 @@ bool Condition::unserialize(PropStream& propStream)
 			return true;
 		}
 
-		if(attr_type == enums::CONDITIONATTRIBUTE_ID)
+		if(attr_type == enums::CONDITIONATTRIBUTE_NAME)
 		{
-			uint32_t value = 0;
-			if(!propStream.GET_VALUE(value)){
+			std::string value = 0;
+			if(!propStream.GET_STRING(value)){
 				return false;
 			}
 
-			id = value;
+			name = value;
 			return true;
 		}
 
@@ -491,13 +480,13 @@ bool Condition::serialize(PropWriteStream& propWriteStream)
 	propWriteStream.ADD_VALUE(combatType.value());
 
 	propWriteStream.ADD_UCHAR(*CONDITIONATTRIBUTE_SOURCE);
-	propWriteStream.ADD_VALUE(source.value());
+	propWriteStream.ADD_VALUE(sourceId);
 
 	propWriteStream.ADD_UCHAR(*CONDITIONATTRIBUTE_TICKS);
 	propWriteStream.ADD_VALUE(ticks);
 
-	propWriteStream.ADD_UCHAR(*CONDITIONATTRIBUTE_ID);
-	propWriteStream.ADD_VALUE(id);
+	propWriteStream.ADD_UCHAR(*CONDITIONATTRIBUTE_NAME);
+	propWriteStream.ADD_STRING(name);
 
 	propWriteStream.ADD_UCHAR(*CONDITIONATTRIBUTE_FLAGS);
 	propWriteStream.ADD_VALUE(flags);
