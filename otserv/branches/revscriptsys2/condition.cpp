@@ -252,7 +252,10 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 	ticks = addCondition->ticks;
 	name = addCondition->name;
 	flags = addCondition->flags;
-	combatSource = new CombatSource(*addCondition->combatSource);
+	if(addCondition->combatSource){
+		delete combatSource;
+		combatSource = new CombatSource(*addCondition->combatSource);
+	}
 
 	bool fullUpdate = (effectList.size() != addCondition->effectList.size());
 	if(!fullUpdate){
@@ -331,7 +334,6 @@ bool Condition::unserialize(PropStream& propStream)
 			}
 
 			mechanicType = (MechanicType)value;
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_COMBAT)
@@ -353,7 +355,6 @@ bool Condition::unserialize(PropStream& propStream)
 			}
 
 			ticks = value;
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_NAME)
@@ -364,7 +365,6 @@ bool Condition::unserialize(PropStream& propStream)
 			}
 
 			name = value;
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_FLAGS)
@@ -375,7 +375,6 @@ bool Condition::unserialize(PropStream& propStream)
 			}
 
 			flags = value;
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_TYPE)
@@ -387,7 +386,6 @@ bool Condition::unserialize(PropStream& propStream)
 
 			Condition::Effect* effect = new Condition::Effect(EffectType(value), 0, 0, 0, 0, 0);
 			effectList.push_back(effect);
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODTYPE)
@@ -396,8 +394,6 @@ bool Condition::unserialize(PropStream& propStream)
 			if(!propStream.GET_VALUE(currEffect->mod_type)){
 				return false;
 			}
-
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODVALUE)
@@ -406,8 +402,6 @@ bool Condition::unserialize(PropStream& propStream)
 			if(!propStream.GET_VALUE(currEffect->mod_value)){
 				return false;
 			}
-
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODTOTAL)
@@ -416,8 +410,6 @@ bool Condition::unserialize(PropStream& propStream)
 			if(!propStream.GET_VALUE(currEffect->mod_total)){
 				return false;
 			}
-
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODPERCENT)
@@ -426,8 +418,6 @@ bool Condition::unserialize(PropStream& propStream)
 			if(!propStream.GET_VALUE(currEffect->mod_percent)){
 				return false;
 			}
-
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODTICKS)
@@ -436,8 +426,6 @@ bool Condition::unserialize(PropStream& propStream)
 			if(!propStream.GET_VALUE(currEffect->mod_percent)){
 				return false;
 			}
-
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT_MODPOD)
@@ -460,8 +448,6 @@ bool Condition::unserialize(PropStream& propStream)
 			else{
 				return false;
 			}
-
-			return true;
 		}
 
 		if(attr_type == enums::CONDITIONATTR_END)
@@ -598,7 +584,8 @@ bool Condition::Effect::onBegin(Creature* creature)
 
 		case EFFECT_SCRIPT:
 		{
-			if(!g_game.onConditionBegin(creature, owner_condition)){
+			if(g_game.onConditionBegin(creature, owner_condition)){
+				//handled by script
 				return false;
 			}
 			break;
@@ -661,7 +648,8 @@ bool Condition::Effect::onEnd(Creature* creature, ConditionEnd reason)
 
 		case EFFECT_SCRIPT:
 		{
-			if(!g_game.onConditionEnd(creature, owner_condition, reason)){
+			if(g_game.onConditionEnd(creature, owner_condition, reason)){
+				//handled by script
 				return false;
 			}
 			break;
@@ -849,7 +837,8 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 
 		case EFFECT_SCRIPT:
 		{
-			if(!g_game.onConditionTick(creature, owner_condition, ticks)){
+			if(g_game.onConditionTick(creature, owner_condition, ticks)){
+				//handled by script
 				return false;
 			}
 			break;

@@ -843,11 +843,11 @@ void OnLogout::Event::update_instance(Manager& state, Environment& environment, 
 ///////////////////////////////////////////////////////////////////////////////
 // OnChangeOutfit Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when a player changes outfit through the outfit dialog
+// Triggered when a player request the outfit dialog
 
-OnChangeOutfit::Event::Event(Player* player, OutfitType& outfit) :
+OnChangeOutfit::Event::Event(Player* player, std::list<Outfit>& outfitList) :
 	player(player),
-	outfit(outfit)
+	outfitList(outfitList)
 {
 	propagate_by_default = true;
 }
@@ -872,20 +872,13 @@ void OnChangeOutfit::Event::push_instance(LuaState& state, Environment& environm
 	state.pushClassTableInstance("OnChangeOutfit");
 	state.pushThing(player);
 	state.setField(-2, "player");
-	state.pushOutfit(outfit);
-	state.setField(-2, "outfit");
+	//TODO: push empty outfit list
 }
 
 void OnChangeOutfit::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
-	thread->getField(-1, "outfit");
-	if(thread->isTable()) {
-		outfit = thread->popOutfit();
-	}
-	else {
-		thread->HandleError(ERROR_WARN, "Event 'OnChangeOutfit' invalid value of 'outfit'");
-		thread->pop();
-	}
+	//TODO:
+	//retrieve the outfitList
 }
 
 
@@ -1240,7 +1233,7 @@ bool OnCondition::Event::dispatch(Manager& state, Environment& environment)
 			return true;
 	}
 
-	if(dispatchEvent<OnCondition::Event>
+	if(dispatchEvent<OnCondition::Event, ScriptInformation>
 			(this, state, environment, environment.Generic.OnCondition))
 		return true;
 

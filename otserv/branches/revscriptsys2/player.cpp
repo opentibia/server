@@ -3853,7 +3853,7 @@ void Player::onGainSharedExperience(uint64_t gainExp, bool fromMonster)
 
 bool Player::isImmune(CombatType type) const
 {
-	if(hasFlag(PlayerFlag_CannotBeAttacked)){
+	if(type != COMBAT_NONE && hasFlag(PlayerFlag_CannotBeAttacked)){
 		return true;
 	}
 
@@ -3862,7 +3862,7 @@ bool Player::isImmune(CombatType type) const
 
 bool Player::isImmune(MechanicType type) const
 {
-	if(hasFlag(PlayerFlag_CannotBeAttacked)){
+	if(type != MECHANIC_NONE && hasFlag(PlayerFlag_CannotBeAttacked)){
 		return true;
 	}
 

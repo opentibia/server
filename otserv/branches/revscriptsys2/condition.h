@@ -127,7 +127,17 @@ public:
 	//class Effect
 	class Effect{
 	public:
-		Effect(EffectType type,
+		Effect(EffectType type) :
+		  effectType(type),
+		  mod_type(0),
+		  mod_value(0),
+		  mod_total(0),
+		  mod_percent(0),
+		  mod_ticks(0),
+		  mod_pod(boost::any()),
+		  n(0), i(0), j(0), owner_condition(NULL) {}
+
+		  Effect(EffectType type,
 			int32_t mod_type,
 			int32_t mod_value,
 			int32_t mod_total,
@@ -149,7 +159,6 @@ public:
 		bool onUpdate(Creature* creature, const Condition::Effect* addEffect);
 		
 		bool onTick(Creature* creature, uint32_t ticks);
-		//bool onCombat(const CombatSource& combatSource, Creature* creature, CombatType type, int32_t& amount);
 		void setOwner(Condition* condition) {owner_condition = condition;}
 
 		EffectType getEffectType() const {return effectType;}

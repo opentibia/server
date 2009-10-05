@@ -460,7 +460,7 @@ public:
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
 		{if(client) client->sendDistanceShoot(from, to, type);}
 	void sendHouseWindow(House* house, uint32_t listId) const;
-	void sendOutfitWindow() const;
+	void sendOutfitWindow(const std::list<Outfit>& outfitList) const;
 	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName)
 		{if(client) client->sendCreatePrivateChannel(channelId, channelName);}
 	void sendClosePrivate(uint16_t channelId) const
@@ -500,8 +500,8 @@ public:
 		{if(client) client->sendChannelsDialog();}
 	void sendOpenPrivateChannel(const std::string& receiver)
 		{if(client) client->sendOpenPrivateChannel(receiver);}
-	void sendOutfitWindow()
-		{if(client) client->sendOutfitWindow();}
+	void sendOutfitWindow(const std::list<Outfit>& outfitList)
+		{if(client) client->sendOutfitWindow(outfitList);}
 	void sendCloseContainer(uint32_t cid)
 		{if(client) client->sendCloseContainer(cid);}
 	void sendChannel(uint16_t channelId, const std::string& channelName)

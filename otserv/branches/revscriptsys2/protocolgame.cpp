@@ -2364,7 +2364,7 @@ void ProtocolGame::sendHouseWindow(uint32_t windowTextId, House* _house,
 	}
 }
 
-void ProtocolGame::sendOutfitWindow()
+void ProtocolGame::sendOutfitWindow(const std::list<Outfit>& outfitList)
  {
  	#define MAX_NUMBER_OF_OUTFITS 25
  	//client 8.0 outfits limit is 25
@@ -2375,13 +2375,6 @@ void ProtocolGame::sendOutfitWindow()
  		msg->AddByte(0xC8);
  		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
 
-		std::list<Outfit> outfitList;
-		for(OutfitMap::iterator it = player->outfits.begin(); it != player->outfits.end(); ++it){
-			if(player->canWearOutfit(it->first, it->second.addons)){
-				outfitList.push_back(it->second);
-			}
-		}
-
  		if(outfitList.size() > 0){
 			if(outfitList.size() > MAX_NUMBER_OF_OUTFITS){
  				msg->AddByte(MAX_NUMBER_OF_OUTFITS);
@@ -2391,7 +2384,7 @@ void ProtocolGame::sendOutfitWindow()
 			}
 
  			uint32_t counter = 0;
-			std::list<Outfit>::iterator it;
+			std::list<Outfit>::const_iterator it;
  			for(it = outfitList.begin(); it != outfitList.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
  				msg->AddU16(it->lookType);
 				msg->AddString(it->name);

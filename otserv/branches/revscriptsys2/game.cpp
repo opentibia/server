@@ -1373,11 +1373,11 @@ bool Game::onPlayerLogout(Player* player, bool forced, bool timeout)
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onPlayerChangeOutfit(Player* player, OutfitType& outfit)
+bool Game::onPlayerChangeOutfit(Player* player, std::list<Outfit>& outfitList)
 {
 	if(!script_system)
 		return false; // Not handled
-	Script::OnChangeOutfit::Event evt(player, outfit);
+	Script::OnChangeOutfit::Event evt(player, outfitList);
 	return script_system->dispatchEvent(evt);
 }
 
@@ -4007,7 +4007,19 @@ bool Game::playerRequestOutfit(uint32_t playerId)
 	if(!player || player->isRemoved())
 		return false;
 
-	player->sendOutfitWindow();
+	std::list<Outfit> outfitList;
+	if(onPlayerChangeOutfit(player, outfitList)){
+		//handled by script
+	}
+	else{
+		for(OutfitMap::iterator it = player->outfits.begin(); it != player->outfits.end(); ++it){
+			if(player->canWearOutfit(it->first, it->second.addons)){
+				outfitList.push_back(it->second);
+			}
+		}
+	}
+
+	player->sendOutfitWindow(outfitList);
 	return true;
 }
 
@@ -4019,15 +4031,13 @@ bool Game::playerChangeOutfit(uint32_t playerId, OutfitType outfit)
 
 	uint32_t outfitId = Outfits::getInstance()->getOutfitId(outfit.lookType);
 	if(player->canWearOutfit(outfitId, outfit.lookAddons)){		
-		if(onPlayerChangeOutfit(player, outfit)){
-			player->defaultOutfit = outfit;
+		player->defaultOutfit = outfit;
 
-			if(player->hasCondition(CONDITION_SHAPESHIFT)){
-				return false;
-			}
-
-			internalCreatureChangeOutfit(player, outfit);
+		if(player->hasCondition(CONDITION_SHAPESHIFT)){
+			return false;
 		}
+
+		internalCreatureChangeOutfit(player, outfit);
 	}
 
 	return true;
@@ -4716,8 +4726,9 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource,
 bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, CombatEffect combatEffect,
 	Creature* target, int32_t healthChange)
 {
-	if(!g_game.onCreatureDamage(combatType, combatSource, target, healthChange)){
-		return true;
+	if(g_game.onCreatureDamage(combatType, combatSource, target, healthChange)){
+		//handled by script
+		return false;
 	}
 
 	const Position& targetPos = target->getPosition();
@@ -4878,8 +4889,9 @@ bool Game::combatChangeMana(CombatSource combatSource, CombatEffect combatEffect
 	Creature* target, int32_t manaChange)
 {
 	CombatType combatType = COMBAT_MANADRAIN;
-	if(!g_game.onCreatureDamage(combatType, combatSource, target, manaChange) || combatType != COMBAT_MANADRAIN){
-		return true;
+	if(g_game.onCreatureDamage(combatType, combatSource, target, manaChange) || combatType != COMBAT_MANADRAIN){
+		//handled by script
+		return false;
 	}
 
 	const Position& targetPos = target->getPosition();

@@ -72,6 +72,7 @@ class ServiceManager;
 class Commands;
 class ChatChannel;
 struct OutfitType;
+struct Outfit;
 class Waypoint;
 struct FindPathParams;
 class QTreeLeafNode;

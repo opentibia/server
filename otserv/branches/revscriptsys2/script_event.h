@@ -508,12 +508,12 @@ namespace Script {
 
 	///////////////////////////////////////////////////////////////////////////////
 	// OnChangeOut event
-	// Triggered when a player changes outfit through the outfit dialog
+	// Triggered when a player request the outfit dialog
 
 	namespace OnChangeOutfit {
 		class Event : public Script::Event {
 		public:
-			Event(Player* player, OutfitType& outfit);
+			Event(Player* player, std::list<Outfit>& outfitList);
 			~Event();
 
 			std::string getName() const {return "OnChangeOutfit";}
@@ -527,7 +527,7 @@ namespace Script {
 
 		protected:
 			Player* player;
-			OutfitType& outfit;
+			std::list<Outfit>& outfitList;
 		};
 	}
 
