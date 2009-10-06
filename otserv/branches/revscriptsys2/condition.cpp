@@ -21,7 +21,6 @@
 
 #include "condition.h"
 #include "game.h"
-#include "combat.h"
 #include "player.h"
 #include "configmanager.h"
 
@@ -29,13 +28,17 @@ extern Game g_game;
 extern ConfigManager g_config;
 
 Condition* Condition::createPeriodDamageCondition(ConditionId id, uint32_t interval,
-	int32_t value, uint32_t rounds)
+	int32_t damage, uint32_t rounds)
 {
+	if(rounds == 0){
+		return NULL;
+	}
+
 	Condition* condition = Condition::createCondition(id, 0);
 	if(condition){
-		value = std::abs(value);
+		damage = std::abs(damage);
 		Condition::Effect* effect = NULL;
-		effect = new Condition::Effect(EFFECT_PERIODIC_DAMAGE, condition->getCombatType().value(), value, rounds, 0, interval);
+		effect = new Condition::Effect(EFFECT_PERIODIC_DAMAGE, condition->getCombatType().value(), damage, rounds, 0, interval);
 		
 		condition->addEffect(effect);
 		return condition;
@@ -45,14 +48,18 @@ Condition* Condition::createPeriodDamageCondition(ConditionId id, uint32_t inter
 }
 
 Condition* Condition::createPeriodAverageDamageCondition(ConditionId id, uint32_t interval,
-	int32_t value, int32_t total)
+	int32_t startDamage, int32_t totalDamage)
 {
+	if(startDamage == 0){
+		return NULL;
+	}
+
 	Condition* condition = Condition::createCondition(id, 0);
 	if(condition){
-		value = std::abs(value);
-		total = std::abs(total);
+		startDamage = std::abs(startDamage);
+		totalDamage = std::abs(totalDamage);
 		Condition::Effect* effect = NULL;
-		effect = new Condition::Effect(EFFECT_PERIODIC_DAMAGE, condition->getCombatType().value(), value, total, total / value, interval);		
+		effect = new Condition::Effect(EFFECT_PERIODIC_DAMAGE, condition->getCombatType().value(), startDamage, totalDamage, totalDamage / startDamage, interval);
 		condition->addEffect(effect);
 		return condition;
 	}
@@ -149,8 +156,6 @@ Condition::~Condition()
 		delete *it;
 	}
 	effectList.clear();
-
-	delete combatSource;
 }
 
 Condition::Condition(const Condition& rhs)
@@ -161,19 +166,11 @@ Condition::Condition(const Condition& rhs)
 	ticks = rhs.ticks;
 	name = rhs.name;
 	flags = rhs.flags;
-	if(rhs.combatSource){
-		combatSource = new CombatSource(*rhs.combatSource);
-	}
+	combatSource = rhs.combatSource;
 
 	for(std::list<Effect*>::const_iterator it = rhs.effectList.begin(); it != rhs.effectList.end(); ++it){
 		addEffect(new Condition::Effect(*(*it)));
 	}
-}
-
-void Condition::setSource(const CombatSource& _combatSource)
-{
-	delete combatSource;
-	combatSource = new CombatSource(_combatSource);
 }
 
 uint16_t Condition::getIcon() const
@@ -197,7 +194,7 @@ uint16_t Condition::getIcon() const
 		icons |= ICON_SWORDS;
 	}
 
-	if(hasBitSet(FLAG_PARTYBUFF, flags)){
+	if(hasBitSet(FLAG_STRENGTHENED, flags)){
 		icons |= ICON_PARTY_BUFF;
 	}
 
@@ -252,10 +249,7 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 	ticks = addCondition->ticks;
 	name = addCondition->name;
 	flags = addCondition->flags;
-	if(addCondition->combatSource){
-		delete combatSource;
-		combatSource = new CombatSource(*addCondition->combatSource);
-	}
+	combatSource = addCondition->combatSource;
 
 	bool fullUpdate = (effectList.size() != addCondition->effectList.size());
 	if(!fullUpdate){
@@ -562,6 +556,7 @@ bool Condition::Effect::onBegin(Creature* creature)
 	switch(effectType){
 		case EFFECT_MOD_SPEED:
 		{
+			n = (int32_t)std::ceil(((float)creature->getBaseSpeed()) * mod_percent + mod_value);
 			g_game.changeSpeed(creature, n);
 			break;
 		}
@@ -579,6 +574,14 @@ bool Condition::Effect::onBegin(Creature* creature)
 		{
 			const OutfitType& outfit = boost::any_cast<const OutfitType>(mod_pod);
 			g_game.internalCreatureChangeOutfit(creature, outfit);
+			break;
+		}
+
+		case EFFECT_DISPEL:
+		{
+			ConditionId id = ConditionId::fromInteger(mod_type);
+			CombatSource combatSource = owner_condition->combatSource;
+			creature->removeCondition(id.toString(), combatSource);
 			break;
 		}
 
@@ -703,8 +706,7 @@ bool Condition::Effect::onUpdate(Creature* creature, const Condition::Effect* ad
 	mod_pod = addEffect->mod_pod;
 
 	//misc values
-	//n is used as an internal tick counter
-	//n = 0;
+	//'n' is mostly used as a tick counter and should normally not be reset
 	i = 0;
 	j = 0;
 
@@ -722,7 +724,7 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 				n = 0;
 
 				CombatType combatType = CombatType::fromInteger(mod_type);
-				CombatSource combatSource = *owner_condition->combatSource;
+				CombatSource combatSource = owner_condition->combatSource;
 				combatSource.setSourceIsCondition(true);
 
 				if(effectType == EFFECT_PERIODIC_HEAL){

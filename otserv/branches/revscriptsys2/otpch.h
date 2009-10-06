@@ -25,6 +25,7 @@
 #include <boost/regex.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <boost/foreach.hpp>
 //std
 #include <algorithm>
 #include <list>
@@ -43,3 +44,21 @@ extern "C"
 //otserv
 #include "position.h"
 #include "thing.h"
+#include "account.h"
+#include "ban.h"
+#include "party.h"
+#include "cylinder.h"
+#include "fileloader.h"
+#include "database.h"
+#include "databasemysql.h"
+#include "databasepgsql.h"
+#include "databasesqlite.h"
+#include "exception.h"
+#include "logger.h"
+#include "md5.h"
+#include "sha1.h"
+#include "rsa.h"
+#include "scheduler.h"
+#include "tasks.h"
+#include "server.h"
+#include "status.h"

@@ -22,6 +22,7 @@
 #define __OTSERV_CONDITION_H__
 
 #include "classes.h"
+#include "combat.h"
 #include "condition_attributes.h"
 #include "outfit.h"
 
@@ -51,28 +52,29 @@ enum EffectType{
 	EFFECT_MOD_STAT,
 	EFFECT_MOD_SKILL,
 	EFFECT_SHAPESHIFT,
-	EFFECT_SHIELD,
-	EFFECT_MANASHIELD,
+	EFFECT_DISPEL,
+	//EFFECT_SHIELD,
+	//EFFECT_MANASHIELD,
 	EFFECT_LIGHT,
 	EFFECT_SCRIPT
 };
 
 enum ConditionFlag{
-	FLAG_INFIGHT	= 1,
-	FLAG_SLOW		= 2,
-	FLAG_HASTE		= 4,
-	FLAG_PARTYBUFF	= 8,
-	FLAG_MANASHIELD = 16,
-	FLAG_DRUNK		= 32
+	FLAG_INFIGHT		= 1,
+	FLAG_SLOW			= 2,
+	FLAG_HASTE			= 4,
+	FLAG_STRENGTHENED	= 8,
+	FLAG_MANASHIELD		= 16,
+	FLAG_DRUNK			= 32
 };
 
 class Condition{
 public:
 	static Condition* createPeriodDamageCondition(ConditionId id, uint32_t interval,
-		int32_t value, uint32_t rounds);
+		int32_t damage, uint32_t rounds);
 
 	static Condition* createPeriodAverageDamageCondition(ConditionId id, uint32_t interval,
-		int32_t value, int32_t total);
+		int32_t startDamage, int32_t total);
 
 	static Condition* createCondition(ConditionId id, uint32_t ticks, uint32_t sourceId = 0, uint32_t flags = 0);
 
@@ -95,8 +97,7 @@ public:
 		mechanicType(mechanicType),
 		sourceId(sourceId),
 		ticks(ticks),
-		flags(flags),
-		combatSource(NULL)
+		flags(flags)
 		{}
 	Condition(const Condition& rhs);
 	~Condition();
@@ -108,7 +109,7 @@ public:
 	const std::string& getName() const {return name;}
 	uint32_t getTicks() const {return ticks;}
 	void setTicks(uint32_t newTicks) {ticks = newTicks;}
-	void setSource(const CombatSource& _combatSource);
+	void setSource(const CombatSource& _combatSource) {combatSource = _combatSource;}
 
 	bool onBegin(Creature* creature);
 	void onEnd(Creature* creature, ConditionEnd reason);
@@ -194,7 +195,7 @@ protected:
 	std::list<Effect*> effectList;
 
 	//variables that should not be serialized
-	CombatSource* combatSource;
+	CombatSource combatSource;
 
 	friend Effect;
 };

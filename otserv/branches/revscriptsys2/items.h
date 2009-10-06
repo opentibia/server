@@ -199,8 +199,6 @@ public:
 	uint32_t currency;
 
 	Abilities abilities;
-
-	Condition* condition;
 	CombatType combatType;
 	bool replaceable;
 };

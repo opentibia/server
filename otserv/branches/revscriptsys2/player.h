@@ -320,7 +320,7 @@ public:
 	virtual void onAddCondition(const Condition* condition, bool preAdd = true);
 	virtual void onAddCombatCondition(const Condition* condition, bool preAdd = true);
 	virtual void onEndCondition(const Condition* condition, bool preEnd = true);
-	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
+	virtual void onCombatRemoveCondition(const CombatSource& combatSource, Condition* condition);
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onSummonAttackedCreature(Creature* summon, Creature* target);
 	virtual void onAttacked();

@@ -290,6 +290,8 @@ public:
 	Weapon* getWeapon() const {return items[id].weaponInstance;}
 	Ammo_t	getAmmoType() const {return items[id].ammoType;}
 	int32_t	getShootRange() const {return items[id].shootRange;}
+	bool isReplaceable() const {return Item::items[id].replaceable;}
+	CombatType getCombatType() const {return Item::items[id].combatType;}
 
 protected:
 	// If weight description is needed from outside of item class

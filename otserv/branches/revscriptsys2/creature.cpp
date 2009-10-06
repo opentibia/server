@@ -1244,7 +1244,7 @@ void Creature::onAddCondition(const Condition* condition, bool preAdd /*= true*/
 		removeCondition(CONDITION_HASTE);
 	}
 	else if(condition->getName() == CONDITION_HASTE.toString()){
-		//TODO: If haste flag is set remove paralyze
+		//TODO: If FLAG_HASTE is set remove paralyze
 		removeCondition(MECHANIC_PARALYZED);
 	}
 }
@@ -1261,7 +1261,7 @@ void Creature::onEndCondition(const Condition* condition, bool preEnd /*= true*/
 	}
 }
 
-void Creature::onCombatRemoveCondition(const Creature* attacker, Condition* condition)
+void Creature::onCombatRemoveCondition(const CombatSource& combatSource, Condition* condition)
 {
 	removeCondition(condition);
 }
@@ -1479,13 +1479,13 @@ void Creature::removeCondition(const std::string& name, uint32_t sourceId)
 	}
 }
 
-void Creature::removeCondition(const std::string& name, const Creature* attacker)
+void Creature::removeCondition(const std::string& name, const CombatSource& combatSource)
 {
 	ConditionList tmpList = conditions;
 
 	for(ConditionList::iterator it = tmpList.begin(); it != tmpList.end(); ++it){
 		if((*it)->getName() == name){
-			onCombatRemoveCondition(attacker, *it);
+			onCombatRemoveCondition(combatSource, *it);
 		}
 	}
 }

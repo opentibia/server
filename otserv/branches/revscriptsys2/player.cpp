@@ -3577,13 +3577,15 @@ void Player::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 	sendIcons();
 }
 
-void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condition)
+void Player::onCombatRemoveCondition(const CombatSource& combatSource, Condition* condition)
 {
-	//Creature::onCombatRemoveCondition(attacker, condition);
+	//Creature::onCombatRemoveCondition(combatSource, condition);
 
-	if(condition->getSourceId() != 0){
-		//Means the condition is from an item
-		if(g_game.getWorldType() == WORLD_TYPE_PVPE){
+	if(g_game.getWorldType() == WORLD_TYPE_PVPE){
+		if(	condition->getSourceId() != 0 &&
+			combatSource.isSourceCreature() &&
+			combatSource.getSourceCreature()->getPlayer() )
+		{
 			SlotType slot = SlotType::fromInteger(condition->getSourceId());
 			Item* item = getInventoryItem(slot);
 			if(item){
@@ -3593,25 +3595,12 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 				}
 			}
 		}
-	}
-	else{
-		removeCondition(condition);
-
-		/*
-		if(!canDoAction()){
-			int32_t delay = getNextActionTime();
-			delay -= (delay % EVENT_CREATURE_THINK_INTERVAL);
-			if(delay < 0){
-				removeCondition(condition);
-			}
-			else{
-				condition->setTicks(delay);
-			}
-		}
 		else{
 			removeCondition(condition);
 		}
-		*/
+	}
+	else{
+		removeCondition(condition);
 	}
 }
 

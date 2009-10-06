@@ -29,37 +29,38 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
-CombatSource::CombatSource(Creature* creature, Item* item, bool sourceCondition) :
-	creature(creature), item(item), sourceCondition(sourceCondition)
+CombatSource::CombatSource(Creature* creature, Item* item, bool condition) :
+	creature(creature), item(item), condition(condition)
 {
 	if(creature) creature->addRef();
 	if(item) item->addRef();
 }
 
 CombatSource::CombatSource(Creature* creature) :
-	creature(creature), item(NULL), sourceCondition(false)
+	creature(creature), item(NULL), condition(false)
 {
 	if(creature) creature->addRef();
 }
 
 CombatSource::CombatSource(Item* item) :
-	creature(NULL), item(item), sourceCondition(false)
+	creature(NULL), item(item), condition(false)
 {
 	if(item) item->addRef();
+}
+
+CombatSource::CombatSource(const CombatSource& rhs) :
+	creature(NULL),
+	item(NULL)
+{
+	setSourceCreature(rhs.creature);
+	setSourceItem(rhs.item);
+	setSourceIsCondition(rhs.condition);
 }
 
 CombatSource::~CombatSource()
 {
-	if(creature) creature->unRef();
-	if(item) item->unRef();
-}
-
-CombatSource::CombatSource(const CombatSource& rhs)
-{
-	creature = rhs.creature;
-	if(creature) creature->addRef();
-	item = rhs.item;
-	if(item) item->addRef();
+	setSourceCreature(NULL);
+	setSourceItem(NULL);
 }
 
 void CombatSource::setSourceCreature(Creature* _creature)
@@ -949,42 +950,3 @@ void CombatArea::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 	copyArea(swArea, seArea, MATRIXOPERATION_MIRROR);
 	areas[SOUTHEAST] = seArea;
 }
-
-//**********************************************************
-
-void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
-{
-	//remove magic walls/wild growth
-	if(blockSolid()){
-		g_game.internalRemoveItem(NULL, this, 1);
-	}
-	else{
-		const ItemType& it = items[getID()];
-		if(it.condition){
-			Condition* conditionCopy = it.condition->clone();
-			uint32_t owner = getOwner();
-			Creature* creature = g_game.getCreatureByID(owner);
-			if(owner != 0 && purposeful){
-				bool harmfulField = true;
-				if(g_game.getWorldType() == WORLD_TYPE_NOPVP || getTile()->hasFlag(TILEPROP_NOPVPZONE) ){
-					if(creature){
-						if(creature->getPlayer() || creature->isPlayerSummon()){
-							harmfulField = false;
-						}
-					}
-				}
-
-				if(   !harmfulField ||
-					  (OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
-						creature->hasBeenAttacked(owner))
-				{
-					CombatSource combatSource(creature, this, true);
-					conditionCopy->setSource(combatSource);
-				}
-			}
-
-			creature->addCondition(conditionCopy);
-		}
-	}
-}
-

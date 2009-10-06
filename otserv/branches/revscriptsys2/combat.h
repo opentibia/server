@@ -26,7 +26,8 @@
 #include "otsystem.h"
 
 struct CombatSource{
-	CombatSource(Creature* creature, Item* item, bool sourceCondition);
+	CombatSource() : creature(NULL), item(NULL), condition(false) {}
+	CombatSource(Creature* creature, Item* item, bool condition);
 	CombatSource(Creature* creature);
 	CombatSource(Item* item);
 	~CombatSource();
@@ -34,19 +35,19 @@ struct CombatSource{
 
 	bool isSourceCreature() const {return creature != NULL;}
 	bool isSourceItem() const {return item != NULL;}
-	bool isSourceCondition() const {return sourceCondition;}
+	bool isSourceCondition() const {return condition;}
 
 	Creature* getSourceCreature() const {return creature;}
 	Item* getSourceItem() const {return item;}
 
 	void setSourceCreature(Creature* _creature);
 	void setSourceItem(Item* _item);
-	void setSourceIsCondition(bool b) {sourceCondition = b;}
+	void setSourceIsCondition(bool b) {condition = b;}
 
 private:
 	Creature* creature;
 	Item* item;
-	bool sourceCondition;
+	bool condition;
 };
 
 struct CombatEffect{
@@ -138,21 +139,14 @@ protected:
 
 class MagicField : public Item{
 public:
-	MagicField(uint16_t _type) : Item(_type) {createTime = OTSYS_TIME();}
+	MagicField(uint16_t _type) : Item(_type)
+	{
+		setAttribute("created", (int32_t)std::time(NULL));
+	}
 	~MagicField() {}
 
 	virtual MagicField* getMagicField() {return this;}
 	virtual const MagicField* getMagicField() const {return this;}
-
-	bool isReplaceable() const {return Item::items[getID()].replaceable;}
-	CombatType getCombatType() const {
-		const ItemType& it = items[getID()];
-		return it.combatType;
-	}
-	void onStepInField(Creature* creature, bool purposeful = true);
-
-private:
-	int64_t createTime;
 };
 
 class MatrixArea

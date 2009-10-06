@@ -64,6 +64,7 @@ Tile* IOMapOTBM::createTile(Item*& ground, Item* item, int px, int py, int pz)
 		else{
 			// Tile is not blocking with possibly multiple items, use dynamic
 			tile = new DynamicTile(px, py, pz);
+			//tile = new IndexedTile(px, py, pz);
 		}
 		
 		tile->__internalAddThing(ground);

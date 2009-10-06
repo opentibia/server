@@ -108,10 +108,9 @@ ItemType::ItemType()
 	breakChance   = -1;
 	shootRange    = 1;
 
-	condition = NULL;
 	combatType = COMBAT_NONE;
-
 	replaceable = true;
+
 	bedPartnerDirection = NORTH;
 	maleSleeperID = 0;
 	femaleSleeperID = 0;
@@ -122,7 +121,7 @@ ItemType::ItemType()
 
 ItemType::~ItemType()
 {
-	delete condition;
+	//
 }
 
 Items::Items() :
@@ -140,16 +139,13 @@ Items::~Items()
 void Items::clear()
 {
 	currencyMap.clear();
-	//TODO. clear items?
 }
 
 bool Items::reload()
 {
 	//TODO?
 	/*
-	for (ItemMap::iterator it = items.begin(); it != items.end(); it++){
-		delete it->second->condition;
-	}
+	clear();
 	return loadFromXml(m_datadir);
 	*/
 	return false;
@@ -444,11 +440,9 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(asLowerCaseString(strValue) == "door"){
 										it.type = ITEM_TYPE_DOOR;
 									}
-									//[ added for beds system
 									else if(asLowerCaseString(strValue) == "bed"){
 										it.type = ITEM_TYPE_BED;
 									}
-									//]
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown type " << strValue  << std::endl;
 									}
@@ -1087,109 +1081,26 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.preventSkillLoss = (intValue != 0);
 								}
 							}
-							/*
-							else if(asLowerCaseString(strValue) == "field"){
-								it.group = ITEM_GROUP_MAGICFIELD;
-								it.type = ITEM_TYPE_MAGICFIELD;
-								CombatType combatType = COMBAT_NONE;
-								ConditionDamage* conditionDamage = NULL;
-
+							else if(asLowerCaseString(strValue) == "combattype"){
+								it.combatType = COMBAT_NONE;
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									if(asLowerCaseString(strValue) == "fire"){
-										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
-										combatType = COMBAT_FIREDAMAGE;
+										it.combatType = COMBAT_FIREDAMAGE;
 									}
 									else if(asLowerCaseString(strValue) == "energy"){
-										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_ENERGY);
-										combatType = COMBAT_ENERGYDAMAGE;
+										it.combatType = COMBAT_ENERGYDAMAGE;
 									}
 									else if(asLowerCaseString(strValue) == "poison"){
-										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
-										combatType = COMBAT_EARTHDAMAGE;
+										it.combatType = COMBAT_EARTHDAMAGE;
 									}
 									else if(asLowerCaseString(strValue) == "drown"){
-										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);
-										combatType = COMBAT_DROWNDAMAGE;
+										it.combatType = COMBAT_DROWNDAMAGE;
 									}
-									//else if(asLowerCaseString(strValue) == "physical"){
-									//	damageCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_PHYSICAL);
-									//	combatType = COMBAT_PHYSICALDAMAGE;
-									//}
 									else{
-										std::cout << "Warning: [Items::loadFromXml] " << "Unknown field value " << strValue  << std::endl;
-									}
-
-									if(combatType != COMBAT_NONE){
-										it.combatType = combatType;
-										it.condition = conditionDamage;
-										uint32_t ticks = 0;
-										int32_t damage = 0;
-										int32_t start = 0;
-										int32_t count = 1;
-
-										xmlNodePtr fieldAttributesNode = itemAttributesNode->children;
-										while(fieldAttributesNode){
-											if(readXMLString(fieldAttributesNode, "key", strValue)){
-												if(asLowerCaseString(strValue) == "ticks"){
-													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
-														ticks = std::max(0, intValue);
-													}
-												}
-
-												if(asLowerCaseString(strValue) == "count"){
-													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
-														if(intValue > 0){
-															count = intValue;
-														}
-														else{
-															count = 1;
-														}
-													}
-												}
-
-												if(asLowerCaseString(strValue) == "start"){
-													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
-														if(intValue > 0){
-															start = intValue;
-														}
-														else{
-															start = 0;
-														}
-													}
-												}
-
-												if(asLowerCaseString(strValue) == "damage"){
-													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
-
-														damage = -intValue;
-
-														if(start > 0){
-															std::list<int32_t> damageList;
-															ConditionDamage::generateDamageList(damage, start, damageList);
-
-															for(std::list<int32_t>::iterator it = damageList.begin(); it != damageList.end(); ++it){
-																conditionDamage->addDamage(1, ticks, -*it);
-															}
-
-															start = 0;
-														}
-														else{
-															conditionDamage->addDamage(count, ticks, damage);
-														}
-													}
-												}
-											}
-
-											fieldAttributesNode = fieldAttributesNode->next;
-										}
-
-										if(conditionDamage->getTotalDamage() > 0){
-											conditionDamage->setParam(CONDITIONPARAM_FORCEUPDATE, true);
-										}
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown combatType value " << strValue  << std::endl;
 									}
 								}
 							}
-							*/
 							else if(asLowerCaseString(strValue) == "replaceable"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.replaceable = (intValue != 0);
