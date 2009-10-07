@@ -23,6 +23,13 @@
 
 #include "iomap.h"
 
+enum OTBM_Version {
+	OTBM_1 = 0,
+	OTBM_2 = 1,
+	OTBM_3 = 2,
+	OTBM_4 = 3,
+};
+
 enum OTBM_AttrTypes_t{
 	OTBM_ATTR_DESCRIPTION = 1,
 	OTBM_ATTR_EXT_FILE = 2,

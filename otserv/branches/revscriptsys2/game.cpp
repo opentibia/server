@@ -4726,7 +4726,8 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource,
 bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, CombatEffect combatEffect,
 	Creature* target, int32_t healthChange)
 {
-	if(g_game.onCreatureDamage(combatType, combatSource, target, healthChange)){
+	// Don't send events for script (undefined) damage
+	if(combatType != COMBAT_UNDEFINEDDAMAGE && g_game.onCreatureDamage(combatType, combatSource, target, healthChange)){
 		//handled by script
 		return false;
 	}

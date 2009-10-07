@@ -195,6 +195,7 @@ end
 
 function NPC:onHearFocusInternal(event)
 	local text = event.text
+	self.state.message = text
 	
 	-- We have focus already
 	if containsFarewell(text) then
@@ -393,6 +394,7 @@ function NPC:listen()
 	end
 	
 	local npc, event = coroutine.yield("LISTEN")
+	self.state.message = event.text
 	return event.text, event.class
 end
 

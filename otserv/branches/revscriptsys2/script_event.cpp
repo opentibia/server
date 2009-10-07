@@ -1286,16 +1286,16 @@ OnAttack::Event::~Event()
 
 bool OnAttack::Event::check_match(const ScriptInformation& info)
 {
-	//TODO: Decide if player summon is handled as actors or players
+	// Summons are actors like all actors
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
 		case FILTER_NAME:
-			return creature->getPlayer() == NULL && strcasecmp(creature->getName(), info.name) == 0;
+			return creature->getPlayer() == NULL && creature->getName() == info.name;
 		case FILTER_PLAYER:
 			return creature->getPlayer() != NULL;
 		case FILTER_ATTACKED_NAME:
-			return attacked != NULL && attacked->getPlayer() == NULL && strcasecmp(attacked->getName(), info.name) == 0;
+			return attacked != NULL && attacked->getPlayer() == NULL && attacked->getName() == info.name;
 		case FILTER_ATTACKED_PLAYER:
 			return attacked != NULL && attacked->getPlayer() != NULL;
 		case FILTER_ATTACKED_ACTOR:
@@ -1364,17 +1364,17 @@ OnDamage::Event::~Event()
 
 bool OnDamage::Event::check_match(const ScriptInformation& info)
 {
-	//TODO: Decide if player summon is handled as actors or players
+	// Player summons are actors
 	Creature* attacker = combatSource.getSourceCreature();
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
 		case FILTER_NAME:
-			return creature->getPlayer() == NULL && strcasecmp(creature->getName(), info.name) == 0;
+			return creature->getPlayer() == NULL && creature->getName() == info.name;
 		case FILTER_PLAYER:
 			return creature->getPlayer() != NULL;
 		case FILTER_ATTACKER_NAME:
-			return attacker != NULL && strcasecmp(attacker->getName(), info.name) == 0;
+			return attacker != NULL && attacker->getName() == info.name;
 		case FILTER_ATTACKER_PLAYER:
 			return attacker != NULL && attacker->getPlayer() != NULL;
 		case FILTER_ATTACKER_ACTOR:
@@ -1415,10 +1415,10 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 	state.pushClassTableInstance("OnDamageEvent");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
-	state.pushEnum(combatType);
-	state.setField(-2, "combatType");
 	state.pushThing(combatSource.getSourceCreature());
 	state.setField(-2, "attacker");
+	state.pushEnum(combatType);
+	state.setField(-2, "combatType");
 	state.pushThing(combatSource.getSourceItem());
 	state.setField(-2, "item");
 	state.pushBoolean(combatSource.isSourceCondition());
@@ -1467,17 +1467,17 @@ OnKill::Event::~Event()
 
 bool OnKill::Event::check_match(const ScriptInformation& info)
 {
-	//TODO: Decide if player summon is handled as actors or players
+	// Player summons are actors
 	Creature* killer = combatSource.getSourceCreature();
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
 		case FILTER_NAME:
-			return creature->getPlayer() == NULL && strcasecmp(creature->getName(), info.name) == 0;
+			return creature->getPlayer() == NULL && creature->getName() == info.name;
 		case FILTER_PLAYER:
 			return creature->getPlayer() != NULL;
 		case FILTER_KILLER_NAME:
-			return killer != NULL && killer->getPlayer() == NULL && strcasecmp(killer->getName(), info.name) == 0;
+			return killer != NULL && killer->getPlayer() == NULL && killer->getName() == info.name;
 		case FILTER_KILLER_PLAYER:
 			return killer != NULL && killer->getPlayer() != NULL;
 		case FILTER_KILLER_ACTOR:
@@ -1563,16 +1563,16 @@ OnDeath::Event::~Event()
 
 bool OnDeath::Event::check_match(const ScriptInformation& info)
 {
-	//TODO: Decide if player summon is handled as actors or players
+	// Player summons are actors
 	switch(info.method) {
 		case FILTER_ALL:
 			return true;
 		case FILTER_NAME:
-			return creature->getPlayer() == NULL && strcasecmp(creature->getName(), info.name) == 0;
+			return creature->getPlayer() == NULL && creature->getName() == info.name;
 		case FILTER_PLAYER:
 			return creature->getPlayer() != NULL;
 		case FILTER_KILLER_NAME:
-			return killer != NULL && killer->getPlayer() == NULL && strcasecmp(killer->getName(), info.name) == 0;
+			return killer != NULL && killer->getPlayer() == NULL && killer->getName() == info.name;
 		case FILTER_KILLER_PLAYER:
 			return killer != NULL && killer->getPlayer() != NULL;
 		case FILTER_PLAYER_DEATH_BY_PLAYER:

@@ -115,7 +115,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		return false;
 	}
 
-	if(header_version > 2){
+	if(header_version > OTBM_4){
 		setLastErrorString("Unknown OTBM version detected, please update your server.");
 		return false;
 	}

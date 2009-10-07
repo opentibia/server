@@ -49,3 +49,10 @@ function filter(f, list)
 end
 
 --
+
+function with(obj, f, ...)
+	if obj then
+		return obj:f(...)
+	end
+	return nil
+end

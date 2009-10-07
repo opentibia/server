@@ -363,7 +363,7 @@ inline const std::string& Item::getName() const {
 }
 
 inline const std::string& Item::getPluralName() const {
-	const std::string* pluralname = getStringAttribute("pluralname");
+	const std::string* pluralname = getStringAttribute("pluralName");
 	if(pluralname)
 		return *pluralname;
 	return items[id].pluralName;
@@ -407,15 +407,15 @@ inline std::string Item::getText() const {
 }
 
 inline void Item::setWrittenDate(time_t n) {
-	setAttribute("writtendate", (int32_t)n);
+	setAttribute("writtenDate", (int32_t)n);
 }
 
 inline void Item::clearWrittenDate() {
-	eraseAttribute("writtendate");
+	eraseAttribute("writtenDate");
 }
 
 inline time_t Item::getWrittenDate() const {
-	const int32_t* date = getIntegerAttribute("writtendate");
+	const int32_t* date = getIntegerAttribute("writtenDate");
 	if(date)
 		return (time_t)*date;
 	return 0;
@@ -455,7 +455,7 @@ inline uint16_t Item::getCharges() const {
 }
 
 inline void Item::setFluidType(uint16_t n) {
-	setAttribute("fluidtype", (int32_t)n);
+	setAttribute("fluidType", (int32_t)n);
 }
 
 inline uint16_t Item::getFluidType() const {
@@ -477,11 +477,11 @@ inline uint32_t Item::getOwner() const {
 }
 
 inline void Item::setCorpseOwner(uint32_t _corpseOwner) {
-	setAttribute("corpseowner", (int32_t)_corpseOwner);
+	setAttribute("corpseOwner", (int32_t)_corpseOwner);
 }
 
 inline uint32_t Item::getCorpseOwner() {
-	const int32_t* owner = getIntegerAttribute("corpseowner");
+	const int32_t* owner = getIntegerAttribute("corpseOwner");
 	if(owner)
 		return (uint32_t)*owner;
 	return 0;
@@ -506,11 +506,11 @@ inline int32_t Item::getDuration() const {
 
 
 inline void Item::setDecaying(ItemDecayState_t decayState) {
-	setAttribute("decaystate", (int32_t)decayState);
+	setAttribute("decayState", (int32_t)decayState);
 }
 
 inline ItemDecayState_t Item::getDecaying() const {
-	const int32_t* state = getIntegerAttribute("decaystate");
+	const int32_t* state = getIntegerAttribute("decayState");
 	if(state)
 		return (ItemDecayState_t)(*state);
 	return DECAYING_FALSE;
