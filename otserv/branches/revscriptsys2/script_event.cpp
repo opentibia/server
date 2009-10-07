@@ -872,13 +872,69 @@ void OnChangeOutfit::Event::push_instance(LuaState& state, Environment& environm
 	state.pushClassTableInstance("OnChangeOutfit");
 	state.pushThing(player);
 	state.setField(-2, "player");
-	//TODO: push empty outfit list
+	state.newTable();
+	int n = 1;
+	for(std::list<Outfit>::iterator iter = outfitList.begin(); iter != outfitList.end(); ++iter, ++n){
+		state.newTable();
+		state.setField(-1, "type", iter->lookType);
+		state.newTable();
+		for(int i = 1; i < 3; ++i){
+			state.setField(-1, i, (iter->addons & (1 << i)) != 0);
+		}
+		state.setField(-2, "addons");
+	}
+	state.setField(-2, "outfits");
 }
 
 void OnChangeOutfit::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
-	//TODO:
-	//retrieve the outfitList
+	/* structure like follows:
+		outfits = {
+			{type = 130, addons={[1]=true, [2]=false, [3]=true}},
+			{type = 130, addons=3}
+		}
+	*/
+	try{
+		thread->getField(-1, "outfits");
+		if(!thread->isTable())
+			thread->HandleError("'outfits' must be a table.");
+		// iterate over the table
+		thread->pushNil();
+		while(thread->iterateTable(-2)){
+			Outfit o;
+
+			thread->getField(-1, "type");
+			o.lookType = thread->popInteger();
+
+			thread->getField(-1, "addons");
+			if(thread->isTable()){
+				// Iterate over addons
+				thread->pushNil();
+				while(thread->iterateTable(-1)){
+					bool hasit = thread->popBoolean();
+					thread->duplicate();
+					int addon = thread->popInteger();
+					o.addons |= (1 << addon);
+				}
+			}
+			else{
+				// Integer value
+				o.addons = thread->popInteger();
+			}
+
+			// Only 2 addons for outfits so far...
+			o.addons &= 3;
+
+			outfitList.push_back(o);
+
+			thread->pop(); // pop value
+		}
+		// Pop the 'outfits' table
+		thread->pop();
+	} catch(Error& e) {
+		thread->HandleError(ERROR_WARN, std::string("Event 'OnChangeOutfit' invalid structure of 'outfits'") + e.what());
+	}
+	thread->pop();
 }
 
 

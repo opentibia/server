@@ -4009,15 +4009,20 @@ bool Game::playerRequestOutfit(uint32_t playerId)
 
 	std::list<Outfit> outfitList;
 	if(onPlayerChangeOutfit(player, outfitList)){
-		//handled by script
+		// script thinks we shouldn't display any dialog
+		return false;
 	}
-	else{
-		for(OutfitMap::iterator it = player->outfits.begin(); it != player->outfits.end(); ++it){
-			if(player->canWearOutfit(it->first, it->second.addons)){
-				outfitList.push_back(it->second);
-			}
-		}
+	
+	// If the list is empty, add atleast one outfit
+	if(outfitList.empty()) {
+		Outfit tmp;
+		if(player->isMale())
+			tmp.lookType = 130;
+		else
+			tmp.lookType = 144;
+		outfitList.push_back(tmp);
 	}
+	
 
 	player->sendOutfitWindow(outfitList);
 	return true;

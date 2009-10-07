@@ -22,44 +22,48 @@
 
 using namespace Script;
 
-Environment::Environment() {
+Environment::Environment()
+{
 	objectID_counter = 0;
 }
 
-Environment::~Environment() {
+Environment::~Environment()
+{
 }
 
-void Environment::cleanup() {
+void Environment::cleanup()
+{
 	object_map.clear();
 	objectID_counter = 0;
 	Generic.OnSay.clear();
 }
 
-void Environment::cleanupUnusedListeners(ListenerList& list) {
-	for(ListenerList::iterator giter = list.begin(),
-		gend = list.end();
-		giter != gend;)
-	{
-		if((*giter)->isActive() == false) {
+void Environment::cleanupUnusedListeners(ListenerList& list)
+{
+	for(ListenerList::iterator giter = list.begin(), gend = list.end(); giter != gend;){
+		if((*giter)->isActive() == false){
 			giter = list.erase(giter);
 		} else ++giter;
 	}
 }
 
- void Environment::cleanupUnusedListeners() {
+ void Environment::cleanupUnusedListeners()
+ {
 	cleanupUnusedListeners(Generic.OnSay);
 }
 
-void Environment::registerSpecificListener(Listener_ptr listener) {
+void Environment::registerSpecificListener(Listener_ptr listener)
+{
 	specific_listeners[listener->getID()] = listener;
 }
 
-bool Environment::stopListener(ListenerList& list, uint32_t id) {
+bool Environment::stopListener(ListenerList& list, uint32_t id)
+{
 	for(ListenerList::iterator giter = list.begin(),
 		gend = list.end(); giter != gend;
 		++giter)
 	{
-		if((*giter)->getID() == id && (*giter)->isActive()) {
+		if((*giter)->getID() == id && (*giter)->isActive()){
 			(*giter)->deactivate();
 			return true;
 		}
@@ -67,36 +71,32 @@ bool Environment::stopListener(ListenerList& list, uint32_t id) {
 	return false;
 }
 
-bool Environment::stopListener(ListenerStringMap& list, uint32_t id) {
+bool Environment::stopListener(ListenerStringMap& list, uint32_t id)
+{
 
-	for(ListenerStringMap::iterator giter = list.begin(),
-		gend = list.end(); giter != gend;
-		++giter)
-	{
-		stopListener(giter->second, id);
-	}
+	for(ListenerStringMap::iterator giter = list.begin(), gend = list.end(); giter != gend; ++giter)
+		if(stopListener(giter->second, id))
+			return true;
 	return false;
 }
 
-bool Environment::stopListener(ListenerItemMap& item_map, uint32_t id) {
+bool Environment::stopListener(ListenerItemMap& item_map, uint32_t id)
+{
 
 	Script::ListenerMap::iterator list_iter;
-	for(list_iter = item_map.ItemId.begin(); list_iter != item_map.ItemId.end(); ++list_iter){
-		if(stopListener(list_iter->second, id)){
+	for(list_iter = item_map.ItemId.begin(); list_iter != item_map.ItemId.end(); ++list_iter)
+		if(stopListener(list_iter->second, id))
 			return true;
-		}
-	}
 
-	for(list_iter = item_map.ActionId.begin(); list_iter != item_map.ActionId.end(); ++list_iter){
-		if(stopListener(list_iter->second, id)){
+	for(list_iter = item_map.ActionId.begin(); list_iter != item_map.ActionId.end(); ++list_iter)
+		if(stopListener(list_iter->second, id))
 			return true;
-		}
-	}
 
 	return false;
 }
 
-bool Environment::stopListener(ListenerType type, uint32_t id) {
+bool Environment::stopListener(ListenerType type, uint32_t id)
+{
 	switch(type.value())
 	{
 		case enums::ON_SAY_LISTENER:
@@ -183,6 +183,7 @@ bool Environment::stopListener(ListenerType type, uint32_t id) {
 	return false;
 }
 
-bool Environment::stopListener(Listener* listener) {
+bool Environment::stopListener(Listener* listener)
+{
 	return stopListener(listener->type(), listener->getID());
 }

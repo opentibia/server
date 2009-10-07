@@ -41,7 +41,7 @@ function KillTest.ratDeathHandler(event)
 	event:skip()
 end
 
-registerOnKilled("rat", "name", KillTest.ratDeathHandler)
+registerOnKilled("Rat", "name", KillTest.ratDeathHandler)
 
 function KillTest.playerKillHandler(event)
 	local tag = createItem(2599)
