@@ -182,7 +182,7 @@ public:
 
 		Condition* owner_condition;
 
-		friend Condition;
+		friend class Condition;
 	};
 
 protected:
@@ -197,7 +197,7 @@ protected:
 	//variables that should not be serialized
 	CombatSource combatSource;
 
-	friend Effect;
+	friend class Effect;
 };
 
 #endif
