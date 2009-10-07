@@ -47,9 +47,50 @@ void Environment::cleanupUnusedListeners(ListenerList& list)
 	}
 }
 
+void Environment::cleanupUnusedListeners(ListenerStringMap& list)
+{
+	for(ListenerStringMap::iterator giter = list.begin(), gend = list.end(); giter != gend;)
+		cleanupUnusedListeners(giter->second);
+}
+
+void Environment::cleanupUnusedListeners(ListenerMap& list)
+{
+	for(ListenerMap::iterator giter = list.begin(), gend = list.end(); giter != gend;)
+		cleanupUnusedListeners(giter->second);
+}
+
+void Environment::cleanupUnusedListeners(ListenerItemMap& list)
+{
+	cleanupUnusedListeners(list.ItemId);
+	cleanupUnusedListeners(list.ActionId);
+}
+
  void Environment::cleanupUnusedListeners()
  {
 	cleanupUnusedListeners(Generic.OnSay);
+	cleanupUnusedListeners(Generic.OnUseItem);
+	cleanupUnusedListeners(Generic.OnEquipItem);
+	cleanupUnusedListeners(Generic.OnMoveCreature);
+	cleanupUnusedListeners(Generic.OnJoinChannel);
+	cleanupUnusedListeners(Generic.OnLeaveChannel);
+	cleanupUnusedListeners(Generic.OnLogin);
+	cleanupUnusedListeners(Generic.OnLogout);
+	cleanupUnusedListeners(Generic.OnChangeOutfit);
+	cleanupUnusedListeners(Generic.OnLook);
+	cleanupUnusedListeners(Generic.OnTurn);
+	cleanupUnusedListeners(Generic.OnLoad);
+	cleanupUnusedListeners(Generic.OnUnload);
+	cleanupUnusedListeners(Generic.OnSpawn);
+	cleanupUnusedListeners(Generic.OnAdvance);
+	cleanupUnusedListeners(Generic.OnMoveItem);
+	cleanupUnusedListeners(Generic.OnMoveItemOnItem);
+	cleanupUnusedListeners(Generic.OnCondition);
+	cleanupUnusedListeners(Generic.OnAttack);
+	cleanupUnusedListeners(Generic.OnDamage);
+	cleanupUnusedListeners(Generic.OnKilled);
+	cleanupUnusedListeners(Generic.OnKill);
+	cleanupUnusedListeners(Generic.OnDeathBy);
+	cleanupUnusedListeners(Generic.OnDeath);
 }
 
 void Environment::registerSpecificListener(Listener_ptr listener)
@@ -183,7 +224,7 @@ bool Environment::stopListener(ListenerType type, uint32_t id)
 	return false;
 }
 
-bool Environment::stopListener(Listener* listener)
+bool Environment::stopListener(Listener_ptr listener)
 {
 	return stopListener(listener->type(), listener->getID());
 }

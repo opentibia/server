@@ -30,7 +30,7 @@ namespace Script {
 	//typedef boost::shared_ptr<const Listener> Listener_cptr;
 
 	typedef std::vector<Listener_ptr> ListenerList;
-	typedef std::map<uint32_t, ListenerList > ListenerMap;
+	typedef std::map<uint32_t, ListenerList> ListenerMap;
 	typedef struct{
 		ListenerMap ItemId;
 		ListenerMap ActionId;
@@ -73,7 +73,7 @@ namespace Script {
 		void registerSpecificListener(Listener_ptr listener);
 
 		// Stop a listener!
-		bool stopListener(Listener* listener);
+		bool stopListener(Listener_ptr listener);
 		bool stopListener(ListenerType type, uint32_t id);
 
 		struct {
@@ -108,7 +108,11 @@ namespace Script {
 		bool stopListener(ListenerList& list, uint32_t id);
 		bool stopListener(ListenerItemMap& item_map, uint32_t id);
 		bool stopListener(ListenerStringMap& list, uint32_t id);
+
 		void cleanupUnusedListeners(ListenerList& list);
+		void cleanupUnusedListeners(ListenerStringMap& list);
+		void cleanupUnusedListeners(ListenerItemMap& list);
+		void cleanupUnusedListeners(ListenerMap& list);
 
 		void debugOutput() const; // noop unless passed preprocessor directive
 
