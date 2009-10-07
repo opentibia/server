@@ -82,7 +82,7 @@ public:
 		MechanicType mechanicType = MECHANIC_NONE, CombatType combatType = COMBAT_NONE,
 		uint32_t sourceId = 0, uint32_t flags = 0);
 
-	static Condition* Condition::createCondition(PropStream& propStream);
+	static Condition* createCondition(PropStream& propStream);
 
 	class Effect;
 
