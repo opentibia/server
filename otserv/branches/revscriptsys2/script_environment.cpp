@@ -49,13 +49,13 @@ void Environment::cleanupUnusedListeners(ListenerList& list)
 
 void Environment::cleanupUnusedListeners(ListenerStringMap& list)
 {
-	for(ListenerStringMap::iterator giter = list.begin(), gend = list.end(); giter != gend;)
+	for(ListenerStringMap::iterator giter = list.begin(), gend = list.end(); giter != gend; ++giter)
 		cleanupUnusedListeners(giter->second);
 }
 
 void Environment::cleanupUnusedListeners(ListenerMap& list)
 {
-	for(ListenerMap::iterator giter = list.begin(), gend = list.end(); giter != gend;)
+	for(ListenerMap::iterator giter = list.begin(), gend = list.end(); giter != gend; ++giter)
 		cleanupUnusedListeners(giter->second);
 }
 

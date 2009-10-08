@@ -2444,11 +2444,10 @@ void Player::addDefaultRegeneration(uint32_t addTicks)
 	else{
 		condition = Condition::createCondition(CONDITION_REGENERATION, addTicks);
 		if(condition){
-			Condition::Effect* effect = new Condition::Effect(EFFECT_REGEN_HEALTH, 0, vocation->getHealthGainAmount(), 0, 0,
-				vocation->getHealthGainTicks() * 1000);
+			Condition::Effect* effect;
+			effect = Condition::Effect::createRegenHealth(vocation->getHealthGainTicks() * 1000, 0, vocation->getHealthGainAmount());
 			condition->addEffect(effect);
-			effect = new Condition::Effect(EFFECT_REGEN_MANA, 0, vocation->getManaGainAmount(), 0, 0,
-				vocation->getManaGainTicks() * 1000);
+			effect = Condition::Effect::createRegenMana(vocation->getManaGainTicks() * 1000, 0, vocation->getManaGainAmount());
 			condition->addEffect(effect);
 
 			addCondition(condition);
