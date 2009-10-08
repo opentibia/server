@@ -39,33 +39,128 @@ struct LightInfo{
 	};
 };
 
-enum EffectType{
-	EFFECT_PERIODIC_HEAL,
-	EFFECT_PERIODIC_DAMAGE,
-	EFFECT_PERIODIC_MOD_STAMINA,
-	EFFECT_MOD_HEAL,
-	EFFECT_MOD_DAMAGE,
-	EFFECT_MOD_SPEED,
-	EFFECT_REGEN_HEALTH,
-	EFFECT_REGEN_MANA,
-	EFFECT_REGEN_SOUL,
-	EFFECT_MOD_STAT,
-	EFFECT_MOD_SKILL,
-	EFFECT_SHAPESHIFT,
-	EFFECT_DISPEL,
-	//EFFECT_SHIELD,
-	//EFFECT_MANASHIELD,
-	EFFECT_LIGHT,
-	EFFECT_SCRIPT
+struct EffectModPeriodicDamage{
+	EffectModPeriodicDamage() {}
+	EffectModPeriodicDamage(CombatType type, int32_t total, int32_t percent, int32_t value, int32_t rounds) : 
+		type(type),
+		total(total),
+		percent(percent),
+		value(value),
+		rounds(rounds),
+		sum(0),
+		roundCompleted(0) {}
+
+	CombatType type;
+	int32_t total;
+	int32_t percent;
+	int32_t value;
+	int32_t rounds;
+
+	//
+	int32_t sum;
+	int32_t roundCompleted;
 };
 
-enum ConditionFlag{
-	FLAG_INFIGHT		= 1,
-	FLAG_SLOW			= 2,
-	FLAG_HASTE			= 4,
-	FLAG_STRENGTHENED	= 8,
-	FLAG_MANASHIELD		= 16,
-	FLAG_DRUNK			= 32
+struct EffectModPeriodicStamina{
+	EffectModPeriodicStamina() {}
+	EffectModPeriodicStamina(int32_t value) : 
+		value(value) {}
+
+	int32_t value;
+};
+
+struct EffectModStat{
+	EffectModStat() {}
+	EffectModStat(PlayerStatType type, int32_t percent, int32_t value) : 
+		type(type),
+		percent(percent),
+		value(value),
+		delta(0) {}
+	PlayerStatType type;
+	int32_t percent;
+	int32_t value;
+
+	//
+	int32_t delta;
+};
+
+struct EffectModSkill{
+	EffectModSkill() {}
+	EffectModSkill(SkillType type, int32_t percent, int32_t value) : 
+		type(type),
+		percent(percent),
+		value(value),
+		delta(0) {}
+	SkillType type;
+	int32_t percent;
+	int32_t value;
+
+	//
+	int32_t delta;
+};
+
+struct EffectModSpeed{
+	EffectModSpeed() {}
+	EffectModSpeed(int32_t percent, int32_t value) : 
+		percent(percent),
+		value(value),
+		delta(0) {}
+
+	int32_t percent;
+	int32_t value;
+
+	//
+	int32_t delta;
+};
+
+struct EffectModRegen{
+	EffectModRegen() {}
+	EffectModRegen(int32_t percent, int32_t value) : 
+		percent(percent),
+		value(value) {}
+	EffectModRegen(PlayerStatType type, int32_t percent, int32_t value) : 
+		type(type),
+		percent(percent),
+		value(value) {}
+
+	PlayerStatType type;
+	int32_t percent;
+	int32_t value;
+};
+
+struct EffectModLight{
+	EffectModLight() {}
+	EffectModLight(int32_t level, int32_t color) : 
+		level(level),
+		color(color) {}
+
+	int32_t level;
+	int32_t color;
+};
+
+struct EffectModShapeShift{
+	EffectModShapeShift() {}
+	EffectModShapeShift(uint32_t lookType, uint32_t lookTypeEx, uint32_t lookHead,
+		uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet, uint32_t lookAddons) : 
+		lookType(lookType),
+		lookTypeEx(lookTypeEx),
+		lookHead(lookHead),
+		lookBody(lookBody),
+		lookLegs(lookLegs),
+		lookFeet(lookFeet),
+		lookAddons(lookAddons) {}
+
+	uint32_t lookType;
+	uint32_t lookTypeEx;
+	uint32_t lookHead;
+	uint32_t lookBody;
+	uint32_t lookLegs;
+	uint32_t lookFeet;
+	uint32_t lookAddons;
+};
+
+struct EffectModDispel{
+	std::string name;
 };
 
 class Condition{
@@ -84,8 +179,16 @@ public:
 
 	static Condition* createCondition(PropStream& propStream);
 
-	class Effect;
+	enum Flag{
+		FLAG_INFIGHT		= 1,
+		FLAG_SLOW			= 2,
+		FLAG_HASTE			= 4,
+		FLAG_STRENGTHENED	= 8,
+		FLAG_MANASHIELD		= 16,
+		FLAG_DRUNK			= 32
+	};
 
+	class Effect;
 	Condition(const std::string& name,
 			CombatType combatType,
 			MechanicType mechanicType,
@@ -128,31 +231,57 @@ public:
 	//class Effect
 	class Effect{
 	public:
-		Effect(EffectType type) :
-		  effectType(type),
-		  mod_type(0),
-		  mod_value(0),
-		  mod_total(0),
-		  mod_percent(0),
-		  mod_ticks(0),
-		  mod_pod(boost::any()),
-		  n(0), i(0), j(0), owner_condition(NULL) {}
+		enum Type{
+			//periodic
+			PERIODIC_HEAL,
+			PERIODIC_DAMAGE,
+			PERIODIC_MOD_STAMINA,
+			REGEN_HEALTH,
+			REGEN_MANA,
+			REGEN_SOUL,
 
-		  Effect(EffectType type,
-			int32_t mod_type,
-			int32_t mod_value,
-			int32_t mod_total,
-			int32_t mod_percent,
-			int32_t mod_ticks,
-			boost::any mod_pod = boost::any()) :
-		  effectType(type),
-		  mod_type(mod_type),
-		  mod_value(mod_value),
-		  mod_total(mod_total),
-		  mod_percent(mod_percent),
-		  mod_ticks(mod_ticks),
-		  mod_pod(mod_pod),
-		  n(0), i(0), j(0), owner_condition(NULL) {}
+			//start/end
+			MOD_SPEED,
+			MOD_STAT,
+			MOD_SKILL,
+			SHAPESHIFT,
+			LIGHT,
+			DISPEL,
+
+			SCRIPT
+		};
+
+		static Effect* createRegenHealth(uint32_t interval, int32_t percent, int32_t value)
+		{
+			EffectModRegen mod(percent, value);
+			return new Effect(REGEN_HEALTH, interval, mod);
+		}
+
+		static Effect* createRegenMana(uint32_t interval, int32_t percent, int32_t value)
+		{
+			EffectModRegen mod(percent, value);
+			return new Effect(REGEN_MANA, interval, mod);
+		}
+
+		static Effect* createRegenSoul(uint32_t interval, int32_t percent, int32_t value)
+		{
+			EffectModRegen mod(percent, value);
+			return new Effect(REGEN_SOUL, interval, mod);
+		}
+
+		static Effect* createModStamina(uint32_t interval, int32_t value)
+		{
+			EffectModPeriodicStamina mod(value);
+			return new Effect(PERIODIC_MOD_STAMINA, interval, mod);
+		}
+
+		Effect(Effect::Type type, uint32_t interval, boost::any data = boost::any()) :
+			type(type),
+			interval(interval),
+			data(data),
+			tickCount(0),
+			owner_condition(NULL)
+			{}
 
 		~Effect(){};
 		bool onBegin(Creature* creature);
@@ -162,24 +291,19 @@ public:
 		bool onTick(Creature* creature, uint32_t ticks);
 		void setOwner(Condition* condition) {owner_condition = condition;}
 
-		EffectType getEffectType() const {return effectType;}
+		Effect::Type getEffectType() const {return type;}
+		template<typename T> T& getModEffect() {return boost::any_cast<T&>(data);}
 
 	protected:
-		int32_t getStatValue(Creature* creature);
-		int32_t getSkillValue(Creature* creature);
+		int32_t getStatValue(Creature* creature, PlayerStatType statType, int32_t percent, int32_t value);
+		int32_t getSkillValue(Creature* creature, SkillType skillType, int32_t percent, int32_t value);
 
-		EffectType effectType;
+		Effect::Type type;
+		boost::any data;
+		uint32_t interval;
 
-		uint32_t mod_type;		//hp/mana/soul etc.
-		int32_t mod_value;		//flat amount
-		int32_t mod_total;		//total amount
-		int32_t mod_percent;	//percent amount
-		int32_t mod_ticks;
-		boost::any mod_pod;
-
-		//misc values, depending on effect
-		int32_t n, i, j;
-
+		//variables that should not be serialized
+		uint32_t tickCount;
 		Condition* owner_condition;
 
 		friend class Condition;

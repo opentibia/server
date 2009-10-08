@@ -1359,7 +1359,7 @@ void Tile::updateTileFlags(Item* item, bool removed)
 				setFlag(TILEPROP_BLOCKSOLIDNOTMOVEABLE);
 			}
 		}
-		if(item->hasProperty(ITEMPROP_BLOCKPROJECTILE)){
+		if(item->hasProperty(ITEMPROP_BLOCKPATHFIND)){
 			setFlag(TILEPROP_BLOCKPATH);
 
 			if(!item->hasProperty(ITEMPROP_MOVEABLE)){
@@ -1412,7 +1412,7 @@ void Tile::updateTileFlags(Item* item, bool removed)
 				resetFlag(TILEPROP_BLOCKSOLIDNOTMOVEABLE);
 			}
 		}
-		if(item->hasProperty(ITEMPROP_BLOCKPROJECTILE) && !hasItemWithProperty(item, ITEMPROP_BLOCKPROJECTILE) ){
+		if(item->hasProperty(ITEMPROP_BLOCKPATHFIND) && !hasItemWithProperty(item, ITEMPROP_BLOCKPATHFIND) ){
 			resetFlag(TILEPROP_BLOCKPATH);
 
 			if(!item->hasProperty(ITEMPROP_MOVEABLE) && !hasItemWithProperty(item, ITEMPROP_MOVEABLE) ){
