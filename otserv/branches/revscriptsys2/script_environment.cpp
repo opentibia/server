@@ -40,7 +40,7 @@ void Environment::cleanup()
 
 void Environment::cleanupUnusedListeners(ListenerList& list)
 {
-	for(ListenerList::iterator giter = list.begin(), gend = list.end(); giter != gend;){
+	for(ListenerList::iterator giter = list.begin(); giter != list.end();){
 		if((*giter)->isActive() == false){
 			giter = list.erase(giter);
 		} else ++giter;

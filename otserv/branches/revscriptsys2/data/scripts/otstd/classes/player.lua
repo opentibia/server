@@ -1,6 +1,8 @@
 
 otstd.Player = {}
 
+-- Easier message passing
+
 function Player:sendNote(msg)
 	self:sendMessage(MESSAGE_STATUS_CONSOLE_BLUE, msg)
 end
@@ -21,6 +23,9 @@ function Player:sendAdvance(msg)
 	self:sendMessage(MESSAGE_EVENT_ADVANCE, msg)
 end
 
+
+-- Fetch some data about the player
+
 function Player:getTimeSinceLogin()
 	return os.difftime(os.time(), self:getLastLogin())
 end
@@ -30,7 +35,15 @@ function Player:getPlayTime()
 	return t + self:getTimeSinceLogin()
 end
 
---
+function Player:isFemale()
+	return self:getSex() == FEMALE
+end
+
+function Player:isMale()
+	return self:getSex() == MALE
+end
+
+-- 
 
 function Player:getTown()
 	return map:getTown(self:getTownID())
@@ -186,7 +199,12 @@ end
 -- Login / Logout
 function otstd.Player.LoginHandler(event)
 	local player = event.player
-	-- Nothing yet
+	
+	-- Load outfits
+	if player.loadOutfits then
+		-- Defined in outfits.lua
+		player:loadOutfits()
+	end
 end
 
 function otstd.Player.LogoutHandler(event)
@@ -196,6 +214,12 @@ function otstd.Player.LogoutHandler(event)
 	
 	-- Save playtime
 	player:setStorageValue("__playtime", player:getPlayTime())
+	
+	-- Save outfits
+	if player.saveOutfits then
+		-- Defined in outfits.lua
+		player:saveOutfits()
+	end
 end
 
 otstd.Player.onLoginListener  = registerOnLogin(otstd.Player.LoginHandler)

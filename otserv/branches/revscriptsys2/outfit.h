@@ -46,40 +46,13 @@ struct OutfitType
 
 struct Outfit
 {
-	Outfit() : outfitId(0), lookType(0), addons(0), isPremium(false), isDefault(false), name("") {}
-	uint32_t outfitId;
+	Outfit() : lookType(0), addons(0) {}
 	uint32_t lookType;
 	uint32_t addons;
-	bool isPremium;
-	bool isDefault;
 	std::string name;
 };
 
 typedef std::list<Outfit> OutfitList;
-typedef std::map<uint32_t, Outfit > OutfitMap;
 
-class Outfits
-{
-public:
-	~Outfits();
-
-	static Outfits* getInstance()
-	{
-		static Outfits instance;
-		return &instance;
-	}
-
-	bool loadFromXml(const std::string& datadir);
-
-	uint32_t getOutfitId(uint32_t lookType);
-	bool getOutfit(uint32_t lookType, Outfit& outfit);
-	bool getOutfit(uint32_t outfitId, PlayerSex sex, Outfit& outfit);
-	const OutfitMap& getOutfits(PlayerSex playersex);
-
-private:
-	Outfits();
-	OutfitList allOutfits;
-	std::map<PlayerSex, OutfitMap > outfitMaps;
-};
 
 #endif

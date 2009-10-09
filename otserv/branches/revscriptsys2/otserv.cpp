@@ -547,19 +547,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::cout << "[done]" << std::endl;
 
-	// load outfits data
-	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "outfits.xml";
-	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
-	Outfits* outfits = Outfits::getInstance();
-	if(!outfits->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
-	}
-	std::cout << "[done]" << std::endl;
-
 	//load admin protocol configuration
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "admin.xml";

@@ -365,9 +365,6 @@ public:
 #endif
 
 	void checkRecentlyGainedExperience(uint32_t interval);
-	bool canWearOutfit(uint32_t outfitId, uint32_t addons);
-	bool addOutfit(uint32_t outfitId, uint32_t addons);
-	bool removeOutfit(uint32_t outfitId, uint32_t addons);
 	bool canLogout();
 	void broadcastLoot(Creature* creature, Container* corpse);
 	bool checkPzBlockOnCombat(Player* targetPlayer);
@@ -737,9 +734,6 @@ protected:
 	uint32_t guildLevel;
 
 	LightInfo itemsLight;
-
-	OutfitMap outfits;
-	bool requestedOutfitWindow;
 
 	//read/write storage data
 	uint32_t windowTextId;

@@ -4013,18 +4013,22 @@ bool Game::playerRequestOutfit(uint32_t playerId)
 		return false;
 	}
 	
+	/*
 	// If the list is empty, add atleast one outfit
 	if(outfitList.empty()) {
 		Outfit tmp;
 		if(player->isMale())
-			tmp.lookType = 130;
+			tmp.lookType = 128;
 		else
-			tmp.lookType = 144;
+			tmp.lookType = 136;
+		tmp.name = "Citizen";
 		outfitList.push_back(tmp);
 	}
-	
+	*/
 
-	player->sendOutfitWindow(outfitList);
+	// If list is empty, don't display any dialog at all.
+	if(!outfitList.empty())
+		player->sendOutfitWindow(outfitList);
 	return true;
 }
 
@@ -4034,16 +4038,13 @@ bool Game::playerChangeOutfit(uint32_t playerId, OutfitType outfit)
 	if(!player || player->isRemoved())
 		return false;
 
-	uint32_t outfitId = Outfits::getInstance()->getOutfitId(outfit.lookType);
-	if(player->canWearOutfit(outfitId, outfit.lookAddons)){		
-		player->defaultOutfit = outfit;
 
-		if(player->hasCondition(CONDITION_SHAPESHIFT)){
-			return false;
-		}
+	player->defaultOutfit = outfit;
 
-		internalCreatureChangeOutfit(player, outfit);
-	}
+	if(player->hasCondition(CONDITION_SHAPESHIFT))
+		return false;
+
+	internalCreatureChangeOutfit(player, outfit);
 
 	return true;
 }

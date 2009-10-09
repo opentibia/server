@@ -1,6 +1,7 @@
 -- Only aliases necessary so far
 MALE = SEX_MALE
 FEMALE = SEX_FEMALE
+
 CONST_ME_DRAWBLOOD = 0
 CONST_ME_LOSEENERGY = 1
 CONST_ME_POFF = 2

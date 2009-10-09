@@ -877,11 +877,8 @@ void OnChangeOutfit::Event::push_instance(LuaState& state, Environment& environm
 	for(std::list<Outfit>::iterator iter = outfitList.begin(); iter != outfitList.end(); ++iter, ++n){
 		state.newTable();
 		state.setField(-1, "type", iter->lookType);
-		state.newTable();
-		for(int i = 1; i < 3; ++i){
-			state.setField(-1, i, (iter->addons & (1 << i)) != 0);
-		}
-		state.setField(-2, "addons");
+		state.setField(-2, "name", iter->name);
+		state.setField(-2, "addons", iter->addons);
 	}
 	state.setField(-2, "outfits");
 }
@@ -906,21 +903,11 @@ void OnChangeOutfit::Event::update_instance(Manager& state, Environment& environ
 			thread->getField(-1, "type");
 			o.lookType = thread->popInteger();
 
+			thread->getField(-1, "name");
+			o.name = thread->popString();
+
 			thread->getField(-1, "addons");
-			if(thread->isTable()){
-				// Iterate over addons
-				thread->pushNil();
-				while(thread->iterateTable(-1)){
-					bool hasit = thread->popBoolean();
-					thread->duplicate();
-					int addon = thread->popInteger();
-					o.addons |= (1 << addon);
-				}
-			}
-			else{
-				// Integer value
-				o.addons = thread->popInteger();
-			}
+			o.addons = thread->popInteger();
 
 			// Only 2 addons for outfits so far...
 			o.addons &= 3;

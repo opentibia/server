@@ -4180,78 +4180,12 @@ void Player::checkSkullTicks(int32_t ticks)
 }
 #endif
 
-bool Player::canWearOutfit(uint32_t outfitId, uint32_t addons)
-{
-	OutfitMap::iterator it = outfits.find(outfitId);
-	if(it != outfits.end()){
-		if(it->second.isPremium && !isPremium()){
-			return false;
-		}
-
-		if((it->second.addons & addons) == addons){
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool Player::addOutfit(uint32_t outfitId, uint32_t addons)
-{
-	Outfit outfit;
-	if(Outfits::getInstance()->getOutfit(outfitId, getSex(), outfit)){
-		OutfitMap::iterator it = outfits.find(outfitId);
-		if(it != outfits.end()){
-			outfit.addons |= it->second.addons;
-			outfit.addons |= addons;
-			outfits[outfitId] = outfit;
-			return true;
-		}
-
-		outfit.addons |= addons;
-		outfits[outfitId] = outfit;
-		return true;
-	}
-	else{
-		//std::cout << getName() << " outfit " << outfitId << " does not exist, addons: " << addons << std::endl;
-	}
-
-	return false;
-}
-
-bool Player::removeOutfit(uint32_t outfitId, uint32_t addons)
-{
-	OutfitMap::iterator it = outfits.find(outfitId);
-	if(it != outfits.end()){
-		if(addons == 0xFF){
-			//remove outfit
-			outfits.erase(it);
-		}
-		else{
-			//remove addons
-			outfits[outfitId].addons = it->second.addons & (~addons);
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
 void Player::setSex(PlayerSex player_sex)
 {
 	if(sex != player_sex){
 		sex = player_sex;
 
-		//add default outfits to player outfits
-		const OutfitMap& default_outfits = Outfits::getInstance()->getOutfits(getSex());
-		for(OutfitMap::const_iterator it = default_outfits.begin(); it != default_outfits.end(); ++it){
-			if(!it->second.isDefault){
-				continue;
-			}
-
-			addOutfit(it->first, it->second.addons);
-		}
+		// REVSCRIPTSYS TODO how do we fix this change?
 	}
 }
 
