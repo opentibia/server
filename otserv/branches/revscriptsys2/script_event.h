@@ -69,7 +69,7 @@ namespace Script {
 		// update, peek at top table and fill this event with values from it)
 		virtual void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread) = 0;
 
-		// Should not be called directly (calling functions 
+		// Should not be called directly (calling functions
 		// can't be made fiend due to compiler limitations)
 		bool call(Manager& stae, Environment& environment, Listener_ptr listener);
 	protected:
@@ -748,15 +748,17 @@ namespace Script {
 			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
+			Creature* creature;
+			Condition* condition;
+			ConditionEnd reason;
+			uint32_t ticks;
+
 			enum EventType{
 				EVENT_BEGIN,
 				EVENT_END,
 				EVENT_TICK
 			} eventType;
-			Creature* creature;
-			Condition* condition;
-			ConditionEnd reason;
-			uint32_t ticks;
+
 		};
 	}
 
@@ -849,9 +851,9 @@ namespace Script {
 			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
-			Creature* creature;
 			CombatType& combatType;
 			CombatSource& combatSource;
+			Creature* creature;
 			int32_t& value;
 		};
 	}
@@ -990,7 +992,7 @@ bool dispatchEvent(T* e, Script::Manager& state, Script::Environment& environmen
 {
 	if(specific_list.size() == 0)
 		return false;
-	
+
 	for(Script::ListenerList::iterator event_iter = specific_list.begin();
 		event_iter != specific_list.end();
 		++event_iter)
@@ -1006,7 +1008,7 @@ bool dispatchEvent(T* e, Script::Manager& state, Script::Environment& environmen
 {
 	if(specific_list.size() == 0)
 		return false;
-	
+
 	for(Script::ListenerList::iterator event_iter = specific_list.begin();
 		event_iter != specific_list.end();
 		++event_iter)

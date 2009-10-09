@@ -106,7 +106,7 @@ bool Vocations::loadFromXml(const std::string& datadir)
 					skillNode = p->children;
 					while(skillNode){
 						if(xmlStrcmp(skillNode->name, (const xmlChar*)"skill") == 0){
-							uint32_t skill_id;
+							int32_t skill_id;
 							if(readXMLInteger(skillNode, "id", intVal)){
 								skill_id = intVal;
 								if(skill_id < SKILL_FIRST || skill_id > SKILL_LAST){

@@ -21,7 +21,7 @@
 
 #include "definitions.h"
 
-#if defined WIN32
+#if defined __WINDOWS__
 #include <winerror.h>
 #endif
 

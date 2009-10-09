@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 	if(parseCommandLine(g_command_opts, std::vector<std::string>(argv, argv + argc)) == false){
 		return 0;
 	}
-	
+
 #if !defined(__WINDOWS__)
 	if(g_command_opts.runfile != ""){
 		std::ofstream f(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out);
@@ -580,7 +580,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 
 	std::cout << ":: Worldtype: " << asUpperCaseString(worldType) << std::endl;
-	
+
 	std::cout << ":: Cleaning online players info... " << std::flush;
 	if(!IOPlayer::instance()->cleanOnlineInfo()){
 		std::stringstream errormsg;
@@ -616,15 +616,14 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		std::cout << " [salted]";
 	std::cout << std::endl;
 
-	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE),
-		g_config.getString(ConfigManager::MAP_KIND))){
-		// ok ... so we didn't succeed in laoding the map.
+	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE))){
+		// ok ... so we didn't succeed in loading the map.
 		// perhaps the path to map didn't include path to data directory?
 		// let's try to prepend path to datadir before bailing out miserably.
 		filename.str("");
 		filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << g_config.getString(ConfigManager::MAP_FILE);
 
-		if(!g_game.loadMap(filename.str(), g_config.getString(ConfigManager::MAP_KIND))){
+		if(!g_game.loadMap(filename.str())){
 			ErrorMessage("Couldn't load map");
 			exit(-1);
 		}
@@ -634,7 +633,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	g_game.runStartupScripts(true);
 
 	// Tie ports and register services
-	
+
 	// Tibia protocols
 	service_manager->add<ProtocolGame>(g_config.getNumber(ConfigManager::GAME_PORT));
 	service_manager->add<ProtocolLogin>(g_config.getNumber(ConfigManager::LOGIN_PORT));

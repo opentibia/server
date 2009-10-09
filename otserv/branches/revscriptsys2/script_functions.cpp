@@ -159,7 +159,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Thing", "getDescription([int lookdistance])", &Manager::lua_Thing_getDescription);
 	registerMemberFunction("Thing", "moveTo(table pos)", &Manager::lua_Thing_moveToPosition);
 	registerMemberFunction("Thing", "destroy()", &Manager::lua_Thing_destroy);
-	
+
 	registerGlobalFunction("getThingByID(int id)", &Manager::lua_getThingByID);
 
 	// Creature
@@ -313,7 +313,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Item", "setIntegerAttribute(string key, int value)", &Manager::lua_Item_setIntegerAttribute);
 	registerMemberFunction("Item", "setFloatAttribute(string key, float value)", &Manager::lua_Item_setFloatAttribute);
 	registerMemberFunction("Item", "setBooleanAttribute(string key, boolean value)", &Manager::lua_Item_setBooleanAttribute);
-	
+
 	// Container
 	registerMemberFunction("Container", "addItem(Item item)", &Manager::lua_Container_addItem);
 	registerMemberFunction("Container", "getItem(int index)", &Manager::lua_Container_getItem);
@@ -346,7 +346,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Town", "getTemplePosition()", &Manager::lua_Town_getTemplePosition);
 	registerMemberFunction("Town", "getName()", &Manager::lua_Town_getName);
 	registerMemberFunction("Town", "getID()", &Manager::lua_Town_getID);
-	
+
 	registerGlobalFunction("getAllTowns()", &Manager::lua_getTowns);
 	registerGlobalFunction("sendMailTo(Item item, string playername [, Town town])", &Manager::lua_sendMailTo);
 
@@ -374,7 +374,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("House", "setOwner(int guid)", &Manager::lua_House_setOwner);
 	registerMemberFunction("House", "setSubownerList(table list)", &Manager::lua_House_setSubownerList);
 	registerMemberFunction("House", "setPaidUntil(int until)", &Manager::lua_House_setPaidUntil);
-	
+
 	registerGlobalFunction("getAllHouses()", &Manager::lua_getHouses);
 
 	// Channel
@@ -419,7 +419,7 @@ void Manager::registerFunctions() {
 	// On(De)Equip
 	registerGlobalFunction("registerOnEquipItem(string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
 	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
-	
+
 	// OnServerLoad
 	registerGlobalFunction("registerOnServerLoad(function callback)", &Manager::lua_registerGenericEvent_OnServerLoad);
 
@@ -430,10 +430,10 @@ void Manager::registerFunctions() {
 	// OnSpot / OnLose
 	registerGlobalFunction("registerOnSpotCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnSpotCreature);
 	registerGlobalFunction("registerOnLoseCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLoseCreature);
-	
+
 	// OnThink
 	registerGlobalFunction("registerOnCreatureThink(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnCreatureThink);
-	
+
 	// OnSpawn
 	registerGlobalFunction("registerOnSpawn(string cname, function callback)", &Manager::lua_registerGenericEvent_OnSpawn);
 
@@ -456,7 +456,7 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnLookAtItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtItem);
 	registerGlobalFunction("registerOnLookAtCreature(Creature creature, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
 	registerGlobalFunction("registerOnPlayerLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
-	
+
 	// OnAdvance
 	registerGlobalFunction("registerOnAdvance([LevelType skillid = nil], function callback)", &Manager::lua_registerGenericEvent_OnAdvance);
 	registerGlobalFunction("registerOnPlayerAdvance(Player player [, LevelType skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
@@ -492,7 +492,7 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
 	registerGlobalFunction("sendMagicEffect(position where, int type)", &Manager::lua_sendMagicEffect);
 	registerGlobalFunction("sendAnimatedText(position where, int color, string text)", &Manager::lua_sendAnimatedText);
-	
+
 	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
 
 	registerGlobalFunction("getWorldType()", &Manager::lua_getWorldType);
@@ -633,13 +633,13 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 					// We should be inserted before substrings...
 					if(info.method == OnSay::FILTER_SUBSTRING || info.method == OnSay::FILTER_ALL){
 						environment->Generic.OnSay.insert(listener_iter, listener);
-						registered = true; 
+						registered = true;
 						break;
 					}
 
 					if(info.filter.length() < si_onsay.filter.length()){
 						environment->Generic.OnSay.insert(listener_iter, listener);
-						registered = true; 
+						registered = true;
 						break;
 					}
 				}
@@ -648,13 +648,13 @@ int LuaState::lua_registerGenericEvent_OnSay() {
 					// We should be inserted before generic...
 					if(info.method == OnSay::FILTER_ALL){
 						environment->Generic.OnSay.insert(listener_iter, listener);
-						registered = true; 
+						registered = true;
 						break;
 					}
 
 					if(info.filter.length() < si_onsay.filter.length()){
 						environment->Generic.OnSay.insert(listener_iter, listener);
-						registered = true; 
+						registered = true;
 						break;
 					}
 				}
@@ -1032,9 +1032,9 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	std::string method = popString();
 
 	OnEquipItem::ScriptInformation si_onequip;
-	
+
 	si_onequip.slot = slot;
-	
+
 	if(method == "itemid") {
 		si_onequip.method = OnEquipItem::FILTER_ITEMID;
 	}
@@ -1069,7 +1069,7 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	std::string method = popString();
 
 	OnEquipItem::ScriptInformation si_ondeequip;
-	
+
 	si_ondeequip.slot = slot;
 
 	if(method == "itemid") {
@@ -3057,7 +3057,7 @@ int LuaState::lua_Actor_setMechanicImmunities()
 	MechanicType immunities = MECHANIC_NONE;
 	for(MechanicType::iterator i = MechanicType::begin(); i != MechanicType::end(); ++i){
 		getField(-1, i->toString());
-		immunities |= (MechanicType)popInteger();		
+		immunities |= (MechanicType)popInteger();
 	}
 
 	pop();
@@ -3083,7 +3083,7 @@ int LuaState::lua_Actor_setDamageImmunities()
 	CombatType immunities = COMBAT_NONE;
 	for(CombatType::iterator i = COMBAT_PHYSICALDAMAGE; i != CombatType::end(); ++i){
 		getField(-1, i->toString());
-		immunities |= (CombatType)popInteger();		
+		immunities |= (CombatType)popInteger();
 	}
 
 	pop();
@@ -3627,7 +3627,7 @@ int LuaState::lua_Player_removeItem()
 		subtype = popInteger();
 	itemid = popInteger();
 	Player* player = popPlayer();
-	
+
 	const ItemType& it = Item::items[itemid];
 	if(it.id == 0){
 		pushBoolean(false);
@@ -3860,7 +3860,7 @@ int LuaState::lua_Item_setItemID()
 	}
 
 	const ItemType& it = Item::items[newid];
-	if(it.stackable && newcount > 100 || newcount < -1){
+	if((it.stackable && newcount > 100) || newcount < -1){
 		throw Error("Item.setItemID : Stack count is out of range.");
 	}
 
@@ -4267,7 +4267,7 @@ int LuaState::lua_Combat_setCallback()
 	std::string function = putAwayFunction(function_str); // Save function
 	CallBackParam_t key = (CallBackParam_t)popNumber();
 	Combat* combat = popCombat();
-	
+
 	combat->setCallback(
 	//setCombatCallBack(combat, key, function_name)
 	const char* function = popString(L);
@@ -5235,7 +5235,7 @@ int LuaState::lua_House_getSubownerList()
 int LuaState::lua_House_getTiles()
 {
 	House* house = popHouse();
-	
+
 	newTable();
 	int n = 1;
 	for(HouseTileList::iterator hit = house->getTileBegin(), end = house->getTileEnd();
@@ -5251,7 +5251,7 @@ int LuaState::lua_House_getTiles()
 int LuaState::lua_House_getTown()
 {
 	House* house = popHouse();
-	
+
 	pushTown(Towns::getInstance().getTown(house->getTownId()));
 	return 1;
 }
@@ -5425,7 +5425,7 @@ int LuaState::lua_sendMagicEffect()
 {
 	uint32_t type = popUnsignedInteger();
 	Position pos = popPosition();
-	
+
 	g_game.addMagicEffect(pos, type);
 	pushBoolean(true);
 	return 1;

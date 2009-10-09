@@ -19,7 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#if defined __WINDOWS__ || defined WIN32
+#if defined __WINDOWS__
 #include <winerror.h>
 #endif
 
@@ -97,7 +97,7 @@ void ServiceManager::stop()
 	m_acceptors.clear();
 
 	OutputMessagePool::getInstance()->stop();
-	
+
 	// Give the server 3 seconds to process all messages before death
 	death_timer.expires_from_now(boost::posix_time::seconds(3));
 	death_timer.async_wait(boost::bind(&ServiceManager::die, this));
@@ -251,7 +251,7 @@ void ServicePort::openAcceptor(boost::weak_ptr<ServicePort> weak_service, uint16
 		return;
 	}
 
-	if(ServicePort_ptr service = weak_service.lock()){		
+	if(ServicePort_ptr service = weak_service.lock()){
 		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "ServicePort::openAcceptor" << std::endl;
 		#endif

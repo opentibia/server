@@ -37,7 +37,7 @@
 #error "database.h should be included first."
 #endif
 
-#ifdef WIN32
+#ifdef __WINDOWS__
 #include <windows.h>
 #else
 #include <sqltypes.h>

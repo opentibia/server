@@ -114,7 +114,7 @@ public:
 	  * \param filekind Kind of the map, BIN SQL or TXT
 	  * \return Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
 	  */
-	int loadMap(std::string filename, std::string filekind);
+	int loadMap(std::string filename);
 
 	/**
 	* Load all scripts

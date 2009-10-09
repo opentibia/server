@@ -30,7 +30,7 @@
 #include "outputmessage.h"
 #include "tools.h"
 
-#ifndef WIN32
+#ifndef __WINDOWS__
 	#define SOCKET_ERROR -1
 	#define INVALID_SOCKET -1
 #endif

@@ -107,7 +107,7 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 	return false;
 }
 
-#if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
+#if defined __WINDOWS__ && !defined __GNUC__
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);

@@ -40,41 +40,40 @@ Map::~Map()
 	//
 }
 
-bool Map::loadMap(const std::string& identifier, const std::string& type)
+bool Map::loadMap(const std::string& identifier)
 {
-	IOMap* loader;
+	IOMap* loader = new IOMapOTBM();
 
-	if(type == "OTBM"){
-		loader = new IOMapOTBM();
-	}
-	else{
-		std::cout << "FATAL: Could not determine the map format." << std::endl;
-		return false;
-	}
+	if(loader){
 
-	std::cout << ":: Loading map from: " << identifier << " " << loader->getSourceDescription() << std::endl;
+		std::cout << ":: Loading map from: " << identifier << " " << loader->getSourceDescription() << std::endl;
 
-	if(!loader->loadMap(this, identifier)){
-		std::cout << "FATAL: [OTBM loader] " << loader->getLastErrorString() << std::endl;
-		return false;
-	}
+		if(!loader->loadMap(this, identifier)){
+			std::cout << "FATAL: [OTBM loader] " << loader->getLastErrorString() << std::endl;
+			return false;
+		}
 
-	if(!loader->loadSpawns(this)){
-		std::cout << "WARNING: could not load spawn data." << std::endl;
-	}
+		if(!loader->loadSpawns(this)){
+			std::cout << "WARNING: could not load spawn data." << std::endl;
+		}
 
-	if(!loader->loadHouses(this)){
-		std::cout << "WARNING: could not load house data." << std::endl;
+		if(!loader->loadHouses(this)){
+			std::cout << "WARNING: could not load house data." << std::endl;
+		}
+
+		delete loader;
+
+		IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
+		IOMapSerialize->updateHouseInfo();
+		IOMapSerialize->processHouseAuctions();
+		IOMapSerialize->loadHouseInfo(this);
+		IOMapSerialize->loadMap(this);
+		return true;
 	}
 
 	delete loader;
 
-	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
-	IOMapSerialize->updateHouseInfo();
-	IOMapSerialize->processHouseAuctions();
-	IOMapSerialize->loadHouseInfo(this);
-	IOMapSerialize->loadMap(this);
-	return true;
+	return false;
 }
 
 
@@ -523,7 +522,7 @@ const SpectatorVec& Map::getSpectators(const Position& centerPos)
 				minRangeZ = 0;
 				maxRangeZ = 7;
 			}
-			
+
 			getSpectatorsInternal(list, centerPos, false,
 				minRangeX, maxRangeX,
 				minRangeY, maxRangeY,
@@ -912,7 +911,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 
 	const Tile* tile = NULL;
 	AStarNode* found = NULL;
-	
+
 	while(fpp.maxSearchDist != -1 || nodes.countClosedNodes() < 100){
 		AStarNode* n = nodes.getBestNode();
 		if(!n){
@@ -924,7 +923,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 			dirList.clear();
 			return false; //no path found
 		}
-		
+
 		if(pathCondition(startPos, Position(n->x, n->y, startPos.z), fpp, bestMatch)){
 			found = n;
 			endPos = Position(n->x, n->y, startPos.z);
@@ -993,20 +992,20 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 
 		nodes.closeNode(n);
 	}
-	
+
 	int32_t prevx = endPos.x;
 	int32_t prevy = endPos.y;
 	int32_t dx, dy;
-	
+
 	if(!found){
 		return false;
 	}
-	
+
 	found = found->parent;
 	while(found){
 		pos.x = found->x;
 		pos.y = found->y;
-		
+
 		dx = pos.x - prevx;
 		dy = pos.y - prevy;
 

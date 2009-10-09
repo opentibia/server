@@ -1277,17 +1277,6 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 	return true;
 }
 
-int32_t round(float v)
-{
-	int32_t t = (int32_t)std::floor(v);
-	if((v - t) > 0.5){
-		return t + 1;
-	}
-	else{
-		return t;
-	}
-}
-
 void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOperation_t op) const
 {
 	uint32_t centerY, centerX;
@@ -1362,8 +1351,8 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 				int32_t newY = y - centerY;
 
 				//perform rotation
-				int32_t rotatedX = round(newX * a + newY * b);
-				int32_t rotatedY = round(newX * c + newY * d);
+				int32_t rotatedX = ::round(newX * a + newY * b);
+				int32_t rotatedY = ::round(newX * c + newY * d);
 
 				//write in the output matrix using rotated coordinates
 				(*output)[rotatedY + rotateCenterY][rotatedX + rotateCenterX] = (*input)[y][x];

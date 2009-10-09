@@ -35,7 +35,7 @@
 
 extern ConfigManager g_config;
 
-#if defined WIN32 || defined __WINDOWS__
+#if defined __WINDOWS__
 
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
 		#include "dbghelp.h"
@@ -106,7 +106,7 @@ ExceptionHandler::~ExceptionHandler()
 
 bool ExceptionHandler::InstallHandler()
 {
-#if defined WIN32 || defined __WINDOWS__
+#if defined __WINDOWS__
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
 
 		++ref_counter;
@@ -150,7 +150,7 @@ bool ExceptionHandler::RemoveHandler()
 		return false;
 	}
 
-#if defined WIN32 || defined __WINDOWS__
+#if defined __WINDOWS__
 
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
 
@@ -180,7 +180,7 @@ bool ExceptionHandler::RemoveHandler()
 	return true;
 }
 
-#if defined WIN32 || defined __WINDOWS__
+#if defined __WINDOWS__
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
 
 		long ExceptionHandler::MiniDumpExceptionHandler(struct _EXCEPTION_POINTERS *pExceptionInfo)

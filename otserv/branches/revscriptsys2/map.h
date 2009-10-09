@@ -151,7 +151,7 @@ public:
 	* \param type map type "OTBM", "XML"
 	* \return true if the map was loaded successfully
 	*/
-	bool loadMap(const std::string& identifier, const std::string& type);
+	bool loadMap(const std::string& identifier);
 
 	/**
 	* Save a map.
@@ -233,7 +233,7 @@ public:
 	bool getPathMatching(const Creature* creature, std::list<Direction>& dirList,
 		const FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp);
 
-	
+
 	// Waypoints on the map
 	Waypoints waypoints;
 

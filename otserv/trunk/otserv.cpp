@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
 	std::cout << std::endl;
 #endif
 
-#if !defined(WIN32) && !defined(__ROOT_PERMISSION__)
+#if !defined(__WINDOWS__) && !defined(__ROOT_PERMISSION__)
 	if( getuid() == 0 || geteuid() == 0 ){
 		std::cout << std::endl << "OTServ executed as root user, please login with a normal user." << std::endl;
 		return 1;
@@ -241,9 +241,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-#if defined __WINDOWS__ || defined WIN32
-	//nothing yet
-#else
+#if !defined __WINDOWS__
 	// ignore sigpipe...
 	struct sigaction sigh;
 	sigh.sa_handler = SIG_IGN;
@@ -419,7 +417,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 #endif
 
 
-#if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
+#if !defined(__WINDOWS__) && !defined(__NO_HOMEDIR_CONF__)
 	std::string configpath;
 	configpath = getenv("HOME");
 	configpath += "/.otserv/";
@@ -439,7 +437,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 #endif
 	{
 		std::ostringstream os;
-#if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
+#if !defined(__WINDOWS__) && !defined(__NO_HOMEDIR_CONF__)
 		os << "Unable to load " << configname << " or " << configpath;
 #else
 		os << "Unable to load " << configname;
@@ -449,7 +447,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::cout << " [done]" << std::endl;
 
-#ifdef WIN32
+#ifdef __WINDOWS__
 	std::stringstream mutexName;
 	mutexName << "otserv_" << g_config.getNumber(ConfigManager::LOGIN_PORT);
 	CreateMutex(NULL, FALSE, mutexName.str().c_str());

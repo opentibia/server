@@ -170,15 +170,6 @@ end
 		return setHouseOwner(self.id, guid)
 	end
 
-	function House:payRent(guid)
-		local guid = tonumber(guid)
-		if(tonumber(self.id) == 0) then
-			error('House:payRent(): House ID not set!')
-		end
-
-		return payHouseRent(self.id, guid)
-	end
-
 	-- Buy function for the house
 	function House:buy(cid)
 		if(tonumber(self.id) == 0) then

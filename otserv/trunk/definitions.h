@@ -28,21 +28,23 @@
 #define OTSERV_CLIENT_VERSION "8.50"
 #define CURRENT_SCHEMA_VERSION 19
 
-#if defined(_WIN32) && !defined(WIN32)
-	#define WIN32
-#endif
-
-#if defined(WIN32) && !defined(__WINDOWS__)
-	#define __WINDOWS__
-#endif
-
-#if defined(__WINDOWS__) && !defined(_WIN32)
-	#define _WIN32
-#endif
-
-#ifdef __MINGW32__
+#if defined __MINGW32__
 	#define XML_GCC_FREE
 	//Cross-compiling
+	#ifndef __WINDOWS__
+		#define __WINDOWS__
+	#endif
+#endif
+
+#if defined _WIN32 || defined WIN32 || defined __WINDOWS__
+	#ifndef _WIN64
+		#ifndef _WIN32
+			#define _WIN32
+		#endif
+		#ifndef WIN32
+			#define WIN32
+		#endif
+	#endif
 	#ifndef __WINDOWS__
 		#define __WINDOWS__
 	#endif

@@ -214,7 +214,7 @@ void Game::loadGameState()
 	// REVSCRIPT TODO Load global storage
 }
 
-int Game::loadMap(std::string filename, std::string filekind)
+int Game::loadMap(std::string filename)
 {
 	if(!map){
 		map = new Map;
@@ -231,7 +231,7 @@ int Game::loadMap(std::string filename, std::string filekind)
 	Actor::despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
 	Actor::despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
 
-	return map->loadMap(filename, filekind);
+	return map->loadMap(filename);
 }
 
 void Game::runWaitingScripts()
@@ -243,7 +243,7 @@ void Game::runWaitingScripts()
 		boost::bind(&Game::runWaitingScripts, this)));
 }
 
-bool Game::loadScripts() 
+bool Game::loadScripts()
 {
 	bool is_reload = false;
 	// Unload any old
@@ -493,7 +493,7 @@ bool Game::useItem(Player* player, const Position& pos, uint8_t index,
 	if(!player->canDoAction()){
 		return false;
 	}
-	
+
 	player->stopWalk();
 
 	if(isHotkey){
@@ -571,7 +571,7 @@ bool Game::useItemEx(Player* player, const Position& fromPos, uint16_t fromSprit
 	}
 	else{
 		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
-		
+
 		if(ret == RET_TOOFARAWAY) {
 			return useItemFarEx(player->getID(), fromPos, fromStackPos, fromSpriteId,
 				toPos, toStackPos, toSpriteId, isHotkey);
@@ -1650,7 +1650,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		player->setNextActionTask(task);
 		return false;
 	}
-	
+
 	player->setNextActionTask(NULL);
 
 	Cylinder* fromCylinder = internalGetCylinder(player, fromPos);
@@ -2695,9 +2695,9 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 		return false;
 	}
 
-	// The event handler will probably want to send messages to the 
-	// channel. To prevent debugs, we make the player unable to hear 
-	// messages in the channel, since we haven't actually sent the 
+	// The event handler will probably want to send messages to the
+	// channel. To prevent debugs, we make the player unable to hear
+	// messages in the channel, since we haven't actually sent the
 	// channel to him yet.
 	channel->makePlayerDeaf(player);
 
@@ -2844,7 +2844,7 @@ bool Game::playerCloseNpcChannel(uint32_t playerId)
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 	getSpectators(list, player->getPosition());
-	
+
 	for(it = list.begin(); it != list.end(); ++it){
 		//if((npc = (*it)->getNpc())){
 			// REVSCRIPT TODO
@@ -2909,7 +2909,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 
 	Position walkToPos = fromPos;
 	ReturnValue ret = canUse(player, fromPos);
-	
+
 	if(ret != RET_NOERROR){
 		if(ret == RET_TOOFARAWAY){
 			return useItemFarEx(playerId, fromPos, fromStackPos, fromSpriteId,
@@ -3041,7 +3041,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 	ReturnValue ret = canUse(player, fromPos);
 	if(ret != RET_NOERROR){
 		if(ret == RET_TOOFARAWAY){
-			return useItemFarEx(playerId, fromPos, fromStackPos, spriteId, item->getPosition(), 
+			return useItemFarEx(playerId, fromPos, fromStackPos, spriteId, item->getPosition(),
 				item->getParent()->__getIndexOfThing(item), isHotkey, creatureId);
 		}
 
@@ -3742,7 +3742,7 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 			return false;
 	}
 
-	if(desc.length() == 0) 
+	if(desc.length() == 0)
 		return false;
 
 	player->sendTextMessage(MSG_INFO_DESCR, "You see " + desc);
@@ -4012,7 +4012,7 @@ bool Game::playerRequestOutfit(uint32_t playerId)
 		// script thinks we shouldn't display any dialog
 		return false;
 	}
-	
+
 	/*
 	// If the list is empty, add atleast one outfit
 	if(outfitList.empty()) {
@@ -4068,11 +4068,11 @@ bool Game::checkReload(Player* player, const std::string& text)
 		}
 		else if(param == " scripts" || param == "s"){
 			std::cout << "================================================================================\n";
-			
+
 			runShutdownScripts(false);
 			g_game.loadScripts();
 			runStartupScripts(false);
-			
+
 			for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
 				it != Game::listCreature.list.end();
 				++it)
@@ -4364,7 +4364,7 @@ bool Game::isSightClear(const Position& fromPos, const Position& toPos, bool flo
 bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 {
 	Script::OnTurn::Event evt(creature, dir);
-	
+
 	if(!script_system || !script_system->dispatchEvent(evt)){
 		if(creature->getDirection() != dir){
 			creature->setDirection(dir);
@@ -4502,17 +4502,17 @@ void Game::removeCreatureCheck(Creature* creature)
 	creature->creatureCheck = false;
 }
 
-uint32_t Game::getPlayersOnline() 
+uint32_t Game::getPlayersOnline()
 {
 	return (uint32_t)Player::listPlayer.list.size();
 }
 
-uint32_t Game::getMonstersOnline() 
+uint32_t Game::getMonstersOnline()
 {
 	return (uint32_t)Actor::listMonster.list.size();
 }
 
-uint32_t Game::getCreaturesOnline() 
+uint32_t Game::getCreaturesOnline()
 {
 	return (uint32_t)listCreature.list.size();
 }
@@ -5085,7 +5085,7 @@ void Game::checkDecay()
 {
 	g_scheduler.addEvent(createSchedulerTask(EVENT_DECAYINTERVAL,
 		boost::bind(&Game::checkDecay, this)));
-	
+
 	size_t bucket = (last_bucket + 1) % EVENT_DECAY_BUCKETS;
 
 	for(DecayList::iterator it = decayItems[bucket].begin(); it != decayItems[bucket].end();){
@@ -5391,7 +5391,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 	Account account =  IOAccount::instance()->loadAccount(acc, true);
 	int16_t removeNotations = 2; //2 - remove notations & kick, 1 - kick, 0 - nothing
-		
+
 	if(actionType == ACTION_NOTATION)
 	{
 		g_bans.addAccountNotation(account.number, player->getGUID(), comment, statement, reasonId, actionType);

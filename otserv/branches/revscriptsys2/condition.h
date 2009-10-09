@@ -41,7 +41,7 @@ struct LightInfo{
 
 struct EffectModPeriodicDamage{
 	EffectModPeriodicDamage() {}
-	EffectModPeriodicDamage(CombatType type, int32_t total, int32_t percent, int32_t value, int32_t rounds) : 
+	EffectModPeriodicDamage(CombatType type, int32_t total, int32_t percent, int32_t value, int32_t rounds) :
 		type(type),
 		total(total),
 		percent(percent),
@@ -63,7 +63,7 @@ struct EffectModPeriodicDamage{
 
 struct EffectModPeriodicStamina{
 	EffectModPeriodicStamina() {}
-	EffectModPeriodicStamina(int32_t value) : 
+	EffectModPeriodicStamina(int32_t value) :
 		value(value) {}
 
 	int32_t value;
@@ -71,7 +71,7 @@ struct EffectModPeriodicStamina{
 
 struct EffectModStat{
 	EffectModStat() {}
-	EffectModStat(PlayerStatType type, int32_t percent, int32_t value) : 
+	EffectModStat(PlayerStatType type, int32_t percent, int32_t value) :
 		type(type),
 		percent(percent),
 		value(value),
@@ -86,7 +86,7 @@ struct EffectModStat{
 
 struct EffectModSkill{
 	EffectModSkill() {}
-	EffectModSkill(SkillType type, int32_t percent, int32_t value) : 
+	EffectModSkill(SkillType type, int32_t percent, int32_t value) :
 		type(type),
 		percent(percent),
 		value(value),
@@ -101,7 +101,7 @@ struct EffectModSkill{
 
 struct EffectModSpeed{
 	EffectModSpeed() {}
-	EffectModSpeed(int32_t percent, int32_t value) : 
+	EffectModSpeed(int32_t percent, int32_t value) :
 		percent(percent),
 		value(value),
 		delta(0) {}
@@ -115,10 +115,10 @@ struct EffectModSpeed{
 
 struct EffectModRegen{
 	EffectModRegen() {}
-	EffectModRegen(int32_t percent, int32_t value) : 
+	EffectModRegen(int32_t percent, int32_t value) :
 		percent(percent),
 		value(value) {}
-	EffectModRegen(PlayerStatType type, int32_t percent, int32_t value) : 
+	EffectModRegen(PlayerStatType type, int32_t percent, int32_t value) :
 		type(type),
 		percent(percent),
 		value(value) {}
@@ -130,7 +130,7 @@ struct EffectModRegen{
 
 struct EffectModLight{
 	EffectModLight() {}
-	EffectModLight(int32_t level, int32_t color) : 
+	EffectModLight(int32_t level, int32_t color) :
 		level(level),
 		color(color) {}
 
@@ -141,7 +141,7 @@ struct EffectModLight{
 struct EffectModShapeShift{
 	EffectModShapeShift() {}
 	EffectModShapeShift(uint32_t lookType, uint32_t lookTypeEx, uint32_t lookHead,
-		uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet, uint32_t lookAddons) : 
+		uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet, uint32_t lookAddons) :
 		lookType(lookType),
 		lookTypeEx(lookTypeEx),
 		lookHead(lookHead),
@@ -287,7 +287,7 @@ public:
 		bool onBegin(Creature* creature);
 		bool onEnd(Creature* creature, ConditionEnd reason);
 		bool onUpdate(Creature* creature, const Condition::Effect* addEffect);
-		
+
 		bool onTick(Creature* creature, uint32_t ticks);
 		void setOwner(Condition* condition) {owner_condition = condition;}
 
@@ -299,8 +299,8 @@ public:
 		int32_t getSkillValue(Creature* creature, SkillType skillType, int32_t percent, int32_t value);
 
 		Effect::Type type;
-		boost::any data;
 		uint32_t interval;
+		boost::any data;
 
 		//variables that should not be serialized
 		uint32_t tickCount;

@@ -3,10 +3,10 @@
 ----------------------------
 
 -- data directory location
-datadir = "data/"
+data_directory = "data/"
 
 -- map location
-map = "data/world/map.otbm"
+map_file = "data/world/map.otbm"
 
 -- Type of map storage,
 -- 'relational' - Slower, but possible to run database queries to change all items to another id for example.
@@ -15,18 +15,14 @@ map = "data/world/map.otbm"
 -- type /reload config and the save the server with /closeserver serversave
 map_store_type = "binary"
 
--- mapkind
--- options: OTBM for binary map, XML for OTX map
-mapkind = "OTBM"
-
 -- server name
-servername = "OTServ"
+server_name = "OTServ"
 
 -- server location
-location = "Germany"
+server_location = "Germany"
 
 -- server ip (the ip that server listens on)
-ip = "127.0.0.1"
+server_ip = "127.0.0.1"
 
 -- login server port
 -- This should be the port used for connecting with IP changers etc.
@@ -46,41 +42,41 @@ status_port = "7171"
 admin_port = "7171"
 
 -- server url
-url = "http://otfans.net"
+server_url = "http://otfans.net"
 
 -- server owner name
-ownername = "Tliff"
+server_owner_name = "Tliff"
 
 -- server owner email
-owneremail = "otserv@tibia.de"
+server_owner_email = "otserv@tibia.de"
 
 -- world name
-worldname = "OpenTibia"
+game_world_name = "OpenTibia"
 
 -- world type
 -- options: pvp, no-pvp, pvp-enforced
-worldtype = "pvp"
+game_world_type = "pvp"
 
 -- does player rate (from lua functions) count on experience gained from killings players on pvp-e worlds?
 rates_for_player_killing = false
 
 -- exhausted time in ms (1000 = 1 second) for "yell" speak type
-exhausted = 1000
+yell_exhausted = 1000
 
 -- exhausted time in ms (1000 = 1 second) for aggressive spells/weapons
-fightexhausted = 2000
+fight_exhausted = 2000
 
 -- exhausted time in ms (1000 = 1 second) for none-aggressive spells
-healexhausted = 1000
+heal_exhausted = 1000
 
 -- exhausted time in ms (1000 = 1 second) for floor changing
 stairhop_exhausted = 2000
 
 -- attack speed using melee (1000 = 1 second)
-attackspeed = 2000
+attack_speed = 2000
 
 -- how many ms to add if the player is already exhausted and tries to cast a spell/yells (1000 = 1 second)
-exhaustedadd = 200
+exhausted_add = 200
 
 -- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1 second)
 in_fight_duration = 60000
@@ -92,23 +88,23 @@ field_ownership_duration = 5000
 death_assist_count = 19
 
 -- enable (advanced, item based) hotkeys?
-enablehotkeys = true
+enable_hotkeys = true
 
 -- minimum amount of time between actions ('Use') (1000 = 1 second)
-minactioninterval = 200
+minimum_action_interval = 200
 
 -- minimum amount of time between extended actions ('Use with...') (1000 = 1 second)
-minactionexinterval = 1000
+minimum_extended_action_interval = 1000
 
 -- house rent period
 -- options: daily, weekly, monthly
-houserentperiod = "monthly"
+house_rent_period = "monthly"
 
 -- whether or not to check for premium accounts when using beds
-premonlybeds = true
+bed_only_premium = true
 
 -- Should the server use account balance system or depot system for paying houses?
-useaccbalance = true
+use_account_balance = true
 
 -- How long time the red skull will last in seconds (default 30 days)
 red_skull_duration = 30*24*60*60
@@ -135,10 +131,10 @@ kills_per_week_black_skull = 10
 kills_per_month_black_skull = 20
 
 -- Broadcast violation window banishments
-broadcast_banishments = "no"
+broadcast_banishments = false
 
 -- Violation window config
-max_violation_comment_size = 255
+maximum_violation_comment_size = 255
 notations_to_banishment = 3
 warnings_to_final_banishment = 4
 warnings_to_deletion = 5
@@ -147,7 +143,7 @@ final_banishment_length = 30*86400 --seconds
 ip_banishment_length = 86400 --seconds
 
 -- Extra experience % per player when sharing experience
-party_exp_mul = 5
+party_experience_multiplier = 5
 
 -- Anti-MageBomb system
 -- This system works as in Tibia, time in milliseconds
@@ -158,20 +154,20 @@ show_crash_window = true
 
 -- AFK Configuration (in milliseconds, but use values for minutes)
 -- Maximum time a player can stay away from keyboard before being kicked
-max_idle_time = 16*60*1000
+maximum_idle_time = 16*60*1000
 -- Player will be warned about being kicked at this time
-max_idle_time_warning = 15*60*1000
+maximum_idle_time_warning = 15*60*1000
 
 -- Should just premium players be able to use addons?
 addons_only_for_premium = true
 
 -- rates (experience, skill, magic level, loot and spawn)
-rate_exp = 1
-rate_exp_pvp = 1
+rate_experience = 1
+rate_experience_pvp = 1
 rate_skill = 1
-rate_mag = 1
-rate_loot = 1
-rate_spawn = 1
+rate_magic_level = 1
+rate_monster_loot = 1
+rate_monster_spawn = 1
 
 -- Stamina Configuration
 -- Gain stamina rate - 1 second offline = X milliseconds of stamina
@@ -213,57 +209,57 @@ allow_gamemaster_multiclient = false
 
 -- despawn configs
 -- how many floors can a monster go from his spawn before despawning
-despawnrange = 2
+monster_despawn_range = 2
 -- how many square metters can a monster be far from his spawn before despawning
-despawnradius = 50
+monster_despawn_radius = 50
 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
-maxmessagebuffer = 4
+maximum_message_buffer = 4
 
 -- max amount of none stackable items that a NPC will sell to a player at the same time
-npc_max_nonestackable_sell_amount = 100
+npc_maximum_nonestackable_sell_amount = 100
 
 -- motd (the message box that you sometimes get before you choose characters)
-motd = "Welcome to OTServ 0.6.3!"
-motdnum = "1"
+message_of_the_day = "Welcome to OTServ 0.6.3!"
+message_of_the_day_number = "1"
 
 -- login message
-loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otfans.net."
+login_message = "Welcome to OTServ 0.6.3. For help visit http://otfans.net."
 
 -- how many logins attempts until ip is temporary disabled
 -- set to 0 to disable
-logintries = 5
+maximum_login_tries = 5
 
 -- how long the retry timeout until a new login can be made (without disabling the ip)
-retrytimeout = 5000
+login_retry_timeout = 5000
 
 -- how long the player need to wait until the ip is allowed again
-logintimeout = 60 * 1000
+login_unlock_timeout = 60 * 1000
 
 -- allow clones (multiple logins of the same char)
-allowclones = false
+allow_character_clones = false
 
 -- only one player online per account
-checkaccounts = true
+one_player_per_account = true
 
 -- max number of players allowed
-maxplayers = "900"
+maximum_players = "900"
 
 -- save client debug assertion reports
-saveclientdebug = true
+save_client_debug = true
 
 -- Set the max query interval for retrieving status information
 -- default: 5 minutes / IP
 -- set to 0 to disable
-statustimeout = 30 * 1000
+status_information_timeout = 30 * 1000
 
 -- accounts password type
 -- options: plain, md5, sha1
-passwordtype = "plain"
+password_type = "plain"
 
 -- Password salt
 -- Offers better security against rainbow table attacks etc.
-passwordsalt = ""
+password_salt = ""
 
 -- House configuration (game_class)
 -- House tile price
@@ -276,18 +272,21 @@ house_level = 1
 -- PS: This info is going to be shown just if house has no owner
 show_house_prices = false
 
--- SQL type
--- options: mysql, sqlite, odbc or pgsql
-sql_type = "sqlite"
+-- The amount of events that can be called inside eachother
+script_recursion_depth = 16
 
---- SQL connection part
-sql_db   = "db.s3db"
---- sql_db = "otserv" -- use this for MySQL/PgSQL
---- sql_db = "Your Source" -- ODBC
+-- Database configuration
+-- options: mysql, sqlite, odbc or pgsql
+database_type = "mysql"
+
+-- SQL connection part
+database_schema = "revscriptsys"
+-- database_schema = "otserv" -- use this for MySQL/PgSQL
+-- database_schema = "Your Source" -- ODBC
 
 -- there settings are not used by SQLite
-sql_host = "localhost"
-sql_port = 3306
---- sql_port = 5432 -- use this for PgSQL
-sql_user = "root"
-sql_pass = ""
+database_host = "localhost"
+database_port = 3306
+-- database_port = 5432 -- use this for PgSQL
+database_username = "root"
+database_password = ""

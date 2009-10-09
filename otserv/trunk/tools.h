@@ -51,7 +51,7 @@ std::string asLowerCaseString(const std::string& source);
 std::string asUpperCaseString(const std::string& source);
 bool utf8ToLatin1(char* intext, std::string& outtext);
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
-#if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
+#if defined __WINDOWS__ && !defined __GNUC__
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value);
 #endif
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
@@ -60,6 +60,9 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 bool readXMLContentString(xmlNodePtr node, std::string& value);
 std::vector<std::string> explodeString(const std::string& inString, const std::string& separator);
 bool hasBitSet(uint32_t flag, uint32_t flags);
+
+uint32_t rand24b();
+float box_muller(float m, float s);
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM);
 
