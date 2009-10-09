@@ -2395,15 +2395,15 @@ void ProtocolGame::sendHouseWindow(uint32_t windowTextId, House* _house,
 }
 
 void ProtocolGame::sendOutfitWindow()
- {
- 	#define MAX_NUMBER_OF_OUTFITS 25
- 	//client 8.0 outfits limit is 25
+{
+	#define MAX_NUMBER_OF_OUTFITS 25
+	//client 8.0 outfits limit is 25
 
- 	NetworkMessage_ptr msg = getOutputBuffer();
- 	if(msg){
- 		TRACK_MESSAGE(msg);
- 		msg->AddByte(0xC8);
- 		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
+	NetworkMessage_ptr msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+		msg->AddByte(0xC8);
+		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
 
 		std::list<Outfit> outfitList;
 		for(OutfitMap::iterator it = player->outfits.begin(); it != player->outfits.end(); ++it){
@@ -2412,26 +2412,26 @@ void ProtocolGame::sendOutfitWindow()
 			}
 		}
 
- 		if(outfitList.size() > 0){
+		if(outfitList.size() > 0){
 			if(outfitList.size() > MAX_NUMBER_OF_OUTFITS){
- 				msg->AddByte(MAX_NUMBER_OF_OUTFITS);
- 			}
+				msg->AddByte(MAX_NUMBER_OF_OUTFITS);
+			}
 			else{
-	 			msg->AddByte(outfitList.size());
+				msg->AddByte(outfitList.size());
 			}
 
- 			uint32_t counter = 0;
+			uint32_t counter = 0;
 			std::list<Outfit>::iterator it;
- 			for(it = outfitList.begin(); it != outfitList.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
- 				msg->AddU16(it->lookType);
+			for(it = outfitList.begin(); it != outfitList.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
+				msg->AddU16(it->lookType);
 				msg->AddString(it->name);
 				if(g_config.getNumber(ConfigManager::ADDONS_ONLY_FOR_PREMIUM) && !player->isPremium()){
- 					msg->AddByte(0);
+					msg->AddByte(0);
 				}
 				else{
 					msg->AddByte(it->addons);
 				}
- 			}
+			}
 		}
 		else{
 			msg->AddByte(1);
@@ -2439,8 +2439,8 @@ void ProtocolGame::sendOutfitWindow()
 			msg->AddString("");
 			msg->AddByte(player->getDefaultOutfit().lookAddons);
 		}
- 	}
- }
+	}
+}
 
 void ProtocolGame::sendVIPLogIn(uint32_t guid)
 {
