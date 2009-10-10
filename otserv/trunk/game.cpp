@@ -2351,7 +2351,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-	Thing* thing = internalGetThing(player, pos, stackPos, spriteId, STACKPOS_USEITEM);
+	Thing* thing = internalGetThing(player, pos, stackPos, spriteId);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
