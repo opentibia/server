@@ -37,8 +37,8 @@ Condition* Condition::createPeriodDamageCondition(ConditionId id, uint32_t inter
 	Condition* condition = Condition::createCondition(id, 0);
 	if(condition){
 		damage = std::abs(damage);
-		EffectModPeriodicDamage mod(condition->getCombatType(), 0, 0, damage, rounds);
-		Condition::Effect* effect = new Condition::Effect(Effect::PERIODIC_DAMAGE, interval, mod);
+		Condition::Effect effect = Condition::Effect::createPeriodicDamage(interval, condition->getCombatType(),
+			0, 0, damage, rounds);
 		condition->addEffect(effect);
 		return condition;
 	}
@@ -57,8 +57,8 @@ Condition* Condition::createPeriodAverageDamageCondition(ConditionId id, uint32_
 	if(condition){
 		startDamage = std::abs(startDamage);
 		totalDamage = std::abs(totalDamage);
-		EffectModPeriodicDamage mod(condition->getCombatType(), totalDamage, (totalDamage / startDamage), startDamage, 0);
-		Condition::Effect* effect = new Condition::Effect(Effect::PERIODIC_DAMAGE, interval, mod);
+		Condition::Effect effect = Condition::Effect::createPeriodicDamage(interval, condition->getCombatType(),
+			totalDamage, (totalDamage / startDamage), startDamage, 0);
 		condition->addEffect(effect);
 		return condition;
 	}
@@ -97,7 +97,7 @@ Condition* Condition::createCondition(ConditionId id, uint32_t ticks, uint32_t s
 		{
 			Condition* condition = Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId);
 			if(condition){
-				Condition::Effect* effect = Condition::Effect::createModStamina(1000, -g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS));
+				Condition::Effect effect = Condition::Effect::createModStamina(1000, -g_config.getNumber(ConfigManager::RATE_STAMINA_LOSS));
 				condition->addEffect(effect);
 			}
 			return condition;
@@ -151,9 +151,6 @@ Condition* Condition::createCondition(PropStream& propStream)
 
 Condition::~Condition()
 {
-	for(std::list<Condition::Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
-		delete *it;
-	}
 	effectList.clear();
 }
 
@@ -167,8 +164,8 @@ Condition::Condition(const Condition& rhs)
 	flags = rhs.flags;
 	combatSource = rhs.combatSource;
 
-	for(std::list<Effect*>::const_iterator it = rhs.effectList.begin(); it != rhs.effectList.end(); ++it){
-		addEffect(new Condition::Effect(*(*it)));
+	for(std::list<Effect>::const_iterator it = rhs.effectList.begin(); it != rhs.effectList.end(); ++it){
+		addEffect(*it);
 	}
 }
 
@@ -210,8 +207,8 @@ uint16_t Condition::getIcon() const
 
 bool Condition::onBegin(Creature* creature)
 {
-	for(std::list<Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
-		if(!(*it)->onBegin(creature)){
+	for(std::list<Effect>::iterator it = effectList.begin(); it != effectList.end(); ++it){
+		if(!(*it).onBegin(creature)){
 			return false;
 		}
 	}
@@ -221,8 +218,8 @@ bool Condition::onBegin(Creature* creature)
 
 void Condition::onEnd(Creature* creature, ConditionEnd reason)
 {
-	for(std::list<Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
-		(*it)->onEnd(creature, reason);
+	for(std::list<Effect>::iterator it = effectList.begin(); it != effectList.end(); ++it){
+		(*it).onEnd(creature, reason);
 	}
 }
 
@@ -252,9 +249,9 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 
 	bool fullUpdate = (effectList.size() != addCondition->effectList.size());
 	if(!fullUpdate){
-		std::list<Effect*>::iterator curIt = effectList.begin();
-		for(std::list<Effect*>::const_iterator it = addCondition->effectList.begin(); it != addCondition->effectList.end(); ++it){
-			if(!(*curIt)->onUpdate(creature, *it)){
+		std::list<Effect>::iterator curIt = effectList.begin();
+		for(std::list<Effect>::const_iterator it = addCondition->effectList.begin(); it != addCondition->effectList.end(); ++it){
+			if(!(*curIt).onUpdate(creature, *it)){
 				fullUpdate = true;
 				break;
 			}
@@ -265,14 +262,13 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 
 	if(fullUpdate){
 		//Condition has been changed, maybe from a script reload, doing a full update
-		for(std::list<Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
-			(*it)->onEnd(creature, CONDITIONEND_REMOVED);
-			delete (*it);
+		for(std::list<Effect>::iterator it = effectList.begin(); it != effectList.end(); ++it){
+			(*it).onEnd(creature, CONDITIONEND_REMOVED);
 		}
 		effectList.clear();
 
-		for(std::list<Effect*>::const_iterator it = addCondition->effectList.begin(); it != addCondition->effectList.end(); ++it){
-			addEffect(new Effect(*(*it)) );
+		for(std::list<Effect>::const_iterator it = addCondition->effectList.begin(); it != addCondition->effectList.end(); ++it){
+			addEffect(*it);
 		}
 	}
 
@@ -281,8 +277,8 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 
 bool Condition::onTick(Creature* creature, uint32_t interval)
 {
-	for(std::list<Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
-		if(!(*it)->onTick(creature, interval)){
+	for(std::list<Effect>::iterator it = effectList.begin(); it != effectList.end(); ++it){
+		if(!(*it).onTick(creature, interval)){
 			return false;
 		}
 	}
@@ -298,9 +294,9 @@ bool Condition::onTick(Creature* creature, uint32_t interval)
 	return true;
 }
 
-void Condition::addEffect(Condition::Effect* effect)
+void Condition::addEffect(Effect effect)
 {
-	effect->setOwner(this);
+	effect.setOwner(this);
 	effectList.push_back(effect);
 }
 
@@ -372,230 +368,11 @@ bool Condition::unserialize(PropStream& propStream)
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT)
 		{
-			uint32_t value = 0;
-			//effect type
-			if(!propStream.GET_VALUE(value)){
+			Effect effect;
+			if(!effect.unserialize(propStream)){
 				return false;
 			}
 
-			//interval
-			uint32_t interval;
-			if(!propStream.GET_VALUE(interval)){
-				return false;
-			}
-
-			//size
-			uint32_t size;
-			if(!propStream.GET_VALUE(size)){
-				return false;
-			}
-
-			//revision
-			uint32_t revision;
-			if(!propStream.GET_VALUE(revision)){
-				return false;
-			}
-
-			Effect::Type effectType = Effect::Type(value);
-			boost::any data = boost::any();
-
-			switch(effectType){
-				case Effect::PERIODIC_HEAL:
-				case Effect::PERIODIC_DAMAGE:
-				{
-					if(revision != 1){
-						return false;
-					}
-					EffectModPeriodicDamage mod;
-					if(!propStream.GET_VALUE(value)){
-						return false;
-					}
-					mod.type = CombatType::fromInteger(value);
-
-					if(!propStream.GET_VALUE(mod.total)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.percent)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.value)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.rounds)){
-						return false;
-					}
-
-					data = mod;
-					break;
-				}
-				case Effect::PERIODIC_MOD_STAMINA:
-				{
-					if(revision != 1){
-						return false;
-					}
-					EffectModPeriodicStamina mod;
-					if(!propStream.GET_VALUE(mod.value)){
-						return false;
-					}
-					data = mod;
-					break;
-				}
-				case Effect::REGEN_HEALTH:
-				case Effect::REGEN_MANA:
-				case Effect::REGEN_SOUL:
-				{
-					if(revision != 1){
-						return false;
-					}
-					uint32_t value;
-					if(!propStream.GET_VALUE(value)){
-						return false;
-					}
-
-					EffectModRegen mod;
-					mod.type = PlayerStatType::fromInteger(value);
-
-					if(!propStream.GET_VALUE(mod.percent)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.value)){
-						return false;
-					}
-					data = mod;
-					break;
-				}
-				case Effect::MOD_SPEED:
-				{
-					if(revision != 1){
-						return false;
-					}
-					EffectModSpeed mod;
-					if(!propStream.GET_VALUE(mod.percent)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.value)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.delta)){
-						return false;
-					}
-					data = mod;
-					break;
-				}
-				case Effect::MOD_STAT:
-				{
-					if(revision != 1){
-						return false;
-					}
-					uint32_t value;
-					if(!propStream.GET_VALUE(value)){
-						return false;
-					}
-
-					EffectModStat mod;
-					mod.type = PlayerStatType::fromInteger(value);
-
-					if(!propStream.GET_VALUE(mod.percent)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.value)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.delta)){
-						return false;
-					}
-					data = mod;
-					break;
-				}
-				case Effect::MOD_SKILL:
-				{
-					if(revision != 1){
-						return false;
-					}
-					uint32_t value;
-					if(!propStream.GET_VALUE(value)){
-						return false;
-					}
-
-					EffectModSkill mod;
-					mod.type = SkillType::fromInteger(value);
-
-					if(!propStream.GET_VALUE(mod.percent)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.value)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.delta)){
-						return false;
-					}
-					data = mod;
-					break;
-				}
-				case Effect::SHAPESHIFT:
-				{
-					if(revision != 1){
-						return false;
-					}
-					EffectModShapeShift mod;
-					if(!propStream.GET_VALUE(mod.lookType)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.lookTypeEx)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.lookHead)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.lookBody)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.lookLegs)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.lookFeet)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.lookAddons)){
-						return false;
-					}
-					data = mod;
-					break;
-				}
-				case Effect::LIGHT:
-				{
-					if(revision != 1){
-						return false;
-					}
-					EffectModLight mod;
-					if(!propStream.GET_VALUE(mod.level)){
-						return false;
-					}
-					if(!propStream.GET_VALUE(mod.color)){
-						return false;
-					}
-					data = mod;
-					break;
-				}
-				case Effect::DISPEL:
-				{
-					if(revision != 1){
-						return false;
-					}
-					EffectModDispel mod;
-					if(!propStream.GET_STRING(mod.name)){
-						return false;
-					}
-					data = mod;
-					break;
-				}
-
-				case Effect::SCRIPT:
-					break;
-				default: return false;
-			}
-
-			Condition::Effect* effect = new Condition::Effect(effectType, interval, data);
 			effectList.push_back(effect);
 		}
 
@@ -626,110 +403,9 @@ bool Condition::serialize(PropWriteStream& propWriteStream)
 	propWriteStream.ADD_UCHAR(*CONDITIONATTRIBUTE_FLAGS);
 	propWriteStream.ADD_VALUE(flags);
 
-	for(std::list<Effect*>::iterator it = effectList.begin(); it != effectList.end(); ++it){
-		propWriteStream.ADD_UCHAR(*CONDITIONATTRIBUTE_EFFECT);
-		propWriteStream.ADD_ULONG((*it)->type);
-		propWriteStream.ADD_ULONG((*it)->interval);
-
-		switch((*it)->type){
-			case Effect::PERIODIC_HEAL:
-			case Effect::PERIODIC_DAMAGE:
-			{
-				EffectModPeriodicDamage& mod = (*it)->getModEffect<EffectModPeriodicDamage>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1); /*revision*/
-				propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
-				propWriteStream.ADD_VALUE(mod.total);
-				propWriteStream.ADD_VALUE(mod.percent);
-				propWriteStream.ADD_VALUE(mod.value);
-				propWriteStream.ADD_VALUE(mod.rounds);
-				break;
-			}
-			case Effect::PERIODIC_MOD_STAMINA:
-			{
-				EffectModPeriodicStamina& mod = (*it)->getModEffect<EffectModPeriodicStamina>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1);
-				propWriteStream.ADD_VALUE(mod.value);
-				break;
-			}
-			case Effect::REGEN_HEALTH:
-			case Effect::REGEN_MANA:
-			case Effect::REGEN_SOUL:
-			{
-				EffectModRegen& mod = (*it)->getModEffect<EffectModRegen>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1);
-				propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
-				propWriteStream.ADD_VALUE(mod.percent);
-				propWriteStream.ADD_VALUE(mod.value);
-				break;
-			}
-			case Effect::MOD_SPEED:
-			{
-				EffectModSpeed& mod = (*it)->getModEffect<EffectModSpeed>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1);
-				propWriteStream.ADD_VALUE(mod.percent);
-				propWriteStream.ADD_VALUE(mod.value);
-				propWriteStream.ADD_VALUE(mod.delta);
-				break;
-			}
-			case Effect::MOD_STAT:
-			{
-				EffectModStat& mod = (*it)->getModEffect<EffectModStat>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1);
-				propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
-				propWriteStream.ADD_VALUE(mod.percent);
-				propWriteStream.ADD_VALUE(mod.value);
-				propWriteStream.ADD_VALUE(mod.delta);
-				break;
-			}
-			case Effect::MOD_SKILL:
-			{
-				EffectModSkill& mod = (*it)->getModEffect<EffectModSkill>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1);
-				propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
-				propWriteStream.ADD_VALUE(mod.percent);
-				propWriteStream.ADD_VALUE(mod.value);
-				propWriteStream.ADD_VALUE(mod.delta);
-				break;
-			}
-			case Effect::SHAPESHIFT:
-			{
-				EffectModShapeShift& mod = (*it)->getModEffect<EffectModShapeShift>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1);				
-				propWriteStream.ADD_VALUE(mod.lookType);
-				propWriteStream.ADD_VALUE(mod.lookTypeEx);
-				propWriteStream.ADD_VALUE(mod.lookHead);
-				propWriteStream.ADD_VALUE(mod.lookBody);
-				propWriteStream.ADD_VALUE(mod.lookLegs);
-				propWriteStream.ADD_VALUE(mod.lookFeet);
-				propWriteStream.ADD_VALUE(mod.lookAddons);
-				break;
-			}
-			case Effect::LIGHT:
-			{
-				EffectModLight& mod = (*it)->getModEffect<EffectModLight>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1);
-				propWriteStream.ADD_VALUE(mod.level);
-				propWriteStream.ADD_VALUE(mod.color);
-				break;
-			}
-			case Effect::DISPEL:
-			{
-				EffectModDispel& mod = (*it)->getModEffect<EffectModDispel>();
-				propWriteStream.ADD_ULONG(sizeof(mod));
-				propWriteStream.ADD_ULONG(1);
-				propWriteStream.ADD_STRING(mod.name);
-				break;
-			}
-			default: return false;
-		}
+	for(std::list<Effect>::iterator it = effectList.begin(); it != effectList.end(); ++it){
+		Effect& effect = (*it);
+		effect.serialize(propWriteStream);
 	}
 
 	return true;
@@ -740,10 +416,10 @@ int32_t Condition::Effect::getStatValue(Creature* creature, PlayerStatType statT
 	if(percent != 0){
 		switch(statType.value()){
 			case enums::STAT_MAXHITPOINTS:
-				return (int32_t)(creature->getMaxMana() * (percent / 100.f));
+				return (int32_t)((float)creature->getMaxHealth() * (percent / 100.f));
 			
-				case enums::STAT_MAXMANAPOINTS:
-					return (int32_t)(creature->getMaxMana() * (percent / 100.f));
+			case enums::STAT_MAXMANAPOINTS:
+				return (int32_t)((float)creature->getMaxMana() * (percent / 100.f));
 
 			default:
 				break;
@@ -752,9 +428,9 @@ int32_t Condition::Effect::getStatValue(Creature* creature, PlayerStatType statT
 		if(Player* player = creature->getPlayer()){
 			switch(statType.value()){
 				case enums::STAT_SOULPOINTS:
-					return (int32_t)(player->getPlayerInfo(PLAYERINFO_SOUL) * (percent / 100.f));
+					return (int32_t)((float)player->getPlayerInfo(PLAYERINFO_SOUL) * (percent / 100.f));
 				case enums::STAT_MAGICPOINTS:
-					return (int32_t)(player->getMagicLevel() * (percent / 100.f));
+					return (int32_t)((float)player->getMagicLevel() * (percent / 100.f));
 				default:
 					break;
 			}
@@ -787,27 +463,30 @@ bool Condition::Effect::onBegin(Creature* creature)
 	switch(type){
 		case Effect::MOD_SPEED:
 		{
-			EffectModSpeed& modSpeed = getModEffect<EffectModSpeed>();
-			modSpeed.delta = (int32_t)std::ceil(((float)creature->getBaseSpeed()) * ((float)modSpeed.percent) / 100 + modSpeed.value);
-			g_game.changeSpeed(creature, modSpeed.delta);
+			Effect::ModSpeed& modSpeed = getModEffect<Effect::ModSpeed>();
+			int32_t delta = (int32_t)std::ceil(((float)creature->getBaseSpeed()) * ((float)modSpeed.percent) / 100 + modSpeed.value);
+			g_game.changeSpeed(creature, delta);
+			modSpeed.delta += delta;
 			break;
 		}
 
 		case Effect::LIGHT:
 		{
-			//interval = getTicks()/lightInfo.level;
-			EffectModLight& modLight = getModEffect<EffectModLight>();
+			const Effect::ModLight& modLight = getModEffect<const Effect::ModLight>();
 			LightInfo lightInfo;
 			lightInfo.level = modLight.level;
 			lightInfo.color = modLight.color;
 			creature->setCreatureLight(lightInfo);
 			g_game.changeLight(creature);
+
+			//set the interval for the periodic light changes
+			interval = owner_condition->getTicks()/lightInfo.level;
 			break;
 		}
 
 		case Effect::SHAPESHIFT:
 		{
-			EffectModShapeShift& modShapeShift = getModEffect<EffectModShapeShift>();
+			const Effect::ModShapeShift& modShapeShift = getModEffect<const Effect::ModShapeShift>();
 			OutfitType outfit;
 			outfit.lookType = modShapeShift.lookType;
 			outfit.lookTypeEx = modShapeShift.lookTypeEx;
@@ -821,7 +500,7 @@ bool Condition::Effect::onBegin(Creature* creature)
 
 		case Effect::DISPEL:
 		{
-			EffectModDispel& modDispel = getModEffect<EffectModDispel>();			
+			const Effect::ModDispel& modDispel = getModEffect<const Effect::ModDispel>();
 			CombatSource combatSource = owner_condition->combatSource;
 			combatSource.setSourceIsCondition(true);
 			creature->removeCondition(modDispel.name, combatSource);
@@ -844,19 +523,21 @@ bool Condition::Effect::onBegin(Creature* creature)
 		switch(type){
 			case Effect::MOD_STAT:
 			{
-				EffectModStat& modStat = getModEffect<EffectModStat>();
-				modStat.delta = getStatValue(creature, modStat.type, modStat.percent, modStat.value);
-				player->setVarStats(modStat.type, modStat.delta);
+				Effect::ModStat& modStat = getModEffect<Effect::ModStat>();
+				int32_t delta = getStatValue(creature, modStat.type, modStat.percent, modStat.value);
+				player->setVarStats(modStat.type, delta);
 				player->sendStats();
+				modStat.delta += delta;
 				break;
 			}
 			
 			case Effect::MOD_SKILL:
 			{
-				EffectModSkill& modSkill = getModEffect<EffectModSkill>();
-				modSkill.delta = getSkillValue(creature, modSkill.type, modSkill.percent, modSkill.value);
-				player->setVarSkill(modSkill.type, modSkill.delta);
+				Effect::ModSkill& modSkill = getModEffect<Effect::ModSkill>();
+				int32_t delta = getSkillValue(creature, modSkill.type, modSkill.percent, modSkill.value);
+				player->setVarSkill(modSkill.type, delta);
 				player->sendSkills();
+				modSkill.delta += delta;
 				break;
 			}
 
@@ -874,7 +555,7 @@ bool Condition::Effect::onEnd(Creature* creature, ConditionEnd reason)
 		case Effect::MOD_SPEED:
 		{
 			//revert our changes
-			EffectModSpeed& modSpeed = getModEffect<EffectModSpeed>();
+			const Effect::ModSpeed& modSpeed = getModEffect<const Effect::ModSpeed>();
 			g_game.changeSpeed(creature, -modSpeed.delta);
 			break;
 		}
@@ -910,7 +591,7 @@ bool Condition::Effect::onEnd(Creature* creature, ConditionEnd reason)
 			case Effect::MOD_STAT:
 			{
 				//revert our changes
-				EffectModStat& modStat = getModEffect<EffectModStat>();
+				const Effect::ModStat& modStat = getModEffect<const Effect::ModStat>();
 				player->setVarStats(modStat.type, -modStat.delta);
 				player->sendStats();
 				break;
@@ -919,7 +600,7 @@ bool Condition::Effect::onEnd(Creature* creature, ConditionEnd reason)
 			case Effect::MOD_SKILL:
 			{
 				//revert our changes
-				EffectModSkill& modSkill = getModEffect<EffectModSkill>();
+				const Effect::ModSkill& modSkill = getModEffect<const Effect::ModSkill>();
 				player->setVarSkill(modSkill.type, -modSkill.delta);
 				player->sendSkills();
 				break;
@@ -933,16 +614,16 @@ bool Condition::Effect::onEnd(Creature* creature, ConditionEnd reason)
 	return true;
 }
 
-bool Condition::Effect::onUpdate(Creature* creature, const Condition::Effect* addEffect)
+bool Condition::Effect::onUpdate(Creature* creature, const Effect& addEffect)
 {
-	if(type != addEffect->type){
+	if(type != addEffect.type){
 		return false;
 	}
 
 	onEnd(creature, CONDITIONEND_UPDATE);
 
-	data = addEffect->data;
-	interval = addEffect->interval;
+	data = addEffect.data;
+	interval = addEffect.interval;
 	return true;
 }
 
@@ -960,21 +641,21 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 			case Effect::PERIODIC_HEAL:
 			case Effect::PERIODIC_DAMAGE:
 			{
-				EffectModPeriodicDamage& modPeriodicDamage = getModEffect<EffectModPeriodicDamage>();
+				Effect::ModPeriodicDamage& modPeriodicDamage = getModEffect<Effect::ModPeriodicDamage>();
 				CombatSource combatSource = owner_condition->combatSource;
 				combatSource.setSourceItem(NULL);
 				combatSource.setSourceIsCondition(true);
 
 				if(type == Effect::PERIODIC_HEAL){
 					int32_t heal = modPeriodicDamage.value;
-					//std::cout << "Healing " << mod_value << " "  << combatType.toString() << " to " << creature->getName() << std::endl;
+					//std::cout << "Healing " << heal << " to " << creature->getName() << std::endl;
 					if(!g_game.combatBlockHit(COMBAT_HEALING, combatSource, creature, heal, false, false)){
 						g_game.combatChangeHealth(COMBAT_HEALING, combatSource, creature, heal);
 					}
 				}
 				else{
 					int32_t damage = -modPeriodicDamage.value;
-					//std::cout << "Dealing " << mod_value << " "  << combatType.toString() << " to " << creature->getName() << std::endl;
+					//std::cout << "Dealing " << damage << " "  << modPeriodicDamage.type.toString() << " to " << creature->getName() << std::endl;
 					if(!g_game.combatBlockHit(modPeriodicDamage.type, combatSource, creature, damage, false, false)){
 						g_game.combatChangeHealth(modPeriodicDamage.type, combatSource, creature, damage);
 					}
@@ -1025,15 +706,17 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 			case Effect::REGEN_SOUL:
 			{
 				if(creature->getZone() != ZONE_PROTECTION){
-					EffectModRegen modRegen = getModEffect<EffectModRegen>();
+					Effect::ModRegen modRegen = getModEffect<Effect::ModRegen>();
+					int32_t value = getStatValue(creature, modRegen.type, modRegen.percent, modRegen.value);
+					//std::cout << "Regen " << value << " to " << creature->getName() << std::endl;
 					if(type == Effect::REGEN_HEALTH){
-						creature->changeHealth(getStatValue(creature, modRegen.type, modRegen.percent, modRegen.value));
+						creature->changeHealth(value);
 					}
 					else if(type == Effect::REGEN_MANA){
-						creature->changeMana(getStatValue(creature, modRegen.type, modRegen.percent, modRegen.value));
+						creature->changeMana(value);
 					}
 					else if(Player* player = creature->getPlayer()){
-						player->changeSoul(getStatValue(creature, modRegen.type, modRegen.percent, modRegen.value));
+						player->changeSoul(value);
 					}
 				}
 				break;
@@ -1054,7 +737,7 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 			case Effect::PERIODIC_MOD_STAMINA:
 			{
 				if(Player* player = creature->getPlayer()){
-					EffectModPeriodicStamina modStamina = getModEffect<EffectModPeriodicStamina>();
+					Effect::ModPeriodicStamina modStamina = getModEffect<Effect::ModPeriodicStamina>();
 					if(modStamina.value < 0){
 						player->removeStamina(ticks * std::abs(modStamina.value));
 					}
@@ -1073,6 +756,18 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 				break;
 			}
 
+			case PERIODIC_TRIGGER:
+			{
+				Effect::ModPeriodicTrigger& modTrigger = getModEffect<Effect::ModPeriodicTrigger>();
+				if(modTrigger.count < modTrigger.maxCount){
+					++modTrigger.count;
+					Effect effect = *modTrigger.effect;
+					effect.onBegin(creature);
+					owner_condition->addEffect(effect);
+				}
+				break;
+			}
+
 			default:
 				break;
 		}
@@ -1080,49 +775,355 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 	}
 	return true;
 }
-
-/*
-TODO: Use Effect::SCRIPT instead?
-bool Condition::Effect::onCombat(const CombatSource& combatSource, Creature* creature, CombatType type, int32_t& amount)
+bool Condition::Effect::unserialize(PropStream& propStream)
 {
-	switch(effectType){
-		case Effect::MANASHIELD:
-		{
-			//TODO:
-			break;
-		}
+	uint32_t value;
+	if(!propStream.GET_VALUE(value)){
+		return false;
+	}
+	
+	type = Effect::Type(value);
 
-		case Effect::SHIELD:
-		{
-			//TODO:
-			break;
-		}
+	if(!propStream.GET_VALUE(interval)){
+		return false;
+	}
 
-		case Effect::MOD_HEAL:
-		case Effect::MOD_DAMAGE:
+	//revision
+	uint16_t revision;
+	if(!propStream.GET_VALUE(revision)){
+		return false;
+	}
+
+	switch(type){
+		case Effect::PERIODIC_HEAL:
+		case Effect::PERIODIC_DAMAGE:
 		{
-			if(hasBitSet(type.value(), mod_type)){
-				if(percent != 0){
-					amount = amount + (int32_t)(amount * percent / 100.f);
-				}
-				else{
-					amount = amount + value;
-				}
+			if(revision != 1){
+				return false;
+			}
+			
+			Effect::ModPeriodicDamage mod;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+			mod.type = CombatType::fromInteger(value);
+
+			if(!propStream.GET_VALUE(mod.total)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.percent)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.value)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.rounds)){
+				return false;
 			}
 
+			data = mod;
+			break;
+		}
+		case Effect::PERIODIC_MOD_STAMINA:
+		{
+			if(revision != 1){
+				return false;
+			}
+			Effect::ModPeriodicStamina mod;
+			if(!propStream.GET_VALUE(mod.value)){
+				return false;
+			}
+			data = mod;
+			break;
+		}
+		case Effect::REGEN_HEALTH:
+		case Effect::REGEN_MANA:
+		case Effect::REGEN_SOUL:
+		{
+			if(revision != 1){
+				return false;
+			}
+			uint32_t value;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			Effect::ModRegen mod;
+			mod.type = PlayerStatType::fromInteger(value);
+
+			if(!propStream.GET_VALUE(mod.percent)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.value)){
+				return false;
+			}
+			data = mod;
+			break;
+		}
+		case Effect::PERIODIC_TRIGGER:
+		{
+			if(revision != 1){
+				return false;
+			}
+
+			Effect::ModPeriodicTrigger mod;
+			mod.effect = new Effect;
+			if(!mod.effect->unserialize(propStream)){
+				return false;
+			}
+
+			if(!propStream.GET_VALUE(mod.maxCount)){
+				return false;
+			}
+
+			if(!propStream.GET_VALUE(mod.count)){
+				return false;
+			}
+
+			data = mod;
+			break;
+		}
+		case Effect::MOD_SPEED:
+		{
+			if(revision != 1){
+				return false;
+			}
+			Effect::ModSpeed mod;
+			if(!propStream.GET_VALUE(mod.percent)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.value)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.delta)){
+				return false;
+			}
+			data = mod;
+			break;
+		}
+		case Effect::MOD_STAT:
+		{
+			if(revision != 1){
+				return false;
+			}
+			uint32_t value;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			Effect::ModStat mod;
+			mod.type = PlayerStatType::fromInteger(value);
+
+			if(!propStream.GET_VALUE(mod.percent)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.value)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.delta)){
+				return false;
+			}
+			data = mod;
+			break;
+		}
+		case Effect::MOD_SKILL:
+		{
+			if(revision != 1){
+				return false;
+			}
+			uint32_t value;
+			if(!propStream.GET_VALUE(value)){
+				return false;
+			}
+
+			Effect::ModSkill mod;
+			mod.type = SkillType::fromInteger(value);
+
+			if(!propStream.GET_VALUE(mod.percent)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.value)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.delta)){
+				return false;
+			}
+			data = mod;
+			break;
+		}
+		case Effect::SHAPESHIFT:
+		{
+			if(revision != 1){
+				return false;
+			}
+			Effect::ModShapeShift mod;
+			if(!propStream.GET_VALUE(mod.lookType)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.lookTypeEx)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.lookHead)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.lookBody)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.lookLegs)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.lookFeet)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.lookAddons)){
+				return false;
+			}
+			data = mod;
+			break;
+		}
+		case Effect::LIGHT:
+		{
+			if(revision != 1){
+				return false;
+			}
+			Effect::ModLight mod;
+			if(!propStream.GET_VALUE(mod.level)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.color)){
+				return false;
+			}
+			data = mod;
+			break;
+		}
+		case Effect::DISPEL:
+		{
+			if(revision != 1){
+				return false;
+			}
+			Effect::ModDispel mod;
+			if(!propStream.GET_STRING(mod.name)){
+				return false;
+			}
+			data = mod;
 			break;
 		}
 
 		case Effect::SCRIPT:
-		{
-			//TODO:
 			break;
-		}
-
-		default:
-			break;
+		default: return false;
 	}
 
 	return true;
 }
-*/
+
+bool Condition::Effect::serialize(PropWriteStream& propWriteStream)
+{
+	propWriteStream.ADD_UCHAR(*CONDITIONATTRIBUTE_EFFECT);
+	propWriteStream.ADD_VALUE((uint32_t)type);
+	propWriteStream.ADD_VALUE(interval);
+
+	switch(type){
+		case Effect::PERIODIC_HEAL:
+		case Effect::PERIODIC_DAMAGE:
+		{
+			Effect::ModPeriodicDamage& mod = getModEffect<Effect::ModPeriodicDamage>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
+			propWriteStream.ADD_VALUE(mod.total);
+			propWriteStream.ADD_VALUE(mod.percent);
+			propWriteStream.ADD_VALUE(mod.value);
+			propWriteStream.ADD_VALUE(mod.rounds);
+			break;
+		}
+		case Effect::PERIODIC_MOD_STAMINA:
+		{
+			Effect::ModPeriodicStamina& mod = getModEffect<Effect::ModPeriodicStamina>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_VALUE(mod.value);
+			break;
+		}
+		case Effect::REGEN_HEALTH:
+		case Effect::REGEN_MANA:
+		case Effect::REGEN_SOUL:
+		{
+			Effect::ModRegen& mod = getModEffect<Effect::ModRegen>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
+			propWriteStream.ADD_VALUE(mod.percent);
+			propWriteStream.ADD_VALUE(mod.value);
+			break;
+		}
+		case Effect::PERIODIC_TRIGGER:
+		{
+			Effect::ModPeriodicTrigger& mod = getModEffect<Effect::ModPeriodicTrigger>();
+			propWriteStream.ADD_USHORT(1); //revision
+			mod.effect->serialize(propWriteStream);
+			propWriteStream.ADD_VALUE(mod.maxCount);
+			propWriteStream.ADD_VALUE(mod.count);
+			break;
+		}
+		case Effect::MOD_SPEED:
+		{
+			Effect::ModSpeed& mod = getModEffect<Effect::ModSpeed>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_VALUE(mod.percent);
+			propWriteStream.ADD_VALUE(mod.value);
+			propWriteStream.ADD_VALUE(mod.delta);
+			break;
+		}
+		case Effect::MOD_STAT:
+		{
+			Effect::ModStat& mod = getModEffect<Effect::ModStat>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
+			propWriteStream.ADD_VALUE(mod.percent);
+			propWriteStream.ADD_VALUE(mod.value);
+			propWriteStream.ADD_VALUE(mod.delta);
+			break;
+		}
+		case Effect::MOD_SKILL:
+		{
+			Effect::ModSkill& mod = getModEffect<Effect::ModSkill>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
+			propWriteStream.ADD_VALUE(mod.percent);
+			propWriteStream.ADD_VALUE(mod.value);
+			propWriteStream.ADD_VALUE(mod.delta);
+			break;
+		}
+		case Effect::SHAPESHIFT:
+		{
+			Effect::ModShapeShift& mod = getModEffect<Effect::ModShapeShift>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_VALUE(mod.lookType);
+			propWriteStream.ADD_VALUE(mod.lookTypeEx);
+			propWriteStream.ADD_VALUE(mod.lookHead);
+			propWriteStream.ADD_VALUE(mod.lookBody);
+			propWriteStream.ADD_VALUE(mod.lookLegs);
+			propWriteStream.ADD_VALUE(mod.lookFeet);
+			propWriteStream.ADD_VALUE(mod.lookAddons);
+			break;
+		}
+		case Effect::LIGHT:
+		{
+			Effect::ModLight& mod = getModEffect<Effect::ModLight>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_VALUE(mod.level);
+			propWriteStream.ADD_VALUE(mod.color);
+			break;
+		}
+		case Effect::DISPEL:
+		{
+			Effect::ModDispel& mod = getModEffect<Effect::ModDispel>();
+			propWriteStream.ADD_USHORT(1); //revision
+			propWriteStream.ADD_STRING(mod.name);
+			break;
+		}
+		case Effect::SCRIPT:
+			break;
+		default: return false;
+	}
+
+	return true;
+}

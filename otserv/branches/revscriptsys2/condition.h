@@ -39,130 +39,6 @@ struct LightInfo{
 	};
 };
 
-struct EffectModPeriodicDamage{
-	EffectModPeriodicDamage() {}
-	EffectModPeriodicDamage(CombatType type, int32_t total, int32_t percent, int32_t value, int32_t rounds) :
-		type(type),
-		total(total),
-		percent(percent),
-		value(value),
-		rounds(rounds),
-		sum(0),
-		roundCompleted(0) {}
-
-	CombatType type;
-	int32_t total;
-	int32_t percent;
-	int32_t value;
-	int32_t rounds;
-
-	//
-	int32_t sum;
-	int32_t roundCompleted;
-};
-
-struct EffectModPeriodicStamina{
-	EffectModPeriodicStamina() {}
-	EffectModPeriodicStamina(int32_t value) :
-		value(value) {}
-
-	int32_t value;
-};
-
-struct EffectModStat{
-	EffectModStat() {}
-	EffectModStat(PlayerStatType type, int32_t percent, int32_t value) :
-		type(type),
-		percent(percent),
-		value(value),
-		delta(0) {}
-	PlayerStatType type;
-	int32_t percent;
-	int32_t value;
-
-	//
-	int32_t delta;
-};
-
-struct EffectModSkill{
-	EffectModSkill() {}
-	EffectModSkill(SkillType type, int32_t percent, int32_t value) :
-		type(type),
-		percent(percent),
-		value(value),
-		delta(0) {}
-	SkillType type;
-	int32_t percent;
-	int32_t value;
-
-	//
-	int32_t delta;
-};
-
-struct EffectModSpeed{
-	EffectModSpeed() {}
-	EffectModSpeed(int32_t percent, int32_t value) :
-		percent(percent),
-		value(value),
-		delta(0) {}
-
-	int32_t percent;
-	int32_t value;
-
-	//
-	int32_t delta;
-};
-
-struct EffectModRegen{
-	EffectModRegen() {}
-	EffectModRegen(int32_t percent, int32_t value) :
-		percent(percent),
-		value(value) {}
-	EffectModRegen(PlayerStatType type, int32_t percent, int32_t value) :
-		type(type),
-		percent(percent),
-		value(value) {}
-
-	PlayerStatType type;
-	int32_t percent;
-	int32_t value;
-};
-
-struct EffectModLight{
-	EffectModLight() {}
-	EffectModLight(int32_t level, int32_t color) :
-		level(level),
-		color(color) {}
-
-	int32_t level;
-	int32_t color;
-};
-
-struct EffectModShapeShift{
-	EffectModShapeShift() {}
-	EffectModShapeShift(uint32_t lookType, uint32_t lookTypeEx, uint32_t lookHead,
-		uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet, uint32_t lookAddons) :
-		lookType(lookType),
-		lookTypeEx(lookTypeEx),
-		lookHead(lookHead),
-		lookBody(lookBody),
-		lookLegs(lookLegs),
-		lookFeet(lookFeet),
-		lookAddons(lookAddons) {}
-
-	uint32_t lookType;
-	uint32_t lookTypeEx;
-	uint32_t lookHead;
-	uint32_t lookBody;
-	uint32_t lookLegs;
-	uint32_t lookFeet;
-	uint32_t lookAddons;
-};
-
-struct EffectModDispel{
-	std::string name;
-};
-
 class Condition{
 public:
 	static Condition* createPeriodDamageCondition(ConditionId id, uint32_t interval,
@@ -185,7 +61,8 @@ public:
 		FLAG_HASTE			= 4,
 		FLAG_STRENGTHENED	= 8,
 		FLAG_MANASHIELD		= 16,
-		FLAG_DRUNK			= 32
+		FLAG_DRUNK			= 32,
+		//FLAG_PERSISTENT	= 64
 	};
 
 	class Effect;
@@ -219,7 +96,7 @@ public:
 	bool onUpdate(Creature* creature, const Condition* addCondition);
 	bool onTick(Creature* creature, uint32_t ticks);
 
-	void addEffect(Condition::Effect* effect);
+	void addEffect(Effect effect);
 
 	Condition* clone()  const { return new Condition(*this); }
 
@@ -239,6 +116,7 @@ public:
 			REGEN_HEALTH,
 			REGEN_MANA,
 			REGEN_SOUL,
+			PERIODIC_TRIGGER,
 
 			//start/end
 			MOD_SPEED,
@@ -248,32 +126,259 @@ public:
 			LIGHT,
 			DISPEL,
 
-			SCRIPT
+			SCRIPT,
+
+			/*
+			AURA_MOD_SPEED,
+			AURA_MOD_STAT,
+			AURA_MOD_SKILL,
+			AURA_PERIODIC_DAMAGE
+			*/
 		};
 
-		static Effect* createRegenHealth(uint32_t interval, int32_t percent, int32_t value)
+		struct ModPeriodicDamage{
+			ModPeriodicDamage() {}
+			ModPeriodicDamage(CombatType type, int32_t total, int32_t percent, int32_t value, int32_t rounds) : 
+				type(type),
+				total(total),
+				percent(percent),
+				value(value),
+				rounds(rounds),
+				sum(0),
+				roundCompleted(0) {}
+
+			CombatType type;
+			int32_t total;
+			int32_t percent;
+			int32_t value;
+			int32_t rounds;
+
+			//
+			int32_t sum;
+			int32_t roundCompleted;
+		};
+
+		struct ModPeriodicStamina{
+			ModPeriodicStamina() {}
+			ModPeriodicStamina(int32_t value) :
+				value(value) {}
+
+			int32_t value;
+		};
+
+		struct ModStat{
+			ModStat() {}
+			ModStat(PlayerStatType type, int32_t percent, int32_t value) :
+				type(type),
+				percent(percent),
+				value(value),
+				delta(0) {}
+			PlayerStatType type;
+			int32_t percent;
+			int32_t value;
+
+			//
+			int32_t delta;
+		};
+
+		struct ModSkill{
+			ModSkill() {}
+			ModSkill(SkillType type, int32_t percent, int32_t value) :
+				type(type),
+				percent(percent),
+				value(value),
+				delta(0) {}
+			SkillType type;
+			int32_t percent;
+			int32_t value;
+
+			//
+			int32_t delta;
+		};
+
+		struct ModSpeed{
+			ModSpeed() {}
+			ModSpeed(int32_t percent, int32_t value) :
+				percent(percent),
+				value(value),
+				delta(0) {}
+
+			int32_t percent;
+			int32_t value;
+
+			//
+			int32_t delta;
+		};
+
+		struct ModRegen{
+			ModRegen() {}
+			ModRegen(int32_t percent, int32_t value) :
+				percent(percent),
+				value(value) {}
+			ModRegen(PlayerStatType type, int32_t percent, int32_t value) :
+				type(type),
+				percent(percent),
+				value(value) {}
+
+			PlayerStatType type;
+			int32_t percent;
+			int32_t value;
+		};
+
+		struct ModPeriodicTrigger{
+			ModPeriodicTrigger() :
+				effect(NULL) {}
+			ModPeriodicTrigger(Effect* effect, uint32_t maxCount = 1) :
+				effect(effect),
+				maxCount(maxCount) {}
+			~ModPeriodicTrigger() { delete effect; effect = NULL;}
+
+			ModPeriodicTrigger(const ModPeriodicTrigger& rhs) :
+				effect(NULL)
+			{
+				if(effect){
+					delete effect;
+					effect = NULL;
+				}
+				if(rhs.effect){
+					effect = new Effect(*rhs.effect);
+				}
+				maxCount = rhs.maxCount;
+			}
+
+			Effect* effect;
+			uint32_t maxCount;
+			//
+			uint32_t count;
+		};
+
+		struct ModLight{
+			ModLight() {}
+			ModLight(int32_t level, int32_t color) :
+				level(level),
+				color(color) {}
+
+			int32_t level;
+			int32_t color;
+		};
+
+		struct ModShapeShift{
+			ModShapeShift() {}
+			ModShapeShift(uint32_t lookType, uint32_t lookTypeEx, uint32_t lookHead,
+				uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet, uint32_t lookAddons) :
+				lookType(lookType),
+				lookTypeEx(lookTypeEx),
+				lookHead(lookHead),
+				lookBody(lookBody),
+				lookLegs(lookLegs),
+				lookFeet(lookFeet),
+				lookAddons(lookAddons) {}
+
+			uint32_t lookType;
+			uint32_t lookTypeEx;
+			uint32_t lookHead;
+			uint32_t lookBody;
+			uint32_t lookLegs;
+			uint32_t lookFeet;
+			uint32_t lookAddons;
+		};
+
+		struct ModDispel{
+			ModDispel() {}
+			ModDispel(const std::string& name) :
+				name(name) {}
+
+			std::string name;
+		};
+
+		static Effect createPeriodicHeal(uint32_t interval, int32_t total,
+			int32_t percent, int32_t value, int32_t rounds)
 		{
-			EffectModRegen mod(percent, value);
-			return new Effect(REGEN_HEALTH, interval, mod);
+			ModPeriodicDamage mod(COMBAT_HEALING, total, percent, value, rounds);
+			return Effect(Effect::PERIODIC_HEAL, interval, mod);
 		}
 
-		static Effect* createRegenMana(uint32_t interval, int32_t percent, int32_t value)
+		static Effect createPeriodicDamage(uint32_t interval, CombatType type, int32_t total,
+			int32_t percent, int32_t value, int32_t rounds)
 		{
-			EffectModRegen mod(percent, value);
-			return new Effect(REGEN_MANA, interval, mod);
+			ModPeriodicDamage mod(type, total, percent, value, rounds);
+			return Effect(Effect::PERIODIC_DAMAGE, interval, mod);
 		}
 
-		static Effect* createRegenSoul(uint32_t interval, int32_t percent, int32_t value)
+		static Effect createModStamina(uint32_t interval, int32_t value)
 		{
-			EffectModRegen mod(percent, value);
-			return new Effect(REGEN_SOUL, interval, mod);
+			ModPeriodicStamina mod(value);
+			return Effect(Effect::PERIODIC_MOD_STAMINA, interval, mod);
 		}
 
-		static Effect* createModStamina(uint32_t interval, int32_t value)
+		static Effect createRegenHealth(uint32_t interval, int32_t percent, int32_t value)
 		{
-			EffectModPeriodicStamina mod(value);
-			return new Effect(PERIODIC_MOD_STAMINA, interval, mod);
+			ModRegen mod(percent, value);
+			return Effect(Effect::REGEN_HEALTH, interval, mod);
 		}
+
+		static Effect createRegenMana(uint32_t interval, int32_t percent, int32_t value)
+		{
+			ModRegen mod(percent, value);
+			return Effect(Effect::REGEN_MANA, interval, mod);
+		}
+
+		static Effect createRegenSoul(uint32_t interval, int32_t percent, int32_t value)
+		{
+			ModRegen mod(percent, value);
+			return Effect(Effect::REGEN_SOUL, interval, mod);
+		}
+
+		static Effect createPeriodicTrigger(uint32_t interval, Effect triggerEffect, uint32_t maxCount)
+		{
+			ModPeriodicTrigger mod(new Effect(triggerEffect), maxCount);
+			return Effect(Effect::PERIODIC_TRIGGER, interval, mod);
+		}
+
+		static Effect createModSpeed(int32_t percent, int32_t value)
+		{
+			ModSpeed mod(percent, value);
+			return Effect(Effect::MOD_SPEED, 0, mod);
+		}
+
+		static Effect createModStat(PlayerStatType type, int32_t percent, int32_t value)
+		{
+			ModStat mod(type, percent, value);
+			return Effect(Effect::MOD_STAT, mod);
+		}
+
+		static Effect createModSkill(SkillType type, int32_t percent, int32_t value)
+		{
+			ModSkill mod(type, percent, value);
+			return Effect(Effect::MOD_SKILL, 0, mod);
+		}
+
+		static Effect createModShapeShift(const OutfitType& outfit)
+		{
+			ModShapeShift mod(outfit.lookType, outfit.lookTypeEx, outfit.lookHead,
+				outfit.lookBody, outfit.lookLegs, outfit.lookFeet, outfit.lookAddons);
+			return Effect(Effect::SHAPESHIFT, mod);
+		}
+
+		static Effect createModLight(int32_t level, int32_t color)
+		{
+			ModLight mod(level, color);
+			return Effect(Effect::LIGHT, mod);
+		}
+
+		static Effect createModDispel(const std::string& name)
+		{
+			ModDispel mod(name);
+			return Effect(Effect::DISPEL, mod);
+		}
+
+		Effect() :
+			type(type),
+			interval(0),
+			data(boost::any()),
+			tickCount(0),
+			owner_condition(NULL)
+			{}
 
 		Effect(Effect::Type type, uint32_t interval, boost::any data = boost::any()) :
 			type(type),
@@ -283,16 +388,28 @@ public:
 			owner_condition(NULL)
 			{}
 
+		Effect(Effect::Type type, boost::any data = boost::any()) :
+			type(type),
+			interval(0),
+			data(data),
+			tickCount(0),
+			owner_condition(NULL)
+			{}
+
 		~Effect(){};
 		bool onBegin(Creature* creature);
 		bool onEnd(Creature* creature, ConditionEnd reason);
-		bool onUpdate(Creature* creature, const Condition::Effect* addEffect);
+		bool onUpdate(Creature* creature, const Effect& addEffect);
 
 		bool onTick(Creature* creature, uint32_t ticks);
 		void setOwner(Condition* condition) {owner_condition = condition;}
 
 		Effect::Type getEffectType() const {return type;}
 		template<typename T> T& getModEffect() {return boost::any_cast<T&>(data);}
+
+		//serialization
+		bool unserialize(PropStream& propStream);
+		bool serialize(PropWriteStream& propWriteStream);
 
 	protected:
 		int32_t getStatValue(Creature* creature, PlayerStatType statType, int32_t percent, int32_t value);
@@ -316,7 +433,7 @@ protected:
 	uint32_t sourceId;
 	uint32_t ticks;
 	uint32_t flags;
-	std::list<Effect*> effectList;
+	std::list<Effect> effectList;
 
 	//variables that should not be serialized
 	CombatSource combatSource;
