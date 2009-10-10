@@ -1351,8 +1351,8 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 				int32_t newY = y - centerY;
 
 				//perform rotation
-				int32_t rotatedX = ::round(newX * a + newY * b);
-				int32_t rotatedY = ::round(newX * c + newY * d);
+				int32_t rotatedX = round(newX * a + newY * b);
+				int32_t rotatedY = round(newX * c + newY * d);
 
 				//write in the output matrix using rotated coordinates
 				(*output)[rotatedY + rotateCenterY][rotatedX + rotateCenterX] = (*input)[y][x];

@@ -361,22 +361,32 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 				thing = tile->getTopDownItem();
 			}
 			else if(type == STACKPOS_USEITEM){
-				//First check items with topOrder 2 (ladders, signs, splashes)
-				Item* item =  tile->getItemByTopOrder(2);
-				if(item && g_actions->hasAction(item)){
-					thing = item;
-				}
-				else{
-					//then down items
-					thing = tile->getTopDownItem();
-					if(thing == NULL){
-						//then last we check items with topOrder 3 (doors etc)
-						thing = tile->getTopTopItem();
-					}
+				//the first down item is usually the right item unless there is topOrder items with scripts
+				Item* downItem = tile->getTopDownItem();
 
-					if(thing == NULL){
-						thing = tile->ground;
+				//check items with topOrder 2 (ladders, signs, splashes)
+				Item* topOrderItem =  tile->getItemByTopOrder(2);
+				if(topOrderItem && g_actions->hasAction(topOrderItem) ){
+					const ItemType& it = Item::items[topOrderItem->getID()];
+					//if the top order item has a height or allows pickupable items we use the first down item instead
+					if(!(downItem && (it.hasHeight || it.allowPickupable))){
+						thing = topOrderItem;
 					}
+				}
+
+				if(thing == NULL){
+					//first down item
+					thing = downItem;
+				}
+
+				if(thing == NULL){
+					//then items with topOrder 3 (doors etc)
+					thing = tile->getTopTopItem();
+				}
+
+				if(thing == NULL){
+					//and finally the ground
+					thing = tile->ground;
 				}
 			}
 			else{
@@ -2351,7 +2361,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-	Thing* thing = internalGetThing(player, pos, stackPos, spriteId);
+	Thing* thing = internalGetThing(player, pos, stackPos, spriteId, STACKPOS_USEITEM);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
