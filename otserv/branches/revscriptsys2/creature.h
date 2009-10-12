@@ -362,6 +362,9 @@ public:
 	bool getCustomValue(const std::string& key, uint32_t value) const;
 	bool getCustomValue(const std::string& key, int32_t value) const;
 
+	StorageMap::const_iterator getCustomValueIteratorBegin() const {return storageMap.begin();}
+	StorageMap::const_iterator getCustomValueIteratorEnd() const {return storageMap.end();}
+
 protected:
 	static const int32_t mapWalkWidth = Map_maxViewportX * 2 + 1;
 	static const int32_t mapWalkHeight = Map_maxViewportY * 2 + 1;

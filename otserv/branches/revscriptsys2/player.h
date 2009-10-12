@@ -133,9 +133,6 @@ public:
 	bool depositMoney(uint32_t amount);
 	bool transferMoneyTo(const std::string& name, uint32_t amount);
 
-	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
-	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
-
 	std::string getAccountName() const {return accountName;}
 	uint32_t getAccountId() const {return accountId;}
 	uint32_t getLevel() const {return level;}

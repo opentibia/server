@@ -551,6 +551,8 @@ public:
 	int lua_getTile();
 	int lua_getTowns();
 	int lua_sendMailTo();
+	int lua_setGlobalValue();
+	int lua_getGlobalValue();
 	int lua_getHouses();
 	int lua_getWorldType();
 	int lua_getWorldTime();

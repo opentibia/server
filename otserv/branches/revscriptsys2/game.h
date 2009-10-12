@@ -72,6 +72,7 @@ private:
 	RuleViolation(const RuleViolation&);
 };
 
+typedef std::map<std::string, std::string> StorageMap;
 typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 typedef std::vector<Player*> PlayerVector;
 
@@ -134,6 +135,13 @@ public:
 
 	void runStartupScripts(bool real_startup);
 	void runShutdownScripts(bool real_shutdown);
+
+	/*
+	 * Modify persistent game state
+	 */
+	void setCustomValue(const std::string& key, const std::string& value);
+	bool getCustomValue(const std::string& key, std::string& value) const;
+	bool eraseCustomValue(const std::string& key);
 
 	/**
 	  * Get the map size - info purpose only
@@ -686,6 +694,7 @@ protected:
 	std::vector<Creature*> toAddCheckCreatureVector;
 
 	// Script handling
+	StorageMap globalStorage;
 	Script::Environment* script_environment;
 	Script::Manager* script_system;
 	uint32_t waitingScriptEvent;

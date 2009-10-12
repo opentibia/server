@@ -312,10 +312,10 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	//load storage map
 	query.str("");
-	query << "SELECT `key`, `value` FROM `player_storage` WHERE `player_id` = " << player->getGUID();
+	query << "SELECT `id`, `value` FROM `player_storage` WHERE `player_id` = " << player->getGUID();
 	if((result = db->storeQuery(query.str()))){
 		do{
-			std::string key = result->getDataString("key");
+			std::string key = result->getDataString("id");
 			std::string value = result->getDataString("value");
 			player->setCustomValue(key, value);
 		}while(result->next());
@@ -570,8 +570,8 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 		return false;
 	}
 
-	stmt.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
-	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
+	stmt.setQuery("INSERT INTO `player_storage` (`player_id` , `id` , `value` ) VALUES ");
+	for(StorageMap::const_iterator cit = player->getCustomValueIteratorBegin(); cit != player->getCustomValueIteratorEnd();cit++){
 		query << player->getGUID() << ", " << db->escapeString(cit->first) << ", " << db->escapeString(cit->second);
 		if(!stmt.addRow(query)){
 			return false;

@@ -175,11 +175,6 @@ void Game::setGameState(GameState_t newState)
 	}
 }
 
-void Game::saveGameState()
-{
-	// REVSCRIPT TODO Save global storage
-}
-
 bool Game::saveServer(bool payHouses, bool shallowSave /*=false*/)
 {
 	uint64_t start = OTSYS_TIME();
@@ -211,7 +206,48 @@ bool Game::saveServer(bool payHouses, bool shallowSave /*=false*/)
 
 void Game::loadGameState()
 {
-	// REVSCRIPT TODO Load global storage
+	Database* db = Database::instance();
+	DBQuery query;
+
+	DBResult* result = db->storeQuery("SELECT `id`, `value` FROM `global_storage`");
+	if(!result){
+		std::cout << "Could not load global game state." << std::endl;
+		return;
+	}
+	
+	globalStorage.clear();
+
+	do{
+		std::string key = result->getDataString("id");
+		std::string value = result->getDataString("value");
+		globalStorage[key] = value;
+	}while(result->next());
+	db->freeResult(result);
+}
+
+void Game::saveGameState()
+{
+	Database* db = Database::instance();
+	
+	DBQuery q;
+	DBTransaction transaction(db);
+	transaction.begin();
+	std::ostringstream query;
+	
+	db->executeQuery("DELETE FROM `global_storage`");
+
+	DBInsert global_stmt(db);
+	global_stmt.setQuery("INSERT INTO `global_storage` (`id`, `value`) VALUES ");
+
+	for(StorageMap::const_iterator giter = globalStorage.begin(); giter != globalStorage.end(); ++giter){
+		query << db->escapeString(giter->first) << ", " << db->escapeString(giter->second);
+		if(!global_stmt.addRow(query.str())){
+			std::cout << "Could not save global game state." << std::endl;
+			return;
+		}
+	}
+	if(!global_stmt.execute())
+		std::cout << "Could not save global game state." << std::endl;
 }
 
 int Game::loadMap(std::string filename)
@@ -316,6 +352,29 @@ void Game::scriptCleanup()
 
 	g_scheduler.addEvent(createSchedulerTask(EVENT_SCRIPT_CLEANUP_INTERVAL,
 		boost::bind(&Game::scriptCleanup, this)));
+}
+
+void Game::setCustomValue(const std::string& key, const std::string& value)
+{
+	globalStorage[key] = value;
+}
+
+bool Game::getCustomValue(const std::string& key, std::string& value) const
+{
+	StorageMap::const_iterator i = globalStorage.find(key);
+	if(i == globalStorage.end())
+		return false;
+	value = i->second;
+	return true;
+}
+
+bool Game::eraseCustomValue(const std::string& key)
+{
+	StorageMap::const_iterator i = globalStorage.find(key);
+	if(i == globalStorage.end())
+		return false;
+	globalStorage.erase(i);
+	return true;
 }
 
 void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)

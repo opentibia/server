@@ -30,6 +30,8 @@ end
 
 
 -- Don't use require_directory as order is important.
+require("otstd/classes/global")
+
 require("otstd/classes/events")
 
 require("otstd/classes/thing")

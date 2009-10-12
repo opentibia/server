@@ -495,6 +495,9 @@ void Manager::registerFunctions() {
 
 	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
 
+	registerGlobalFunction("setGlobalValue(string key, string text)", &Manager::lua_setGlobalValue);
+	registerGlobalFunction("getGlobalValue(string key)", &Manager::lua_getGlobalValue);
+
 	registerGlobalFunction("getWorldType()", &Manager::lua_getWorldType);
 	registerGlobalFunction("getWorldTime()", &Manager::lua_getWorldTime);
 	registerGlobalFunction("getWorldUpTime()", &Manager::lua_getWorldUpTime);
@@ -5497,6 +5500,34 @@ int LuaState::lua_sendMailTo()
 
 	bool result = IOPlayer::instance()->sendMail(NULL, name, townId, item);
 	pushBoolean(result);
+	return 1;
+}
+
+int LuaState::lua_getGlobalValue()
+{
+	std::string key(popString());
+	std::string v;
+	if(g_game.getCustomValue(key, v))
+		pushString(v);
+	else
+		pushNil();
+	return 1;
+}
+
+int LuaState::lua_setGlobalValue()
+{
+	std::string value;
+	if(isNil(-1)){
+		pop();
+		std::string key(popString());
+		g_game.eraseCustomValue(key);
+	}
+	else{
+		std::string value(popString());
+		std::string key(popString());
+		g_game.setCustomValue(key, value);
+	}
+	pushBoolean(true);
 	return 1;
 }
 
