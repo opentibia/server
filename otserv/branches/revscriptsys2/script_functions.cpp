@@ -491,6 +491,7 @@ void Manager::registerFunctions() {
 	// Game/Map functions
 	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
 	registerGlobalFunction("sendMagicEffect(position where, int type)", &Manager::lua_sendMagicEffect);
+	registerGlobalFunction("sendDistanceEffect([Creature c = nil], position from, position to, int type)", &Manager::lua_sendDistanceEffect);
 	registerGlobalFunction("sendAnimatedText(position where, int color, string text)", &Manager::lua_sendAnimatedText);
 
 	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
@@ -5430,6 +5431,17 @@ int LuaState::lua_sendMagicEffect()
 	Position pos = popPosition();
 
 	g_game.addMagicEffect(pos, type);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_sendDistanceEffect()
+{
+	uint32_t type = popUnsignedInteger();
+	Position to = popPosition();
+	Position from = popPosition();
+	Creature* c = popCreature(ERROR_PASS);
+	g_game.addDistanceEffect(c, from, to, type);
 	pushBoolean(true);
 	return 1;
 }

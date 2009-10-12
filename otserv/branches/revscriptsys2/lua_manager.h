@@ -547,6 +547,7 @@ public:
 
 	// - Game
 	int lua_sendMagicEffect();
+	int lua_sendDistanceEffect();
 	int lua_sendAnimatedText();
 	int lua_getTile();
 	int lua_getTowns();
