@@ -220,11 +220,11 @@ maximum_message_buffer = 4
 npc_maximum_nonestackable_sell_amount = 100
 
 -- motd (the message box that you sometimes get before you choose characters)
-message_of_the_day = "Welcome to OTServ 0.6.3!"
+message_of_the_day = "Welcome to OTServ 0.7.0!"
 message_of_the_day_number = "1"
 
 -- login message
-login_message = "Welcome to OTServ 0.6.3. For help visit http://otfans.net."
+login_message = "Welcome to OTServ 0.7.0 (revscriptsys). For help visit http://otfans.net."
 
 -- how many logins attempts until ip is temporary disabled
 -- set to 0 to disable
