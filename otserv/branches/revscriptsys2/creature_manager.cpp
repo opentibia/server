@@ -480,7 +480,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 					if(asLowerCaseString(strValue) == "shooteffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
 							ShootType_t shoot = getShootType(strValue);
-							if(shoot != NM_SHOOT_UNK){
+							if(shoot != SHOOT_EFFECT_UNK){
 								combat->setParam(COMBATPARAM_DISTANCEEFFECT, shoot);
 							}
 							else{
@@ -491,7 +491,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 					else if(asLowerCaseString(strValue) == "areaeffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
 							MagicEffectClasses effect = getMagicEffect(strValue);
-							if(effect != EFFECT_UNK){
+							if(effect != MAGIC_EFFECT_UNK){
 								combat->setParam(COMBATPARAM_EFFECT, effect);
 							}
 							else{

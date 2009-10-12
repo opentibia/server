@@ -106,12 +106,12 @@ void Combat::combatToTarget(CombatSource& combatSource, CombatParams& params, Cr
 {
 	bool result = internalCombat(combatSource, params, target);
 	if(result){
-		if(params.effects.impactEffect != EFFECT_NONE){
+		if(params.effects.impactEffect != MAGIC_EFFECT_NONE){
 			g_game.addMagicEffect(target->getPosition(), params.effects.impactEffect);
 		}
 
 		Creature* attacker = combatSource.getSourceCreature();
-		if(attacker && params.effects.distanceEffect != EFFECT_NONE){
+		if(attacker && params.effects.distanceEffect != MAGIC_EFFECT_NONE){
 			g_game.addDistanceEffect(attacker, attacker->getPosition(), target->getPosition(), params.effects.distanceEffect);
 		}
 	}
