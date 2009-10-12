@@ -150,7 +150,7 @@ void BedItem::sleep(Player* player)
 	}
 
 	if(sleeperGUID != 0){
-		g_game.addMagicEffect(this->getPosition(), NM_ME_PUFF);
+		g_game.addMagicEffect(this->getPosition(), EFFECT_PUFF);
 		wakeUp();
 	}
 	else{

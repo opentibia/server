@@ -53,17 +53,17 @@ private:
 struct CombatEffect{
 	CombatEffect(bool showEffect) : showEffect(showEffect)
 	{
-		hitEffect = NM_ME_UNK;
+		hitEffect = EFFECT_UNK;
 		hitTextColor = TEXTCOLOR_UNK;
-		impactEffect = NM_ME_NONE;
-		distanceEffect = NM_ME_NONE;
+		impactEffect = EFFECT_NONE;
+		distanceEffect = EFFECT_NONE;
 	}
 
 	CombatEffect() {
-		hitEffect = NM_ME_UNK;
+		hitEffect = EFFECT_UNK;
 		hitTextColor = TEXTCOLOR_UNK;
-		impactEffect = NM_ME_NONE;
-		distanceEffect = NM_ME_NONE;
+		impactEffect = EFFECT_NONE;
+		distanceEffect = EFFECT_NONE;
 		showEffect = true;
 	}
 

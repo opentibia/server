@@ -362,7 +362,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 	}
 	else{
 		g_game.addDistanceEffect(player, player->getPosition(), tile->getPosition(), params.effects.distanceEffect);
-		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
+		g_game.addMagicEffect(tile->getPosition(), EFFECT_PUFF);
 	}
 
 	if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION)){

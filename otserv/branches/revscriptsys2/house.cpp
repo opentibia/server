@@ -155,7 +155,7 @@ bool House::kickPlayer(Player* player, const std::string& name)
 		if(houseTile && houseTile->getHouse() == this){
 			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && !kickingPlayer->hasFlag(PlayerFlag_CanEditHouses)){
 				if(g_game.internalTeleport(player, kickingPlayer, getEntryPosition()) == RET_NOERROR){
-					g_game.addMagicEffect(getEntryPosition(), NM_ME_TELEPORT);
+					g_game.addMagicEffect(getEntryPosition(), EFFECT_TELEPORT);
 				}
 				return true;
 			}
@@ -204,7 +204,7 @@ void House::setAccessList(uint32_t listId, const std::string& textlist)
 	KickPlayerList::iterator itkick;
 	for(itkick = kickList.begin(); itkick != kickList.end(); ++itkick){
 		if(g_game.internalTeleport(NULL, *itkick, getEntryPosition()) == RET_NOERROR){
-			g_game.addMagicEffect(getEntryPosition(), NM_ME_TELEPORT);
+			g_game.addMagicEffect(getEntryPosition(), EFFECT_TELEPORT);
 		}
 	}
 }

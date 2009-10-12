@@ -2146,7 +2146,7 @@ void ProtocolGame::sendRemoveCreature(const Creature* creature, const Position& 
 			RemoveTileItem(msg, pos, stackpos);
 
 			if(isLogout){
-				AddMagicEffect(msg, pos, NM_ME_PUFF);
+				AddMagicEffect(msg, pos, EFFECT_PUFF);
 			}
 		}
 	}

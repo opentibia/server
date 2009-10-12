@@ -4449,7 +4449,7 @@ int LuaState::luaDoCombat(lua_State *L)
 			}
 			else{
 				combat->postCombatEffects(creature, var.pos);
-				g_game.addMagicEffect(var.pos, NM_ME_PUFF);
+				g_game.addMagicEffect(var.pos, EFFECT_PUFF);
 			}
 			break;
 		}

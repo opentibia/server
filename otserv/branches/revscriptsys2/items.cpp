@@ -73,7 +73,7 @@ ItemType::ItemType()
 	ammoType      = AMMO_NONE;
 	ammoAction    = AMMOACTION_NONE;
 	shootType     = (ShootType_t)0;
-	magicEffect   = NM_ME_NONE;
+	magicEffect   = EFFECT_NONE;
 	attack        = 0;
 	defense       = 0;
 	extraDefense  = 0;
@@ -740,7 +740,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(asLowerCaseString(strValue) == "effect"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
 									MagicEffectClasses effect = getMagicEffect(strValue);
-									if(effect != NM_ME_UNK){
+									if(effect != EFFECT_UNK){
 										it.magicEffect = effect;
 									}
 									else{

@@ -28,7 +28,7 @@
 class TrashHolder : public Item, public Cylinder
 {
 public:
-	TrashHolder(uint16_t _type, MagicEffectClasses _effect = NM_ME_NONE);
+	TrashHolder(uint16_t _type, MagicEffectClasses _effect = EFFECT_NONE);
 	~TrashHolder();
 	
 	virtual TrashHolder* getTrashHolder() {return this;}
