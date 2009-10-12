@@ -979,8 +979,6 @@ bool OnLook::Event::check_match(const ScriptInformation& info)
 				return item && item->getID() == info.id;
 			case FILTER_ACTIONID:
 				return item && item->getActionId() == info.id;
-			case FILTER_CREATUREID:
-				return creature && (int32_t)creature->getID() == info.id;
 			default: break;
 		}
 	}
@@ -995,8 +993,11 @@ bool OnLook::Event::dispatch(Manager& state, Environment& environment)
 		)
 		return true;
 
+	Item* item = object->getItem();
+	Creature* creature = object->getCreature();
+
 	if(creature){
-		list = player->getListeners(ON_LOOKED_AT_LISTENER);
+		list = creature->getListeners(ON_LOOKED_AT_LISTENER);
 		if(dispatchEvent<OnLook::Event>
 				(this, state, environment, list)
 			)

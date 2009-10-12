@@ -991,11 +991,11 @@ int LuaState::lua_registerGenericEvent_OnLookAtItem() {
 	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *manager));
 
 	ListenerList* list = NULL;
-	switch(si_onuse.method){
+	switch(si_onlook.method){
 		case OnLook::FILTER_ITEMID:
-			list = &environment->Generic.OnLook.ItemId[si_onuse.id];
+			list = &environment->Generic.OnLook.ItemId[si_onlook.id];
 		case OnLook::FILTER_ACTIONID:
-			list = &environment->Generic.OnLook.ActionId[si_onuse.id];
+			list = &environment->Generic.OnLook.ActionId[si_onlook.id];
 			break;
 		default:
 			break; // impossible, crash
