@@ -172,6 +172,7 @@ public:
 	Actor* popActor(Script::ErrorMode mode = Script::ERROR_THROW);
 	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
 	Container* popContainer(Script::ErrorMode mode = Script::ERROR_THROW);
+	Condition* popCondition(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
 	Town* popTown(Script::ErrorMode mode = Script::ERROR_THROW);
 	House* popHouse(Script::ErrorMode mode = Script::ERROR_THROW);
@@ -186,6 +187,7 @@ public:
 	void pushTown(Town* town);
 	void pushHouse(House* house);
 	void pushChannel(ChatChannel* channel);
+	void pushCondition(Condition* condition);
 	void pushWaypoint(Waypoint_ptr pos);
 	void pushOutfit(const OutfitType& outfit);
 	template<class E, int size_>
@@ -308,6 +310,33 @@ public:
 
 	int lua_getThingByID();
 
+	// - - Condition
+	int lua_Condition_setName();
+	int lua_Condition_setCombatType();
+	int lua_Condition_setMechanicType();
+	int lua_Condition_setTicks();
+	int lua_Condition_setFlags();
+
+	int lua_Condition_addPeriodicHeal();
+	int lua_Condition_addPeriodicDamage();
+	int lua_Condition_addAveragePeriodicDamage();
+	int lua_Condition_addModStamina();
+	int lua_Condition_addRegenHealth();
+	int lua_Condition_addRegenPercentHealth();
+	int lua_Condition_addRegenMana();
+	int lua_Condition_addRegenPercentMana();
+	int lua_Condition_addRegenSoul();
+	int lua_Condition_addRegenPercentSoul();
+	//int lua_Condition_addPeriodicTrigger();
+	int lua_Condition_addSpeed();
+	int lua_Condition_addModStat();
+	int lua_Condition_addModPercentStat();
+	int lua_Condition_addModSkill();
+	int lua_Condition_addModPercentSkill();
+	int lua_Condition_addShapeShift();
+	int lua_Condition_addLight();
+	int lua_Condition_addScript();
+
 	// - - Creature
 	int lua_Creature_getID();
 	int lua_Creature_getOrientation();
@@ -334,6 +363,8 @@ public:
 
 	int lua_Creature_setRawCustomValue();
 	int lua_Creature_getRawCustomValue();
+	int lua_Creature_internalAddCondition();
+	int lua_createCondition();
 
 	int lua_getCreatureByName();
 	int lua_getCreaturesByName();

@@ -156,6 +156,8 @@ void Manager::registerClasses() {
 
 	registerClass("Channel");
 
+	registerClass("Condition");
+
 	// Event classes
 	registerMemberFunction("Event", "skip()", &Manager::lua_Event_skip);
 	registerMemberFunction("Event", "propagate()", &Manager::lua_Event_propagate);
@@ -175,6 +177,33 @@ void Manager::registerClasses() {
 	registerMemberFunction("Thing", "destroy()", &Manager::lua_Thing_destroy);
 
 	registerGlobalFunction("getThingByID(int id)", &Manager::lua_getThingByID);
+
+	// Condition
+	registerMemberFunction("Condition", "setName(string name)", &Manager::lua_Condition_setName);
+	registerMemberFunction("Condition", "setCombatType(CombatType type)", &Manager::lua_Condition_setCombatType);
+	registerMemberFunction("Condition", "setMechanicType(MechanicType type)", &Manager::lua_Condition_setMechanicType);
+	registerMemberFunction("Condition", "setTicks(int ticks)", &Manager::lua_Condition_setTicks);
+	registerMemberFunction("Condition", "setFlags(int flags)", &Manager::lua_Condition_setFlags);
+
+	registerMemberFunction("Condition", "addPeriodicHeal(int interval, int value, int rounds)", &Manager::lua_Condition_addPeriodicHeal);
+	registerMemberFunction("Condition", "addPeriodicDamage(int interval, CombatType type, int value, int rounds)", &Manager::lua_Condition_addPeriodicDamage);
+	registerMemberFunction("Condition", "addAveragePeriodicDamage(int interval, CombatType type, int totalDamage, int startDamage)", &Manager::lua_Condition_addAveragePeriodicDamage);
+	registerMemberFunction("Condition", "addModStamina(int interval, int value)", &Manager::lua_Condition_addModStamina);
+	registerMemberFunction("Condition", "addRegenHealth(int interval, int value)", &Manager::lua_Condition_addRegenHealth);
+	registerMemberFunction("Condition", "addRegenPercentHealth(int interval, PlayerStatType type, int percent)", &Manager::lua_Condition_addRegenPercentHealth);
+	registerMemberFunction("Condition", "addRegenMana(int interval, int value)", &Manager::lua_Condition_addRegenMana);
+	registerMemberFunction("Condition", "addRegenPercentMana(int interval, PlayerStatType type, int percent)", &Manager::lua_Condition_addRegenPercentMana);
+	registerMemberFunction("Condition", "addRegenSoul(int interval, int value)", &Manager::lua_Condition_addRegenSoul);
+	registerMemberFunction("Condition", "addRegenPercentSoul(int interval, PlayerStatType type, int percent)", &Manager::lua_Condition_addRegenPercentSoul);
+	//registerMemberFunction("Condition", "addPeriodicTrigger()", &Manager::lua_Condition_addPeriodicTrigger);
+	registerMemberFunction("Condition", "addModSpeed(int percent, int value)", &Manager::lua_Condition_addSpeed);
+	registerMemberFunction("Condition", "addModStat(int value)", &Manager::lua_Condition_addModStat);
+	registerMemberFunction("Condition", "addModPercentStat(PlayerStatType type, int percent)", &Manager::lua_Condition_addModPercentStat);
+	registerMemberFunction("Condition", "addModSkill(int value)", &Manager::lua_Condition_addModSkill);
+	registerMemberFunction("Condition", "addModPercentSkill(SkillType type, int percent)", &Manager::lua_Condition_addModPercentSkill);
+	registerMemberFunction("Condition", "addShapeShift(table outfit)", &Manager::lua_Condition_addShapeShift);
+	registerMemberFunction("Condition", "addLight(int level, int color)", &Manager::lua_Condition_addLight);
+	registerMemberFunction("Condition", "addScript([int interval = nil])", &Manager::lua_Condition_addScript);
 
 	// Creature
 	registerMemberFunction("Creature", "setRawCustomValue(string key, mixed value)", &Manager::lua_Creature_setRawCustomValue);
@@ -201,7 +230,9 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "isImmuneToMechanic(MechanicType conditiontype)", &Manager::lua_Creature_isImmuneToMechanic);
 	registerMemberFunction("Creature", "getMechanicImmunities()", &Manager::lua_Creature_getMechanicImmunities);
 	registerMemberFunction("Creature", "getDamageImmunities()", &Manager::lua_Creature_getDamageImmunities);
+	registerMemberFunction("Creature", "internalAddCondition(Condition condition)", &Manager::lua_Creature_internalAddCondition);
 
+	registerGlobalFunction("createCondition()", &Manager::lua_createCondition);
 	registerGlobalFunction("getCreatureByName(string name)", &Manager::lua_getCreatureByName);
 	registerGlobalFunction("getCreaturesByName(string name)", &Manager::lua_getCreaturesByName);
 
@@ -2695,6 +2726,253 @@ int LuaState::lua_Tile_hasProperty()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Class Condition
+
+int LuaState::lua_Condition_setName()
+{
+	std::string name = popString();
+	Condition* condition = popCondition();
+	condition->setName(name);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_setCombatType()
+{
+	CombatType combatType = popEnum<CombatType>();
+	Condition* condition = popCondition();
+	condition->setCombatType(combatType);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_setMechanicType()
+{
+	MechanicType mechanicType = popEnum<MechanicType>();
+	Condition* condition = popCondition();
+	condition->setMechanicType(mechanicType);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_setTicks()
+{
+	uint32_t ticks = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->setTicks(ticks);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_setFlags()
+{
+	uint32_t flags = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->setFlags(flags);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addPeriodicHeal()
+{
+	int32_t rounds = popInteger();
+	int32_t value = std::abs(popInteger());
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createPeriodicHeal(interval, value, rounds));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addPeriodicDamage()
+{
+	int32_t rounds = popInteger();
+	int32_t value = std::abs(popInteger());
+	CombatType combatType = popEnum<CombatType>();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createPeriodicDamage(interval, combatType, 0, 0, value, rounds));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addAveragePeriodicDamage()
+{
+	int32_t startDamage = std::abs(popInteger());
+	int32_t totalDamage = std::abs(popInteger());
+	CombatType combatType = popEnum<CombatType>();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createPeriodicDamage(interval, combatType, totalDamage, (totalDamage / startDamage), startDamage, 0));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addModStamina()
+{
+	int32_t value = popInteger();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createModStamina(interval, value));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addRegenHealth()
+{
+	int32_t value = popInteger();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createRegenHealth(interval, value));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addRegenPercentHealth()
+{
+	int32_t percent = popInteger();
+	PlayerStatType type = popEnum<PlayerStatType>();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createRegenPercentHealth(interval, type, percent));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addRegenMana()
+{
+	int32_t value = popInteger();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createRegenMana(interval, value));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addRegenPercentMana()
+{
+	int32_t percent = popInteger();
+	PlayerStatType type = popEnum<PlayerStatType>();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createRegenPercentMana(interval, type, percent));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addRegenSoul()
+{
+	int32_t value = popInteger();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createRegenSoul(interval, value));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addRegenPercentSoul()
+{
+	int32_t percent = popInteger();
+	PlayerStatType type = popEnum<PlayerStatType>();
+	uint32_t interval = popUnsignedInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createRegenPercentSoul(interval, type, percent));
+	pushBoolean(true);
+	return 1;
+}
+
+/*
+//TODO:
+int LuaState::lua_Condition_addPeriodicTrigger()
+{
+	Condition* condition = popCondition();
+	pushBoolean(true);
+	return 1;
+}
+*/
+
+int LuaState::lua_Condition_addSpeed()
+{
+	int32_t value = popInteger();
+	int32_t percent = popInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createModSpeed(percent, value));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addModStat()
+{
+	int32_t value = popInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createModStat(value));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addModPercentStat()
+{
+	int32_t percent = popInteger();
+	PlayerStatType type = popEnum<PlayerStatType>();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createModPercentStat(type, percent));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addModSkill()
+{
+	int32_t value = popInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createModSkill(value));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addModPercentSkill()
+{
+	int32_t percent = popInteger();
+	SkillType type = popEnum<SkillType>();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createModPercentSkill(type, percent));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addShapeShift()
+{
+	OutfitType outfit = popOutfit();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createModShapeShift(outfit));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addLight()
+{
+	int32_t color = popInteger();
+	int32_t level = popInteger();
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createModLight(level, color));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Condition_addScript()
+{
+	uint32_t interval = 0;
+	if(!isNil(-1))
+		interval = popUnsignedInteger();
+	else{
+		pop();
+	}
+	Condition* condition = popCondition();
+	condition->addEffect(Condition::Effect::createScript(interval));
+	pushBoolean(true);
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Class Creature
 
 int LuaState::lua_Creature_getID()
@@ -2910,6 +3188,22 @@ int LuaState::lua_Creature_getRawCustomValue()
 	} else {
 		pushNil();
 	}
+	return 1;
+}
+
+int LuaState::lua_Creature_internalAddCondition()
+{
+	Condition* condition = popCondition();
+	Creature* creature = popCreature();
+	bool ret = creature->addCondition(condition);
+	pushBoolean(ret);
+	return 1;
+}
+
+int LuaState::lua_createCondition()
+{
+	Condition* condition = Condition::createCondition("", 0, MECHANIC_NONE, COMBAT_NONE, 0);
+	pushCondition(condition);
 	return 1;
 }
 

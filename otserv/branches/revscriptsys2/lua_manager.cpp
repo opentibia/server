@@ -487,6 +487,16 @@ void LuaState::pushChannel(ChatChannel* channel)
 	}
 }
 
+void LuaState::pushCondition(Condition* condition)
+{
+	if(condition) {
+		Script::ObjectID* objid = pushClassInstance("Condition");
+		*objid = environment->addObject(condition);
+	} else {
+		pushNil();
+	}
+}
+
 void LuaState::pushWaypoint(Waypoint_ptr wp)
 {
 	if(wp) {
@@ -701,6 +711,22 @@ Container* LuaState::popContainer(Script::ErrorMode mode /* = Script::ERROR_THRO
 		return i;
 	}
 	return NULL;
+}
+
+Condition* LuaState::popCondition(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	getMetaObject();
+
+	if(!isUserdata(-1)) {
+		HandleError(mode, std::string("Couldn't pop condition, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		pop();
+		return NULL;
+	}
+
+	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
+	pop();
+
+	return (Condition*)environment->getObject(*objid);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

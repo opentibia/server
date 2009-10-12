@@ -49,6 +49,39 @@ function Creature:isCombatExhausted()
 	return false
 end
 
+function Creature:addCondition(cond)
+	-- Create the actual condition
+	local obj = createCondition()
+	-- Use coroutine to guarantee no leaks due to script errors
+	local co = coroutine.create(Condition.makeConditionObject)
+	state, cond = coroutine.resume(co, obj, cond)
+	if not state then
+		obj:destroy()
+		error(cond) -- Propagate the error
+	end
+	-- Success!
+	if not typeof(cond, "Condition") then
+		obj:destroy()
+		error("Expected return value from Condition.makeConditionObject to be a Condition object")
+	end
+	
+	-- Apply it
+	self:internalAddCondition(cond)
+end
+
+function Condition.makeConditionObject(obj, condition)
+	local t = condition[0]
+	if not Condition.parseEffect(obj, condition) then
+		-- Multiple effects, propagate
+		for _, v in ipairs(t) do
+			--Condition.parseEffect(obj, v)
+		end
+	end
+	
+	obj:setTicks(condition.duration)
+	return obj
+end
+
 function Creature:canSee(what, multifloor)
 	local myX = self:getX()
 	local myY = self:getY()

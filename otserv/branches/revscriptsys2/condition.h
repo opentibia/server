@@ -82,14 +82,21 @@ public:
 	Condition(const Condition& rhs);
 	~Condition();
 
-	IconType getIcon() const;
-	MechanicType getMechanicType() const { return mechanicType;}
-	CombatType getCombatType() const { return combatType;}
-	uint32_t getSourceId() const { return sourceId;}
 	const std::string& getName() const {return name;}
+	CombatType getCombatType() const { return combatType;}
+	MechanicType getMechanicType() const { return mechanicType;}
+	uint32_t getSourceId() const { return sourceId;}
 	uint32_t getTicks() const {return ticks;}
-	void setTicks(uint32_t newTicks) {ticks = newTicks;}
+	uint32_t getFlags() const {return flags;}
+	IconType getIcon() const;
+
+	void setName(const std::string& _name) {name = _name;}
+	void setCombatType(CombatType _combatType) {combatType = _combatType;}
+	void setMechanicType(MechanicType _mechanicType) {mechanicType = _mechanicType;}
+	void setSourceId(uint32_t _sourceId) {sourceId = _sourceId;}
+	void setTicks(uint32_t _ticks) {ticks = _ticks;}
 	void setSource(const CombatSource& _combatSource) {combatSource = _combatSource;}
+	void setFlags(uint32_t _flags) {flags = _flags;}
 
 	bool onBegin(Creature* creature);
 	void onEnd(Creature* creature, ConditionEnd reason);
@@ -168,10 +175,15 @@ public:
 
 		struct ModStat{
 			ModStat() {}
-			ModStat(PlayerStatType type, int32_t percent, int32_t value) :
+			ModStat(int32_t value) :
+				type(0),
+				percent(0),
+				value(value),
+				delta(0) {}
+			ModStat(PlayerStatType type, int32_t percent) :
 				type(type),
 				percent(percent),
-				value(value),
+				value(0),
 				delta(0) {}
 			PlayerStatType type;
 			int32_t percent;
@@ -183,10 +195,15 @@ public:
 
 		struct ModSkill{
 			ModSkill() {}
-			ModSkill(SkillType type, int32_t percent, int32_t value) :
+			ModSkill(int32_t value) :
+				type(0),
+				percent(0),
+				value(value),
+				delta(0) {}
+			ModSkill(SkillType type, int32_t percent) :
 				type(type),
 				percent(percent),
-				value(value),
+				value(0),
 				delta(0) {}
 			SkillType type;
 			int32_t percent;
@@ -212,13 +229,14 @@ public:
 
 		struct ModRegen{
 			ModRegen() {}
-			ModRegen(int32_t percent, int32_t value) :
-				percent(percent),
+			ModRegen(int32_t value) :
+				type(0),
+				percent(0),
 				value(value) {}
-			ModRegen(PlayerStatType type, int32_t percent, int32_t value) :
+			ModRegen(PlayerStatType type, int32_t percent) :
 				type(type),
 				percent(percent),
-				value(value) {}
+				value(0) {}
 
 			PlayerStatType type;
 			int32_t percent;
@@ -291,10 +309,9 @@ public:
 			std::string name;
 		};
 
-		static Effect createPeriodicHeal(uint32_t interval, int32_t total,
-			int32_t percent, int32_t value, int32_t rounds)
+		static Effect createPeriodicHeal(uint32_t interval, int32_t value, int32_t rounds)
 		{
-			ModPeriodicDamage mod(COMBAT_HEALING, total, percent, value, rounds);
+			ModPeriodicDamage mod(COMBAT_HEALING, 0, 0, value, rounds);
 			return Effect(Effect::PERIODIC_HEAL, interval, mod);
 		}
 
@@ -311,21 +328,39 @@ public:
 			return Effect(Effect::PERIODIC_MOD_STAMINA, interval, mod);
 		}
 
-		static Effect createRegenHealth(uint32_t interval, int32_t percent, int32_t value)
+		static Effect createRegenHealth(uint32_t interval, int32_t value)
 		{
-			ModRegen mod(percent, value);
+			ModRegen mod(value);
 			return Effect(Effect::REGEN_HEALTH, interval, mod);
 		}
 
-		static Effect createRegenMana(uint32_t interval, int32_t percent, int32_t value)
+		static Effect createRegenPercentHealth(uint32_t interval, PlayerStatType type, int32_t percent)
 		{
-			ModRegen mod(percent, value);
+			ModRegen mod(type, percent);
+			return Effect(Effect::REGEN_HEALTH, interval, mod);
+		}
+
+		static Effect createRegenMana(uint32_t interval, int32_t value)
+		{
+			ModRegen mod(value);
 			return Effect(Effect::REGEN_MANA, interval, mod);
 		}
 
-		static Effect createRegenSoul(uint32_t interval, int32_t percent, int32_t value)
+		static Effect createRegenPercentMana(uint32_t interval, PlayerStatType type, int32_t percent)
 		{
-			ModRegen mod(percent, value);
+			ModRegen mod(type, percent);
+			return Effect(Effect::REGEN_MANA, interval, mod);
+		}
+
+		static Effect createRegenSoul(uint32_t interval, int32_t value)
+		{
+			ModRegen mod(value);
+			return Effect(Effect::REGEN_SOUL, interval, mod);
+		}
+
+		static Effect createRegenPercentSoul(uint32_t interval, PlayerStatType type, int32_t percent)
+		{
+			ModRegen mod(type, percent);
 			return Effect(Effect::REGEN_SOUL, interval, mod);
 		}
 
@@ -341,15 +376,27 @@ public:
 			return Effect(Effect::MOD_SPEED, 0, mod);
 		}
 
-		static Effect createModStat(PlayerStatType type, int32_t percent, int32_t value)
+		static Effect createModStat(int32_t value)
 		{
-			ModStat mod(type, percent, value);
+			ModStat mod(value);
 			return Effect(Effect::MOD_STAT, mod);
 		}
 
-		static Effect createModSkill(SkillType type, int32_t percent, int32_t value)
+		static Effect createModPercentStat(PlayerStatType type, int32_t percent)
 		{
-			ModSkill mod(type, percent, value);
+			ModStat mod(type, percent);
+			return Effect(Effect::MOD_STAT, mod);
+		}
+
+		static Effect createModSkill(int32_t value)
+		{
+			ModSkill mod(value);
+			return Effect(Effect::MOD_SKILL, 0, mod);
+		}
+
+		static Effect createModPercentSkill(SkillType type, int32_t percent)
+		{
+			ModSkill mod(type, percent);
 			return Effect(Effect::MOD_SKILL, 0, mod);
 		}
 
@@ -370,6 +417,11 @@ public:
 		{
 			ModDispel mod(name);
 			return Effect(Effect::DISPEL, mod);
+		}
+
+		static Effect createScript(int32_t interval = 0)
+		{
+			return Effect(Effect::SCRIPT, interval);
 		}
 
 		Effect() :

@@ -1340,9 +1340,8 @@ void OnCondition::Event::push_instance(LuaState& state, Environment& environment
 	state.pushClassTableInstance("OnCondition");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
-	//TODO:
-	//state.pushCondition(condition);
-	//state.setField(-2, "condition");
+	state.pushCondition(condition);
+	state.setField(-2, "condition");
 
 	if(eventType == EVENT_BEGIN){
 		//
