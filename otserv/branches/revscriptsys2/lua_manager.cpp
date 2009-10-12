@@ -101,6 +101,8 @@ bool LuaState::iterateTable(int32_t index)
 
 void LuaState::getField(int32_t index, const std::string& field_name)
 {
+	if(!isTable(index) && !isUserdata(index))
+		throw Script::Error("Attempt to index non-table value.");
 	lua_getfield(state, index, field_name.c_str());
 }
 

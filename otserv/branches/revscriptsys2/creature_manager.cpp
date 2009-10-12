@@ -32,8 +32,6 @@ CreatureManager::CreatureManager()
 
 CreatureManager::~CreatureManager()
 {
-	for(TypeMap::iterator it = creature_types.begin(); it != creature_types.end(); it++)
-		delete it->second;
 }
 
 bool CreatureManager::loadFromXml(const std::string& _datadir,bool reloading /*= false*/)

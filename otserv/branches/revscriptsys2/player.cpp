@@ -1297,6 +1297,25 @@ void Player::updateSaleShopList(uint32_t itemId)
 	}
 }
 */
+
+
+void Player::sendOutfitWindow(const OutfitList& outfitList)
+{
+	validOutfitList = outfitList;
+	if(client)
+		client->sendOutfitWindow(outfitList);
+}
+
+bool Player::canWearOutfit(const OutfitType& ot) const
+{
+	for(OutfitList::const_iterator oiter = validOutfitList.begin(); oiter != validOutfitList.end(); ++oiter){
+		const Outfit& o = *oiter;
+		if(o.lookType == ot.lookType && (o.addons & ot.lookAddons) == o.addons)
+			return true;
+	}
+	return false;
+}
+
 Item* Player::getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen)
 {
 	_windowTextId = windowTextId;

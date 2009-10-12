@@ -4038,6 +4038,9 @@ bool Game::playerChangeOutfit(uint32_t playerId, OutfitType outfit)
 	if(!player || player->isRemoved())
 		return false;
 
+	// Check that this outfit was in the list we sent to the client
+	if(!player->canWearOutfit(outfit))
+		return false;
 
 	player->defaultOutfit = outfit;
 

@@ -369,6 +369,9 @@ public:
 	void broadcastLoot(Creature* creature, Container* corpse);
 	bool checkPzBlockOnCombat(Player* targetPlayer);
 
+	// Returns true if the outfit is valid according to our internal 'sent outfit list'
+	bool canWearOutfit(const OutfitType& ot) const;
+
 	//tile
 	//send methods
 	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item);
@@ -497,8 +500,7 @@ public:
 		{if(client) client->sendChannelsDialog();}
 	void sendOpenPrivateChannel(const std::string& receiver)
 		{if(client) client->sendOpenPrivateChannel(receiver);}
-	void sendOutfitWindow(const std::list<Outfit>& outfitList)
-		{if(client) client->sendOutfitWindow(outfitList);}
+	void sendOutfitWindow(const OutfitList& outfitList);
 	void sendCloseContainer(uint32_t cid)
 		{if(client) client->sendCloseContainer(cid);}
 	void sendChannel(uint16_t channelId, const std::string& channelName)
@@ -678,6 +680,11 @@ protected:
 	ChaseMode chaseMode;
 	FightMode fightMode;
 	bool safeMode;
+
+	// This list is set to the same list as sent by sendOutfitWindow
+	// and used when setting the outfit to make sure the client doesn't
+	// fool us
+	OutfitList validOutfitList;
 
 	//account variables
 	uint32_t accountId;

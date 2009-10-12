@@ -921,7 +921,6 @@ void OnChangeOutfit::Event::update_instance(Manager& state, Environment& environ
 	} catch(Error& e) {
 		thread->HandleError(ERROR_WARN, std::string("Event 'OnChangeOutfit' invalid structure of 'outfits'") + e.what());
 	}
-	thread->pop();
 }
 
 
