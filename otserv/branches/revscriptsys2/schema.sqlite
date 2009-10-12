@@ -169,8 +169,8 @@ CREATE TABLE "player_skills" (
 
 CREATE TABLE "player_storage" (
 	"player_id" INTEGER NOT NULL,
-	"key" INTEGER NOT NULL,
-	"value" INTEGER NOT NULL,
+	"id" TEXT NOT NULL,
+	"value" TEXT NOT NULL,
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
 );
 
@@ -237,8 +237,8 @@ CREATE TABLE "bans" (
 );
 
 CREATE TABLE "global_storage" (
-	"key" INTEGER NOT NULL,
-	"value" INTEGER NOT NULL
+	"id" TEXT UNIQUE NOT NULL,
+	"value" TEXT NOT NULL
 );
 
 CREATE TABLE "schema_info" (

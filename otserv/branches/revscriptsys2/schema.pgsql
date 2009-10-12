@@ -105,8 +105,9 @@ CREATE TABLE "player_spells" (
 
 CREATE TABLE "player_storage" (
 	"player_id" INT NOT NULL,
-	"key" INT NOT NULL,
-	"value" INT NOT NULL,
+	"id" TEXT NOT NULL,
+	"value" TEXT NOT NULL,
+	PRIMARY KEY("player_id", "id"(10))
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
 );
 
@@ -184,7 +185,8 @@ CREATE TABLE "tiles" (
 	"x" INT(6) NOT NULL,
 	"y" INT(6) NOT NULL,
 	"z" INT(3) NOT NULL,
-	PRIMARY KEY("id")
+	PRIMARY KEY("id"),
+	UNIQUE("x", "y", "z")
 );
 
 CREATE TABLE "tile_items" (
