@@ -540,24 +540,24 @@ bool WeaponMelee::getSkillType(const Player* player, const Item* item,
 			skillpoint = 0;
 	}
 
-	WeaponType_t weaponType = item->getWeaponType();
+	WeaponType weaponType = item->getWeaponType();
 
-	switch(weaponType){
-		case WEAPON_SWORD:
+	switch(weaponType.value()){
+		case enums::WEAPON_SWORD:
 		{
 			skill = SKILL_SWORD;
 			return true;
 			break;
 		}
 
-		case WEAPON_CLUB:
+		case enums::WEAPON_CLUB:
 		{
 			skill = SKILL_CLUB;
 			return true;
 			break;
 		}
 
-		case WEAPON_AXE:
+		case enums::WEAPON_AXE:
 		{
 			skill = SKILL_AXE;
 			return true;

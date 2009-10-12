@@ -334,7 +334,7 @@ public:
 	virtual void onPlacedCreature();
 	virtual void onRemovedCreature();
 
-	virtual WeaponType_t getWeaponType() {return WEAPON_NONE;}
+	virtual WeaponType getWeaponType() {return WEAPON_NONE;}
 	virtual bool getCombatValues(int32_t& min, int32_t& max) {return false;}
 
 	size_t getSummonCount() const {return summons.size();}

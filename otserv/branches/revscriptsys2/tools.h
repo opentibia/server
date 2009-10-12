@@ -68,11 +68,6 @@ void formatDate(time_t time, char* buffer);
 //buffer should have at least 16 bytes
 void formatDateShort(time_t time, char* buffer);
 
-MagicEffectClasses getMagicEffect(const std::string& strValue);
-ShootType_t getShootType(const std::string& strValue);
-Ammo_t getAmmoType(const std::string& strValue);
-AmmoAction_t getAmmoAction(const std::string& strValue);
-
 std::string getViolationReasonString(int32_t reasonId);
 std::string getViolationActionString(ViolationAction actionId, bool ipBanishment);
 std::string playerSexAdjectiveString(PlayerSex sex);

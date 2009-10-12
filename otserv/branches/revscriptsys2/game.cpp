@@ -864,7 +864,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			if(it.isFluidContainer()){
 				int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
 				if(index < maxFluidType){
-					subType = reverseFluidMap[index];
+					subType = reverseFluidMap[index].value();
 				}
 			}
 
@@ -2617,7 +2617,7 @@ ReturnValue Game::internalTeleport(Creature* actor, Thing* thing, const Position
 	return RET_NOTPOSSIBLE;
 }
 
-bool Game::anonymousBroadcastMessage(MessageClasses type, const std::string& text)
+bool Game::anonymousBroadcastMessage(MessageClass type, const std::string& text)
 {
 	if(type < MSG_CLASS_FIRST || type > MSG_CLASS_LAST)
 		return false;
@@ -3750,7 +3750,7 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 	if(it.isFluidContainer()){
 		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
 		if(count < maxFluidType){
-			subType = reverseFluidMap[count];
+			subType = reverseFluidMap[count].value();
 		}
 	}
 	else{
@@ -4174,12 +4174,12 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 		return false;
 	}
 
-	switch(type) {
-		case SPEAK_PRIVATE:
-		case SPEAK_PRIVATE_RED:
-		case SPEAK_RVR_ANSWER:
-		case SPEAK_RVR_CONTINUE:
-		case SPEAK_RVR_CHANNEL:
+	switch(type.value()) {
+		case enums::SPEAK_PRIVATE:
+		case enums::SPEAK_PRIVATE_RED:
+		case enums::SPEAK_RVR_ANSWER:
+		case enums::SPEAK_RVR_CONTINUE:
+		case enums::SPEAK_RVR_CHANNEL:
 			break;
 		default:
 			if(!script_system)
@@ -4192,30 +4192,30 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 			break;
 	}
 
-	if(text.empty()) return false;
+	if(text.empty())
+		return false;
 
-	if(isMuteableChannel){
+	if(isMuteableChannel)
 		player->removeMessageBuffer();
-	}
 
-	switch(type){
-		case SPEAK_SAY:
+	switch(type.value()){
+		case enums::SPEAK_SAY:
 			return internalCreatureSay(player, SPEAK_SAY, text);
 			break;
-		case SPEAK_WHISPER:
+		case enums::SPEAK_WHISPER:
 			return playerWhisper(player, text);
 			break;
-		case SPEAK_YELL:
+		case enums::SPEAK_YELL:
 			return playerYell(player, text);
 			break;
-		case SPEAK_PRIVATE:
-		case SPEAK_PRIVATE_RED:
-		case SPEAK_RVR_ANSWER:
+		case enums::SPEAK_PRIVATE:
+		case enums::SPEAK_PRIVATE_RED:
+		case enums::SPEAK_RVR_ANSWER:
 			return playerSpeakTo(player, type, receiver, text);
 			break;
-		case SPEAK_CHANNEL_Y:
-		case SPEAK_CHANNEL_R1:
-		case SPEAK_CHANNEL_R2:
+		case enums::SPEAK_CHANNEL_Y:
+		case enums::SPEAK_CHANNEL_R1:
+		case enums::SPEAK_CHANNEL_R2:
 			if(playerTalkToChannel(player, type, text, channelId)){
 				return true;
 			}
@@ -4224,16 +4224,16 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 				return playerSay(playerId, 0, SPEAK_SAY, receiver, text);
 			}
 			break;
-		case SPEAK_PRIVATE_PN:
+		case enums::SPEAK_PRIVATE_PN:
 			return playerSpeakToNpc(player, text);
 			break;
-		case SPEAK_BROADCAST:
+		case enums::SPEAK_BROADCAST:
 			return internalBroadcastMessage(player, text);
 			break;
-		case SPEAK_RVR_CHANNEL:
+		case enums::SPEAK_RVR_CHANNEL:
 			return playerReportRuleViolation(player, text);
 			break;
-		case SPEAK_RVR_CONTINUE:
+		case enums::SPEAK_RVR_CONTINUE:
 			return playerContinueReport(player, text);
 			break;
 
@@ -4751,7 +4751,7 @@ bool Game::combatBlockHit(CombatType combatType, CombatSource combatSource, Crea
 		return true;
 	}
 	else if(blockType == BLOCK_IMMUNITY){
-		uint8_t hitEffect = 0;
+		MagicEffect hitEffect(MAGIC_EFFECT_PUFF);
 
 		if(combatType == COMBAT_UNDEFINEDDAMAGE)
 			; // Nothing
@@ -4765,8 +4765,6 @@ bool Game::combatBlockHit(CombatType combatType, CombatSource combatSource, Crea
 			hitEffect = MAGIC_EFFECT_POISON_RINGS;
 		else if(combatType == COMBAT_HOLYDAMAGE)
 			hitEffect = MAGIC_EFFECT_HOLYDAMAGE;
-		else
-			hitEffect = MAGIC_EFFECT_PUFF;
 
 		addMagicEffect(list, targetPos, hitEffect);
 
@@ -4850,8 +4848,8 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, 
 				target->drainHealth(combatType, combatSource, damage, combatEffect.showEffect);
 
 				if(combatEffect.showEffect){
-					TextColor_t textColor = TEXTCOLOR_NONE;
-					uint8_t hitEffect = 0;
+					TextColor textColor = TEXTCOLOR_NONE;
+					MagicEffect hitEffect;
 
 					if(combatType == COMBAT_PHYSICALDAMAGE)
 					{
@@ -4863,7 +4861,7 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, 
 						}
 						else if(race == RACE_BLOOD){
 							textColor = TEXTCOLOR_RED;
-							hitEffect = MAGIC_EFFECT_DRAW_BLOOD;
+							hitEffect = MAGIC_EFFECT_BLOOD;
 						}
 						else if(race == RACE_UNDEAD){
 							textColor = TEXTCOLOR_LIGHTGREY;
@@ -4871,7 +4869,7 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, 
 						}
 						else if(race == RACE_FIRE){
 							textColor = TEXTCOLOR_ORANGE;
-							hitEffect = MAGIC_EFFECT_DRAW_BLOOD;
+							hitEffect = MAGIC_EFFECT_BLOOD;
 						}
 						else if(race == RACE_ENERGY){
 							textColor = TEXTCOLOR_PURPLE;
@@ -5015,16 +5013,14 @@ void Game::addCreatureHealth(const SpectatorVec& list, const Creature* target)
 	}
 }
 
-void Game::addAnimatedText(const Position& pos, uint8_t textColor,
-	const std::string& text)
+void Game::addAnimatedText(const Position& pos, uint8_t textColor, const std::string& text)
 {
 	const SpectatorVec& list = getSpectators(pos);
 
 	addAnimatedText(list, pos, textColor, text);
 }
 
-void Game::addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor,
-	const std::string& text)
+void Game::addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor, const std::string& text)
 {
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
@@ -5034,39 +5030,38 @@ void Game::addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_
 	}
 }
 
-void Game::addMagicEffect(const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const Position& pos, MagicEffect effect)
 {
 	const SpectatorVec& list = getSpectators(pos);
 
 	addMagicEffect(list, pos, effect);
 }
 
-void Game::addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t effect)
+void Game::addMagicEffect(const SpectatorVec& list, const Position& pos, MagicEffect effect)
 {
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
 		if((player = (*it)->getPlayer())){
-			player->sendMagicEffect(pos, effect);
+			player->sendMagicEffect(pos, effect.value());
 		}
 	}
 }
 
-void Game::addDistanceEffect(Creature* creature, const Position& fromPos, const Position& toPos,
-	uint8_t effect)
+void Game::addDistanceEffect(Creature* creature, const Position& fromPos, const Position& toPos, ShootEffect effect)
 {
 	if(creature){
 		if(effect == SHOOT_EFFECT_WEAPONTYPE){
-			switch(creature->getWeaponType()){
-				case WEAPON_AXE: effect = SHOOT_EFFECT_WHIRLWINDAXE; break;
-				case WEAPON_SWORD: effect = SHOOT_EFFECT_WHIRLWINDSWORD; break;
-				case WEAPON_CLUB: effect = SHOOT_EFFECT_WHIRLWINDCLUB; break;
+			switch(creature->getWeaponType().value()){
+				case enums::WEAPON_AXE:   effect = SHOOT_EFFECT_WHIRLWINDAXE; break;
+				case enums::WEAPON_SWORD: effect = SHOOT_EFFECT_WHIRLWINDSWORD; break;
+				case enums::WEAPON_CLUB:  effect = SHOOT_EFFECT_WHIRLWINDCLUB; break;
 
-				default: effect = MAGIC_EFFECT_NONE; break;
+				default:                  effect = SHOOT_EFFECT_NONE; break;
 			}
 		}
 	}
 
-	if(effect != MAGIC_EFFECT_NONE){
+	if(effect != SHOOT_EFFECT_NONE){
 		SpectatorVec list;
 		getSpectators(list, fromPos, false);
 		getSpectators(list, toPos, true);
@@ -5075,7 +5070,7 @@ void Game::addDistanceEffect(Creature* creature, const Position& fromPos, const 
 		Player* tmpPlayer = NULL;
 		for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
 			if((tmpPlayer = (*it)->getPlayer())){
-				tmpPlayer->sendDistanceShoot(fromPos, toPos, effect);
+				tmpPlayer->sendDistanceShoot(fromPos, toPos, effect.value());
 			}
 		}
 	}

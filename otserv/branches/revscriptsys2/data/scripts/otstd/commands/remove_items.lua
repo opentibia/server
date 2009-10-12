@@ -26,7 +26,7 @@ function RemoveItems.handler(event)
         for item in ipairs(items) do
             item:destroy()
         end
-		sendMagicEffect(pos, CONST_ME_POFF)
+		sendMagicEffect(pos, MAGIC_EFFECT_POFF)
     end
 end
 

@@ -56,21 +56,21 @@ struct CombatEffect{
 		hitEffect = MAGIC_EFFECT_UNK;
 		hitTextColor = TEXTCOLOR_UNK;
 		impactEffect = MAGIC_EFFECT_NONE;
-		distanceEffect = MAGIC_EFFECT_NONE;
+		distanceEffect = SHOOT_EFFECT_NONE;
 	}
 
 	CombatEffect() {
 		hitEffect = MAGIC_EFFECT_UNK;
 		hitTextColor = TEXTCOLOR_UNK;
 		impactEffect = MAGIC_EFFECT_NONE;
-		distanceEffect = MAGIC_EFFECT_NONE;
+		distanceEffect = SHOOT_EFFECT_NONE;
 		showEffect = true;
 	}
 
-	MagicEffectClasses hitEffect;
-	TextColor_t hitTextColor;
-	uint8_t impactEffect;
-	uint8_t distanceEffect;
+	MagicEffect hitEffect;
+	TextColor hitTextColor;
+	MagicEffect impactEffect;
+	ShootEffect distanceEffect;
 	bool showEffect;
 };
 

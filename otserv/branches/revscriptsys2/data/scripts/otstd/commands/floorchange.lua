@@ -43,8 +43,8 @@ function otstd.Commands.moveVerticalHandler(event, dir)
 	
 	while true do
 		if event.creature:moveTo(pos) then
-			--sendMagicEffect(old_pos, CONST_ME_TELEPORT)
-			sendMagicEffect(pos, CONST_ME_TELEPORT)
+			--sendMagicEffect(old_pos, MAGIC_EFFECT_TELEPORT)
+			sendMagicEffect(pos, MAGIC_EFFECT_TELEPORT)
 			break
 		end
 		

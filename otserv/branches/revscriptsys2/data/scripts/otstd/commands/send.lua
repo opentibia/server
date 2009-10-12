@@ -41,9 +41,7 @@ function SendPlayer.handler(event)
 		event.player:sendNote("No player by that name '" .. name .. "'.")
 		return
 	else
-		if players[N]:moveTo(dest) then
-			sendMagicEffect(dest, CONST_ME_TELEPORT)
-		end
+		players[N]:teleportTo(dest)
 	end
 	
 end

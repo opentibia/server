@@ -48,7 +48,7 @@ public:
 	bool isPlayerInvited(const Player* player) const;
 	void updateAllPartyIcons();
 	void updatePartyIcons(Player* player);
-	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
+	void broadcastPartyMessage(MessageClass msgClass, const std::string& msg, bool sendToInvitations = false);
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 	bool canOpenCorpse(uint32_t ownerId);
 

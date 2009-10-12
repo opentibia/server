@@ -232,7 +232,8 @@ void OnSay::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "creature");
 	state.pushChannel(channel);
 	state.setField(-2, "channel");
-	state.setField(-1, "class", int32_t(speak_class));
+	state.pushEnum(speak_class);
+	state.setField(-2, "class");
 	state.setField(-1, "text", text);
 	//std::cout << state.typeOf() << ":" << state.getStackSize() << std::endl;
 	//std::cout << "endof" << std::endl;
@@ -241,8 +242,13 @@ void OnSay::Event::push_instance(LuaState& state, Environment& environment)
 void OnSay::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
 	thread->getField(-1, "class");
-	if(thread->isNumber()) {
-		speak_class = (SpeakClass)thread->popInteger();
+	if(thread->isTable()) {
+		try{
+			speak_class = thread->popEnum<SpeakClass>();
+		} catch(enum_conversion_error&){
+			thread->HandleError(ERROR_WARN, "Event 'OnSay' invalid value of 'class'");
+			thread->pop();
+		}
 	}
 	else {
 		thread->HandleError(ERROR_WARN, "Event 'OnSay' invalid value of 'class'");
@@ -292,7 +298,8 @@ void OnHear::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "creature");
 	state.pushThing(talking_creature);
 	state.setField(-2, "talking_creature");
-	state.setField(-1, "class", int32_t(speak_class));
+	state.pushEnum(speak_class);
+	state.setField(-2, "class");
 	state.setField(-1, "text", message);
 }
 
@@ -1473,7 +1480,12 @@ void OnDamage::Event::update_instance(Manager& state, Environment& environment, 
 {
 	thread->getField(-1, "combatType");
 	if(thread->isTable()) {
-		combatType = thread->popEnum<CombatType>();
+		try{
+			combatType = thread->popEnum<CombatType>();
+		} catch(enum_conversion_error&){
+			thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of 'combatType'");
+			thread->pop();
+		}
 	}
 	else {
 		thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of 'combatType'");

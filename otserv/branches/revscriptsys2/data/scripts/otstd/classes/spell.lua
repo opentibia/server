@@ -15,8 +15,8 @@ function Spell:new()
 		soul        = 0,
 		aggressive  = false,
 		premium     = false,
-		effect      = CONST_ME_NONE,
-		failEffect  = CONST_ME_POFF,
+		effect      = MAGIC_EFFECT_NONE,
+		failEffect  = MAGIC_EFFECT_POFF,
 		
 		-- Instant spells
 		area        = nil,

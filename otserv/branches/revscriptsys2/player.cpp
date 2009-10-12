@@ -322,11 +322,11 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 		if(!item)
 			continue;
 
-		switch(item->getWeaponType()){
-			case WEAPON_SWORD:
-			case WEAPON_AXE:
-			case WEAPON_CLUB:
-			case WEAPON_WAND:
+		switch(item->getWeaponType().value()){
+			case enums::WEAPON_SWORD:
+			case enums::WEAPON_AXE:
+			case enums::WEAPON_CLUB:
+			case enums::WEAPON_WAND:
 			{
 				const Weapon* weapon = item->getWeapon();
 				if(weapon){
@@ -336,7 +336,7 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 				break;
 			}
 
-			case WEAPON_DIST:
+			case enums::WEAPON_DIST:
 			{
 				if(!ignoreAmmu && item->getAmmoType() != AMMO_NONE){
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
@@ -366,7 +366,7 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 	return NULL;
 }
 
-WeaponType_t Player::getWeaponType()
+WeaponType Player::getWeaponType()
 {
 	Item* item = getWeapon();
 	if(!item){
@@ -382,27 +382,27 @@ int32_t Player::getWeaponSkill(const Item* item) const
 		return getSkill(SKILL_FIST, SKILL_LEVEL);
 	}
 
-	WeaponType_t weaponType = item->getWeaponType();
+	WeaponType weaponType = item->getWeaponType();
 	int32_t attackSkill;
 
-	switch(weaponType){
-		case WEAPON_SWORD:
+	switch(weaponType.value()){
+		case enums::WEAPON_SWORD:
 			attackSkill = getSkill(SKILL_SWORD, SKILL_LEVEL);
 			break;
 
-		case WEAPON_CLUB:
+		case enums::WEAPON_CLUB:
 		{
 			attackSkill = getSkill(SKILL_CLUB, SKILL_LEVEL);
 			break;
 		}
 
-		case WEAPON_AXE:
+		case enums::WEAPON_AXE:
 		{
 			attackSkill = getSkill(SKILL_AXE, SKILL_LEVEL);
 			break;
 		}
 
-		case WEAPON_DIST:
+		case enums::WEAPON_DIST:
 		{
 			attackSkill = getSkill(SKILL_DIST, SKILL_LEVEL);
 			break;
@@ -444,10 +444,10 @@ void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
 	for(SlotType::iterator slot = SLOT_RIGHT; slot <= SLOT_LEFT; ++slot){
 		item = getInventoryItem(*slot);
 		if(item){
-			switch(item->getWeaponType()){
-			case WEAPON_NONE:
+			switch(item->getWeaponType().value()){
+			case enums::WEAPON_NONE:
 				break;
-			case WEAPON_SHIELD:
+			case enums::WEAPON_SHIELD:
 				shield = item;
 				break;
 			default: // weapons that are not shields
@@ -515,9 +515,9 @@ double Player::getDefenseFactor() const
 	return modes[fightMode.value()];
 }
 
-uint16_t Player::getIcons() const
+IconType Player::getIcons() const
 {
-	uint16_t icons = ICON_NONE;
+	IconType icons = ICON_NONE;
 
 	ConditionList::const_iterator it;
 	for(it = conditions.begin(); it != conditions.end(); ++it){
@@ -540,7 +540,7 @@ uint16_t Player::getIcons() const
 void Player::sendIcons() const
 {
 	if(client){
-		client->sendIcons(getIcons());
+		client->sendIcons(getIcons().value());
 	}
 }
 
@@ -601,7 +601,7 @@ void Player::sendCreatureSay(const Creature* creature, SpeakClass type, const st
 		client->sendCreatureSay(creature, type, text);
 }
 
-void Player::sendCreatureSquare(const Creature* creature, SquareColor_t color)
+void Player::sendCreatureSquare(const Creature* creature, SquareColor color)
 {
 	if(client)
 		client->sendCreatureSquare(creature, color);
@@ -3937,7 +3937,7 @@ void Player::changeSoul(int32_t soulChange)
 	sendStats();
 }
 
-PartyShields_t Player::getPartyShield(const Player* player) const
+PartyShieldType Player::getPartyShield(const Player* player) const
 {
 	if(!player){
 		return SHIELD_NONE;
@@ -4061,7 +4061,7 @@ void Player::clearPartyInvitations()
 }
 
 #ifdef __SKULLSYSTEM__
-Skulls_t Player::getSkull() const
+SkullType Player::getSkull() const
 {
 	if(hasFlag(PlayerFlag_NotGainInFight)){
 		return SKULL_NONE;
@@ -4070,7 +4070,7 @@ Skulls_t Player::getSkull() const
 	return skullType;
 }
 
-Skulls_t Player::getSkullClient(const Player* player) const
+SkullType Player::getSkullClient(const Player* player) const
 {
 	if(!player){
 		return SKULL_NONE;
@@ -4134,7 +4134,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	sendTextMessage(MSG_STATUS_WARNING, msg.str());
 
-	Skulls_t oldSkull = getSkull();
+	SkullType oldSkull = getSkull();
 	if(oldSkull == SKULL_RED || oldSkull == SKULL_BLACK){
 		lastSkullTime = std::time(NULL);
 	}

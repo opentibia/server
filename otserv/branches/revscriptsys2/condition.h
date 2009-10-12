@@ -82,7 +82,7 @@ public:
 	Condition(const Condition& rhs);
 	~Condition();
 
-	uint16_t getIcon() const;
+	IconType getIcon() const;
 	MechanicType getMechanicType() const { return mechanicType;}
 	CombatType getCombatType() const { return combatType;}
 	uint32_t getSourceId() const { return sourceId;}

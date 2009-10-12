@@ -790,7 +790,7 @@ Item* Creature::dropCorpse()
 {
 	Item* splash = NULL;
 	if(getRace() == RACE_VENOM)
-		splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_GREEN);
+		splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_SLIME);
 	else if(getRace() == RACE_BLOOD)
 		splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
 

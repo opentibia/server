@@ -101,12 +101,26 @@ void Manager::registerClasses() {
 	registerEnum<ZoneType>();
 	registerEnum<WorldType>();
 	registerEnum<Script::ListenerType>();
+
 	registerEnum<MechanicType>();
 	registerEnum<ConditionId>();
 	registerEnum<ConditionEnd>();
 	registerEnum<ConditionAttribute>();
 
-	// Classes...
+	registerEnum<PlayerFlag>();
+	registerEnum<MagicEffect>();
+	registerEnum<ShootEffect>();
+	registerEnum<SpeakClass>();
+	registerEnum<MessageClass>();
+	registerEnum<FluidType>();
+	//registerEnum<TextColor>();
+	registerEnum<IconType>();
+	registerEnum<WeaponType>();
+	registerEnum<AmmunitionType>();
+	registerEnum<AmmunitionAction>();
+	registerEnum<WieldInformation>();
+	registerEnum<SkullType>();
+
 	registerClass("Event");
 	registerClass("OnSayEvent", "Event");
 	registerClass("OnUseItemEvent", "Event");
@@ -490,8 +504,8 @@ void Manager::registerFunctions() {
 
 	// Game/Map functions
 	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
-	registerGlobalFunction("sendMagicEffect(position where, int type)", &Manager::lua_sendMagicEffect);
-	registerGlobalFunction("sendDistanceEffect([Creature c = nil], position from, position to, int type)", &Manager::lua_sendDistanceEffect);
+	registerGlobalFunction("sendMagicEffect(position where, MagicEffect type)", &Manager::lua_sendMagicEffect);
+	registerGlobalFunction("sendDistanceEffect([Creature c = nil], position from, position to, ShootEffect type)", &Manager::lua_sendDistanceEffect);
 	registerGlobalFunction("sendAnimatedText(position where, int color, string text)", &Manager::lua_sendAnimatedText);
 
 	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
@@ -3466,9 +3480,9 @@ int LuaState::lua_Player_getSkullType()
 }
 int LuaState::lua_Player_hasGroupFlag()
 {
-	int32_t f = popInteger();
+	PlayerFlag f = popEnum<PlayerFlag>();
 	Player* player = popPlayer();
-	if(f < 0 || f >= PlayerFlag_LastFlag)
+	if(!f.exists())
 		throw Error("Invalid player flag passed to function Player.hasGroupFlag!");
 	pushBoolean(player->hasFlag((PlayerFlags)f));
 	return 1;
@@ -3559,7 +3573,7 @@ int LuaState::lua_Player_sendMessage()
 	uint32_t messageClass = popUnsignedInteger();
 	Player* player = popPlayer();
 
-	player->sendTextMessage((MessageClasses)messageClass, text);
+	player->sendTextMessage((MessageClass)messageClass, text);
 	pushBoolean(true);
 	return 1;
 }
@@ -5427,7 +5441,7 @@ int LuaState::lua_Waypoint_getName()
 
 int LuaState::lua_sendMagicEffect()
 {
-	uint32_t type = popUnsignedInteger();
+	MagicEffect type = popEnum<MagicEffect>();
 	Position pos = popPosition();
 
 	g_game.addMagicEffect(pos, type);
@@ -5437,7 +5451,7 @@ int LuaState::lua_sendMagicEffect()
 
 int LuaState::lua_sendDistanceEffect()
 {
-	uint32_t type = popUnsignedInteger();
+	ShootEffect type = popEnum<ShootEffect>();
 	Position to = popPosition();
 	Position from = popPosition();
 	Creature* c = popCreature(ERROR_PASS);

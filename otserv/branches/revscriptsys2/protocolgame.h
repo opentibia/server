@@ -206,7 +206,7 @@ private:
 	void sendCancelTarget();
 	void sendCreatureOutfit(const Creature* creature, const OutfitType& outfit);
 	void sendStats();
-	void sendTextMessage(MessageClasses mclass, const std::string& message);
+	void sendTextMessage(MessageClass mclass, const std::string& message);
 
 	void sendShop(const std::list<ShopInfo>& shop);
 	void sendCloseShop();
@@ -235,7 +235,7 @@ private:
 
 	void sendCreatureSkull(const Creature* creature);
 	void sendCreatureShield(const Creature* creature);
-	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
+	void sendCreatureSquare(const Creature* creature, SquareColor color);
 
 	//tiles
 	void sendAddTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
@@ -275,9 +275,10 @@ private:
 		int32_t width, int32_t height, NetworkMessage_ptr msg);
 
 	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
-	void AddTextMessage(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message);
+	void AddTextMessage(NetworkMessage_ptr msg,MessageClass mclass, const std::string& message);
 	void AddAnimatedText(NetworkMessage_ptr msg,const Position& pos, unsigned char color, const std::string& text);
 	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, unsigned char type);
+	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, MagicEffect type) {AddMagicEffect(msg, pos, type.value());}
 	void AddDistanceShoot(NetworkMessage_ptr msg,const Position& from, const Position& to, uint8_t type);
 	void AddCreature(NetworkMessage_ptr msg,const Creature* creature, bool known, uint32_t remove);
 	void AddPlayerStats(NetworkMessage_ptr msg);

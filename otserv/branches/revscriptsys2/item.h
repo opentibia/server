@@ -113,6 +113,9 @@ class Item : virtual public Thing, public ItemAttributes
 public:
 	//Factory member to create item of right type based on type
 	static Item* CreateItem(const uint16_t _type, uint16_t _count = 1);
+	static Item* CreateItem(const uint16_t _type, FluidType _fluid) {
+		return CreateItem(_type, (_fluid == FLUID_NONE? -1 : _fluid.value()));
+	}
 	static Item* CreateItem(PropStream& propStream);
 	static bool loadItem(xmlNodePtr node, Container* parent);
 	static bool loadContainer(xmlNodePtr node, Container* parent);
@@ -286,9 +289,9 @@ public:
 	uint16_t getMaxWriteLength() const {return items[id].maxTextLen;}
 	uint32_t getDefaultDuration() const {return items[id].decayTime * 1000;}
 
-	WeaponType_t getWeaponType() const {return items[id].weaponType;}
+	WeaponType getWeaponType() const {return items[id].weaponType;}
 	Weapon* getWeapon() const {return items[id].weaponInstance;}
-	Ammo_t	getAmmoType() const {return items[id].ammoType;}
+	AmmunitionType	getAmmoType() const {return items[id].ammoType;}
 	int32_t	getShootRange() const {return items[id].shootRange;}
 	bool isReplaceable() const {return Item::items[id].replaceable;}
 	CombatType getCombatType() const {return Item::items[id].combatType;}

@@ -47,7 +47,7 @@ public:
 	uint16_t getSoulMax() const {return maxSoul;}
 	uint16_t getSoulGainTicks() const {return gainSoulTicks;}
 
-	float getMeleeBaseDamage(WeaponType_t weaponType) const
+	float getMeleeBaseDamage(WeaponType weaponType) const
 	{
 		if(weaponType == WEAPON_SWORD)
 			return swordBaseDamage;

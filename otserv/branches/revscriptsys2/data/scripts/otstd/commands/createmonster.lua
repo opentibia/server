@@ -9,7 +9,7 @@ function CreateMonster.handler(event)
 	local monster = createMonster(name, event.creature:getPosition())
 	
 	if not monster then
-		sendMagicEffect(event.creature:getPosition(), CONST_ME_POFF)
+		sendMagicEffect(event.creature:getPosition(), MAGIC_EFFECT_POFF)
 		event.creature:sendNote("Could not summon monster '" .. name .. "'.");
 	end
 end

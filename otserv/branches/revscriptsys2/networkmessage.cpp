@@ -121,7 +121,7 @@ void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
 		uint32_t fluidIndex = count % 8;
-		AddByte(fluidMap[fluidIndex]);
+		AddByte(fluidMap[fluidIndex].value());
 	}
 }
 
@@ -136,7 +136,7 @@ void NetworkMessage::AddItem(const Item* item)
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
 		uint32_t fluidIndex = item->getSubType() % 8;
-		AddByte(fluidMap[fluidIndex]);
+		AddByte(fluidMap[fluidIndex].value());
 	}
 }
 

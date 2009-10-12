@@ -1167,15 +1167,15 @@ void ProtocolGame::parseSay(NetworkMessage& msg)
 
 	std::string receiver;
 	uint16_t channelId = 0;
-	switch(type){
-	case SPEAK_PRIVATE:
-	case SPEAK_PRIVATE_RED:
-	case SPEAK_RVR_ANSWER:
+	switch(type.value()){
+	case enums::SPEAK_PRIVATE:
+	case enums::SPEAK_PRIVATE_RED:
+	case enums::SPEAK_RVR_ANSWER:
 		receiver = msg.GetString();
 		break;
-	case SPEAK_CHANNEL_Y:
-	case SPEAK_CHANNEL_R1:
-	case SPEAK_CHANNEL_R2:
+	case enums::SPEAK_CHANNEL_Y:
+	case enums::SPEAK_CHANNEL_R1:
+	case enums::SPEAK_CHANNEL_R2:
 		channelId = msg.GetU16();
 		break;
 	default:
@@ -1185,6 +1185,7 @@ void ProtocolGame::parseSay(NetworkMessage& msg)
 	const std::string text = msg.GetString();
 	if(text.length() > 255)
 		return;
+
 	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, &Game::playerSay, player->getID(), channelId, type, receiver, text);
 }
 
@@ -1490,7 +1491,7 @@ void ProtocolGame::sendCreatureSkull(const Creature* creature)
 			msg->AddByte(0x90);
 			msg->AddU32(creature->getID());
 #ifdef __SKULLSYSTEM__
-			msg->AddByte(player->getSkullClient(creature->getPlayer()));
+			msg->AddByte(player->getSkullClient(creature->getPlayer()).value());
 #else
 			msg->AddByte(SKULL_NONE);
 #endif
@@ -1506,12 +1507,12 @@ void ProtocolGame::sendCreatureShield(const Creature* creature)
 			TRACK_MESSAGE(msg);
 			msg->AddByte(0x91);
 			msg->AddU32(creature->getID());
-			msg->AddByte(player->getPartyShield(creature->getPlayer()));
+			msg->AddByte(player->getPartyShield(creature->getPlayer()).value());
 		}
 	}
 }
 
-void ProtocolGame::sendCreatureSquare(const Creature* creature, SquareColor_t color)
+void ProtocolGame::sendCreatureSquare(const Creature* creature, SquareColor color)
 {
 	if(canSee(creature)){
 		NetworkMessage_ptr msg = getOutputBuffer();
@@ -1519,7 +1520,7 @@ void ProtocolGame::sendCreatureSquare(const Creature* creature, SquareColor_t co
 			TRACK_MESSAGE(msg);
 			msg->AddByte(0x86);
 			msg->AddU32(creature->getID());
-			msg->AddByte((uint8_t)color);
+			msg->AddByte(color.value());
 		}
 	}
 }
@@ -1533,7 +1534,7 @@ void ProtocolGame::sendStats()
 	}
 }
 
-void ProtocolGame::sendTextMessage(MessageClasses mclass, const std::string& message)
+void ProtocolGame::sendTextMessage(MessageClass mclass, const std::string& message)
 {
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
@@ -2128,7 +2129,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 						sendVIP((*it), vip_name, online);
 					}
 				}
-				sendIcons(player->getIcons());
+				sendIcons(player->getIcons().value());
 			}
 			else{
 				AddTileCreature(msg, pos, stackpos, creature);
@@ -2476,10 +2477,10 @@ void ProtocolGame::AddMapDescription(NetworkMessage_ptr msg, const Position& pos
 	GetMapDescription(pos.x - 8, pos.y - 6, pos.z, 18, 14, msg);
 }
 
-void ProtocolGame::AddTextMessage(NetworkMessage_ptr msg, MessageClasses mclass, const std::string& message)
+void ProtocolGame::AddTextMessage(NetworkMessage_ptr msg, MessageClass mclass, const std::string& message)
 {
 	msg->AddByte(0xB4);
-	msg->AddByte(mclass);
+	msg->AddByte(mclass.value());
 	msg->AddString(message);
 }
 
@@ -2538,11 +2539,11 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 
 	msg->AddU16(creature->getStepSpeed());
 #ifdef __SKULLSYSTEM__
-	msg->AddByte(player->getSkullClient(creature->getPlayer()));
+	msg->AddByte(player->getSkullClient(creature->getPlayer()).value());
 #else
-	msg->AddByte(SKULL_NONE);
+	msg->AddByte(SKULL_NONE.value());
 #endif
-	msg->AddByte(player->getPartyShield(creature->getPlayer()));
+	msg->AddByte(player->getPartyShield(creature->getPlayer()).value());
 }
 
 void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)
@@ -2624,27 +2625,27 @@ void ProtocolGame::AddCreatureSpeak(NetworkMessage_ptr msg, const Creature* crea
 		msg->AddU16(0x0000);
 	}
 
-	msg->AddByte(type);
-	switch(type){
-		case SPEAK_SAY:
-		case SPEAK_WHISPER:
-		case SPEAK_YELL:
-		case SPEAK_MONSTER_SAY:
-		case SPEAK_MONSTER_YELL:
-		case SPEAK_PRIVATE_NP:
+	msg->AddByte(type.value());
+	switch(type.value()){
+		case enums::SPEAK_SAY:
+		case enums::SPEAK_WHISPER:
+		case enums::SPEAK_YELL:
+		case enums::SPEAK_MONSTER_SAY:
+		case enums::SPEAK_MONSTER_YELL:
+		case enums::SPEAK_PRIVATE_NP:
 			if(creature)
 				msg->AddPosition(creature->getPosition());
 			else
 				msg->AddPosition(player->getPosition());
 			break;
-		case SPEAK_CHANNEL_Y:
-		case SPEAK_CHANNEL_W:
-		case SPEAK_CHANNEL_R1:
-		case SPEAK_CHANNEL_R2:
-		case SPEAK_CHANNEL_O:
+		case enums::SPEAK_CHANNEL_Y:
+		case enums::SPEAK_CHANNEL_W:
+		case enums::SPEAK_CHANNEL_R1:
+		case enums::SPEAK_CHANNEL_R2:
+		case enums::SPEAK_CHANNEL_O:
 			msg->AddU16(channelId);
 			break;
-		case SPEAK_RVR_CHANNEL: {
+		case enums::SPEAK_RVR_CHANNEL: {
 			uint32_t t = (OTSYS_TIME() / 1000) & 0xFFFFFFFF;
 			msg->AddU32(t - time);
 		} break;
@@ -2894,7 +2895,7 @@ void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopInfo item)
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
 		uint32_t fluidIndex = item.subType % 8;
-		msg->AddByte(fluidMap[fluidIndex]);
+		msg->AddByte(fluidMap[fluidIndex].value());
 	}
 	else{
 		msg->AddByte(1);

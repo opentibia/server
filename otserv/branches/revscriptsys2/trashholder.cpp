@@ -24,7 +24,7 @@
 
 extern Game g_game;
 
-TrashHolder::TrashHolder(uint16_t _type, MagicEffectClasses _effect /*= MAGIC_EFFECT_NONE*/) : Item(_type)
+TrashHolder::TrashHolder(uint16_t _type, MagicEffect _effect /*= MAGIC_EFFECT_NONE*/) : Item(_type)
 {
 	effect = _effect;
 }

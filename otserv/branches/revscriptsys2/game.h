@@ -446,7 +446,7 @@ public:
 	bool internalCloseTrade(Player* player);
 	bool internalBroadcastMessage(Player* player, const std::string& text);
 
-	bool anonymousBroadcastMessage(MessageClasses type, const std::string& text);
+	bool anonymousBroadcastMessage(MessageClass type, const std::string& text);
 
 	//Implementation of player invoked events
 	bool playerMoveThing(uint32_t playerId, const Position& fromPos, uint16_t spriteId, uint8_t fromStackPos,
@@ -640,10 +640,14 @@ public:
 	void addCreatureHealth(const Creature* target);
 	void addCreatureHealth(const SpectatorVec& list, const Creature* target);
 	void addAnimatedText(const Position& pos, uint8_t textColor, const std::string& text);
+	void addAnimatedText(const Position& pos, TextColor textColor, const std::string& text) {
+		addAnimatedText(pos, textColor.value(), text);}
 	void addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor, const std::string& text);
-	void addMagicEffect(const Position& pos, uint8_t effect);
-	void addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t effect);
-	void addDistanceEffect(Creature* creature, const Position& fromPos, const Position& toPos, uint8_t effect);
+	void addAnimatedText(const SpectatorVec& list, const Position& pos, TextColor textColor, const std::string& text) {
+		addAnimatedText(list, pos, (uint8_t)textColor.value(), text);}
+	void addMagicEffect(const Position& pos, MagicEffect effect);
+	void addMagicEffect(const SpectatorVec& list, const Position& pos, MagicEffect effect);
+	void addDistanceEffect(Creature* creature, const Position& fromPos, const Position& toPos, ShootEffect effect);
 
 	std::string getTradeErrorDescription(ReturnValue ret, Item* item);
 

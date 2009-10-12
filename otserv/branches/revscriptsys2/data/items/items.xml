@@ -18204,7 +18204,7 @@
 		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="ammunition"/>
 		<attribute key="ammoType" value="arrow"/>
-		<attribute key="shootType" value="flammingarrow"/>
+		<attribute key="shootType" value="flamingarrow"/>
 		<attribute key="maxHitChance" value="90"/>
 		<attribute key="ammoAction" value="removecount"/>
 	</item>

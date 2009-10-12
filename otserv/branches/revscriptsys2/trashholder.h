@@ -28,7 +28,7 @@
 class TrashHolder : public Item, public Cylinder
 {
 public:
-	TrashHolder(uint16_t _type, MagicEffectClasses _effect = MAGIC_EFFECT_NONE);
+	TrashHolder(uint16_t _type, MagicEffect _effect = MAGIC_EFFECT_NONE);
 	~TrashHolder();
 	
 	virtual TrashHolder* getTrashHolder() {return this;}
@@ -63,7 +63,7 @@ public:
 	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 private:
-	MagicEffectClasses effect;
+	MagicEffect effect;
 };
 
 #endif

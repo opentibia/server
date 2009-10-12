@@ -76,7 +76,7 @@ protected:
 	int32_t manaPercent;
 	int32_t soul;
 	int32_t range;
-	AmmoAction_t ammoAction;
+	AmmunitionAction ammoAction;
 	CombatParams params;
 
 private:

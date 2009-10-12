@@ -121,11 +121,11 @@ public:
 	uint16_t       maxItems;
 	float          weight;
 	bool           showCount;
-	WeaponType_t   weaponType;
+	WeaponType     weaponType;
 	Weapon*        weaponInstance;
-	Ammo_t         ammoType;
-	ShootType_t    shootType;
-	MagicEffectClasses magicEffect;
+	AmmunitionType ammoType;
+	ShootEffect    shootType;
+	MagicEffect    magicEffect;
 	int32_t        attack;
 	int32_t        defense;
 	int32_t        extraDefense;
@@ -146,7 +146,7 @@ public:
 	int32_t        runeLevel;
 	std::string    runeSpellName;
 
-	uint32_t       wieldInfo;
+	WieldInformation wieldInfo;
 	std::string    vocationString;
 	uint32_t       minRequiredLevel;
 	uint32_t       minRequiredMagicLevel;
@@ -193,8 +193,8 @@ public:
 	int32_t hitChance;
 	int32_t maxHitChance;
 	uint32_t shootRange;
-	AmmoAction_t ammoAction;
-	int32_t fluidSource;
+	AmmunitionAction ammoAction;
+	FluidType fluidSource;
 
 	uint32_t currency;
 

@@ -111,7 +111,7 @@ void Combat::combatToTarget(CombatSource& combatSource, CombatParams& params, Cr
 		}
 
 		Creature* attacker = combatSource.getSourceCreature();
-		if(attacker && params.effects.distanceEffect != MAGIC_EFFECT_NONE){
+		if(attacker && params.effects.distanceEffect != SHOOT_EFFECT_NONE){
 			g_game.addDistanceEffect(attacker, attacker->getPosition(), target->getPosition(), params.effects.distanceEffect);
 		}
 	}

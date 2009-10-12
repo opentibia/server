@@ -6,7 +6,7 @@ UltimateHealingRune.level       = 22
 UltimateHealingRune.mana        = 400
 UltimateHealingRune.health      = 0
 
-UltimateHealingRune.effect = CONST_ME_MAGIC_BLUE
+UltimateHealingRune.effect = MAGIC_EFFECT_MAGIC_BLUE
 
 UltimateHealingRune.reagent       = 2260
 UltimateHealingRune.product.id    = 2273

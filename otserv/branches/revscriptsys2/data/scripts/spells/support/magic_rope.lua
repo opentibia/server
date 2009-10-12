@@ -5,7 +5,7 @@ magic_rope.vocation    = "any"
 magic_rope.level       = 9
 magic_rope.mana        = 20
 
-magic_rope.effect = CONST_ME_TELEPORT
+magic_rope.effect = MAGIC_EFFECT_TELEPORT
 
 function magic_rope:onBeginCast(event)
 	local caster = event.caster

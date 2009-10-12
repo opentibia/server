@@ -169,9 +169,9 @@ Condition::Condition(const Condition& rhs)
 	}
 }
 
-uint16_t Condition::getIcon() const
+IconType Condition::getIcon() const
 {
-	uint16_t icons = 0;
+	IconType icons;
 
 	switch(combatType.value()){
 		case enums::COMBAT_ENERGYDAMAGE: icons |= ICON_ENERGY; break;

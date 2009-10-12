@@ -108,13 +108,13 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->currentOutfit = player->defaultOutfit;
 
 #ifdef __SKULLSYSTEM__
-	int32_t skullType = result->getDataInt("skull_type");
+	SkullType skullType = SkullType(result->getDataInt("skull_type"));
 	int64_t lastSkullTime = result->getDataLong("skull_time");
 
 	if((skullType == SKULL_RED && std::time(NULL) < lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
 		(skullType == SKULL_BLACK && std::time(NULL) < lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION))){
 		player->lastSkullTime = lastSkullTime;
-		player->skullType = (Skulls_t)skullType;
+		player->skullType = skullType;
 	}
 #endif
 
@@ -478,7 +478,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	<< ", `stamina` = " << player->stamina;
 
 #ifdef __SKULLSYSTEM__
-	query << ", `skull_type` = " << (player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK ? player->getSkull() : 0);
+	query << ", `skull_type` = " << (player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK ? player->getSkull().value() : 0);
 	query << ", `skull_time` = " << player->lastSkullTime;
 #endif
 

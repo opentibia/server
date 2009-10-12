@@ -490,7 +490,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 					}
 					else if(asLowerCaseString(strValue) == "areaeffect"){
 						if(readXMLString(attributeNode, "value", strValue)){
-							MagicEffectClasses effect = getMagicEffect(strValue);
+							MagicEffect effect = getMagicEffect(strValue);
 							if(effect != MAGIC_EFFECT_UNK){
 								combat->setParam(COMBATPARAM_EFFECT, effect);
 							}

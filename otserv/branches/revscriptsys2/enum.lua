@@ -176,6 +176,12 @@ function enum(params, ...)
 	implementation:write("}\n\n")
 end
 
+function definition(code)
+	header:write("//begin raw definitions\n\n")
+	header:write(code)
+	header:write("//end raw definitions\n\n")
+end
+
 function BeginEnumFile(filename)
 	-- These are global
 	header = {name = filename .. ".h", _ = ""}

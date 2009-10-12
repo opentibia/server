@@ -53,7 +53,7 @@ ItemType::ItemType()
 	blockPathFind = false;
 	allowPickupable = false;
 
-	wieldInfo        = 0;
+	wieldInfo        = WIELDINFO_NONE;
 	minRequiredLevel = 0;
 	minRequiredMagicLevel = 0;
 
@@ -72,7 +72,7 @@ ItemType::ItemType()
 	wieldPosition = SLOT_HAND;
 	ammoType      = AMMO_NONE;
 	ammoAction    = AMMOACTION_NONE;
-	shootType     = (ShootType_t)0;
+	shootType     = SHOOT_EFFECT_NONE;
 	magicEffect   = MAGIC_EFFECT_NONE;
 	attack        = 0;
 	defense       = 0;
@@ -82,7 +82,7 @@ ItemType::ItemType()
 	decayTime     = 0;
 	stopTime      = false;
 	corpseType    = RACE_NONE;
-	fluidSource  = -1;
+	fluidSource   = FLUID_NONE;
 	clientCharges = false;
 	allowDistRead = false;
 
@@ -568,59 +568,10 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "fluidsource"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									if(asLowerCaseString(strValue) == "water"){
-										it.fluidSource = FLUID_WATER;
-									}
-									else if(asLowerCaseString(strValue) == "blood"){
-										it.fluidSource = FLUID_BLOOD;
-									}
-									else if(asLowerCaseString(strValue) == "beer"){
-										it.fluidSource = FLUID_BEER;
-									}
-									else if(asLowerCaseString(strValue) == "slime"){
-										it.fluidSource = FLUID_SLIME;
-									}
-									else if(asLowerCaseString(strValue) == "lemonade"){
-										it.fluidSource = FLUID_LEMONADE;
-									}
-									else if(asLowerCaseString(strValue) == "milk"){
-										it.fluidSource = FLUID_MILK;
-									}
-									else if(asLowerCaseString(strValue) == "mana"){
-										it.fluidSource = FLUID_MANA;
-									}
-									else if(asLowerCaseString(strValue) == "life"){
-										it.fluidSource = FLUID_LIFE;
-									}
-									else if(asLowerCaseString(strValue) == "oil"){
-										it.fluidSource = FLUID_OIL;
-									}
-									else if(asLowerCaseString(strValue) == "urine"){
-										it.fluidSource = FLUID_URINE;
-									}
-									else if(asLowerCaseString(strValue) == "coconut"){
-										it.fluidSource = FLUID_COCONUTMILK;
-									}
-									else if(asLowerCaseString(strValue) == "wine"){
-										it.fluidSource = FLUID_WINE;
-									}
-									else if(asLowerCaseString(strValue) == "mud"){
-										it.fluidSource = FLUID_MUD;
-									}
-									else if(asLowerCaseString(strValue) == "fruitjuice"){
-										it.fluidSource = FLUID_FRUITJUICE;
-									}
-									else if(asLowerCaseString(strValue) == "lava"){
-										it.fluidSource = FLUID_LAVA;
-									}
-									else if(asLowerCaseString(strValue) == "rum"){
-										it.fluidSource = FLUID_RUM;
-									}
-									else if(asLowerCaseString(strValue) == "swamp"){
-										it.fluidSource = FLUID_SWAMP;
-									}
-									else{
-										std::cout << "Warning: [Items::loadFromXml] " << "Unknown fluidSource " << strValue  << std::endl;
+									try{
+										it.fluidSource = FluidType::fromString(strValue);
+									} catch(enum_conversion_error& e) {
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown fluidSource " << e.what() << std::endl;
 									}
 								}
 							}
@@ -720,31 +671,28 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "ammotype"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									it.ammoType = getAmmoType(strValue);
-									if(it.ammoType == AMMO_NONE){
-										std::cout << "Warning: [Items::loadFromXml] " << "Unknown ammoType " << strValue  << std::endl;
+									try{
+										it.ammoType = AmmunitionType::fromString(strValue);
+									} catch(enum_conversion_error& e){
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown ammoType " << e.what() << std::endl;
 									}
 								}
 							}
 							else if(asLowerCaseString(strValue) == "shoottype"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									ShootType_t shoot = getShootType(strValue);
-									if(shoot != SHOOT_EFFECT_UNK){
-										it.shootType = shoot;
-									}
-									else{
-										std::cout << "Warning: [Items::loadFromXml] " << "Unknown shootType " << strValue  << std::endl;
+									try{
+										it.shootType = ShootEffect::fromString(strValue);
+									} catch(enum_conversion_error& e){
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown shootType " << e.what() << std::endl;
 									}
 								}
 							}
 							else if(asLowerCaseString(strValue) == "effect"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									MagicEffectClasses effect = getMagicEffect(strValue);
-									if(effect != MAGIC_EFFECT_UNK){
-										it.magicEffect = effect;
-									}
-									else{
-										std::cout << "Warning: [Items::loadFromXml] " << "Unknown effect " << strValue  << std::endl;
+									try{
+										it.magicEffect = MagicEffect::fromString(strValue);
+									} catch(enum_conversion_error& e){
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown effect " << e.what() << std::endl;
 									}
 								}
 							}
@@ -810,10 +758,10 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "ammoaction"){
 								if(readXMLString(itemAttributesNode, "value", strValue)){
-									it.ammoAction = getAmmoAction(strValue);
-
-									if(it.ammoAction == AMMOACTION_NONE){
-										std::cout << "Warning: [Items::loadFromXml] " << "Unknown ammoAction " << strValue  << std::endl;
+									try{
+										it.ammoAction = AmmunitionAction::fromString(strValue);
+									} catch(enum_conversion_error& e){
+										std::cout << "Warning: [Items::loadFromXml] " << "Unknown ammoAction " << e.what() << std::endl;
 									}
 								}
 							}
@@ -1262,17 +1210,17 @@ void Items::loadWeaponDefaults() {
 
 		if(it->weaponType != WEAPON_NONE){
 			Weapon* weapon = NULL;
-			switch(it->weaponType){
-				case WEAPON_AXE:
-				case WEAPON_SWORD:
-				case WEAPON_CLUB:
+			switch(it->weaponType.value()){
+				case enums::WEAPON_AXE:
+				case enums::WEAPON_SWORD:
+				case enums::WEAPON_CLUB:
 				{
 					weapon = new WeaponMelee();
 					break;
 				}
 
-				case WEAPON_AMMO:
-				case WEAPON_DIST:
+				case enums::WEAPON_AMMO:
+				case enums::WEAPON_DIST:
 				{
 					if(it->weaponType == WEAPON_DIST && it->ammoType != AMMO_NONE){
 						//distance weapons with ammunitions are configured seperatly

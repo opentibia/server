@@ -265,7 +265,7 @@ public:
 	void setFightMode(FightMode mode);
 	void setSafeMode(bool _safeMode) {safeMode = _safeMode;}
 	bool hasSafeMode() const {return safeMode;}
-	uint16_t getIcons() const;
+	IconType getIcons() const;
 
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);
@@ -291,7 +291,7 @@ public:
 	BlockType getLastAttackBlockType() const {return lastAttackBlockType;}
 
 	Item* getWeapon(bool ignoreAmmu = false);
-	virtual WeaponType_t getWeaponType();
+	virtual WeaponType getWeaponType();
 	int32_t getWeaponSkill(const Item* item) const;
 	void getShieldAndWeapon(const Item* &shield, const Item* &weapon) const;
 
@@ -340,7 +340,7 @@ public:
 
 	void setParty(Party* _party) {party = _party;}
 	Party* getParty() const {return party;}
-	PartyShields_t getPartyShield(const Player* player) const;
+	PartyShieldType getPartyShield(const Player* player) const;
 	bool isInviting(const Player* player) const;
 	bool isPartner(const Player* player) const;
 	void sendPlayerPartyIcons(Player* player);
@@ -349,13 +349,13 @@ public:
 	void clearPartyInvitations();
 
 #ifdef __SKULLSYSTEM__
-	Skulls_t getSkull() const;
-	Skulls_t getSkullClient(const Player* player) const;
+	SkullType getSkull() const;
+	SkullType getSkullClient(const Player* player) const;
 	bool hasAttacked(const Player* attacked) const;
 	void addAttacked(const Player* attacked);
 	void clearAttacked();
 	void addUnjustifiedDead(const Player* attacked);
-	void setSkull(Skulls_t newSkull) {skullType = newSkull;}
+	void setSkull(SkullType newSkull) {skullType = newSkull;}
 	void sendCreatureSkull(const Creature* creature) const
 		{if(client) client->sendCreatureSkull(creature);}
 	void checkSkullTicks(int32_t ticks);
@@ -383,7 +383,7 @@ public:
 
 	void sendCreatureTurn(const Creature* creature);
 	void sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text);
-	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
+	void sendCreatureSquare(const Creature* creature, SquareColor color);
 	void sendCreatureChangeOutfit(const Creature* creature, const OutfitType& outfit);
 	void sendCreatureChangeVisible(const Creature* creature, bool visible);
 	void sendCreatureLight(const Creature* creature);
@@ -468,7 +468,7 @@ public:
 	void sendStats();
 	void sendSkills() const
 		{if(client) client->sendSkills();}
-	void sendTextMessage(MessageClasses mclass, const std::string& message) const
+	void sendTextMessage(MessageClass mclass, const std::string& message) const
 		{if(client) client->sendTextMessage(mclass, message);}
 	void sendTextWindow(Item* item, uint16_t maxlen, bool canWrite) const
 		{if(client) client->sendTextWindow(windowTextId, item, maxlen, canWrite);}
@@ -747,7 +747,7 @@ protected:
 	uint32_t editListId;
 
 #ifdef __SKULLSYSTEM__
-	Skulls_t skullType;
+	SkullType skullType;
 	int64_t lastSkullTime;
 	typedef std::set<uint32_t> AttackedSet;
 	AttackedSet attackedSet;
