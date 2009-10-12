@@ -539,8 +539,7 @@ namespace Script {
 		enum FilterType {
 			FILTER_NONE,
 			FILTER_ITEMID,
-			FILTER_ACTIONID,
-			FILTER_CREATUREID,
+			FILTER_ACTIONID
 		};
 
 		struct ScriptInformation {

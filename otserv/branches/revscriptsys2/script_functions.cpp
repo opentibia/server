@@ -469,7 +469,7 @@ void Manager::registerFunctions() {
 
 	// OnLook
 	registerGlobalFunction("registerOnLookAtItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnLookAtItem);
-	registerGlobalFunction("registerOnLookAtCreature(Creature creature, function callback)", &Manager::lua_registerGenericEvent_OnLookAtCreature);
+	registerGlobalFunction("registerOnLookAtCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLookAtCreature);
 	registerGlobalFunction("registerOnPlayerLookAt(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnLook);
 
 	// OnAdvance
@@ -790,7 +790,17 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 	boost::any p(si_onuse);
 	Listener_ptr listener(new Listener(ON_USE_ITEM_LISTENER, p, *manager));
 
-	environment->Generic.OnUseItem.push_back(listener);
+	ListenerList* list = NULL;
+	switch(si_onuse.method){
+		case OnUseItem::FILTER_ITEMID:
+			list = &environment->Generic.OnUseItem.ItemId[si_onuse.id];
+		case OnUseItem::FILTER_ACTIONID:
+			list = &environment->Generic.OnUseItem.ActionId[si_onuse.id];
+			break;
+		default:
+			break; // impossible, crash
+	}
+	list->push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -980,7 +990,17 @@ int LuaState::lua_registerGenericEvent_OnLookAtItem() {
 	boost::any p(si_onlook);
 	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *manager));
 
-	environment->Generic.OnLook.push_back(listener);
+	ListenerList* list = NULL;
+	switch(si_onuse.method){
+		case OnLook::FILTER_ITEMID:
+			list = &environment->Generic.OnLook.ItemId[si_onuse.id];
+		case OnLook::FILTER_ACTIONID:
+			list = &environment->Generic.OnLook.ActionId[si_onuse.id];
+			break;
+		default:
+			break; // impossible, crash
+	}
+	list->push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -990,20 +1010,24 @@ int LuaState::lua_registerGenericEvent_OnLookAtItem() {
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_OnLookAtCreature() {
+int LuaState::lua_registerSpecificEvent_OnLookAtCreature() {
 	// Store callback
-	insert(-3);
+	insert(-2);
 
-	Creature* at = popCreature();
+	Creature* who = popCreature();
 
 	OnLook::ScriptInformation si_onlook;
-	si_onlook.method = OnLook::FILTER_CREATUREID;
-	si_onlook.id = at->getID();
+	si_onlook.method = OnLook::FILTER_NONE;
+	si_onlook.id = 0;
 
+	// Listener is unbound automatically
 	boost::any p(si_onlook);
-	Listener_ptr listener(new Listener(ON_LOOK_LISTENER, p, *manager));
+	Listener_ptr listener(
+		new Listener(ON_LOOKED_AT_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
 
-	environment->Generic.OnLook.push_back(listener);
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());

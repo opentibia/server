@@ -1,4 +1,4 @@
---[[
+
 local energyWave = Spell:new("Energy Wave")
 
 energyWave.words       = "exevo mort hur"
@@ -8,7 +8,7 @@ energyWave.magic_level = 40
 energyWave.mana        = 170
 energyWave.aggressive  = false
 
-energyWave.damagetype = COMBAT_ENERGYDAMAGE,
+energyWave.damagetype = COMBAT_ENERGYDAMAGE
 energyWave.effect     = COMBAT_ME_ENERGYAREA
 energyWave.area       =
 	{
@@ -25,4 +25,3 @@ energyWave.formula =
 	end
 
 energyWave:register()
-]]--

@@ -78,7 +78,7 @@ namespace Script {
 
 		struct {
 			ListenerList OnSay;
-			ListenerList OnUseItem;
+			ListenerItemMap OnUseItem;
 			ListenerList OnEquipItem;
 			ListenerList OnMoveCreature;
 			ListenerList OnJoinChannel;
@@ -86,7 +86,8 @@ namespace Script {
 			ListenerList OnLogin;
 			ListenerList OnLogout;
 			ListenerList OnChangeOutfit;
-			ListenerList OnLook;
+			ListenerItemMap OnLook;
+			ListenerList OnLookAtCreature;
 			ListenerList OnTurn;
 			ListenerList OnLoad;
 			ListenerList OnUnload;

@@ -339,10 +339,27 @@ bool OnUseItem::Event::check_match(const ScriptInformation& info)
 
 bool OnUseItem::Event::dispatch(Manager& state, Environment& environment)
 {
-	// Extremely naive solution
-	// Should be a map with id:callback instead.
-	return dispatchEvent<OnUseItem::Event, ScriptInformation>
-		(this, state, environment, environment.Generic.OnUseItem);
+	ListenerMap::iterator list_iter;
+
+	if(item->getActionId() != 0){
+		list_iter = environment.Generic.OnUseItem.ActionId.find(item->getActionId());
+		if(list_iter != environment.Generic.OnUseItem.ActionId.end()){
+			if(dispatchEvent<OnUseItem::Event, ScriptInformation>
+					(this, state, environment, list_iter->second)){
+				return true;
+			}
+		}
+	}
+
+	list_iter = environment.Generic.OnUseItem.ItemId.find(item->getID());
+	if(list_iter != environment.Generic.OnUseItem.ItemId.end()){
+		if(dispatchEvent<OnUseItem::Event, ScriptInformation>
+				(this, state, environment, list_iter->second)){
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void OnUseItem::Event::push_instance(LuaState& state, Environment& environment)
@@ -978,10 +995,38 @@ bool OnLook::Event::dispatch(Manager& state, Environment& environment)
 		)
 		return true;
 
-	// Extremely naive solution
-	// Should be a map with id:callback instead.
-	return dispatchEvent<OnLook::Event, ScriptInformation>
-		(this, state, environment, environment.Generic.OnLook);
+	if(creature){
+		list = player->getListeners(ON_LOOKED_AT_LISTENER);
+		if(dispatchEvent<OnLook::Event>
+				(this, state, environment, list)
+			)
+			return true;
+	}
+
+	// Check generic listeners
+	if(item){
+		ListenerMap::iterator list_iter;
+
+		if(item->getActionId() != 0){
+			list_iter = environment.Generic.OnLook.ActionId.find(item->getActionId());
+			if(list_iter != environment.Generic.OnLook.ActionId.end()){
+				if(dispatchEvent<OnLook::Event, ScriptInformation>
+						(this, state, environment, list_iter->second)){
+					return true;
+				}
+			}
+		}
+
+		list_iter = environment.Generic.OnLook.ItemId.find(item->getID());
+		if(list_iter != environment.Generic.OnLook.ItemId.end()){
+			if(dispatchEvent<OnLook::Event, ScriptInformation>
+					(this, state, environment, list_iter->second)){
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void OnLook::Event::push_instance(LuaState& state, Environment& environment)

@@ -232,6 +232,14 @@ int32_t LuaState::popInteger()
 	return i;
 }
 
+int32_t LuaState::popInteger(int def)
+{
+	if(lua_isnumber(state, -1))
+		def = lua_tointeger(state, -1);
+	pop();
+	return def;
+}
+
 uint32_t LuaState::popUnsignedInteger()
 {
 	double d = lua_tonumber(state, -1);
@@ -519,16 +527,17 @@ OutfitType LuaState::popOutfit(Script::ErrorMode mode /* = Script::ERROR_THROW *
 	outfit.lookType = popInteger();
 	getField(-1, "head");
 	outfit.lookHead = popInteger();
+	
 	getField(-1, "body");
-	outfit.lookBody = popInteger();
+	outfit.lookBody = popInteger(0);
 	getField(-1, "legs");
-	outfit.lookLegs = popInteger();
+	outfit.lookLegs = popInteger(0);
 	getField(-1, "feet");
-	outfit.lookFeet = popInteger();
+	outfit.lookFeet = popInteger(0);
 	getField(-1, "item");
-	outfit.lookTypeEx = popInteger();
+	outfit.lookTypeEx = popInteger(0);
 	getField(-1, "addons");
-	outfit.lookAddons = popInteger();
+	outfit.lookAddons = popInteger(0);
 
 	pop();
 	return outfit;

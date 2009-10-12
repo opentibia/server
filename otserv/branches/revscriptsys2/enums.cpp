@@ -406,6 +406,7 @@ template<> void Script::ListenerType__Base::initialize()
 	initAddValue(Script::enums::ON_LOGOUT_LISTENER, "ON_LOGOUT_LISTENER", true);
 	initAddValue(Script::enums::ON_CHANGE_OUTFIT_LISTENER, "ON_CHANGE_OUTFIT_LISTENER", true);
 	initAddValue(Script::enums::ON_LOOK_LISTENER, "ON_LOOK_LISTENER", true);
+	initAddValue(Script::enums::ON_LOOKED_AT_LISTENER, "ON_LOOKED_AT_LISTENER", true);
 	initAddValue(Script::enums::ON_TURN_LISTENER, "ON_TURN_LISTENER", true);
 	initAddValue(Script::enums::ON_LOAD_LISTENER, "ON_LOAD_LISTENER", true);
 	initAddValue(Script::enums::ON_UNLOAD_LISTENER, "ON_UNLOAD_LISTENER", true);

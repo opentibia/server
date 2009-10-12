@@ -131,6 +131,7 @@ public:
 	void pop(int n = 1);
 	bool popBoolean();
 	int32_t popInteger();
+	int32_t popInteger(int def);
 	uint32_t popUnsignedInteger();
 	double popFloat();
 	std::string popString();
@@ -248,7 +249,7 @@ public:
 	int lua_registerSpecificEvent_OnChangeOutfit();
 
 	int lua_registerGenericEvent_OnLookAtItem();
-	int lua_registerGenericEvent_OnLookAtCreature();
+	int lua_registerSpecificEvent_OnLookAtCreature();
 	int lua_registerSpecificEvent_OnLook();
 	int lua_registerGenericEvent_OnEquipItem();
 	int lua_registerGenericEvent_OnDeEquipItem();
