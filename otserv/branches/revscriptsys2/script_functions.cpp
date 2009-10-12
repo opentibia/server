@@ -180,6 +180,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "setRawCustomValue(string key, mixed value)", &Manager::lua_Creature_setRawCustomValue);
 	registerMemberFunction("Creature", "getRawCustomValue(string key)", &Manager::lua_Creature_getRawCustomValue);
 
+	registerMemberFunction("Creature", "addSummon(Actor other)", &Manager::lua_Creature_addSummon);
 	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
@@ -2706,6 +2707,24 @@ int LuaState::lua_Creature_setHealth()
 	}
 
 	push(true);
+	return 1;
+}
+
+int LuaState::lua_Creature_addSummon()
+{
+	Actor* summon = popActor();
+	Creature* creature = popCreature();
+
+	if(summon == creature)
+		throw Script::Error("A creature can not be a summon of itself.");
+	if(creature != summon->getMaster()){
+		// Fix for being able to add summons belonging to a player already
+		if(summon->isPlayerSummon())
+			summon->getMaster()->removeSummon(summon);
+
+		summon->convinceCreature(creature);
+	}
+	pushBoolean(true);
 	return 1;
 }
 

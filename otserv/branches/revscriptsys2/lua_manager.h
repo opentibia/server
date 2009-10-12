@@ -319,6 +319,7 @@ public:
 	int lua_Creature_say();
 	int lua_Creature_setOutfit();
 	int lua_Creature_walk();
+	int lua_Creature_addSummon();
 	int lua_Creature_getSpeed();
 	int lua_Creature_getArmor();
 	int lua_Creature_getDefense();
