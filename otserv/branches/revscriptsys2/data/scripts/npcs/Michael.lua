@@ -1,5 +1,5 @@
 local Michael = NPC:new("Michael")
-
+--[[
 Michael.outfit = {
 	type = 130,
 	head = 20,
@@ -15,10 +15,11 @@ Michael.farewell = "Goodbye $sir $name."
 --Michael.walk_radius = 3
 
 Michael.dialog = {
-	["job|occupation"] = "My job is to be awesome.";
-	["queue"] = function(self) return "There is " .. #self.queue .. " people in queue." end;
-	["count my gold"] = function(self) return "You have " .. self.focus:countMoney() .. " gold." end;
-	["dialog"] = function(self)
+	{"job|occupation", "My job is to be awesome."};
+	{"queue", function(self) return "There is " .. #self.queue .. " people in queue." end};
+	{"count my gold", function(self) return "You have " .. self.focus:countMoney() .. " gold." end};
+	{"ab'dendriel", travel{122, 322, 7}};
+	{"dialog", function(self)
 		self:say("Do you want to continue this conversation?")
 		local reply = self:listen()
 		if containsAgreement(reply) then
@@ -37,10 +38,9 @@ Michael.dialog = {
 		else
 			self:say("You didn't continue, resume normal conversation flow.")
 		end
-	end;
+	end};
 }
 
--- Trade is not working either
 Michael.trade = {
 	{"mace", id=2398, buy=90, sell=30};
 	{"empty vial|vial", type=0, id=2006, sell=5};
@@ -51,3 +51,4 @@ Michael.trade = {
 function Michael:onHear(message, class)
 	self:say("Awesome, you said '" .. message .. "'.")
 end
+--]]
