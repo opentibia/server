@@ -73,7 +73,7 @@ function otstd.fluid_container.drinkFluid(event)
 		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), "Glup.")
 	end
 	
-	item:setSubtype(FLUID_NONE:value())
+	item:setSubtype(FLUID_NONE)
 	event:skip()
 end
 
@@ -91,7 +91,7 @@ function otstd.fluid_container.createSplash(event)
 		local splash = createItem(2016, item:getSubtype())
 		splash:startDecaying()
 		tile:addItem(splash)
-		item:setSubtype(FLUID_NONE:value())
+		item:setSubtype(FLUID_NONE)
 		event:skip()
 		return
 	end
@@ -126,13 +126,13 @@ function otstd.fluid_container.callback(event)
 				elseif(toItemType.isFluidContainer and toItem:getSubtype() ~= 0) then
 					--Fill the container with fluid from toItem (and empty it)
 					item:setSubtype(toItem:getSubType())
-					toItem:setSubtype(FLUID_NONE:value())
+					toItem:setSubtype(FLUID_NONE)
 					event:skip()
 					return
 				else if(item:getSubType() == FLUID_OIL:value() and toItem:getItemID() == 2046) then
 					--Refill oil lamp
 					toItem:setItemID(2044)
-					item:setSubtype(FLUID_NONE:value())
+					item:setSubtype(FLUID_NONE)
 					event:skip()
 					return
 				end

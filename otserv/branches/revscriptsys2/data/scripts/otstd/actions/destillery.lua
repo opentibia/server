@@ -23,7 +23,7 @@ function otstd.destillery.use_rum_flask_callback(event)
 			local v = otstd.destilleries[destillery:getItemID()];
 			if(v ~= nil) then
 				if(v.full) then
-					item:setSubtype(FLUID_RUM:value())
+					item:setSubtype(FLUID_RUM)
 					destillery:setItemID(v.newid)
 					destillery:startDecaying()
 				else
