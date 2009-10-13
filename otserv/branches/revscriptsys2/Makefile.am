@@ -63,7 +63,7 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	fileloader.cpp     networkmessage.cpp  spawn.cpp \
 	beds.cpp           game.cpp            status.cpp \
 	chat.cpp           house.cpp           otserv.cpp \
-	combat.cpp         housetile.cpp       outfit.cpp \
+	combat.cpp         housetile.cpp       const.cpp \
 	ioaccount.cpp      outputmessage.cpp   tasks.cpp \
 	condition.cpp      iomapotbm.cpp       party.cpp           teleport.cpp \
 	configmanager.cpp  iomapserialize.cpp  player.cpp          thing.cpp \

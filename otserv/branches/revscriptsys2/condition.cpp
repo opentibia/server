@@ -679,7 +679,7 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 						//number of rounds done
 						modPeriodicDamage.roundCompleted++;
 
-						int32_t curRounds = std::ceil(((float)modPeriodicDamage.percent) / modPeriodicDamage.value);
+						int32_t curRounds = (int32_t)std::ceil(((float)modPeriodicDamage.percent) / modPeriodicDamage.value);
 						if(modPeriodicDamage.roundCompleted >= curRounds){
 							modPeriodicDamage.roundCompleted = 0;
 							--modPeriodicDamage.value;
