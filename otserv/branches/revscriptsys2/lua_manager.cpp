@@ -227,22 +227,20 @@ bool LuaState::popBoolean()
 
 int32_t LuaState::popInteger()
 {
-	int32_t i = lua_tointeger(state, -1);
-	pop();
-	return i;
+	return int32_t(popFloat());
 }
 
 int32_t LuaState::popInteger(int def)
 {
-	if(lua_isnumber(state, -1))
-		def = lua_tointeger(state, -1);
+	if(lua_isnumber(state, -1) || lua_istable(state, -1))
+		def = popInteger();
 	pop();
 	return def;
 }
 
 uint32_t LuaState::popUnsignedInteger()
 {
-	double d = lua_tonumber(state, -1);
+	double d = popFloat();
 	pop();
 	if(d < 0)
 		throw Script::Error("Expected unsigned number, got negative number.");
@@ -251,8 +249,16 @@ uint32_t LuaState::popUnsignedInteger()
 
 double LuaState::popFloat()
 {
-	double d = lua_tonumber(state, -1);
-	pop();
+	double d;
+	if(lua_istable(state, -1)) {
+		lua_getfield(state, -1, "__intValue");
+		d = lua_tonumber(state, -1);
+		pop(2);
+	}
+	else{
+		d = lua_tonumber(state, -1);
+		pop(1);
+	}
 	return d;
 }
 

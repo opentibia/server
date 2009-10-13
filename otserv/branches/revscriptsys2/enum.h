@@ -79,7 +79,7 @@ protected:
 
 public:
 	// Some useful types
-	typedef std::map<Enum<E, size_>, std::string > EnumToString;
+	typedef std::multimap<Enum<E, size_>, std::string > EnumToString;
 	typedef std::map<std::string, Enum<E, size_> > StringToEnum;
 	// Required for some name-resolving of BitEnums
 	typedef Enum<E, size_> base_class;
@@ -136,6 +136,20 @@ public:
 			throw enum_conversion_error(os.str());
 		}
 		return i->second;
+	}
+
+	/**
+	 * Get all string values associated with one enum value
+	 * will throw if the value does not exist
+	 *
+	 * @param _e The enum value to convert to a string
+	 */
+	static std::vector<std::string> toStrings(const Enum<E, size_>& _e) {
+		init();
+		std::vector<std::string> v;
+		for(EnumToString::const_iterator i = enum_to_string.lower_bound(_e); i != enum_to_string.upper_bound(_e); ++i)
+			v.push_back(i->second);
+		return v;
 	}
 
 	/**
@@ -221,6 +235,15 @@ public:
 	}
 
 	/**
+	 * Returns a list of all string values of this enum value (may be empty)
+	 *
+	 * @return The name(s) of this value
+	 */
+	std::vector<std::string> toStrings() const {
+		return toStrings(*this);
+	}
+
+	/**
 	 * Returns true if this is a valid value
 	 */
 	bool exists() {
@@ -258,7 +281,7 @@ protected: // Private stuff
 
 	static void initAddValue(E _e, std::string str, bool real_name) {
 		if(real_name)
-			enum_to_string[_e] = str;
+			enum_to_string.insert(std::make_pair(_e, str));
 
 		string_to_enum[str] = _e;
 		std::transform(str.begin(), str.end(), str.begin(), tolower);

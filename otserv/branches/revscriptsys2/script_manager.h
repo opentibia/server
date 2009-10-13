@@ -129,7 +129,10 @@ inline void Script::Manager::registerEnum()
 		// Table to hold string values
 		newTable(); // index 3
 		// Should iterate over all possible values here
-		setField(3, 1, ei->toString());
+		std::vector<std::string> stringValues = ei->toStrings();
+		int n = 1;
+		for(std::vector<std::string>::const_iterator str = stringValues.begin(); str != stringValues.end(); ++str, ++n)
+			setField(3, n, *str);
 		
 		// Save the table
 		setField(2, "__strValues");
