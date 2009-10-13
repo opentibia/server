@@ -140,8 +140,8 @@ int Manager::luaCreateEnum(lua_State* L)
 					lua_insert(L, 1);
 
 					// Pop enum key, class table and name str
-					lua_pop(L, 2);
-
+					lua_pop(L, 3);
+					
 					// Only thing left is the enum value
 					return 1;
 				}
@@ -184,7 +184,6 @@ int Manager::luaCreateEnum(lua_State* L)
 						// str key at -2
 						// str value at -1
 						
-						std::cout << lua_tostring(L, -1) << " == " << lua_tostring(L, -7) << std::endl;
 						if(lua_equal(L, -1, -7) == 1){
 							// Pop value, key, __strValues
 							lua_pop(L, 3);

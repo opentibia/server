@@ -52,8 +52,15 @@ public:
 	const ET* operator->() {return reinterpret_cast<const ET*>(&(i->first));}
 
 	// Move the iterator
-	const enum_iterator<ET>& operator++() {++i; return *this;}
-	enum_iterator<ET> operator++(int) {enum_iterator<ET> r = *this; ++i; return r;}
+	const enum_iterator<ET>& operator++() {
+		++i;
+		return *this;
+	}
+	enum_iterator<ET> operator++(int) {
+		enum_iterator<ET> r = *this;
+		++i;
+		return r;
+	}
 	
 	// Compare the iterator
 	bool operator==(const enum_iterator<ET>& o) const {return i == o.i;}
@@ -79,7 +86,7 @@ protected:
 
 public:
 	// Some useful types
-	typedef std::multimap<Enum<E, size_>, std::string > EnumToString;
+	typedef std::map<Enum<E, size_>, std::vector<std::string> > EnumToString;
 	typedef std::map<std::string, Enum<E, size_> > StringToEnum;
 	// Required for some name-resolving of BitEnums
 	typedef Enum<E, size_> base_class;
@@ -135,7 +142,7 @@ public:
 			os << "Enum " << enum_name << " value out of range (" << (int)_e.e << ")";
 			throw enum_conversion_error(os.str());
 		}
-		return i->second;
+		return i->second.front();
 	}
 
 	/**
@@ -146,10 +153,10 @@ public:
 	 */
 	static std::vector<std::string> toStrings(const Enum<E, size_>& _e) {
 		init();
-		std::vector<std::string> v;
-		for(EnumToString::const_iterator i = enum_to_string.lower_bound(_e); i != enum_to_string.upper_bound(_e); ++i)
-			v.push_back(i->second);
-		return v;
+		typename EnumToString::const_iterator i = enum_to_string.find(_e);
+		if(i == enum_to_string.end())
+			return std::vector<std::string>();
+		return i->second;
 	}
 
 	/**
@@ -280,8 +287,7 @@ protected: // Private stuff
 	}
 
 	static void initAddValue(E _e, std::string str, bool real_name) {
-		if(real_name)
-			enum_to_string.insert(std::make_pair(_e, str));
+		enum_to_string[_e].push_back(str);
 
 		string_to_enum[str] = _e;
 		std::transform(str.begin(), str.end(), str.begin(), tolower);

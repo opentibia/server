@@ -802,7 +802,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			}
 			else if(type == STACKPOS_USEITEM){
 				//First check items with topOrder 2 (ladders, signs, splashes)
-				Item* item =  tile->getItemByTopOrder(2);
+				Item* item = tile->getItemByTopOrder(2);
 				if(item){// && g_actions->hasAction(item)){
 					thing = item;
 				}
@@ -2106,7 +2106,7 @@ ReturnValue Game::internalAddItem(Creature* actor, Cylinder* toCylinder, Item* i
 	return RET_NOERROR;
 }
 
-ReturnValue Game::internalRemoveItem(Creature* actor, Item* item, int32_t count /*= -1*/,  bool test /*= false*/, uint32_t flags /*= 0*/)
+ReturnValue Game::internalRemoveItem(Creature* actor, Item* item, int32_t count /*= -1*/, bool test /*= false*/, uint32_t flags /*= 0*/)
 {
 	Cylinder* cylinder = item->getParent();
 	if(cylinder == NULL){
@@ -3604,11 +3604,11 @@ bool Game::internalCloseTrade(Player* player)
 {
 	Player* tradePartner = player->tradePartner;
 	if((tradePartner && tradePartner->getTradeState() == TRADE_TRANSFER) ||
-		  player->getTradeState() == TRADE_TRANSFER){
+			player->getTradeState() == TRADE_TRANSFER){
 #ifdef __DEBUG__
-  		std::cout << "Warning: [Game::playerCloseTrade] TradeState == TRADE_TRANSFER. " <<
-		  	player->getName() << " " << player->getTradeState() << " , " <<
-		  	tradePartner->getName() << " " << tradePartner->getTradeState() << std::endl;
+		std::cout << "Warning: [Game::playerCloseTrade] TradeState == TRADE_TRANSFER. " <<
+			player->getName() << " " << player->getTradeState() << " , " <<
+			tradePartner->getName() << " " << tradePartner->getTradeState() << std::endl;
 #endif
 		return true;
 	}
@@ -5446,7 +5446,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 		IOPlayer::instance()->getLastIP(ip, guid);
 	}
 
-	Account account =  IOAccount::instance()->loadAccount(acc, true);
+	Account account = IOAccount::instance()->loadAccount(acc, true);
 	int16_t removeNotations = 2; //2 - remove notations & kick, 1 - kick, 0 - nothing
 
 	if(actionType == ACTION_NOTATION)

@@ -130,9 +130,9 @@ inline void Script::Manager::registerEnum()
 		newTable(); // index 3
 		// Should iterate over all possible values here
 		std::vector<std::string> stringValues = ei->toStrings();
-		int n = 1;
-		for(std::vector<std::string>::const_iterator str = stringValues.begin(); str != stringValues.end(); ++str, ++n)
-			setField(3, n, *str);
+		int in = 1;
+		for(std::vector<std::string>::const_iterator str = stringValues.begin(); str != stringValues.end(); ++str, ++in)
+			setField(3, in, *str);
 		
 		// Save the table
 		setField(2, "__strValues");
@@ -140,12 +140,9 @@ inline void Script::Manager::registerEnum()
 		// set integer converted value
 		setField(2, "__intValue", ei->value());
 		
-		// Push another pointer to the class instance
-		duplicate(2);
-
 		// Save first pointer to class instance as a global
-		//std::cout << "set " << ei->toString() << " to " << lua_topointer(state, -1) << " " << typeName(-1) << std::endl;
-		setGlobal(ei->toString());
+		duplicate(2);
+		setGlobal(stringValues.front());
 
 		//std::cout << "set field of " << lua_topointer(state, 1) << " to " << lua_topointer(state, -1) << " " << typeName(-1) << std::endl;
 		// Other should go into the table for this Enum
