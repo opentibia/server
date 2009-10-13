@@ -53,24 +53,24 @@ function otstd.fluid_container.drinkFluid(event)
 		local amount = math.random(80, 160)
 		player:setMana(player:getMana() + amount)
 	
-		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), "Aaaah...")
+		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE, "Aaaah...")
 		sendMagicEffect(player:getPosition(), MAGIC_EFFECT_LOSE_ENERGY)
 		
 	elseif(fluidType == FLUID_LIFE) then
 		local amount = math.random(40, 75)
 		player:setHealth(player:getHealth() + amount)
 
-		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), "Aaaah...")
+		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE, "Aaaah...")
 		sendMagicEffect(player:getPosition(), MAGIC_EFFECT_LOSE_ENERGY)
 		
 	elseif(otstd.fluid_container.alcohols[fluidType] ~= nil) then
-		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), "Aaaah...")
+		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE, "Aaaah...")
 		--TODO:
 	elseif(otstd.fluid_container.toxics[fluidType] ~= nil) then
-		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), "Aarrggh it's toxic!")
+		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE, "Aarrggh it's toxic!")
 		--TODO:
 	else
-		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), "Glup.")
+		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE, "Gulp.")
 	end
 	
 	item:setSubtype(FLUID_NONE)
@@ -121,7 +121,7 @@ function otstd.fluid_container.callback(event)
 		if(tile) then
 			local toItem = tile:getTopThing()
 			if(toItem) then
-				local toItemType = getItemType(toItem:getItemID())
+				local toItemType = Items[toItem:getItemID()]
 				if(toItemType.fluidSource ~= FLUID_NONE) then
 					--Fill the empty container with fluid from the corpse/ground
 					item:setSubtype(toItemType.fluidSource)

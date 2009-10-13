@@ -170,7 +170,6 @@ void Manager::registerClasses() {
 	registerMemberFunction("Thing", "getParentTile()", &Manager::lua_Thing_getParentTile);
 	registerMemberFunction("Thing", "getParent()", &Manager::lua_Thing_getParent);
 	registerMemberFunction("Thing", "isMoveable()", &Manager::lua_Thing_isMoveable);
-	registerMemberFunction("Thing", "getPosition()", &Manager::lua_Thing_getPosition);
 	registerMemberFunction("Thing", "getName()", &Manager::lua_Thing_getName);
 	registerMemberFunction("Thing", "getDescription([int lookdistance])", &Manager::lua_Thing_getDescription);
 	registerMemberFunction("Thing", "moveTo(table pos)", &Manager::lua_Thing_moveToPosition);

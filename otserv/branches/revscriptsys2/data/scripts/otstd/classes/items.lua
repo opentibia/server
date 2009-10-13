@@ -1,15 +1,21 @@
 
+local internalGetItemType = getItemType
+
 Items = {}
 setmetatable(Items, {
 	__index = 
 		function(o, itemid)
-			local t = getItemType(itemid)
+			local t = internalGetItemType(itemid)
 			if t then
 				o[t] = t
 			end
 			return t
 		end;
 })
+
+function getItemType(id)
+	return Items[id]
+end
 
 function getItemNameByID(itemid, count, alternate_name)
 	local item_type = Items[itemid]

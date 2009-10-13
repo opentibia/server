@@ -157,6 +157,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[REMOVE_RUNE_CHARGES] = getGlobalBoolean(L, "remove_rune_charges", true);
 	m_confInteger[REMOVE_WEAPON_CHARGES] = getGlobalBoolean(L, "remove_weapon_charges", true);
 	m_confInteger[MAXIMUM_SCRIPT_RECURSION_DEPTH] = getGlobalNumber(L, "script_recursion_depth", 16);
+	m_confInteger[DETAIL_SCRIPT_ERRORS] = getGlobalBoolean(L, "detailed_script_errors", false);
 	m_confInteger[LOGIN_ATTACK_DELAY] = getGlobalNumber(L, "login_attack_delay", 10*1000);
 	m_confInteger[SHOW_CRASH_WINDOW] = getGlobalBoolean(L, "show_crash_window", true);
 	m_confInteger[IDLE_TIME] = getGlobalNumber(L, "maximum_idle_time", 16*60*1000);

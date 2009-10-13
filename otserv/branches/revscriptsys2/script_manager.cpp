@@ -393,8 +393,38 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		return ret;
 	} catch(Script::Error& err) {
 		// We can't use lua_error in the C++ function as it doesn't call destructors properly.
+		std::ostringstream os;
+
+		os << err.what();
+
+		if(g_config.getNumber(ConfigManager::DETAIL_SCRIPT_ERRORS)){
+			os << "\nLua stack contents:\n";
+			for(int i = 1; i <= lua_gettop(L); ++i){
+				os << "\t" << i << "\t" << luaL_typename(L, i) << " = ";
+				switch(lua_type(L, i)){
+					case LUA_TNIL:
+						os << "nil";
+						break;
+					case LUA_TNUMBER:
+						os << lua_tonumber(L, i);
+						break;
+					case LUA_TBOOLEAN:
+						os << (lua_toboolean(L, i) == 1 ? "true" : "false");
+						break;
+					case LUA_TSTRING:
+						os << lua_tostring(L, i);
+						break;
+					default:
+						os << lua_topointer(L, i);
+						break;
+				}
+				os << "\n";
+			}
+		}
+
+
 		state->clearStack();
-		state->pushString(err.what());
+		state->pushString(os.str().c_str());
 	}
 
 	if(private_thread)

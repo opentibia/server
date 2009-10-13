@@ -174,7 +174,20 @@ bool LuaState::isBoolean(int32_t index)
 
 bool LuaState::isNumber(int32_t index)
 {
-	return lua_isnumber(state, index) != 0;
+	if(lua_isnumber(state, index) != 0)
+		return true;
+	if(lua_istable(state, index) != 0){
+		lua_getfield(state, index, "__intValue");
+		if(lua_isnil(state, -1)){
+			lua_pop(state, 1);
+			return false;
+		}
+		else{
+			lua_pop(state, 1);
+			return true;
+		}
+	}
+	return false;
 }
 
 bool LuaState::isString(int32_t index)
@@ -234,14 +247,12 @@ int32_t LuaState::popInteger(int def)
 {
 	if(lua_isnumber(state, -1) || lua_istable(state, -1))
 		def = popInteger();
-	pop();
 	return def;
 }
 
 uint32_t LuaState::popUnsignedInteger()
 {
 	double d = popFloat();
-	pop();
 	if(d < 0)
 		throw Script::Error("Expected unsigned number, got negative number.");
 	return uint32_t(d);
