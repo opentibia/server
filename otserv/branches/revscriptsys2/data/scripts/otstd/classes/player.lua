@@ -4,23 +4,23 @@ otstd.Player = {}
 -- Easier message passing
 
 function Player:sendNote(msg)
-	self:sendMessage(MESSAGE_STATUS_CONSOLE_BLUE, msg)
+	self:sendMessage(MSG_STATUS_CONSOLE_BLUE, msg)
 end
 
 function Player:sendWarning(msg)
-	self:sendMessage(MESSAGE_STATUS_CONSOLE_RED, msg)
+	self:sendMessage(MSG_STATUS_CONSOLE_RED, msg)
 end
 
 function Player:sendInfo(msg)
-	self:sendMessage(MESSAGE_INFO_DESCR, msg)
+	self:sendMessage(MSG_INFO_DESCR, msg)
 end
 
 function Player:sendCancel(msg)
-	self:sendMessage(MESSAGE_STATUS_SMALL, msg)
+	self:sendMessage(MSG_STATUS_SMALL, msg)
 end
 
 function Player:sendAdvance(msg)
-	self:sendMessage(MESSAGE_EVENT_ADVANCE, msg)
+	self:sendMessage(MSG_EVENT_ADVANCE, msg)
 end
 
 
