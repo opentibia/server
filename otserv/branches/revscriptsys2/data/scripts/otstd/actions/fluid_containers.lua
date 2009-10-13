@@ -44,7 +44,7 @@ function otstd.fluid_container.drinkFluid(event)
 	local item = event.item
 
 	local fluidType = FluidType(item:getSubtype())
-	if(fluidType == FLUID_NONE) then
+	if not fluidType or fluidType == FLUID_NONE then
 		event.player:sendInfo("It is empty.")
 		return
 	end
@@ -107,6 +107,11 @@ function otstd.fluid_container.callback(event)
 
 	local fluidType = FluidType(item:getSubtype())
 	
+	if not fluidType then
+		-- Fluid container in invalid state
+		return
+	end
+	
 	if(toPos.x == playerPos.x and toPos.y == playerPos.y and toPos.z == playerPos.z) then
 		otstd.fluid_container.drinkFluid(event)
 	elseif(fluidType ~= FLUID_NONE) then
@@ -129,7 +134,7 @@ function otstd.fluid_container.callback(event)
 					toItem:setSubtype(FLUID_NONE)
 					event:skip()
 					return
-				else if(item:getSubType() == FLUID_OIL:value() and toItem:getItemID() == 2046) then
+				elseif(item:getSubType() == FLUID_OIL:value() and toItem:getItemID() == 2046) then
 					--Refill oil lamp
 					toItem:setItemID(2044)
 					item:setSubtype(FLUID_NONE)
