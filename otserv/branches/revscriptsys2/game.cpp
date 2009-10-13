@@ -370,7 +370,7 @@ bool Game::getCustomValue(const std::string& key, std::string& value) const
 
 bool Game::eraseCustomValue(const std::string& key)
 {
-	StorageMap::const_iterator i = globalStorage.find(key);
+	StorageMap::iterator i = globalStorage.find(key);
 	if(i == globalStorage.end())
 		return false;
 	globalStorage.erase(i);

@@ -325,7 +325,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "addMoney(int amount)", &Manager::lua_Player_addMoney);
 	registerMemberFunction("Player", "removeMoney(int amount)", &Manager::lua_Player_removeMoney);
 
-	registerMemberFunction("Player", "sendMessage(int type, string msg)", &Manager::lua_Player_sendMessage);
+	registerMemberFunction("Player", "sendMessage(MessageClass type, string msg)", &Manager::lua_Player_sendMessage);
 
 	registerMemberFunction("Player", "canUseSpell(string spellname)", &Manager::lua_Player_canUseSpell);
 	registerMemberFunction("Player", "learnSpell(string spellname)", &Manager::lua_Player_learnSpell);
