@@ -462,7 +462,7 @@ inline void Item::setFluidType(uint16_t n) {
 }
 
 inline uint16_t Item::getFluidType() const {
-	const int32_t* fluidtype = getIntegerAttribute("fluidtype");
+	const int32_t* fluidtype = getIntegerAttribute("fluidType");
 	if(fluidtype && *fluidtype >= 0)
 		return (uint16_t)*fluidtype;
 	return 0;

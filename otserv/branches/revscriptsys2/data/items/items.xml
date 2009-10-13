@@ -11564,10 +11564,12 @@
 	<item id="5513" article="a" name="distilling machine">
 		<attribute key="decayTo" value="5469"/>
 		<attribute key="duration" value="15"/>
+		<attribute key="description" value="It is full."/>
 	</item>
 	<item id="5514" article="a" name="distilling machine">
 		<attribute key="decayTo" value="5470"/>
 		<attribute key="duration" value="15"/>
+		<attribute key="description" value="It is full."/>
 	</item>
 	<item id="5515" article="a" name="closed door">
 		<attribute key="type" value="door"/>

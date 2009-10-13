@@ -6,7 +6,7 @@ MakeItem.groups = {"Community Manager", "Server Administrator"}
 
 function MakeItem.handler(event)
 	local name = event.param
-	local count = name:match("(%d+)")
+	local count = name:match("%s(%d+)")
 	
 	if count then
 		name = name:gsub("(%w+)(%w)" .. count .. "(%w)(%w+)", " ")

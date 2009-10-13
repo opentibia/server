@@ -319,6 +319,7 @@ OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos, Retur
 	targetPos(toPos),
 	retval(retval)
 {
+	propagate_by_default = true;
 }
 
 OnUseItem::Event::~Event()

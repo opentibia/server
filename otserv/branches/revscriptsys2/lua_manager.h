@@ -488,10 +488,6 @@ public:
 	int lua_getPlayerByNameWildcard();
 	int lua_getPlayersByNameWildcard();
 
-	int lua_Player_canUseSpell();
-	int lua_Player_learnSpell();
-	int lua_Player_unlearnSpell();
-
 	// - - Item
 	int lua_createItem();
 	int lua_getItemIDByName();

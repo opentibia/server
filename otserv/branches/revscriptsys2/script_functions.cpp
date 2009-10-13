@@ -113,7 +113,7 @@ void Manager::registerClasses() {
 	registerEnum<SpeakClass>();
 	registerEnum<MessageClass>();
 	registerEnum<FluidType>();
-	//registerEnum<TextColor>();
+	registerEnum<TextColor>();
 	registerEnum<IconType>();
 	registerEnum<WeaponType>();
 	registerEnum<AmmunitionType>();
@@ -326,10 +326,6 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "removeMoney(int amount)", &Manager::lua_Player_removeMoney);
 
 	registerMemberFunction("Player", "sendMessage(MessageClass type, string msg)", &Manager::lua_Player_sendMessage);
-
-	registerMemberFunction("Player", "canUseSpell(string spellname)", &Manager::lua_Player_canUseSpell);
-	registerMemberFunction("Player", "learnSpell(string spellname)", &Manager::lua_Player_learnSpell);
-	registerMemberFunction("Player", "unlearnSpell(string spellname)", &Manager::lua_Player_unlearnSpell);
 
 	registerGlobalFunction("getOnlinePlayers()", &Manager::lua_getOnlinePlayers);
 	registerGlobalFunction("getPlayerByName(string name)", &Manager::lua_getPlayerByName);
@@ -3904,33 +3900,6 @@ int LuaState::lua_Player_sendMessage()
 
 	player->sendTextMessage(messageClass, text);
 	pushBoolean(true);
-	return 1;
-}
-
-int LuaState::lua_Player_canUseSpell()
-{
-	std::string spellName = popString();
-	Player* player = popPlayer();
-	//TODO: player->canUseSpell()
-	pushBoolean(false);
-	return 1;
-}
-
-int LuaState::lua_Player_learnSpell()
-{
-	std::string spellName = popString();
-	Player* player = popPlayer();
-	//TODO: player->learnSpell()
-	pushBoolean(false);
-	return 1;
-}
-
-int LuaState::lua_Player_unlearnSpell()
-{
-	std::string spellName = popString();
-	Player* player = popPlayer();
-	//TODO: player->learnSpell()
-	pushBoolean(false);
 	return 1;
 }
 
