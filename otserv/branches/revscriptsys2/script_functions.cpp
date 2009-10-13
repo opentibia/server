@@ -823,13 +823,9 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 
 	ListenerList* list = NULL;
 	switch(si_onuse.method){
-		case OnUseItem::FILTER_ITEMID:
-			list = &environment->Generic.OnUseItem.ItemId[si_onuse.id];
-		case OnUseItem::FILTER_ACTIONID:
-			list = &environment->Generic.OnUseItem.ActionId[si_onuse.id];
-			break;
-		default:
-			break; // impossible, crash
+		case OnUseItem::FILTER_ITEMID: list = &environment->Generic.OnUseItem.ItemId[si_onuse.id]; break;
+		case OnUseItem::FILTER_ACTIONID: list = &environment->Generic.OnUseItem.ActionId[si_onuse.id]; break;
+		default: break; // impossible, crash
 	}
 	list->push_back(listener);
 
@@ -1023,13 +1019,9 @@ int LuaState::lua_registerGenericEvent_OnLookAtItem() {
 
 	ListenerList* list = NULL;
 	switch(si_onlook.method){
-		case OnLook::FILTER_ITEMID:
-			list = &environment->Generic.OnLook.ItemId[si_onlook.id];
-		case OnLook::FILTER_ACTIONID:
-			list = &environment->Generic.OnLook.ActionId[si_onlook.id];
-			break;
-		default:
-			break; // impossible, crash
+		case OnLook::FILTER_ITEMID: list = &environment->Generic.OnLook.ItemId[si_onlook.id]; break;
+		case OnLook::FILTER_ACTIONID: list = &environment->Generic.OnLook.ActionId[si_onlook.id]; break;
+		default: break; // impossible, crash
 	}
 	list->push_back(listener);
 
@@ -2711,7 +2703,7 @@ int LuaState::lua_Tile_addItem()
 		g_game.internalRemoveItem(NULL, item);
 	}
 
-	ReturnValue ret = g_game.internalAddItem(NULL, tile, item);
+	ReturnValue ret = g_game.internalAddItem(NULL, tile, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	pushInteger(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
@@ -3907,10 +3899,10 @@ int LuaState::lua_Player_setTown()
 int LuaState::lua_Player_sendMessage()
 {
 	std::string text = popString();
-	uint32_t messageClass = popUnsignedInteger();
+	MessageClass messageClass = popEnum<MessageClass>();
 	Player* player = popPlayer();
 
-	player->sendTextMessage((MessageClass)messageClass, text);
+	player->sendTextMessage(messageClass, text);
 	pushBoolean(true);
 	return 1;
 }
@@ -4281,7 +4273,7 @@ int LuaState::lua_Container_addItem()
 		g_game.internalRemoveItem(NULL, item);
 	}
 
-	ReturnValue ret = g_game.internalAddItem(NULL, container, item);
+	ReturnValue ret = g_game.internalAddItem(NULL, container, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	pushInteger(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;

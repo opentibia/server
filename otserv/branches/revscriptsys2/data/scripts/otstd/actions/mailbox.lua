@@ -1,6 +1,11 @@
 
 otstd.mailbox = {}
 
+otstd.mailboxes = {
+		[2593] = {},
+		[3981] = {}
+	}
+
 function otstd.mailbox.handler(event)
 	event.creature:sendNote("Attempting to send")
 	local mail = event.item
@@ -50,4 +55,15 @@ function otstd.mailbox.handler(event)
 	sendMail(mail, name, town)
 end
 
-otstd.mailbox.listener = registerOnMoveItemToItem("itemid", 2593, otstd.mailbox.handler)
+function otstd.mailbox.registerHandlers()
+	for id, data in pairs(otstd.mailboxes) do
+		if data.listener ~= nil then
+			stopListener(data.listener)
+		end
+		
+		data.listener =
+			registerOnMoveItemToItem("itemid", id, otstd.mailbox.handler)
+	end
+end
+
+otstd.mailbox.registerHandlers()
