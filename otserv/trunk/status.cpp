@@ -46,7 +46,8 @@ enum RequestedInfo_t{
 	REQUEST_MAP_INFO           = 0x10,
 	REQUEST_EXT_PLAYERS_INFO   = 0x20,
 	REQUEST_PLAYER_STATUS_INFO = 0x40,
-	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80
+	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80,
+	REQUEST_RATES_SERVER_INFO  = 0xA6,
 };
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -255,6 +256,15 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddString(g_config.getString(ConfigManager::URL).c_str());
 		output->AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
 		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
+	}
+
+	if(requestedInfo & REQUEST_RATES_SERVER_INFO){
+		output->AddByte(0x13); // server info - rates
+		output->AddU16(g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
+		output->AddU16(g_config.getNumber(ConfigManager::RATE_MAGIC));
+		output->AddU16(g_config.getNumber(ConfigManager::RATE_SKILL));
+		output->AddU16(g_config.getNumber(ConfigManager::RATE_LOOT));
+		output->AddU16(g_config.getNumber(ConfigManager::RATE_SPAWN));
 	}
 
 	if(requestedInfo & REQUEST_PLAYERS_INFO){
