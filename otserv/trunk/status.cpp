@@ -137,13 +137,13 @@ void addXMLProperty(xmlNodePtr p, const std::string& tag, T val)
 {
 	std::ostringstream os;
 	os << val;
-	xmlSetProp(root, (const xmlChar*)tag.c_str(), (const xmlChar*)os.str().c_str());
+	xmlSetProp(p, (const xmlChar*)tag.c_str(), (const xmlChar*)os.str().c_str());
 }
 
 template <>
 void addXMLProperty(xmlNodePtr p, const std::string& tag, const std::string& val)
 {
-	xmlSetProp(root, (const xmlChar*)tag.c_str(), (const xmlChar*)val.c_str());
+	xmlSetProp(p, (const xmlChar*)tag.c_str(), (const xmlChar*)val.c_str());
 }
 
 std::string Status::getStatusString() const
@@ -155,12 +155,12 @@ std::string Status::getStatusString() const
 
 	doc = xmlNewDoc((const xmlChar*)"1.0");
 	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"tsqp", NULL);
-	root=doc->children;
+	root = doc->children;
 
 	addXMLProperty(p, "version", "1.0");
-	
+
 	// generic info
-	p = xmlNewNode(NULL,(const xmlChar*)"serverinfo");
+	p = xmlNewNode(NULL, (const xmlChar*)"serverinfo");
 	addXMLProperty(p, "uptime", getUptime());
 	addXMLProperty(p, "ip", g_config.getString(ConfigManager::IP));
 	addXMLProperty(p, "servername", g_config.getString(ConfigManager::SERVER_NAME));
@@ -173,20 +173,20 @@ std::string Status::getStatusString() const
 	xmlAddChild(root, p);
 
 	// owner info
-	p = xmlNewNode(NULL,"owner");
+	p = xmlNewNode(NULL, "owner");
 	addXMLProperty(p, "name", g_config.getString(ConfigManager::OWNER_NAME));
 	addXMLProperty(p, "email", g_config.getString(ConfigManager::OWNER_EMAIL));
 	xmlAddChild(root, p);
 
 	// players
-	p = xmlNewNode(NULL,"players");
+	p = xmlNewNode(NULL, "players");
 	addXMLProperty(p, "online", m_playersonline);
 	addXMLProperty(p, "max", m_playersmax);
 	addXMLProperty(p, "peak", m_playerspeak);
 	xmlAddChild(root, p);
 
 	// monsters
-	p = xmlNewNode(NULL,"monsters");
+	p = xmlNewNode(NULL, "monsters");
 	addXMLProperty(p, "total", g_game.getMonstersOnline());
 	xmlAddChild(root, p);
 
@@ -194,14 +194,14 @@ std::string Status::getStatusString() const
 	uint32_t mapWidth, mapHeight;
 	g_game.getMapDimensions(mapWidth, mapHeight);
 
-	p = xmlNewNode(NULL,"map");
+	p = xmlNewNode(NULL, "map");
 	addXMLProperty(p, "name", m_mapname.c_str());
 	addXMLProperty(p, "author", m_mapauthor.c_str());
 	addXMLProperty(p, "width", mapWidth);
 	addXMLProperty(p, "height", mapHeight);
 	xmlAddChild(root, p);
 
-	p = xmlNewNode(NULL,"rates");
+	p = xmlNewNode(NULL, "rates");
 	addXMLProperty(p, "experience", g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 	addXMLProperty(p, "magic", g_config.getNumber(ConfigManager::RATE_MAGIC));
 	addXMLProperty(p, "skill", g_config.getNumber(ConfigManager::RATE_SKILL));
