@@ -12,10 +12,9 @@ function otstd.blueberry_bush.callback(event)
 		local blueberries = createItem(2677, 3)
 		tile:addItem(blueberries)
 		bush:startDecaying()
-		return
 	end
-	
-	event.retval = RETURNVALUE_NOTPOSSIBLE
+
+	event:skip()
 end
 
 function otstd.blueberry_bush.registerHandlers()

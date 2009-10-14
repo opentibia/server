@@ -110,6 +110,8 @@ function otstd.food.handler(event)
 	else
 		item:destroy()
 	end
+	
+	event:skip()
 end
 
 function otstd.food.registerHandlers()

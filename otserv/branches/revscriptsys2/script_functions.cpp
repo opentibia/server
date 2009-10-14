@@ -2470,13 +2470,21 @@ int LuaState::lua_Thing_getParent()
 {
 	Thing* thing = popThing();
 	Cylinder* parent = thing->getParent();
-	if(parent->getTile()) {
-		pushTile(static_cast<Tile*>(parent));
-	} else if(parent->getItem()){
-		pushThing(parent->getItem());
-	} else if(parent->getCreature()){
-		pushThing(parent->getCreature());
-	} else {
+	if(parent){
+		if(parent->getItem()){
+			pushThing(parent->getItem());
+		} else if(parent->getCreature()){
+			pushThing(parent->getCreature());
+		}
+		else if(parent->getTile()) {
+			pushTile(static_cast<Tile*>(parent));
+		}
+		else{
+			//impossible
+			pushNil();
+		}
+	}
+	else {
 		pushNil();
 	}
 	return 1;

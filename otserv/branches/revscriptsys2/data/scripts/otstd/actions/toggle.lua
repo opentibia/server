@@ -155,6 +155,7 @@ otstd.toggles = {
 function otstd.toggle.handler(event)
 	local item = event.item
 	item:setItemID(event.toggle.newid)
+	event:skip()
 end
 
 function otstd.toggle.registerHandlers()

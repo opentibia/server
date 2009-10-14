@@ -40,6 +40,10 @@ function Tile:isPz()
 	return self:hasProperty(TILEPROP_PROTECTIONZONE)
 end
 
+function Tile:isInHouse()
+	return self:hasProperty(TILEPROP_HOUSE_TILE)
+end
+
 function Tile:isNoPVP()
 	return self:hasProperty(TILEPROP_NOPVPZONE)
 end
