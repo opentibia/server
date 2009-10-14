@@ -582,7 +582,7 @@ ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx,
 	if(script_system){
 		if(toPosEx.x == 0xFFFF){
 			Item* toItem = internalGetItem(player, toPosEx, toPosEx.stackpos);
-			Script::OnUseItem::Event evt(player, item, &toPosEx, toItem, retval);
+			Script::OnUseItem::Event evt(player, item, NULL, toItem, retval);
 			if(script_system->dispatchEvent(evt)) {
 				return retval;
 			}

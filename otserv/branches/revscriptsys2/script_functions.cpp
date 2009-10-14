@@ -4376,7 +4376,7 @@ int LuaState::lua_getItemType()
 	setField(-1, "defense", it.defense);
 	setField(-1, "extraDefense", it.extraDefense);
 	setField(-1, "armor", it.armor);
-	setField(-1, "slotPosition", it.slotPosition);
+	//setField(-1, "slotPosition", it.slotPosition);
 	setField(-1, "isVertical", it.isVertical);
 	setField(-1, "isHorizontal", it.isHorizontal);
 	setField(-1, "isHangable", it.isHangable);
@@ -4406,7 +4406,7 @@ int LuaState::lua_getItemType()
 	setField(-1, "runeLevel", it.runeLevel);
 	setField(-1, "runeSpellName", it.runeSpellName);
 
-	setField(-1, "wieldInfo", it.wieldInfo);
+	//setField(-1, "wieldInfo", it.wieldInfo);
 	setField(-1, "vocationString", it.vocationString);
 	setField(-1, "minRequiredLevel", it.minRequiredLevel);
 	setField(-1, "minRequiredMagicLevel", it.minRequiredMagicLevel);

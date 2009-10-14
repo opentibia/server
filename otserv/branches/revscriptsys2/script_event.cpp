@@ -387,9 +387,9 @@ void OnUseItem::Event::push_instance(LuaState& state, Environment& environment)
 	} else {
 		state.pushNil();
 	}
-	state.setField(-2, "targetPos");
+	state.setField(-2, "targetPosition");
 	state.pushThing(targetItem);
-	state.setField(-2, "targetItem");
+	state.setField(-2, "targetInventoryItem");
 }
 
 void OnUseItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)

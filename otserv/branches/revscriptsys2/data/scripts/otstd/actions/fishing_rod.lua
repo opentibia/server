@@ -1,68 +1,22 @@
-otstd.fishing_rod = {}
+otstd.fishing = {}
 
-otstd.fishing_rods = {
-		[2580] = {callback =
-			-- normal fishing rod
-			function(event)
-				local player = event.player
-				local fish_spot = event.fish_spot
+function otstd.fishing.formula(player)
+	return (player:getSkill(SKILL_FISH) / 200) + (0.85 * math.random())
+end
 
-				--check how many worms we have
-				if(player:getItemCount(3976) < 1) then
-					event.gainSkill = false
-				end
-
-				if(event.gainSkill and event.hasFish) then
-					local chance = (player:getSkill(SKILL_FISH) / 200) + (0.85 * math.random())					
-					if(chance > 0.7) then
-						local fish = createItem(event.fish_spot_callback(chance) or 2667)
-						player:addItem(fish)
-						player:advanceSkill(SKILL_FISH, 1)
-						player:removeItem(3976, -1, 1)
-						
-						fish_spot:setItemID(event.newid)
-						fish_spot:startDecaying()
-					end
-					
-					player:advanceSkill(SKILL_FISH, 1)
-				end
-				if(event.effect) then
-					sendMagicEffect(fish_spot:getPosition(), event.effect)
-				end
-			end
-			},
-		[10223] = {callback =
-			-- mechanical fishing rod
-			function(event)
-				local player = event.player
-				local fish_spot = event.fish_spot
-
-				--check how many nails we have
-				if(player:getItemCount(8309) < 1) then
-					event.gainSkill = false
-				end
-
-				if(event.gainSkill and event.hasFish) then
-					local chance = (player:getSkill(SKILL_FISH) / 200) + (0.85 * math.random())					
-					if(chance > 0.7) then
-						local mechanic_fish = createItem(10224)
-						player:addItem(mechanic_fish)
-						player:advanceSkill(SKILL_FISH, 1)
-						player:removeItem(8309, -1, 1)
-						
-						fish_spot:setItemID(event.newid)
-						fish_spot:startDecaying()
-					end
-					
-					player:advanceSkill(SKILL_FISH, 1)
-				end
-				sendMagicEffect(fish_spot:getPosition(), MAGIC_EFFECT_LOSE_ENERGY)
-			end
-			}
+otstd.fishing.rods = {
+		-- normal fishing rod
+		[2580] = {
+			worm = 3976 -- Type of worm
+		},
+		-- mechanical fishing rod
+		[10223] = {
+			worm = 8309 -- Type of worm
+		},
 	}
 
-otstd.fish_spots = {
-		[493] = {hasFish = false},
+otstd.fishing.spots = {
+		[493] =  {hasFish = false},
 		[4608] = {newid = 4617, hasFish = true, effect = MAGIC_EFFECT_LOSE_ENERGY},
 		[4609] = {newid = 4618, hasFish = true, effect = MAGIC_EFFECT_LOSE_ENERGY},
 		[4610] = {newid = 4619, hasFish = true, effect = MAGIC_EFFECT_LOSE_ENERGY},
@@ -87,16 +41,16 @@ otstd.fish_spots = {
 		[4823] = {hasFish = false, effect = MAGIC_EFFECT_LOSE_ENERGY},
 		[4824] = {hasFish = false, effect = MAGIC_EFFECT_LOSE_ENERGY},
 		[4825] = {hasFish = false, effect = MAGIC_EFFECT_LOSE_ENERGY},
-		[7236] = {newid = 7237, hasFish = true, callback =
+		[7236] = {newid = 7237, hasFish = true, getFish =
 			-- ice hole
-			function(chance)
-				if(chance > 0.83) then
+			function(spot, chance)
+				if chance > 0.83 then
 					--trout
 					return 7158
-				elseif(chance > 0.75) then
+				elseif chance > 0.75 then
 					--pike
 					return 2669
-				elseif(chance > 0.5) then
+				elseif chance > 0.5 then
 					--perch
 					return 7159
 				end
@@ -106,43 +60,92 @@ otstd.fish_spots = {
 			}
 	}
 
-function otstd.fishing_rod.callback(event)
+function Item:canFish()
+	return otstd.fishing.spots[self:getItemID()] ~= nil
+end
+	
+function Item:hasFish()
+	local spot = otstd.fishing.spots[self:getItemID()]
+	return spot and spot.hasFish
+end
+
+function Item:getFish(roll)
+	local spot = otstd.fishing.spots[self:getItemID()]
+	if spot then
+		if spot.getFish then
+			return spot.getFish(item, roll)
+		else
+			return 2667
+		end
+	else
+		return nil
+	end
+end
+
+function otstd.fishing.standardRodHandler(event)
+	local player = event.player
+	local roll = otstd.fishing.formula(player)
+	
+	if event.hasFish and roll > 0.7 then
+		local fish = createItem(event.spot:getFish(roll))
+		player:addItem(fish)
+		return true -- Return true if we caught something
+	end
+	return false
+end
+
+function otstd.fishing.handler(event)
 	local player = event.player
 	local item = event.item
-	local toPos = event.targetPos
+	local toPos = event.targetPosition
 		
 	local tile = map:getTile(toPos)
-	if(tile) then
-		local toItem = event.targetItem or tile:getTopThing()
-		if(toItem) then
-			local v = otstd.fish_spots[toItem:getItemID()]
-			if(v ~= nil) then
-				event.hasFish = v.hasFish
-				event.gainSkill = not tile:isPz()
-				event.fish_spot = toItem
-				event.fish_spot_callback = v.callback
-				event.newid = v.newid
-				event.effect = v.effect
-				event.callback(event)
-				event:skip()
+	if tile then
+		local spot = event.targetItem or tile:getTopThing()
+		if spot and spot:canFish() then
+			event.player:sendNote("You can has fish?")
+			local spotdata = otstd.fishing.spots[spot:getItemID()]
+			event.hasFish = spot:hasFish()
+			event.spot = spot
+			
+			if spotdata.effect then
+				sendMagicEffect(spot:getPosition(), spotdata.effect)
 			end
+			
+			if player:getItemCount(event.rod.worm) == 0 then
+				event.hasFish = false
+			end
+			
+			if event.rod.handler and event.rod.handler(event) or otstd.fishing.standardRodHandler(event) then
+				-- True means a catch!
+				player:advanceSkill(SKILL_FISH, 2)
+				player:removeItem(event.rod.worm, -1, 1)
+				
+				spot:setItemID(spotdata.newid)
+				spot:startDecaying()
+			elseif event.hasFish then
+				-- Didn't catch anything, but still a noble try (used a worm)...
+				player:advanceSkill(SKILL_FISH, 1)
+			end
+			
+			event:skip()
 		end
 	end
 end
 
-function otstd.fishing_rod.registerHandlers()
-	for id, data in pairs(otstd.fishing_rods) do
+function otstd.fishing.registerHandlers()
+	for id, data in pairs(otstd.fishing.rods) do
 		if data.listener ~= nil then
 			stopListener(data.listener)
 		end
 
 		function lamba_callback(event)
-			event.callback = data.callback
-			otstd.fishing_rod.callback(event)
+			event.rod = data
+			otstd.fishing.handler(event)
 		end
 		data.listener =
 			registerOnUseItem("itemid", id, lamba_callback)
 	end
 end
 
-otstd.fishing_rod.registerHandlers()
+otstd.fishing.registerHandlers()

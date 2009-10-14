@@ -192,6 +192,8 @@ public:
 	void pushOutfit(const OutfitType& outfit);
 	template<class E, int size_>
 	void pushEnum(const Enum<E, size_>&);
+	template<class E, int size_>
+	void pushEnum(const BitEnum<E, size_>&);
 
 
 	// Generic
@@ -203,6 +205,10 @@ public:
 	void push(const std::string& str) {pushString(str);}
 	void push(Thing* thing) {pushThing(thing);}
 	void push(const Position& pos) {pushPosition(pos);}
+	template <class E, int size_>
+	void push(const Enum<E, size_>& e) {pushEnum<E, size_>(e);}
+	template <class E, int size_>
+	void push(const BitEnum<E, size_>& e) {pushEnum<E, size_>(e);}
 	#ifndef __GNUC__
 	void push(int i) {pushInteger(i);}
 	#endif
@@ -626,6 +632,12 @@ template <class ET> inline ET LuaState::popEnum(Script::ErrorMode mode){
 template<class E, int size_>
 inline void LuaState::pushEnum(const Enum<E, size_>& e){
 	getGlobal(e.toString());
+}
+
+template<class E, int size_>
+inline void LuaState::pushEnum(const BitEnum<E, size_>& e){
+	throw enum_conversion_error("Can not convert BitEnum to lua value (yet)");
+	//getGlobal(e.toString());
 }
 
 
