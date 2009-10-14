@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Water Elemental" nameDescription="a water elemental" race="undead" experience="450" speed="450" manacost="0">
 	<health now="550" max="550"/>
-	<look type="11" corpse="2016"/>
+	<look type="11" corpse="2025"/>
 	<targetchange interval="5000" chance="8"/>
 	<strategy attack="100" defense="0"/>
 	<flags>

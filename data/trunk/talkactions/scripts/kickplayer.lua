@@ -11,7 +11,7 @@ function onSay(cid, words, param)
 	end
 
 	local playerKickAccess = getPlayerAccess(playerKick)
-	if playerKickAccess < access then
+	if playerKickAccess < getPlayerAccess(cid) then
 		if(doRemoveCreature(playerKick) ~= LUA_ERROR) then
 			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Player kicked.")
 		else

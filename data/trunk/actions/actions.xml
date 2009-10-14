@@ -200,6 +200,7 @@
 	
 	<!-- Teleport Items -->
 	<action itemid="430" script="teleport.lua"/>
+	<action itemid="1369" script="teleport.lua"/>
 	<action itemid="1386" script="teleport.lua"/>
 	<action itemid="3678" script="teleport.lua"/>
 	<action itemid="5543" script="teleport.lua"/>
