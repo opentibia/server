@@ -37,7 +37,7 @@ function Tile:getTopMoveableThing()
 end
 
 function Tile:isPz()
-	return self:hasProperty(TILEPROP_PROTECTONZONE)
+	return self:hasProperty(TILEPROP_PROTECTIONZONE)
 end
 
 function Tile:isNoPVP()

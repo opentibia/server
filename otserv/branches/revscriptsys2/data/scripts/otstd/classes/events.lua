@@ -9,12 +9,13 @@ end
 
 function registerOnUseItemNearby(method, filter, callback)
 	function onUseItemNearby(evt)
-		if evt.target then
+		if evt.targetPos then
 			local ppos = evt.player:getPosition()
-			if math.abs(evt.target.x - ppos.x) <= 1 and math.abs(evt.target.y - ppos.y) <= 1 and evt.target.z - ppos.z then
+			if math.abs(evt.targetPos.x - ppos.x) <= 1 and math.abs(evt.targetPos.y - ppos.y) <= 1 and evt.targetPos.z - ppos.z then
 				callback(evt)
 			else
 				evt.retval = RETURNVALUE_TOOFARAWAY
+				evt:skip()
 			end
 		else
 			callback(evt)
