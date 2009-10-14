@@ -63,7 +63,7 @@ otstd.fluids = {
 	[FLUID_SLIME] = {text="Aarrggh it's toxic!", callback=Toxic},
 	[FLUID_SWAMP] = {text="Aarrggh it's toxic!", callback=Toxic},
 	[FLUID_MANA] = {text="Aaaah...", effect=MAGIC_EFFECT_LOSE_ENERGY, callback=ManaRegen},
-	[FLUID_MANA] = {text="Aaaah...", effect=MAGIC_EFFECT_LOSE_ENERGY, callback=LifeRegen},
+	[FLUID_LIFE] = {text="Aaaah...", effect=MAGIC_EFFECT_LOSE_ENERGY, callback=LifeRegen},
 }
 
 	

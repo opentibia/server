@@ -98,7 +98,7 @@ function otstd.food.callback(event)
 	local item = event.item
 	
 	local v = otstd.food_list[item:getItemID()]
-	if v ~= nil then
+	if v then
 		local amount = v.amount or 0
 		if player:getFood() + amount > 1200 then
 			player:sendInfo("You are full.")

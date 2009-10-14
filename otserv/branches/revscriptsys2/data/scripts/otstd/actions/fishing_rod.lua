@@ -7,11 +7,22 @@ end
 otstd.fishing.rods = {
 		-- normal fishing rod
 		[2580] = {
-			worm = 3976 -- Type of worm
+			bait = 3976 -- worm
 		},
 		-- mechanical fishing rod
 		[10223] = {
-			worm = 8309 -- Type of worm
+			bait = 8309, -- nail
+			handler =
+			function(event)
+				local player = event.player
+				local roll = otstd.fishing.formula(player)
+				
+				if event.hasFish and roll > 0.7 then
+					local fish = createItem(10224)
+					player:addItem(fish)
+				end
+				return true
+			end
 		},
 	}
 
@@ -112,19 +123,19 @@ function otstd.fishing.handler(event)
 				sendMagicEffect(spot:getPosition(), spotdata.effect)
 			end
 			
-			if player:getItemCount(event.rod.worm) == 0 then
+			if player:getItemCount(event.rod.bait) == 0 then
 				event.hasFish = false
 			end
 			
 			if event.rod.handler and event.rod.handler(event) or otstd.fishing.standardRodHandler(event) then
 				-- True means a catch!
 				player:advanceSkill(SKILL_FISH, 2)
-				player:removeItem(event.rod.worm, -1, 1)
+				player:removeItem(event.rod.bait, -1, 1)
 				
 				spot:setItemID(spotdata.newid)
 				spot:startDecaying()
 			elseif event.hasFish then
-				-- Didn't catch anything, but still a noble try (used a worm)...
+				-- Didn't catch anything, but still a noble try (used a bait)...
 				player:advanceSkill(SKILL_FISH, 1)
 			end
 			
