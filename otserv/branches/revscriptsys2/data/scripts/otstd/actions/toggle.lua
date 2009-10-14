@@ -155,14 +155,14 @@ otstd.toggles = {
 function otstd.toggle.callback(event)
 	local item = event.item
 	local v = otstd.toggles[item:getItemID()]
-	if(v ~= nil) then
+	if v then
 		item:setItemID(v.newid)
 	end
 end
 
 function otstd.toggle.registerHandlers()
 	for id, data in pairs(otstd.toggles) do
-		if data.listener ~= nil then
+		if data.listener then
 			stopListener(data.listener)
 		end
 		data.listener =

@@ -6,24 +6,25 @@ otstd.shovels = {
 	}
 	
 function otstd.shovel.callback(event)
-	local toPos = event.targetPos
-	local tile = map:getTile(toPos)
-	if tile then
-		local hole = tile:getThing(toPos.stackpos)
-		if not hole then
+	local toPos = event.targetPosition
+	local tile = toPos and map:getTile(toPos)
+	if not tile then
+		event.retval = RETURNVALUE_NOTPOSSIBLE
+		return
+	end
+
+	local hole = tile:getThing(toPos.stackpos)
+	if not hole then
+		return
+	end 
+	
+	for holeid, openid in pairs(otstd.holes) do
+		if openid.open and hole:getItemID() == holeid then
+			hole:setItemID(openid.open)
+			hole:startDecaying()
 			return
-		end 
-		
-		for holeid, openid in pairs(otstd.holes) do
-			if openid.open and hole:getItemID() == holeid then
-				hole:setItemID(openid.open)
-				hole:startDecaying()
-				return
-			end
 		end
 	end
-	
-	event.retval = RETURNVALUE_NOTPOSSIBLE
 end
 
 function otstd.shovel.registerHandlers()

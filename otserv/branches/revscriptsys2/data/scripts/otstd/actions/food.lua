@@ -98,16 +98,16 @@ function otstd.food.callback(event)
 	local item = event.item
 	
 	local v = otstd.food_list[item:getItemID()]
-	if(v ~= nil) then
+	if v ~= nil then
 		local amount = v.amount or 0
-		if(player:getFood() + amount > 1200) then
+		if player:getFood() + amount > 1200 then
 			player:sendInfo("You are full.")
 			return
 		end
 		
 		--player:addFood(v.amount)
 		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), v.text)
-		if(item:getCount() > 1) then
+		if item:getCount() > 1 then
 			item:setCount(item:getCount() - 1)
 		else
 			item:destroy()
@@ -117,7 +117,7 @@ end
 
 function otstd.food.registerHandlers()
 	for id, data in pairs(otstd.food_list) do
-		if data.listener ~= nil then
+		if data.listener then
 			stopListener(data.listener)
 		end
 		data.listener =

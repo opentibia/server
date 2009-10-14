@@ -20,7 +20,7 @@ end
 
 function otstd.blueberry_bush.registerHandlers()
 	for id, data in pairs(otstd.blueberry_bushes) do
-		if data.listener ~= nil then
+		if data.listener then
 			stopListener(data.listener)
 		end
 		data.listener =

@@ -21,7 +21,7 @@ otstd.clocks = {
 function otstd.clock.getTibiaTime()
 	local worldTime = getWorldTime()
 	local hours = 0
-	while (worldTime > 60) do
+	while worldTime > 60 do
 		hours = hours + 1
 		worldTime = worldTime - 60
 	end
@@ -37,7 +37,7 @@ end
 
 function otstd.clock.registerHandlers()
 	for id, data in pairs(otstd.clocks) do
-		if data.listener ~= nil then
+		if data.listener then
 			stopListener(data.listener)
 		end
 		data.listener =

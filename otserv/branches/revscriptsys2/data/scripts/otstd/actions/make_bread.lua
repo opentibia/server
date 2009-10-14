@@ -14,41 +14,43 @@ otstd.ovens = {
 function otstd.make_bread.use_wheat_on_mill_callback(event)
 	local player = event.player
 	local item = event.item
-	local toPos = event.targetPos
+	local toPos = event.targetPosition
+	local tile = toPos and map:getTile(toPos)
+	if not tile then
+		return
+	end
 	
-	local tile = map:getTile(toPos)
-	if(tile) then
-		local mill = tile:getTopThing()
-		if(mill and mill:getItemID() == 1381) then
-			item:destroy()
-			local flour = createItem(2692)
-			player:addItem(flour)
-			
-			event.retcode = RETURNVALUE_NOERROR
-			event:skip()
-		end
+	local mill = tile:getTopThing()
+	if(mill and mill:getItemID() == 1381) then
+		item:destroy()
+		local flour = createItem(2692)
+		player:addItem(flour)
+		
+		event.retcode = RETURNVALUE_NOERROR
+		event:skip()
 	end
 end
 
 function otstd.make_bread.use_flour_on_water_callback(event)
 	local player = event.player
 	local item = event.item
-	local toPos = event.targetPos
+	local toPos = event.targetPosition
+	local tile = toPos and map:getTile(toPos)
+	if not tile then
+		return
+	end
 	
-	local tile = map:getTile(toPos)
-	if(tile) then
-		local toItem = event.targetItem or tile:getTopThing()
-		if(toItem) then
-			local toItemType = Items[toItem:getItemID()]
-			if(toItemType.isFluidContainer and toItem:getSubtype() == FLUID_WATER:value()) then
-				local dough = createItem(2693)
-				player:addItem(dough)
-				toItem:setSubtype(FLUID_NONE)
-				item:destroy()
-				
-				event.retcode = RETURNVALUE_NOERROR
-				event:skip()
-			end
+	local toItem = event.targetInventoryItem or tile:getTopThing()
+	if(toItem) then
+		local toItemType = Items[toItem:getItemID()]
+		if(toItemType.isFluidContainer and toItem:getSubtype() == FLUID_WATER:value()) then
+			local dough = createItem(2693)
+			player:addItem(dough)
+			toItem:setSubtype(FLUID_NONE)
+			item:destroy()
+			
+			event.retcode = RETURNVALUE_NOERROR
+			event:skip()
 		end
 	end
 end
@@ -56,19 +58,20 @@ end
 function otstd.make_bread.use_dough_on_oven_callback(event)
 	local player = event.player
 	local item = event.item
-	local toPos = event.targetPos
-	
-	local tile = map:getTile(toPos)
-	if(tile) then
-		local oven = tile:getTopThing()
-		if(oven and otstd.ovens[oven:getItemID()] ~= nil) then
-			local bread = createItem(2689)
-			player:addItem(bread)
-			item:destroy()
-			
-			event.retcode = RETURNVALUE_NOERROR
-			event:skip()
-		end
+	local toPos = event.targetPosition
+	local tile = toPos and map:getTile(toPos)
+	if not tile then
+		return
+	end
+
+	local oven = tile:getTopThing()
+	if(oven and otstd.ovens[oven:getItemID()] ~= nil) then
+		local bread = createItem(2689)
+		player:addItem(bread)
+		item:destroy()
+		
+		event.retcode = RETURNVALUE_NOERROR
+		event:skip()
 	end
 end
 

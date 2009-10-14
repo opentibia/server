@@ -13,7 +13,7 @@ otstd.instruments = {
 		[2079] = {},
 		[2080] = {callback =
 			function(event)
-				if(math.random(0, 1) == 1) then
+				if math.random(0, 1) == 1 then
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
 				else
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
@@ -22,7 +22,7 @@ otstd.instruments = {
 			},
 		[2081] = {callback =
 			function(event)
-				if(math.random(0, 1) == 1) then
+				if math.random(0, 1) == 1 then
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
 				else
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
@@ -31,7 +31,7 @@ otstd.instruments = {
 			},
 		[2082] = {callback =
 			function(event)
-				if(math.random(0, 1) == 1) then
+				if math.random(0, 1) == 1 then
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
 				else
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
@@ -40,7 +40,7 @@ otstd.instruments = {
 			},
 		[2083] = {callback =
 			function(event)
-				if(math.random(0, 1) == 1) then
+				if math.random(0, 1) == 1 then
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
 				else
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
@@ -71,7 +71,7 @@ otstd.instruments = {
 		
 		[3952] = {callback =
 			function(event)
-				if(math.random(1, 10) == 1) then
+				if math.random(1, 10) == 1 then
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
 				end
 			end
@@ -79,7 +79,7 @@ otstd.instruments = {
 		[3957] = {},
 		[5786] = {callback =
 			function(event)
-				if(math.random(1, 10) == 1) then
+				if math.random(1, 10) == 1 then
 					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
 					event.item:destroy()
 				else
@@ -103,9 +103,9 @@ function otstd.instrument.callback(event)
 	local item = event.item
 
 	local v = otstd.instruments[item:getItemID()]
-	if(v ~= nil) then
-		if(not v.callback) then
-			if(v.effect) then
+	if v ~= nil then
+		if not v.callback then
+			if v.effect then
 				sendMagicEffect(event.item:getPosition(), v.effect)
 			else
 				sendMagicEffect(event.item:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
@@ -118,7 +118,7 @@ end
 
 function otstd.instrument.registerHandlers()
 	for id, data in pairs(otstd.instruments) do
-		if data.listener ~= nil then
+		if data.listener then
 			stopListener(data.listener)
 		end
 		data.listener =

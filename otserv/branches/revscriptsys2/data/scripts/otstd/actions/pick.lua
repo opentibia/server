@@ -13,18 +13,16 @@ otstd.pick_spots = {
 function otstd.pick.callback(event)
 	local player = event.player
 	local item = event.item
-	local toPos = event.targetPos
+	local toPos = event.targetPosition
+	local tile = toPos and map:getTile(toPos)
 	
-	local tile = map:getTile(toPos)
-	if(tile) then
-		local toItem = event.targetItem or tile:getTopThing()
-		if(toItem) then			
-			local v = otstd.pick_spots[toItem:getItemID()];
-			if(v and v.callback) then
-				v.callback(event, toItem)
-				event.retcode = RETURNVALUE_NOERROR
-				event:skip()
-			end
+	local toItem = event.targetInventoryItem or tile:getTopThing()
+	if(toItem) then			
+		local v = otstd.pick_spots[toItem:getItemID()];
+		if(v and v.callback) then
+			v.callback(event, toItem)
+			event.retcode = RETURNVALUE_NOERROR
+			event:skip()
 		end
 	end
 end

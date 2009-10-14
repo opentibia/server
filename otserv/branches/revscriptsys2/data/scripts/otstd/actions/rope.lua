@@ -12,9 +12,9 @@ otstd.ropespots = {
 	}
 	
 function otstd.rope.callback(event)
-	local toPos = event.targetPos
-	local tile = map:getTile(toPos)
-	if tile == nil then
+	local toPos = event.targetPosition
+	local tile = toPos and map:getTile(toPos)
+	if not tile then
 		return
 	end
 	
