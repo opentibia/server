@@ -93,25 +93,22 @@ otstd.food_list = {
 		]]--
 	}
 
-function otstd.food.callback(event)
+function otstd.food.handler(event)
 	local player = event.player
 	local item = event.item
 	
-	local v = otstd.food_list[item:getItemID()]
-	if v then
-		local amount = v.amount or 0
-		if player:getFood() + amount > 1200 then
-			player:sendInfo("You are full.")
-			return
-		end
-		
-		--player:addFood(v.amount)
-		sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), v.text)
-		if item:getCount() > 1 then
-			item:setCount(item:getCount() - 1)
-		else
-			item:destroy()
-		end
+	local amount = event.food.amount or 0
+	if player:getFood() + amount > 1200 then
+		player:sendInfo("You are full.")
+		return
+	end
+	
+	--player:addFood(v.amount)
+	sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), event.food.text)
+	if item:getCount() > 1 then
+		item:setCount(item:getCount() - 1)
+	else
+		item:destroy()
 	end
 end
 
@@ -120,8 +117,13 @@ function otstd.food.registerHandlers()
 		if data.listener then
 			stopListener(data.listener)
 		end
+		
+		function lamba_callback(event)
+			event.food = data
+			otstd.food.handler(event)
+		end
 		data.listener =
-			registerOnUseItem("itemid", id, otstd.food.callback)
+			registerOnUseItem("itemid", id, lamba_callback)
 	end
 end
 

@@ -152,12 +152,9 @@ otstd.toggles = {
 		[9905] = {newid = 9904}
 	}
 
-function otstd.toggle.callback(event)
+function otstd.toggle.handler(event)
 	local item = event.item
-	local v = otstd.toggles[item:getItemID()]
-	if v then
-		item:setItemID(v.newid)
-	end
+	item:setItemID(event.toggle.newid)
 end
 
 function otstd.toggle.registerHandlers()
@@ -165,8 +162,13 @@ function otstd.toggle.registerHandlers()
 		if data.listener then
 			stopListener(data.listener)
 		end
+
+		function lamba_callback(event)
+			event.toggle = data
+			otstd.toggle.handler(event)
+		end
 		data.listener =
-			registerOnUseItem("itemid", id, otstd.toggle.callback)
+			registerOnUseItem("itemid", id, lamba_callback)
 	end
 end
 
