@@ -448,6 +448,8 @@ public:
 	int lua_Player_getMaximumCap();
 	int lua_Player_getLevel();
 	int lua_Player_getMagicLevel();
+	int lua_Player_getSkill();
+	int lua_Player_advanceSkill();
 	int lua_Player_isPremium();
 	int lua_Player_getCorpseId();
 
@@ -479,6 +481,7 @@ public:
 	int lua_Player_countMoney();
 	int lua_Player_addMoney();
 	int lua_Player_removeMoney();
+	int lua_Player_getItemCount();
 
 	int lua_Player_sendMessage();
 
@@ -531,7 +534,7 @@ public:
 	int lua_Tile_getItemWithActionID();
 	int lua_Tile_getItemWithItemID();
 	int lua_Tile_addItem();
-	int lua_Tile_getItemTypeCount();
+	int lua_Tile_getItemCount();
 	int lua_Tile_hasProperty();
 	int lua_Tile_queryAdd();
 

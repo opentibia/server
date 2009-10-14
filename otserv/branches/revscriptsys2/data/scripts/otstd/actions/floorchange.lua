@@ -22,6 +22,10 @@ end
 
 function otstd.floorchange.registerHandlers()
 	for id, data in pairs(otstd.ladders) do
+		if data.listener ~= nil then
+			stopListener(data.listener)
+		end
+
 		function lamba_callback(event)
 			event.ladder = data.ladder
 			event.drop = data.drop

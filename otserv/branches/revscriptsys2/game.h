@@ -167,6 +167,7 @@ public:
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
 		uint32_t spriteId = 0, stackPosType_t type = STACKPOS_NORMAL);
+	Item* internalGetItem(Player* player, const Position& pos, int32_t index);
 	void internalGetPosition(Item* item, Position& pos, uint8_t& stackpos);
 
 	/**
@@ -631,7 +632,7 @@ protected:
 	ReturnValue internalUseItem(Player* player, const Position& pos,
 		uint8_t index, Item* item, uint32_t creatureId);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-		Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
+		Item* item, bool isHotkey, uint32_t creatureId);
 	bool openContainer(Player* player, Container* container, const uint8_t index);
 	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);
 

@@ -313,10 +313,21 @@ void OnHear::Event::update_instance(Manager& state, Environment& environment, Lu
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a player use an item
 
-OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos, ReturnValue& retval) :
+OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos, Item* targetItem, ReturnValue& retval) :
 	user(user),
 	item(item),
 	targetPos(toPos),
+	targetItem(targetItem),
+	retval(retval)
+{
+	propagate_by_default = true;
+}
+
+OnUseItem::Event::Event(Player* user, Item* item, ReturnValue& retval) :
+	user(user),
+	item(item),
+	targetPos(NULL),
+	targetItem(NULL),
 	retval(retval)
 {
 	propagate_by_default = true;
@@ -376,7 +387,9 @@ void OnUseItem::Event::push_instance(LuaState& state, Environment& environment)
 	} else {
 		state.pushNil();
 	}
-	state.setField(-2, "target");
+	state.setField(-2, "targetPos");
+	state.pushThing(targetItem);
+	state.setField(-2, "targetItem");
 }
 
 void OnUseItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)

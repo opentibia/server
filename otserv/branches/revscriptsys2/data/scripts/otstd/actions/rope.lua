@@ -12,12 +12,13 @@ otstd.ropespots = {
 	}
 	
 function otstd.rope.callback(event)
-	local tile = map:getTile(event.target)
+	local toPos = event.targetPos
+	local tile = map:getTile(toPos)
 	if tile == nil then
 		return
 	end
 	
-	local hole = tile:getThing(event.target.stackpos)
+	local hole = tile:getThing(toPos.stackpos)
 	
 	for spotid, _ in pairs(otstd.ropespots) do
 		if spotid == hole:getItemID() then

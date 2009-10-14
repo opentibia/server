@@ -218,6 +218,121 @@ otstd.doorlist = {
 		[7055] = {newid=7054, horizontal=false, closed=false, level=false},
 		[7056] = {newid=7057, horizontal=true, closed=true, level=false},
 		[7057] = {newid=7056, horizontal=true, closed=false, level=false}
+
+		--[[
+		[8541" script="doors/door_locked.lua"/>
+		[8542" script="increment.lua"/>
+		[8543] = {newid= , horizontal=false, closed=false, level=false},
+		[8544" script="doors/door_locked.lua"/>
+		[8545" script="increment.lua"/>
+		[8546] = {newid= , horizontal=true, closed=false, level=false},
+
+		[8547" script="increment.lua"/>
+		[8548] = {newid= , horizontal=false, closed=false, level=false},
+		[8549" script="increment.lua"/>
+		[8550] = {newid= , horizontal=true, closed=false, level=false},
+
+		[8551" script="doors/questdoor_closed.lua"/>
+		[8552" script="doors/door_open_vertical.lua"/>
+		[8553" script="doors/questdoor_closed.lua"/>
+		[8554] = {newid= , horizontal=true, closed=false, level=false},
+
+		[8555" script="doors/gateofexp_closed.lua"/>
+		[8556" script="doors/door_open_vertical.lua"/>
+		[8557" script="doors/gateofexp_closed.lua"/>
+		[8558] = {newid= , horizontal=true, closed=false, level=false},
+
+		[8696" script="increment.lua"/>
+		[8697] = {newid= , horizontal=false, closed=false, level=false},
+
+		[9165" script="doors/door_locked.lua"/>
+		[9166" script="increment.lua"/>
+		[9167] = {newid= , horizontal=false, closed=false, level=false},
+		[9168" script="doors/door_locked.lua"/>
+		[9169" script="increment.lua"/>
+		[9170] = {newid= , horizontal=true, closed=false, level=false},
+
+		[9171" script="increment.lua"/>
+		[9172" script="doors/door_open_vertical.lua"/>
+		[9173" script="increment.lua"/>
+		[9174] = {newid= , horizontal=true, closed=false, level=false},
+
+		[9175" script="doors/questdoor_closed.lua"/>
+		[9176" script="doors/door_open_vertical.lua"/>
+		[9177" script="doors/questdoor_closed.lua"/>
+		[9178] = {newid= , horizontal=true, closed=false, level=false},
+
+		[9179" script="doors/gateofexp_closed.lua"/>
+		[9180] = {newid= , horizontal=false, closed=false, level=false},
+		[9181" script="doors/gateofexp_closed.lua"/>
+		[9182] = {newid= , horizontal=true, closed=false, level=false},
+
+		[9267" script="doors/door_locked.lua"/>
+		[9268" script="increment.lua"/>
+		[9269" script="doors/door_open_vertical.lua"/>
+		[9270" script="doors/door_locked.lua"/>
+		[9271" script="increment.lua"/>
+		[9272] = {newid= , horizontal=true, closed=false, level=false},
+
+		[9273" script="increment.lua"/>
+		[9274" script="doors/door_open_vertical.lua"/>
+		[9275" script="increment.lua"/>
+		[9276] = {newid= , horizontal=true, closed=false, level=false},
+
+		[9277" script="doors/questdoor_closed.lua"/>
+		[9278" script="doors/door_open_vertical.lua"/>
+		[9279" script="doors/questdoor_closed.lua"/>
+		[9280] = {newid= , horizontal=true, closed=false, level=false},
+
+		[9281" script="doors/gateofexp_closed.lua"/>
+		[9282" script="doors/door_open_vertical.lua"/>
+		[9283" script="doors/gateofexp_closed.lua"/>
+		[9284] = {newid= , horizontal=true, closed=false, level=false},
+			
+		[10268" script="doors/door_locked.lua"/>
+		[10269" script="increment.lua"/>
+		[10270] = {newid= , horizontal=false, closed=false, level=false},
+		[10271" script="doors/door_locked.lua"/>
+		[10272" script="increment.lua"/>
+		[10273] = {newid= , horizontal=true, closed=false, level=false},
+		
+		[10274" script="increment.lua"/>
+		[10275" script="doors/door_open_vertical.lua"/>
+		[10276" script="increment.lua"/>
+		[10277] = {newid= , horizontal=true, closed=false, level=false},
+		
+		[10278" script="doors/questdoor_closed.lua"/>
+		[10279" script="doors/door_open_vertical.lua"/>
+		[10280" script="doors/gateofexp_closed.lua"/>
+		[10281] = {newid= , horizontal=true, closed=false, level=false},
+		
+		[10282" script="doors/gateofexp_closed.lua"/>
+		[10283" script="doors/door_open_vertical.lua"/>
+		[10284" script="doors/gateofexp_closed.lua"/>
+		[10285] = {newid= , horizontal=true, closed=false, level=false},
+		
+		[10468" script="doors/door_locked.lua"/>
+		[10469" script="increment.lua"/>
+		[10470" script="doors/door_open_vertical.lua"/>
+		[10471" script="increment.lua"/>
+		[10472" script="doors/door_open_vertical.lua"/>
+		
+		[10473" script="doors/gateofexp_closed.lua"/>
+		[10474" script="doors/door_open_vertical.lua"/>
+		[10475" script="doors/questdoor_closed.lua"/>
+		[10476" script="doors/door_open_vertical.lua"/>
+		
+		[10477" script="doors/door_locked.lua"/>
+		[10478" script="increment.lua"/>
+		[10479] = {newid= , horizontal=true, closed=false, level=false},
+		[10480" script="increment.lua"/>
+		[10481] = {newid= , horizontal=true, closed=false, level=false},
+		
+		[10482" script="doors/gateofexp_closed.lua"/>
+		[10483] = {newid= , horizontal=true, closed=false, level=false},
+		[10484" script="doors/questdoor_closed.lua"/>
+		[10485" script="doors/door_open_vertical.lua"/>
+		]]--
 	}
 	
 function Item:switchDoor(moveobjects)

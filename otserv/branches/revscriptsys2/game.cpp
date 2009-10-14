@@ -492,12 +492,8 @@ ReturnValue Game::canUseFar(const Creature* creature, const Position& toPos, boo
 	return RET_NOERROR;
 }
 
-ReturnValue Game::internalUseItem(Player* player, const Position& pos,
-	uint8_t index, Item* item, uint32_t creatureId)
+ReturnValue Game::internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item, uint32_t creatureId)
 {
-	bool foundAction = false; //(getAction(item) != NULL);
-
-	//check if it is a house door
 	if(Door* door = item->getDoor()){
 		if(!door->canUse(player)){
 			return RET_CANNOTUSETHISOBJECT;
@@ -513,7 +509,7 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos,
 
 	ReturnValue retval = RET_NOERROR;
 	if(script_system){
-		Script::OnUseItem::Event evt(player, item, NULL, retval);
+		Script::OnUseItem::Event evt(player, item, retval);
 		if(script_system->dispatchEvent(evt)) {
 			return retval;
 		}
@@ -539,11 +535,7 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos,
 		}
 	}
 
-	if(!foundAction){
-		return RET_CANNOTUSETHISOBJECT;
-	}
-
-	return RET_NOERROR;
+	return RET_CANNOTUSETHISOBJECT;
 }
 
 bool Game::useItem(Player* player, const Position& pos, uint8_t index,
@@ -584,15 +576,22 @@ bool Game::useItem(Player* player, const Position& pos, uint8_t index,
 }
 
 ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-	Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess)
+	Item* item, bool isHotkey, uint32_t creatureId)
 {
-	isSuccess = false;
-
 	ReturnValue retval = RET_NOERROR;
 	if(script_system){
-		Script::OnUseItem::Event evt(player, item, &toPosEx, retval);
-		if(script_system->dispatchEvent(evt)) {
-			return retval;
+		if(toPosEx.x == 0xFFFF){
+			Item* toItem = internalGetItem(player, toPosEx, toPosEx.stackpos);
+			Script::OnUseItem::Event evt(player, item, &toPosEx, toItem, retval);
+			if(script_system->dispatchEvent(evt)) {
+				return retval;
+			}
+		}
+		else{
+			Script::OnUseItem::Event evt(player, item, &toPosEx, NULL, retval);
+			if(script_system->dispatchEvent(evt)) {
+				return retval;
+			}
 		}
 	}
 
@@ -611,8 +610,6 @@ bool Game::useItemEx(Player* player, const Position& fromPos, uint16_t fromSprit
 	int32_t fromStackPos = item->getParent()->__getIndexOfThing(item);
 	PositionEx fromPosEx(fromPos, fromStackPos);
 	PositionEx toPosEx(toPos, toStackPos);
-	ReturnValue ret = RET_NOERROR;
-	bool isSuccess = false;
 
 	if(isHotkey){
 		int32_t subType = -1;
@@ -622,24 +619,25 @@ bool Game::useItemEx(Player* player, const Position& fromPos, uint16_t fromSprit
 
 		const ItemType& it = Item::items[item->getID()];
 		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
+		ReturnValue ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
+		showUseHotkeyMessage(player, it, itemCount);
 
-		if(isSuccess){
-			showUseHotkeyMessage(player, it, itemCount);
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			return false;
 		}
 	}
 	else{
-		ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId, isSuccess);
+		ReturnValue ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
 
 		if(ret == RET_TOOFARAWAY) {
 			return useItemFarEx(player->getID(), fromPos, fromStackPos, fromSpriteId,
 				toPos, toStackPos, toSpriteId, isHotkey);
 		}
-	}
-
-	if(ret != RET_NOERROR){
-		player->sendCancelMessage(ret);
-		return false;
+		else if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			return false;
+		}
 	}
 
 	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
@@ -875,6 +873,16 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			SlotType slot = (SlotType)static_cast<unsigned char>(pos.y);
 			return player->getInventoryItem(slot);
 		}
+	}
+
+	return NULL;
+}
+
+Item* Game::internalGetItem(Player* player, const Position& pos, int32_t index)
+{
+	Thing* thing = internalGetThing(player, pos, index);
+	if(thing && thing->getItem()){
+		return thing->getItem();
 	}
 
 	return NULL;

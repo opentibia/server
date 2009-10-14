@@ -80,13 +80,15 @@ end
 function otstd.fluid_container.createSplash(event)
 	local player = event.player
 	local item = event.item
-	local toPos = event.target
+	local toPos = event.targetPos
+	local toItem = event.targetItem
 	
-	if(toPos.x == 0xFFFF) then
+	if(toItem ~= nil) then
 		--player is using the item onto the inventory
 		toPos = player:getPosition()
 	end
 	
+	local tile = map:getTile(toPos)
 	if(tile and not tile:isBlocking() ) then
 		local splash = createItem(2016, item:getSubtype())
 		splash:startDecaying()
@@ -103,7 +105,7 @@ function otstd.fluid_container.callback(event)
 	local player = event.player
 	local item = event.item
 	local playerPos = player:getPosition()
-	local toPos = event.target
+	local toPos = event.targetPos
 
 	local fluidType = FluidType(item:getSubtype())
 	
@@ -119,7 +121,7 @@ function otstd.fluid_container.callback(event)
 	else
 		local tile = map:getTile(toPos)
 		if(tile) then
-			local toItem = tile:getTopThing()
+			local toItem = event.targetItem or tile:getTopThing()
 			if(toItem) then
 				local toItemType = Items[toItem:getItemID()]
 				if(toItemType.fluidSource ~= FLUID_NONE) then

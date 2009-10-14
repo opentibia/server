@@ -290,6 +290,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getMana()", &Manager::lua_Player_getMana);
 	registerMemberFunction("Player", "getLevel()", &Manager::lua_Player_getLevel);
 	registerMemberFunction("Player", "getMagicLevel()", &Manager::lua_Player_getMagicLevel);
+	registerMemberFunction("Player", "getSkill(SkillType skill)", &Manager::lua_Player_getSkill);
+	registerMemberFunction("Player", "advanceSkill(SkillType skill, int count)", &Manager::lua_Player_advanceSkill);
 	registerMemberFunction("Player", "isPremium()", &Manager::lua_Player_isPremium);
 	registerMemberFunction("Player", "getManaMax()", &Manager::lua_Player_getManaMax);
 	registerMemberFunction("Player", "setMana(integer newval)", &Manager::lua_Player_setMana);
@@ -312,6 +314,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getGuildRank()", &Manager::lua_Player_getGuildRank);
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
 
+	registerMemberFunction("Player", "getItemCount(int itemid)", &Manager::lua_Player_getItemCount);
 	registerMemberFunction("Player", "addItem(Item item)", &Manager::lua_Player_addItem);
 	registerMemberFunction("Player", "removeItem(int id [, int type [,int count]])", &Manager::lua_Player_removeItem);
 	registerMemberFunction("Player", "getInventoryItem(SlotType slot)", &Manager::lua_Player_getInventoryItem);
@@ -370,18 +373,17 @@ void Manager::registerClasses() {
 	// Tile
 	registerMemberFunction("Tile", "getThing(int index)", &Manager::lua_Tile_getThing);
 	registerMemberFunction("Tile", "getCreatures()", &Manager::lua_Tile_getCreatures);
-	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
+
+	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
+	registerMemberFunction("Tile", "getItemCount(int itemid)", &Manager::lua_Tile_getItemCount);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
+	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItemsWithItemID()", &Manager::lua_Tile_getItemsWithItemID);
 	registerMemberFunction("Tile", "getItemsWithActionID()", &Manager::lua_Tile_getItemsWithActionID);
 	registerMemberFunction("Tile", "getItemWithItemID()", &Manager::lua_Tile_getItemWithItemID);
 	registerMemberFunction("Tile", "getItemWithActionID()", &Manager::lua_Tile_getItemWithActionID);
 	registerMemberFunction("Tile", "queryAdd()", &Manager::lua_Tile_queryAdd);
 	registerMemberFunction("Tile", "hasProperty(TileProp prop)", &Manager::lua_Tile_hasProperty);
-
-	registerMemberFunction("Tile", "getItemTypeCount(int itemid)", &Manager::lua_Tile_getItemTypeCount);
-
-	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
 
 	// Town
 	registerMemberFunction("Town", "getTemplePosition()", &Manager::lua_Town_getTemplePosition);
@@ -2663,7 +2665,7 @@ int LuaState::lua_Tile_getItemWithItemID()
 	return 1;
 }
 
-int LuaState::lua_Tile_getItemTypeCount() {
+int LuaState::lua_Tile_getItemCount() {
 	int32_t type = popInteger();
 	Tile* tile = popTile();
 	push(tile->__getItemTypeCount(type));
@@ -3639,6 +3641,24 @@ int LuaState::lua_Player_getMagicLevel()
 	return 1;
 }
 
+int LuaState::lua_Player_getSkill()
+{
+	SkillType skill = popEnum<SkillType>();
+	Player* p = popPlayer();
+	push(p->getSkill(skill, SKILL_LEVEL));
+	return 1;
+}
+
+int LuaState::lua_Player_advanceSkill()
+{
+	int32_t count = popInteger();
+	SkillType skill = popEnum<SkillType>();
+	Player* p = popPlayer();
+	p->addSkillAdvance(skill, count);
+	pushBoolean(true);
+	return 1;
+}
+
 int LuaState::lua_Player_isPremium()
 {
 	Player* player = popPlayer();
@@ -3834,7 +3854,7 @@ int LuaState::lua_Player_getInventoryItem()
 	return 1;
 }
 
-int LuaState::lua_Player_getItemTypeCount()
+int LuaState::lua_Player_getItemCount()
 {
 	int32_t type = popInteger();
 	Player* player = popPlayer();
@@ -3862,6 +3882,13 @@ int LuaState::lua_Player_removeMoney()
 	int32_t amount = popInteger();
 	Player* player = popPlayer();
 	pushBoolean(g_game.removeMoney(NULL, player, amount));
+	return 1;
+}
+
+int LuaState::lua_Player_getItemTypeCount() {
+	int32_t type = popInteger();
+	Player* player = popPlayer();
+	push(player->__getItemTypeCount(type));
 	return 1;
 }
 

@@ -6,9 +6,10 @@ otstd.shovels = {
 	}
 	
 function otstd.shovel.callback(event)
-	local tile = map:getTile(event.target)
+	local toPos = event.targetPos
+	local tile = map:getTile(toPos)
 	if tile then
-		local hole = tile:getThing(event.target.stackpos)
+		local hole = tile:getThing(toPos.stackpos)
 		if not hole then
 			return
 		end 

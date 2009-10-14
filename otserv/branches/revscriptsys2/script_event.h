@@ -220,7 +220,8 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Player* user, Item* item, const PositionEx* toPos, ReturnValue& retval);
+			Event(Player* user, Item* item, const PositionEx* toPos, Item* toItem, ReturnValue& retval);
+			Event(Player* user, Item* item, ReturnValue& retval);
 			~Event();
 
 			std::string getName() const {return "OnUseItem";}
@@ -239,6 +240,7 @@ namespace Script {
 			Player* user;
 			Item* item;
 			const PositionEx* targetPos;
+			Item* targetItem;
 			ReturnValue& retval;
 		};
 	}

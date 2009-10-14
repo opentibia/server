@@ -10,7 +10,7 @@ otstd.destilleries = {
 function otstd.destillery.use_rum_flask_callback(event)
 	local player = event.player
 	local item = event.item
-	local toPos = event.target
+	local toPos = event.targetPos
 	
 	if(item:getSubtype() ~= FLUID_NONE:value()) then
 		return
@@ -40,7 +40,7 @@ end
 function otstd.destillery.use_sugar_cane_callback(event)
 	local player = event.player
 	local item = event.item
-	local toPos = event.target
+	local toPos = event.targetPos
 
 	local tile = map:getTile(toPos)
 	if(tile) then
