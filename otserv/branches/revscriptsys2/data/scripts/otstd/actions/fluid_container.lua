@@ -43,7 +43,7 @@ local Toxic = otstd.fluid_container.Toxic
 
 function otstd.fluid_container.ManaRegen(player, fluid)
 	local amount = math.random(80, 160)
-	event.player:setMana(event.player:getMana() + amount)
+	event.player:setMana(player:getMana() + amount)
 end
 local ManaRegen = otstd.fluid_container.ManaRegen
 

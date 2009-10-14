@@ -1,5 +1,17 @@
 otstd.instrument = {}
 
+function otstd.instrument.piano_handler(event)
+	local item = event.item
+	if math.random(0, 1) == 1 then
+		sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_RED)
+	else
+		sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
+	end
+	return true
+end
+
+local piano_handler = otstd.instrument.piano_handler
+
 otstd.instruments = {
 		[2070] = {},
 		[2071] = {},
@@ -11,42 +23,10 @@ otstd.instruments = {
 		[2077] = {},
 		[2078] = {},
 		[2079] = {},
-		[2080] = {callback =
-			function(event)
-				if math.random(0, 1) == 1 then
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
-				else
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
-				end
-			end
-			},
-		[2081] = {callback =
-			function(event)
-				if math.random(0, 1) == 1 then
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
-				else
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
-				end
-			end
-			},
-		[2082] = {callback =
-			function(event)
-				if math.random(0, 1) == 1 then
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
-				else
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
-				end
-			end
-			},
-		[2083] = {callback =
-			function(event)
-				if math.random(0, 1) == 1 then
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
-				else
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
-				end
-			end
-			},
+		[2080] = {handler = piano_handler},
+		[2081] = {handler = piano_handler},
+		[2082] = {handler = piano_handler},
+		[2083] = {handler = piano_handler},
 		[2084] = {},
 		[2085] = {},
 		[2095] = {effect = MAGIC_EFFECT_SOUND_YELLOW},
@@ -54,14 +34,16 @@ otstd.instruments = {
 		[2364] = {},		
 		[2367] = {effect = MAGIC_EFFECT_SOUND_PURPLE},
 		[2368] = {},
-		[2369] = {callback =
+		[2369] = {handler =
 			function(event)
-				sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
+				local item = event.item
+				sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
 				for i = 1, 11 do
 					local grape = createItem(2681)
 					event.player:addItem(grape)
 				end
 				event.item:destroy()
+				return true
 			end
 			},
 		[2370] = {},
@@ -69,50 +51,54 @@ otstd.instruments = {
 		[2373] = {effect = MAGIC_EFFECT_SOUND_RED},
 		[2374] = {},
 		
-		[3952] = {callback =
+		[3952] = {handler =
 			function(event)
+				local item = event.item
 				if math.random(1, 10) == 1 then
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
+					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
 				end
+				return true
 			end
 			},
 		[3957] = {},
-		[5786] = {callback =
+		[5786] = {handler =
 			function(event)
+				local item = event.item
 				if math.random(1, 10) == 1 then
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_RED)
-					event.item:destroy()
+					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_RED)
+					item:destroy()
 				else
-					sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_PURPLE)
+					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_PURPLE)
 					--TODO: summon wolf
 				end
+				return true
 			end
 			},
-		[6572] = {callback =
+		[6572] = {handler =
 			function(event)
-				event.player:say(MSG_STATUS_CONSOLE_ORANGE, "TOOOOOOT")
-				sendMagicEffect(event.player:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
-				event.item:setItemID(6573)
-				event.item:startDecaying()
+				local item = event.item
+				event.player:sendMessage(MSG_STATUS_CONSOLE_ORANGE, "TOOOOOOT")
+				sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
+				item:setItemID(6573)
+				item:startDecaying()
+				return true
 			end
 			}
 	}
 
-function otstd.instrument.callback(event)
+function otstd.instrument.standardInstrumentHandler(event)
+	local item = event.item
+	local effect = event.instrument.effect
+	sendMagicEffect(item:getPosition(), effect or MAGIC_EFFECT_SOUND_GREEN)
+	return true
+end
+
+function otstd.instrument.handler(event)
 	local player = event.player
 	local item = event.item
 
-	local v = otstd.instruments[item:getItemID()]
-	if v ~= nil then
-		if not v.callback then
-			if v.effect then
-				sendMagicEffect(event.item:getPosition(), v.effect)
-			else
-				sendMagicEffect(event.item:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
-			end
-		else
-			v.callback(event)
-		end
+	if event.instrument.handler and event.instrument.handler(event) or otstd.instrument.standardInstrumentHandler(event) then
+		event:skip()
 	end
 end
 
@@ -121,8 +107,13 @@ function otstd.instrument.registerHandlers()
 		if data.listener then
 			stopListener(data.listener)
 		end
+
+		function lamba_callback(event)
+			event.instrument = data
+			otstd.instrument.handler(event)
+		end
 		data.listener =
-			registerOnUseItem("itemid", id, otstd.instrument.callback)
+			registerOnUseItem("itemid", id, lamba_callback)
 	end
 end
 

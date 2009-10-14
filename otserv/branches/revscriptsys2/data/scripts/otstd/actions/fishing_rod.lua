@@ -20,7 +20,10 @@ otstd.fishing.rods = {
 				if event.hasFish and roll > 0.7 then
 					local fish = createItem(10224)
 					player:addItem(fish)
+					event.caughtFish = true
+					return true
 				end
+				event.caughtFish = false
 				return true
 			end
 		},
@@ -100,6 +103,7 @@ function otstd.fishing.standardRodHandler(event)
 	if event.hasFish and roll > 0.7 then
 		local fish = createItem(event.spot:getFish(roll))
 		player:addItem(fish)
+		event.caughtFish = true
 		return true -- Return true if we caught something
 	end
 	return false
@@ -109,12 +113,12 @@ function otstd.fishing.handler(event)
 	local player = event.player
 	local item = event.item
 	local toPos = event.targetPosition
-		
-	local tile = map:getTile(toPos)
+	local tile = toPos and map:getTile(toPos)
+	
 	if tile then
 		local spot = event.targetItem or tile:getTopThing()
 		if spot and spot:canFish() then
-			event.player:sendNote("You can has fish?")
+			--event.player:sendNote("You can has fish?")
 			local spotdata = otstd.fishing.spots[spot:getItemID()]
 			event.hasFish = spot:hasFish()
 			event.spot = spot
@@ -127,13 +131,15 @@ function otstd.fishing.handler(event)
 				event.hasFish = false
 			end
 			
+			event.caughtFish = false
 			if event.rod.handler and event.rod.handler(event) or otstd.fishing.standardRodHandler(event) then
-				-- True means a catch!
-				player:advanceSkill(SKILL_FISH, 2)
-				player:removeItem(event.rod.bait, -1, 1)
+				if event.caughtFish then
+					player:advanceSkill(SKILL_FISH, 2)
+					player:removeItem(event.rod.bait, -1, 1)
 				
-				spot:setItemID(spotdata.newid)
-				spot:startDecaying()
+					spot:setItemID(spotdata.newid)
+					spot:startDecaying()
+				end
 			elseif event.hasFish then
 				-- Didn't catch anything, but still a noble try (used a bait)...
 				player:advanceSkill(SKILL_FISH, 1)
