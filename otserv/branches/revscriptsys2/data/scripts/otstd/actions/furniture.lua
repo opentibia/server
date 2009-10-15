@@ -37,7 +37,7 @@ function otstd.furniture.bedKitHandler(event)
 		return false
 	end
 
-	function getPosByDir(pos, dir)
+	local function getPosByDir(pos, dir)
 		if(dir == NORTH) then
 			pos.y = pos.y-1
 		elseif(dir == SOUTH) then
