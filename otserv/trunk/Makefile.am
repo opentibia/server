@@ -79,8 +79,6 @@ pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
 
 pkgsysconf_DATA = config.lua
 
-SUBDIRS = data
-
 config.lua:
 	cp $(srcdir)/config.lua.dist config.lua
 

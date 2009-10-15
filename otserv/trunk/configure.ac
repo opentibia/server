@@ -193,5 +193,5 @@ if test -n "$SQLITE_FLAGS"; then
 	AC_SUBST(SQLITE_LIBS)
 fi
 
-AC_CONFIG_FILES([Makefile data/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
