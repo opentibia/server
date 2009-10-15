@@ -11,13 +11,6 @@ local ENCHANT_ICE = 7759
 local ENCHANT_FIRE = 7760
 local ENCHANT_EARTH = 7761
 local ENCHANT_ENERGY = 7762
-
-otstd.enchant.shrines = {
-		[ENCHANT_ICE]    = {shrine = {7508, 7509, 7510, 7511} },
-		[ENCHANT_FIRE]   = {shrine = {7504, 7505, 7506, 7507} },
-		[ENCHANT_EARTH]  = {shrine = {7516, 7517, 7518, 7519} },
-		[ENCHANT_ENERGY] = {shrine = {7512, 7513, 7514, 7515} }
-	}
 	
 otstd.enchant.shrines = {
 		[7508] = {ENCHANT_ICE}, [7509] = {ENCHANT_ICE}, [7510] = {ENCHANT_ICE}, [7511] = {ENCHANT_ICE},		
