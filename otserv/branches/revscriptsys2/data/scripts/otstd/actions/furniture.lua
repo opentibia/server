@@ -25,6 +25,7 @@ otstd.furniture.modifiable_beds = {
 
 function otstd.furniture.bedKitHandler(event)
 	local player = event.player
+	local bedKitItem = event.item
 	local toPos = event.targetPosition
 	local tile = toPos and map:getTile(toPos)
 	if not tile then
@@ -69,6 +70,9 @@ function otstd.furniture.bedKitHandler(event)
 
 	bed[2]:setItemID(newbed[bed[2]:getBedDirection()])
 	sendMagicEffect(bed[2]:getPosition(), MAGIC_EFFECT_BLOCKHIT)	
+	
+	bedKitItem:destroy()
+	event:skip()
 	return true
 end
 
