@@ -26,7 +26,7 @@ function otstd.floorchange.registerHandlers()
 			stopListener(data.listener)
 		end
 
-		function lamba_callback(event)
+		local function lamba_callback(event)
 			event.ladder = data.ladder
 			event.drop = data.drop
 			otstd.floorchange.callback(event)

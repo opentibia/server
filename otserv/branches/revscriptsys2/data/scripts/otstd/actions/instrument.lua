@@ -108,7 +108,7 @@ function otstd.instrument.registerHandlers()
 			stopListener(data.listener)
 		end
 
-		function lamba_callback(event)
+		local function lamba_callback(event)
 			event.instrument = data
 			otstd.instrument.handler(event)
 		end

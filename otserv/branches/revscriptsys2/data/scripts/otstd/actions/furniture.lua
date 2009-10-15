@@ -207,7 +207,7 @@ function otstd.furniture.registerKitHandlers()
 			stopListener(data.listener)
 		end
 		
-		function lamba_callback(event)
+		local function lamba_callback(event)
 			event.kit = data
 			otstd.furniture.kit_handler(event)
 		end

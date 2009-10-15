@@ -120,7 +120,7 @@ function otstd.food.registerHandlers()
 			stopListener(data.listener)
 		end
 		
-		function lamba_callback(event)
+		local function lamba_callback(event)
 			event.food = data
 			otstd.food.handler(event)
 		end

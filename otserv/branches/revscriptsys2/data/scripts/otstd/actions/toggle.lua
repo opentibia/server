@@ -164,7 +164,7 @@ function otstd.toggle.registerHandlers()
 			stopListener(data.listener)
 		end
 
-		function lamba_callback(event)
+		local function lamba_callback(event)
 			event.toggle = data
 			otstd.toggle.handler(event)
 		end
