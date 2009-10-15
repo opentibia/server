@@ -128,7 +128,14 @@ function otstd.fishing.handler(event)
 				event.hasFish = false
 			end
 			
-			if event.rod.handler and event.rod.handler(event) or otstd.fishing.standardRodHandler(event) then
+			local caught = false
+			if event.rod.handler then
+				caught = event.rod.handler(event)
+			else
+				caught = otstd.fishing.standardRodHandler(event)
+			end
+			
+			if caught then
 				player:advanceSkill(SKILL_FISH, 2)
 				player:removeItem(event.rod.bait, -1, 1)
 			
