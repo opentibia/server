@@ -2873,9 +2873,10 @@ void Npc::removeShopPlayer(const Player* player)
 
 void Npc::closeAllShopWindows()
 {
-	ShopPlayerList closeList = shopPlayerList;
-	for(ShopPlayerList::iterator it = closeList.begin(); it != closeList.end(); ++it){
-		(*it)->closeShopWindow();
+	for(ShopPlayerList::iterator it = shopPlayerList.begin(); it != shopPlayerList.end();){
+		Player* player = *(it);
+		it = shopPlayerList.erase(it);
+		player->closeShopWindow();
 	}
 }
 
