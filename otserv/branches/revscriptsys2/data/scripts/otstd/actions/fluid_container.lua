@@ -72,8 +72,7 @@ function Player:drink(item)
 		error("Can not drink non-fluid item " .. item:getItemID())
 	end
 
-	local fluidType = FluidType(item:getSubtype())
-	
+	local fluidType = FluidType(item:getSubtype())	
 	if not fluidType then
 		error("Could not drink fluid of subtype " .. item:getSubtype() .. " this fluid does not exist.")
 	end
@@ -84,7 +83,6 @@ function Player:drink(item)
 	end
 	
 	local fluid = otstd.fluids[fluidType]
-
 	if fluid then
 		if fluid.effect then
 			sendMagicEffect(self:getPosition(), fluid.effect)
@@ -119,7 +117,7 @@ function otstd.fluid_container.createSplash(event)
 		return
 	end
 	
-	event.retval = RETURNVALUE_NOTENOUGHROOM
+	event.retval = RET_NOTENOUGHROOM
 end
 
 function otstd.fluid_container.callback(event)
@@ -133,8 +131,7 @@ function otstd.fluid_container.callback(event)
 		return
 	end
 
-	local fluidType = FluidType(item:getSubtype())
-	
+	local fluidType = FluidType(item:getSubtype())	
 	if not fluidType then
 		-- Fluid container in invalid state
 		return
@@ -176,7 +173,7 @@ function otstd.fluid_container.callback(event)
 			end
 		end
 		
-		event.retcode = RETURNVALUE_NOTPOSSIBLE
+		event.retcode = RET_NOTPOSSIBLE
 	end
 end
 

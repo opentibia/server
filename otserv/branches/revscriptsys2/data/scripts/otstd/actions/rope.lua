@@ -50,7 +50,7 @@ function otstd.rope.callback(event)
 		end
 	end
 	
-	event.retval = RETURNVALUE_NOTPOSSIBLE
+	event.retval = RET_NOTPOSSIBLE
 end
 
 function otstd.rope.registerHandlers()

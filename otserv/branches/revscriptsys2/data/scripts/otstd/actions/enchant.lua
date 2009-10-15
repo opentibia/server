@@ -19,11 +19,21 @@ otstd.enchant.shrines = {
 		[7512] = {ENCHANT_ENERGY}, [7513] = {ENCHANT_ENERGY}, [7514] = {ENCHANT_ENERGY}, [7515] = {ENCHANT_ENERGY}
 	}
 	
+
 otstd.enchant.enchantable_gems = {
 		[2146] = {newid = ENCHANT_ICE},
 		[2147] = {newid = ENCHANT_FIRE},
 		[2149] = {newid = ENCHANT_EARTH},
 		[2150] = {newid = ENCHANT_ENERGY}
+	}
+	
+otstd.enchant.disenchant_tools = {
+		[5942] = {}
+	}
+
+otstd.enchant.disenchantable_items = {
+		[2956] = {newid = 2957, dust = 5905, chance = 8},
+		[2916] = {newid = 2917, dust = 5906, chance = 8}
 	}
 	
 otstd.enchant.enchantable_weapons = {
@@ -52,26 +62,26 @@ otstd.enchant.enchantable_weapons = {
 	
 function otstd.enchant.weapon_callback(event)
 	local player = event.player
-	local enchanted_gem = event.item
+	local enchantedItem = event.item
 	local toPos = event.targetPosition
 	local tile = toPos and map:getTile(toPos)
 	
-	local weapon = event.targetInventoryItem or tile:getTopThing()
-	if(weapon) then			
-		local weapondata = otstd.enchant.enchantable_weapons[weapon:getItemID()];
-		if(weapondata) then
+	local weaponItem = event.targetInventoryItem or tile:getTopThing()
+	if(weaponItem) then
+		local weapondata = otstd.enchant.enchantable_weapons[weaponItem:getItemID()];
+		if weapondata then
 			if weapondata.handler then
-				event.weapon = weapon
+				event.weapon = weaponItem
 				weapondata.handler(event)
 			else
-				local charges = weapondata.charges or -1
-				local newid = weapondata.enchants[enchanted_gem:getItemID()]
+				local charges = weapon.charges or -1
+				local newid = weapondata.enchants[enchantedItem:getItemID()]
 				if not newid then
 					return
 				end
 
-				weapon:setItemID(newid, charges)
-				enchanted_gem:destroy()
+				weaponItem:setItemID(newid, charges)
+				enchantedItem:destroy()
 
 				event.retcode = RETURNVALUE_NOERROR
 				event:skip()
@@ -116,19 +126,53 @@ end
 
 function otstd.enchant.gem_handler(event)
 	local player = event.player
-	local gem = event.item
+	local item = event.item
+	
+	local shrineItem = tile:getTopThing()
+	if(shrineItem) then			
+		local shrinedata = otstd.enchant.shrines[shrineItem:getItemID()];
+		if shrinedata then
+			if shrinedata.handler then
+				event.shrine = shrineItem
+				shrinedata.handler(event)
+			else
+				player:enchantGem(item, event.newid)
+				event.retcode = RETURNVALUE_NOERROR
+				event:skip()
+			end
+		end
+
+	end
+end
+
+function otstd.enchant.disenchant_handler(event)
+	local player = event.player
+	local disenchant_tool = event.item
 	local toPos = event.targetPosition
 	local tile = toPos and map:getTile(toPos)
 	
-	local shrine = tile:getTopThing()
-	if(shrine) then			
-		local shrinedata = otstd.enchant.shrines[shrine:getItemID()];
-		if(shrinedata) then
-			if shrinedata.handler then
-				event.shrine = shrine
-				shrinedata.handler(event)
+	local disenchantItem = event.targetInventoryItem or tile:getTopThing()
+	if(disenchantItem) then			
+		local tooldata = otstd.enchant.disenchantable_items[disenchantItem:getItemID()];
+		if(tooldata) then
+			if tooldata.handler then
+				event.newid = tooldata.newid
+				tooldata.handler(event)
 			else
-				player:enchantGem(gem, event.newid)
+				local chance = tooldata.chance
+				local newid = tooldata.newid
+				
+				if chance >= math.random(1, 100) then
+					local dustid = tooldata.dust
+					local dust = createItem(dustid)
+					player:addItem(dust)
+					sendMagicEffect(disenchantItem:getPosition(), MAGIC_EFFECT_STUN)
+				else
+					sendMagicEffect(disenchantItem:getPosition(), MAGIC_EFFECT_BLOCKHIT)
+				end
+
+				disenchantItem:setItemID(newid)
+					
 				event.retcode = RETURNVALUE_NOERROR
 				event:skip()
 			end
@@ -158,6 +202,19 @@ function otstd.enchant.registerHandlers()
 
 		data.listener =
 			registerOnUseItemNearby("itemid", id, otstd.enchant.weapon_callback)
+	end
+
+	for id, data in pairs(otstd.enchant.disenchant_tools) do
+		if data.listener ~= nil then
+			stopListener(data.listener)
+		end
+
+		local function lamba_callback(event)
+			event.newid = data.newid
+			otstd.enchant.disenchant_handler(event)
+		end
+		data.listener =
+			registerOnUseItemNearby("itemid", id, lamba_callback)
 	end
 end
 

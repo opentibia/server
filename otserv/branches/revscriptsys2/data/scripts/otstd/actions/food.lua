@@ -105,11 +105,7 @@ function otstd.food.handler(event)
 	
 	--player:addFood(v.amount)
 	sendAnimatedText(player:getPosition(), TEXTCOLOR_ORANGE:value(), event.food.text)
-	if item:getCount() > 1 then
-		item:setCount(item:getCount() - 1)
-	else
-		item:destroy()
-	end
+	item:removeCount(1)
 	
 	event:skip()
 end

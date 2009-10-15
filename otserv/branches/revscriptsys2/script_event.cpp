@@ -381,7 +381,8 @@ void OnUseItem::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "player");
 	state.pushThing(item);
 	state.setField(-2, "item");
-	state.setField(-1, "retval", retval);
+	state.pushEnum(retval);
+	state.setField(-2, "retval");
 	if(targetPos) {
 		state.pushPosition(*targetPos);
 	} else {
@@ -395,8 +396,8 @@ void OnUseItem::Event::push_instance(LuaState& state, Environment& environment)
 void OnUseItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
 	thread->getField(-1, "retval");
-	if(thread->isNumber()) {
-		retval = (ReturnValue)thread->popInteger();
+	if(thread->isTable()) {
+		retval = thread->popEnum<ReturnValue>();
 	}
 	else {
 		thread->HandleError(ERROR_WARN, "Event 'OnUseItem' invalid value of 'retval'");

@@ -14,7 +14,7 @@ function registerOnUseItemNearby(method, filter, callback)
 			if math.abs(evt.targetPosition.x - ppos.x) <= 1 and math.abs(evt.targetPosition.y - ppos.y) <= 1 and evt.targetPosition.z - ppos.z then
 				callback(evt)
 			else
-				evt.retval = RETURNVALUE_TOOFARAWAY
+				evt.retval = RET_TOOFARAWAY
 				evt:skip()
 			end
 		else

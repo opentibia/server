@@ -9,7 +9,7 @@ function otstd.shovel.callback(event)
 	local toPos = event.targetPosition
 	local tile = toPos and map:getTile(toPos)
 	if not tile then
-		event.retval = RETURNVALUE_NOTPOSSIBLE
+		event.retval = RET_NOTPOSSIBLE
 		return
 	end
 

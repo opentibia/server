@@ -1,5 +1,17 @@
 
 
+function Item:removeCount(count)
+	if count <= 0 then
+		return
+	end
+	
+	if self:getCount() > count then
+		self:setCount(self:getCount() - count)
+	else
+		self:destroy()
+	end
+end
+
 function Item:setRawAttribute(key, value)
 	if type(value) == "string" or type(value) == "number" then
 		return self:setAttribute(value)
