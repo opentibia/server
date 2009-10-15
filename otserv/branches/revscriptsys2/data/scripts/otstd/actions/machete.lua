@@ -44,17 +44,17 @@ function otstd.machete.callback(event)
 	if useabledata.handler then
 		event.targetItem = toItem
 		useabledata.handler(event)
-	end
-
-	local newid = useabledata.newid
-	if not newid then
-		toItem:destroy()
 	else
-		toItem:setItemID(newid)
-		toItem:startDecaying()
-	end
+		local newid = useabledata.newid
+		if not newid then
+			toItem:destroy()
+		else
+			toItem:setItemID(newid)
+			toItem:startDecaying()
+		end
 
-	event:skip()
+		event:skip()
+	end
 end
 
 function otstd.machete.registerHandlers()
