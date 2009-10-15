@@ -1006,253 +1006,253 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 
 void Player::sendCancelMessage(ReturnValue message) const
 {
-	switch(message){
-	case RET_DESTINATIONOUTOFREACH:
+	switch(message.value()){
+	case enums::RET_DESTINATIONOUTOFREACH:
 		sendCancel("Destination is out of reach.");
 		break;
 
-	case RET_NOTMOVEABLE:
+	case enums::RET_NOTMOVEABLE:
 		sendCancel("You cannot move this object.");
 		break;
 
-	case RET_DROPTWOHANDEDITEM:
+	case enums::RET_DROPTWOHANDEDITEM:
 		sendCancel("Drop the double-handed object first.");
 		break;
 
-	case RET_BOTHHANDSNEEDTOBEFREE:
+	case enums::RET_BOTHHANDSNEEDTOBEFREE:
 		sendCancel("Both hands needs to be free.");
 		break;
 
-	case RET_CANNOTBEDRESSED:
+	case enums::RET_CANNOTBEDRESSED:
 		sendCancel("You cannot dress this object there.");
 		break;
 
-	case RET_PUTTHISOBJECTINYOURHAND:
+	case enums::RET_PUTTHISOBJECTINYOURHAND:
 		sendCancel("Put this object in your hand.");
 		break;
 
-	case RET_PUTTHISOBJECTINBOTHHANDS:
+	case enums::RET_PUTTHISOBJECTINBOTHHANDS:
 		sendCancel("Put this object in both hands.");
 		break;
 
-	case RET_CANONLYUSEONEWEAPON:
+	case enums::RET_CANONLYUSEONEWEAPON:
 		sendCancel("You may only use one weapon.");
 		break;
 
-	case RET_CANONLYUSEONESHIELD:
+	case enums::RET_CANONLYUSEONESHIELD:
 		sendCancel("You may only use one shield.");
 		break;
 
-	case RET_TOOFARAWAY:
+	case enums::RET_TOOFARAWAY:
 		sendCancel("Too far away.");
 		break;
 
-	case RET_FIRSTGODOWNSTAIRS:
+	case enums::RET_FIRSTGODOWNSTAIRS:
 		sendCancel("First go downstairs.");
 		break;
 
-	case RET_FIRSTGOUPSTAIRS:
+	case enums::RET_FIRSTGOUPSTAIRS:
 		sendCancel("First go upstairs.");
 		break;
 
-	case RET_NOTENOUGHCAPACITY:
+	case enums::RET_NOTENOUGHCAPACITY:
 		sendCancel("This object is too heavy.");
 		break;
 
-	case RET_CONTAINERNOTENOUGHROOM:
+	case enums::RET_CONTAINERNOTENOUGHROOM:
 		sendCancel("You cannot put more objects in this container.");
 		break;
 
-	case RET_NEEDEXCHANGE:
-	case RET_NOTENOUGHROOM:
+	case enums::RET_NEEDEXCHANGE:
+	case enums::RET_NOTENOUGHROOM:
 		sendCancel("There is not enough room.");
 		break;
 
-	case RET_CANNOTPICKUP:
+	case enums::RET_CANNOTPICKUP:
 		sendCancel("You cannot pickup this object.");
 		break;
 
-	case RET_CANNOTTHROW:
+	case enums::RET_CANNOTTHROW:
 		sendCancel("You cannot throw there.");
 		break;
 
-	case RET_THEREISNOWAY:
+	case enums::RET_THEREISNOWAY:
 		sendCancel("There is no way.");
 		break;
 
-	case RET_THISISIMPOSSIBLE:
+	case enums::RET_THISISIMPOSSIBLE:
 		sendCancel("This is impossible.");
 		break;
 
-	case RET_PLAYERISPZLOCKED:
+	case enums::RET_PLAYERISPZLOCKED:
 		sendCancel("You can not enter a protection zone after attacking another player.");
 		break;
 
-	case RET_PLAYERISNOTINVITED:
+	case enums::RET_PLAYERISNOTINVITED:
 		sendCancel("You are not invited.");
 		break;
 
-	case RET_CREATUREDOESNOTEXIST:
+	case enums::RET_CREATUREDOESNOTEXIST:
 		sendCancel("Creature does not exist.");
 		break;
 
-	case RET_DEPOTISFULL:
+	case enums::RET_DEPOTISFULL:
 		sendCancel("You cannot put more items in this depot.");
 		break;
 
-	case RET_CANNOTUSETHISOBJECT:
+	case enums::RET_CANNOTUSETHISOBJECT:
 		sendCancel("You can not use this object.");
 		break;
 
-	case RET_PLAYERWITHTHISNAMEISNOTONLINE:
+	case enums::RET_PLAYERWITHTHISNAMEISNOTONLINE:
 		sendCancel("A player with this name is not online.");
 		break;
 
-	case RET_NOTREQUIREDLEVELTOUSERUNE:
+	case enums::RET_NOTREQUIREDLEVELTOUSERUNE:
 		sendCancel("You do not have the required magic level to use this rune.");
 		break;
 
-	case RET_YOUAREALREADYTRADING:
+	case enums::RET_YOUAREALREADYTRADING:
 		sendCancel("You are already trading.");
 		break;
 
-	case RET_THISPLAYERISALREADYTRADING:
+	case enums::RET_THISPLAYERISALREADYTRADING:
 		sendCancel("This player is already trading.");
 		break;
 
-	case RET_YOUMAYNOTLOGOUTDURINGAFIGHT:
+	case enums::RET_YOUMAYNOTLOGOUTDURINGAFIGHT:
 		sendCancel("You may not logout during or immediately after a fight!");
 		break;
 
-	case RET_DIRECTPLAYERSHOOT:
+	case enums::RET_DIRECTPLAYERSHOOT:
 		sendCancel("You are not allowed to shoot directly on players.");
 		break;
 
-	case RET_NOTENOUGHLEVEL:
+	case enums::RET_NOTENOUGHLEVEL:
 		sendCancel("You do not have enough level.");
 		break;
 
-	case RET_NOTENOUGHMAGICLEVEL:
+	case enums::RET_NOTENOUGHMAGICLEVEL:
 		sendCancel("You do not have enough magic level.");
 		break;
 
-	case RET_NOTENOUGHMANA:
+	case enums::RET_NOTENOUGHMANA:
 		sendCancel("You do not have enough mana.");
 		break;
 
-	case RET_NOTENOUGHSOUL:
+	case enums::RET_NOTENOUGHSOUL:
 		sendCancel("You do not have enough soul");
 		break;
 
-	case RET_YOUAREEXHAUSTED:
+	case enums::RET_YOUAREEXHAUSTED:
 		sendCancel("You are exhausted.");
 		break;
 
-	case RET_CANONLYUSETHISRUNEONCREATURES:
+	case enums::RET_CANONLYUSETHISRUNEONCREATURES:
 		sendCancel("You can only use this rune on creatures.");
 		break;
 
-	case RET_PLAYERISNOTREACHABLE:
+	case enums::RET_PLAYERISNOTREACHABLE:
 		sendCancel("Player is not reachable.");
 		break;
 
-	case RET_CREATUREISNOTREACHABLE:
+	case enums::RET_CREATUREISNOTREACHABLE:
 		sendCancel("Creature is not reachable.");
 		break;
 
-	case RET_ACTIONNOTPERMITTEDINPROTECTIONZONE:
+	case enums::RET_ACTIONNOTPERMITTEDINPROTECTIONZONE:
 		sendCancel("This action is not permitted in a protection zone.");
 		break;
 
-	case RET_YOUMAYNOTATTACKTHISPERSON:
+	case enums::RET_YOUMAYNOTATTACKTHISPERSON:
 		sendCancel("You may not attack this person.");
 		break;
 
-	case RET_YOUMAYNOTATTACKTHISCREATURE:
+	case enums::RET_YOUMAYNOTATTACKTHISCREATURE:
 		sendCancel("You may not attack this creature.");
 		break;
 
-	case RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE:
+	case enums::RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE:
 		sendCancel("You may not attack a person in a protection zone.");
 		break;
 
-	case RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE:
+	case enums::RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE:
 		sendCancel("You may not attack a person while you are in a protection zone.");
 		break;
 
-	case RET_YOUCANONLYUSEITONCREATURES:
+	case enums::RET_YOUCANONLYUSEITONCREATURES:
 		sendCancel("You can only use it on creatures.");
 		break;
 
-	case RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS:
+	case enums::RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS:
 		sendCancel("Turn secure mode off if you really want to attack unmarked players.");
 		break;
 
-	case RET_YOUNEEDPREMIUMACCOUNT:
+	case enums::RET_YOUNEEDPREMIUMACCOUNT:
 		sendCancel("You need a premium account to use this spell.");
 		break;
 
-	case RET_YOUNEEDTOLEARNTHISSPELL:
+	case enums::RET_YOUNEEDTOLEARNTHISSPELL:
 		sendCancel("You need to learn this spell first.");
 		break;
 
-	case RET_YOURVOCATIONCANNOTUSETHISSPELL:
+	case enums::RET_YOURVOCATIONCANNOTUSETHISSPELL:
 		sendCancel("Your vocation cannot use this spell.");
 		break;
 
-	case RET_YOUNEEDAWEAPONTOUSETHISSPELL:
+	case enums::RET_YOUNEEDAWEAPONTOUSETHISSPELL:
 		sendCancel("You need to equip a weapon to use this spell.");
 		break;
 
-	case RET_PLAYERISPZLOCKEDLEAVEPVPZONE:
+	case enums::RET_PLAYERISPZLOCKEDLEAVEPVPZONE:
 		sendCancel("You can not leave a pvp zone after attacking another player.");
 		break;
 
-	case RET_PLAYERISPZLOCKEDENTERPVPZONE:
+	case enums::RET_PLAYERISPZLOCKEDENTERPVPZONE:
 		sendCancel("You can not enter a pvp zone after attacking another player.");
 		break;
 
-	case RET_ACTIONNOTPERMITTEDINANONPVPZONE:
+	case enums::RET_ACTIONNOTPERMITTEDINANONPVPZONE:
 		sendCancel("This action is not permitted in a non-pvp zone.");
 		break;
 
-	case RET_YOUCANNOTLOGOUTHERE:
+	case enums::RET_YOUCANNOTLOGOUTHERE:
 		sendCancel("You can not logout here.");
 		break;
 
-	case RET_YOUNEEDAMAGICITEMTOCASTSPELL:
+	case enums::RET_YOUNEEDAMAGICITEMTOCASTSPELL:
 		sendCancel("You need a magic item to cast this spell.");
 		break;
 
-	case RET_CANNOTCONJUREITEMHERE:
+	case enums::RET_CANNOTCONJUREITEMHERE:
 		sendCancel("You cannot conjure items here.");
 		break;
 
-	case RET_YOUNEEDTOSPLITYOURSPEARS:
+	case enums::RET_YOUNEEDTOSPLITYOURSPEARS:
 		sendCancel("You need to split your spears first.");
 		break;
 
-	case RET_NAMEISTOOAMBIGIOUS:
+	case enums::RET_NAMEISTOOAMBIGIOUS:
 		sendCancel("Name is too ambigious.");
 		break;
 
-	case RET_YOUARENOTTHEOWNER:
+	case enums::RET_YOUARENOTTHEOWNER:
 		sendCancel("You are not the owner.");
 		break;
 
-	case RET_NOTREQUIREDPROFESSION:
+	case enums::RET_NOTREQUIREDPROFESSION:
 		sendCancel("You don't have the required profession.");
 		break;
 
-	case RET_NOTREQUIREDLEVEL:
+	case enums::RET_NOTREQUIREDLEVEL:
 		sendCancel("You don't have the required level.");
 		break;
 
-	case RET_NEEDPREMIUMTOEQUIPITEM:
+	case enums::RET_NEEDPREMIUMTOEQUIPITEM:
 		sendCancel("You need a premium account to equip this item.");
 		break;
 
-	case RET_NOTPOSSIBLE:
+	case enums::RET_NOTPOSSIBLE:
 	default:
 		sendCancel("Sorry, not possible.");
 		break;

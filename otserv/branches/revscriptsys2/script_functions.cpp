@@ -101,12 +101,10 @@ void Manager::registerClasses() {
 	registerEnum<ZoneType>();
 	registerEnum<WorldType>();
 	registerEnum<Script::ListenerType>();
-
 	registerEnum<MechanicType>();
 	registerEnum<ConditionId>();
 	registerEnum<ConditionEnd>();
 	registerEnum<ConditionAttribute>();
-
 	registerEnum<PlayerFlag>();
 	registerEnum<MagicEffect>();
 	registerEnum<ShootEffect>();
@@ -120,6 +118,7 @@ void Manager::registerClasses() {
 	registerEnum<AmmunitionAction>();
 	registerEnum<WieldInformation>();
 	registerEnum<SkullType>();
+	registerEnum<ReturnValue>();
 
 	registerClass("Event");
 	registerClass("OnSayEvent", "Event");
@@ -297,7 +296,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "setMana(integer newval)", &Manager::lua_Player_setMana);
 	registerMemberFunction("Player", "addManaSpent(integer howmuch)", &Manager::lua_Player_addManaSpent);
 	registerMemberFunction("Player", "getSoulPoints()", &Manager::lua_Player_getSoulPoints);
-	registerMemberFunction("Player", "setSoulPoints()", &Manager::lua_Player_setSoulPoints);
+	registerMemberFunction("Player", "setSoulPoints(int newval)", &Manager::lua_Player_setSoulPoints);
 	registerMemberFunction("Player", "getFreeCap()", &Manager::lua_Player_getFreeCap);
 	registerMemberFunction("Player", "getMaximumCap()", &Manager::lua_Player_getMaximumCap);
 	registerMemberFunction("Player", "getSex()", &Manager::lua_Player_getSex);
@@ -327,7 +326,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "addMoney(int amount)", &Manager::lua_Player_addMoney);
 	registerMemberFunction("Player", "removeMoney(int amount)", &Manager::lua_Player_removeMoney);
 
-	registerMemberFunction("Player", "sendMessage(MessageClass type, string msg)", &Manager::lua_Player_sendMessage);
+	registerMemberFunction("Player", "sendMessage(MessageClass type, mixed msg)", &Manager::lua_Player_sendMessage);
 
 	registerGlobalFunction("getOnlinePlayers()", &Manager::lua_getOnlinePlayers);
 	registerGlobalFunction("getPlayerByName(string name)", &Manager::lua_getPlayerByName);
@@ -2689,7 +2688,7 @@ int LuaState::lua_Tile_queryAdd()
 	Thing* thing = popThing();
 	Tile* tile = popTile();
 
-	pushInteger(tile->__queryAdd(0, thing, 1, flags));
+	pushEnum(tile->__queryAdd(0, thing, 1, flags));
 	return 1;
 }
 
@@ -2697,7 +2696,7 @@ int LuaState::lua_Tile_addItem()
 {
 	Item* item = popItem(Script::ERROR_PASS);
 	if(item == NULL) {
-		pushInteger(RET_NOTPOSSIBLE);
+		pushEnum(RET_NOTPOSSIBLE);
 		pushBoolean(false);
 		return 2;
 	}
@@ -2709,7 +2708,7 @@ int LuaState::lua_Tile_addItem()
 	}
 
 	ReturnValue ret = g_game.internalAddItem(NULL, tile, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
-	pushInteger(ret);
+	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
 }
@@ -3928,11 +3927,21 @@ int LuaState::lua_Player_setTown()
 
 int LuaState::lua_Player_sendMessage()
 {
-	std::string text = popString();
-	MessageClass messageClass = popEnum<MessageClass>();
-	Player* player = popPlayer();
-
-	player->sendTextMessage(messageClass, text);
+	if(isString(-1)){
+		std::string text = popString();
+		MessageClass messageClass = popEnum<MessageClass>();
+		Player* player = popPlayer();
+		player->sendTextMessage(messageClass, text);
+	}
+	else if(isTable(-1)){
+		ReturnValue ret = popEnum<ReturnValue>();
+		MessageClass messageClass = popEnum<MessageClass>();
+		Player* player = popPlayer();
+		player->sendCancelMessage(ret);
+	}
+	else{
+		throw Error("msg must be either a string or ReturnValue (was " + typeName() + ").");
+	}
 	pushBoolean(true);
 	return 1;
 }
@@ -3943,7 +3952,7 @@ int LuaState::lua_Player_addItem()
 
 	Item* item = popItem(ERROR_PASS);
 	if(item == NULL) {
-		pushInteger(RET_NOTPOSSIBLE);
+		pushEnum(RET_NOTPOSSIBLE);
 		pushBoolean(false);
 		return 2;
 	}
@@ -3961,7 +3970,7 @@ int LuaState::lua_Player_addItem()
 	else{
 		ret = g_game.internalAddItem(NULL, player, item);
 	}
-	pushInteger(ret);
+	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
 }
@@ -4031,7 +4040,7 @@ int LuaState::lua_getPlayerByNameWildcard()
 	Player* p = NULL;
 	ReturnValue ret = g_game.getPlayerByNameWildcard(name, p);
 
-	pushInteger(ret);
+	pushEnum(ret);
 	pushThing(p);
 	return 2;
 }
@@ -4265,7 +4274,7 @@ int LuaState::lua_Container_addItem()
 {
 	Item* item = popItem(ERROR_PASS);
 	if(item == NULL) {
-		pushInteger(RET_NOTPOSSIBLE);
+		pushEnum(RET_NOTPOSSIBLE);
 		pushBoolean(false);
 		return 2;
 	}
@@ -4277,7 +4286,7 @@ int LuaState::lua_Container_addItem()
 	}
 
 	ReturnValue ret = g_game.internalAddItem(NULL, container, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
-	pushInteger(ret);
+	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
 }

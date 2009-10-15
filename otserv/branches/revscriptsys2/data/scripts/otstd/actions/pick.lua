@@ -1,11 +1,12 @@
 otstd.pick = {}
 
 otstd.pick_spots = {
-		[7200] = {callback =
+		[7200] = {handler =
 			-- fragile ice
-			function(event, toItem)
-				toItem:setItemID(7236)
-				sendMagicEffect(toItem:getPosition(), MAGIC_EFFECT_BLOCKHIT)
+			function(event)
+				local pick_spot = event.pick_spot
+				pick_spot:setItemID(7236)
+				sendMagicEffect(pick_spot:getPosition(), MAGIC_EFFECT_BLOCKHIT)
 			end
 			},
 	}
@@ -18,9 +19,10 @@ function otstd.pick.callback(event)
 	
 	local toItem = event.targetInventoryItem or tile:getTopThing()
 	if(toItem) then			
-		local v = otstd.pick_spots[toItem:getItemID()];
-		if(v and v.callback) then
-			v.callback(event, toItem)
+		local spot = otstd.pick_spots[toItem:getItemID()];
+		if(spot and spot.handler) then
+			spot.pick_spot = toItem
+			spot.handler(event)
 			event.retcode = RETURNVALUE_NOERROR
 			event:skip()
 		end
