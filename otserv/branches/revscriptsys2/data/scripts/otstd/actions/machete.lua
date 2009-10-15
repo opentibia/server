@@ -16,16 +16,6 @@ otstd.machete.useableItems = {
 		[7539] = {newid = 7545}
 	}
 
-function otstd.machete.standardKitHandler(event)
-	local item = event.item
-	local kit = event.kit
-
-	item:setItemID(kit.newid)
-	sendMagicEffect(item:getPosition(), MAGIC_EFFECT_BLOCKHIT)	
-	event:skip()
-	return true
-end
-
 function otstd.machete.callback(event)
 	local player = event.player
 	local item = event.item
