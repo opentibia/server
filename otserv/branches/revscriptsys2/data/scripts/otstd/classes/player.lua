@@ -23,6 +23,45 @@ function Player:sendAdvance(msg)
 	self:sendMessage(MSG_EVENT_ADVANCE, msg)
 end
 
+function Player:pickup(item)
+	assert(typeof(item, "Item"))
+	
+	local parent = item:getParent()
+	if not parent or not typeof(parent, "Tile") then
+		return false
+	end
+
+	local itemPos = item:getPosition()
+	local playerPos = self:getPosition()
+	
+	if(math.abs(itemPos.x - self:getPosition().x) <= 1 and
+		  math.abs(itemPos.y - self:getPosition().y) <= 1 and
+		  itemPos.z == self:getPosition().z) then
+		  return self:internalPickup(item)
+	end
+
+	return false
+end
+
+function Player:walkTo(toPos)
+	if not self:internalWalkTo(toPos) then
+		return false
+	end
+
+	while (math.abs(to.x - self:getPosition().x) > 1 or
+			math.abs(to.y - self:getPosition().y) > 1 or
+			to.z ~= self:getPosition().z) do
+
+		--if not #self or not self:isAutoWalking() then
+		if not #self then
+			return false
+		end
+
+		wait(1000)
+	end
+
+	return true
+end
 
 -- Fetch some data about the player
 

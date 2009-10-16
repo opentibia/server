@@ -27,14 +27,17 @@ function otstd.juice_squeezer.callback(event)
 	end
 	
 	local juicedata = otstd.juice_squeezer.mixable_fruits[fruit:getItemID()]
-	event:skip()
-
+	if not juicedata then
+		return
+	end
+	
 	local juicetype = juicedata.type or 21
 	if player:removeItem(2006, -1, 1) then
 		fruit:removeCount(1)
 		local vial = createItem(2006, juicetype)
 		player:addItem(vial)
 	end
+	event:skip()
 end
 
 function otstd.juice_squeezer.registerHandler()

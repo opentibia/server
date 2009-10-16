@@ -5,18 +5,40 @@ end
 
 
 -------------------------------------------------------------------------------
--- Wrapper for OnUseItem that will return toofaraway when the item is out of reach
+-- Wrapper for OnUseItem that will take care of moving to the item and if necessary pickup the item
 
 function registerOnUseItemNearby(method, filter, callback)
 	function onUseItemNearby(evt)
 		if evt.targetPosition then
-			local ppos = evt.player:getPosition()
-			if math.abs(evt.targetPosition.x - ppos.x) <= 1 and math.abs(evt.targetPosition.y - ppos.y) <= 1 and evt.targetPosition.z - ppos.z then
-				callback(evt)
-			else
-				evt.retval = RET_TOOFARAWAY
-				evt:skip()
+			local player = evt.player
+			local playerPos = player:getPosition()
+			local targetPos = evt.targetPosition
+			local useItem = evt.item
+			local useItemPos = useItem:getPosition()
+
+			local parent = useItem:getParent()
+			if parent and typeof(parent, "Tile") then
+			
+				if math.abs(useItemPos.x - playerPos.x) > 1 or math.abs(useItemPos.y - playerPos.y) > 1 then
+					evt.retval = RET_ITEMOUTORANGE
+					evt:skip()
+					return
+				end
+				
+				if math.abs(useItemPos.x - targetPos.x) > 1 or math.abs(useItemPos.y - targetPos.y) > 1 then
+					evt.retval = RET_NEEDTOPICKUPITEM
+					evt:skip()
+					return
+				end
 			end
+							
+			if math.abs(targetPos.x - playerPos.x) > 1 or math.abs(targetPos.y - playerPos.y) > 1 then
+				evt.retval = RET_NEEDTOMOVETOTARGET
+				evt:skip()
+				return
+			end
+			
+			callback(evt)
 		else
 			callback(evt)
 		end

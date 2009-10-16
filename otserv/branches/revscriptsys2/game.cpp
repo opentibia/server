@@ -448,44 +448,27 @@ void Game::proceduralRefresh(Map::TileMap::iterator* begin)
 		boost::bind(&Game::proceduralRefresh, this, begin)));
 }
 
-ReturnValue Game::canUse(const Player* player, const Position& pos)
+ReturnValue Game::canUseItem(const Player* player, const Position& pos, bool checkLineOfSight /*= false*/)
 {
-	const Position& playerPos = player->getPosition();
-
-	if(pos.x != 0xFFFF){
-		if(playerPos.z > pos.z){
-			return RET_FIRSTGOUPSTAIRS;
-		}
-		else if(playerPos.z < pos.z){
-			return RET_FIRSTGODOWNSTAIRS;
-		}
-		else if(!Position::areInRange<1,1,0>(playerPos, pos)){
-			return RET_TOOFARAWAY;
-		}
-	}
-
-	return RET_NOERROR;
-}
-
-ReturnValue Game::canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight)
-{
-	if(toPos.x == 0xFFFF){
+	if(pos.x == 0xFFFF){
 		return RET_NOERROR;
 	}
 
-	const Position& creaturePos = creature->getPosition();
-
-	if(creaturePos.z > toPos.z){
+	const Position& playerPos = player->getPosition();
+	if(playerPos.z > pos.z){
 		return RET_FIRSTGOUPSTAIRS;
 	}
-	else if(creaturePos.z < toPos.z){
+	else if(playerPos.z < pos.z){
 		return RET_FIRSTGODOWNSTAIRS;
 	}
-	else if(!Position::areInRange<7,5,0>(toPos, creaturePos)){
-		return RET_TOOFARAWAY;
+	else if(!Position::areInRange<7,5,0>(playerPos, pos)){
+		return RET_NOTPOSSIBLE;
+	}
+	else if(!Position::areInRange<1,1,0>(playerPos, pos)){
+		return RET_ITEMOUTORANGE;
 	}
 
-	if(checkLineOfSight && !canThrowObjectTo(creaturePos, toPos)){
+	if(checkLineOfSight && !canThrowObjectTo(playerPos, pos)){
 		return RET_CANNOTTHROW;
 	}
 
@@ -494,6 +477,11 @@ ReturnValue Game::canUseFar(const Creature* creature, const Position& toPos, boo
 
 ReturnValue Game::internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item, uint32_t creatureId)
 {
+	ReturnValue retval = canUseItem(player, pos);
+	if(retval != RET_NOERROR){
+		return retval;
+	}
+
 	if(Door* door = item->getDoor()){
 		if(!door->canUse(player)){
 			return RET_CANNOTUSETHISOBJECT;
@@ -507,7 +495,6 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos, uint8_t i
 		return RET_NOERROR;
 	}
 
-	ReturnValue retval = RET_NOERROR;
 	if(script_system){
 		Script::OnUseItem::Event evt(player, item, retval);
 		if(script_system->dispatchEvent(evt)) {
@@ -538,47 +525,14 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos, uint8_t i
 	return RET_CANNOTUSETHISOBJECT;
 }
 
-bool Game::useItem(Player* player, const Position& pos, uint8_t index,
-	Item* item, bool isHotkey)
-{
-	if(!player->canDoAction()){
-		return false;
-	}
-
-	player->stopWalk();
-
-	if(isHotkey){
-		int32_t subType = -1;
-		if(item->hasSubType() && !item->hasCharges()){
-			subType = item->getSubType();
-		}
-
-		const ItemType& it = Item::items[item->getID()];
-		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-
-		showUseHotkeyMessage(player, it, itemCount);
-	}
-	else{
-		ReturnValue ret = internalUseItem(player, pos, index, item, 0);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-	}
-
-	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
-	return true;
-}
-
 ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
 	Item* item, bool isHotkey, uint32_t creatureId)
 {
-	ReturnValue retval = RET_NOERROR;
+	ReturnValue retval = canUseItem(player, fromPosEx);
+	if(retval != RET_NOERROR){
+		return retval;
+	}
+
 	if(script_system){
 		if(toPosEx.x == 0xFFFF){
 			Item* toItem = internalGetItem(player, toPosEx, toPosEx.stackpos);
@@ -596,112 +550,6 @@ ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx,
 	}
 
 	return RET_CANNOTUSETHISOBJECT;
-}
-
-bool Game::useItemEx(Player* player, const Position& fromPos, uint16_t fromSpriteId, const Position& toPos,
-	uint8_t toStackPos, uint16_t toSpriteId, Item* item, bool isHotkey, uint32_t creatureId /* = 0*/)
-{
-	if(!player->canDoAction()){
-		return false;
-	}
-
-	player->stopWalk();
-
-	int32_t fromStackPos = item->getParent()->__getIndexOfThing(item);
-	PositionEx fromPosEx(fromPos, fromStackPos);
-	PositionEx toPosEx(toPos, toStackPos);
-
-	if(isHotkey){
-		int32_t subType = -1;
-		if(item->hasSubType() && !item->hasCharges()){
-			subType = item->getSubType();
-		}
-
-		const ItemType& it = Item::items[item->getID()];
-		uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
-		ReturnValue ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
-		showUseHotkeyMessage(player, it, itemCount);
-
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-	}
-	else{
-		ReturnValue ret = internalUseItemEx(player, fromPosEx, toPosEx, item, isHotkey, creatureId);
-
-		if(ret == RET_TOOFARAWAY) {
-			return useItemFarEx(player->getID(), fromPos, fromStackPos, fromSpriteId,
-				toPos, toStackPos, toSpriteId, isHotkey);
-		}
-		else if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-	}
-
-	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
-	return true;
-}
-
-bool Game::internalUseItemFarEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
-	const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey, uint32_t creatureId)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	Thing* thing = internalGetThing(player, fromPos, fromStackPos, fromSpriteId);
-	if(!thing){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		return false;
-	}
-
-	Item* item = thing->getItem();
-	if(!item || item->getClientID() != fromSpriteId || !item->isUseable()){
-		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-		return false;
-	}
-
-	Position itemPos = fromPos;
-	uint8_t itemStackPos = fromStackPos;
-
-	if(fromPos.x != 0xFFFF && toPos.x != 0xFFFF && Position::areInRange<1,1,0>(fromPos, player->getPosition()) &&
-		!Position::areInRange<1,1,0>(fromPos, toPos))
-	{
-		//need to pickup the item first
-		Item* moveItem = NULL;
-		ReturnValue ret = internalMoveItem(player, item->getParent(), player, INDEX_WHEREEVER,
-			item, item->getItemCount(), &moveItem);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-
-		//changing the position since its now in the inventory of the player
-		internalGetPosition(moveItem, itemPos, itemStackPos);
-	}
-
-	std::list<Direction> listDir;
-	if(getPathToEx(player, toPos, listDir, 0, 1, true, true)){
-		g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
-			this, playerId, listDir)));
-
-		SchedulerTask* task = NULL;
-		if(creatureId != 0) {
-			task = createSchedulerTask(400, boost::bind(&Game::playerUseBattleWindow, this,
-				playerId, fromPos, fromStackPos, creatureId, fromSpriteId, isHotkey));
-		} else {
-			task = createSchedulerTask(400, boost::bind(&Game::playerUseItemEx, this,
-				playerId, itemPos, itemStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
-		}
-		player->setNextWalkActionTask(task);
-		return true;
-	}
-	else{
-		player->sendCancelMessage(RET_THEREISNOWAY);
-		return false;
-	}
 }
 
 void Game::showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount)
@@ -2952,61 +2800,7 @@ bool Game::playerStopAutoWalk(uint32_t playerId)
 	return true;
 }
 
-bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	if(isHotkey && !g_config.getNumber(ConfigManager::HOTKEYS)){
-		return false;
-	}
-
-	Thing* thing = internalGetThing(player, fromPos, fromStackPos, fromSpriteId, STACKPOS_USEITEM);
-	if(!thing){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		return false;
-	}
-
-	Item* item = thing->getItem();
-	if(!item || !item->isUseable()){
-		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-		return false;
-	}
-
-	Position walkToPos = fromPos;
-	ReturnValue ret = canUse(player, fromPos);
-
-	if(ret != RET_NOERROR){
-		if(ret == RET_TOOFARAWAY){
-			return useItemFarEx(playerId, fromPos, fromStackPos, fromSpriteId,
-				toPos, toStackPos, toSpriteId, isHotkey);
-		}
-
-		player->sendCancelMessage(ret);
-		return false;
-	}
-
-	if(isHotkey){
-		showUseHotkeyMessage(player, item);
-	}
-
-	player->resetIdle();
-
-	if(!player->canDoAction()){
-		uint32_t delay = player->getNextActionTime();
-		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseItemEx, this,
-			playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
-		player->setNextActionTask(task);
-		return false;
-	}
-
-	player->setNextActionTask(NULL);
-
-	return useItemEx(player, fromPos, fromSpriteId, toPos, toStackPos, toSpriteId, item, isHotkey);
-}
-
-bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPos,
+bool Game::playerUseItem(uint32_t playerId, Position pos, uint8_t stackPos,
 	uint8_t index, uint16_t spriteId, bool isHotkey)
 {
 	Player* player = getPlayerByID(playerId);
@@ -3029,31 +2823,6 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-	ReturnValue ret = canUse(player, pos);
-	if(ret != RET_NOERROR){
-		if(ret == RET_TOOFARAWAY){
-			std::list<Direction> listDir;
-			if(getPathToEx(player, pos, listDir, 0, 1, true, true)){
-				g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
-					this, player->getID(), listDir)));
-
-				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseItem, this,
-					playerId, pos, stackPos, index, spriteId, isHotkey));
-				player->setNextWalkActionTask(task);
-				return true;
-			}
-
-			ret = RET_THEREISNOWAY;
-		}
-
-		player->sendCancelMessage(ret);
-		return false;
-	}
-
-	if(isHotkey){
-		showUseHotkeyMessage(player, item);
-	}
-
 	player->resetIdle();
 
 	if(!player->canDoAction()){
@@ -3065,12 +2834,134 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	}
 
 	player->setNextActionTask(NULL);
+	player->stopWalk();
 
-	useItem(player, pos, index, item, isHotkey);
+	ReturnValue ret = internalUseItem(player, pos, index, item, 0);
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
+
+	if(isHotkey){
+		showUseHotkeyMessage(player, item);
+	}
+
+	if(ret != RET_NOERROR){
+		if(ret == RET_ITEMOUTORANGE){
+			std::list<Direction> listDir;
+			if(getPathToEx(player, pos, listDir, 0, 1, true, true)){
+				g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
+					this, player->getID(), listDir)));
+
+				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseItem, this,
+					playerId, pos, stackPos, index, spriteId, isHotkey));
+				player->setNextWalkActionTask(task);
+				return true;
+			}
+
+			player->sendCancelMessage(RET_THEREISNOWAY);
+			return false;
+		}
+
+		player->sendCancelMessage(ret);
+		return false;
+	}
+
 	return true;
 }
 
-bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos,
+bool Game::playerUseItemEx(uint32_t playerId, Position fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
+	Position toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	if(isHotkey && !g_config.getNumber(ConfigManager::HOTKEYS)){
+		return false;
+	}
+
+	Thing* thing = internalGetThing(player, fromPos, fromStackPos, fromSpriteId, STACKPOS_USEITEM);
+	if(!thing){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		return false;
+	}
+
+	Item* item = thing->getItem();
+	if(!item || !item->isUseable()){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+
+	player->resetIdle();
+
+	if(!player->canDoAction()){
+		uint32_t delay = player->getNextActionTime();
+		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerUseItemEx, this,
+			playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
+		player->setNextActionTask(task);
+		return false;
+	}
+
+	player->setNextActionTask(NULL);
+	player->stopWalk();
+
+	ReturnValue ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(toPos, toStackPos), item, isHotkey, 0);
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
+
+	if(isHotkey){
+		showUseHotkeyMessage(player, item);
+	}
+
+	if(ret != RET_NOERROR){		
+		if(ret == RET_NEEDTOPICKUPITEM){
+			Item* moveItem = NULL;
+			ret = internalMoveItem(player, item->getParent(), player, INDEX_WHEREEVER,
+				item, item->getItemCount(), &moveItem);
+			if(ret == RET_NOERROR){
+				//changing the position since its now in the inventory of the player
+				internalGetPosition(moveItem, fromPos, fromStackPos);
+				ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(toPos, toStackPos), item, isHotkey, 0);
+			}
+		}
+
+		if(ret == RET_ITEMOUTORANGE){
+			std::list<Direction> listDir;
+			if(getPathToEx(player, fromPos, listDir, 0, 1, true, true)){
+				g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
+					this, player->getID(), listDir)));
+
+				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseItemEx, this,
+					playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
+				player->setNextWalkActionTask(task);
+				return true;
+			}
+
+			player->sendCancelMessage(RET_THEREISNOWAY);
+			return false;
+		}
+		
+		if(ret == RET_NEEDTOMOVETOTARGET){
+			std::list<Direction> listDir;
+			if(getPathToEx(player, toPos, listDir, 0, 1, true, true)){
+				g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
+					this, player->getID(), listDir)));
+
+				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseItemEx, this,
+					playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
+				player->setNextWalkActionTask(task);
+				return true;
+			}
+
+			player->sendCancelMessage(RET_THEREISNOWAY);
+			return false;
+		}
+
+		player->sendCancelMessage(ret);
+		return false;
+	}
+
+	return true;
+}
+
+bool Game::playerUseBattleWindow(uint32_t playerId, Position fromPos, uint8_t fromStackPos,
 	uint32_t creatureId, uint16_t spriteId, bool isHotkey)
 {
 	Player* player = getPlayerByID(playerId);
@@ -3105,21 +2996,6 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 		return false;
 	}
 
-	ReturnValue ret = canUse(player, fromPos);
-	if(ret != RET_NOERROR){
-		if(ret == RET_TOOFARAWAY){
-			return useItemFarEx(playerId, fromPos, fromStackPos, spriteId, item->getPosition(),
-				item->getParent()->__getIndexOfThing(item), isHotkey, creatureId);
-		}
-
-		player->sendCancelMessage(ret);
-		return false;
-	}
-
-	if(isHotkey){
-		showUseHotkeyMessage(player, item);
-	}
-
 	player->resetIdle();
 
 	if(!player->canDoAction()){
@@ -3131,8 +3007,48 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 	}
 
 	player->setNextActionTask(NULL);
+	player->stopWalk();
 
-	return useItemEx(player, fromPos, spriteId, creature->getPosition(), creature->getParent()->__getIndexOfThing(creature), 0, item, isHotkey, creatureId);
+	ReturnValue ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(creature->getPosition(), 0), item, isHotkey, creatureId);
+	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
+
+	if(isHotkey){
+		showUseHotkeyMessage(player, item);
+	}
+
+	if(ret != RET_NOERROR){		
+		if(ret == RET_NEEDTOPICKUPITEM){
+			Item* moveItem = NULL;
+			ret = internalMoveItem(player, item->getParent(), player, INDEX_WHEREEVER,
+				item, item->getItemCount(), &moveItem);
+			if(ret == RET_NOERROR){
+				//changing the position since its now in the inventory of the player
+				internalGetPosition(moveItem, fromPos, fromStackPos);
+				ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(creature->getPosition(), 0), item, isHotkey, creatureId);
+			}
+		}
+
+		if(ret == RET_ITEMOUTORANGE){
+			std::list<Direction> listDir;
+			if(getPathToEx(player, fromPos, listDir, 0, 1, true, true)){
+				g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
+					this, player->getID(), listDir)));
+
+				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseBattleWindow, this,
+			playerId, fromPos, fromStackPos, creatureId, spriteId, isHotkey));
+				player->setNextWalkActionTask(task);
+				return true;
+			}
+
+			player->sendCancelMessage(RET_THEREISNOWAY);
+			return false;
+		}
+
+		player->sendCancelMessage(ret);
+		return false;
+	}
+
+	return true;
 }
 
 bool Game::playerCloseContainer(uint32_t playerId, uint8_t cid)

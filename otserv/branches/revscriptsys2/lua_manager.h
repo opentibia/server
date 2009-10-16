@@ -488,6 +488,8 @@ public:
 	int lua_Player_addMoney();
 	int lua_Player_removeMoney();
 	int lua_Player_getItemCount();
+	int lua_Player_internalWalkTo();
+	int lua_Player_internalPickup();
 
 	int lua_Player_sendMessage();
 

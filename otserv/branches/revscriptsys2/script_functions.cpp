@@ -321,6 +321,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "setTown(Town town)", &Manager::lua_Player_setTown);
 	registerMemberFunction("Player", "setVocation(int vocationid)", &Manager::lua_Player_setVocation);
 	registerMemberFunction("Player", "hasGroupFlag(integer flag)", &Manager::lua_Player_hasGroupFlag);
+	registerMemberFunction("Player", "internalWalkTo(position pos)", &Manager::lua_Player_internalWalkTo);
+	registerMemberFunction("Player", "internalPickup(Item item)", &Manager::lua_Player_internalPickup);
 
 	registerMemberFunction("Player", "countMoney()", &Manager::lua_Player_countMoney);
 	registerMemberFunction("Player", "addMoney(int amount)", &Manager::lua_Player_addMoney);
@@ -3867,6 +3869,35 @@ int LuaState::lua_Player_getItemCount()
 	Player* player = popPlayer();
 	push(player->__getItemTypeCount(type));
 	return 1;
+}
+
+int LuaState::lua_Player_internalWalkTo()
+{
+	Position pos = popPosition();
+	Player* player = popPlayer();
+
+	std::list<Direction> listDir;
+	if(g_game.getPathToEx(player, pos, listDir, 0, 1, true, true)){
+		g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
+			&g_game, player->getID(), listDir)));
+
+		pushBoolean(true);
+		return 1;
+	}
+
+	pushBoolean(false);
+	return 1;
+}
+
+int LuaState::lua_Player_internalPickup()
+{
+	Item* item = popItem();
+	Player* player = popPlayer();
+
+	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), player, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
+	pushEnum(ret);
+	pushBoolean(ret == RET_NOERROR);
+	return 2;
 }
 
 int LuaState::lua_Player_countMoney()

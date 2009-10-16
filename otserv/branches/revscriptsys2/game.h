@@ -471,11 +471,11 @@ public:
 	bool playerReceivePing(uint32_t playerId);
 	bool playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(uint32_t playerId);
-	bool playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos,
-		uint16_t fromSpriteId, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey);
-	bool playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPos,
+	bool playerUseItem(uint32_t playerId, Position pos, uint8_t stackPos,
 		uint8_t index, uint16_t spriteId, bool isHotkey);
-	bool playerUseBattleWindow(uint32_t playerId, const Position& fromPos,
+	bool playerUseItemEx(uint32_t playerId, Position fromPos, uint8_t fromStackPos,
+		uint16_t fromSpriteId, Position toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey);
+	bool playerUseBattleWindow(uint32_t playerId, Position fromPos,
 		uint8_t fromStackPos, uint32_t creatureId, uint16_t spriteId, bool isHotkey);
 	bool playerCloseContainer(uint32_t playerId, uint8_t cid);
 	bool playerMoveUpContainer(uint32_t playerId, uint8_t cid);
@@ -610,29 +610,14 @@ public:
 	bool combatChangeMana(CombatSource combatSource, CombatEffect combatEffect,
 		Creature* target, int32_t manaChange);
 
-	// Action helper function
-public:
-	ReturnValue canUse(const Player* player, const Position& pos);
-	ReturnValue canUse(const Player* player, const Position& pos, const Item* item);
-	ReturnValue canUseFar(const Creature* creature, const Position& toPos, bool checkLineOfSight);
-
-	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey);
-	bool useItemEx(Player* player, const Position& fromPos, uint16_t fromSpriteId, const Position& toPos,
-		uint8_t toStackPos, uint16_t toSpriteId, Item* item, bool isHotkey, uint32_t creatureId = 0);
-
-	bool useItemFarEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
-		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey)
-	{return internalUseItemFarEx(playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey, 0);}
-	bool useItemFarEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
-		const Position& toPos, uint8_t toStackPos, bool isHotkey, uint32_t creatureId = 0)
-	{return internalUseItemFarEx(playerId, fromPos, fromStackPos, fromSpriteId, toPos, toStackPos, 0, isHotkey, creatureId);}
 protected:
-	bool internalUseItemFarEx(uint32_t playerId, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
-		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId, bool isHotkey, uint32_t creatureId);
+	// Action helper function
+	ReturnValue canUseItem(const Player* player, const Position& pos, bool checkLineOfSight = false);
 	ReturnValue internalUseItem(Player* player, const Position& pos,
 		uint8_t index, Item* item, uint32_t creatureId);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
 		Item* item, bool isHotkey, uint32_t creatureId);
+
 	bool openContainer(Player* player, Container* container, const uint8_t index);
 	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);
 

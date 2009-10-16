@@ -1043,10 +1043,6 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You may only use one shield.");
 		break;
 
-	case enums::RET_TOOFARAWAY:
-		sendCancel("Too far away.");
-		break;
-
 	case enums::RET_FIRSTGODOWNSTAIRS:
 		sendCancel("First go downstairs.");
 		break;
