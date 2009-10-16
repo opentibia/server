@@ -838,17 +838,23 @@ void LuaStateManager::runScheduledThreads()
 {
 	int64_t current_time = OTSYS_TIME();
 	while(queued_threads.empty() == false) {
+		//std::cout << "Running waiting threads... (" << queued_threads.size() << ")";
 		const ThreadSchedule& scheduled = queued_threads.top();
+		//std::cout << " next " << (scheduled.scheduled_time - current_time) << " ";
 		if(scheduled.scheduled_time < current_time) {
+			//std::cout << "RUN";
 			int32_t t = scheduled.thread->run(0);
 			if(t > 0) {
+				//std::cout << "Rescheudule " << t;
 				scheduleThread(t, scheduled.thread);
 			} else {
 				ThreadMap::iterator iter = threads.find(scheduled.thread->state);
 				threads.erase(iter);
 			}
 			queued_threads.pop();
+			//std::cout << "[Done]" << std::endl;
 		} else {
+			//std::cout << "[Done]" << std::endl;
 			break;
 		}
 	}

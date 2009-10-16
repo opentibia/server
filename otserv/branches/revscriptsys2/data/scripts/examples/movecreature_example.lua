@@ -17,6 +17,9 @@ function movecreature_example.move_callback(event)
 	local field = createItem(1488)
 	event.toTile:addItem(field)
 	field:startDecaying()
+	
+	wait(5000)
+	field:destroy()
 end
 
 function movecreature_example.stepIn_callback(event)

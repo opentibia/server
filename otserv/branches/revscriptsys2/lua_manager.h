@@ -680,7 +680,7 @@ public:
 		LuaThread_ptr thread;
 
 		bool operator<(const LuaStateManager::ThreadSchedule& rhs) const {
-			return scheduled_time < rhs.scheduled_time;
+			return scheduled_time > rhs.scheduled_time;
 		}
 	};
 protected:
