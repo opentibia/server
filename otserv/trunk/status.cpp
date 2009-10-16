@@ -157,7 +157,7 @@ std::string Status::getStatusString() const
 	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"tsqp", NULL);
 	root = doc->children;
 
-	addXMLProperty(p, "version", "1.0");
+	addXMLProperty(root, "version", "1.0");
 
 	// generic info
 	p = xmlNewNode(NULL, (const xmlChar*)"serverinfo");
