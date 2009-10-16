@@ -17,8 +17,8 @@ function SetItemAttribute.handler(event)
 		key = key:strip_whitespace()
 		value = value:strip_whitespace()
 		
+		event.creature:sendNote("Set " .. item:getName() .. " attribute \"" .. key .. "\" to \"" .. (value or "") .. "\".")
 		item:setAttribute(key, value)
-		event.creature:sendNote("Set attribute \"" .. key .. "\" to \"" .. (value or "") .. "\".")
 	end
 end
 
