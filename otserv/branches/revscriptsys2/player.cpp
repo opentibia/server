@@ -530,7 +530,7 @@ IconType Player::getIcons() const
 		icons |= ICON_PZBLOCK;
 	}
 
-	if(getTile()->getZone() == ZONE_PROTECTION){
+	if(getParentTile()->getZone() == ZONE_PROTECTION){
 		icons |= ICON_PZ;
 	}
 
@@ -572,7 +572,7 @@ void Player::sendUpdateTile(const Tile* tile, const Position& pos)
 void Player::sendCreatureAppear(const Creature* creature, const Position& pos)
 {
 	if(client)
-		client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfThing(this, creature));
+		client->sendAddCreature(creature, pos, creature->getParentTile()->getClientIndexOfThing(this, creature));
 }
 
 void Player::sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
@@ -592,7 +592,7 @@ void Player::sendCreatureMove(const Creature* creature, const Tile* newTile, con
 void Player::sendCreatureTurn(const Creature* creature)
 {
 	if(client)
-		client->sendCreatureTurn(creature, creature->getTile()->getClientIndexOfThing(this, creature));
+		client->sendCreatureTurn(creature, creature->getParentTile()->getClientIndexOfThing(this, creature));
 }
 
 void Player::sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text)
@@ -633,10 +633,10 @@ void Player::sendCreatureChangeVisible(const Creature* creature, bool visible)
 			}
 			else{
 				if(visible){
-					client->sendAddCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature));
+					client->sendAddCreature(creature, creature->getPosition(), creature->getParentTile()->getClientIndexOfThing(this, creature));
 				}
 				else{
-					client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature), false);
+					client->sendRemoveCreature(creature, creature->getPosition(), creature->getParentTile()->getClientIndexOfThing(this, creature), false);
 				}
 			}
 		}
@@ -4217,7 +4217,7 @@ bool Player::canLogout()
 		return false;
 	}
 
-	if(getTile()->hasFlag(TILEPROP_NOLOGOUT)){
+	if(getParentTile()->hasFlag(TILEPROP_NOLOGOUT)){
 		return false;
 	}
 
@@ -4313,7 +4313,7 @@ int32_t Player::getStaminaMinutes()
 void Player::checkIdleTime(uint32_t ticks)
 {
 	if(g_config.getNumber(ConfigManager::IDLE_TIME) > 0){
-		if(!getTile()->hasFlag(TILEPROP_NOLOGOUT) && !hasFlag(PlayerFlag_CanAlwaysLogin)){
+		if(!getParentTile()->hasFlag(TILEPROP_NOLOGOUT) && !hasFlag(PlayerFlag_CanAlwaysLogin)){
 			idleTime += ticks;
 			if(idleTime >= g_config.getNumber(ConfigManager::IDLE_TIME)){
 				kickPlayer();

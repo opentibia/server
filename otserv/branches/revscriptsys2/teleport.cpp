@@ -98,14 +98,14 @@ void Teleport::__addThing(Creature* actor, Thing* thing)
 
 void Teleport::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
-	Tile* destTile = g_game.getTile(getDestPos().x, getDestPos().y, getDestPos().z);
+	Tile* destTile = g_game.getParentTile(getDestPos().x, getDestPos().y, getDestPos().z);
 	if(destTile){
 		if(Creature* creature = thing->getCreature()){
-			getTile()->moveCreature(actor, creature, destTile, true);
+			getParentTile()->moveCreature(actor, creature, destTile, true);
 			g_game.addMagicEffect(destTile->getPosition(), MAGIC_EFFECT_TELEPORT);
 		}
 		else if(Item* item = thing->getItem()){
-			g_game.internalMoveItem(actor, getTile(), destTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
+			g_game.internalMoveItem(actor, getParentTile(), destTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 		}
 	}
 }

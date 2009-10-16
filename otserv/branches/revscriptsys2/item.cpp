@@ -245,7 +245,7 @@ void Item::setID(uint16_t newid)
 	}
 
 	if(getParent()){
-		if(Tile* tile = getParent()->getTile()){
+		if(Tile* tile = getParent()->getParentTile()){
 			tile->items_onItemModified(this);
 		}
 	}

@@ -531,7 +531,7 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
 	// Game/Map functions
-	registerGlobalFunction("getTile(int x, int y, int z)", &Manager::lua_getTile);
+	registerGlobalFunction("getParentTile(int x, int y, int z)", &Manager::lua_getTile);
 	registerGlobalFunction("sendMagicEffect(position where, MagicEffect type)", &Manager::lua_sendMagicEffect);
 	registerGlobalFunction("sendDistanceEffect([Creature c = nil], position from, position to, ShootEffect type)", &Manager::lua_sendDistanceEffect);
 	registerGlobalFunction("sendAnimatedText(position where, int color, string text)", &Manager::lua_sendAnimatedText);
@@ -2461,7 +2461,7 @@ int LuaState::lua_Thing_getZ()
 int LuaState::lua_Thing_getParentTile()
 {
 	Thing* thing = popThing();
-	pushTile(thing->getTile());
+	pushTile(thing->getParentTile());
 	return 1;
 }
 
@@ -2475,7 +2475,7 @@ int LuaState::lua_Thing_getParent()
 		} else if(parent->getCreature()){
 			pushThing(parent->getCreature());
 		}
-		else if(parent->getTile()) {
+		else if(parent->getParentTile()) {
 			pushTile(static_cast<Tile*>(parent));
 		}
 		else{
@@ -5822,7 +5822,7 @@ int LuaState::lua_getTile()
 	int32_t z = popInteger();
 	int32_t y = popInteger();
 	int32_t x = popInteger();
-	pushTile(g_game.getTile(x, y, z));
+	pushTile(g_game.getParentTile(x, y, z));
 	return 1;
 }
 
@@ -6022,12 +6022,12 @@ int LuaScriptInterface::luaDoRelocate()
 	PositionEx toPos = popPositionEx();
 	PositionEx fromPos = popPositionEx();
 
-	Tile* fromTile = g_game.getTile(fromPos.x, fromPos.y, fromPos.z);
+	Tile* fromTile = g_game.getParentTile(fromPos.x, fromPos.y, fromPos.z);
 	if(!fromTile){
 		throwLuaException(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
 	}
 
-	Tile* toTile = g_game.getTile(toPos.x, toPos.y, toPos.z);
+	Tile* toTile = g_game.getParentTile(toPos.x, toPos.y, toPos.z);
 	if(!toTile){
 		throwLuaException(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
 	}
@@ -6155,7 +6155,7 @@ int LuaScriptInterface::luaGetTileItemById()
 
 	PositionEx pos = popPosition();
 
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	Tile* tile = g_game.getParentTile(pos.x, pos.y, pos.z);
 	if(!tile){
 		pushThing(NULL);
 		return 1;
@@ -6185,7 +6185,7 @@ int LuaScriptInterface::luaGetTileItemByType()
 
 	PositionEx pos = popPosition();
 
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	Tile* tile = g_game.getParentTile(pos.x, pos.y, pos.z);
 	if(!tile){
 		pushThing(NULL);
 		return 1;
@@ -6213,7 +6213,7 @@ int LuaScriptInterface::luaGetTileThingByPos()
 
 	ScriptEnvironment* env = getScriptEnv();
 
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	Tile* tile = g_game.getParentTile(pos.x, pos.y, pos.z);
 	if(!tile){
 		if(pos.stackpos == -1){
 			pushInteger(-1);
@@ -6246,7 +6246,7 @@ int LuaScriptInterface::luaGetTopCreature()
 
 	PositionEx pos = popPositionEx();
 
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	Tile* tile = g_game.getParentTile(pos.x, pos.y, pos.z);
 	if(!tile){
 		pushThing(NULL);
 		return 1;
@@ -6279,7 +6279,7 @@ int LuaScriptInterface::luaDoCreateItem()
 
 	uint32_t itemId = popUnsignedInteger();
 
-	Tile* tile = g_game.getTile(pos);
+	Tile* tile = g_game.getParentTile(pos);
 	if(!tile){
 		tile = new Tile(pos);
 		g_game.getMap()->setTile(pos, newtile);
@@ -6348,7 +6348,7 @@ int LuaScriptInterface::luaGetTileHouseInfo()
 	//getTileHouseInfo(pos)
 	Position pos = popPosition();
 
-	Tile *tile = g_game.getMap()->getTile(pos);
+	Tile *tile = g_game.getMap()->getParentTile(pos);
 
 	if(HouseTile* houseTile = dynamic_cast<HouseTile*>(tile)){
 		House* house = houseTile->getHouse();

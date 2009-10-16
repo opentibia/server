@@ -138,7 +138,7 @@ void Combat::combatToArea(CombatSource& combatSource, CombatParams& params,
 			CreatureIterator cend = iter_tile->creatures_end();
 			for(cit = iter_tile->creatures_begin(); bContinue && cit != cend; ++cit){
 				if(params.targetCasterOrTopMost){
-					if(attacker && attacker->getTile() == iter_tile){
+					if(attacker && attacker->getParentTile() == iter_tile){
 						if(*cit == attacker){
 							bContinue = false;
 						}
@@ -211,11 +211,11 @@ bool Combat::defaultCombat(CombatSource& combatSource, CombatParams& params, Cre
 	if(params.itemId != 0){
 		Creature* attacker = combatSource.getSourceCreature();
 		if(spectators){
-			addTileItem(*spectators, attacker, target->getTile(), params);
+			addTileItem(*spectators, attacker, target->getParentTile(), params);
 		}
 		else{
-			const SpectatorVec& list = g_game.getSpectators(target->getTile()->getPosition());
-			addTileItem(list, attacker, target->getTile(), params);
+			const SpectatorVec& list = g_game.getSpectators(target->getParentTile()->getPosition());
+			addTileItem(list, attacker, target->getParentTile(), params);
 		}
 	}
 	return true;
@@ -336,7 +336,7 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 			targetPos.y >= 0 && targetPos.y < 0xFFFF &&
 			targetPos.z >= 0 && targetPos.z < MAP_MAX_LAYERS)
 	{
-		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
+		Tile* tile = g_game.getParentTile(targetPos.x, targetPos.y, targetPos.z);
 		if(!tile){
 			// These tiles will never have anything on them
 			tile = new StaticTile(targetPos.x, targetPos.y, targetPos.z);
@@ -533,7 +533,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 
 		if(attacker->getPlayer() || attacker->isPlayerSummon()){
 			//nopvp-zone
-			if(target->getPlayer() && target->getTile()->hasFlag(TILEPROP_NOPVPZONE)){
+			if(target->getPlayer() && target->getParentTile()->hasFlag(TILEPROP_NOPVPZONE)){
 				return RET_ACTIONNOTPERMITTEDINANONPVPZONE;
 			}
 
@@ -647,7 +647,7 @@ CombatArea::CombatArea(const CombatArea& rhs)
 
 bool CombatArea::getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const
 {
-	Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
+	Tile* tile = g_game.getParentTile(targetPos.x, targetPos.y, targetPos.z);
 
 	const MatrixArea* area = getArea(centerPos, targetPos);
 	if(!area){
@@ -676,7 +676,7 @@ bool CombatArea::getList(const Position& centerPos, const Position& targetPos, s
 					tmpPosZ >= 0 && tmpPosZ < MAP_MAX_LAYERS)
 				{
 					if(g_game.isSightClear(targetPos, Position(tmpPosX, tmpPosY, tmpPosZ), true)){
-						tile = g_game.getTile(tmpPosX, tmpPosY, tmpPosZ);
+						tile = g_game.getParentTile(tmpPosX, tmpPosY, tmpPosZ);
 						if(!tile){
 							// This tile will never have anything on it
 							tile = new StaticTile(tmpPosX, tmpPosY, tmpPosZ);

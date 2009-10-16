@@ -344,8 +344,8 @@ public:
 	virtual void setParent(Cylinder* cylinder);
 
 	virtual Position getPosition() const;
-	virtual Tile* getTile(){return _tile;}
-	virtual const Tile* getTile() const{return _tile;}
+	virtual Tile* getParentTile(){return _tile;}
+	virtual const Tile* getParentTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;
 
 	static bool canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY);

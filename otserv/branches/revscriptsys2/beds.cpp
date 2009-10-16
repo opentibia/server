@@ -105,7 +105,7 @@ BedItem* BedItem::getNextBedItem()
 		default: break;
 	}
 
-	Tile* tile = g_game.getMap()->getTile(targetPos);
+	Tile* tile = g_game.getMap()->getParentTile(targetPos);
 	if(tile != NULL) {
 		return tile->getBedItem();
 	}
@@ -165,7 +165,7 @@ void BedItem::sleep(Player* player)
 		Beds::instance().setBedSleeper(this, player->getGUID());
 
 		// make the player walk onto the bed and kick him
-		player->getTile()->moveCreature(NULL, player, getTile());
+		player->getParentTile()->moveCreature(NULL, player, getParentTile());
 		g_scheduler.addEvent(createSchedulerTask(SCHEDULER_MINTICKS, boost::bind(&Game::kickPlayer, &g_game, player->getID())));
 
 		// change self and partner's appearance

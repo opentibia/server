@@ -19,7 +19,9 @@ function movecreature_example.move_callback(event)
 	field:startDecaying()
 	
 	wait(5000)
-	field:destroy()
+	if #field then
+		field:destroy()
+	end
 end
 
 function movecreature_example.stepIn_callback(event)

@@ -110,8 +110,14 @@ int Manager::luaGetClassInstanceID(lua_State* L)
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(L, -1);
 	lua_pop(L, 1);
 
-	if(objid)
-		lua_pushnumber(L, (double)*objid);
+	if(objid){
+		Manager* manager = (Manager*)lua_touserdata(L, lua_upvalueindex(1));
+		if(manager->environment->getObject(*objid)){
+			lua_pushnumber(L, (double)*objid);
+		}
+		else
+			lua_pushnil(L);
+	}
 	else
 		lua_pushnil(L);
 

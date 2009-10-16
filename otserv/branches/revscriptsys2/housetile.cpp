@@ -58,7 +58,7 @@ void HouseTile::__internalAddThing(uint32_t index, Thing* thing)
 
 void HouseTile::updateHouse(Item* item)
 {
-	if(item->getTile() == this){
+	if(item->getParentTile() == this){
 		Door* door = item->getDoor();
 		if(door && door->getDoorId() != 0){
 			house->addDoor(door);
@@ -101,7 +101,7 @@ Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item
 		if(const Player* player = creature->getPlayer()){
 			if(!house->isInvited(player)){
 				const Position& entryPos = house->getEntryPosition();
-				Tile* destTile = g_game.getTile(entryPos.x, entryPos.y, entryPos.z);
+				Tile* destTile = g_game.getParentTile(entryPos.x, entryPos.y, entryPos.z);
 				
 				if(!destTile){
 #ifdef __DEBUG__
@@ -113,7 +113,7 @@ Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item
 						<< " - Tile not found: " << entryPos << std::endl;
 					
 					const Position& templePos = player->getTemplePosition();
-					destTile = g_game.getTile(templePos.x, templePos.y, templePos.z);
+					destTile = g_game.getParentTile(templePos.x, templePos.y, templePos.z);
 					if(!destTile){
 						destTile = &(Tile::null_tile);
 					}

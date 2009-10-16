@@ -757,7 +757,7 @@ bool Game::openContainer(Player* player, Container* container, const uint8_t ind
 Cylinder* Game::internalGetCylinder(Player* player, const Position& pos)
 {
 	if(pos.x != 0xFFFF){
-		return getTile(pos.x, pos.y, pos.z);
+		return getParentTile(pos.x, pos.y, pos.z);
 	}
 	else{
 		//container
@@ -776,7 +776,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 	uint32_t spriteId /*= 0*/, stackPosType_t type /*= STACKPOS_NORMAL*/)
 {
 	if(pos.x != 0xFFFF){
-		Tile* tile = getTile(pos.x, pos.y, pos.z);
+		Tile* tile = getParentTile(pos.x, pos.y, pos.z);
 
 		if(tile){
 			/*look at*/
@@ -911,7 +911,7 @@ void Game::internalGetPosition(Item* item, Position& pos, uint8_t& stackpos)
 				stackpos = pos.y;
 			}
 		}
-		else if(Tile* tile = topParent->getTile()){
+		else if(Tile* tile = topParent->getParentTile()){
 			pos = tile->getPosition();
 			stackpos = tile->__getIndexOfThing(item);
 		}
@@ -923,14 +923,14 @@ void Game::setTile(Tile* newtile)
 	return map->setTile(newtile->getPosition(), newtile);
 }
 
-Tile* Game::getTile(int32_t x, int32_t y, int32_t z)
+Tile* Game::getParentTile(int32_t x, int32_t y, int32_t z)
 {
-	return map->getTile(x, y, z);
+	return map->getParentTile(x, y, z);
 }
 
-Tile* Game::getTile(const Position& pos)
+Tile* Game::getParentTile(const Position& pos)
 {
-	return map->getTile(pos);
+	return map->getParentTile(pos);
 }
 
 QTreeLeafNode* Game::getLeaf(uint32_t x, uint32_t y)
@@ -1243,7 +1243,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	if(creature->isRemoved())
 		return false;
 
-	Tile* tile = creature->getTile();
+	Tile* tile = creature->getParentTile();
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -1383,7 +1383,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 		}
 	}
 
-	Tile* toTile = getTile(toPos);
+	Tile* toTile = getParentTile(toPos);
 	const Position& movingCreaturePos = movingCreature->getPosition();
 
 	if(!toTile){
@@ -1415,7 +1415,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 		}
 	}
 
-	ReturnValue ret = internalMoveCreature(player, movingCreature, movingCreature->getTile(), toTile);
+	ReturnValue ret = internalMoveCreature(player, movingCreature, movingCreature->getParentTile(), toTile);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
@@ -1580,7 +1580,7 @@ bool Game::onCreatureDeath(Creature* creature, Item* corpse, Creature* killer)
 
 ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Direction direction, uint32_t flags /*= 0*/)
 {
-	Cylinder* fromTile = creature->getTile();
+	Cylinder* fromTile = creature->getParentTile();
 	Cylinder* toTile = NULL;
 
 	const Position& currentPos = creature->getPosition();
@@ -1631,10 +1631,10 @@ ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Dire
 
 	if(creature->getPlayer() && canChangeFloor){
 		//try go up
-		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
-			Tile* tmpTile = getTile(currentPos.x, currentPos.y, currentPos.z - 1);
+		if(currentPos.z != 8 && creature->getParentTile()->hasHeight(3)){
+			Tile* tmpTile = getParentTile(currentPos.x, currentPos.y, currentPos.z - 1);
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->blockSolid())){
-				tmpTile = getTile(destPos.x, destPos.y, destPos.z - 1);
+				tmpTile = getParentTile(destPos.x, destPos.y, destPos.z - 1);
 				if(tmpTile && tmpTile->ground && !tmpTile->blockSolid()){
 					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
 					destPos.z -= 1;
@@ -1643,9 +1643,9 @@ ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Dire
 		}
 		else{
 			//try go down
-			Tile* tmpTile = getTile(destPos);
+			Tile* tmpTile = getParentTile(destPos);
 			if(currentPos.z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->blockSolid()))){
-				tmpTile = getTile(destPos.x, destPos.y, destPos.z + 1);
+				tmpTile = getParentTile(destPos.x, destPos.y, destPos.z + 1);
 
 				if(tmpTile && tmpTile->hasHeight(3)){
 					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
@@ -1655,7 +1655,7 @@ ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Dire
 		}
 	}
 
-	toTile = getTile(destPos);
+	toTile = getParentTile(destPos);
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
 	if(toTile != NULL){
@@ -1681,7 +1681,7 @@ ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature,
 		return ret;
 	}
 
-	fromCylinder->getTile()->moveCreature(actor, creature, toCylinder);
+	fromCylinder->getParentTile()->moveCreature(actor, creature, toCylinder);
 
 	if(creature->getParent() == toCylinder){
 		int32_t index = 0;
@@ -1690,7 +1690,7 @@ ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature,
 
 		uint32_t n = 0;
 		while((subCylinder = toCylinder->__queryDestination(index, creature, &toItem, flags)) != toCylinder){
-			toCylinder->getTile()->moveCreature(actor, creature, subCylinder);
+			toCylinder->getParentTile()->moveCreature(actor, creature, subCylinder);
 			toCylinder = subCylinder;
 			flags = 0;
 
@@ -1765,8 +1765,8 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	}
 
 	const Position& playerPos = player->getPosition();
-	const Position& mapFromPos = fromCylinder->getTile()->getPosition();
-	const Position& mapToPos = toCylinder->getTile()->getPosition();
+	const Position& mapFromPos = fromCylinder->getParentTile()->getPosition();
+	const Position& mapToPos = toCylinder->getParentTile()->getPosition();
 
 	if(playerPos.z > mapFromPos.z){
 		player->sendCancelMessage(RET_FIRSTGOUPSTAIRS);
@@ -1797,17 +1797,17 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	}
 
 	//hangable item specific code
-	Tile* toTile = toCylinder->getTile();
+	Tile* toTile = toCylinder->getParentTile();
 	if(item->isHangable() && (toTile->isVertical() || toTile->isHorizontal())){
 		//destination supports hangable objects so need to move there first
 
-		if(toCylinder->getTile()->isVertical()){
+		if(toCylinder->getParentTile()->isVertical()){
 			if(player->getPosition().x + 1 == mapToPos.x){
 				player->sendCancelMessage(RET_NOTPOSSIBLE);
 				return false;
 			}
 		}
-		else if(toCylinder->getTile()->isHorizontal()){
+		else if(toCylinder->getParentTile()->isHorizontal()){
 			if(player->getPosition().y + 1 == mapToPos.y){
 				player->sendCancelMessage(RET_NOTPOSSIBLE);
 				return false;
@@ -1816,11 +1816,11 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 
 		if(!Position::areInRange<1,1,0>(playerPos, mapToPos)){
 			Position walkPos = mapToPos;
-			if(toCylinder->getTile()->isVertical()){
+			if(toCylinder->getParentTile()->isVertical()){
 				walkPos.x -= -1;
 			}
 
-			if(toCylinder->getTile()->isHorizontal()){
+			if(toCylinder->getParentTile()->isHorizontal()){
 				walkPos.y -= -1;
 			}
 
@@ -2160,7 +2160,7 @@ ReturnValue Game::internalPlayerAddItem(Player* player, Item* item, bool dropOnM
 	ReturnValue ret = internalAddItem(NULL, player, item);
 
 	if(ret != RET_NOERROR && dropOnMap){
-		ret = internalAddItem(NULL, player->getTile(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		ret = internalAddItem(NULL, player->getParentTile(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	}
 
 	return ret;
@@ -2454,7 +2454,7 @@ bool Game::addMoney(Creature* actor, Cylinder* cylinder, uint32_t money, uint32_
 
 				ReturnValue ret = internalAddItem(actor, cylinder, moneyItem, INDEX_WHEREEVER, flags);
 				if(ret != RET_NOERROR){
-					internalAddItem(actor, cylinder->getTile(), moneyItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+					internalAddItem(actor, cylinder->getParentTile(), moneyItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 				}
 
 				count -= moneyCount;
@@ -2606,7 +2606,7 @@ ReturnValue Game::internalTeleport(Creature* actor, Thing* thing, const Position
 	else if(thing->isRemoved())
 		return RET_NOTPOSSIBLE;
 
-	Tile* toTile = getTile(newPos.x, newPos.y, newPos.z);
+	Tile* toTile = getParentTile(newPos.x, newPos.y, newPos.z);
 	if(toTile){
 		if(Creature* creature = thing->getCreature()){
 			ReturnValue ret = toTile->__queryAdd(0, creature, 1, FLAG_NOLIMIT);
@@ -2614,7 +2614,7 @@ ReturnValue Game::internalTeleport(Creature* actor, Thing* thing, const Position
 				return ret;
 			}
 
-			creature->getTile()->moveCreature(actor, creature, toTile, true);
+			creature->getParentTile()->moveCreature(actor, creature, toTile, true);
 			return RET_NOERROR;
 		}
 		else if(Item* item = thing->getItem()){
@@ -3176,7 +3176,7 @@ bool Game::playerUpdateTile(uint32_t playerId, const Position& pos)
 		return false;
 
 	if(player->canSee(pos)){
-		Tile* tile = getTile(pos.x, pos.y, pos.z);
+		Tile* tile = getParentTile(pos.x, pos.y, pos.z);
 		player->sendUpdateTile(tile, pos);
 		return true;
 	}

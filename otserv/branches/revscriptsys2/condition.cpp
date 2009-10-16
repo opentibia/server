@@ -662,7 +662,7 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 				}
 
 				bool skip = false;
-				if(const MagicField* field = creature->getTile()->getFieldItem()){
+				if(const MagicField* field = creature->getParentTile()->getFieldItem()){
 					if(field->getCombatType() == modPeriodicDamage.type){
 						//The creature is still standing in the field so the damage should
 						//not be counted towards the total damage.

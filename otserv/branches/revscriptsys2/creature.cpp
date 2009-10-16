@@ -351,7 +351,7 @@ void Creature::updateMapCache()
 		for(int32_t x = -((mapWalkWidth - 1) / 2); x <= ((mapWalkWidth - 1) / 2); ++x){
 			pos.x = myPos.x + x;
 			pos.y = myPos.y + y;
-			tile = g_game.getTile(pos.x, pos.y, myPos.z);
+			tile = g_game.getParentTile(pos.x, pos.y, myPos.z);
 			updateTileCache(tile, pos);
 		}
 	}
@@ -424,7 +424,7 @@ int32_t Creature::getWalkCache(const Position& pos) const
 
 #ifdef __DEBUG__
 		//testing
-		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+		Tile* tile = g_game.getParentTile(pos.x, pos.y, pos.z);
 		if(tile && (tile->__queryAdd(0, this, 1, FLAG_PATHFINDING | FLAG_IGNOREFIELDDAMAGE) == RET_NOERROR)){
 			if(!localMapCache[y][x]){
 				std::cout << "Wrong cache value" << std::endl;
@@ -497,7 +497,7 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 	}
 	else if(isMapLoaded){
 		if(creature->getPosition().z == getPosition().z){
-			updateTileCache(creature->getTile(), creature->getPosition());
+			updateTileCache(creature->getParentTile(), creature->getPosition());
 		}
 	}
 
@@ -515,7 +515,7 @@ void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 	}
 	else if(isMapLoaded){
 		if(creature->getPosition().z == getPosition().z){
-			updateTileCache(creature->getTile(), creature->getPosition());
+			updateTileCache(creature->getParentTile(), creature->getPosition());
 		}
 	}
 }
@@ -609,7 +609,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 
 					//update 0
 					for(int32_t x = -((mapWalkWidth - 1) / 2); x <= ((mapWalkWidth - 1) / 2); ++x){
-						tile = g_game.getTile(myPos.x + x, myPos.y - ((mapWalkHeight - 1) / 2), myPos.z);
+						tile = g_game.getParentTile(myPos.x + x, myPos.y - ((mapWalkHeight - 1) / 2), myPos.z);
 						updateTileCache(tile, x, -((mapWalkHeight - 1) / 2));
 					}
 				}
@@ -621,7 +621,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 
 					//update mapWalkHeight - 1
 					for(int32_t x = -((mapWalkWidth - 1) / 2); x <= ((mapWalkWidth - 1) / 2); ++x){
-						tile = g_game.getTile(myPos.x + x, myPos.y + ((mapWalkHeight - 1) / 2), myPos.z);
+						tile = g_game.getParentTile(myPos.x + x, myPos.y + ((mapWalkHeight - 1) / 2), myPos.z);
 						updateTileCache(tile, x, (mapWalkHeight - 1) / 2);
 					}
 				}
@@ -646,7 +646,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 
 					//update mapWalkWidth - 1
 					for(int32_t y = -((mapWalkHeight - 1) / 2); y <= ((mapWalkHeight - 1) / 2); ++y){
-						tile = g_game.getTile(myPos.x + ((mapWalkWidth - 1) / 2), myPos.y + y, myPos.z);
+						tile = g_game.getParentTile(myPos.x + ((mapWalkWidth - 1) / 2), myPos.y + y, myPos.z);
 						updateTileCache(tile, (mapWalkWidth - 1) / 2, y);
 					}
 				}
@@ -670,7 +670,7 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 
 					//update 0
 					for(int32_t y = -((mapWalkHeight - 1) / 2); y <= ((mapWalkHeight - 1) / 2); ++y){
-						tile = g_game.getTile(myPos.x - ((mapWalkWidth - 1) / 2), myPos.y + y, myPos.z);
+						tile = g_game.getParentTile(myPos.x - ((mapWalkWidth - 1) / 2), myPos.y + y, myPos.z);
 						updateTileCache(tile, -((mapWalkWidth - 1) / 2), y);
 					}
 				}
@@ -737,12 +737,12 @@ void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 
 void Creature::onPlacedCreature()
 {
-	g_game.onCreatureMove(this, this, NULL, getTile());
+	g_game.onCreatureMove(this, this, NULL, getParentTile());
 }
 
 void Creature::onRemovedCreature()
 {
-	g_game.onCreatureMove(this, this, getTile(), NULL);
+	g_game.onCreatureMove(this, this, getParentTile(), NULL);
 }
 
 void Creature::onDie()
@@ -794,7 +794,7 @@ Item* Creature::dropCorpse()
 	else if(getRace() == RACE_BLOOD)
 		splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
 
-	Tile* tile = getTile();
+	Tile* tile = getParentTile();
 	if(splash){
 		g_game.internalAddItem(NULL, tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
 		g_game.startDecay(splash);
@@ -1092,7 +1092,7 @@ bool Creature::setAttackedCreature(Creature* creature)
 }
 
 ZoneType Creature::getZone() const {
-	const Tile* tile = getTile();
+	const Tile* tile = getParentTile();
 	if(tile->hasFlag(TILEPROP_PROTECTIONZONE)){
 		return ZONE_PROTECTION;
 	}
@@ -1637,7 +1637,7 @@ int32_t Creature::getStepDuration() const
 	}
 
 	int32_t duration = 0;
-	const Tile* tile = getTile();
+	const Tile* tile = getParentTile();
 	if(tile && tile->ground){
 		uint32_t groundId = tile->ground->getID();
 		uint16_t groundSpeed = Item::items[groundId].speed;

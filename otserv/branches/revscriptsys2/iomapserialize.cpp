@@ -103,7 +103,7 @@ bool IOMapSerialize::loadMapRelational(Map* map)
 						int32_t y = result->getDataInt("y");
 						int32_t z = result->getDataInt("z");
 
-						Tile* tile = map->getTile(x, y, z);
+						Tile* tile = map->getParentTile(x, y, z);
 						if(!tile){
 							std::cout << "ERROR: Unserialization of invalid tile in IOMapSerialize::loadMapRelational() - " << Position(x, y,z)  << std::endl;
 							continue;
@@ -176,7 +176,7 @@ bool IOMapSerialize::loadItems(Database* db, DBResult* result, Cylinder* parent,
 	Item* item = NULL;
 	Tile* tile = NULL;
 	if(!parent->getItem()){
-		tile = parent->getTile();
+		tile = parent->getParentTile();
 	}
 
 	do{
@@ -440,7 +440,7 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 				}
 			}
 			else{
-				Tile* tile = map->getTile(x, y, z);
+				Tile* tile = map->getParentTile(x, y, z);
 				if(!tile){
 					std::cout << "ERROR: Unserialization of invalid tile in IOMapSerialize::loadTile()" << std::endl;
 					break;
@@ -491,7 +491,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent, bool dep
 
 	Tile* tile = NULL;
 	if(!parent->getItem()){
-		tile = parent->getTile();
+		tile = parent->getParentTile();
 	}
 
 	bool isInContainer = (!depotTransfer && !tile);

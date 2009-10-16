@@ -101,7 +101,7 @@ bool Map::saveMap()
 	return saved;
 }
 
-Tile* Map::getTile(int32_t x, int32_t y, int32_t z)
+Tile* Map::getParentTile(int32_t x, int32_t y, int32_t z)
 {
 	if(x < 0 || x >= 0xFFFF || y < 0 || y >= 0xFFFF || z  < 0 || z >= MAP_MAX_LAYERS){
 		return NULL;
@@ -123,9 +123,9 @@ Tile* Map::getTile(int32_t x, int32_t y, int32_t z)
 	}
 }
 
-Tile* Map::getTile(const Position& pos)
+Tile* Map::getParentTile(const Position& pos)
 {
-	return getTile(pos.x, pos.y, pos.z);
+	return getParentTile(pos.x, pos.y, pos.z);
 }
 
 void Map::setTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
@@ -206,7 +206,7 @@ void Map::reAssignTile(int32_t x, int32_t y, int32_t z, Tile* newtile)
 
 void Map::makeTileIndexed(const Position& pos)
 {
-	Tile* tile = getTile(pos);
+	Tile* tile = getParentTile(pos);
 	if(tile && !tile->hasFlag(TILEPROP_INDEXED_TILE)){
 		const Position& pos = tile->getPosition();
 
@@ -239,7 +239,7 @@ void Map::makeTileIndexed(const Position& pos)
 
 bool Map::placeCreature(const Position& centerPos, Creature* creature, bool extendedPos /*=false*/, bool forceLogin /*=false*/)
 {
-	Tile* tile = getTile(centerPos);
+	Tile* tile = getParentTile(centerPos);
 
 	bool foundTile = false;
 	bool placeInPZ = false;
@@ -291,7 +291,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool exte
 			tryPos.x = tryPos.x + dx;
 			tryPos.y = tryPos.y + dy;
 
-			tile = getTile(tryPos);
+			tile = getParentTile(tryPos);
 			if(!tile || (placeInPZ && !tile->hasFlag(TILEPROP_PROTECTIONZONE)))
 				continue;
 
@@ -315,7 +315,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool exte
 		uint32_t flags = 0;
 		Cylinder* toCylinder = tile->__queryDestination(index, creature, &toItem, flags);
 		toCylinder->__internalAddThing(creature);
-		Tile* toTile = toCylinder->getTile();
+		Tile* toTile = toCylinder->getParentTile();
 		toTile->qt_node->addCreature(creature);
 		return true;
 	}
@@ -329,7 +329,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool exte
 
 bool Map::removeCreature(Creature* creature)
 {
-	Tile* tile = creature->getTile();
+	Tile* tile = creature->getParentTile();
 	if(tile){
 		tile->qt_node->removeCreature(creature);
 		tile->__removeThing(NULL, creature, 0);
@@ -657,13 +657,13 @@ bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 			  !(fromPos.x == rx && fromPos.y == ry && fromPos.z == rz) ) ){
 
 			if(lastrz != rz){
-				if(const_cast<Map*>(this)->getTile(lastrx, lastry, std::min(lastrz, rz))){
+				if(const_cast<Map*>(this)->getParentTile(lastrx, lastry, std::min(lastrz, rz))){
 					return false;
 				}
 			}
 			lastrx = rx; lastry = ry; lastrz = rz;
 
-			const Tile* tile = const_cast<Map*>(this)->getTile(rx, ry, rz);
+			const Tile* tile = const_cast<Map*>(this)->getParentTile(rx, ry, rz);
 			if(tile){
 				if(tile->blockProjectile()){
 					return false;
@@ -703,13 +703,13 @@ const Tile* Map::canWalkTo(const Creature* creature, const Position& pos)
 {
 	switch(creature->getWalkCache(pos)){
 		case 0: return NULL;
-		case 1: return getTile(pos);
+		case 1: return getParentTile(pos);
 		break;
 	}
 
 	//used for none-cached tiles
-	Tile* tile = getTile(pos);
-	if(creature->getTile() != tile){
+	Tile* tile = getParentTile(pos);
+	if(creature->getParentTile() != tile){
 		if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING | FLAG_IGNOREFIELDDAMAGE) != RET_NOERROR){
 			return NULL;
 		}

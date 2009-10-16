@@ -164,8 +164,8 @@ public:
 	* Get a single tile.
 	* \return A pointer to that tile.
 	*/
-	Tile* getTile(int32_t x, int32_t y, int32_t z);
-	Tile* getTile(const Position& pos);
+	Tile* getParentTile(int32_t x, int32_t y, int32_t z);
+	Tile* getParentTile(const Position& pos);
 
 	QTreeLeafNode* getLeaf(uint16_t x, uint16_t y){ return root.getLeaf(x, y);}
 

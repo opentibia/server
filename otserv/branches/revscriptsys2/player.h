@@ -574,12 +574,14 @@ public:
 	virtual const Cylinder* getParent() const {return Creature::getParent();}
 	virtual bool isRemoved() const {return Creature::isRemoved();}
 	virtual Position getPosition() const {return Creature::getPosition();}
-	virtual Tile* getTile() {return Creature::getTile();}
-	virtual const Tile* getTile() const {return Creature::getTile();}
+	virtual Tile* getTile() {return NULL;}
+	virtual const Tile* getTile() const {return NULL;}
 	virtual Item* getItem() {return NULL;}
 	virtual const Item* getItem() const {return NULL;}
 	virtual Creature* getCreature() {return this;}
 	virtual const Creature* getCreature() const {return this;}
+	virtual Tile* getParentTile() {return Creature::getParentTile();}
+	virtual const Tile* getParentTile() const {return Creature::getParentTile();}
 
 	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
 	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap, bool itemCount = true) const;

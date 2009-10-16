@@ -241,7 +241,7 @@ bool ProtocolGame::connect(uint32_t playerId)
 	player->isConnecting = false;
 	player->client = this;
 	player->client->sendAddCreature(player, player->getPosition(),
-		player->getTile()->__getIndexOfThing(player));
+		player->getParentTile()->__getIndexOfThing(player));
 	player->lastip = player->getIP();
 	IOPlayer::instance()->updateLoginInfo(player);
 	m_acceptPackets = true;
@@ -257,7 +257,7 @@ bool ProtocolGame::logout(bool forced)
 
 	if(!player->isRemoved()){
 		if(!forced){
-			if(player->getTile()->hasFlag(TILEPROP_NOLOGOUT)){
+			if(player->getParentTile()->hasFlag(TILEPROP_NOLOGOUT)){
 				player->sendCancelMessage(RET_YOUCANNOTLOGOUTHERE);
 				return false;
 			}
@@ -763,7 +763,7 @@ void ProtocolGame::GetFloorDescription(NetworkMessage_ptr msg, int32_t x, int32_
 
 	for(int32_t nx = 0; nx < width; nx++){
 		for(int32_t ny = 0; ny < height; ny++){
-			tile = g_game.getTile(x + nx + offset, y + ny + offset, z);
+			tile = g_game.getParentTile(x + nx + offset, y + ny + offset, z);
 
 			if(tile){
 				if(skip >= 0){

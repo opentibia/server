@@ -952,7 +952,7 @@ bool Actor::pushItem(Item* item, int32_t radius)
 			tryPos.x = tryPos.x + dx;
 			tryPos.y = tryPos.y + dy;
 
-			Tile* tile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
+			Tile* tile = g_game.getParentTile(tryPos.x, tryPos.y, tryPos.z);
 			if(tile && g_game.canThrowObjectTo(centerPos, tryPos)){
 				if(g_game.internalMoveItem(this, item->getParent(), tile,
 					INDEX_WHEREEVER, item, item->getItemCount(), NULL) == RET_NOERROR){
@@ -1006,7 +1006,7 @@ bool Actor::pushCreature(Creature* creature)
 
 	for(std::vector<Direction>::iterator it = dirList.begin(); it != dirList.end(); ++it){
 		const Position& tryPos = Combat::getCasterPosition(creature, *it);
-		Tile* toTile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
+		Tile* toTile = g_game.getParentTile(tryPos.x, tryPos.y, tryPos.z);
 
 		if(toTile && !toTile->blockPathFind()){
 			if(g_game.internalMoveCreature(this, creature, *it) == RET_NOERROR){
@@ -1089,7 +1089,7 @@ bool Actor::getNextStep(Direction& dir, uint32_t& flags)
 
 	if(result && (canPushItems() || canPushCreatures()) ){
 		const Position& pos = Combat::getCasterPosition(this, dir);
-		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+		Tile* tile = g_game.getParentTile(pos.x, pos.y, pos.z);
 		if(tile){
 			if(canPushItems()){
 				pushItems(tile);
@@ -1228,7 +1228,7 @@ bool Actor::canWalkTo(Position pos, Direction dir)
 			return false;
 		}
 
-		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+		Tile* tile = g_game.getParentTile(pos.x, pos.y, pos.z);
 		if(tile && tile->getTopVisibleCreature(this) == NULL && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			return true;
 		}

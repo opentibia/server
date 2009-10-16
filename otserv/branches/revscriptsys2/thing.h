@@ -49,8 +49,8 @@ public:
 	Cylinder* getTopParent(); //returns Tile/Container or a Player
 	const Cylinder* getTopParent() const;
 
-	virtual Tile* getTile();
-	virtual const Tile* getTile() const;
+	virtual Tile* getParentTile();
+	virtual const Tile* getParentTile() const;
 
 	virtual Position getPosition() const;
 	virtual int getThrowRange() const = 0;
@@ -58,6 +58,8 @@ public:
 
 	virtual Item* getItem() {return NULL;}
 	virtual const Item* getItem() const {return NULL;}
+	virtual Tile* getTile() {return NULL;}
+	virtual const Tile* getTile() const {return NULL;}
 	virtual Creature* getCreature() {return NULL;}
 	virtual const Creature* getCreature() const {return NULL;}
 

@@ -451,8 +451,8 @@ void LuaState::pushThing(Thing* thing)
 			return;
 		}
 		*objid = environment->addThing(creature);
-	} else if(thing && thing->getTile()) {
-		pushTile(thing->getTile());
+	} else if(thing && thing->getParentTile()) {
+		pushTile(thing->getParentTile());
 	} else if(thing) {
 		Script::ObjectID* objid;
 		objid = pushClassInstance("Thing");
@@ -587,7 +587,7 @@ Tile* LuaState::popTile(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 	getField(-1, "z");
 	int32_t z = popInteger();
 
-	Tile* tile = g_game.getTile(x, y, z);
+	Tile* tile = g_game.getParentTile(x, y, z);
 	if(!tile)
 		HandleError(mode, "Tile position is invalid.");
 	return tile;

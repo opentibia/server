@@ -285,7 +285,7 @@ void Tile::onUpdateTile()
 
 void Tile::moveCreature(Creature* actor, Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
 {
-	Tile* newTile = toCylinder->getTile();
+	Tile* newTile = toCylinder->getParentTile();
 	int32_t oldStackPos = __getIndexOfThing(creature);
 
 	Position oldPos = getPosition();
@@ -447,12 +447,12 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(player->isPzLocked() && !player->getTile()->hasFlag(TILEPROP_PVPZONE) && hasFlag(TILEPROP_PVPZONE)){
+			if(player->isPzLocked() && !player->getParentTile()->hasFlag(TILEPROP_PVPZONE) && hasFlag(TILEPROP_PVPZONE)){
 				//player is trying to enter a pvp zone while being pz-locked
 				return RET_PLAYERISPZLOCKEDENTERPVPZONE;
 			}
 
-			if(player->isPzLocked() && player->getTile()->hasFlag(TILEPROP_PVPZONE) && !hasFlag(TILEPROP_PVPZONE)){
+			if(player->isPzLocked() && player->getParentTile()->hasFlag(TILEPROP_PVPZONE) && !hasFlag(TILEPROP_PVPZONE)){
 				//player is trying to leave a pvp zone while being pz-locked
 				return RET_PLAYERISPZLOCKEDLEAVEPVPZONE;
 			}
@@ -598,7 +598,7 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 		int dx = getPosition().x;
 		int dy = getPosition().y;
 		int dz = getPosition().z + 1;
-		Tile* downTile = g_game.getTile(dx, dy, dz);
+		Tile* downTile = g_game.getParentTile(dx, dy, dz);
 
 		if(downTile){
 			if(downTile->floorChange(NORTH))
@@ -609,7 +609,7 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 				dx -= 1;
 			if(downTile->floorChange(WEST))
 				dx += 1;
-			destTile = g_game.getTile(dx, dy, dz);
+			destTile = g_game.getParentTile(dx, dy, dz);
 		}
 	}
 	else if(floorChange()){
@@ -625,7 +625,7 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 			dx += 1;
 		if(floorChange(WEST))
 			dx -= 1;
-		destTile = g_game.getTile(dx, dy, dz);
+		destTile = g_game.getParentTile(dx, dy, dz);
 	}
 
 
@@ -1184,7 +1184,7 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, const Cylinder* ol
 		if(creature){
 			const Tile* fromTile = NULL;
 			if(oldParent){
-				fromTile = oldParent->getTile();
+				fromTile = oldParent->getParentTile();
 			}
 		}
 		else{
@@ -1233,7 +1233,7 @@ void Tile::postRemoveNotification(Creature* actor, Thing* thing,  const Cylinder
 	if(creature){
 		const Tile* toTile = NULL;
 		if(newParent){
-			toTile = newParent->getTile();
+			toTile = newParent->getParentTile();
 		}
 	}
 	else{

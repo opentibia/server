@@ -55,6 +55,9 @@ public:
 	virtual Creature* getCreature() = 0;
 	virtual const Creature* getCreature() const = 0;
 
+	virtual Tile* getParentTile() = 0;
+	virtual const Tile* getParentTile() const = 0;
+
 	/**
 	  * Query if the cylinder can add an object
 	  * \param index points to the destination index (inventory slot/container position)
@@ -236,6 +239,8 @@ public:
 	virtual const Item* getItem() const {return NULL;}
 	virtual Creature* getCreature() {return NULL;}
 	virtual const Creature* getCreature() const {return NULL;}
+	virtual Tile* getParentTile() {return NULL;}
+	virtual const Tile* getParentTile() const {return NULL;}
 
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const {return RET_NOTPOSSIBLE;}

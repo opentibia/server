@@ -343,9 +343,9 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int
 		}
 
 	if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION)){
-		onUsedAmmo(player, item, target->getTile());
+		onUsedAmmo(player, item, target->getParentTile());
 	}
-	onUsedWeapon(player, item, target->getTile());
+	onUsedWeapon(player, item, target->getParentTile());
 	return true;
 }
 
@@ -792,7 +792,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 	}
 	else{
 		// We failed attack, miss!
-		Tile* destTile = target->getTile();
+		Tile* destTile = target->getParentTile();
 		if(!Position::areInRange<1,1,0>(player->getPosition(), target->getPosition())){
 			typedef std::pair<int32_t, int32_t> dPair;
 			std::vector<dPair> destList;
@@ -812,7 +812,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 			Tile* tmpTile = NULL;
 
 			for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
-				tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
+				tmpTile = g_game.getParentTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
 				// Blocking tiles or tiles without ground ain't valid targets for spears
 				if(tmpTile && !tmpTile->hasFlag(TILEPROP_BLOCKSOLIDNOTMOVEABLE) && tmpTile->ground != NULL){
 					destTile = tmpTile;

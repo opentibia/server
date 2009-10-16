@@ -92,12 +92,14 @@ public:
 	virtual const Cylinder* getParent() const {return Thing::getParent();}
 	virtual bool isRemoved() const {return Thing::isRemoved();}
 	virtual Position getPosition() const {return Thing::getPosition();}
-	virtual Tile* getTile() {return Thing::getTile();}
-	virtual const Tile* getTile() const {return Thing::getTile();}
+	virtual Tile* getTile() {return NULL;}
+	virtual const Tile* getTile() const {return NULL;}
 	virtual Item* getItem() {return this;}
 	virtual const Item* getItem() const {return this;}
 	virtual Creature* getCreature() {return NULL;}
 	virtual const Creature* getCreature() const {return NULL;}
+	virtual Tile* getParentTile() {return Thing::getParentTile();}
+	virtual const Tile* getParentTile() const {return Thing::getParentTile();}
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,

@@ -411,6 +411,8 @@ public:
 	virtual const Item* getItem() const {return NULL;}
 	virtual Creature* getCreature() {return NULL;}
 	virtual const Creature* getCreature() const {return NULL;}
+	virtual Tile* getParentTile() {return this;}
+	virtual const Tile* getParentTile() const {return this;}
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
