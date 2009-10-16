@@ -36,8 +36,8 @@ function otstd.juice_squeezer.callback(event)
 		fruit:removeCount(1)
 		local vial = createItem(2006, juicetype)
 		player:addItem(vial)
+		event:skip()
 	end
-	event:skip()
 end
 
 function otstd.juice_squeezer.registerHandler()
