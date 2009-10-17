@@ -21,27 +21,35 @@
 
 #include "ioaccount.h"
 #include "database.h"
+#include "game.h"
 #include "configmanager.h"
-#include "account.h"
 
+extern Game g_game;
 extern ConfigManager g_config;
 
-Account IOAccount::loadAccount(const std::string& name, bool preLoad /* = false*/)
+Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* = false*/)
 {
 	Account acc;
+	acc.name = accountName;
+
+	if(g_game.onAccountLogin(acc.name, acc.number, acc.password,
+		acc.premiumEnd, acc.warnings, acc.charList)){
+		// script handled it
+		return acc;
+	}
 
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `id`, `name`, `password`, `premend`, `warnings` FROM `accounts` WHERE `name` = " << db->escapeString(name);
+	query << "SELECT `id`, `name`, `password`, `premend`, `warnings` FROM `accounts` WHERE `name` = " << db->escapeString(accountName);
 	if(!(result = db->storeQuery(query.str()))){
 		return acc;
 	}
 
 	acc.number = result->getDataInt("id");
 	acc.password = result->getDataString("password");
-	acc.premEnd = result->getDataInt("premend");
+	acc.premiumEnd = result->getDataInt("premend");
 	acc.name = result->getDataString("name");
 	acc.warnings = result->getDataInt("warnings");
 	db->freeResult(result);
@@ -64,22 +72,22 @@ Account IOAccount::loadAccount(const std::string& name, bool preLoad /* = false*
 	return acc;
 }
 
-bool IOAccount::saveAccount(Account acc)
+bool IOAccount::saveAccount(const Account& acc)
 {
 	Database* db = Database::instance();
 	DBQuery query;
 
-	query << "UPDATE `accounts` SET `premend` = " << acc.premEnd << ", `warnings` = " << acc.warnings << " WHERE `id` = " << acc.number;
+	query << "UPDATE `accounts` SET `premend` = " << acc.premiumEnd << ", `warnings` = " << acc.warnings << " WHERE `id` = " << acc.number;
 	return db->executeQuery(query.str());
 }
 
-bool IOAccount::getPassword(const std::string& accountname, const std::string &name, std::string &password)
+bool IOAccount::getPassword(const std::string& accountName, const std::string& playerName, std::string& password)
 {
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`name` = " << db->escapeString(accountname) << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`name` = " << db->escapeString(accountName) << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(playerName);
 	if((result = db->storeQuery(query.str()))){
 		password = result->getDataString("password");
 		db->freeResult(result);
@@ -88,3 +96,19 @@ bool IOAccount::getPassword(const std::string& accountname, const std::string &n
 
 	return false;
 }
+
+uint16_t IOAccount::getPremiumDaysLeft(uint32_t time)
+{
+	uint32_t now = (uint32_t)std::time(NULL) / 86400;
+	if((time_t)time == time_t(-1))
+		return 0xFFFF;
+
+	if(uint32_t(time / 86400) < now)
+		return 0;
+
+	if(uint32_t(time / 86400) - now >= 0xFFFF)
+		return 0xFFFF;
+
+	return uint16_t(uint32_t(time / 86400) - now);
+}
+

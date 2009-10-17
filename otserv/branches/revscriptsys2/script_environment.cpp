@@ -73,6 +73,7 @@ void Environment::cleanupUnusedListeners(ListenerItemMap& list)
 	cleanupUnusedListeners(Generic.OnMoveCreature);
 	cleanupUnusedListeners(Generic.OnJoinChannel);
 	cleanupUnusedListeners(Generic.OnLeaveChannel);
+	cleanupUnusedListeners(Generic.OnAccountLogin);
 	cleanupUnusedListeners(Generic.OnLogin);
 	cleanupUnusedListeners(Generic.OnLogout);
 	cleanupUnusedListeners(Generic.OnChangeOutfit);
@@ -82,6 +83,10 @@ void Environment::cleanupUnusedListeners(ListenerItemMap& list)
 	cleanupUnusedListeners(Generic.OnUnload);
 	cleanupUnusedListeners(Generic.OnSpawn);
 	cleanupUnusedListeners(Generic.OnAdvance);
+	cleanupUnusedListeners(Generic.OnTrade);
+	cleanupUnusedListeners(Generic.OnShopPurchase);
+	cleanupUnusedListeners(Generic.OnShopSell);
+	cleanupUnusedListeners(Generic.OnShopClose);
 	cleanupUnusedListeners(Generic.OnMoveItem);
 	cleanupUnusedListeners(Generic.OnMoveItemOnItem);
 	cleanupUnusedListeners(Generic.OnCondition);
@@ -168,6 +173,9 @@ bool Environment::stopListener(ListenerType type, uint32_t id)
 			if(stopListener(Generic.OnLeaveChannel, id))
 				return true;
 			break;
+		case enums::ON_ACCOUNT_LOGIN_LISTENER:
+			if(stopListener(Generic.OnAccountLogin, id))
+				return true;
 		case enums::ON_LOGIN_LISTENER:
 			if(stopListener(Generic.OnLogin, id))
 				return true;
@@ -190,6 +198,15 @@ bool Environment::stopListener(ListenerType type, uint32_t id)
 			return false; // No specific listeners
 		case enums::ON_ADVANCE_LISTENER:
 			if(stopListener(Generic.OnAdvance, id))
+				return true;
+		case enums::ON_SHOP_PURCHASE_LISTENER:
+			if(stopListener(Generic.OnShopPurchase, id))
+				return true;
+		case enums::ON_SHOP_SELL_LISTENER:
+			if(stopListener(Generic.OnShopSell, id))
+				return true;
+		case enums::ON_SHOP_CLOSE_LISTENER:
+			if(stopListener(Generic.OnShopClose, id))
 				return true;
 		case enums::ON_ATTACK_LISTENER:
 			if(stopListener(Generic.OnAttack, id))

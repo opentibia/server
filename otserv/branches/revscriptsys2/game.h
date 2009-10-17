@@ -490,11 +490,11 @@ public:
 	bool playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(uint32_t playerId);
 
-	bool playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+	bool playerShopPurchase(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		uint8_t amount, bool ignoreCapacity = false, bool buyWithBackpack = false);
-	bool playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+	bool playerShopSell(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		uint8_t amount);
-	bool playerCloseShop(uint32_t playerId);
+	bool playerShopClose(uint32_t playerId);
 	bool playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count);
 
 	bool playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
@@ -523,11 +523,16 @@ public:
 	bool playerReportBug(uint32_t playerId, std::string comment);
 
 	// Script event callbacks, all are in the game class so we don't have to include the script files
-	bool onPlayerLogout(Player* player, bool forced, bool timeout);
+	bool onAccountLogin(std::string& name, uint32_t& number, std::string& password,
+		time_t& premiumEnd, uint32_t& warnings, std::list<std::string>& charList);
 	bool onPlayerLogin(Player* player);
+	bool onPlayerLogout(Player* player, bool forced, bool timeout);
 	bool onPlayerChangeOutfit(Player* player, std::list<Outfit>& outfitList);
 	bool onPlayerEquipItem(Player* player, Item* item, SlotType slot, bool equip);
 	bool onPlayerAdvance(Player* player, LevelType skill, uint32_t oldLevel, uint32_t newLevel);
+	bool onPlayerShopPurchase(Player* player, uint16_t itemId, int32_t type, uint32_t amount, bool ignoreCapacity, bool buyWithBackpack);
+	bool onPlayerShopSell(Player* player, uint16_t itemId, int32_t type, uint32_t amount);
+	bool onPlayerShopClose(Player* player);
 	bool onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
 	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
 	bool onSpawn(Actor* actor);

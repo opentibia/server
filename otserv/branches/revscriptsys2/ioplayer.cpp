@@ -20,10 +20,10 @@
 #include "otpch.h"
 
 #include "ioplayer.h"
+#include "ioaccount.h"
 #include "game.h"
 #include "fileloader.h"
 #include "player.h"
-#include "account.h"
 #include "depot.h"
 #include "town.h"
 #include "configmanager.h"
@@ -200,7 +200,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 
 	player->password = result->getDataString("password");
-	player->premiumDays = Account::getPremiumDaysLeft(result->getDataInt("premend"));
+	player->premiumDays = IOAccount::getPremiumDaysLeft(result->getDataInt("premend"));
 	db->freeResult(result);
 
 	// we need to find out our skills

@@ -27,7 +27,6 @@
 #include "tile.h"
 #include "combat.h"
 #include "ioplayer.h"
-#include "account.h"
 #include "ioaccount.h"
 #include "chat.h"
 #include "server.h"
@@ -1272,6 +1271,16 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	return true;
 }
 
+bool Game::onAccountLogin(std::string& name, uint32_t& number, std::string& password,
+	time_t& premiumEnd, uint32_t& warnings, std::list<std::string>& charList)
+{
+	if(!script_system)
+		return false; // Not handled
+
+	Script::OnAccountLogin::Event evt(name, number, password, premiumEnd, warnings, charList);
+	return script_system->dispatchEvent(evt);
+}
+
 bool Game::onPlayerLogin(Player* player)
 {
 	if(!script_system)
@@ -1309,6 +1318,40 @@ bool Game::onPlayerAdvance(Player* player, LevelType skill, uint32_t oldLevel, u
 	if(!script_system)
 		return false; // Not handled
 	Script::OnAdvance::Event evt(player, skill, oldLevel, newLevel);
+	return script_system->dispatchEvent(evt);
+}
+
+/*
+bool Game::onPlayerTrade(Player* player, Item* tradeItem)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::onTrade::Event evt(player, tradeItem);
+	return script_system->dispatchEvent(evt);
+}
+*/
+
+bool Game::onPlayerShopPurchase(Player* player, uint16_t itemId, int32_t type, uint32_t amount, bool ignoreCapacity, bool buyWithBackpack)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnShopPurchase::Event evt(player, itemId, type, amount, ignoreCapacity, buyWithBackpack);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onPlayerShopSell(Player* player, uint16_t itemId, int32_t type, uint32_t amount)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnShopSell::Event evt(player, itemId, type, amount);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onPlayerShopClose(Player* player)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnShopClose::Event evt(player);
 	return script_system->dispatchEvent(evt);
 }
 
@@ -3386,8 +3429,8 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 				internalMoveItem(NULL, cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, tradeItem1->getItemCount(), NULL);
 				internalMoveItem(NULL, cylinder2, player, INDEX_WHEREEVER, tradeItem2, tradeItem2->getItemCount(), NULL);
 
-				tradeItem1->onTradeEvent(ON_TRADE_TRANSFER, tradePartner);
-				tradeItem2->onTradeEvent(ON_TRADE_TRANSFER, player);
+				//tradeItem1->onTradeEvent(ON_TRADE_TRANSFER, tradePartner);
+				//tradeItem2->onTradeEvent(ON_TRADE_TRANSFER, player);
 
 				isSuccess = true;
 			}
@@ -3396,11 +3439,11 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 		if(!isSuccess){
 			std::string errorDescription = getTradeErrorDescription(ret1, tradeItem1);
 			tradePartner->sendTextMessage(MSG_INFO_DESCR, errorDescription);
-			tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
+			//tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
 
 			errorDescription = getTradeErrorDescription(ret2, tradeItem2);
 			player->sendTextMessage(MSG_INFO_DESCR, errorDescription);
-			player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
+			//player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
 		}
 
 		player->setTradeState(TRADE_NONE);
@@ -3545,7 +3588,7 @@ bool Game::internalCloseTrade(Player* player)
 			tradeItems.erase(it);
 		}
 
-		player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
+		//player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
 		player->tradeItem = NULL;
 	}
 
@@ -3563,7 +3606,7 @@ bool Game::internalCloseTrade(Player* player)
 				tradeItems.erase(it);
 			}
 
-			tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
+			//tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
 			tradePartner->tradeItem = NULL;
 		}
 
@@ -3577,18 +3620,37 @@ bool Game::internalCloseTrade(Player* player)
 	return true;
 }
 
-bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t count,
+bool Game::playerShopPurchase(uint32_t playerId, uint16_t spriteId, uint8_t count,
 	uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
 	Player* player = getPlayerByID(playerId);
 	if(player == NULL || player->isRemoved())
 		return false;
 
-	// REVSCRIPT TODO
-	// shop buy item
-	/*
-	Creature* merchant = player->getShopOwner(onBuy, onSell);
-	if(merchant == NULL)
+	
+	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
+	if(it.id == 0){
+		return false;
+	}
+
+	int32_t subType = -1;
+	if(it.isFluidContainer()){
+		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
+		if(count < maxFluidType){
+			subType = reverseFluidMap[count].value();
+		}
+	}
+	else if(it.hasSubType() && !it.stackable){
+		subType = count;
+	}
+
+	return onPlayerShopPurchase(player, it.id, subType, amount, ignoreCapacity, buyWithBackpack);
+}
+
+bool Game::playerShopSell(uint32_t playerId, uint16_t spriteId, uint8_t count, uint8_t amount)
+{
+	Player* player = getPlayerByID(playerId);
+	if(player == NULL || player->isRemoved())
 		return false;
 
 	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
@@ -3596,67 +3658,31 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 		return false;
 	}
 
-	uint8_t subType = 0;
+	int32_t subType = -1;
 	if(it.isFluidContainer()){
 		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
 		if(count < maxFluidType){
-			subType = (uint8_t)reverseFluidMap[count];
+			subType = reverseFluidMap[count].value();
 		}
 	}
-	else{
+	else if(it.hasSubType() && !it.stackable){
 		subType = count;
 	}
-	*/
 
-	// REVSCRIPT TODO
-	//merchant->onPlayerTrade(player, SHOPEVENT_BUY, onBuy, it.id, subType, amount);
-	return true;
+	if(!player->hasShopItemForSale(it.id, subType)){
+		return false;
+	}
+
+	return onPlayerShopSell(player, it.id, subType, amount);
 }
 
-bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count, uint8_t amount)
+bool Game::playerShopClose(uint32_t playerId)
 {
 	Player* player = getPlayerByID(playerId);
 	if(player == NULL || player->isRemoved())
 		return false;
 
-	// REVSCRIPT TODO
-	// shop sell item
-	/*
-	Creature* merchant = player->getShopOwner(onBuy, onSell);
-	if(merchant == NULL)
-		return false;
-
-	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
-	if(it.id == 0){
-		return false;
-	}
-
-	uint8_t subType = 0;
-	if(it.isFluidContainer()){
-		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
-		if(count < maxFluidType){
-			subType = (uint8_t)reverseFluidMap[count];
-		}
-	}
-	else{
-		subType = count;
-	}
-	*/
-	// REVSCRIPT TODO
-	//merchant->onPlayerTrade(player, SHOPEVENT_SELL, onSell, it.id, subType, amount);
-	return true;
-}
-
-bool Game::playerCloseShop(uint32_t playerId)
-{
-	Player* player = getPlayerByID(playerId);
-	if(player == NULL || player->isRemoved())
-		return false;
-
-	// REVSCRIPTSYS TODO
-	// Close shop
-	//player->closeShopWindow();
-	return true;
+	return onPlayerShopClose(player);
 }
 
 bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
@@ -3670,7 +3696,7 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 		return false;
 	}
 
-	int32_t subType = 0;
+	int32_t subType = -1;
 	if(it.isFluidContainer()){
 		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
 		if(count < maxFluidType){

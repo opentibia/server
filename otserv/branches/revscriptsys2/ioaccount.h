@@ -23,7 +23,6 @@
 
 #include "classes.h"
 
-/** Baseclass for all Player-Loaders */
 class IOAccount {
 public:
 	IOAccount() {}
@@ -34,10 +33,25 @@ public:
 		return &instance;
 	}
 
-	Account loadAccount(const std::string& name, bool preLoad = false);
-	bool saveAccount(Account account);
+	Account loadAccount(const std::string& accountName, bool preLoad = false);
+	bool saveAccount(const Account& account);
+	bool getPassword(const std::string& accountName, const std::string& playerName, std::string& password);
+	
+	static uint16_t getPremiumDaysLeft(uint32_t time);
+};
 
-	bool getPassword(const std::string& accountname, const std::string& name, std::string& password);
+class Account
+{
+public:
+	Account() : number(0), premiumEnd(0), warnings(0) {}
+	~Account() {};
+
+	std::string name;
+	uint32_t number;
+	std::string password;
+	time_t premiumEnd;
+	uint32_t warnings;
+	std::list<std::string> charList;
 };
 
 #endif

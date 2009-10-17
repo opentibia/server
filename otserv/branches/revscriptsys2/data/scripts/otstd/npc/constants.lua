@@ -5,11 +5,13 @@ NPC.listenRadius = 4
 NPC.walkRadius = 3
 
 NPC.defaultOutfit = {
-	type = 130,
-	head = 20,
-	body = 15,
-	legs = 10,
-	feet = 5
+	["type"] = 130,
+	["head"] = 20,
+	["body"] = 15,
+	["legs"] = 10,
+	["feet"] = 5,
+	["item"] = 0,
+	["addons"] = 0
 }
 
 -- Default phrases

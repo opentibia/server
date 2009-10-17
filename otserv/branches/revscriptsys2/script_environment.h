@@ -83,6 +83,7 @@ namespace Script {
 			ListenerList OnMoveCreature;
 			ListenerList OnJoinChannel;
 			ListenerList OnLeaveChannel;
+			ListenerList OnAccountLogin;
 			ListenerList OnLogin;
 			ListenerList OnLogout;
 			ListenerList OnChangeOutfit;
@@ -93,6 +94,10 @@ namespace Script {
 			ListenerList OnUnload;
 			ListenerStringMap OnSpawn;
 			ListenerList OnAdvance;
+			ListenerList OnTrade;
+			ListenerList OnShopPurchase;
+			ListenerList OnShopSell;
+			ListenerList OnShopClose;
 			ListenerItemMap OnMoveItem;
 			ListenerList OnMoveItemOnItem;
 			ListenerList OnCondition;

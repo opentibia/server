@@ -23,11 +23,6 @@
 #include "items.h"
 #include "item_attributes.h"
 
-enum TradeEvents_t{
-	ON_TRADE_TRANSFER,
-	ON_TRADE_CANCEL
-};
-
 enum ItemDecayState_t{
 	DECAYING_FALSE = 0,
 	DECAYING_TRUE,
@@ -249,7 +244,6 @@ public:
 	virtual bool canRemove() const {return true;}
 	virtual bool canTransform() const {return true;}
 	virtual void onRemoved();
-	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;}
 
 	bool hasProperty(uint32_t props) const;
 

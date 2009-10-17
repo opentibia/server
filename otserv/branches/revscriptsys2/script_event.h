@@ -459,6 +459,48 @@ namespace Script {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
+	// OnAccountLogin event
+	// Triggered when the character list is retrieved from the database
+
+	namespace OnAccountLogin {
+		enum FilterType {
+			FILTER_NAME
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			std::string name;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(std::string& name, uint32_t& number, std::string& password,
+				time_t& premiumEnd, uint32_t& warnings, std::list<std::string>& charList);
+			~Event();
+
+			std::string getName() const {return "OnAccountLogin";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			std::string& name;
+			uint32_t& number;
+			std::string& password;
+			time_t& premiumEnd;
+			uint32_t& warnings;
+			std::list<std::string>& charList;
+		};
+	}	
+
+	///////////////////////////////////////////////////////////////////////////////
 	// OnLogin event
 	// Triggered when a player enters the server
 
@@ -710,6 +752,123 @@ namespace Script {
 			LevelType skill;
 			uint32_t oldSkillLevel;
 			uint32_t newSkillLevel;
+		};
+	}
+
+
+	////////////////////////////////////////////////////////////////
+	// OnShopPurchase event
+	// Triggered when a player wants to purchase an item from a NPC
+
+	namespace OnShopPurchase {
+		enum FilterType {
+			FILTER_NAME
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			std::string name;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* player, uint16_t itemId, int32_t type, uint32_t amount, bool ignoreCapacity, bool buyWithBackpack);
+			~Event();
+
+			std::string getName() const {return "onShopPurchase";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
+			uint16_t itemId;
+			int32_t type;
+			uint32_t amount;
+			bool ignoreCapacity;
+			bool buyWithBackpack;
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	// OnShopSell event
+	// Triggered when a player wants to sell an item to a NPC
+
+	namespace OnShopSell {
+		enum FilterType {
+			FILTER_NAME
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			std::string name;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* player, uint16_t itemId, int32_t type, uint32_t amount);
+			~Event();
+
+			std::string getName() const {return "onShopSell";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
+			uint16_t itemId;
+			int32_t type;
+			uint32_t amount;
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	// OnShopClose event
+	// Triggered when a player closes the shop window
+
+	namespace OnShopClose {
+		enum FilterType {
+			FILTER_NAME
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			std::string name;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* player);
+			~Event();
+
+			std::string getName() const {return "OnShopClose";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
 		};
 	}
 

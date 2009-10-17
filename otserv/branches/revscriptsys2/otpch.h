@@ -44,7 +44,6 @@ extern "C"
 //otserv
 #include "position.h"
 #include "thing.h"
-#include "account.h"
 #include "ban.h"
 #include "party.h"
 #include "cylinder.h"

@@ -47,14 +47,20 @@ enum playerinfo_t {
 	PLAYERINFO_MAXSOUL
 };
 
-enum freeslot_t {
-	SLOT_TYPE_NONE,
-	SLOT_TYPE_INVENTORY,
-	SLOT_TYPE_CONTAINER
+struct ShopItem{
+	ShopItem(uint16_t itemId, int32_t subType, uint32_t buyPrice, uint32_t sellPrice) :
+		itemId(itemId), subType(subType), buyPrice(buyPrice), sellPrice(sellPrice) {}
+	ShopItem() :
+		itemId(0), subType(-1), buyPrice(0), sellPrice(0) {}
+
+	uint16_t itemId;
+	int32_t subType;
+	uint32_t buyPrice;
+	uint32_t sellPrice;
 };
 
-typedef std::pair<uint32_t, Container*> containervector_pair;
-typedef std::vector<containervector_pair> ContainerVector;
+typedef std::list<ShopItem> ShopItemList;
+typedef std::vector< std::pair<uint32_t, Container*> > ContainerVector;
 typedef std::map<uint32_t, Depot*> DepotMap;
 typedef std::set<uint32_t> VIPListSet;
 typedef std::map<uint32_t, uint32_t> MuteCountMap;
@@ -477,19 +483,15 @@ public:
 	void sendToChannel(Creature* creature, SpeakClass type, const std::string& text, uint16_t channelId, uint32_t time = 0) const
 		{if(client) client->sendToChannel(creature, type, text, channelId, time);}
 	
-	// new: shop window
-	// REVSCRIPTSYS TODO: Add shop support
-	void sendShop()
-		{}//if(client){client->sendShop(shopItemList);}}
-	void sendSaleItemList() const
-		{}//if(client) client->sendSaleItemList(shopItemList);}
-	void sendCloseShop() const
-		// REVSCRIPT TODO
-		{}//if(client) client->sendCloseShop();}
+	void sendShopWindow(const ShopItemList& list);
+	void sendShopSaleList(const ShopItemList& list) const
+		{if(client) client->sendShopSaleList(list);}
+	void sendShopClose() const
+		{if(client) client->sendShopClose();}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
-		{}//if(client) client->sendTradeItemRequest(player, item, ack);}
+		{if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const
-		{}//if(client) client->sendCloseTrade();}
+		{if(client) client->sendCloseTrade();}
 
 	void sendWorldLight(LightInfo& lightInfo)
 		{if(client) client->sendWorldLight(lightInfo);}
@@ -543,14 +545,10 @@ public:
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
 
-	// REVSCRIPTSYS TODO
 	// Shop window utility functions
-	/*
-	void openShopWindow(const std::list<ShopInfo>& shop);
-	void closeShopWindow();
 	void updateSaleShopList(uint32_t itemId);
-	bool hasShopItemForSale(uint32_t itemId, uint8_t subType);
-	*/
+	bool hasShopItemForSale(uint32_t itemId, int32_t subType);
+
 	VIPListSet VIPList;
 	uint32_t maxVipLimit;
 
@@ -684,6 +682,8 @@ protected:
 	// and used when setting the outfit to make sure the client doesn't
 	// fool us
 	OutfitList validOutfitList;
+
+	ShopItemList validShopList;
 
 	//account variables
 	uint32_t accountId;

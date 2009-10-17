@@ -78,5 +78,6 @@ struct FindPathParams;
 class QTreeLeafNode;
 struct LootBlock;
 struct Quest;
+struct ShopItem;
 
 #endif

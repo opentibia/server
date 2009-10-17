@@ -854,11 +854,7 @@ void Player::addContainer(uint32_t cid, Container* container)
 	}
 
 	//id doesnt exist, create it
-	containervector_pair cv;
-	cv.first = cid;
-	cv.second = container;
-
-	containerVec.push_back(cv);
+	containerVec.push_back(std::make_pair(cid, container));
 }
 
 void Player::closeContainer(uint32_t cid)
@@ -1262,10 +1258,9 @@ void Player::sendStats()
 	}
 }
 
-/*
-bool Player::hasShopItemForSale(uint32_t itemId, uint8_t subType)
+bool Player::hasShopItemForSale(uint32_t itemId, int32_t subType)
 {
-	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
+	for(ShopItemList::const_iterator it = validShopList.begin(); it != validShopList.end(); ++it){
 		if(it->itemId == itemId && (*it).buyPrice > 0){
 			const ItemType& iit = Item::items[itemId];
 			if(iit.stackable || iit.isRune()){
@@ -1281,18 +1276,21 @@ bool Player::hasShopItemForSale(uint32_t itemId, uint8_t subType)
 
 void Player::updateSaleShopList(uint32_t itemId)
 {
-	const ItemType& itemtype = Item::items[itemId];
-	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
-		if(it->itemId == itemId || itemtype.currency != 0){
-			if(client){
-				client->sendSaleItemList(shopItemList);
-			}
-
+	const ItemType& itemType = Item::items[itemId];
+	for(ShopItemList::const_iterator it = validShopList.begin(); it != validShopList.end(); ++it){
+		if(it->itemId == itemId || itemType.currency != 0){
+			sendShopSaleList(validShopList);
 			break;
 		}
 	}
 }
-*/
+
+void Player::sendShopWindow(const ShopItemList& list)
+{
+	validShopList = list;
+	if(client)
+		client->sendShopWindow(list);
+}
 
 
 void Player::sendOutfitWindow(const OutfitList& outfitList)
@@ -1589,10 +1587,7 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 			g_game.internalCloseTrade(this);
 		}
 
-		// REVSCRIPTSYS
-		// Close shop window when player logs out
-		//closeShopWindow();
-
+		g_game.onPlayerShopClose(this);
 		g_game.cancelRuleViolation(this);
 
 		if(hasFlag(PlayerFlag_CanAnswerRuleViolations)){
@@ -1629,23 +1624,6 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 #endif
 	}
 }
-
-/*
-void Player::closeShopWindow()
-{
-	//unreference callbacks
-	int32_t onBuy;
-	int32_t onSell;
-
-	Npc* npc = getShopOwner(onBuy, onSell);
-	if(npc){
-		setShopOwner(NULL, -1, -1);
-		// REVSCRIPT TODO
-		//npc->onPlayerEndTrade(this, onBuy, onSell);
-		sendCloseShop();
-	}
-}
-*/
 
 void Player::onWalk(Direction& dir)
 {
@@ -3200,13 +3178,7 @@ void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* 
 			onSendContainer(container);
 		}
 
-		// REVSCRIPTSYS TODO
-		// Shop..
-		/*
-		if(shopOwner){
-			updateSaleShopList(item->getID());
-		}
-		*/
+		updateSaleShopList(item->getID());
 	}
 	else if(const Creature* creature = thing->getCreature()){
 		if(creature == this){
@@ -3286,13 +3258,9 @@ void Player::postRemoveNotification(Creature* actor, Thing* thing, const Cylinde
 			}
 		}
 
-		// REVSCRIPTSYS TODO
-		//
-		/*
-		if(shopOwner && requireListUpdate){
+		if(requireListUpdate){
 			updateSaleShopList(item->getID());
 		}
-		*/
 	}
 }
 

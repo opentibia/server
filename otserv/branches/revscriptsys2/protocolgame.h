@@ -26,35 +26,7 @@
 #include "enums.h"
 #include "const.h"
 
-struct ShopInfo{
-	uint32_t itemId;
-	int32_t subType;
-	uint32_t buyPrice;
-	uint32_t sellPrice;
-	// Name can be found using Item::items[itemId].
-	
-	ShopInfo(){
-		itemId = 0;
-		subType = 1;
-		buyPrice = 0;
-		sellPrice = 0;
-	};
-	ShopInfo(uint32_t _itemId, int32_t _subType = 0,
-		uint32_t _buyPrice = 0, uint32_t _sellPrice = 0){
-		itemId = _itemId;
-		subType = _subType;
-		buyPrice = _buyPrice;
-		sellPrice = _sellPrice;
-	};
-};
-
-enum connectResult_t{
-	CONNECT_SUCCESS = 1,
-	CONNECT_TOMANYPLAYERS = 2,
-	CONNECT_MASTERPOSERROR = 3,
-	CONNECT_INTERNALERROR = 4
-};
-
+typedef std::list<ShopItem> ShopItemList;
 typedef boost::shared_ptr<NetworkMessage> NetworkMessage_ptr;
 
 class ProtocolGame : public Protocol
@@ -132,9 +104,9 @@ private:
 
 	//shop methods
 	void parseLookInShop(NetworkMessage& msg);
-	void parsePlayerPurchase(NetworkMessage& msg);
-	void parsePlayerSale(NetworkMessage& msg);
-	void parseCloseShop(NetworkMessage& msg);
+	void parseShopPurchase(NetworkMessage& msg);
+	void parseShopSale(NetworkMessage& msg);
+	void parseShopClose(NetworkMessage& msg);
 
 	//party methods
 	void parseInviteToParty(NetworkMessage& msg);
@@ -208,10 +180,10 @@ private:
 	void sendStats();
 	void sendTextMessage(MessageClass mclass, const std::string& message);
 
-	void sendShop(const std::list<ShopInfo>& shop);
-	void sendCloseShop();
-	void sendPlayerCash(uint32_t amount);
-	void sendSaleItemList(const std::list<ShopInfo>& shop);
+	void sendShopWindow(const ShopItemList& list);
+	void sendShopSaleList(const ShopItemList& list);
+	void sendShopClose();
+	void sendMoney(uint32_t amount);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	void sendQuestLog();
@@ -312,7 +284,7 @@ private:
 	void RemoveInventoryItem(NetworkMessage_ptr msg, SlotType slot);
 
 	//shop
-	void AddShopItem(NetworkMessage_ptr msg, const ShopInfo item);
+	void AddShopItem(NetworkMessage_ptr msg, const ShopItem& shopItem);
 
 	friend class Player;
 

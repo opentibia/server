@@ -22,7 +22,6 @@
 #include "protocollogin.h"
 #include "outputmessage.h"
 #include "ioaccount.h"
-#include "account.h"
 #include "ban.h"
 #include "game.h"
 #include "configmanager.h"
@@ -156,8 +155,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			output->AddU32(serverip);
 			output->AddU16(g_config.getNumber(ConfigManager::GAME_PORT));
 		}
-		//Add premium days
-		output->AddU16(Account::getPremiumDaysLeft(account.premEnd));//output->AddU16(0);
+		output->AddU16(IOAccount::getPremiumDaysLeft(account.premiumEnd));
 
 		OutputMessagePool::getInstance()->send(output);
 	}

@@ -105,23 +105,6 @@ typedef std::list<HouseTile*> HouseTileList;
 typedef std::list<Door*> HouseDoorList;
 typedef std::list<BedItem*> HouseBedItemList;
 
-class HouseTransferItem : public Item
-{
-public:
-	static HouseTransferItem* createHouseTransferItem(House* house);
-
-	HouseTransferItem(House* _house) : Item(0) {house = _house;}
-	virtual ~HouseTransferItem(){}
-
-	virtual bool onTradeEvent(TradeEvents_t event, Player* owner);
-
-	House* getHouse(){return house;}
-	virtual bool canTransform() const {return false;}
-
-protected:
-	House* house;
-};
-
 class House
 {
 public:
@@ -193,10 +176,6 @@ public:
 	Door* getDoorByNumber(uint32_t doorId) const;
 	Door* getDoorByPosition(const Position& pos);
 
-	HouseTransferItem* getTransferItem();
-	void resetTransferItem();
-	bool executeTransfer(HouseTransferItem* item, Player* player);
-
 	HouseTileList::iterator getTileBegin() {return houseTiles.begin();}
 	HouseTileList::iterator getTileEnd() {return houseTiles.end();}
 	size_t getTileCount() {return houseTiles.size();}
@@ -236,9 +215,6 @@ private:
 	bool guildHall;
 	uint32_t syncFlags;
 	bool pendingDepotTransfer;
-
-	HouseTransferItem* transferItem;
-	Container transfer_container;
 };
 
 typedef std::map<uint32_t, House*> HouseMap;

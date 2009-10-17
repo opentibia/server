@@ -485,15 +485,15 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	case 0x7A: // player bought from shop
-		parsePlayerPurchase(msg);
+		parseShopPurchase(msg);
 		break;
 
 	case 0x7B: // player sold to shop
-		parsePlayerSale(msg);
+		parseShopSale(msg);
 		break;
 
 	case 0x7C: // player closed shop window
-		parseCloseShop(msg);
+		parseShopClose(msg);
 		break;
 
 	case 0x7D: // Request trade
@@ -1311,28 +1311,28 @@ void ProtocolGame::parseLookInShop(NetworkMessage &msg)
 	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, &Game::playerLookInShop, player->getID(), id, count);
 }
 
-void ProtocolGame::parsePlayerPurchase(NetworkMessage &msg)
+void ProtocolGame::parseShopPurchase(NetworkMessage &msg)
 {
 	uint16_t id = msg.GetU16();
 	uint8_t count = msg.GetByte();
 	uint8_t amount = msg.GetByte();
 	bool ignoreCapacity = (msg.GetByte() == 0x01);
 	bool buyWithBackpack = (msg.GetByte() == 0x01);
-	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, &Game::playerPurchaseItem, player->getID(), id, count, amount, ignoreCapacity, buyWithBackpack);
+	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, &Game::playerShopPurchase, player->getID(), id, count, amount, ignoreCapacity, buyWithBackpack);
 }
 
-void ProtocolGame::parsePlayerSale(NetworkMessage &msg)
+void ProtocolGame::parseShopSale(NetworkMessage &msg)
 {
 	uint16_t id = msg.GetU16();
 	uint8_t count = msg.GetByte();
 	uint8_t amount = msg.GetByte();
 
-	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, &Game::playerSellItem, player->getID(), id, count, amount);
+	addGameTaskTimed(DISPATCHER_TASK_EXPIRATION, &Game::playerShopSell, player->getID(), id, count, amount);
 }
 
-void ProtocolGame::parseCloseShop(NetworkMessage &msg)
+void ProtocolGame::parseShopClose(NetworkMessage &msg)
 {
-	addGameTask(&Game::playerCloseShop, player->getID());
+	addGameTask(&Game::playerShopClose, player->getID());
 }
 
 void ProtocolGame::parseRequestTrade(NetworkMessage& msg)
@@ -1679,32 +1679,25 @@ void ProtocolGame::sendContainer(uint32_t cid, const Container* container, bool 
 	}
 }
 
-void ProtocolGame::sendShop(const std::list<ShopInfo>& shop)
+void ProtocolGame::sendShopWindow(const ShopItemList& list)
 {
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7A);
-		msg->AddByte(std::min((size_t)255, shop.size()));
+		msg->AddByte(std::min((size_t)255, list.size()));
 
-		std::list<ShopInfo>::const_iterator it;
+		ShopItemList::const_iterator it;
 		uint32_t i = 0;
-		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i){
+		for(it = list.begin(); it != list.end() && i < 255; ++it, ++i){
 			AddShopItem(msg, (*it));
 		}
 	}
+
+	sendShopSaleList(list);
 }
 
-void ProtocolGame::sendCloseShop()
-{
-	NetworkMessage_ptr msg = getOutputBuffer();
-	if(msg){
-		TRACK_MESSAGE(msg);
-		msg->AddByte(0x7C);
-	}
-}
-
-void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
+void ProtocolGame::sendShopSaleList(const ShopItemList& list)
 {
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
@@ -1713,15 +1706,15 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 
 		std::map<uint32_t, uint32_t> saleMap;
 
-		if(shop.size() <= 5){
+		if(list.size() <= 5){
 			// For very small shops it's not worth it to create the complete map
-			for(std::list<ShopInfo>::const_iterator it = shop.begin(); it != shop.end(); ++it){
-				const ShopInfo& sInfo = *it;
-				if(sInfo.sellPrice > 0){
-					int8_t subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
-					uint32_t count = player->__getItemTypeCount(sInfo.itemId, subtype);
+			for(ShopItemList::const_iterator it = list.begin(); it != list.end(); ++it){
+				const ShopItem& shopItem = *it;
+				if(shopItem.sellPrice > 0){
+					int32_t subType = (shopItem.subType == 0 ? -1 :shopItem.subType);
+					uint32_t count = player->__getItemTypeCount(shopItem.itemId, subType);
 					if(count > 0){
-						saleMap[sInfo.itemId] = count;
+						saleMap[shopItem.itemId] = count;
 					}
 				}
 			}
@@ -1736,22 +1729,22 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 			// We must still check manually for the special items that require subtype matches
 			// (That is, fluids such as potions etc., actually these items are very few since
 			// health potions now use their own ID)
-			for(std::list<ShopInfo>::const_iterator it = shop.begin(); it != shop.end(); ++it){
-				const ShopInfo& sInfo = *it;
-				if(sInfo.sellPrice > 0){
-					int8_t subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
-					if(subtype != -1){
+			for(ShopItemList::const_iterator it = list.begin(); it != list.end(); ++it){
+				const ShopItem& shopItem = *it;
+				if(shopItem.sellPrice > 0){
+					int32_t subType = (shopItem.subType == 0 ? -1 :shopItem.subType);
+					if(subType != -1){
 						// This shop item requires extra checks
-						uint32_t count = player->__getItemTypeCount(sInfo.itemId, subtype);
+						uint32_t count = player->__getItemTypeCount(shopItem.itemId, subType);
 
 						if(count > 0)
-							saleMap[sInfo.itemId] = count;
+							saleMap[shopItem.itemId] = count;
 						else
 							// No count if you include subtypes in the calculations
-							saleMap[sInfo.itemId] = 0;
+							saleMap[shopItem.itemId] = 0;
 					}
 					else{
-						saleMap[sInfo.itemId] = tempSaleMap[sInfo.itemId];
+						saleMap[shopItem.itemId] = tempSaleMap[shopItem.itemId];
 					}
 				}
 			}
@@ -1763,6 +1756,15 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 			msg->AddItemId(it->first);
 			msg->AddByte(std::min((uint32_t)255, it->second));
 		}
+	}
+}
+
+void ProtocolGame::sendShopClose()
+{
+	NetworkMessage_ptr msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+		msg->AddByte(0x7C);
 	}
 }
 
@@ -2884,25 +2886,24 @@ void ProtocolGame::RemoveContainerItem(NetworkMessage_ptr msg, uint8_t cid, uint
 	msg->AddByte(slot);
 }
 
-// shop
-void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopInfo item)
+void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopItem& shopItem)
 {
-	const ItemType& it = Item::items[item.itemId];
+	const ItemType& it = Item::items[shopItem.itemId];
 	msg->AddU16(it.clientId);
 
 	if(it.stackable || it.isRune()){
-		msg->AddByte(item.subType);
+		msg->AddByte(shopItem.subType);
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		uint32_t fluidIndex = item.subType % 8;
+		uint32_t fluidIndex = shopItem.subType % 8;
 		msg->AddByte(fluidMap[fluidIndex].value());
 	}
 	else{
 		msg->AddByte(1);
 	}
 
-	msg->AddString(Item::getDescription(it, -1, NULL, item.subType, false));
+	msg->AddString(Item::getDescription(it, -1, NULL, shopItem.subType, false));
 	msg->AddU32((uint32_t)(it.weight*100));
-	msg->AddU32(item.buyPrice);
-	msg->AddU32(item.sellPrice);
+	msg->AddU32(shopItem.buyPrice);
+	msg->AddU32(shopItem.sellPrice);
 }

@@ -804,6 +804,128 @@ void OnLeaveChannel::Event::update_instance(Manager& state, Environment& environ
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// OnAccountLogin Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when the character list is retrieved from the database
+
+OnAccountLogin::Event::Event(std::string& name, uint32_t& number, std::string& password,
+	time_t& premiumEnd, uint32_t& warnings, std::list<std::string>& charList) :
+	name(name), number(number), password(password), premiumEnd(premiumEnd), warnings(warnings), charList(charList) 
+{
+	propagate_by_default = true;
+}
+
+OnAccountLogin::Event::~Event() {
+}
+
+bool OnAccountLogin::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method){
+		case FILTER_NAME: return info.name == name;
+		default:
+			break;
+	}
+
+	return false;
+}
+
+bool OnAccountLogin::Event::dispatch(Manager& state, Environment& environment)
+{
+	return dispatchEvent<OnAccountLogin::Event>
+		(this, state, environment, environment.Generic.OnAccountLogin);
+}
+
+void OnAccountLogin::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnAccountLogin");
+	state.push(name);
+	state.setField(-2, "name");
+	state.push(number);
+	state.setField(-2, "number");
+	state.push(password);
+	state.setField(-2, "password");
+	state.push((uint64_t)premiumEnd);
+	state.setField(-2, "premiumEnd");
+	state.push(warnings);
+	state.setField(-2, "warnings");
+
+	state.newTable();
+	int n = 1;
+	for(std::list<std::string>::iterator iter = charList.begin(); iter != charList.end(); ++iter, ++n){
+		state.newTable();
+		state.setField(-1, "name", *iter);
+	}
+	state.setField(-2, "charList");
+}
+
+void OnAccountLogin::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	thread->getField(-1, "name");
+	if(thread->isString()) {
+		name = thread->popString();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnAccountLogin' invalid value of 'name'");
+		thread->pop();
+	}
+
+	thread->getField(-1, "number");
+	if(thread->isNumber()) {
+		number = thread->popUnsignedInteger();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnAccountLogin' invalid value of 'number'");
+		thread->pop();
+	}
+
+	thread->getField(-1, "password");
+	if(thread->isString()) {
+		password = thread->popString();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnAccountLogin' invalid value of 'password'");
+		thread->pop();
+	}
+
+	thread->getField(-1, "premiumEnd");
+	if(thread->isNumber()) {
+		premiumEnd = thread->popValue<uint64_t>();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnAccountLogin' invalid value of 'premiumEnd'");
+		thread->pop();
+	}
+
+	thread->getField(-1, "warnings");
+	if(thread->isNumber()) {
+		warnings = thread->popUnsignedInteger();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnAccountLogin' invalid value of 'warnings'");
+		thread->pop();
+	}
+
+	try{
+		thread->getField(-1, "charList");
+		if(!thread->isTable())
+			thread->HandleError("'charList' must be a table.");
+		// iterate over the table
+		thread->pushNil();
+		while(thread->iterateTable(-2)){
+
+			thread->getField(-1, "name");
+			charList.push_back(thread->popString());
+			thread->pop(); // pop value
+		}
+		// Pop the 'charList' table
+		thread->pop();
+	} catch(Error& e) {
+		thread->HandleError(ERROR_WARN, std::string("Event 'OnAccountLogin' invalid structure of 'charList'") + e.what());
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // OnLogin Event
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a player enters the server
@@ -1282,6 +1404,181 @@ void OnAdvance::Event::update_instance(Manager& state, Environment& environment,
 {
 	;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnShopPurchase Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player wants to purchase an item from a NPC
+
+OnShopPurchase::Event::Event(Player* player, uint16_t itemId, int32_t type, uint32_t amount, bool ignoreCapacity, bool buyWithBackpack) :
+	player(player),
+	itemId(itemId),
+	type(type),
+	amount(amount),
+	ignoreCapacity(ignoreCapacity),
+	buyWithBackpack(buyWithBackpack)
+{
+	propagate_by_default = true;
+}
+
+OnShopPurchase::Event::~Event()
+{
+}
+
+bool OnShopPurchase::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_NAME:
+			return info.name == player->getName();
+		default: break;
+	}
+	return false;
+}
+
+bool OnShopPurchase::Event::dispatch(Manager& state, Environment& environment)
+{
+	ListenerList list = player->getListeners(ON_SHOP_PURCHASE_LISTENER);
+	if(dispatchEvent<OnShopPurchase::Event, ScriptInformation>
+			(this, state, environment, list)
+		)
+		return true;
+
+	return dispatchEvent<OnShopPurchase::Event, ScriptInformation>
+		(this, state, environment, environment.Generic.OnShopPurchase);
+}
+
+void OnShopPurchase::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnShopPurchaseEvent");
+	state.pushThing(player);
+	state.setField(-2, "player");
+	state.push(itemId);
+	state.setField(-2, "itemId");
+	state.push(type);
+	state.setField(-2, "type");
+	state.push(amount);
+	state.setField(-2, "amount");
+	state.push(ignoreCapacity);
+	state.setField(-2, "ignoreCapacity");
+	state.push(buyWithBackpack);
+	state.setField(-2, "buyWithBackpack");
+}
+
+void OnShopPurchase::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnShopSell Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player wants to sell an item to a NPC
+
+OnShopSell::Event::Event(Player* player, uint16_t itemId, int32_t type, uint32_t amount) :
+	player(player),
+	itemId(itemId),
+	type(type),
+	amount(amount)
+{
+	propagate_by_default = true;
+}
+
+OnShopSell::Event::~Event()
+{
+}
+
+bool OnShopSell::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_NAME:
+			return info.name == player->getName();
+		default: break;
+	}
+	return false;
+}
+
+bool OnShopSell::Event::dispatch(Manager& state, Environment& environment)
+{
+	ListenerList list = player->getListeners(ON_SHOP_SELL_LISTENER);
+	if(dispatchEvent<OnShopSell::Event, ScriptInformation>
+			(this, state, environment, list)
+		)
+		return true;
+
+	return dispatchEvent<OnShopSell::Event, ScriptInformation>
+		(this, state, environment, environment.Generic.OnShopSell);
+}
+
+void OnShopSell::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnShopSellEvent");
+	state.pushThing(player);
+	state.setField(-2, "player");
+	state.push(itemId);
+	state.setField(-2, "itemId");
+	state.push(type);
+	state.setField(-2, "type");
+	state.push(amount);
+	state.setField(-2, "amount");
+}
+
+void OnShopSell::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnShopClose Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player closes the shop window
+
+OnShopClose::Event::Event(Player* player) :
+	player(player)
+{
+	propagate_by_default = true;
+}
+
+OnShopClose::Event::~Event()
+{
+}
+
+bool OnShopClose::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_NAME:
+			return info.name == player->getName();
+		default: break;
+	}
+	return false;
+}
+
+bool OnShopClose::Event::dispatch(Manager& state, Environment& environment)
+{
+	ListenerList list = player->getListeners(ON_SHOP_CLOSE_LISTENER);
+	if(dispatchEvent<OnShopClose::Event, ScriptInformation>
+			(this, state, environment, list)
+		)
+		return true;
+
+	return dispatchEvent<OnShopClose::Event, ScriptInformation>
+		(this, state, environment, environment.Generic.OnShopClose);
+}
+
+void OnShopClose::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnShopCloseEvent");
+	state.pushThing(player);
+	state.setField(-2, "player");
+}
+
+void OnShopClose::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnCondition Event

@@ -402,6 +402,7 @@ template<> void Script::ListenerType__Base::initialize()
 	initAddValue(Script::enums::ON_MOVE_ITEM_LISTENER, "ON_MOVE_ITEM_LISTENER", true);
 	initAddValue(Script::enums::ON_OPEN_CHANNEL_LISTENER, "ON_OPEN_CHANNEL_LISTENER", true);
 	initAddValue(Script::enums::ON_CLOSE_CHANNEL_LISTENER, "ON_CLOSE_CHANNEL_LISTENER", true);
+	initAddValue(Script::enums::ON_ACCOUNT_LOGIN_LISTENER, "ON_ACCOUNT_LOGIN_LISTENER", true);
 	initAddValue(Script::enums::ON_LOGIN_LISTENER, "ON_LOGIN_LISTENER", true);
 	initAddValue(Script::enums::ON_LOGOUT_LISTENER, "ON_LOGOUT_LISTENER", true);
 	initAddValue(Script::enums::ON_CHANGE_OUTFIT_LISTENER, "ON_CHANGE_OUTFIT_LISTENER", true);
@@ -416,6 +417,9 @@ template<> void Script::ListenerType__Base::initialize()
 	initAddValue(Script::enums::ON_KILL_LISTENER, "ON_KILL_LISTENER", true);
 	initAddValue(Script::enums::ON_DEATH_LISTENER, "ON_DEATH_LISTENER", true);
 	initAddValue(Script::enums::ON_ADVANCE_LISTENER, "ON_ADVANCE_LISTENER", true);
+	initAddValue(Script::enums::ON_SHOP_PURCHASE_LISTENER, "ON_SHOP_PURCHASE_LISTENER", true);
+	initAddValue(Script::enums::ON_SHOP_SELL_LISTENER, "ON_SHOP_SELL_LISTENER", true);
+	initAddValue(Script::enums::ON_SHOP_CLOSE_LISTENER, "ON_SHOP_CLOSE_LISTENER", true);
 	initAddValue(Script::enums::ON_ATTACK_LISTENER, "ON_ATTACK_LISTENER", true);
 	initAddValue(Script::enums::ON_DAMAGE_LISTENER, "ON_DAMAGE_LISTENER", true);
 	initAddValue(Script::enums::ON_CONDITION_LISTENER, "ON_CONDITION_LISTENER", true);
