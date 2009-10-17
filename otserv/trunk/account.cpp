@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <cmath>
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -38,15 +39,9 @@ Account::~Account()
 
 uint16_t Account::getPremiumDaysLeft(uint32_t _premEnd)
 {
-	uint32_t today = (uint32_t)time(NULL) / 86400;
-	if((time_t)_premEnd == time_t(-1))
-		return 0xFFFF;
-
-	if(uint32_t(_premEnd / 86400) < today)
+	if(_premEnd < (uint32_t)time(NULL)){
 		return 0;
+	}
 
-	if(uint32_t(_premEnd / 86400) - today >= 0xFFFF)
-		return 0xFFFF;
-
-	return uint16_t(uint32_t(_premEnd / 86400) - today);
+	return (uint16_t)std::ceil((double)(_premEnd - time(NULL)) / 86400);
 }
