@@ -252,10 +252,8 @@ public:
 	int lua_registerGenericEvent_OnLogin();
 	int lua_registerGenericEvent_OnLogout();
 	int lua_registerSpecificEvent_OnLogout();
-
 	int lua_registerGenericEvent_OnChangeOutfit();
 	int lua_registerSpecificEvent_OnChangeOutfit();
-
 	int lua_registerGenericEvent_OnLookAtItem();
 	int lua_registerSpecificEvent_OnLookAtCreature();
 	int lua_registerSpecificEvent_OnLook();
@@ -290,6 +288,13 @@ public:
 	int lua_registerSpecificEvent_OnDeathBy();
 	int lua_registerGenericEvent_OnDeath();
 	int lua_registerSpecificEvent_OnDeath();
+	int lua_registerGenericEvent_OnShopPurchase();
+	int lua_registerGenericEvent_OnShopSell();
+	int lua_registerGenericEvent_OnShopClose();
+	int lua_registerGenericEvent_OnTradeBegin();
+	int lua_registerSpecificEvent_OnTradeBegin();
+	int lua_registerGenericEvent_OnTradeEnd();
+	int lua_registerSpecificEvent_OnTradeEnd();
 
 	int lua_stopListener();
 
@@ -425,6 +430,8 @@ public:
 	int lua_Actor_setTarget();
 	int lua_Actor_setMechanicImmunities();
 	int lua_Actor_setDamageImmunities();
+	int lua_Actor_openShop();
+	int lua_Actor_closeShop();
 
 	/*
 	TODO:

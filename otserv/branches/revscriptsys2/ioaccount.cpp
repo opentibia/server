@@ -34,7 +34,7 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 
 	if(g_game.onAccountLogin(acc.name, acc.number, acc.password,
 		acc.premiumEnd, acc.warnings, acc.charList)){
-		// script handled it
+		//handled by script
 		return acc;
 	}
 

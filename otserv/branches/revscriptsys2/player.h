@@ -719,7 +719,7 @@ protected:
 	ConditionList storedConditionList;
 
 	//trade variables
-	Player* tradePartner;
+	Player* tradePlayer;
 	TradeState tradeState;
 	Item* tradeItem;
 

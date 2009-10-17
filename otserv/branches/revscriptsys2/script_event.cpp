@@ -1426,25 +1426,15 @@ OnShopPurchase::Event::~Event()
 {
 }
 
-bool OnShopPurchase::Event::check_match(const ScriptInformation& info)
-{
-	switch(info.method) {
-		case FILTER_NAME:
-			return info.name == player->getName();
-		default: break;
-	}
-	return false;
-}
-
 bool OnShopPurchase::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerList list = player->getListeners(ON_SHOP_PURCHASE_LISTENER);
-	if(dispatchEvent<OnShopPurchase::Event, ScriptInformation>
+	if(dispatchEvent<OnShopPurchase::Event>
 			(this, state, environment, list)
 		)
 		return true;
 
-	return dispatchEvent<OnShopPurchase::Event, ScriptInformation>
+	return dispatchEvent<OnShopPurchase::Event>
 		(this, state, environment, environment.Generic.OnShopPurchase);
 }
 
@@ -1489,25 +1479,15 @@ OnShopSell::Event::~Event()
 {
 }
 
-bool OnShopSell::Event::check_match(const ScriptInformation& info)
-{
-	switch(info.method) {
-		case FILTER_NAME:
-			return info.name == player->getName();
-		default: break;
-	}
-	return false;
-}
-
 bool OnShopSell::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerList list = player->getListeners(ON_SHOP_SELL_LISTENER);
-	if(dispatchEvent<OnShopSell::Event, ScriptInformation>
+	if(dispatchEvent<OnShopSell::Event>
 			(this, state, environment, list)
 		)
 		return true;
 
-	return dispatchEvent<OnShopSell::Event, ScriptInformation>
+	return dispatchEvent<OnShopSell::Event>
 		(this, state, environment, environment.Generic.OnShopSell);
 }
 
@@ -1545,25 +1525,15 @@ OnShopClose::Event::~Event()
 {
 }
 
-bool OnShopClose::Event::check_match(const ScriptInformation& info)
-{
-	switch(info.method) {
-		case FILTER_NAME:
-			return info.name == player->getName();
-		default: break;
-	}
-	return false;
-}
-
 bool OnShopClose::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerList list = player->getListeners(ON_SHOP_CLOSE_LISTENER);
-	if(dispatchEvent<OnShopClose::Event, ScriptInformation>
+	if(dispatchEvent<OnShopClose::Event>
 			(this, state, environment, list)
 		)
 		return true;
 
-	return dispatchEvent<OnShopClose::Event, ScriptInformation>
+	return dispatchEvent<OnShopClose::Event>
 		(this, state, environment, environment.Generic.OnShopClose);
 }
 
@@ -1581,10 +1551,158 @@ void OnShopClose::Event::update_instance(Manager& state, Environment& environmen
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// OnTradeBegin Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player closes the shop window
+
+OnTradeBegin::Event::Event(Player* player1, Item* item1, Player* player2, Item* item2) :
+	player1(player1),
+	item1(item1),
+	player2(player2),
+	item2(item2)
+{
+	propagate_by_default = true;
+}
+
+OnTradeBegin::Event::~Event()
+{
+}
+
+bool OnTradeBegin::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_ALL:
+			return true;
+		case FILTER_ITEMID:
+			return (item1 && item1->getID() == info.id) || (item2 && item2->getID() == info.id);
+		case FILTER_ACTIONID:
+			return (item1 && item1->getActionId() == info.id) || (item2 && item2->getActionId() == info.id);
+		default: break;
+	}
+	return false;
+}
+
+bool OnTradeBegin::Event::dispatch(Manager& state, Environment& environment)
+{
+	if(player1){
+		ListenerList list = player1->getListeners(ON_TRADE_BEGIN_LISTENER);
+		if(dispatchEvent<OnTradeBegin::Event, ScriptInformation>
+				(this, state, environment, list)
+			)
+			return true;
+	}
+
+	if(player2){
+		ListenerList list = player2->getListeners(ON_TRADE_BEGIN_LISTENER);
+		if(dispatchEvent<OnTradeBegin::Event, ScriptInformation>
+				(this, state, environment, list)
+			)
+			return true;
+	}
+
+	return dispatchEvent<OnTradeBegin::Event>
+		(this, state, environment, environment.Generic.OnTradeBegin);
+}
+
+void OnTradeBegin::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnTradeBeginEvent");
+	state.pushThing(player1);
+	state.setField(-2, "player1");
+	state.pushThing(item1);
+	state.setField(-2, "item1");
+	state.pushThing(player2);
+	state.setField(-2, "player2");
+	state.pushThing(item2);
+	state.setField(-2, "item2");
+}
+
+void OnTradeBegin::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// OnTradeEnd Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a trade is ended (cancelled or completed)
+
+OnTradeEnd::Event::Event(Player* player1, Item* item1, Player* player2, Item* item2, bool isCompleted) :
+	player1(player1),
+	item1(item1),
+	player2(player2),
+	item2(item2),
+	isCompleted(isCompleted)
+{
+	propagate_by_default = true;
+}
+
+OnTradeEnd::Event::~Event()
+{
+}
+
+bool OnTradeEnd::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method) {
+		case FILTER_ALL:
+			return true;
+		case FILTER_ITEMID:
+			return (item1 && item1->getID() == info.id) || (item2 && item2->getID() == info.id);
+		case FILTER_ACTIONID:
+			return (item1 && item1->getActionId() == info.id) || (item2 && item2->getActionId() == info.id);
+		default: break;
+	}
+	return false;
+}
+
+bool OnTradeEnd::Event::dispatch(Manager& state, Environment& environment)
+{
+	if(player1){
+		ListenerList list = player1->getListeners(ON_TRADE_END_LISTENER);
+		if(dispatchEvent<OnTradeEnd::Event>
+				(this, state, environment, list)
+			)
+			return true;
+	}
+
+	if(player2){
+		ListenerList list = player2->getListeners(ON_TRADE_END_LISTENER);
+		if(dispatchEvent<OnTradeEnd::Event>
+				(this, state, environment, list)
+			)
+			return true;
+	}
+
+	return dispatchEvent<OnTradeEnd::Event>
+		(this, state, environment, environment.Generic.OnTradeEnd);
+}
+
+void OnTradeEnd::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnTradeEndEvent");
+	state.pushThing(player1);
+	state.setField(-2, "player1");
+	state.pushThing(item1);
+	state.setField(-2, "item1");
+	state.pushThing(player2);
+	state.setField(-2, "player2");
+	state.pushThing(item2);
+	state.setField(-2, "item2");
+	state.push(isCompleted);
+	state.setField(-2, "isCompleted");
+}
+
+void OnTradeEnd::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // OnCondition Event
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a condition is added/removed or ticks
-
 
 OnCondition::Event::Event(Creature* creature, Condition* condition) :
 	creature(creature),

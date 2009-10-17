@@ -87,6 +87,8 @@ void Environment::cleanupUnusedListeners(ListenerItemMap& list)
 	cleanupUnusedListeners(Generic.OnShopPurchase);
 	cleanupUnusedListeners(Generic.OnShopSell);
 	cleanupUnusedListeners(Generic.OnShopClose);
+	cleanupUnusedListeners(Generic.OnTradeBegin);
+	cleanupUnusedListeners(Generic.OnTradeEnd);
 	cleanupUnusedListeners(Generic.OnMoveItem);
 	cleanupUnusedListeners(Generic.OnMoveItemOnItem);
 	cleanupUnusedListeners(Generic.OnCondition);
@@ -202,11 +204,20 @@ bool Environment::stopListener(ListenerType type, uint32_t id)
 		case enums::ON_SHOP_PURCHASE_LISTENER:
 			if(stopListener(Generic.OnShopPurchase, id))
 				return true;
+			return false; // No specific listeners
 		case enums::ON_SHOP_SELL_LISTENER:
 			if(stopListener(Generic.OnShopSell, id))
 				return true;
+			return false; // No specific listeners
 		case enums::ON_SHOP_CLOSE_LISTENER:
 			if(stopListener(Generic.OnShopClose, id))
+				return true;
+			return false; // No specific listeners
+		case enums::ON_TRADE_BEGIN_LISTENER:
+			if(stopListener(Generic.OnTradeBegin, id))
+				return true;
+		case enums::ON_TRADE_END_LISTENER:
+			if(stopListener(Generic.OnTradeEnd, id))
 				return true;
 		case enums::ON_ATTACK_LISTENER:
 			if(stopListener(Generic.OnAttack, id))

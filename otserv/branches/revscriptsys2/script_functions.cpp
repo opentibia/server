@@ -280,6 +280,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "setTarget(Creature target)", &Manager::lua_Actor_setTarget);
 	registerMemberFunction("Actor", "setMechanicImmunities(table immunities)", &Manager::lua_Actor_setMechanicImmunities);
 	registerMemberFunction("Actor", "setDamageImmunities(table immunities)", &Manager::lua_Actor_setDamageImmunities);
+	registerMemberFunction("Actor", "openShop(Player who, table list)", &Manager::lua_Actor_openShop);
+	registerMemberFunction("Actor", "closeShop(Player who)", &Manager::lua_Actor_closeShop);
 
 	registerGlobalFunction("createMonster(string monstertypename, table pos)", &Manager::lua_createMonster);
 	registerGlobalFunction("createActor(string name, table pos)", &Manager::lua_createActor);
@@ -504,6 +506,17 @@ void Manager::registerFunctions() {
 	// OnAdvance
 	registerGlobalFunction("registerOnAdvance([LevelType skillid = nil], function callback)", &Manager::lua_registerGenericEvent_OnAdvance);
 	registerGlobalFunction("registerOnPlayerAdvance(Player player [, LevelType skillid = nil], function callback)", &Manager::lua_registerSpecificEvent_OnAdvance);
+
+	// OnShopPurchase/OnShopSell/OnShopClose
+	registerGlobalFunction("registerOnShopPurchase(function callback)", &Manager::lua_registerGenericEvent_OnShopPurchase);
+	registerGlobalFunction("registerOnShopSell(function callback)", &Manager::lua_registerGenericEvent_OnShopSell);
+	registerGlobalFunction("registerOnShopClose(function callback)", &Manager::lua_registerGenericEvent_OnShopClose);
+
+	//OnTradeBegin/onTradeEnd
+	registerGlobalFunction("registerOnTradeBegin(string method [, int filter = nil], function callback)", &Manager::lua_registerGenericEvent_OnTradeBegin);
+	registerGlobalFunction("registerOnPlayerTradeBegin(Player who, string method [, int filter = nil], function callback)", &Manager::lua_registerSpecificEvent_OnTradeBegin);
+	registerGlobalFunction("registerOnTradeEnd(string method [, int filter = nil], function callback)", &Manager::lua_registerGenericEvent_OnTradeEnd);
+	registerGlobalFunction("registerOnPlayerTradeEnd(Player who, string method [, int filter = nil], function callback)", &Manager::lua_registerSpecificEvent_OnTradeEnd);
 
 	// OnCondition
 	registerGlobalFunction("registerOnCondition(string name, string method, function callback)", &Manager::lua_registerGenericEvent_OnCondition);
@@ -1340,7 +1353,6 @@ int LuaState::lua_registerGenericEvent_OnSpawn() {
 	std::string cname = popString();
 	toLowerCaseString(cname);
 
-
 	boost::any p(0);
 	Listener_ptr listener(
 		new Listener(ON_SPAWN_LISTENER, p, *manager),
@@ -1511,13 +1523,12 @@ int LuaState::lua_registerGenericEvent_OnAdvance() {
 	if(isNil()){
 		si_onadvance.method = OnAdvance::FILTER_ALL;
 		si_onadvance.skill = LEVEL_EXPERIENCE; // Unused, just don't leave it hanging
+		pop();
 	}
 	else{
 		si_onadvance.method = OnAdvance::FILTER_SKILL;
 		si_onadvance.skill = popEnum<LevelType>();
 	}
-	// Pop the nil
-	pop();
 
 	boost::any p(si_onadvance);
 	Listener_ptr listener(new Listener(ON_ADVANCE_LISTENER, p, *manager));
@@ -1534,7 +1545,6 @@ int LuaState::lua_registerGenericEvent_OnAdvance() {
 }
 
 int LuaState::lua_registerSpecificEvent_OnAdvance() {
-	Creature* who = NULL;
 	OnAdvance::ScriptInformation si_onadvance;
 
 	// store callback
@@ -1544,21 +1554,232 @@ int LuaState::lua_registerSpecificEvent_OnAdvance() {
 	if(isNil()){
 		si_onadvance.method = OnAdvance::FILTER_ALL;
 		si_onadvance.skill = LEVEL_EXPERIENCE; // Unused, just don't leave it hanging
+		pop();
 	}
 	else{
 		si_onadvance.method = OnAdvance::FILTER_SKILL;
 		si_onadvance.skill = popEnum<LevelType>();
 	}
-	// Pop the nil
-	pop();
 
 	// Finally player
-	who = popPlayer();
+	Player* who = popPlayer();
 
 	// Callback is now the top of the stack
 	boost::any p(si_onadvance);
 	Listener_ptr listener(
 		new Listener(ON_ADVANCE_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnShopPurchase() {
+	boost::any p(0);
+	Listener_ptr listener(new Listener(ON_SHOP_PURCHASE_LISTENER, p, *manager));
+
+	environment->Generic.OnShopPurchase.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnShopSell() {
+	boost::any p(0);
+	Listener_ptr listener(new Listener(ON_SHOP_SELL_LISTENER, p, *manager));
+
+	environment->Generic.OnShopSell.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnShopClose() {
+	boost::any p(0);
+	Listener_ptr listener(new Listener(ON_SHOP_CLOSE_LISTENER, p, *manager));
+
+	environment->Generic.OnShopClose.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnTradeBegin() {
+	// store callback
+	insert(-3);
+
+	OnTradeBegin::ScriptInformation si_ontrade;
+
+	if(isNil()){
+		si_ontrade.method = OnTradeBegin::FILTER_ALL;
+		si_ontrade.id = 0; // Unused, just don't leave it hanging
+		pop();
+	}
+	else{
+		si_ontrade.id = popInteger();
+	}
+
+	std::string method = popString();
+
+	if(method == "itemid") {
+		si_ontrade.method = OnTradeBegin::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_ontrade.method = OnTradeBegin::FILTER_ACTIONID;
+	}
+	else if(si_ontrade.method != OnTradeBegin::FILTER_ALL) {
+		throw Error("Invalid argument (1) 'method'");
+	}
+
+	boost::any p(si_ontrade);
+	Listener_ptr listener(new Listener(ON_TRADE_BEGIN_LISTENER, p, *manager));
+
+	environment->Generic.OnTradeBegin.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnTradeBegin() {
+	// store callback
+	insert(-4);
+
+	OnTradeBegin::ScriptInformation si_ontrade;
+
+	if(isNil()){
+		si_ontrade.method = OnTradeBegin::FILTER_ALL;
+		si_ontrade.id = 0; // Unused, just don't leave it hanging
+		pop();
+	}
+	else{
+		si_ontrade.id = popInteger();
+	}
+
+	std::string method = popString();
+
+	if(method == "itemid") {
+		si_ontrade.method = OnTradeBegin::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_ontrade.method = OnTradeBegin::FILTER_ACTIONID;
+	}
+	else if(si_ontrade.method != OnTradeBegin::FILTER_ALL) {
+		throw Error("Invalid argument (1) 'method'");
+	}
+
+	Player* who = popPlayer();
+
+	boost::any p(si_ontrade);
+	Listener_ptr listener(
+		new Listener(ON_TRADE_BEGIN_LISTENER, p, *manager),
+		boost::bind(&Listener::deactivate, _1));
+
+	environment->registerSpecificListener(listener);
+	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnTradeEnd() {
+	// store callback
+	insert(-3);
+
+	OnTradeEnd::ScriptInformation si_ontrade;
+
+	if(isNil()){
+		si_ontrade.method = OnTradeEnd::FILTER_ALL;
+		si_ontrade.id = 0; // Unused, just don't leave it hanging
+		pop();
+	}
+	else{
+		si_ontrade.id = popInteger();
+	}
+
+	std::string method = popString();
+
+	if(method == "itemid") {
+		si_ontrade.method = OnTradeEnd::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_ontrade.method = OnTradeEnd::FILTER_ACTIONID;
+	}
+	else if(si_ontrade.method != OnTradeEnd::FILTER_ALL) {
+		throw Error("Invalid argument (1) 'method'");
+	}
+
+	boost::any p(si_ontrade);
+	Listener_ptr listener(new Listener(ON_TRADE_END_LISTENER, p, *manager));
+
+	environment->Generic.OnTradeEnd.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerSpecificEvent_OnTradeEnd() {
+	// store callback
+	insert(-4);
+
+	OnTradeEnd::ScriptInformation si_ontrade;
+
+	if(isNil()){
+		si_ontrade.method = OnTradeEnd::FILTER_ALL;
+		si_ontrade.id = 0; // Unused, just don't leave it hanging
+		pop();
+	}
+	else{
+		si_ontrade.id = popInteger();
+	}
+
+	std::string method = popString();
+
+	if(method == "itemid") {
+		si_ontrade.method = OnTradeEnd::FILTER_ITEMID;
+	}
+	else if(method == "actionid") {
+		si_ontrade.method = OnTradeEnd::FILTER_ACTIONID;
+	}
+	else if(si_ontrade.method != OnTradeEnd::FILTER_ALL) {
+		throw Error("Invalid argument (1) 'method'");
+	}
+
+	Player* who = popPlayer();
+
+	boost::any p(si_ontrade);
+	Listener_ptr listener(
+		new Listener(ON_TRADE_BEGIN_LISTENER, p, *manager),
 		boost::bind(&Listener::deactivate, _1));
 
 	environment->registerSpecificListener(listener);
@@ -3445,6 +3666,55 @@ int LuaState::lua_Actor_setDamageImmunities()
 	actor->getType().damageImmunities(immunities);
 	//actor->updateMapCache();
 
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_openShop()
+{
+	if(!isTable(-1)) {
+		HandleError(Script::ERROR_THROW, "Attempt to treat non-table value as a shop list.");
+		pop();
+		pushBoolean(false);
+		return 1;
+	}
+
+	ShopItemList list;
+
+	// iterate over the table
+	pushNil();
+	while(iterateTable(-2)){
+		ShopItem shopItem;
+		getField(-1, "itemId");
+		shopItem.itemId = popUnsignedInteger();
+		getField(-1, "subType");
+		shopItem.subType = popInteger();
+		getField(-1, "buyPrice");
+		shopItem.buyPrice = popUnsignedInteger();
+		getField(-1, "sellPrice");
+		shopItem.sellPrice = popUnsignedInteger();
+
+		list.push_back(shopItem);
+
+		pop(); // pop value
+	}
+	// Pop the 'list' table
+	pop();
+
+	Player* player = popPlayer();
+	Actor* actor = popActor();
+
+	player->sendShopWindow(list);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_closeShop()
+{
+	Player* player = popPlayer();
+	Actor* actor = popActor();
+
+	player->sendShopClose();
 	pushBoolean(true);
 	return 1;
 }

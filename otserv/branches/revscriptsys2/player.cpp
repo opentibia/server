@@ -104,7 +104,7 @@ Creature()
 	fightMode = FIGHTMODE_ATTACK;
 	safeMode = true;
 
-	tradePartner = NULL;
+	tradePlayer = NULL;
 	tradeState = TRADE_NONE;
 	tradeItem = NULL;
 
@@ -1583,7 +1583,7 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 			getParty()->leaveParty(this);
 		}
 
-		if(tradePartner){
+		if(tradePlayer){
 			g_game.internalCloseTrade(this);
 		}
 
@@ -1646,8 +1646,8 @@ void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const
 				}
 			}
 
-			if(tradePartner){
-				if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), getPosition())){
+			if(tradePlayer){
+				if(!Position::areInRange<2,2,0>(tradePlayer->getPosition(), getPosition())){
 					g_game.internalCloseTrade(this);
 				}
 			}

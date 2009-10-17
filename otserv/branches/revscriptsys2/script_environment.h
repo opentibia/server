@@ -98,6 +98,8 @@ namespace Script {
 			ListenerList OnShopPurchase;
 			ListenerList OnShopSell;
 			ListenerList OnShopClose;
+			ListenerList OnTradeBegin;
+			ListenerList OnTradeEnd;
 			ListenerItemMap OnMoveItem;
 			ListenerList OnMoveItemOnItem;
 			ListenerList OnCondition;

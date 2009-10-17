@@ -229,7 +229,7 @@ void Creature::onAttacking(uint32_t interval)
 		attackedCreature->onAttacked();
 
 		if(!g_game.onCreatureAttack(this, attackedCreature)){
-			//script interfered
+			//handled by script
 			return;
 		}
 

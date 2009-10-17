@@ -761,15 +761,6 @@ namespace Script {
 	// Triggered when a player wants to purchase an item from a NPC
 
 	namespace OnShopPurchase {
-		enum FilterType {
-			FILTER_NAME
-		};
-
-		struct ScriptInformation {
-			FilterType method;
-			std::string name;
-		};
-
 		class Event : public Script::Event {
 		public:
 			Event(Player* player, uint16_t itemId, int32_t type, uint32_t amount, bool ignoreCapacity, bool buyWithBackpack);
@@ -779,9 +770,6 @@ namespace Script {
 
 			// Runs the event
 			bool dispatch(Manager& state, Environment& environment);
-
-			// This checks if the script information matches this events prerequiste (data members)
-			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
 			void push_instance(LuaState& state, Environment& environment);
@@ -802,15 +790,6 @@ namespace Script {
 	// Triggered when a player wants to sell an item to a NPC
 
 	namespace OnShopSell {
-		enum FilterType {
-			FILTER_NAME
-		};
-
-		struct ScriptInformation {
-			FilterType method;
-			std::string name;
-		};
-
 		class Event : public Script::Event {
 		public:
 			Event(Player* player, uint16_t itemId, int32_t type, uint32_t amount);
@@ -820,9 +799,6 @@ namespace Script {
 
 			// Runs the event
 			bool dispatch(Manager& state, Environment& environment);
-
-			// This checks if the script information matches this events prerequiste (data members)
-			bool check_match(const ScriptInformation& info);
 
 			// Lua stack manipulation
 			void push_instance(LuaState& state, Environment& environment);
@@ -841,21 +817,47 @@ namespace Script {
 	// Triggered when a player closes the shop window
 
 	namespace OnShopClose {
-		enum FilterType {
-			FILTER_NAME
-		};
-
-		struct ScriptInformation {
-			FilterType method;
-			std::string name;
-		};
-
 		class Event : public Script::Event {
 		public:
 			Event(Player* player);
 			~Event();
 
 			std::string getName() const {return "OnShopClose";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Player* player;
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	// OnTradeBegin event
+	// Triggered when a player initiate a trade with another player
+
+	namespace OnTradeBegin {
+		enum FilterType {
+			FILTER_ALL,
+			FILTER_ITEMID,
+			FILTER_ACTIONID,
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			int32_t id;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* player1, Item* item1, Player* player2, Item* item2);
+			~Event();
+
+			std::string getName() const {return "OnTradeBegin";}
 
 			// Runs the event
 			bool dispatch(Manager& state, Environment& environment);
@@ -868,7 +870,52 @@ namespace Script {
 			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
 		protected:
-			Player* player;
+			Player* player1;
+			Item* item1;
+			Player* player2;
+			Item* item2;
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	// OnTradeEnd event
+	// Triggered when a trade is ended (cancelled or completed)
+
+	namespace OnTradeEnd {
+		enum FilterType {
+			FILTER_ALL,
+			FILTER_ITEMID,
+			FILTER_ACTIONID,
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			int32_t id;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* player1, Item* item1, Player* player2, Item* item2, bool isCompleted);
+			~Event();
+
+			std::string getName() const {return "OnTradeEnd";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequiste (data members)
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Player* player1;
+			Item* item1;
+			Player* player2;
+			Item* item2;
+			bool isCompleted;
 		};
 	}
 

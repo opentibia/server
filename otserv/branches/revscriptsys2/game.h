@@ -489,14 +489,12 @@ public:
 	bool playerAcceptTrade(uint32_t playerId);
 	bool playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(uint32_t playerId);
-
 	bool playerShopPurchase(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		uint8_t amount, bool ignoreCapacity = false, bool buyWithBackpack = false);
 	bool playerShopSell(uint32_t playerId, uint16_t spriteId, uint8_t count,
 		uint8_t amount);
 	bool playerShopClose(uint32_t playerId);
 	bool playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count);
-
 	bool playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerFollowCreature(uint32_t playerId, uint32_t creatureId);
 	bool playerCancelAttackAndFollow(uint32_t playerId);
@@ -533,6 +531,8 @@ public:
 	bool onPlayerShopPurchase(Player* player, uint16_t itemId, int32_t type, uint32_t amount, bool ignoreCapacity, bool buyWithBackpack);
 	bool onPlayerShopSell(Player* player, uint16_t itemId, int32_t type, uint32_t amount);
 	bool onPlayerShopClose(Player* player);
+	bool onPlayerTradeBegin(Player* player, Item* tradeItem, Player* tradePlayer, Item* tradePlayerItem);
+	bool onPlayerTradeEnd(Player* player, Item* tradeItem, Player* tradePlayer, Item* tradePlayerItem, bool isCompleted = false);
 	bool onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
 	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
 	bool onSpawn(Actor* actor);

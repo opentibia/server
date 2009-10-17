@@ -420,6 +420,8 @@ template<> void Script::ListenerType__Base::initialize()
 	initAddValue(Script::enums::ON_SHOP_PURCHASE_LISTENER, "ON_SHOP_PURCHASE_LISTENER", true);
 	initAddValue(Script::enums::ON_SHOP_SELL_LISTENER, "ON_SHOP_SELL_LISTENER", true);
 	initAddValue(Script::enums::ON_SHOP_CLOSE_LISTENER, "ON_SHOP_CLOSE_LISTENER", true);
+	initAddValue(Script::enums::ON_TRADE_BEGIN_LISTENER, "ON_TRADE_BEGIN_LISTENER", true);
+	initAddValue(Script::enums::ON_TRADE_END_LISTENER, "ON_TRADE_END_LISTENER", true);
 	initAddValue(Script::enums::ON_ATTACK_LISTENER, "ON_ATTACK_LISTENER", true);
 	initAddValue(Script::enums::ON_DAMAGE_LISTENER, "ON_DAMAGE_LISTENER", true);
 	initAddValue(Script::enums::ON_CONDITION_LISTENER, "ON_CONDITION_LISTENER", true);
