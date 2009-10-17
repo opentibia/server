@@ -37,9 +37,9 @@ Account::~Account()
 	charList.clear();
 }
 
-uint16_t Account::getPremiumDaysLeft(uint32_t _premEnd)
+uint16_t Account::getPremiumDaysLeft(int32_t _premEnd)
 {
-	if(_premEnd < (uint32_t)time(NULL)){
+	if(_premEnd < time(NULL)){
 		return 0;
 	}
 
