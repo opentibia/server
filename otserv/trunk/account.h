@@ -34,7 +34,7 @@ public:
 	Account();
 	~Account();
 
-	static uint16_t getPremiumDaysLeft(uint32_t _premEnd);
+	static uint16_t getPremiumDaysLeft(int32_t _premEnd);
 
 	uint32_t number, warnings;
 	std::string name, password;
