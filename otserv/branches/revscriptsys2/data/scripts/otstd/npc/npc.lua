@@ -489,6 +489,10 @@ function NPC:make(name_or_actor, where)
 	-- Create the actor (if necessary)
 	actor = actor or createActor(name, where)
 	
+	if not actor then
+		return nil
+	end
+	
 	-- Create NPC
 	local npc = {}
 	npc.actor = actor

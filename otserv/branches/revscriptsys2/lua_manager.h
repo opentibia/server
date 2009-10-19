@@ -661,9 +661,12 @@ public:
 
 	bool ok() const;
 
+	void reset();
+
 	// Returns a sweetly formatted stack trace
 	std::string report(const std::string& extramessage = "");
 protected:
+	int reference;
 	std::string name;
 	int32_t thread_state;
 };

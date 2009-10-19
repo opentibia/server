@@ -3489,11 +3489,15 @@ int LuaState::lua_createActor()
 
 	Actor* a = Actor::create(ct);
 
-	// Set some default attributes, so the actor can be spawned with issues
+	// Set some default attributes, so the actor can be spawned without issues
 	a->getType().name(name);
 
-	g_game.placeCreature(a, p);
-	pushThing(a);
+	if(!g_game.placeCreature(a, p)){
+		a->unRef();
+		pushNil();
+	}
+	else
+		pushThing(a);
 	return 1;
 }
 

@@ -62,7 +62,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 
 		// These settings might have been set from command line
 		if(m_confString[IP] == "")
-			m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
+			m_confString[IP] = getGlobalString(L, "server_ip", "127.0.0.1");
 		if(m_confInteger[GAME_PORT] == 0)
 			m_confInteger[GAME_PORT] = getGlobalNumber(L, "game_port");
 		if(m_confInteger[ADMIN_PORT] == 0)
@@ -134,7 +134,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATE_SPAWN] = getGlobalNumber(L, "rate_monster_spawn", 1);
 	m_confInteger[RATE_STAMINA_LOSS] = getGlobalNumber(L, "rate_stamina_loss", 1);
 	m_confInteger[RATE_STAMINA_GAIN] = getGlobalNumber(L, "rate_stamina_gain", 334);
-	m_confInteger[SLOW_RATE_STAMINA_GAIN] = getGlobalNumber(L, "slow_rate_stamina_gain", 84);
+	m_confInteger[SLOW_RATE_STAMINA_GAIN] = getGlobalNumber(L, "rate_stamina_gain_slow", 84);
 	m_confInteger[STAMINA_EXTRA_EXPERIENCE_DURATION] = getGlobalNumber(L, "stamina_extra_experience_duration", 60 * 60 * 1000);
 	m_confInteger[STAMINA_EXTRA_EXPERIENCE_ONLYPREM] = getGlobalBoolean(L, "stamina_extra_experience_onlyprem", true);
 	m_confFloat[STAMINA_EXTRA_EXPERIENCE_RATE] = getGlobalFloat(L, "stamina_extra_experience_rate", 0.5);
@@ -376,4 +376,3 @@ void ConfigManager::moveValue(lua_State* from, lua_State* to)
 	// Pop the value we just read
 	lua_pop(from, 1);
 }
-

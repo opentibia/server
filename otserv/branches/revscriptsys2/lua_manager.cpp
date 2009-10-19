@@ -102,7 +102,7 @@ bool LuaState::iterateTable(int32_t index)
 void LuaState::getField(int32_t index, const std::string& field_name)
 {
 	if(!isTable(index) && !isUserdata(index))
-		throw Script::Error("Attempt to index non-table value.");
+		throw Script::Error("Attempt to index non-table value (" + typeName() + ").");
 	lua_getfield(state, index, field_name.c_str());
 }
 
@@ -247,6 +247,8 @@ int32_t LuaState::popInteger(int def)
 {
 	if(lua_isnumber(state, -1) || lua_istable(state, -1))
 		def = popInteger();
+	else
+		pop();
 	return def;
 }
 
@@ -551,9 +553,9 @@ OutfitType LuaState::popOutfit(Script::ErrorMode mode /* = Script::ERROR_THROW *
 		return outfit;
 	}
 	getField(-1, "type");
-	outfit.lookType = popInteger();
+	outfit.lookType = popInteger(0);
 	getField(-1, "head");
-	outfit.lookHead = popInteger();
+	outfit.lookHead = popInteger(0);
 	
 	getField(-1, "body");
 	outfit.lookBody = popInteger(0);
@@ -763,6 +765,9 @@ LuaStateManager::LuaStateManager(Script::Manager* man) : LuaState(man)
 }
 
 LuaStateManager::~LuaStateManager() {
+	for(ThreadMap::iterator t = threads.begin(); t != threads.end(); ++t)
+		t->second->reset();
+	threads.clear();
 	lua_close(state);
 }
 
@@ -869,7 +874,7 @@ LuaThread::LuaThread(Script::Manager* manager, const std::string& name) :
 	thread_state(0)
 {
 	state = lua_newthread(manager->state);
-	lua_pop(manager->state, 1); // Remove the thread from the main stack
+	reference = luaL_ref(manager->state, LUA_REGISTRYINDEX);
 }
 
 LuaThread::LuaThread(Script::Manager* manager, lua_State* L) :
@@ -878,10 +883,26 @@ LuaThread::LuaThread(Script::Manager* manager, lua_State* L) :
 	thread_state(0)
 {
 	state = L;
+	lua_pushthread(L);
+	// Make sure our coroutine is not GC-ed by storing it in the registry
+	reference = luaL_ref(manager->state, LUA_REGISTRYINDEX);
 }
 
 LuaThread::~LuaThread()
 {
+	if(reference && state)
+		// Make coroutine available to GC again
+		luaL_unref(state, LUA_REGISTRYINDEX, reference);
+}
+
+void LuaThread::reset()
+{
+	if(reference && state)
+		// Make coroutine available to GC again
+		luaL_unref(state, LUA_REGISTRYINDEX, reference);
+
+	state = 0;
+	reference = 0;
 }
 
 bool LuaThread::ok() const
