@@ -119,6 +119,7 @@ void ErrorMessage(std::string m){
 struct CommandLineOptions{
 	std::string configfile;
 	bool truncate_log;
+	bool start_closed;
 	std::string logfile;
 	std::string errfile;
 #if !defined(__WINDOWS__)
@@ -281,6 +282,7 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 {
 	std::vector<std::string>::iterator argi = args.begin();
 	opts.truncate_log = false;
+	opts.start_closed = false;
 
 	if(argi != args.end()){
 		++argi;
@@ -348,13 +350,17 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			}
 			opts.errfile = *argi;
 		}
+		else if(arg == "--closed"){
+			opts.start_closed = true;
+		}
 		else if(arg == "--help"){
 			std::cout <<
 			"Usage: otserv {-i|-p|-c|-r|-l}\n"
 			"\n"
 			"\t-i, --ip $1\t\tIP of gameworld server. Should be equal to the \n"
 			"\t\t\t\tglobal IP.\n"
-			"\t-p, --port $1\t\tPort for server to listen on.\n"
+			"\t-p, --port $1 $2\t\tPort ($2) for server to listen on ($1) is type\n"
+			"\t\t\t\t(game, status, login, admin).\n"
 			"\t-c, --config $1\t\tAlternate config file path.\n"
 			"\t-l, --log-file $1 $2\tAll standard output will be logged to the $1\n"
 			"\t\t\t\tfile, all errors will be logged to $2.\n"
@@ -363,7 +369,9 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			"\t\t\t\tof the server process as long as it is running \n\t\t\t\t(UNIX).\n"
 			#endif
 			"\t--truncate-log\t\tReset log file each time the server is \n"
-			"\t\t\t\tstarted.\n";
+			"\t\t\t\tstarted.\n"
+			"\t--closed\t\t\tStarts the server closed.\n"
+			;
 			return false;
 		}
 		else{
@@ -387,6 +395,8 @@ void badAllocationHandler()
 
 void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_manager)
 {
+	int64_t startLoadTime = OTSYS_TIME();
+
 	//dispatcher thread
 	g_game.setGameState(GAME_STATE_STARTUP);
 
@@ -472,9 +482,9 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
     if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
         ErrorMessage("Data directory does not exist!");
         exit(-1);
-    }
+	}
 	*/
-    std::cout << "[done]" << std::endl;
+	std::cout << "[done]" << std::endl;
 
 	std::cout << ":: Checking Database Connection... ";
 	Database* db = Database::instance();
@@ -730,6 +740,8 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	std::cout << convertIPToString(resolvedIp) << std::endl << "::" << std::endl;
 
+	std::cout << ":: Total loading time: " << (OTSYS_TIME() - startLoadTime)/(1000.) << "s" << std::endl;
+
 	IpNetMask.first  = resolvedIp;
 	IpNetMask.second = 0;
 	serverIPs.push_back(IpNetMask);
@@ -738,7 +750,10 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	Status* status = Status::instance();
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
-	g_game.setGameState(GAME_STATE_NORMAL);
+	if(command_opts.start_closed)
+		g_game.setGameState(GAME_STATE_CLOSED);
+	else
+		g_game.setGameState(GAME_STATE_NORMAL);
 	g_game.start(service_manager);
 	g_loaderSignal.notify_all();
 }
