@@ -64,82 +64,81 @@ Combat::~Combat()
 
 bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min, int32_t& max) const
 {
-	if(!creature){
-		return false;
-	}
-
-	if(creature->getCombatValues(min, max)){
-		return true;
-	}
-	else if(Player* player = creature->getPlayer()){
-		if(params.valueCallback){
-			params.valueCallback->getMinMaxValues(player, min, max, params.useCharges);
+	if(creature){
+		if(creature->getCombatValues(min, max)){
 			return true;
 		}
-		else{
-			switch(formulaType){
-				case FORMULA_LEVELMAGIC:
-				{
-					max = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * mina + minb);
-					min = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * maxa + maxb);
-
-					Vocation* vocation = player->getVocation();
-					if(vocation){
-						if(max > 0 && min > 0 && vocation->getHealingBaseDamage() != 1.0){
-							min = int32_t(min * vocation->getHealingBaseDamage());
-							max = int32_t(max * vocation->getHealingBaseDamage());
-						}
-						else if(max < 0 && min < 0 && vocation->getMagicBaseDamage() != 1.0){
-							min = int32_t(min * vocation->getMagicBaseDamage());
-							max = int32_t(max * vocation->getMagicBaseDamage());
-						}
-					}
-
-					return true;
-					break;
-				}
-
-				case FORMULA_SKILL:
-				{
-					Item* tool = player->getWeapon();
-					const Weapon* weapon = g_weapons->getWeapon(tool);
-
-					min = (int32_t)minb;
-
-					if(weapon){
-						max = (int32_t)(weapon->getWeaponDamage(player, target, tool, true) * maxa + maxb);
-						if(params.useCharges && tool->hasCharges() && g_config.getNumber(ConfigManager::REMOVE_WEAPON_CHARGES)){
-							int32_t newCharge = std::max((int32_t)0, ((int32_t)tool->getCharges()) - 1);
-							g_game.transformItem(tool, tool->getID(), newCharge);
-						}
-					}
-					else{
-						max = (int32_t)maxb;
-					}
-
-					return true;
-					break;
-				}
-
-				case FORMULA_VALUE:
-				{
-					min = (int32_t)mina;
-					max = (int32_t)maxa;
-					return true;
-					break;
-				}
-
-				default:
-					min = 0;
-					max = 0;
-					return false;
-					break;
+		else if(Player* player = creature->getPlayer()){
+			if(params.valueCallback){
+				params.valueCallback->getMinMaxValues(player, min, max, params.useCharges);
+				return true;
 			}
+			else{
+				switch(formulaType){
+					case FORMULA_LEVELMAGIC:
+					{
+						max = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * mina + minb);
+						min = (int32_t)((player->getLevel() + player->getMagicLevel() * 4) * 1. * maxa + maxb);
 
-			//std::cout << "No callback set for combat" << std::endl;
+						Vocation* vocation = player->getVocation();
+						if(vocation){
+							if(max > 0 && min > 0 && vocation->getHealingBaseDamage() != 1.0){
+								min = int32_t(min * vocation->getHealingBaseDamage());
+								max = int32_t(max * vocation->getHealingBaseDamage());
+							}
+							else if(max < 0 && min < 0 && vocation->getMagicBaseDamage() != 1.0){
+								min = int32_t(min * vocation->getMagicBaseDamage());
+								max = int32_t(max * vocation->getMagicBaseDamage());
+							}
+						}
+
+						return true;
+						break;
+					}
+
+					case FORMULA_SKILL:
+					{
+						Item* tool = player->getWeapon();
+						const Weapon* weapon = g_weapons->getWeapon(tool);
+
+						min = (int32_t)minb;
+
+						if(weapon){
+							max = (int32_t)(weapon->getWeaponDamage(player, target, tool, true) * maxa + maxb);
+							if(params.useCharges && tool->hasCharges() && g_config.getNumber(ConfigManager::REMOVE_WEAPON_CHARGES)){
+								int32_t newCharge = std::max((int32_t)0, ((int32_t)tool->getCharges()) - 1);
+								g_game.transformItem(tool, tool->getID(), newCharge);
+							}
+						}
+						else{
+							max = (int32_t)maxb;
+						}
+
+						return true;
+						break;
+					}
+
+					case FORMULA_VALUE:
+					{
+						min = (int32_t)mina;
+						max = (int32_t)maxa;
+						return true;
+						break;
+					}
+
+					default:
+						min = 0;
+						max = 0;
+						return false;
+						break;
+				}
+
+				//std::cout << "No callback set for combat" << std::endl;
+			}
 		}
 	}
-	else if(formulaType == FORMULA_VALUE){
+	
+	if(formulaType == FORMULA_VALUE){
 		min = (int32_t)mina;
 		max = (int32_t)maxa;
 		return true;
