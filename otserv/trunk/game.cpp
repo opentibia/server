@@ -2278,7 +2278,12 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	}
 
 	Item* item = thing->getItem();
-	if(!item || !item->isUseable()){
+	if(!item){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+
+	if(!item->isUseable()){
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
@@ -2369,6 +2374,11 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 
 	Item* item = thing->getItem();
 	if(!item){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+
+	if(item->isUseable()){
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
