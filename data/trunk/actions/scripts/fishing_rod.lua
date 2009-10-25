@@ -62,6 +62,11 @@ end
 
 function onUse(cid, item, frompos, item2, topos)
 
+	if(topos.x == CONTAINER_POSITION) then
+		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
+		return TRUE
+	end
+	
 	if (isInArray(NOFISH_WATER, item2.itemid) == TRUE) then
 		doSendMagicEffect(topos, CONST_ME_LOSEENERGY)
 		return TRUE
