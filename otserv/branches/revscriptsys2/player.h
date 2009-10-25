@@ -214,9 +214,6 @@ public:
 	// As above, but returns NULL if the item can not be weared in that slot (armor in hand for example)
 	Item* getEquippedItem(SlotType slot) const;
 
-	bool isItemAbilityEnabled(SlotType slot) const {return inventoryAbilities[slot.value()];}
-	void setItemAbility(SlotType slot, bool enabled) {inventoryAbilities[slot.value()] = enabled;}
-
 	int32_t getVarSkill(SkillType skill) const {return varSkills[skill.value()];}
 	void setVarSkill(SkillType skill, int32_t modifier) {varSkills[skill.value()] += modifier;}
 

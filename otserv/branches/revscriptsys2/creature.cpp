@@ -737,12 +737,12 @@ void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 
 void Creature::onPlacedCreature()
 {
-	g_game.onCreatureMove(this, this, NULL, getParentTile());
+	g_game.onMoveCreature(this, this, NULL, getParentTile());
 }
 
 void Creature::onRemovedCreature()
 {
-	g_game.onCreatureMove(this, this, getParentTile(), NULL);
+	g_game.onMoveCreature(this, this, getParentTile(), NULL);
 }
 
 void Creature::onDie()

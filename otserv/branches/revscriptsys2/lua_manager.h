@@ -470,6 +470,7 @@ public:
 	int lua_Player_getAccess();
 	int lua_Player_getGroup();
 	int lua_Player_getVocationID();
+	int lua_Player_getVocationName();
 	int lua_Player_getTownID();
 	int lua_Player_getGUID();
 	int lua_Player_getPremiumDays();

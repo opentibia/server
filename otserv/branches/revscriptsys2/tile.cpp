@@ -346,7 +346,7 @@ void Tile::moveCreature(Creature* actor, Creature* creature, Cylinder* toCylinde
 	postRemoveNotification(actor, creature, toCylinder, oldStackPos, true);
 	newTile->postAddNotification(actor, creature, this, newStackPos);
 
-	g_game.onCreatureMove(actor, creature, this, newTile);
+	g_game.onMoveCreature(actor, creature, this, newTile);
 }
 
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -1180,18 +1180,9 @@ void Tile::postAddNotification(Creature* actor, Thing* thing, const Cylinder* ol
 
 	if(link == LINK_OWNER){
 		//calling movement scripts
-		Creature* creature = thing->getCreature();
-		if(creature){
-			const Tile* fromTile = NULL;
-			if(oldParent){
-				fromTile = oldParent->getParentTile();
-			}
-		}
-		else{
-			Item* item = thing->getItem();
-			if(item){
-				g_game.onItemMove(actor, item, this, true);
-			}
+		Item* item = thing->getItem();
+		if(item){
+			g_game.onMoveItem(actor, item, this, true);
 		}
 
 		if(Teleport* teleport = getTeleportItem()){
@@ -1229,18 +1220,9 @@ void Tile::postRemoveNotification(Creature* actor, Thing* thing,  const Cylinder
 	}
 
 	//calling movement scripts
-	Creature* creature = thing->getCreature();
-	if(creature){
-		const Tile* toTile = NULL;
-		if(newParent){
-			toTile = newParent->getParentTile();
-		}
-	}
-	else{
-		Item* item = thing->getItem();
-		if(item){
-			g_game.onItemMove(actor, item, this, false);
-		}
+	Item* item = thing->getItem();
+	if(item){
+		g_game.onMoveItem(actor, item, this, false);
 	}
 }
 

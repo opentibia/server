@@ -260,11 +260,17 @@ namespace Script {
 			int32_t id;
 			SlotPosition slot;
 			bool equip;
+			bool postEvent;
 		};
 
 		class Event : public Script::Event {
 		public:
+			// For events that will trigger after the move is completed
 			Event(Player* user, Item* item, SlotType slot, bool equip);
+
+			// For events that will trigger before the move is completed
+			Event(Player* user, Item* item, SlotType slot, bool equip, ReturnValue& retval);
+
 			~Event();
 
 			std::string getName() const {return "OnEquipItem";}
@@ -279,11 +285,16 @@ namespace Script {
 			void push_instance(LuaState& state, Environment& environment);
 			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
+		private:
+			ReturnValue dummyRetVal;
+
 		protected:
 			Player* user;
 			Item* item;
 			SlotPosition equipslot;
 			bool equip;
+			bool postEvent;
+			ReturnValue& retval;
 		};
 	}
 
@@ -367,7 +378,7 @@ namespace Script {
 
 	////////////////////////////////////////////////////////////////
 	// OnMoveItem event
-	// Triggered when an item is moved
+	// Triggered when an item is moved, updated, added or removed from a tile
 
 	namespace OnMoveItem {
 		enum FilterType {
@@ -384,7 +395,12 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
+			// For events that will trigger after the move is completed
 			Event(Creature* actor, Item* item, Tile* tile, bool addItem);
+
+			// For events that will trigger before the move is completed
+			Event(Creature* actor, Item* item, Tile* tile, bool addItem, ReturnValue& retval);
+
 			~Event();
 
 			std::string getName() const {return "OnMoveItem";}
@@ -399,11 +415,15 @@ namespace Script {
 			void push_instance(LuaState& state, Environment& environment);
 			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
 
+		private:
+			ReturnValue dummyRetVal;
+
 		protected:
 			Creature* actor;
 			Item* item;
 			Tile* tile;
 			bool addItem;
+			ReturnValue& retval;
 		};
 	}
 

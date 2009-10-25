@@ -1244,6 +1244,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You need a premium account to equip this item.");
 		break;
 
+	case enums::RET_NOERROR: break;
 	case enums::RET_NOTPOSSIBLE:
 	default:
 		sendCancel("Sorry, not possible.");
@@ -1457,18 +1458,12 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 			storedConditionList.clear();
 		}
 
-		//[ added for beds system
 		BedItem* bed = Beds::instance().getBedBySleeper(getGUID());
 		if(bed){
 			bed->wakeUp();
-			#ifdef __DEBUG__
-			std::cout << "Player " << getName() << " waking up." << std::endl;
-			#endif
 		}
-		//]
 
-		if(lastLogout > 0)
-		{
+		if(lastLogout > 0){
 			int64_t timeOff = time(NULL) - lastLogout - 600;
 			if(timeOff > 0){
 				int32_t stamina_rate = g_config.getNumber(ConfigManager::RATE_STAMINA_GAIN);
@@ -1739,8 +1734,6 @@ void Player::onUpdateInventoryItem(SlotType slot, Item* oldItem, const ItemType&
 
 void Player::onRemoveInventoryItem(SlotType slot, Item* item)
 {
-	//setItemAbility(slot, false);
-
 	if(tradeState != TRADE_TRANSFER){
 		checkTradeState(item);
 
@@ -2757,13 +2750,11 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 
 	if(ret == RET_NOERROR || ret == RET_NOTENOUGHROOM){
 		//need an exchange with source?
-		if(getInventoryItem((SlotType)index) != NULL){
-			if(!getInventoryItem((SlotType)index)->isStackable() || getInventoryItem((SlotType)index)->getID() != item->getID()){
+		if(getInventoryItem(slot) != NULL){
+			if(!getInventoryItem(slot)->isStackable() || getInventoryItem((SlotType)index)->getID() != item->getID()){
 				return RET_NEEDEXCHANGE;
 			}
 		}
-
-		// REVSCRIPT TODO event callback (onEquip)
 
 		//check if enough capacity
 		if(hasCapacity(item, count))
@@ -3152,7 +3143,7 @@ Thing* Player::__getThing(uint32_t index) const
 void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
-		g_game.onPlayerEquipItem(this, thing->getItem(), (SlotType)index, true);
+		g_game.onPlayerEquipItem(this, thing->getItem(), SlotType(index), true);
 	}
 
 	bool requireListUpdate = true;
@@ -3200,7 +3191,7 @@ void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* 
 void Player::postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER){
-		g_game.onPlayerEquipItem(this, thing->getItem(), (SlotType)index, false /*,isCompleteRemoval*/);
+		g_game.onPlayerEquipItem(this, thing->getItem(), SlotType(index), false);
 	}
 
 	bool requireListUpdate = true;

@@ -131,7 +131,7 @@ bool OnServerLoad::Event::dispatch(Manager& state, Environment& environment)
 
 void OnServerLoad::Event::push_instance(LuaState& state, Environment& environment)
 {
-	state.pushClassTableInstance("OnServerLoad");
+	state.pushClassTableInstance("OnServerLoadEvent");
 	state.setField(-1, "reload", !real_startup);
 	state.setField(-1, "startup", real_startup);
 }
@@ -164,7 +164,7 @@ bool OnServerUnload::Event::dispatch(Manager& state, Environment& environment)
 
 void OnServerUnload::Event::push_instance(LuaState& state, Environment& environment)
 {
-	state.pushClassTableInstance("OnServerUnload");
+	state.pushClassTableInstance("OnServerUnloadEvent");
 	state.setField(-1, "reload", !real_shutdown);
 	state.setField(-1, "shutdown", real_shutdown);
 }
@@ -414,8 +414,37 @@ void OnUseItem::Event::update_instance(Manager& state, Environment& environment,
 OnEquipItem::Event::Event(Player* user, Item* item, SlotType slot, bool equip) :
 	user(user),
 	item(item),
-	equip(equip)
+	equip(equip),
+	retval(dummyRetVal)
 {
+	postEvent = true;
+	propagate_by_default = true;
+
+	switch(slot.value()){
+		case ::enums::SLOT_HEAD:     equipslot = SLOTPOSITION_HEAD;     break;
+		case ::enums::SLOT_NECKLACE: equipslot = SLOTPOSITION_NECKLACE; break;
+		case ::enums::SLOT_BACKPACK: equipslot = SLOTPOSITION_BACKPACK; break;
+		case ::enums::SLOT_ARMOR:    equipslot = SLOTPOSITION_ARMOR;    break;
+		case ::enums::SLOT_RIGHT:    equipslot = SLOTPOSITION_RIGHT;    break;
+		case ::enums::SLOT_LEFT:     equipslot = SLOTPOSITION_LEFT;     break;
+		case ::enums::SLOT_LEGS:     equipslot = SLOTPOSITION_LEGS;     break;
+		case ::enums::SLOT_FEET:     equipslot = SLOTPOSITION_FEET;     break;
+		case ::enums::SLOT_RING:     equipslot = SLOTPOSITION_RING;     break;
+		case ::enums::SLOT_AMMO:     equipslot = SLOTPOSITION_AMMO;     break;
+
+		default:                     equipslot = SLOTPOSITION_NONE;     break;
+	}
+}
+
+OnEquipItem::Event::Event(Player* user, Item* item, SlotType slot, bool equip, ReturnValue& retval) :
+	user(user),
+	item(item),
+	equip(equip),
+	retval(retval)
+{
+	postEvent = false;
+	propagate_by_default = true;
+
 	switch(slot.value()){
 		case ::enums::SLOT_HEAD:     equipslot = SLOTPOSITION_HEAD;     break;
 		case ::enums::SLOT_NECKLACE: equipslot = SLOTPOSITION_NECKLACE; break;
@@ -439,7 +468,7 @@ OnEquipItem::Event::~Event()
 bool OnEquipItem::Event::check_match(const ScriptInformation& info)
 {
 
-	if((info.slot & equipslot) || info.equip != equip){
+	if(((info.slot.value() & equipslot.value()) != equipslot.value()) || info.equip != equip || info.postEvent != postEvent){
 		return false;
 	}
 
@@ -468,10 +497,20 @@ void OnEquipItem::Event::push_instance(LuaState& state, Environment& environment
 	state.setField(-2, "player");
 	state.pushThing(item);
 	state.setField(-2, "item");
+	state.pushEnum(retval);
+	state.setField(-2, "retval");
 }
 
 void OnEquipItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
+	thread->getField(-1, "retval");
+	if(thread->isTable()) {
+		retval = thread->popEnum<ReturnValue>();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnEquipItem' invalid value of 'retval'");
+		thread->pop();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -621,16 +660,28 @@ void OnTurn::Event::update_instance(Manager& state, Environment& environment, Lu
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// OnMoveCreature Event
+// OnMoveItem Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when an item is moved
+// Triggered when an item is moved, updated, added or removed from a tile
 
 OnMoveItem::Event::Event(Creature* actor, Item* item, Tile* tile, bool addItem) :
 	actor(actor),
 	item(item),
 	tile(tile),
-	addItem(addItem)
+	addItem(addItem),
+	retval(dummyRetVal)
 {
+	propagate_by_default = true;
+}
+
+OnMoveItem::Event::Event(Creature* actor, Item* item, Tile* tile, bool addItem, ReturnValue& retval) :
+	actor(actor),
+	item(item),
+	tile(tile),
+	addItem(addItem),
+	retval(retval)
+{
+	propagate_by_default = true;
 }
 
 OnMoveItem::Event::~Event()
@@ -713,10 +764,20 @@ void OnMoveItem::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "tile");
 	state.pushThing(item);
 	state.setField(-2, "item");
+	state.pushEnum(retval);
+	state.setField(-2, "retval");
 }
 
 void OnMoveItem::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
+	thread->getField(-1, "retval");
+	if(thread->isTable()) {
+		retval = thread->popEnum<ReturnValue>();
+	}
+	else {
+		thread->HandleError(ERROR_WARN, "Event 'OnMoveItem' invalid value of 'retval'");
+		thread->pop();
+	}
 }
 
 
@@ -837,7 +898,7 @@ bool OnAccountLogin::Event::dispatch(Manager& state, Environment& environment)
 
 void OnAccountLogin::Event::push_instance(LuaState& state, Environment& environment)
 {
-	state.pushClassTableInstance("OnAccountLogin");
+	state.pushClassTableInstance("OnAccountLoginEvent");
 	state.push(name);
 	state.setField(-2, "name");
 	state.push(number);
@@ -947,7 +1008,7 @@ bool OnLogin::Event::dispatch(Manager& state, Environment& environment)
 
 void OnLogin::Event::push_instance(LuaState& state, Environment& environment)
 {
-	state.pushClassTableInstance("OnLogin");
+	state.pushClassTableInstance("OnLoginEvent");
 	state.pushThing(player);
 	state.setField(-2, "player");
 }
@@ -988,7 +1049,7 @@ bool OnLogout::Event::dispatch(Manager& state, Environment& environment)
 
 void OnLogout::Event::push_instance(LuaState& state, Environment& environment)
 {
-	state.pushClassTableInstance("OnLogout");
+	state.pushClassTableInstance("OnLogoutEvent");
 	state.pushThing(player);
 	state.setField(-2, "player");
 	state.setField(-1, "forced", forced);
@@ -1030,7 +1091,7 @@ bool OnChangeOutfit::Event::dispatch(Manager& state, Environment& environment)
 
 void OnChangeOutfit::Event::push_instance(LuaState& state, Environment& environment)
 {
-	state.pushClassTableInstance("OnChangeOutfit");
+	state.pushClassTableInstance("OnChangeOutfitEvent");
 	state.pushThing(player);
 	state.setField(-2, "player");
 	state.newTable();
@@ -1291,7 +1352,7 @@ bool OnSpawn::Event::dispatch(Manager& state, Environment& environment)
 	if(eiter != environment.Generic.OnSpawn.end())
 		return dispatchEvent<OnSpawn::Event>
 			(this, state, environment, eiter->second);
-	return true;
+	return false;
 }
 
 void OnSpawn::Event::push_instance(LuaState& state, Environment& environment)
@@ -1767,7 +1828,7 @@ bool OnCondition::Event::dispatch(Manager& state, Environment& environment)
 
 void OnCondition::Event::push_instance(LuaState& state, Environment& environment)
 {
-	state.pushClassTableInstance("OnCondition");
+	state.pushClassTableInstance("OnConditionEvent");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
 	state.pushCondition(condition);

@@ -54,7 +54,7 @@ function otstd.mailbox.registerHandlers()
 		end
 		
 		data.listener =
-			registerOnMoveItemToItem("itemid", id, otstd.mailbox.handler)
+			registerOnMoveItemToItem("after", "itemid", id, otstd.mailbox.handler)
 	end
 end
 

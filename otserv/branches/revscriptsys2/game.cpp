@@ -1361,7 +1361,7 @@ bool Game::onPlayerShopClose(Player* player)
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile)
+bool Game::onMoveCreature(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile)
 {
 	if(!script_system)
 		return false; // Not handled
@@ -1369,7 +1369,7 @@ bool Game::onCreatureMove(Creature* actor, Creature* moving_creature, Tile* from
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem)
+bool Game::onMoveItem(Creature* actor, Item* item, Tile* tile, bool addItem)
 {
 	if(!script_system)
 		return false; // Not handled
@@ -1656,11 +1656,6 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		return false;
 	}
 
-	if(!item->isPushable()){
-		player->sendCancelMessage(RET_NOTMOVEABLE);
-		return false;
-	}
-
 	const Position& playerPos = player->getPosition();
 	const Position& mapFromPos = fromCylinder->getParentTile()->getPosition();
 	const Position& mapToPos = toCylinder->getParentTile()->getPosition();
@@ -1672,6 +1667,11 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 
 	if(playerPos.z < mapFromPos.z){
 		player->sendCancelMessage(RET_FIRSTGODOWNSTAIRS);
+		return false;
+	}
+
+	if(!item->isPushable()){
+		player->sendCancelMessage(RET_NOTMOVEABLE);
 		return false;
 	}
 
@@ -1690,6 +1690,47 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		else{
 			player->sendCancelMessage(RET_THEREISNOWAY);
 			return false;
+		}
+	}
+
+	ReturnValue ret = RET_NOERROR;
+	if(fromCylinder){
+		if(fromCylinder->getCreature()){
+			Player* player = fromCylinder->getCreature()->getPlayer();
+			Script::OnEquipItem::Event evt(player, item, SlotType(fromIndex), false, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				player->sendCancelMessage(ret);
+				return false;
+			}
+		}
+		else if(fromCylinder->getTile()){
+			Script::OnMoveItem::Event evt(player, item, fromCylinder->getTile(), false, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				player->sendCancelMessage(ret);
+				return false;
+			}
+		}
+	}
+
+	if(toCylinder){
+		if(toCylinder->getCreature()){
+			Player* player = toCylinder->getCreature()->getPlayer();
+			Script::OnEquipItem::Event evt(player, item, SlotType(toIndex), true, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				player->sendCancelMessage(ret);
+				return false;
+			}
+		}
+		else if(toCylinder->getTile()){
+			Script::OnMoveItem::Event evt(player, item, toCylinder->getTile(), true, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				player->sendCancelMessage(ret);
+				return false;
+			}
 		}
 	}
 
@@ -1767,7 +1808,8 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		return false;
 	}
 
-	ReturnValue ret = internalMoveItem(player, fromCylinder, toCylinder, toIndex, item, count, NULL);
+
+	ret = internalMoveItem(player, fromCylinder, toCylinder, toIndex, item, count, NULL);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
@@ -2050,17 +2092,6 @@ ReturnValue Game::internalRemoveItem(Creature* actor, Item* item, int32_t count 
 	item->onRemoved();
 
 	return RET_NOERROR;
-}
-
-ReturnValue Game::internalPlayerAddItem(Player* player, Item* item, bool dropOnMap /*= true*/)
-{
-	ReturnValue ret = internalAddItem(NULL, player, item);
-
-	if(ret != RET_NOERROR && dropOnMap){
-		ret = internalAddItem(NULL, player->getParentTile(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
-	}
-
-	return ret;
 }
 
 Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
@@ -4171,42 +4202,26 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 
 	switch(type.value()){
 		case enums::SPEAK_SAY:
-			return internalCreatureSay(player, SPEAK_SAY, text);
-			break;
+		case enums::SPEAK_PRIVATE_PN:
+			return internalCreatureSay(player, type, text);
 		case enums::SPEAK_WHISPER:
 			return playerWhisper(player, text);
-			break;
 		case enums::SPEAK_YELL:
 			return playerYell(player, text);
-			break;
 		case enums::SPEAK_PRIVATE:
 		case enums::SPEAK_PRIVATE_RED:
 		case enums::SPEAK_RVR_ANSWER:
 			return playerSpeakTo(player, type, receiver, text);
-			break;
 		case enums::SPEAK_CHANNEL_Y:
 		case enums::SPEAK_CHANNEL_R1:
 		case enums::SPEAK_CHANNEL_R2:
-			if(playerTalkToChannel(player, type, text, channelId)){
-				return true;
-			}
-			else{
-				// Resend in default channel
-				return playerSay(playerId, 0, SPEAK_SAY, receiver, text);
-			}
-			break;
-		case enums::SPEAK_PRIVATE_PN:
-			return playerSpeakToNpc(player, text);
-			break;
+			return playerTalkToChannel(player, type, text, channelId) || playerSay(playerId, 0, SPEAK_SAY, receiver, text);
 		case enums::SPEAK_BROADCAST:
 			return internalBroadcastMessage(player, text);
-			break;
 		case enums::SPEAK_RVR_CHANNEL:
 			return playerReportRuleViolation(player, text);
-			break;
 		case enums::SPEAK_RVR_CONTINUE:
 			return playerContinueReport(player, text);
-			break;
 
 		default:
 			break;
@@ -4298,27 +4313,6 @@ bool Game::playerTalkToChannel(Player* player, SpeakClass type, const std::strin
 	}
 
 	return g_chat.talkToChannel(player, type, text, channelId);
-}
-
-bool Game::playerSpeakToNpc(Player* player, const std::string& text)
-{
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	getSpectators(list, player->getPosition());
-
-	//send to npcs only
-	// REVSCRIPTSYS TODO
-	// Player speak to NPC (is this necessary?)
-	/*
-	Creature* tmpNpc = NULL;
-	for(it = list.begin(); it != list.end(); ++it){
-		if((tmpNpc = (*it)->getNpc())){
-			(*it)->onCreatureSay(player, SPEAK_PRIVATE_PN, text);
-		}
-	}
-	*/
-
-	return true;
 }
 
 bool Game::playerReportRuleViolation(Player* player, const std::string& text)
@@ -4441,11 +4435,13 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClass type, const std::s
 			Map::maxClientViewportY, Map::maxClientViewportY);
 	}
 
-	//send to client
-	Player* tmpPlayer = NULL;
-	for(it = list.begin(); it != list.end(); ++it){
-		if((tmpPlayer = (*it)->getPlayer())){
-			tmpPlayer->sendCreatureSay(creature, type, text);
+	if(type != SPEAK_PRIVATE_NP){
+		//send to client
+		Player* tmpPlayer = NULL;
+		for(it = list.begin(); it != list.end(); ++it){
+			if((tmpPlayer = (*it)->getPlayer())){
+				tmpPlayer->sendCreatureSay(creature, type, text);
+			}
 		}
 	}
 

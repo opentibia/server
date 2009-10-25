@@ -356,8 +356,6 @@ public:
 		uint32_t flags = 0, bool test = false);
 	ReturnValue internalRemoveItem(Creature* actor, Item* item, int32_t count = -1,  bool test = false, uint32_t flags = 0);
 
-	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true);
-
 	/**
 	  * Find an item of a certain type
 	  * \param cylinder to search the item
@@ -533,8 +531,8 @@ public:
 	bool onPlayerShopClose(Player* player);
 	bool onPlayerTradeBegin(Player* player, Item* tradeItem, Player* tradePlayer, Item* tradePlayerItem);
 	bool onPlayerTradeEnd(Player* player, Item* tradeItem, Player* tradePlayer, Item* tradePlayerItem, bool isCompleted = false);
-	bool onCreatureMove(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
-	bool onItemMove(Creature* actor, Item* item, Tile* tile, bool addItem);
+	bool onMoveCreature(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
+	bool onMoveItem(Creature* actor, Item* item, Tile* tile, bool addItem);
 	bool onSpawn(Actor* actor);
 	void onSpotCreature(Creature* creature, Creature* spotted);
 	void onLoseCreature(Creature* creature, Creature* lost);
@@ -664,7 +662,6 @@ protected:
 	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClass type, const std::string& receiver, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId);
-	bool playerSpeakToNpc(Player* player, const std::string& text);
 	bool playerReportRuleViolation(Player* player, const std::string& text);
 	bool playerContinueReport(Player* player, const std::string& text);
 

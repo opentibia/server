@@ -41,11 +41,11 @@ function otstd.juice_squeezer.callback(event)
 end
 
 function otstd.juice_squeezer.registerHandler()
-		if otstd.juice_squeezer.listener then
-			stopListener(otstd.juice_squeezer.listener)
-		end
-		
-		otstd.juice_squeezer.listener = registerOnUseItemNearby("itemid", 5865, otstd.juice_squeezer.callback)
+	if otstd.juice_squeezer.listener then
+		stopListener(otstd.juice_squeezer.listener)
+	end
+
+	otstd.juice_squeezer.listener = registerOnUseItemNearby("itemid", 5865, otstd.juice_squeezer.callback)
 end
 
 otstd.juice_squeezer.registerHandler()

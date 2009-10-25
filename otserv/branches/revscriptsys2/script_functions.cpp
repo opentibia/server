@@ -138,6 +138,20 @@ void Manager::registerClasses() {
 	registerClass("OnAdvanceEvent", "Event");
 	registerClass("OnKillEvent", "Event");
 	registerClass("OnDeathEvent", "Event");
+	registerClass("OnHearEvent", "Event");
+	registerClass("OnEquipItemEvent", "Event");
+	registerClass("OnMoveCreatureEvent", "Event");
+	registerClass("OnMoveItemEvent", "Event");
+	registerClass("OnAccountLoginEvent", "Event");
+	registerClass("OnChangeOutfitEvent", "Event");
+	registerClass("OnShopPurchaseEvent", "Event");
+	registerClass("OnShopSellEvent", "Event");
+	registerClass("OnShopCloseEvent", "Event");
+	registerClass("OnTradeBeginEvent", "Event");
+	registerClass("OnTradeEndEvent", "Event");
+	registerClass("OnConditionEvent", "Event");
+	registerClass("OnAttackEvent", "Event");
+	registerClass("OnDamageEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -304,6 +318,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getSex()", &Manager::lua_Player_getSex);
 	registerMemberFunction("Player", "getAccess()", &Manager::lua_Player_getAccess);
 	registerMemberFunction("Player", "getVocationID()", &Manager::lua_Player_getVocationID);
+	registerMemberFunction("Player", "getVocationName()", &Manager::lua_Player_getVocationName);
 	registerMemberFunction("Player", "getTownID()", &Manager::lua_Player_getTownID);
 	registerMemberFunction("Player", "getGUID()", &Manager::lua_Player_getGUID);
 	registerMemberFunction("Player", "getAccessGroup()", &Manager::lua_Player_getGroup);
@@ -463,15 +478,15 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnCreatureTurn(Creature who, function callback)", &Manager::lua_registerSpecificEvent_OnCreatureTurn);
 
 	// On(De)Equip
-	registerGlobalFunction("registerOnEquipItem(string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
-	registerGlobalFunction("registerOnDeEquipItem(string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
+	registerGlobalFunction("registerOnEquipItem([string when = nil], string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnEquipItem);
+	registerGlobalFunction("registerOnDeEquipItem([string when = nil], string method, int filter, SlotPosition slot, function callback)", &Manager::lua_registerGenericEvent_OnDeEquipItem);
 
 	// OnServerLoad
 	registerGlobalFunction("registerOnServerLoad(function callback)", &Manager::lua_registerGenericEvent_OnServerLoad);
 
 	// OnMoveItem
 	// Registering other OnMoveItem events are done through lua
-	registerGlobalFunction("registerOnMoveItem(string method, int filter, boolean isadd, boolean isontile, function callback)", &Manager::lua_registerGenericEvent_OnMoveItem);
+	registerGlobalFunction("registerOnMoveItem([string when = nil], string method, int filter, boolean isadd, boolean isontile, function callback)", &Manager::lua_registerGenericEvent_OnMoveItem);
 
 	// OnSpot / OnLose
 	registerGlobalFunction("registerOnSpotCreature(Creature creature, function callback)", &Manager::lua_registerSpecificEvent_OnSpotCreature);
@@ -1102,15 +1117,31 @@ int LuaState::lua_registerSpecificEvent_OnLook() {
 
 int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	// Store callback
-	insert(-4);
+	insert(-5);
 
 	SlotPosition slot = popEnum<SlotPosition>();
 	int32_t id = popInteger();
 	std::string method = popString();
+	bool postEvent = true;
+
+	// nil means its triggered after the item has been equipped
+	if(isNil()){
+		pop();
+	}
+	else{
+		std::string when = popString();
+		if(when == "before"){
+			postEvent = false;
+		}
+		else if(when == "after"){
+			postEvent = true;
+		}
+		else {
+			throw Error("Invalid argument (1) 'when'");
+		}
+	}
 
 	OnEquipItem::ScriptInformation si_onequip;
-
-	si_onequip.slot = slot;
 
 	if(method == "itemid") {
 		si_onequip.method = OnEquipItem::FILTER_ITEMID;
@@ -1119,10 +1150,13 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 		si_onequip.method = OnEquipItem::FILTER_ACTIONID;
 	}
 	else {
-		throw Error("Invalid argument (1) 'method'");
+		throw Error("Invalid argument (2) 'method'");
 	}
+
 	si_onequip.id = id;
+	si_onequip.slot = slot;
 	si_onequip.equip = true;
+	si_onequip.postEvent = postEvent;
 
 	boost::any p(si_onequip);
 	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *manager));
@@ -1139,15 +1173,31 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 
 int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	// Store callback
-	insert(-4);
+	insert(-5);
 
 	SlotPosition slot = popEnum<SlotPosition>();
 	int32_t id = popInteger();
 	std::string method = popString();
+	bool postEvent = true;
+
+	// nil means its triggered after the item has been de-equipped
+	if(isNil()){
+		pop();
+	}
+	else{
+		std::string when = popString();
+		if(when == "before"){
+			postEvent = false;
+		}
+		else if(when == "after"){
+			postEvent = true;
+		}
+		else {
+			throw Error("Invalid argument (1) 'when'");
+		}
+	}
 
 	OnEquipItem::ScriptInformation si_ondeequip;
-
-	si_ondeequip.slot = slot;
 
 	if(method == "itemid") {
 		si_ondeequip.method = OnEquipItem::FILTER_ITEMID;
@@ -1156,10 +1206,13 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 		si_ondeequip.method = OnEquipItem::FILTER_ACTIONID;
 	}
 	else {
-		throw Error("Invalid argument (1) 'method'");
+		throw Error("Invalid argument (2) 'method'");
 	}
+
 	si_ondeequip.id = id;
+	si_ondeequip.slot = slot;
 	si_ondeequip.equip = false;
+	si_ondeequip.postEvent = postEvent;
 
 	boost::any p(si_ondeequip);
 	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *manager));
@@ -1404,14 +1457,33 @@ int LuaState::lua_registerSpecificEvent_OnCreatureTurn() {
 
 int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	// Store callback
-	insert(-5);
+	insert(-6);
 
 	bool isAddItem = popBoolean();
 	bool isItemOnTile = popBoolean();
 	int32_t id = popInteger();
 	std::string method = popString();
+	bool postEvent = true;
+
+	// nil means its triggered after the item has been moved
+	if(isNil()){
+		pop();
+	}
+	else{
+		std::string when = popString();
+		if(when == "before"){
+			postEvent = false;
+		}
+		else if(when == "after"){
+			postEvent = true;
+		}
+		else {
+			throw Error("Invalid argument (1) 'when'");
+		}
+	}
 
 	OnMoveItem::ScriptInformation si_onmoveitem;
+
 	if(method == "itemid") {
 		si_onmoveitem.method = OnMoveItem::FILTER_ITEMID;
 	}
@@ -1419,8 +1491,9 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 		si_onmoveitem.method = OnMoveItem::FILTER_ACTIONID;
 	}
 	else {
-		throw Error("Invalid argument (1) 'method'");
+		throw Error("Invalid argument (2) 'method'");
 	}
+
 	si_onmoveitem.id = id;
 	si_onmoveitem.addItem = isAddItem;
 	si_onmoveitem.isItemOnTile = isItemOnTile;
@@ -3995,6 +4068,14 @@ int LuaState::lua_Player_getVocationID()
 	return 1;
 }
 
+int LuaState::lua_Player_getVocationName()
+{
+	Player* p = popPlayer();
+	Vocation* vocation = p->getVocation();
+	push(vocation->getVocDescription());
+	return 1;
+}
+
 int LuaState::lua_Player_getSoulPoints()
 {
 	Player* p = popPlayer();
@@ -4268,13 +4349,11 @@ int LuaState::lua_Player_addItem()
 		g_game.internalRemoveItem(NULL, item);
 	}
 
-	ReturnValue ret = RET_NOERROR;
-	if(canDropOnMap){
-		ret = g_game.internalPlayerAddItem(player, item);
+	ReturnValue ret = g_game.internalAddItem(NULL, player, item);
+	if(ret != RET_NOERROR && canDropOnMap){
+		ret = g_game.internalAddItem(NULL, player->getParentTile(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	}
-	else{
-		ret = g_game.internalAddItem(NULL, player, item);
-	}
+
 	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
@@ -4519,11 +4598,11 @@ int LuaState::lua_Item_setItemID()
 	int32_t newid = popInteger();
 	Item* item = popItem();
 
-	if(newid < 0 || newid > 65535) {
+	const ItemType& it = Item::items[newid];
+	if(it.group == ITEM_GROUP_DEPRECATED || it.id == 0){
 		throw Error("Item.setItemID : item ID provided");
 	}
 
-	const ItemType& it = Item::items[newid];
 	if((it.stackable && newcount > 100) || newcount < -1){
 		throw Error("Item.setItemID : Stack count is out of range.");
 	}

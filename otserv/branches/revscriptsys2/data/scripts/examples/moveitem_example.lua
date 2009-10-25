@@ -7,7 +7,7 @@ function moveitem_example.moveToTile_callback(event)
 	end
 end
 
-moveitem_example.moveToTile_listener = registerOnMoveItemToTile("itemid", 1988, moveitem_example.moveToTile_callback)
+moveitem_example.moveToTile_listener = registerOnMoveItemToTile("after", "itemid", 1988, moveitem_example.moveToTile_callback)
 
 function moveitem_example.moveFromTile_callback(event)
 	if(event.creature) then
@@ -16,7 +16,7 @@ function moveitem_example.moveFromTile_callback(event)
 	end
 end
 
-moveitem_example.moveFromTile_listener = registerOnMoveItemFromTile("itemid", 1988,  moveitem_example.moveFromTile_callback)
+moveitem_example.moveFromTile_listener = registerOnMoveItemFromTile("after", "itemid", 1988,  moveitem_example.moveFromTile_callback)
 
 function moveitem_example.moveToItem_callback(event)
 	if(event.creature) then
@@ -25,7 +25,7 @@ function moveitem_example.moveToItem_callback(event)
 	end
 end
 
-moveitem_example.moveTileItem_listener = registerOnMoveItemToItem("itemid", 1988, moveitem_example.moveToItem_callback)
+moveitem_example.moveTileItem_listener = registerOnMoveItemToItem("after", "itemid", 1988, moveitem_example.moveToItem_callback)
 
 function moveitem_example.moveFromItem_callback(event)
 	if(event.creature) then
@@ -34,5 +34,5 @@ function moveitem_example.moveFromItem_callback(event)
 	end
 end
 
-moveitem_example.moveFromItem_listener = registerOnMoveItemFromItem("itemid", 1988, moveitem_example.moveFromItem_callback)
+moveitem_example.moveFromItem_listener = registerOnMoveItemFromItem("after", "itemid", 1988, moveitem_example.moveFromItem_callback)
 

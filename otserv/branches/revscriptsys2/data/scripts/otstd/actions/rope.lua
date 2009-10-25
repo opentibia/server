@@ -19,6 +19,9 @@ function otstd.rope.callback(event)
 	end
 	
 	local hole = tile:getThing(toPos.stackpos)
+	if not hole or not typeof(hole, "Item") then
+		return
+	end
 	
 	for spotid, _ in pairs(otstd.ropespots) do
 		if spotid == hole:getItemID() then
