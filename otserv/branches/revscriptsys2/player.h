@@ -282,7 +282,8 @@ public:
 	virtual void changeMana(int32_t manaChange);
 	void changeSoul(int32_t soulChange);
 
-	bool isPzLocked() const { return pzLocked; }
+	bool isPzLocked() const {return pzLocked; }
+	bool isAutoWalking() const {return eventWalk != 0;}
 	virtual BlockType blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
@@ -770,6 +771,7 @@ protected:
 	friend class Map;
 	friend class IOPlayer;
 	friend class ProtocolGame;
+	friend class LuaState;
 };
 
 #endif

@@ -464,6 +464,7 @@ public:
 	int lua_Player_getSkill();
 	int lua_Player_advanceSkill();
 	int lua_Player_isPremium();
+	int lua_Player_isAutoWalking();
 	int lua_Player_getCorpseId();
 
 	int lua_Player_getSex();
@@ -484,6 +485,7 @@ public:
 	int lua_Player_getGuildNick();
 
 	int lua_Player_getInventoryItem();
+	int lua_Player_getSlot();
 	int lua_Player_addItem();
 	int lua_Player_removeItem();
 	int lua_Player_getItemTypeCount();

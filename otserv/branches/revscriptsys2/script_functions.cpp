@@ -308,6 +308,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getSkill(SkillType skill)", &Manager::lua_Player_getSkill);
 	registerMemberFunction("Player", "advanceSkill(SkillType skill, int count)", &Manager::lua_Player_advanceSkill);
 	registerMemberFunction("Player", "isPremium()", &Manager::lua_Player_isPremium);
+	registerMemberFunction("Player", "isAutoWalking()", &Manager::lua_Player_isAutoWalking);
 	registerMemberFunction("Player", "getManaMax()", &Manager::lua_Player_getManaMax);
 	registerMemberFunction("Player", "setMana(integer newval)", &Manager::lua_Player_setMana);
 	registerMemberFunction("Player", "addManaSpent(integer howmuch)", &Manager::lua_Player_addManaSpent);
@@ -331,9 +332,10 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
 
 	registerMemberFunction("Player", "getItemCount(int itemid)", &Manager::lua_Player_getItemCount);
-	registerMemberFunction("Player", "addItem(Item item)", &Manager::lua_Player_addItem);
+	registerMemberFunction("Player", "addItem(Item item [, SlotType slot = nil [, boolean canDropOnMap = nil]])", &Manager::lua_Player_addItem);
 	registerMemberFunction("Player", "removeItem(int id [, int type [,int count]])", &Manager::lua_Player_removeItem);
 	registerMemberFunction("Player", "getInventoryItem(SlotType slot)", &Manager::lua_Player_getInventoryItem);
+	registerMemberFunction("Player", "getSlot(Item item)", &Manager::lua_Player_getSlot);
 	registerMemberFunction("Player", "addExperience(int experience)", &Manager::lua_Player_addExperience);
 	registerMemberFunction("Player", "setTown(Town town)", &Manager::lua_Player_setTown);
 	registerMemberFunction("Player", "setVocation(int vocationid)", &Manager::lua_Player_setVocation);
@@ -2996,14 +2998,10 @@ int LuaState::lua_Tile_addItem()
 		pushBoolean(false);
 		return 2;
 	}
+
 	Tile* tile = popTile();
 
-	if(item->getParent() != VirtualCylinder::virtualCylinder){
-		// Must remove from previous parent...
-		g_game.internalRemoveItem(NULL, item);
-	}
-
-	ReturnValue ret = g_game.internalAddItem(NULL, tile, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), tile, INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_NOLIMIT);
 	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
@@ -4015,6 +4013,13 @@ int LuaState::lua_Player_advanceSkill()
 	return 1;
 }
 
+int LuaState::lua_Player_isAutoWalking()
+{
+	Player* player = popPlayer();
+	push(player->isAutoWalking());
+	return 1;
+}
+
 int LuaState::lua_Player_isPremium()
 {
 	Player* player = popPlayer();
@@ -4218,6 +4223,20 @@ int LuaState::lua_Player_getInventoryItem()
 	return 1;
 }
 
+int LuaState::lua_Player_getSlot()
+{
+	Item* item = popItem();
+	Player* player = popPlayer();
+	int32_t index = player->__getIndexOfThing(item);
+	if(index == -1){
+		pushNil();
+	}
+	else{
+		pushEnum(SlotType::fromInteger(index));
+	}
+	return 1;
+}
+
 int LuaState::lua_Player_getItemCount()
 {
 	int32_t type = popInteger();
@@ -4232,7 +4251,7 @@ int LuaState::lua_Player_internalWalkTo()
 	Player* player = popPlayer();
 
 	std::list<Direction> listDir;
-	if(g_game.getPathToEx(player, pos, listDir, 0, 1, true, true)){
+	if(g_game.getPathTo(player, pos, listDir)){
 		g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
 			&g_game, player->getID(), listDir)));
 
@@ -4334,7 +4353,13 @@ int LuaState::lua_Player_sendMessage()
 
 int LuaState::lua_Player_addItem()
 {
+	SlotType slot = SLOT_WHEREEVER;
 	bool canDropOnMap = true;
+
+	if(getStackSize() > 3)
+		canDropOnMap = popBoolean();
+	if(getStackSize() > 2)
+		slot = popEnum<SlotType>();
 
 	Item* item = popItem(ERROR_PASS);
 	if(item == NULL) {
@@ -4342,16 +4367,12 @@ int LuaState::lua_Player_addItem()
 		pushBoolean(false);
 		return 2;
 	}
+
 	Player* player = popPlayer();
 
-	if(item->getParent() != VirtualCylinder::virtualCylinder){
-		// Must remove from previous parent...
-		g_game.internalRemoveItem(NULL, item);
-	}
-
-	ReturnValue ret = g_game.internalAddItem(NULL, player, item);
+	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), player, (slot == SLOT_WHEREEVER ? INDEX_WHEREEVER : slot.value() ), item, item->getItemCount(), NULL);
 	if(ret != RET_NOERROR && canDropOnMap){
-		ret = g_game.internalAddItem(NULL, player->getParentTile(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		ret = g_game.internalMoveItem(NULL, item->getParent(), player->getParentTile(), INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 	}
 
 	pushEnum(ret);
@@ -4664,12 +4685,7 @@ int LuaState::lua_Container_addItem()
 	}
 	Container* container = popContainer();
 
-	if(item->getParent() != VirtualCylinder::virtualCylinder){
-		// Must remove from previous parent...
-		g_game.internalRemoveItem(NULL, item);
-	}
-
-	ReturnValue ret = g_game.internalAddItem(NULL, container, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), container, INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_NOLIMIT);
 	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;

@@ -113,8 +113,8 @@ function otstd.fishing.handler(event)
 	local tile = toPos and map:getTile(toPos)
 	
 	if tile then
-		local spot = event.targetItem or tile:getTopThing()
-		if spot and spot:canFish() then
+		local spot = event.targetItem or tile:getGround()
+		if spot and typeof(spot, "Item") and spot:canFish() then
 			--event.player:sendNote("You can has fish?")
 			local spotdata = otstd.fishing.spots[spot:getItemID()]
 			event.hasFish = spot:hasFish()

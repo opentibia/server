@@ -520,36 +520,26 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		//TODO: Move to scripts(?)
-		if(item->isHangable() && (hasFlag(TILEPROP_VERTICAL) || hasFlag(TILEPROP_HORIZONTAL)) ){
-			for(TileItemConstIterator it = items_begin(); it != items_end(); ++it){
-				if((*it)->isHangable()){
-					return RET_NEEDEXCHANGE;
-				}
-			}
+		if(ground == NULL){
+			return RET_NOTPOSSIBLE;
 		}
-		else{
-			if(ground == NULL){
-				return RET_NOTPOSSIBLE;
-			}
 
-			if(hasFlag(TILEPROP_BLOCKSOLID)){
-				if(item->isPickupable()){
-					ItemVector vector = items_getListWithProps(ITEMPROP_BLOCKSOLID);
-					for(ItemVector::iterator it = vector.begin(); it != vector.end(); ++it){
-						const ItemType& iType = Item::items[(*it)->getID()];
-						if(iType.allowPickupable){
-							continue;
-						}
+		if(hasFlag(TILEPROP_BLOCKSOLID)){
+			if(item->isPickupable()){
+				ItemVector vector = items_getListWithProps(ITEMPROP_BLOCKSOLID);
+				for(ItemVector::iterator it = vector.begin(); it != vector.end(); ++it){
+					const ItemType& iType = Item::items[(*it)->getID()];
+					if(iType.allowPickupable){
+						continue;
+					}
 
-						if(!iType.hasHeight || iType.pickupable || iType.isBed()){
-							return RET_NOTENOUGHROOM;
-						}
+					if(!iType.hasHeight || iType.pickupable || iType.isBed()){
+						return RET_NOTENOUGHROOM;
 					}
 				}
-				else{
-					return RET_NOTENOUGHROOM;
-				}
+			}
+			else{
+				return RET_NOTENOUGHROOM;
 			}
 		}
 	}

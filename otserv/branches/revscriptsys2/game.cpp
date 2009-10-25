@@ -1693,109 +1693,6 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		}
 	}
 
-	ReturnValue ret = RET_NOERROR;
-	if(fromCylinder){
-		if(fromCylinder->getCreature()){
-			Player* player = fromCylinder->getCreature()->getPlayer();
-			Script::OnEquipItem::Event evt(player, item, SlotType(fromIndex), false, ret);
-			if(script_system->dispatchEvent(evt)){
-				//handled by script
-				player->sendCancelMessage(ret);
-				return false;
-			}
-		}
-		else if(fromCylinder->getTile()){
-			Script::OnMoveItem::Event evt(player, item, fromCylinder->getTile(), false, ret);
-			if(script_system->dispatchEvent(evt)){
-				//handled by script
-				player->sendCancelMessage(ret);
-				return false;
-			}
-		}
-	}
-
-	if(toCylinder){
-		if(toCylinder->getCreature()){
-			Player* player = toCylinder->getCreature()->getPlayer();
-			Script::OnEquipItem::Event evt(player, item, SlotType(toIndex), true, ret);
-			if(script_system->dispatchEvent(evt)){
-				//handled by script
-				player->sendCancelMessage(ret);
-				return false;
-			}
-		}
-		else if(toCylinder->getTile()){
-			Script::OnMoveItem::Event evt(player, item, toCylinder->getTile(), true, ret);
-			if(script_system->dispatchEvent(evt)){
-				//handled by script
-				player->sendCancelMessage(ret);
-				return false;
-			}
-		}
-	}
-
-	//hangable item specific code
-	Tile* toTile = toCylinder->getParentTile();
-	if(item->isHangable() && (toTile->isVertical() || toTile->isHorizontal())){
-		//destination supports hangable objects so need to move there first
-
-		if(toCylinder->getParentTile()->isVertical()){
-			if(player->getPosition().x + 1 == mapToPos.x){
-				player->sendCancelMessage(RET_NOTPOSSIBLE);
-				return false;
-			}
-		}
-		else if(toCylinder->getParentTile()->isHorizontal()){
-			if(player->getPosition().y + 1 == mapToPos.y){
-				player->sendCancelMessage(RET_NOTPOSSIBLE);
-				return false;
-			}
-		}
-
-		if(!Position::areInRange<1,1,0>(playerPos, mapToPos)){
-			Position walkPos = mapToPos;
-			if(toCylinder->getParentTile()->isVertical()){
-				walkPos.x -= -1;
-			}
-
-			if(toCylinder->getParentTile()->isHorizontal()){
-				walkPos.y -= -1;
-			}
-
-			Position itemPos = fromPos;
-			uint8_t itemStackPos = fromStackPos;
-
-			if(fromPos.x != 0xFFFF && Position::areInRange<1,1,0>(mapFromPos, player->getPosition())
-				&& !Position::areInRange<1,1,0>(mapFromPos, walkPos)){
-				//need to pickup the item first
-				Item* moveItem = NULL;
-				ReturnValue ret = internalMoveItem(player, fromCylinder, player, INDEX_WHEREEVER, item, count, &moveItem);
-				if(ret != RET_NOERROR){
-					player->sendCancelMessage(ret);
-					return false;
-				}
-
-				//changing the position since its now in the inventory of the player
-				internalGetPosition(moveItem, itemPos, itemStackPos);
-			}
-
-			std::list<Direction> listDir;
-			if(map->getPathTo(player, walkPos, listDir)){
-				g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
-					this, player->getID(), listDir)));
-
-				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerMoveItem, this,
-					playerId, itemPos, spriteId, itemStackPos, toPos, count));
-				player->setNextWalkActionTask(task);
-				return true;
-			}
-			else{
-				player->sendCancelMessage(RET_THEREISNOWAY);
-				return false;
-			}
-		}
-	}
-
 	if((std::abs(playerPos.x - mapToPos.x) > item->getThrowRange()) ||
 			(std::abs(playerPos.y - mapToPos.y) > item->getThrowRange()) ||
 			(std::abs(mapFromPos.z - mapToPos.z) * 4 > item->getThrowRange()) ){
@@ -1809,7 +1706,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	}
 
 
-	ret = internalMoveItem(player, fromCylinder, toCylinder, toIndex, item, count, NULL);
+	ReturnValue ret = internalMoveItem(player, fromCylinder, toCylinder, toIndex, item, count, NULL);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
@@ -1828,6 +1725,43 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 	if(item->getParent() == NULL){
 		assert(fromCylinder == item->getParent());
 		return g_game.internalAddItem(actor, toCylinder, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+	}
+
+	ReturnValue ret = RET_NOERROR;
+	if(fromCylinder){
+		if(fromCylinder->getCreature()){
+			Player* player = fromCylinder->getCreature()->getPlayer();
+			Script::OnEquipItem::Event evt(player, item, SlotType(fromCylinder->__getIndexOfThing(item)), false, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				return ret;
+			}
+		}
+		else if(fromCylinder->getTile()){
+			Script::OnMoveItem::Event evt(actor, item, fromCylinder->getTile(), false, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				return ret;
+			}
+		}
+	}
+
+	if(toCylinder){
+		if(toCylinder->getCreature()){
+			Player* player = toCylinder->getCreature()->getPlayer();
+			Script::OnEquipItem::Event evt(player, item, SlotType(index), true, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				return ret;
+			}
+		}
+		else if(toCylinder->getTile()){
+			Script::OnMoveItem::Event evt(actor, item, toCylinder->getTile(), true, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				return ret;
+			}
+		}
 	}
 
 	Item* toItem = NULL;
@@ -1849,7 +1783,7 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 	}
 
 	//check if we can add this item
-	ReturnValue ret = toCylinder->__queryAdd(index, item, count, flags);
+	ret = toCylinder->__queryAdd(index, item, count, flags);
 	if(ret == RET_NEEDEXCHANGE){
 		//check if we can add it to source cylinder
 		int32_t fromIndex = fromCylinder->__getIndexOfThing(item);

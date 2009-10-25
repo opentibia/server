@@ -558,7 +558,7 @@ public:
 	bool isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor);
 
 	bool getPathTo(const Creature* creature, const Position& destPos,
-		std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/);
+		std::list<Direction>& listDir, int32_t maxSearchDist = -1);
 
 	bool getPathToEx(const Creature* creature, const Position& targetPos, std::list<Direction>& dirList,
 		const FindPathParams& fpp);

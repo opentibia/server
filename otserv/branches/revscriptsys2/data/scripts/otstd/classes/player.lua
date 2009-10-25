@@ -43,21 +43,34 @@ function Player:pickup(item)
 	return false
 end
 
-function Player:walkTo(toPos)
-	if not self:internalWalkTo(toPos) then
-		return false
+function Player:walkTo(to)
+	local function isAt(pos)
+		return (pos.x == self:getPosition().x and
+				pos.y == self:getPosition().y and
+				pos.z == self:getPosition().z)
 	end
 
-	while (math.abs(to.x - self:getPosition().x) > 1 or
-			math.abs(to.y - self:getPosition().y) > 1 or
-			to.z ~= self:getPosition().z) do
+	if isAt(to) then
+		return true
+	end
+	
+	if not self:internalWalkTo(to) then
+		return false
+	end
+	
+	local start = self:getPosition()
+	
+	while not isAt(to) do
 
-		--if not #self or not self:isAutoWalking() then
 		if not #self then
 			return false
 		end
 
-		wait(1000)
+		wait(500)
+		
+		if not isAt(start) and not self:isAutoWalking() then
+			return isAt(to)
+		end
 	end
 
 	return true
