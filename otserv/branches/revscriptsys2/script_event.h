@@ -391,6 +391,7 @@ namespace Script {
 			int32_t id;
 			bool addItem;
 			bool isItemOnTile;
+			bool postEvent;
 		};
 
 		class Event : public Script::Event {
@@ -423,6 +424,7 @@ namespace Script {
 			Item* item;
 			Tile* tile;
 			bool addItem;
+			bool postEvent;
 			ReturnValue& retval;
 		};
 	}

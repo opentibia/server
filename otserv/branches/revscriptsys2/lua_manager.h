@@ -513,6 +513,7 @@ public:
 	int lua_createItem();
 	int lua_getItemIDByName();
 	int lua_getItemType();
+	int lua_getMaxItemType();
 	int lua_isValidItemID();
 
 	int lua_Item_getItemID();

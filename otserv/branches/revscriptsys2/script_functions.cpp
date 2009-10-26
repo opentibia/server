@@ -387,6 +387,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Container", "getContentDescription()", &Manager::lua_Container_getContentDescription);
 
 	registerGlobalFunction("getItemType(int itemid)", &Manager::lua_getItemType);
+	registerGlobalFunction("getMaxItemType()", &Manager::lua_getMaxItemType);
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
 	registerGlobalFunction("isValidItemID(int id)", &Manager::lua_isValidItemID);
 
@@ -446,7 +447,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Channel", "getUsers()", &Manager::lua_Channel_getUsers);
 	registerMemberFunction("Channel", "addUser(Player player)", &Manager::lua_Channel_addUser);
 	registerMemberFunction("Channel", "removeUser(Player player)", &Manager::lua_Channel_removeUser);
-	registerMemberFunction("Channel", "talk(Player speaker, int type, string msg)", &Manager::lua_Channel_talk);
+	registerMemberFunction("Channel", "talk(Player speaker, SpeakClass type, string msg)", &Manager::lua_Channel_talk);
 }
 
 void Manager::registerFunctions() {
@@ -1461,8 +1462,8 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	// Store callback
 	insert(-6);
 
-	bool isAddItem = popBoolean();
 	bool isItemOnTile = popBoolean();
+	bool isAddItem = popBoolean();
 	int32_t id = popInteger();
 	std::string method = popString();
 	bool postEvent = true;
@@ -1497,6 +1498,7 @@ int LuaState::lua_registerGenericEvent_OnMoveItem() {
 	}
 
 	si_onmoveitem.id = id;
+	si_onmoveitem.postEvent = postEvent;
 	si_onmoveitem.addItem = isAddItem;
 	si_onmoveitem.isItemOnTile = isItemOnTile;
 
@@ -4863,6 +4865,12 @@ int LuaState::lua_getItemType()
 	return 1;
 }
 
+int LuaState::lua_getMaxItemType()
+{
+	push(Item::items.size());
+	return 1;
+}
+
 int LuaState::lua_isValidItemID()
 {
 	int32_t id = popInteger();
@@ -6136,10 +6144,10 @@ int LuaState::lua_Channel_removeUser()
 int LuaState::lua_Channel_talk()
 {
 	std::string text = popString();
-	int32_t t = popInteger();
+	SpeakClass talkType = popEnum<SpeakClass>();
 	/*Player* user = */popPlayer(ERROR_PASS);
 	ChatChannel* channel = popChannel();
-	channel->talk(NULL, (SpeakClass)t, text);
+	channel->talk(NULL, talkType, text);
 	pushBoolean(true);
 	return 1;
 }

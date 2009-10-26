@@ -417,8 +417,8 @@ OnEquipItem::Event::Event(Player* user, Item* item, SlotType slot, bool equip) :
 	equip(equip),
 	retval(dummyRetVal)
 {
-	postEvent = true;
 	propagate_by_default = true;
+	postEvent = true;
 
 	switch(slot.value()){
 		case ::enums::SLOT_HEAD:     equipslot = SLOTPOSITION_HEAD;     break;
@@ -442,8 +442,8 @@ OnEquipItem::Event::Event(Player* user, Item* item, SlotType slot, bool equip, R
 	equip(equip),
 	retval(retval)
 {
-	postEvent = false;
 	propagate_by_default = true;
+	postEvent = false;
 
 	switch(slot.value()){
 		case ::enums::SLOT_HEAD:     equipslot = SLOTPOSITION_HEAD;     break;
@@ -672,6 +672,7 @@ OnMoveItem::Event::Event(Creature* actor, Item* item, Tile* tile, bool addItem) 
 	retval(dummyRetVal)
 {
 	propagate_by_default = true;
+	postEvent = true;
 }
 
 OnMoveItem::Event::Event(Creature* actor, Item* item, Tile* tile, bool addItem, ReturnValue& retval) :
@@ -682,6 +683,7 @@ OnMoveItem::Event::Event(Creature* actor, Item* item, Tile* tile, bool addItem, 
 	retval(retval)
 {
 	propagate_by_default = true;
+	postEvent = false;
 }
 
 OnMoveItem::Event::~Event()
@@ -690,7 +692,7 @@ OnMoveItem::Event::~Event()
 
 bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 {
-	if(info.addItem != addItem){
+	if(info.addItem != addItem || info.postEvent != postEvent){
 		return false;
 	}
 
@@ -698,7 +700,14 @@ bool OnMoveItem::Event::check_match(const ScriptInformation& info)
 		switch(info.method){
 			case FILTER_ITEMID:
 			{
-				return (tile->items_getItemWithItemId(info.id) != NULL);
+				ItemVector vector = tile->items_getListWithItemId(info.id);
+				if(!vector.empty()){
+					for(ItemVector::iterator it = vector.begin(); it != vector.end(); ++it){
+						if(*it != item){
+							return true;
+						}
+					}
+				}
 				break;
 			}
 			case FILTER_ACTIONID:

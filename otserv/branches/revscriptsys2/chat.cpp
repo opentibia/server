@@ -156,12 +156,12 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClass type, const std::string& t
 		UsersMap::const_iterator iter = m_users.find(fromPlayer->getID());
 		if(iter == m_users.end())
 			return false;
-	}
 
-	// Add trade muted condition
-	if(getId() == CHANNEL_TRADE || getId() == CHANNEL_TRADE_ROOK){
-		Condition* condition = Condition::createCondition(CONDITION_MUTED_CHAT_TRADE, 120000);
-		fromPlayer->addCondition(condition);
+		// Add trade muted condition
+		if(getId() == CHANNEL_TRADE || getId() == CHANNEL_TRADE_ROOK){
+			Condition* condition = Condition::createCondition(CONDITION_MUTED_CHAT_TRADE, 120000);
+			fromPlayer->addCondition(condition);
+		}
 	}
 
 	UsersMap::iterator it;
