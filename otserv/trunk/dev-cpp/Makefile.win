@@ -5,26 +5,26 @@ CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = obj//otserv_private.res
-OBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.o obj//baseevents.o obj//chat.o obj//combat.o obj//commands.o obj//condition.o obj//configmanager.o obj//connection.o obj//container.o obj//creature.o obj//creatureevent.o obj//cylinder.o obj//database.o obj//databasesqlite.o obj//depot.o obj//exception.o obj//fileloader.o obj//game.o obj//house.o obj//housetile.o obj//ioaccount.o obj//iomapotbm.o obj//iomapserialize.o obj//ioplayer.o obj//item.o obj//items.o obj//logger.o obj//luascript.o obj//mailbox.o obj//map.o obj//md5.o obj//monster.o obj//monsters.o obj//movement.o obj//networkmessage.o obj//npc.o obj//otserv.o obj//outfit.o obj//outputmessage.o obj//player.o obj//position.o obj//protocol.o obj//protocolgame.o obj//protocollogin.o obj//raids.o obj//rsa.o obj//scheduler.o obj//scriptmanager.o obj//server.o obj//sha1.o obj//spawn.o obj//spells.o obj//status.o obj//talkaction.o obj//tasks.o obj//teleport.o obj//thing.o obj//tile.o obj//tools.o obj//trashholder.o obj//vocation.o obj//waitlist.o obj//weapons.o obj//databasemysql.o obj//party.o obj//beds.o obj//quests.o obj//protocolold.o obj//databaseodbc.o obj//databasepgsql.o $(RES)
-LINKOBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.o obj//baseevents.o obj//chat.o obj//combat.o obj//commands.o obj//condition.o obj//configmanager.o obj//connection.o obj//container.o obj//creature.o obj//creatureevent.o obj//cylinder.o obj//database.o obj//databasesqlite.o obj//depot.o obj//exception.o obj//fileloader.o obj//game.o obj//house.o obj//housetile.o obj//ioaccount.o obj//iomapotbm.o obj//iomapserialize.o obj//ioplayer.o obj//item.o obj//items.o obj//logger.o obj//luascript.o obj//mailbox.o obj//map.o obj//md5.o obj//monster.o obj//monsters.o obj//movement.o obj//networkmessage.o obj//npc.o obj//otserv.o obj//outfit.o obj//outputmessage.o obj//player.o obj//position.o obj//protocol.o obj//protocolgame.o obj//protocollogin.o obj//raids.o obj//rsa.o obj//scheduler.o obj//scriptmanager.o obj//server.o obj//sha1.o obj//spawn.o obj//spells.o obj//status.o obj//talkaction.o obj//tasks.o obj//teleport.o obj//thing.o obj//tile.o obj//tools.o obj//trashholder.o obj//vocation.o obj//waitlist.o obj//weapons.o obj//databasemysql.o obj//party.o obj//beds.o obj//quests.o obj//protocolold.o obj//databaseodbc.o obj//databasepgsql.o $(RES)
-LIBS =  -L"C:/dev-cpp/lib" -llibxml2 -lgmp -llua5.1 -lboost_system -lwsock32 -lws2_32 -lboost_regex -lsqlite3 -lmysql -lboost_thread -Wl,-Map=otserv.map  -s 
-INCS =  -I"C:/dev-cpp/include" 
-CXXINCS =  -I"C:/dev-cpp/include" 
-BIN  = C:/otserv/otserv.exe
-CXXFLAGS = $(CXXINCS) -D__USE_SQLITE__ -D__USE_MYSQL__ -D__EXCEPTION_TRACER__   -O1
-CFLAGS = $(INCS)   -O1
+OBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.o obj//baseevents.o obj//chat.o obj//combat.o obj//condition.o obj//configmanager.o obj//connection.o obj//container.o obj//creature.o obj//creatureevent.o obj//cylinder.o obj//database.o obj//databasesqlite.o obj//depot.o obj//exception.o obj//fileloader.o obj//game.o obj//house.o obj//housetile.o obj//ioaccount.o obj//iomapotbm.o obj//iomapserialize.o obj//ioplayer.o obj//item.o obj//items.o obj//logger.o obj//luascript.o obj//mailbox.o obj//map.o obj//md5.o obj//monster.o obj//monsters.o obj//movement.o obj//networkmessage.o obj//npc.o obj//otserv.o obj//outfit.o obj//outputmessage.o obj//player.o obj//position.o obj//protocol.o obj//protocolgame.o obj//protocollogin.o obj//raids.o obj//rsa.o obj//scheduler.o obj//scriptmanager.o obj//server.o obj//sha1.o obj//spawn.o obj//spells.o obj//status.o obj//talkaction.o obj//tasks.o obj//teleport.o obj//thing.o obj//tile.o obj//tools.o obj//trashholder.o obj//vocation.o obj//waitlist.o obj//weapons.o obj//databasemysql.o obj//party.o obj//beds.o obj//quests.o obj//protocolold.o obj//databaseodbc.o obj//databasepgsql.o $(RES)
+LINKOBJ  = obj//account.o obj//actions.o obj//admin.o obj//allocator.o obj//ban.o obj//baseevents.o obj//chat.o obj//combat.o obj//condition.o obj//configmanager.o obj//connection.o obj//container.o obj//creature.o obj//creatureevent.o obj//cylinder.o obj//database.o obj//databasesqlite.o obj//depot.o obj//exception.o obj//fileloader.o obj//game.o obj//house.o obj//housetile.o obj//ioaccount.o obj//iomapotbm.o obj//iomapserialize.o obj//ioplayer.o obj//item.o obj//items.o obj//logger.o obj//luascript.o obj//mailbox.o obj//map.o obj//md5.o obj//monster.o obj//monsters.o obj//movement.o obj//networkmessage.o obj//npc.o obj//otserv.o obj//outfit.o obj//outputmessage.o obj//player.o obj//position.o obj//protocol.o obj//protocolgame.o obj//protocollogin.o obj//raids.o obj//rsa.o obj//scheduler.o obj//scriptmanager.o obj//server.o obj//sha1.o obj//spawn.o obj//spells.o obj//status.o obj//talkaction.o obj//tasks.o obj//teleport.o obj//thing.o obj//tile.o obj//tools.o obj//trashholder.o obj//vocation.o obj//waitlist.o obj//weapons.o obj//databasemysql.o obj//party.o obj//beds.o obj//quests.o obj//protocolold.o obj//databaseodbc.o obj//databasepgsql.o $(RES)
+LIBS =  -L"C:/mingw/lib" -llibxml2 -llibmysql -llibsqlite3 -lgmp -llua -lboost_system-mgw44-mt-1_40 -lboost_thread-mgw44-mt-1_40 -llibboost_regex-mgw44-mt-1_40 -lwsock32 -lws2_32  -s 
+INCS =  -I"C:/mingw/include" 
+CXXINCS =  -I"C:/mingw/include" 
+BIN  = ../../../../otserv/otserv.exe
+CXXFLAGS = $(CXXINCS) -D__USE_SQLITE__ -D__USE_MYSQL__ -D__EXCEPTION_TRACER__   -O3
+CFLAGS = $(INCS)   -O3
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom
 
-all: all-before C:/otserv/otserv.exe all-after
+all: all-before ../../../../otserv/otserv.exe all-after
 
 
 clean: clean-custom
 	${RM} $(OBJ) $(BIN)
 
 $(BIN): $(OBJ)
-	$(CPP) $(LINKOBJ) -o "C:\otserv\otserv.exe" $(LIBS)
+	$(CPP) $(LINKOBJ) -o "..\..\..\..\otserv\otserv.exe" $(LIBS)
 
 obj//account.o: ../account.cpp
 	$(CPP) -c ../account.cpp -o obj//account.o $(CXXFLAGS)
@@ -49,9 +49,6 @@ obj//chat.o: ../chat.cpp
 
 obj//combat.o: ../combat.cpp
 	$(CPP) -c ../combat.cpp -o obj//combat.o $(CXXFLAGS)
-
-obj//commands.o: ../commands.cpp
-	$(CPP) -c ../commands.cpp -o obj//commands.o $(CXXFLAGS)
 
 obj//condition.o: ../condition.cpp
 	$(CPP) -c ../condition.cpp -o obj//condition.o $(CXXFLAGS)

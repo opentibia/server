@@ -1,7 +1,7 @@
 [Project]
 FileName=otserv.dev
 Name=otserv
-UnitCount=157
+UnitCount=155
 Type=1
 Ver=1
 ObjFiles=
@@ -11,13 +11,13 @@ PrivateResource=otserv_private.rc
 ResourceIncludes=
 MakeIncludes=
 Compiler=
-CppCompiler=-D__USE_SQLITE___@@_-D__USE_MYSQL___@@_-D__EXCEPTION_TRACER___@@_
-Linker=-llibxml2_@@_-lgmp_@@_-llua5.1_@@_-lboost_system_@@_-lwsock32_@@_-lws2_32_@@_-lboost_regex_@@_-lsqlite3_@@_-lmysql_@@_-lboost_thread_@@_-Wl,-Map=otserv.map_@@_
+CppCompiler=-D__USE_SQLITE___@@_-D__USE_MYSQL___@@_
+Linker=-llibxml2_@@_-llibmysql_@@_-llibsqlite3_@@_-lgmp_@@_-llua_@@_-lboost_system-mgw44-mt-1_40_@@_-lboost_thread-mgw44-mt-1_40_@@_-llibboost_regex-mgw44-mt-1_40_@@_-lwsock32_@@_-lws2_32_@@_
 IsCpp=1
 Icon=otserv.ico
 ExeOutput=C:\otserv\
 ObjectOutput=obj/
-OverrideOutput=0
+OverrideOutput=1
 OverrideOutputName=otserv.exe
 HostApplication=
 Folders=
@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=0000000000100000000100
+CompilerSettings=0000000000001000000100
 
 [Unit1]
 FileName=..\weapons.h
@@ -200,26 +200,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit20]
-FileName=..\condition.cpp
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit21]
-FileName=..\condition.h
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit22]
 FileName=..\configmanager.cpp
 CompileCpp=1
 Folder=otserv
@@ -229,7 +209,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit23]
+[Unit21]
 FileName=..\configmanager.h
 CompileCpp=1
 Folder=otserv
@@ -239,7 +219,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit24]
+[Unit22]
 FileName=..\connection.cpp
 CompileCpp=1
 Folder=otserv
@@ -249,7 +229,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit25]
+[Unit23]
 FileName=..\connection.h
 CompileCpp=1
 Folder=otserv
@@ -259,7 +239,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit26]
+[Unit24]
 FileName=..\const.h
 CompileCpp=1
 Folder=otserv
@@ -269,7 +249,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit27]
+[Unit25]
 FileName=..\container.cpp
 CompileCpp=1
 Folder=otserv
@@ -279,7 +259,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit28]
+[Unit26]
 FileName=..\container.h
 CompileCpp=1
 Folder=otserv
@@ -289,7 +269,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit29]
+[Unit27]
 FileName=..\creature.cpp
 CompileCpp=1
 Folder=otserv
@@ -299,7 +279,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit30]
+[Unit28]
 FileName=..\creature.h
 CompileCpp=1
 Folder=otserv
@@ -309,7 +289,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit31]
+[Unit29]
 FileName=..\creatureevent.cpp
 CompileCpp=1
 Folder=otserv
@@ -319,7 +299,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit32]
+[Unit30]
 FileName=..\creatureevent.h
 CompileCpp=1
 Folder=otserv
@@ -329,7 +309,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit33]
+[Unit31]
 FileName=..\cylinder.cpp
 CompileCpp=1
 Folder=otserv
@@ -339,7 +319,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit34]
+[Unit32]
 FileName=..\cylinder.h
 CompileCpp=1
 Folder=otserv
@@ -349,7 +329,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit35]
+[Unit33]
 FileName=..\database.cpp
 CompileCpp=1
 Folder=otserv
@@ -359,7 +339,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit36]
+[Unit34]
 FileName=..\database.h
 CompileCpp=1
 Folder=otserv
@@ -369,27 +349,27 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
+[Unit35]
+FileName=..\databasemysql.h
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit36]
+FileName=..\databaseodbc.h
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
 [Unit40]
-FileName=..\databasesqlite.cpp
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit41]
-FileName=..\databasesqlite.h
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit42]
 FileName=..\definitions.h
 CompileCpp=1
 Folder=otserv
@@ -399,7 +379,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit43]
+[Unit41]
 FileName=..\depot.cpp
 CompileCpp=1
 Folder=otserv
@@ -409,7 +389,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit44]
+[Unit42]
 FileName=..\depot.h
 CompileCpp=1
 Folder=otserv
@@ -419,7 +399,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit45]
+[Unit43]
 FileName=..\enums.h
 CompileCpp=1
 Folder=otserv
@@ -429,7 +409,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit46]
+[Unit44]
 FileName=..\exception.cpp
 CompileCpp=1
 Folder=otserv
@@ -439,7 +419,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit47]
+[Unit45]
 FileName=..\exception.h
 CompileCpp=1
 Folder=otserv
@@ -449,7 +429,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit48]
+[Unit46]
 FileName=..\fileloader.cpp
 CompileCpp=1
 Folder=otserv
@@ -459,7 +439,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit49]
+[Unit47]
 FileName=..\fileloader.h
 CompileCpp=1
 Folder=otserv
@@ -469,7 +449,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit50]
+[Unit48]
 FileName=..\game.cpp
 CompileCpp=1
 Folder=otserv
@@ -479,7 +459,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit51]
+[Unit49]
 FileName=..\game.h
 CompileCpp=1
 Folder=otserv
@@ -489,7 +469,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit52]
+[Unit50]
 FileName=..\house.cpp
 CompileCpp=1
 Folder=otserv
@@ -499,7 +479,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit53]
+[Unit51]
 FileName=..\house.h
 CompileCpp=1
 Folder=otserv
@@ -509,7 +489,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit54]
+[Unit52]
 FileName=..\housetile.cpp
 CompileCpp=1
 Folder=otserv
@@ -519,7 +499,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit55]
+[Unit53]
 FileName=..\housetile.h
 CompileCpp=1
 Folder=otserv
@@ -529,7 +509,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit56]
+[Unit54]
 FileName=..\ioaccount.cpp
 CompileCpp=1
 Folder=otserv
@@ -539,7 +519,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit57]
+[Unit55]
 FileName=..\ioaccount.h
 CompileCpp=1
 Folder=otserv
@@ -549,7 +529,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit58]
+[Unit56]
 FileName=..\iomap.h
 CompileCpp=1
 Folder=otserv
@@ -559,7 +539,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit59]
+[Unit57]
 FileName=..\iomapotbm.cpp
 CompileCpp=1
 Folder=otserv
@@ -569,7 +549,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit60]
+[Unit58]
 FileName=..\iomapotbm.h
 CompileCpp=1
 Folder=otserv
@@ -579,7 +559,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit61]
+[Unit59]
 FileName=..\iomapserialize.cpp
 CompileCpp=1
 Folder=otserv
@@ -589,7 +569,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit62]
+[Unit60]
 FileName=..\iomapserialize.h
 CompileCpp=1
 Folder=otserv
@@ -599,7 +579,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit63]
+[Unit61]
 FileName=..\ioplayer.cpp
 CompileCpp=1
 Folder=otserv
@@ -609,7 +589,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit64]
+[Unit62]
 FileName=..\ioplayer.h
 CompileCpp=1
 Folder=otserv
@@ -619,7 +599,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit65]
+[Unit63]
 FileName=..\item.cpp
 CompileCpp=1
 Folder=otserv
@@ -629,7 +609,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit66]
+[Unit64]
 FileName=..\item.h
 CompileCpp=1
 Folder=otserv
@@ -639,7 +619,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit67]
+[Unit65]
 FileName=..\itemloader.h
 CompileCpp=1
 Folder=otserv
@@ -649,7 +629,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit68]
+[Unit66]
 FileName=..\items.cpp
 CompileCpp=1
 Folder=otserv
@@ -659,7 +639,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit69]
+[Unit67]
 FileName=..\items.h
 CompileCpp=1
 Folder=otserv
@@ -669,7 +649,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit70]
+[Unit68]
 FileName=..\logger.cpp
 CompileCpp=1
 Folder=otserv
@@ -679,7 +659,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit71]
+[Unit69]
 FileName=..\logger.h
 CompileCpp=1
 Folder=otserv
@@ -689,7 +669,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit72]
+[Unit70]
 FileName=..\luascript.cpp
 CompileCpp=1
 Folder=otserv
@@ -699,7 +679,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit73]
+[Unit71]
 FileName=..\luascript.h
 CompileCpp=1
 Folder=otserv
@@ -709,7 +689,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit74]
+[Unit72]
 FileName=..\mailbox.cpp
 CompileCpp=1
 Folder=otserv
@@ -719,7 +699,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit75]
+[Unit73]
 FileName=..\mailbox.h
 CompileCpp=1
 Folder=otserv
@@ -729,7 +709,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit76]
+[Unit74]
 FileName=..\map.cpp
 CompileCpp=1
 Folder=otserv
@@ -739,7 +719,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit77]
+[Unit75]
 FileName=..\map.h
 CompileCpp=1
 Folder=otserv
@@ -749,7 +729,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit78]
+[Unit76]
 FileName=..\md5.cpp
 CompileCpp=1
 Folder=otserv
@@ -759,7 +739,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit79]
+[Unit77]
 FileName=..\md5.h
 CompileCpp=1
 Folder=otserv
@@ -769,7 +749,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit80]
+[Unit78]
 FileName=..\monster.cpp
 CompileCpp=1
 Folder=otserv
@@ -779,7 +759,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit81]
+[Unit79]
 FileName=..\monster.h
 CompileCpp=1
 Folder=otserv
@@ -789,7 +769,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit82]
+[Unit80]
 FileName=..\monsters.cpp
 CompileCpp=1
 Folder=otserv
@@ -799,7 +779,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit83]
+[Unit81]
 FileName=..\monsters.h
 CompileCpp=1
 Folder=otserv
@@ -809,7 +789,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit84]
+[Unit82]
 FileName=..\movement.cpp
 CompileCpp=1
 Folder=otserv
@@ -819,7 +799,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit85]
+[Unit83]
 FileName=..\movement.h
 CompileCpp=1
 Folder=otserv
@@ -829,7 +809,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit86]
+[Unit84]
 FileName=..\networkmessage.cpp
 CompileCpp=1
 Folder=otserv
@@ -839,7 +819,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit87]
+[Unit85]
 FileName=..\networkmessage.h
 CompileCpp=1
 Folder=otserv
@@ -849,7 +829,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit88]
+[Unit86]
 FileName=..\npc.cpp
 CompileCpp=1
 Folder=otserv
@@ -859,7 +839,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit89]
+[Unit87]
 FileName=..\npc.h
 CompileCpp=1
 Folder=otserv
@@ -869,7 +849,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit90]
+[Unit88]
 FileName=..\otpch.h
 CompileCpp=1
 Folder=otserv
@@ -879,7 +859,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit91]
+[Unit89]
 FileName=..\otserv.cpp
 CompileCpp=1
 Folder=otserv
@@ -889,7 +869,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit92]
+[Unit90]
 FileName=..\otsystem.h
 CompileCpp=1
 Folder=otserv
@@ -899,7 +879,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit93]
+[Unit91]
 FileName=..\outfit.cpp
 CompileCpp=1
 Folder=otserv
@@ -909,7 +889,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit94]
+[Unit92]
 FileName=..\outfit.h
 CompileCpp=1
 Folder=otserv
@@ -919,7 +899,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit95]
+[Unit93]
 FileName=..\outputmessage.cpp
 CompileCpp=1
 Folder=otserv
@@ -929,7 +909,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit96]
+[Unit94]
 FileName=..\outputmessage.h
 CompileCpp=1
 Folder=otserv
@@ -939,7 +919,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit97]
+[Unit95]
 FileName=..\player.cpp
 CompileCpp=1
 Folder=otserv
@@ -949,7 +929,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit98]
+[Unit96]
 FileName=..\player.h
 CompileCpp=1
 Folder=otserv
@@ -959,7 +939,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit99]
+[Unit97]
 FileName=..\position.cpp
 CompileCpp=1
 Folder=otserv
@@ -969,7 +949,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit100]
+[Unit98]
 FileName=..\position.h
 CompileCpp=1
 Folder=otserv
@@ -979,7 +959,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit101]
+[Unit99]
 FileName=..\protocol.cpp
 CompileCpp=1
 Folder=otserv
@@ -989,7 +969,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit102]
+[Unit100]
 FileName=..\protocol.h
 CompileCpp=1
 Folder=otserv
@@ -999,7 +979,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit103]
+[Unit101]
 FileName=..\protocolgame.cpp
 CompileCpp=1
 Folder=otserv
@@ -1009,7 +989,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit104]
+[Unit102]
 FileName=..\protocolgame.h
 CompileCpp=1
 Folder=otserv
@@ -1019,7 +999,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit105]
+[Unit103]
 FileName=..\protocollogin.cpp
 CompileCpp=1
 Folder=otserv
@@ -1029,7 +1009,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit106]
+[Unit104]
 FileName=..\protocollogin.h
 CompileCpp=1
 Folder=otserv
@@ -1039,7 +1019,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit107]
+[Unit105]
 FileName=..\raids.cpp
 CompileCpp=1
 Folder=otserv
@@ -1049,7 +1029,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit108]
+[Unit106]
 FileName=..\raids.h
 CompileCpp=1
 Folder=otserv
@@ -1059,7 +1039,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit109]
+[Unit107]
 FileName=..\rsa.cpp
 CompileCpp=1
 Folder=otserv
@@ -1069,7 +1049,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit110]
+[Unit108]
 FileName=..\rsa.h
 CompileCpp=1
 Folder=otserv
@@ -1079,7 +1059,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit111]
+[Unit109]
 FileName=..\scheduler.cpp
 CompileCpp=1
 Folder=otserv
@@ -1089,7 +1069,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit112]
+[Unit110]
 FileName=..\scheduler.h
 CompileCpp=1
 Folder=otserv
@@ -1099,7 +1079,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit113]
+[Unit111]
 FileName=..\scriptmanager.cpp
 CompileCpp=1
 Folder=otserv
@@ -1109,7 +1089,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit114]
+[Unit112]
 FileName=..\scriptmanager.h
 CompileCpp=1
 Folder=otserv
@@ -1119,7 +1099,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit115]
+[Unit113]
 FileName=..\server.cpp
 CompileCpp=1
 Folder=otserv
@@ -1129,7 +1109,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit116]
+[Unit114]
 FileName=..\server.h
 CompileCpp=1
 Folder=otserv
@@ -1139,7 +1119,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit117]
+[Unit115]
 FileName=..\sha1.cpp
 CompileCpp=1
 Folder=otserv
@@ -1149,7 +1129,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit118]
+[Unit116]
 FileName=..\sha1.h
 CompileCpp=1
 Folder=otserv
@@ -1159,7 +1139,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit119]
+[Unit117]
 FileName=..\spawn.cpp
 CompileCpp=1
 Folder=otserv
@@ -1169,7 +1149,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit120]
+[Unit118]
 FileName=..\spawn.h
 CompileCpp=1
 Folder=otserv
@@ -1179,7 +1159,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit121]
+[Unit119]
 FileName=..\spells.cpp
 CompileCpp=1
 Folder=otserv
@@ -1189,7 +1169,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit122]
+[Unit120]
 FileName=..\spells.h
 CompileCpp=1
 Folder=otserv
@@ -1199,7 +1179,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit123]
+[Unit121]
 FileName=..\status.cpp
 CompileCpp=1
 Folder=otserv
@@ -1209,7 +1189,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit124]
+[Unit122]
 FileName=..\status.h
 CompileCpp=1
 Folder=otserv
@@ -1219,7 +1199,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit125]
+[Unit123]
 FileName=..\talkaction.cpp
 CompileCpp=1
 Folder=otserv
@@ -1229,7 +1209,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit126]
+[Unit124]
 FileName=..\talkaction.h
 CompileCpp=1
 Folder=otserv
@@ -1239,7 +1219,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit127]
+[Unit125]
 FileName=..\tasks.cpp
 CompileCpp=1
 Folder=otserv
@@ -1249,7 +1229,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit128]
+[Unit126]
 FileName=..\tasks.h
 CompileCpp=1
 Folder=otserv
@@ -1259,7 +1239,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit129]
+[Unit127]
 FileName=..\teleport.cpp
 CompileCpp=1
 Folder=otserv
@@ -1269,7 +1249,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit130]
+[Unit128]
 FileName=..\teleport.h
 CompileCpp=1
 Folder=otserv
@@ -1279,7 +1259,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit131]
+[Unit129]
 FileName=..\templates.h
 CompileCpp=1
 Folder=otserv
@@ -1289,7 +1269,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit132]
+[Unit130]
 FileName=..\thing.cpp
 CompileCpp=1
 Folder=otserv
@@ -1299,7 +1279,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit133]
+[Unit131]
 FileName=..\thing.h
 CompileCpp=1
 Folder=otserv
@@ -1309,7 +1289,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit134]
+[Unit132]
 FileName=..\tile.cpp
 CompileCpp=1
 Folder=otserv
@@ -1319,7 +1299,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit135]
+[Unit133]
 FileName=..\tile.h
 CompileCpp=1
 Folder=otserv
@@ -1329,7 +1309,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit136]
+[Unit134]
 FileName=..\tools.cpp
 CompileCpp=1
 Folder=otserv
@@ -1339,7 +1319,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit137]
+[Unit135]
 FileName=..\tools.h
 CompileCpp=1
 Folder=otserv
@@ -1349,7 +1329,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit138]
+[Unit136]
 FileName=..\town.h
 CompileCpp=1
 Folder=otserv
@@ -1359,7 +1339,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit139]
+[Unit137]
 FileName=..\trashholder.cpp
 CompileCpp=1
 Folder=otserv
@@ -1369,7 +1349,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit140]
+[Unit138]
 FileName=..\trashholder.h
 CompileCpp=1
 Folder=otserv
@@ -1379,7 +1359,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit141]
+[Unit139]
 FileName=..\vocation.cpp
 CompileCpp=1
 Folder=otserv
@@ -1389,7 +1369,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit142]
+[Unit140]
 FileName=..\vocation.h
 CompileCpp=1
 Folder=otserv
@@ -1399,7 +1379,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit143]
+[Unit141]
 FileName=..\waitlist.cpp
 CompileCpp=1
 Folder=otserv
@@ -1409,7 +1389,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit144]
+[Unit142]
 FileName=..\waitlist.h
 CompileCpp=1
 Folder=otserv
@@ -1419,7 +1399,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit145]
+[Unit143]
 FileName=..\weapons.cpp
 CompileCpp=1
 Folder=otserv
@@ -1429,7 +1409,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit146]
+[Unit144]
 FileName=..\databasemysql.cpp
 CompileCpp=1
 Folder=otserv
@@ -1439,7 +1419,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit147]
+[Unit145]
 FileName=..\beds.h
 CompileCpp=1
 Folder=otserv
@@ -1449,7 +1429,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit148]
+[Unit146]
 FileName=..\party.cpp
 CompileCpp=1
 Folder=otserv
@@ -1459,7 +1439,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit149]
+[Unit147]
 FileName=..\party.h
 CompileCpp=1
 Folder=otserv
@@ -1469,8 +1449,28 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit150]
+[Unit148]
 FileName=..\beds.cpp
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit149]
+FileName=..\quests.cpp
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit150]
+FileName=..\quests.h
 CompileCpp=1
 Folder=otserv
 Compile=1
@@ -1498,26 +1498,6 @@ ProductVersion=
 AutoIncBuildNr=0
 
 [Unit37]
-FileName=..\databasemysql.h
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit38]
-FileName=..\databaseodbc.h
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit39]
 FileName=..\databasepgsql.h
 CompileCpp=1
 Folder=otserv
@@ -1527,27 +1507,27 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
+[Unit38]
+FileName=..\databasesqlite.cpp
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit39]
+FileName=..\databasesqlite.h
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
 [Unit151]
-FileName=..\quests.cpp
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit152]
-FileName=..\quests.h
-CompileCpp=1
-Folder=otserv
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit153]
 FileName=..\waypoints.h
 CompileCpp=1
 Folder=otserv
@@ -1557,7 +1537,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit154]
+[Unit152]
 FileName=..\protocolold.h
 CompileCpp=1
 Folder=otserv
@@ -1567,8 +1547,28 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit155]
+[Unit153]
 FileName=..\protocolold.cpp
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit154]
+FileName=..\databaseodbc.cpp
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit155]
+FileName=..\databasepgsql.cpp
 CompileCpp=1
 Folder=otserv
 Compile=1
@@ -1596,3 +1596,24 @@ Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+
+[Unit18]
+FileName=..\condition.cpp
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit19]
+FileName=..\condition.h
+CompileCpp=1
+Folder=otserv
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+

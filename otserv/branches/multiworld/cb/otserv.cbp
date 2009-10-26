@@ -8,15 +8,14 @@
 		<Build>
 			<Target title="Debug Windows">
 				<Option platforms="Windows;" />
-				<Option output="..\otserv" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="..\" />
+				<Option output="C:\otserv\otserv-debug" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="C:\otserv\" />
 				<Option object_output="obj\Debug\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-pg" />
 					<Add option="-g" />
-					<Add option="-Wno-unused-parameter" />
 					<Add option="-D__USE_SQLITE__" />
 					<Add option="-D__USE_MYSQL__" />
 					<Add option="-D__DEBUG__" />
@@ -26,29 +25,26 @@
 					<Add option="-pg -lgmon" />
 					<Add option="-llibxml2" />
 					<Add option="-llibmysql" />
+					<Add option="-llibsqlite3" />
 					<Add option="-lgmp" />
-					<Add option="-lsqlite3" />
 					<Add option="-llua" />
-					<Add option="-llibboost_system-mgw34-mt-1_40" />
-					<Add option="-llibboost_regex-mgw34-mt-1_40" />
-					<Add option="-llibboost_thread-mgw34-mt-1_40" />
-					<Add option="-lmingw32" />
+					<Add option="-lboost_system-mgw44-mt-1_40" />
+					<Add option="-lboost_thread-mgw44-mt-1_40" />
+					<Add option="-llibboost_regex-mgw44-mt-1_40" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
-					<Add option="-Wl,-Map=..\otserv.map" />
+					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
 				<Option platforms="Windows;" />
-				<Option output="..\otserv" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="..\" />
+				<Option output="C:\otserv\otserv" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="C:\otserv\" />
 				<Option object_output="obj\Release\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-O1" />
-					<Add option="-Wno-unused-parameter" />
-					<Add option="-mthreads" />
+					<Add option="-O3" />
 					<Add option="-D__USE_SQLITE__" />
 					<Add option="-D__USE_MYSQL__" />
 					<Add option="-D__SKULLSYSTEM__" />
@@ -57,13 +53,12 @@
 					<Add option="-s" />
 					<Add option="-llibxml2" />
 					<Add option="-llibmysql" />
+					<Add option="-llibsqlite3" />
 					<Add option="-lgmp" />
-					<Add option="-lsqlite3" />
 					<Add option="-llua" />
-					<Add option="-llibboost_system-mgw34-mt-1_40" />
-					<Add option="-llibboost_regex-mgw34-mt-1_40" />
-					<Add option="-llibboost_thread-mgw34-mt-1_40" />
-					<Add option="-lmingw32" />
+					<Add option="-lboost_system-mgw44-mt-1_40" />
+					<Add option="-lboost_thread-mgw44-mt-1_40" />
+					<Add option="-llibboost_regex-mgw44-mt-1_40" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 				</Linker>
@@ -133,6 +128,7 @@
 		</VirtualTargets>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-Wno-unused-parameter" />
 		</Compiler>
 		<Unit filename="..\AUTHORS" />
 		<Unit filename="..\Doxyfile" />
