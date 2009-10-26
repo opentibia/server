@@ -13,8 +13,19 @@ setmetatable(Items, {
 		end;
 })
 
-function getItemType(id)
-	return Items[id]
+function items_iterator()
+	local i = 99
+	local maxItems = getMaxItemType()
+	return function ()
+		i = i + 1
+		while i < maxItems and not isValidItemID(i) do
+			i = i + 1
+		end
+
+		if i < maxItems then
+			return Items[i]	
+		end
+	end
 end
 
 function getItemNameByID(itemid, count, alternate_name)

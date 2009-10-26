@@ -1,14 +1,26 @@
 equip_example = {}
 
 function equip_example.equip_callback(event)
-	event.player:sendMessage(17, "Equipped item " .. event.item:getItemID())
+	event.player:sendInfo("Equipped item " .. event.item:getItemID())
 end
-
-equip_example.equip_listener = registerOnEquipItem("itemid", 1988, SLOTPOSITION_BACKPACK, equip_example.equip_callback)
 
 function equip_example.deequip_callback(event)
-	event.player:sendMessage(17, "Deequipped item " .. event.item:getItemID())
+	event.player:sendInfo("Deequipped item " .. event.item:getItemID())
 end
 
-equip_example.deequip_listener = registerOnDeEquipItem("itemid", 1988, SLOTPOSITION_BACKPACK, equip_example.deequip_callback)
+function equip_example.registerHandlers()
+	if equip_example.equip_listener then
+		stopListener(equip_example.equip_listener)
+	end
+	equip_example.equip_listener =
+		registerOnEquipItem("itemid", 1988, SLOTPOSITION_BACKPACK, equip_example.equip_callback)
+	
+	if equip_example.deequip_listener then
+		stopListener(equip_example.deequip_listener)
+	end
+	equip_example.deequip_listener =
+		registerOnDeEquipItem("itemid", 1988, SLOTPOSITION_BACKPACK, equip_example.deequip_callback)
+end
+
+equip_example.registerHandlers()
 

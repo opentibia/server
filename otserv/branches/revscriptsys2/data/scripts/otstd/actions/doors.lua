@@ -420,10 +420,11 @@ function Item:isDoor()
 end
 
 -- Generic door switch function
-function otstd.doors.callback(evt)
-	local door = evt.item
+function otstd.doors.callback(event)
+	local door = event.item
 	if door:isDoor() then
 		door:switchDoor(true)
+		event:skip()
 	end
 end
 

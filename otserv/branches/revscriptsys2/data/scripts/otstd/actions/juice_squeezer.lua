@@ -44,8 +44,8 @@ function otstd.juice_squeezer.registerHandler()
 	if otstd.juice_squeezer.listener then
 		stopListener(otstd.juice_squeezer.listener)
 	end
-
-	otstd.juice_squeezer.listener = registerOnUseItemNearby("itemid", 5865, otstd.juice_squeezer.callback)
+	otstd.juice_squeezer.listener =
+		registerOnUseItemNearby("itemid", 5865, otstd.juice_squeezer.callback)
 end
 
 otstd.juice_squeezer.registerHandler()

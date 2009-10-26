@@ -15,7 +15,7 @@ end
 Channel.getType = Channel.getID
 
 function Channel:message(msg)
-	self:talk(nil, TALKTYPE_CHANNEL_R2, msg)
+	self:talk(nil, SPEAK_CHANNEL_R2, msg)
 end
 
 function Channel:speak(player, msg)

@@ -33,8 +33,30 @@ function TestCommand.TestSpecificStop(event)
 	stopListener(goof_listener);
 end
 
-registerOnSay("beginning", false, "/set", TestCommand.StorageTestSetHandler)
-registerOnSay("beginning", false, "/get", TestCommand.StorageTestGetHandler)
+function TestCommand.registerHandlers()
+	if TestCommand.set_listener then
+		stopListener(TestCommand.set_listener)
+	end
+	TestCommand.set_listener =
+		registerOnSay("beginning", false, "/set", TestCommand.StorageTestSetHandler)
 
-registerOnSay("beginning", false, "/tie",   TestCommand.TestSpecific)
-registerOnSay("beginning", false, "/untie", TestCommand.TestSpecificStop)
+	if TestCommand.get_listener then
+		stopListener(TestCommand.get_listener)
+	end
+	TestCommand.get_listener =
+		registerOnSay("beginning", false, "/get", TestCommand.StorageTestGetHandler)
+
+	if TestCommand.tie_listener then
+		stopListener(TestCommand.tie_listener)
+	end
+	TestCommand.tie_listener =
+		registerOnSay("beginning", false, "/tie",   TestCommand.TestSpecific)
+
+	if TestCommand.untie_listener then
+		stopListener(TestCommand.untie_listener)
+	end
+	TestCommand.untie_listener =
+		registerOnSay("beginning", false, "/untie", TestCommand.TestSpecificStop)
+end
+
+TestCommand.registerHandlers()

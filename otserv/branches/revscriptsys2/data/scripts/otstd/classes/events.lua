@@ -50,7 +50,7 @@ end
 -- OnMoveItem wrappers for easier binding (boolean arguments are confusing)
 
 function registerOnMoveItemToTile(when, method, filter, callback)
-	return registerOnMoveItem(when or nil, method, filter, false, true, callback)
+	return registerOnMoveItem(when, method, filter, true, false, callback)
 end
 
 function registerOnMoveItemFromTile(when, method, filter, callback)
@@ -62,7 +62,7 @@ function registerOnMoveItemToItem(when, method, filter, callback)
 end
 
 function registerOnMoveItemFromItem(when, method, filter, callback)
-	return registerOnMoveItem(when, method, filter, true, false, callback)
+	return registerOnMoveItem(when, method, filter, false, true, callback)
 end
 
 

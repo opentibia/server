@@ -23,33 +23,60 @@ function Player:sendAdvance(msg)
 	self:sendMessage(MSG_EVENT_ADVANCE, msg)
 end
 
-function Player:pickup(item)
+function Player:inRangeOfItem(item)
 	assert(typeof(item, "Item"))
 	
 	local parent = item:getParent()
-	if not parent or not typeof(parent, "Tile") then
+	if not parent then
 		return false
 	end
-
-	local itemPos = item:getPosition()
-	local playerPos = self:getPosition()
 	
-	if(math.abs(itemPos.x - self:getPosition().x) <= 1 and
-		  math.abs(itemPos.y - self:getPosition().y) <= 1 and
-		  itemPos.z == self:getPosition().z) then
-		  return self:internalPickup(item)
+	if typeof(parent, "Container") then
+		while parent and typeof(parent, "Container") do
+			parent = parent:getParent()
+		end
+	end
+	
+	if parent and typeof(parent, "Player") then
+		if self:getGUID() == parent:getGUID() then
+			return true
+		end
 	end
 
+	if parent and typeof(parent, "Tile") then
+		local pos = item:getPosition()
+		playerPos = self:getPosition()
+		return math.abs(pos.x - playerPos.x) <= 1 and math.abs(pos.y - playerPos.y) <= 1 and pos.z == playerPos.z
+	end
+	
 	return false
 end
 
+function Player:pickup(item)
+	assert(typeof(item, "Item"))
+
+	if not #self then
+		return RET_NOTPOSSIBLE, false
+	end
+
+	if self:inRangeOfItem(item) then
+		return self:internalPickup(item)
+	end
+
+	return RET_NOTPOSSIBLE, false
+end
+
 function Player:walkTo(to)
+	if not #self then
+		return false
+	end
+
 	local function isAt(pos)
 		return (pos.x == self:getPosition().x and
 				pos.y == self:getPosition().y and
 				pos.z == self:getPosition().z)
 	end
-
+	
 	if isAt(to) then
 		return true
 	end
@@ -61,16 +88,15 @@ function Player:walkTo(to)
 	local start = self:getPosition()
 	
 	while not isAt(to) do
-
 		if not #self then
 			return false
 		end
-
-		wait(500)
 		
 		if not isAt(start) and not self:isAutoWalking() then
 			return isAt(to)
 		end
+
+		wait(500)
 	end
 
 	return true

@@ -1,4 +1,5 @@
 KillTest = {}
+KillTest.watchList = {}
 
 function KillTest.simpleKillHandler(event)
 	if typeof(event.killer, "Player") then
@@ -14,10 +15,6 @@ function KillTest.simpleKillHandler(event)
 		listener = registerOnCreatureKill(event.killer, "all", KillAgain)
 	end
 end
-KillTest.simpleKillListener = registerOnKill("all", KillTest.simpleKillHandler)
-
-
-KillTest.watchList = {}
 
 function KillTest.ratDeathHandler(event)
 	sendAnimatedText(event.creature:getPosition(), 215, "Block")
@@ -41,17 +38,34 @@ function KillTest.ratDeathHandler(event)
 	event:skip()
 end
 
-registerOnKilled("Rat", "name", KillTest.ratDeathHandler)
-
 function KillTest.playerKillHandler(event)
 	local tag = createItem(2599)
 	tag:setSpecialDescription("Killed by " .. event.killer:getName() .. ".")
 	event.corpse:addItem(tag)
 end
 
-KillTest.playerKillListener = registerOnDeathBy("killer_player", KillTest.playerKillHandler)
+function KillTest.registerHandlers()
+	if KillTest.simpleKill_listener then
+		stopListener(KillTest.simpleKill_listener)
+	end
+	KillTest.simpleKill_listener =
+		registerOnKill("all", KillTest.simpleKillHandler)
 
---[[
-registerOnDeath([string what = nil], string method, function callback)
-registerOnCreatureDeath(Creature creature [, string what = nil], string method, function callback)
-]]--
+	if KillTest.killRat_listener then
+		stopListener(KillTest.killRat_listener)
+	end
+	KillTest.killRat_listener = registerOnKilled("Rat", "name", KillTest.ratDeathHandler)
+
+	if KillTest.playerKill_listener then
+		stopListener(KillTest.playerKill_listener)
+	end
+	KillTest.playerKill_listener =
+		registerOnDeathBy("killer_player", KillTest.playerKillHandler)
+		
+	--[[
+	registerOnDeath([string what = nil], string method, function callback)
+	registerOnCreatureDeath(Creature creature [, string what = nil], string method, function callback)
+	]]--
+end
+
+KillTest.registerHandlers()

@@ -38,4 +38,12 @@ function movecreature_example.stepIn_callback(event)
 		}
 end
 
-movecreature_example.stepInCreature_listener = registerOnAnyCreatureMoveIn("itemid", 420, movecreature_example.stepIn_callback)
+function movecreature_example.registerHandler()
+	if movecreature_example.stepInCreature_listener then
+		stopListener(movecreature_example.stepInCreature_listener)
+	end
+	movecreature_example.stepInCreature_listener =
+		registerOnAnyCreatureMoveIn("itemid", 420, movecreature_example.stepIn_callback)
+end
+
+movecreature_example.registerHandler()
