@@ -1557,7 +1557,11 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 		if(response->getAmount() != -1){
 			if(npcState->itemId > 0){
-				npcState->amount = (int32_t)std::min((int32_t)response->getAmount(), (int32_t)ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT);
+				const ItemType& it = Item::items[npcState->itemId];
+				if(it.id != 0 && it.stackable == false)
+					npcState->amount = (int32_t)std::min((int32_t)response->getAmount(), (int32_t)g_config.getNumber(ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT));
+				else
+					npcState->amount = response->getAmount();
 			}
 			else{
 				npcState->amount = response->getAmount();
@@ -2678,7 +2682,10 @@ int32_t Npc::matchKeywords(NpcResponse* response, std::vector<std::string> wordL
 				//TODO: Should iterate through each word until a number or a new keyword is found.
 				int32_t amount = atoi(lastWordMatchIter->c_str());
 				if(amount > 0){
-					response->setAmount(amount);
+					if(amount <= 500)
+						response->setAmount(amount);
+					else
+						response->setAmount(500);
 				}
 				else{
 					response->setAmount(1);
@@ -3319,7 +3326,7 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->spellName = getFieldString(L, "spellname");
 	state->listName = getFieldString(L, "listname");
 	state->listPluralName = getFieldString(L, "listpname");
-	bool isIdle = getFieldBool(L, "isidle");
+	bool isIdle = getFieldBool(L, "isidle") || getFieldBool(L, "isIdle");
 	if(isIdle){
 		state->focusState = 0;
 	}
