@@ -3003,7 +3003,7 @@ int LuaState::lua_Tile_addItem()
 
 	Tile* tile = popTile();
 
-	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), tile, INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), tile, INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE);
 	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
@@ -3355,7 +3355,7 @@ int LuaState::lua_Creature_walk()
 			throw Error("Creature:walk : Invalid direction");
 	}
 
-	ReturnValue ret = g_game.internalMoveCreature(NULL, creature, (Direction)ndir, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalMoveCreature(NULL, creature, (Direction)ndir);
 	pushBoolean(ret == RET_NOERROR);
 	return 1;
 }
@@ -4687,7 +4687,7 @@ int LuaState::lua_Container_addItem()
 	}
 	Container* container = popContainer();
 
-	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), container, INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), container, INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE);
 	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
@@ -6700,7 +6700,7 @@ int LuaScriptInterface::luaDoCreateItem()
 
 	Item* newItem = Item::CreateItem(itemId, count);
 
-	ReturnValue ret = g_game.internalAddItem(NULL, tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+	ReturnValue ret = g_game.internalAddItem(NULL, tile, newItem, INDEX_WHEREEVER, FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE);
 	if(ret != RET_NOERROR){
 		delete newItem;
 		pushThing(NULL);

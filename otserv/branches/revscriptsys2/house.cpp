@@ -242,7 +242,7 @@ bool House::transferToDepot()
 	for(std::list<Item*>::iterator it = moveItemList.begin(); it != moveItemList.end(); ++it){
 		if(depot) {
 			g_game.internalMoveItem(NULL, (*it)->getParent(), depot, INDEX_WHEREEVER,
-				(*it), (*it)->getItemCount(), NULL, FLAG_NOLIMIT);
+				(*it), (*it)->getItemCount(), NULL, FLAG_IGNORECAPACITY);
 		} else {
 			g_game.internalRemoveItem(NULL, *it);
 		}
@@ -844,7 +844,7 @@ bool Houses::payRent(Player* player, House* house, time_t time /*= 0*/)
 			}
 		}
 		else{
-			hasEnoughMoney = g_game.removeMoney(player, depot, house->getRent(), FLAG_NOLIMIT);
+			hasEnoughMoney = g_game.removeMoney(player, depot, house->getRent(), FLAG_IGNORECAPACITY);
 		}
 	}
 
@@ -957,7 +957,7 @@ bool Houses::payHouse(House* house, time_t time)
 					" days, or you will lose this house.";
 
 				letter->setText(warningText.str());
-				g_game.internalAddItem(NULL, depot, letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
+				g_game.internalAddItem(NULL, depot, letter, INDEX_WHEREEVER);
 
 				house->setPayRentWarnings(house->getPayRentWarnings() + 1);
 				house->setLastWarning(time);

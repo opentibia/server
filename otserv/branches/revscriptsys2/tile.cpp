@@ -353,10 +353,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {
 	if(const Creature* creature = thing->getCreature()){
-		if(hasBitSet(FLAG_NOLIMIT, flags)){
-			return RET_NOERROR;
-		}
-
 		if(hasBitSet(FLAG_PATHFINDING, flags)){
 			if(floorChange() || positionChange()){
 				return RET_NOTPOSSIBLE;
@@ -434,10 +430,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
-			if(!creatures_empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+			if(!hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags) && !creatures_empty()){
 				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
-						return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
+						return RET_NOTENOUGHROOM;
 					}
 				}
 			}
@@ -466,7 +462,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 		else{
-			if(!creatures_empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+			if(!hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags) && !creatures_empty()){
 				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 						return RET_NOTENOUGHROOM;
@@ -499,20 +495,16 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 	}
 	else if(const Item* item = thing->getItem()){
-#ifdef __DEBUG__
-		if(thing->getParent() == NULL && !hasBitSet(FLAG_NOLIMIT, flags)){
-			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
-		}
-#endif
 		if(items_count() >= 0xFFFF){
 			return RET_NOTPOSSIBLE;
 		}
 
-		if(hasBitSet(FLAG_NOLIMIT, flags)){
+		if(item->getParent() == NULL){
+			//The item has just been created and added to this tile through Game::internalAddItem
 			return RET_NOERROR;
 		}
 
-		if(!creatures_empty() && item->blockSolid() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+		if(!hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags) && !creatures_empty() && item->blockSolid()){
 			for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 				if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 					return RET_NOTENOUGHROOM;
@@ -520,11 +512,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		if(ground == NULL){
-			return RET_NOTPOSSIBLE;
-		}
+		//if(ground == NULL){
+		//	return RET_NOTPOSSIBLE;
+		//}
 
-		if(hasFlag(TILEPROP_BLOCKSOLID)){
+		if(!hasBitSet(FLAG_IGNOREBLOCKITEM, flags) && hasFlag(TILEPROP_BLOCKSOLID)){
 			if(item->isPickupable()){
 				ItemVector vector = items_getListWithProps(ITEMPROP_BLOCKSOLID);
 				for(ItemVector::iterator it = vector.begin(); it != vector.end(); ++it){
@@ -623,7 +615,8 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 		destTile = this;
 	}
 	else{
-		flags |= FLAG_NOLIMIT; //Will ignore that there is blocking items/creatures
+		//Ignore checks for blocking items and creatures
+		flags = flags | (FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE);
 	}
 
 	if(destTile){

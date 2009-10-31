@@ -24,13 +24,12 @@
 #define INDEX_WHEREEVER -1
 
 enum cylinderflags_t {
-	FLAG_NOLIMIT = 1,				//Bypass limits like capacity/container limits, blocking items/creatures etc.
-	FLAG_IGNOREBLOCKITEM = 2,		//Bypass moveable blocking item checks
+	FLAG_PATHFINDING         = 1,	//An additional check is done for floor changing/teleport items
+	FLAG_IGNOREBLOCKITEM     = 2,	//Bypass moveable blocking item checks
 	FLAG_IGNOREBLOCKCREATURE = 4,	//Bypass creature checks
-	FLAG_CHILDISOWNER = 8,			//Used by containers to query capacity of the carrier (player)
-	FLAG_PATHFINDING = 16,			//An additional check is done for floor changing/teleport items
-	FLAG_IGNOREFIELDDAMAGE = 32,	//Bypass field damage checks
-	FLAG_IGNORENOTMOVEABLE = 64		//Bypass check for movability
+	FLAG_IGNOREFIELDDAMAGE   = 8,	//Bypass field damage checks
+	FLAG_IGNORENOTMOVEABLE   = 16,	//Bypass check for movability
+	FLAG_IGNORECAPACITY      = 32,	//Bypass checks for capacity (container size/player capacity)
 };
 
 enum cylinderlink_t{
@@ -64,8 +63,7 @@ public:
 		* -1 is a internal value and means add to a empty position, with no destItem
 	  * \param thing the object to move/add
 	  * \param count is the amount that we want to move/add
-	  * \param flags if FLAG_CHILDISOWNER if set the query is from a child-cylinder (check cap etc.)
-		* if FLAG_NOLIMIT is set blocking items/container limits is ignored
+	  * \param flags optional flags to modifiy the default behaviour
 	  * \return ReturnValue holds the return value
 	  */
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* Item, uint32_t count,

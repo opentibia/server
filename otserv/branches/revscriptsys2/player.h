@@ -553,6 +553,7 @@ public:
 	//items
 	ContainerVector containerVec;
 	void preSave();
+	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	//stamina
 	void addStamina(int64_t value);
@@ -584,7 +585,6 @@ public:
 
 protected:
 	void checkTradeState(const Item* item);
-	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	std::string getSkillName(int skillid);
 	void gainExperience(uint64_t& gainExp, bool fromMonster);

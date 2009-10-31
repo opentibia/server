@@ -281,13 +281,6 @@ void Container::onRemoveContainerItem(uint32_t index, Item* item)
 ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {
-	bool childIsOwner = ((flags & FLAG_CHILDISOWNER) == FLAG_CHILDISOWNER);
-	if(childIsOwner){
-		//a child container is querying, since we are the top container (not carried by a player)
-		//just return with no error.
-		return RET_NOERROR;
-	}
-
 	const Item* item = thing->getItem();
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
@@ -310,20 +303,25 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 			cylinder = cylinder->getParent();
 		}
 	}
-	
-	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
 
-	if(index == INDEX_WHEREEVER && !skipLimit){
-		if(size() >= capacity())
-			return RET_CONTAINERNOTENOUGHROOM;
+	if(!hasBitSet(FLAG_IGNORECAPACITY, flags)){
+		if(index == INDEX_WHEREEVER){
+			if(size() >= capacity())
+				return RET_CONTAINERNOTENOUGHROOM;
+		}
+
+		const Cylinder* topParent = getTopParent();
+		if(topParent){
+			if(topParent->getCreature()){
+				const Player* player = topParent->getCreature()->getPlayer();
+				if(!player->hasCapacity(item, count)){
+					return RET_NOTENOUGHCAPACITY;
+				}
+			}
+		}
 	}
 
-	const Cylinder* topParent = getTopParent();
-	if(topParent != this){
-		return topParent->__queryAdd(INDEX_WHEREEVER, item, count, flags | FLAG_CHILDISOWNER);
-	}
-	else
-		return RET_NOERROR;
+	return RET_NOERROR;
 }
 
 ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
@@ -335,7 +333,7 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 		return RET_NOTPOSSIBLE;
 	}
 
-	if( ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT) ){
+	if(hasBitSet(FLAG_IGNORECAPACITY, flags)){
 		maxQueryCount = std::max((uint32_t)1, count);
 		return RET_NOERROR;
 	}

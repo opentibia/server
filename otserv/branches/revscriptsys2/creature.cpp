@@ -796,18 +796,27 @@ Item* Creature::dropCorpse()
 
 	Tile* tile = getParentTile();
 	if(splash){
-		g_game.internalAddItem(NULL, tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
-		g_game.startDecay(splash);
+		if(g_game.internalAddItem(NULL, tile, splash, INDEX_WHEREEVER, FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE) == RET_NOERROR){
+			g_game.startDecay(splash);
+		}
+		else{
+			g_game.FreeThing(splash);
+		}
 	}
 
 	Item* corpse = createCorpse();
 	if(corpse){
-		g_game.internalAddItem(NULL, tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
-		dropLoot(corpse->getContainer());
-		g_game.startDecay(corpse);
+		if(g_game.internalAddItem(NULL, tile, corpse, INDEX_WHEREEVER, FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE) == RET_NOERROR){
+			dropLoot(corpse->getContainer());
+			g_game.startDecay(corpse);
+			return corpse;
+		}
+		else{
+			g_game.FreeThing(corpse);
+		}
 	}
-	
-	return corpse;
+
+	return NULL;
 }
 
 DeathList Creature::getKillers(int32_t assist_count /*= 1*/)

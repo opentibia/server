@@ -409,7 +409,7 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 		TileItemVector list = (*map_iter)->second.list;
 		for(TileItemReverseIterator it = list.rbegin(); it != list.rend(); ++it){
 			Item* item = (*it)->clone();
-			ReturnValue ret = internalAddItem(NULL, tile, item , INDEX_WHEREEVER, FLAG_NOLIMIT);
+			ReturnValue ret = internalAddItem(NULL, tile, item , INDEX_WHEREEVER);
 			if(ret == RET_NOERROR){
 				// REVSCRIPT TODO Add unique items
 				//if(item->getUniqueId() != 0){
@@ -1693,20 +1693,18 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		}
 	}
 
+	ReturnValue retVal = RET_NOERROR;
 	if((std::abs(playerPos.x - mapToPos.x) > item->getThrowRange()) ||
 			(std::abs(playerPos.y - mapToPos.y) > item->getThrowRange()) ||
 			(std::abs(mapFromPos.z - mapToPos.z) * 4 > item->getThrowRange()) ){
-		player->sendCancelMessage(RET_DESTINATIONOUTOFREACH);
-		return false;
+		retVal = RET_DESTINATIONOUTOFREACH;
+	}
+	
+	if(retVal == RET_NOERROR && !canThrowObjectTo(mapFromPos, mapToPos)){
+		retVal = RET_CANNOTTHROW;
 	}
 
-	if(!canThrowObjectTo(mapFromPos, mapToPos)){
-		player->sendCancelMessage(RET_CANNOTTHROW);
-		return false;
-	}
-
-
-	ReturnValue ret = internalMoveItem(player, fromCylinder, toCylinder, toIndex, item, count, NULL);
+	ReturnValue ret = internalMoveItem(player, fromCylinder, toCylinder, toIndex, item, count, NULL, 0, retVal);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 		return false;
@@ -1716,7 +1714,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 }
 
 ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cylinder* toCylinder,
-	int32_t index, Item* item, uint32_t count, Item** _moveItem, uint32_t flags /*= 0*/)
+	int32_t index, Item* item, uint32_t count, Item** _moveItem, uint32_t flags /*= 0*/, ReturnValue retVal /*= RET_NOERROR*/)
 {
 	if(!toCylinder){
 		return RET_NOTPOSSIBLE;
@@ -1724,10 +1722,10 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 
 	if(item->getParent() == NULL){
 		assert(fromCylinder == item->getParent());
-		return g_game.internalAddItem(actor, toCylinder, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		return g_game.internalAddItem(actor, toCylinder, item, INDEX_WHEREEVER, flags);
 	}
 
-	ReturnValue ret = RET_NOERROR;
+	ReturnValue ret = retVal;
 	if(fromCylinder){
 		if(fromCylinder->getCreature()){
 			Player* player = fromCylinder->getCreature()->getPlayer();
@@ -1764,8 +1762,13 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 		}
 	}
 
-	Item* toItem = NULL;
+	// retVal contains the caller functions ReturnValue, it's checked here after the
+	// OnMoveItem event has fired incase it wants to override default behaviour
+	if(retVal != RET_NOERROR){
+		return retVal;
+	}
 
+	Item* toItem = NULL;
 	Cylinder* subCylinder;
 	int floorN = 0;
 	while((subCylinder = toCylinder->__queryDestination(index, item, &toItem, flags)) != toCylinder){
@@ -1920,11 +1923,28 @@ ReturnValue Game::internalAddItem(Creature* actor, Cylinder* toCylinder, Item* i
 		return RET_NOTPOSSIBLE;
 	}
 
+	ReturnValue ret = RET_NOERROR;
+	if(toCylinder->getCreature()){
+		Player* player = toCylinder->getCreature()->getPlayer();
+		Script::OnEquipItem::Event evt(player, item, SlotType(index), true, ret);
+		if(script_system->dispatchEvent(evt)){
+			//handled by script
+			return ret;
+		}
+	}
+	else if(toCylinder->getTile()){
+		Script::OnMoveItem::Event evt(actor, item, toCylinder->getTile(), true, ret);
+		if(script_system->dispatchEvent(evt)){
+			//handled by script
+			return ret;
+		}
+	}
+
 	Item* toItem = NULL;
 	toCylinder = toCylinder->__queryDestination(index, item, &toItem, flags);
 
 	//check if we can add this item
-	ReturnValue ret = toCylinder->__queryAdd(index, item, item->getItemCount(), flags);
+	ret = toCylinder->__queryAdd(index, item, item->getItemCount(), flags);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
@@ -1998,8 +2018,25 @@ ReturnValue Game::internalRemoveItem(Creature* actor, Item* item, int32_t count 
 		count = item->getItemCount();
 	}
 
+	ReturnValue ret = RET_NOERROR;
+	if(cylinder->getCreature()){
+		Player* player = cylinder->getCreature()->getPlayer();
+		Script::OnEquipItem::Event evt(player, item, SlotType(cylinder->__getIndexOfThing(item)), false, ret);
+		if(script_system->dispatchEvent(evt)){
+			//handled by script
+			return ret;
+		}
+	}
+	else if(cylinder->getTile()){
+		Script::OnMoveItem::Event evt(actor, item, cylinder->getTile(), false, ret);
+		if(script_system->dispatchEvent(evt)){
+			//handled by script
+			return ret;
+		}
+	}
+
 	//check if we can remove this item
-	ReturnValue ret = cylinder->__queryRemove(item, count, flags | FLAG_IGNORENOTMOVEABLE);
+	ret = cylinder->__queryRemove(item, count, flags | FLAG_IGNORENOTMOVEABLE);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
@@ -2316,7 +2353,9 @@ bool Game::addMoney(Creature* actor, Cylinder* cylinder, uint32_t money, uint32_
 
 				ReturnValue ret = internalAddItem(actor, cylinder, moneyItem, INDEX_WHEREEVER, flags);
 				if(ret != RET_NOERROR){
-					internalAddItem(actor, cylinder->getParentTile(), moneyItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+					if(internalAddItem(actor, cylinder->getParentTile(), moneyItem, INDEX_WHEREEVER) != RET_NOERROR){
+						FreeThing(moneyItem);
+					}
 				}
 
 				count -= moneyCount;
@@ -2371,7 +2410,7 @@ Item* Game::transformItem(Creature* actor, Item* item, uint16_t newId, int32_t n
 
 		newItem->copyAttributes(item);
 
-		ret = internalAddItem(actor, cylinder, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		ret = internalAddItem(actor, cylinder, newItem, INDEX_WHEREEVER);
 		if(ret != RET_NOERROR){
 			delete newItem;
 			return NULL;
@@ -2471,11 +2510,6 @@ ReturnValue Game::internalTeleport(Creature* actor, Thing* thing, const Position
 	Tile* toTile = getParentTile(newPos.x, newPos.y, newPos.z);
 	if(toTile){
 		if(Creature* creature = thing->getCreature()){
-			ReturnValue ret = toTile->__queryAdd(0, creature, 1, FLAG_NOLIMIT);
-			if(ret != RET_NOERROR){
-				return ret;
-			}
-
 			creature->getParentTile()->moveCreature(actor, creature, toTile, true);
 			return RET_NOERROR;
 		}

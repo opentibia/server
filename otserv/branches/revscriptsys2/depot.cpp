@@ -20,6 +20,7 @@
 #include "otpch.h"
 
 #include "depot.h"
+#include "tools.h"
 
 Depot::Depot(uint16_t _type) :
 Container(_type)
@@ -57,9 +58,7 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		return RET_NOTPOSSIBLE;
 	}
 
-	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
-	
-	if(!skipLimit){
+	if(!hasBitSet(FLAG_IGNORECAPACITY, flags)){
 		int addCount = 0;
 
 		if((item->isStackable() && item->getItemCount() != count)){

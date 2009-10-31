@@ -2591,17 +2591,6 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 		return RET_NOTPOSSIBLE;
 	}
 
-	bool childIsOwner = ((flags & FLAG_CHILDISOWNER) == FLAG_CHILDISOWNER);
-	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
-
-	if(childIsOwner){
-		//a child container is querying the player, just check if enough capacity
-		if(skipLimit || hasCapacity(item, count))
-			return RET_NOERROR;
-		else
-			return RET_NOTENOUGHCAPACITY;
-	}
-
 	if(!item->isPickupable()){
 		return RET_CANNOTPICKUP;
 	}

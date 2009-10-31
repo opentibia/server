@@ -417,7 +417,9 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 		g_game.transformItem(player, item, item->getID(), newCharge);
 	}
 	else if(ammoAction == AMMOACTION_MOVE){
-		g_game.internalMoveItem(player, item->getParent(), destTile, INDEX_WHEREEVER, item, 1, NULL, FLAG_NOLIMIT);
+		if(g_game.internalMoveItem(player, item->getParent(), destTile, INDEX_WHEREEVER, item, 1, NULL) != RET_NOERROR){
+			g_game.internalRemoveItem(player, item);
+		}
 	}
 	else if(ammoAction == AMMOACTION_MOVEBACK){
 		//do nothing

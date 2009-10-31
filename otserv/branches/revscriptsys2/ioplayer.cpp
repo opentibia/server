@@ -846,7 +846,7 @@ bool IOPlayer::sendMail(Creature* actor, const std::string name, uint32_t depotI
 	Depot* depot = player->getDepot(depotId, true);
 	if(depot){
 		if(g_game.internalMoveItem(actor, item->getParent(), depot, INDEX_WHEREEVER,
-			item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
+			item, item->getItemCount(), NULL, FLAG_IGNORECAPACITY) == RET_NOERROR)
 		{
 			result = true;
 		}

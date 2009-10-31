@@ -350,7 +350,7 @@ public:
 		Cylinder* fromCylinder, Cylinder* toCylinder, uint32_t flags = 0);
 
 	ReturnValue internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-		Item* item, uint32_t count, Item** _moveItem, uint32_t flags = 0);
+		Item* item, uint32_t count, Item** _moveItem, uint32_t flags = 0, ReturnValue retVal = RET_NOERROR);
 
 	ReturnValue internalAddItem(Creature* actor, Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
 		uint32_t flags = 0, bool test = false);
