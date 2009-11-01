@@ -592,11 +592,6 @@ public:
 	void checkLight();
 	bool kickPlayer(uint32_t playerId);
 
-	void combatToTarget(Creature* attacker, CombatParams& params, Creature* target);
-	void combatToTarget(CombatSource combatSource, CombatParams& params, Creature* target);
-	void combatToArea(Creature* attacker, CombatParams& params, const Position& pos, const CombatArea* area);
-	void combatToArea(CombatSource combatSource, CombatParams& params, const Position& pos, const CombatArea* area);
-
 	bool combatBlockHit(CombatType combatType, CombatSource combatSource, Creature* target,
 		int32_t& healthChange, bool checkDefense, bool checkArmor);
 	bool combatChangeHealth(CombatType combatType, Creature* attacker,

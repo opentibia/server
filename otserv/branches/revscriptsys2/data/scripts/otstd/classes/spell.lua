@@ -3,51 +3,77 @@ Spell_mt = {__index=Spell}
 otstd.registered_instants = {} -- By words
 otstd.registered_runes    = {} -- By rune ID
 
-function Spell:new()
+function Spell:new(name)
 	local spell = {
 		-- Common for all spells
-		vocation    = "any",
-		words       = nil,
-		level       = 0,
-		magic_level = 0,
-		mana        = 0,
-		health      = 0,
-		soul        = 0,
-		aggressive  = false,
-		premium     = false,
-		effect      = MAGIC_EFFECT_NONE,
-		failEffect  = MAGIC_EFFECT_POFF,
+		name            = name,
+		vocation        = "any",
+		level           = 0,
+		magicLevel      = 0,
+		mana            = 0,
+		health          = 0,
+		soul            = 0,
+		premium         = false,
+		
+		damageType      = COMBAT_NONE,
+		needTarget      = false,
+		aggressive      = false,
+		blockArmor      = false,
+		blockShield     = false,
+		area            = nil,
+		effect          = MAGIC_EFFECT_NONE,
+		failEffect      = MAGIC_EFFECT_POFF,
+		areaEffect      = MAGIC_EFFECT_NONE,
+		
+		-- Overrideable functions
+		onBeginCast     = nil,
+		onCast          = nil,
+		onHitCreature   = nil,
+		onHitTile	    = nil,
+		onFinishCast    = nil,
 		
 		-- Instant spells
-		area        = nil,
+		words           = nil,
 		
 		-- Weapon spells
-		weapon      = 0,
+		weapon          = 0,
 		
 		-- Rune spells
-		rune           = 0,
-		targetcreature = true,
+		rune            = 0,
+		range           = 0,
 		
 		-- Conjure spells
-		reagent        = 0,
-		product        = {id=0, count=0, charges=0}
+		reagent         = 0,
+		product         = {id = 0, count = 0, charges = 0}
 	}
 	setmetatable(spell, Spell_mt)
 	return spell
 end
 
--- Handler for instant spells
+function otstd.canCastSpellOnTile(spell, tile)
+	if spell.aggressive and tile:isPz()  then
+		return false
+	end
+
+	return true
+end
+
+function otstd.canCastSpellOnCreature(spell, creature)
+	return true
+end
+
+-- Generic spell checks for both instant and rune spells
 function otstd.onSpellCheck(event)
 	local caster = event.caster
 	local spell = event.spell
 	local tile = map:getTile(caster:getPosition())
 	
-	if typeof(caster, "Player") then
+	if caster and typeof(caster, "Player") then
 		if caster:canUseSpells() == false then
 			caster:sendCancel("You cannot cast spells.")
 		elseif caster:ignoreSpellCheck() then
 			return true
-		elseif tile:isPZ() and spell.aggressive then
+		elseif tile:isPz() and spell.aggressive then
 			caster:sendCancel("This action is not permitted in a protection zone.")
 		elseif (spell.aggressive and caster:isCombatExhausted()) or (not spell.aggressive and caster:isHealExhausted()) then
 			caster:sendCancel("You are exhausted.")
@@ -77,43 +103,121 @@ function otstd.onSpellCheck(event)
 	end
 end
 
+-- Called once a spell has been casted
 function otstd.onCastSpell(event)
-	local spell = event.spell
 	local caster = event.caster
-	-- All spell checks have been done, remove mana etc.
+	local casterPos = caster and caster:getPosition()
+	--local toPos = casterPos
+	local target = event.targetCreature
+	local spell = event.spell
 	
-	caster:spendMana(spell.mana)
-	caster:removeHealth(spell.health)
-	--caster:removeSoul(spell.soul)
-	
-	if spell.aggressive then
-		--caster:addCombatExhaustion(config["fightexhausted"])
-	else
-		--caster:addHealExhaustion(config["exhausted"])
+	if caster and typeof(caster, "Player") then
+		-- All spell checks have been done, remove mana etc.
+		caster:spendMana(spell.mana)
+		caster:removeHealth(spell.health)
+		--caster:removeSoul(spell.soul)
+		
+		if spell.aggressive then
+			--caster:addCombatExhaustion(config["fightexhausted"])
+		else
+			--caster:addHealExhaustion(config["exhausted"])
+		end
+	end
+		
+	if spell.onFinishCast then
+		-- Normal cast function has been overridden
+		return spell.onFinishCast(event)
 	end
 	
 	if spell.internalFinishCast then
-		spell:internalFinishCast(event)
+		return spell.internalFinishCast(event)
 	end
 	
-	if spell.onFinishCast then
-		spell:onFinishCast(event)
+	-- default spell handling
+	local centerPos = event.targetPosition or casterPos
+	
+	local list = {}
+	if spell.area then
+		-- Collect the positions that the spell hit on					
+		local areaWidth = #spell.area[1]
+		local areaHeight = table.getn(spell.area)
+		
+		local centerX = (areaWidth - 1) / 2
+		local centerY = (areaHeight - 1) / 2
+
+		local dir = caster:getDirection()
+		
+		for rowIndex, rows in pairs(spell.area) do
+			for colIndex, value in ipairs(rows) do
+				
+				if (not directional and string.find(value, "a")) or
+				(dir == NORTH and string.find(value, "n")) or
+				(dir == SOUTH and string.find(value, "s")) or
+				(dir == WEST and string.find(value, "w")) or
+				(dir == EAST and string.find(value, "e")) then
+					local posx = centerPos.x + (centerX - (areaWidth - 1)) + colIndex - 1
+					local posy = centerPos.y + (centerY - (areaHeight - 1)) + rowIndex - 1	
+					
+					local pos = {x = posx, y = posy, z = centerPos.z}
+					local tile = map:getTile(pos)
+					list[pos] = tile and tile:getCreatures()
+				end
+			end
+		end
 	end
 	
-	sendMagicEffect(caster:getPosition(), spell.effect)
+	for pos, creatures in pairs(list) do
+		local position targetTile = map:getTile(pos)
+		
+		if otstd.canCastSpellOnTile(spell, targetTile) then 
+		
+			for __,target in ipairs(creatures) do
+			
+				if otstd.canCastSpellOnCreature(spell, target) then 
+					if spell.onHitCreature then
+						-- Normal cast function has been overridden
+						spell.onHitCreature(target)
+					else
+						--local healthChange = 0
+						--if spell.formula then
+						--	healthChange = spell.formula(caster)
+						--end
+						--combatChangeHealth(spell.damageType, caster, target, healthChange) then
+					end
+				end
+			end
+
+			if spell.onHitTile then
+				spell.onHitTile(targetTile)
+			end					
+			
+			if spell.areaEffect then
+				sendMagicEffect(pos, spell.areaEffect)
+			end
+		end
+	end
+	
+	if caster and spell.effect ~= MAGIC_EFFECT_NONE then
+		sendMagicEffect(caster:getPosition(), spell.effect)
+	end
 end
 
+-------------------------------------------------------------------------------
+-- Instant spells
+
+-- Handler
 function otstd.onSaySpell(event)
-	event.caster = event.creature
+	local caster = event.caster
 	local spell = event.spell
-	
-	if otstd.onSpellCheck(event) then
+
+	if otstd.onSpellCheck(event) and otstd.onInstantSpellCheck(event) then
 		-- Check extra conditions
 		if (not spell.internalBeginCast or spell:internalBeginCast(event)) and (not spell.onBeginCast or spell:onBeginCast(event)) then
+			
 			-- Cast the spell!
 			if spell.onCast then
 				-- Normal cast function has been overridden
-				spell:onCast(event)
+				spell.onCast(event)
 			else
 				otstd.onCastSpell(event)
 			end
@@ -122,16 +226,87 @@ function otstd.onSaySpell(event)
 	end
 	
 	event.text = ""
-	if spell.failEffect then
-		sendMagicEffect(event.creature:getPosition(), spell.failEffect)
+	if caster and spell.failEffect ~= MAGIC_EFFECT_NONE then
+		sendMagicEffect(caster:getPosition(), spell.failEffect)
 	end
+end
+
+-- Spell checks
+function otstd.onInstantSpellCheck(event)	
+	local caster = event.caster
+	
+	if caster and typeof(caster, "Player") then
+		--TODO: Additional checks like black skull, safe-mode
+	end
+	
+	return true
+end
+
+-------------------------------------------------------------------------------
+-- Rune spells
+
+-- Handler
+function otstd.onUseRuneSpell(event)
+	local caster = event.creature
+	local spell = event.spell
+	
+	if otstd.onSpellCheck(event) and otstd.onRuneSpellCheck(event) then
+		-- Check extra conditions
+		if (not spell.internalBeginCast or spell:internalBeginCast(event)) and (not spell.onBeginCast or spell:onBeginCast(event)) then
+			-- Cast the spell!
+			if spell.onCast then
+				-- Normal cast function has been overridden
+				spell.onCast(event)
+			else
+				otstd.onCastSpell(event)
+			end
+			return true
+		end
+	end
+	
+	if caster and spell.failEffect ~= MAGIC_EFFECT_NONE then
+		sendMagicEffect(caster:getPosition(), spell.failEffect)
+	end
+end
+
+-- Spell checks
+function otstd.onRuneSpellCheck(event)
+	local caster = event.player
+	local playerPos = caster:getPosition()
+	local toPos = event.targetPosition
+	local tile = toPos and map:getTile(toPos)
+	local spell = event.spell
+	
+	if caster and typeof(caster, "Player") then
+		if tile then
+			if playerPos.z > toPos.z then
+				player:sendCancel(RET_FIRSTGOUPSTAIRS)
+				return false
+			elseif playerPos.z < toPos.z then
+				player:sendCancel(RET_FIRSTGODOWNSTAIRS)
+				return false
+			else
+				if spell.range > 0 then
+					--if not Map:canThrowObjectTo(playerPos, toPos, true, range, range) then
+					--	player:sendCancel(RET_DESTINATIONOUTOFREACH)
+					--	return false;
+					--end
+				end
+
+				--TODO: Additional checks like black skull, safe-mode
+			end
+		end
+	end
+	
+	return true
 end
 
 -------------------------------------------------------------------------------
 -- Conjure spells
 
-function otstd.onBeginCastConjureSpell(spell, event)
+function otstd.onBeginCastConjureSpell(event)
 	local caster = event.caster
+	local spell = event.spell
 	
 	if spell.reagent ~= 0 then -- Reagents! => Rune spell
 		local reagents = {}
@@ -156,8 +331,9 @@ function otstd.onBeginCastConjureSpell(spell, event)
 	return true
 end
 
-function otstd.onCastConjureSpell(spell, event)
+function otstd.onCastConjureSpell(event)
 	local caster = event.caster
+	local spell = event.spell
 	
 	if event.reagents then -- Reagents! => Rune spell
 		for _, item in ipairs(event.reagents) do
@@ -204,12 +380,15 @@ function Spell:register()
 			event:propagate()
 			
 			local param = string.strip_whitespace(string.sub(event.text, self.words:len()+1) or "")
-			if param:len() > 0 and param:sub(1, 1) ~= "\"" then
-				return
-			end
+			--if param:len() > 0 and param:sub(1, 1) ~= "\"" then
+			--	return
+			--end
 			
 			event.spell = self
-			event.param = param
+			event.caster = event.creature
+			if needTarget then
+				event.targetCreature = getPlayerByName(param)
+			end
 			
 			if self.onSay then
 				self:onSay(event)
@@ -220,8 +399,24 @@ function Spell:register()
 		
 		-- Register the onSay event
 		self.onSayHandler = registerOnSay("beginning", false, self.words, spellSayHandler)
-	elseif spell.rune ~= 0 and spell.rune then
-		-- Rune spell
+		
+	elseif self.rune ~= 0 and self.rune then
+
+		-- Lamba callback to include what spell is being used
+		function spellUseRuneHandler(event)
+			event:skip()
+
+			event.caster = event.player
+			event.spell = self			
+
+			if self.onUseRune then
+				self:onUseRune(event)
+			else
+				otstd.onUseRuneSpell(event)
+			end
+		end
+
+		self.onUseRuneHandler = registerOnUseItem("itemid", self.rune, spellUseRuneHandler)
 	else
 		error("Unknown spell type, spell must be either instant (words) or rune type")
 	end
@@ -231,6 +426,11 @@ function Spell:unregister()
 	if self.onSayHandler then
 		stopListener(self.onSayHandler)
 		self.onSayHandler = nil
+	end
+
+	if self.onUseRuneHandler then
+		stopListener(self.onUseRuneHandler)
+		self.onUseRuneHandler = nil
 	end
 end
 

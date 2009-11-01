@@ -55,22 +55,16 @@ struct CombatEffect{
 	{
 		hitEffect = MAGIC_EFFECT_UNK;
 		hitTextColor = TEXTCOLOR_UNK;
-		impactEffect = MAGIC_EFFECT_NONE;
-		distanceEffect = SHOOT_EFFECT_NONE;
 	}
 
 	CombatEffect() {
 		hitEffect = MAGIC_EFFECT_UNK;
 		hitTextColor = TEXTCOLOR_UNK;
-		impactEffect = MAGIC_EFFECT_NONE;
-		distanceEffect = SHOOT_EFFECT_NONE;
 		showEffect = true;
 	}
 
 	MagicEffect hitEffect;
 	TextColor hitTextColor;
-	MagicEffect impactEffect;
-	ShootEffect distanceEffect;
 	bool showEffect;
 };
 
@@ -80,22 +74,14 @@ struct CombatParams{
 		blockedByArmor = false;
 		blockedByShield = false;
 		targetCasterOrTopMost = false;
-		isAggressive = true;
-		itemId = 0;
-		dispelName = "";
-		useCharges = false;
+		aggressive = true;
 	}
 
-	std::list<const Condition*> conditionList;
-	std::string dispelName;
 	CombatType combatType;
 	bool blockedByArmor;
 	bool blockedByShield;
 	bool targetCasterOrTopMost;
-	bool isAggressive;
-	uint32_t itemId;
-	bool useCharges;
-
+	bool aggressive;
 	CombatEffect effects;
 };
 
@@ -106,10 +92,6 @@ public:
 	Combat();
 	~Combat();
 
-	void combatToTarget(CombatSource& combatSource, CombatParams& params, Creature* target) const;
-	void combatToArea(CombatSource& combatSource, CombatParams& params,
-		const Position& pos, const CombatArea* area) const;
-
 	static bool isInPvpZone(const Creature* attacker, const Creature* target);
 	static bool isUnjustKill(const Creature* attacker, const Creature* target);
 	static bool isPlayerCombat(const Creature* target);
@@ -117,24 +99,6 @@ public:
 	static ReturnValue canDoCombat(const Creature* attacker, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
 	static Position getCasterPosition(const Creature* creature, Direction dir);
-
-protected:
-	bool internalCombat(CombatSource& combatSource, CombatParams& params, Creature* target,
-		const SpectatorVec* spectators = NULL) const;
-
-	bool defaultCombat(CombatSource& combatSource, CombatParams& params, Creature* target,
-		const SpectatorVec* spectators) const;
-
-	void getCombatArea(const Position& centerPos, const Position& targetPos,
-		const CombatArea* area, std::list<Tile*>& list) const;
-
-	bool changeHealth(CombatSource& combatSource, CombatParams& params, Creature* target, int32_t healthChange) const;	
-	bool changeMana(CombatSource& combatSource, CombatParams& params, Creature* target, int32_t manaChange) const;
-	bool applyCondition(CombatSource& combatSource, CombatParams& params, Creature* target) const;
-	bool applyDispel(CombatSource& combatSource, CombatParams& params, Creature* target) const;
-
-	void addTileItem(const SpectatorVec& list, Creature* attacker, Tile* tile, CombatParams& params) const;
-	void getSpectators(const Position& pos, const std::list<Tile*>& tile_list, SpectatorVec& spectators) const;
 };
 
 class MagicField : public Item{
@@ -147,150 +111,6 @@ public:
 
 	virtual MagicField* getMagicField() {return this;}
 	virtual const MagicField* getMagicField() const {return this;}
-};
-
-class MatrixArea
-{
-public:
-	MatrixArea(uint32_t _rows, uint32_t _cols)
-	{
-		centerX = 0;
-		centerY = 0;
-
-		rows = _rows;
-		cols = _cols;
-
-		data_ = new bool*[rows];
-
-		for(uint32_t row = 0; row < rows; ++row){
-			data_[row] = new bool[cols];
-
-			for(uint32_t col = 0; col < cols; ++col){
-				data_[row][col] = 0;
-			}
-		}
-	}
-
-	MatrixArea(const MatrixArea& rhs)
-	{
-		centerX = rhs.centerX;
-		centerY = rhs.centerY;
-		rows = rhs.rows;
-		cols = rhs.cols;
-
-		data_ = new bool*[rows];
-
-		for(uint32_t row = 0; row < rows; ++row){
-			data_[row] = new bool[cols];
-
-			for(uint32_t col = 0; col < cols; ++col){
-				data_[row][col] = rhs.data_[row][col];
-			}
-		}
-	}
-
-	~MatrixArea()
-	{
-		for(uint32_t row = 0; row < rows; ++row){
-			delete[] data_[row];
-		}
-
-		delete[] data_;
-	}
-
-	void setValue(uint32_t row, uint32_t col, bool value) const {data_[row][col] = value;}
-	bool getValue(uint32_t row, uint32_t col) const {return data_[row][col];}
-
-	void setCenter(uint32_t y, uint32_t x) {centerX = x; centerY = y;}
-	void getCenter(uint32_t& y, uint32_t& x) const {x = centerX; y = centerY;}
-
-	size_t getRows() const {return rows;}
-	size_t getCols() const {return cols;}
-
-	inline const bool* operator[](uint32_t i) const { return data_[i]; }
-	inline bool* operator[](uint32_t i) { return data_[i]; }
-
-protected:
-	uint32_t centerX;
-	uint32_t centerY;
-
-	uint32_t rows;
-	uint32_t cols;
-	bool** data_;
-};
-
-typedef std::map<Direction, MatrixArea* > CombatAreaMap;
-
-class CombatArea{
-public:
-	CombatArea() {hasExtArea = false;}
-	~CombatArea() {clear();}
-
-	CombatArea(const CombatArea& rhs);
-
-	ReturnValue doCombat(Creature* attacker, const Position& pos, const Combat& combat) const;
-	bool getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const;
-
-	void setupArea(const std::list<uint32_t>& list, uint32_t rows);
-	void setupArea(int32_t length, int32_t spread);
-	void setupArea(int32_t radius);
-	void setupExtArea(const std::list<uint32_t>& list, uint32_t rows);
-	void clear();
-
-protected:
-	enum MatrixOperation_t{
-		MATRIXOPERATION_COPY,
-		MATRIXOPERATION_MIRROR,
-		MATRIXOPERATION_FLIP,
-		MATRIXOPERATION_ROTATE90,
-		MATRIXOPERATION_ROTATE180,
-		MATRIXOPERATION_ROTATE270
-	};
-
-	MatrixArea* createArea(const std::list<uint32_t>& list, uint32_t rows);
-	void copyArea(const MatrixArea* input, MatrixArea* output, MatrixOperation_t op) const;
-
-	MatrixArea* getArea(const Position& centerPos, const Position& targetPos) const
-	{
-		int32_t dx = targetPos.x - centerPos.x;
-		int32_t dy = targetPos.y - centerPos.y;
-
-		Direction dir = NORTH;
-
-		if(dx < 0){
-			dir = WEST;
-		}
-		else if(dx > 0){
-			dir = EAST;
-		}
-		else if(dy < 0){
-			dir = NORTH;
-		}
-		else{
-			dir = SOUTH;
-		}
-
-		if(hasExtArea){
-			if(dx < 0 && dy < 0)
-				dir = NORTHWEST;
-			else if(dx > 0 && dy < 0)
-				dir = NORTHEAST;
-			else if(dx < 0 && dy > 0)
-				dir = SOUTHWEST;
-			else if(dx > 0 && dy > 0)
-				dir = SOUTHEAST;
-		}
-
-		CombatAreaMap::const_iterator it = areas.find(dir);
-		if(it != areas.end()){
-			return it->second;
-		}
-
-		return NULL;
-	}
-
-	CombatAreaMap areas;
-	bool hasExtArea;
 };
 
 #endif

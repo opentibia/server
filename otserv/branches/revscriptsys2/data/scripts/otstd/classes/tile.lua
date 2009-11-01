@@ -16,7 +16,7 @@ end
 function Tile:getPlayers()
 	local creatures = self:getCreatures()
 	local players = {}
-	for creature in ipairs(creatures) do
+	for __,creature in ipairs(creatures) do
 		if creature:type() == "Player" then
 			players:append(creature)
 		end

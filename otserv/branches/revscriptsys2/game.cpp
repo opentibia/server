@@ -4632,28 +4632,6 @@ void Game::changeLight(const Creature* creature)
 	}
 }
 
-void Game::combatToTarget(Creature* attacker, CombatParams& params, Creature* target)
-{
-	CombatSource combatSource(attacker);
-	combat.combatToTarget(combatSource, params, target);
-}
-
-void Game::combatToTarget(CombatSource combatSource, CombatParams& params, Creature* target)
-{
-	combat.combatToTarget(combatSource, params, target);
-}
-
-void Game::combatToArea(Creature* attacker, CombatParams& params, const Position& pos, const CombatArea* area)
-{
-	CombatSource combatSource(attacker);
-	combat.combatToArea(combatSource, params, pos, area);
-}
-
-void Game::combatToArea(CombatSource combatSource, CombatParams& params, const Position& pos, const CombatArea* area)
-{
-	combat.combatToArea(combatSource, params, pos, area);
-}
-
 bool Game::combatBlockHit(CombatType combatType, CombatSource combatSource, Creature* target,
 	int32_t& healthChange, bool checkDefense, bool checkArmor)
 {

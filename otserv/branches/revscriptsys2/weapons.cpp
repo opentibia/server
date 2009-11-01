@@ -361,7 +361,7 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 		*/
 	}
 	else{
-		g_game.addDistanceEffect(player, player->getPosition(), tile->getPosition(), params.effects.distanceEffect);
+		//g_game.addDistanceEffect(player, player->getPosition(), tile->getPosition(), params.effects.distanceEffect);
 		g_game.addMagicEffect(tile->getPosition(), MAGIC_EFFECT_PUFF);
 	}
 
@@ -510,8 +510,8 @@ bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
 		//int32_t damage = getElementDamage(player, item);
 		CombatParams eParams;
 		eParams.combatType = elementType;
-		eParams.isAggressive = true;
-		eParams.useCharges = true;
+		//eParams.isAggressive = true;
+		//eParams.useCharges = true;
 		//TODO:
 		//Combat::doCombatHealth(player, target, damage, damage, eParams);
 	}
@@ -676,7 +676,7 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 		maxHitChance = 75;
 	}
 
-	params.effects.distanceEffect = it.shootType;
+	//params.effects.distanceEffect = it.shootType;
 	range = it.shootRange;
 	ammuAttackValue = it.attack;
 
@@ -957,7 +957,7 @@ bool WeaponWand::configureWeapon(const ItemType& it)
 {
 	scripted = false;
 	range = it.shootRange;
-	params.effects.distanceEffect = it.shootType;
+	//params.effects.distanceEffect = it.shootType;
 
 	return Weapon::configureWeapon(it);
 }
