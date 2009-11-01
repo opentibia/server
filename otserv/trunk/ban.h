@@ -24,6 +24,7 @@
 
 #include <boost/thread.hpp>
 #include <list>
+#include <vector>
 
 enum BanType_t {
 	BAN_IPADDRESS = 1,

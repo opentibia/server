@@ -42,7 +42,7 @@ EXTRA_DIST=autogen.sh \
 	config.h	 iomap.h	   party.h	     tile.h \
 	configmanager.h  iomapotbm.h	   player.h	     tools.h \
 	connection.h	 iomapserialize.h  position.h	     town.h \
-	const.h		 iomapxml.h	   protocolgame.h    trashholder.h \
+	const.h		 		   protocolgame.h    trashholder.h \
 	container.h	 ioplayer.h	   protocol.h	     vocation.h \
 	creatureevent.h  item.h		   protocollogin.h   waitlist.h \
 	creature.h	 itemloader.h	   protocolold.h     waypoints.h \
