@@ -245,6 +245,9 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "internalAddCondition(Condition condition)", &Manager::lua_Creature_internalAddCondition);
 
 	registerGlobalFunction("createCondition()", &Manager::lua_createCondition);
+	registerGlobalFunction("internalCastSpell(CombatType type, Creature caster, Creature target, int amount \
+		[, boolean blockedByShield [, boolean blockedByArmor \
+		[, boolean showEffect [, MagicEffect hitEffect [, TextColor hitTextColor]]]]])", &Manager::lua_internalCastSpell);
 	registerGlobalFunction("getCreatureByName(string name)", &Manager::lua_getCreatureByName);
 	registerGlobalFunction("getCreaturesByName(string name)", &Manager::lua_getCreaturesByName);
 
@@ -3496,6 +3499,50 @@ int LuaState::lua_createCondition()
 {
 	Condition* condition = Condition::createCondition("", 0, MECHANIC_NONE, COMBAT_NONE, 0);
 	pushCondition(condition);
+	return 1;
+}
+
+int LuaState::lua_internalCastSpell()
+{
+	bool blockedByShield = false;
+	bool blockedByArmor = false;
+
+	CombatEffect combatEffect;
+	if(getStackSize() >= 9) {
+		combatEffect.hitTextColor = popEnum<TextColor>();
+	}
+	if(getStackSize() >= 8) {
+		combatEffect.hitEffect = popEnum<MagicEffect>();
+	}
+	if(getStackSize() >= 7) {
+		combatEffect.showEffect = popBoolean();
+	}
+	if(getStackSize() >= 6) {
+		blockedByArmor = popBoolean();
+	}
+	if(getStackSize() >= 5) {
+		blockedByShield = popBoolean();
+	}
+	int32_t amount = popInteger();
+	Creature* target = popCreature();
+	Creature* caster = popCreature();
+	CombatType combatType = popEnum<CombatType>();
+	
+	CombatSource combatSource(caster);
+	if(g_game.combatBlockHit(combatType, combatSource, target, amount, blockedByShield, blockedByArmor)){
+		pushBoolean(false);
+		return 1;
+	}
+
+	bool result = false;
+	if(combatType != COMBAT_MANADRAIN){
+		result = g_game.combatChangeHealth(combatType, combatSource, combatEffect, target, amount);
+	}
+	else{
+		result = g_game.combatChangeMana(combatSource, combatEffect, target, amount);
+	}
+
+	pushBoolean(result);
 	return 1;
 }
 

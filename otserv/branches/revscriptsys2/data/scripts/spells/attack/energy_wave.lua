@@ -17,13 +17,24 @@ energyWave.area        =
 		{" ", " ", " ", "n", "n", "n", " ", " ", " "},
 		{" ", " ", " ", "n", "n", "n", " ", " ", " "},
 		{"w", "w", "w", " ", "n", " ", "e", "e", "e"},
-		{"w", "w", "w", "w", "c", "e", "e", "e", "e"},
+		{"w", "w", "w", "w", " ", "e", "e", "e", "e"},
 		{"w", "w", "w", " ", "s", " ", "e", "e", "e"},
 		{" ", " ", " ", "s", "s", "s", " ", " ", " "},
 		{" ", " ", " ", "s", "s", "s", " ", " ", " "},
 		{" ", " ", " ", "s", "s", "s", " ", " ", " "},
 	}
 	
+
+--[[
+energyWave.area        = {
+		{"[ne][sw]", "        ", "[e][w]", "        ", "[nw][se]"},
+		{"        ", "[ne][sw]", "[e][w]", "[nw][se]", "        "},
+		{"[s][n]  ", "[s][n]  ","  [a]  ", "[s][n]  ", "[s][n]  "},
+		{"        ", "[nw][se]", "[e][w]", "[ne][sw]", "        "},
+		{"[nw][se]", "        ", "[e][w]", "        ", "[ne][sw]"}
+	}
+]]--
+
 energyWave.onHitCreature =
 	function(creature)
 		print(energyWave.name .. " - onHitCreature: " .. creature:getName() )
@@ -33,12 +44,12 @@ energyWave.onHitTile =
 	function(tile)
 		local field = createItem(1491)
 		tile:addItem(field)
-		print("onHitTile")
+		--print("onHitTile")
 	end
 	
 energyWave.formula = 
 	function(player)
-		return math.random(player:getLevel()/5 + player:getMagicLevel() * 4.5,
+		return -math.random(player:getLevel()/5 + player:getMagicLevel() * 4.5,
 						   player:getLevel()/5 + player:getMagicLevel() * 9)
 	end
 

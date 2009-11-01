@@ -85,8 +85,6 @@ struct CombatParams{
 	CombatEffect effects;
 };
 
-class CombatArea;
-
 class Combat {
 public:
 	Combat();

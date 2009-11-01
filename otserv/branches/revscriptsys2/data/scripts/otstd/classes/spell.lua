@@ -18,8 +18,8 @@ function Spell:new(name)
 		damageType      = COMBAT_NONE,
 		needTarget      = false,
 		aggressive      = false,
-		blockArmor      = false,
-		blockShield     = false,
+		blockedByArmor  = false,
+		blockedByShield = false,
 		area            = nil,
 		effect          = MAGIC_EFFECT_NONE,
 		failEffect      = MAGIC_EFFECT_POFF,
@@ -146,15 +146,41 @@ function otstd.onCastSpell(event)
 		local centerY = (areaHeight - 1) / 2
 
 		local dir = caster:getDirection()
-		
+
+		local dx = centerPos.x - casterPos.x
+		local dy = centerPos.y - casterPos.y		
+		if not (dx == 0 and dy == 0) then
+			if dx < 0 and dy < 0 then
+				dir = NORTHWEST
+			elseif dx > 0 and dy < 0 then
+				dir = NORTHEAST
+			elseif dx < 0 and dy > 0 then
+				dir = SOUTHWEST
+			elseif dx > 0 and dy > 0 then
+				dir = SOUTHEAST
+			elseif dx < 0 then
+				dir = WEST
+			elseif dx > 0 then
+				dir = EAST
+			elseif dy < 0 then
+				dir = NORTH
+			else
+				dir = SOUTH
+			end
+		end
+				
 		for rowIndex, rows in pairs(spell.area) do
 			for colIndex, value in ipairs(rows) do
 				
-				if (not directional and string.find(value, "a")) or
-				(dir == NORTH and string.find(value, "n")) or
-				(dir == SOUTH and string.find(value, "s")) or
-				(dir == WEST and string.find(value, "w")) or
-				(dir == EAST and string.find(value, "e")) then
+				if (value == "a" or value:find("%[a%]") ) or
+				(dir == NORTHWEST and ( value:find("%[nw%]") or value:find("%[wn%]")) ) or
+				(dir == NORTHEAST and ( value:find("%[ne%]") or value:find("%[en%]")) ) or
+				(dir == SOUTHWEST and ( value:find("%[sw%]") or value:find("%[ws%]")) ) or
+				(dir == SOUTHEAST and ( value:find("%[se%]") or value:find("%[es%]")) ) or
+				(dir == NORTH     and ( value == "n" or string.find(value, "%[n%]")) ) or
+				(dir == SOUTH     and ( value == "s" or string.find(value, "%[s%]")) ) or
+				(dir == WEST      and ( value == "w" or string.find(value, "%[w%]")) ) or
+				(dir == EAST      and ( value == "e" or value:find("%[e%]")) ) then
 					local posx = centerPos.x + (centerX - (areaWidth - 1)) + colIndex - 1
 					local posy = centerPos.y + (centerY - (areaHeight - 1)) + rowIndex - 1	
 					
@@ -164,25 +190,30 @@ function otstd.onCastSpell(event)
 				end
 			end
 		end
-	end
+	else
+		local tile = map:getTile(centerPos)
+		list[centerPos] = tile and tile:getCreatures()
+	end	
 	
 	for pos, creatures in pairs(list) do
-		local position targetTile = map:getTile(pos)
-		
-		if otstd.canCastSpellOnTile(spell, targetTile) then 
+		local position targetTile = map:getTile(pos)		
+		if targetTile and otstd.canCastSpellOnTile(spell, targetTile) then 
 		
 			for __,target in ipairs(creatures) do
 			
 				if otstd.canCastSpellOnCreature(spell, target) then 
-					if spell.onHitCreature then
-						-- Normal cast function has been overridden
+					if damageType ~= COMBAT_NONE then
+						local amount = 0
+						if spell.formula then
+							amount = spell.formula(caster)
+						end
+						if internalCastSpell(spell.damageType, caster, target, amount, spell.blockedByShield, spell.blockedByArmor) then
+							if spell.onHitCreature then
+								spell.onHitCreature(target)
+							end
+						end
+					elseif spell.onHitCreature then
 						spell.onHitCreature(target)
-					else
-						--local healthChange = 0
-						--if spell.formula then
-						--	healthChange = spell.formula(caster)
-						--end
-						--combatChangeHealth(spell.damageType, caster, target, healthChange) then
 					end
 				end
 			end
@@ -190,10 +221,10 @@ function otstd.onCastSpell(event)
 			if spell.onHitTile then
 				spell.onHitTile(targetTile)
 			end					
-			
-			if spell.areaEffect then
-				sendMagicEffect(pos, spell.areaEffect)
-			end
+		end
+
+		if spell.areaEffect then
+			sendMagicEffect(pos, spell.areaEffect)
 		end
 	end
 	

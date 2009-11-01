@@ -17,10 +17,10 @@ greatFireball.area        = {
 		{" ", "a", "a", "a", "a", "a", " "},
 		{" ", " ", "a", "a", "a", " ", " "}
 	}
-
+	
 greatFireball.formula = 
 	function(player)
-		return math.random( math.min(40, player:getLevel()/5 + player:getMagicLevel() * 1.4),
+		return -math.random( math.min(40, player:getLevel()/5 + player:getMagicLevel() * 1.4),
 							math.min(70, player:getLevel()/5 + player:getMagicLevel() * 2.8) )
 	end
 
