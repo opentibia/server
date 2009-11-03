@@ -874,6 +874,7 @@ LuaThread::LuaThread(Script::Manager* manager, const std::string& name) :
 	thread_state(0)
 {
 	state = lua_newthread(manager->state);
+	lua_pushvalue(manager->state, -1);
 	reference = luaL_ref(manager->state, LUA_REGISTRYINDEX);
 }
 
@@ -883,9 +884,9 @@ LuaThread::LuaThread(Script::Manager* manager, lua_State* L) :
 	thread_state(0)
 {
 	state = L;
-	lua_pushthread(L);
+	lua_pushthread(state);
 	// Make sure our coroutine is not GC-ed by storing it in the registry
-	reference = luaL_ref(manager->state, LUA_REGISTRYINDEX);
+	reference = luaL_ref(state, LUA_REGISTRYINDEX);
 }
 
 LuaThread::~LuaThread()

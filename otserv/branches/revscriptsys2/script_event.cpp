@@ -45,6 +45,7 @@ Event::~Event() {
 bool Event::call(Manager& state, Environment& environment, Listener_ptr listener)
 {
 	LuaThread_ptr thread = state.newThread(this->getName());
+	state.pop();
 
 	// Stack is empty
 	// Push callback

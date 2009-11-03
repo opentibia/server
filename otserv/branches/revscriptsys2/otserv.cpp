@@ -457,16 +457,16 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		g_config.setString(ConfigManager::DATA_DIRECTORY, dd);
 	}
 #endif
-    std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;
+	std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;
 	/* Won't compile! access is not standard
-    if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
-        ErrorMessage("Data directory does not exist!");
-        exit(-1);
-    }
+	if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
+		ErrorMessage("Data directory does not exist!");
+		exit(-1);
+	}
 	*/
-    std::cout << "[done]" << std::endl;
+	std::cout << "[done]" << std::endl;
 
-	std::cout << ":: Checking Database Connection... ";
+	std::cout << ":: Checking Connection to Database " << g_config.getString(ConfigManager::SQL_DB) << "... ";
 	Database* db = Database::instance();
 	if(db == NULL || !db->isConnected())
 	{
