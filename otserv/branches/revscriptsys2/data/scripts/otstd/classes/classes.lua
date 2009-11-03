@@ -50,4 +50,5 @@ require("otstd/classes/house")
 require("otstd/classes/waypoint")
 
 require("otstd/classes/chat")
+require("otstd/classes/condition")
 require("otstd/classes/spell")
