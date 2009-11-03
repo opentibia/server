@@ -360,7 +360,7 @@ bool Condition::unserialize(PropStream& propStream)
 
 		if(attr_type == enums::CONDITIONATTRIBUTE_NAME)
 		{
-			std::string value = 0;
+			std::string value;
 			if(!propStream.GET_STRING(value)){
 				return false;
 			}
