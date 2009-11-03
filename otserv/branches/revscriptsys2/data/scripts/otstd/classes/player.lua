@@ -318,11 +318,11 @@ function otstd.Player.AdvanceHandler(event)
 	elseif event.skill == LEVEL_AXE then
 		message = "You advanced in axe fighting."
 	elseif event.skill == LEVEL_DIST then
-		message = "You advanced in dist fighting."
+		message = "You advanced in distance fighting."
 	elseif event.skill == LEVEL_SHIELD then
-		message = "You advanced in shield fighting."
+		message = "You advanced in shielding."
 	elseif event.skill == LEVEL_FISHING then
-		message = "You advanced in fishing fighting."
+		message = "You advanced in fishing."
 	elseif event.skill == LEVEL_MAGIC then
 		message = "You advanced to magic level " .. event.newLevel .. "."
 	elseif event.skill == LEVEL_EXPERIENCE then
