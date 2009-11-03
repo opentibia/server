@@ -175,15 +175,10 @@ public:
 
 		struct ModStat{
 			ModStat() {}
-			ModStat(int32_t value) :
-				type(0),
-				percent(0),
-				value(value),
-				delta(0) {}
-			ModStat(PlayerStatType type, int32_t percent) :
+			ModStat(PlayerStatType type, int32_t value, bool percent = false) :
 				type(type),
-				percent(percent),
-				value(0),
+				percent((percent ? value : 0)),
+				value((percent ? 0 : value)),
 				delta(0) {}
 			PlayerStatType type;
 			int32_t percent;
@@ -195,15 +190,10 @@ public:
 
 		struct ModSkill{
 			ModSkill() {}
-			ModSkill(int32_t value) :
-				type(0),
-				percent(0),
-				value(value),
-				delta(0) {}
-			ModSkill(SkillType type, int32_t percent) :
+			ModSkill(SkillType type, int32_t value, bool percent = false) :
 				type(type),
-				percent(percent),
-				value(0),
+				percent((percent ? value : 0)),
+				value((percent ? 0 : value)),
 				delta(0) {}
 			SkillType type;
 			int32_t percent;
@@ -376,27 +366,27 @@ public:
 			return Effect(Effect::MOD_SPEED, 0, mod);
 		}
 
-		static Effect createModStat(int32_t value)
+		static Effect createModStat(PlayerStatType type, int32_t value)
 		{
-			ModStat mod(value);
+			ModStat mod(type, value);
 			return Effect(Effect::MOD_STAT, mod);
 		}
 
 		static Effect createModPercentStat(PlayerStatType type, int32_t percent)
 		{
-			ModStat mod(type, percent);
+			ModStat mod(type, percent, true);
 			return Effect(Effect::MOD_STAT, mod);
 		}
 
-		static Effect createModSkill(int32_t value)
+		static Effect createModSkill(SkillType type, int32_t value)
 		{
-			ModSkill mod(value);
+			ModSkill mod(type, value);
 			return Effect(Effect::MOD_SKILL, 0, mod);
 		}
 
 		static Effect createModPercentSkill(SkillType type, int32_t percent)
 		{
-			ModSkill mod(type, percent);
+			ModSkill mod(type, percent, true);
 			return Effect(Effect::MOD_SKILL, 0, mod);
 		}
 

@@ -209,9 +209,9 @@ void Manager::registerClasses() {
 	registerMemberFunction("Condition", "addRegenPercentSoul(int interval, PlayerStatType type, int percent)", &Manager::lua_Condition_addRegenPercentSoul);
 	//registerMemberFunction("Condition", "addPeriodicTrigger()", &Manager::lua_Condition_addPeriodicTrigger);
 	registerMemberFunction("Condition", "addModSpeed(int percent, int value)", &Manager::lua_Condition_addSpeed);
-	registerMemberFunction("Condition", "addModStat(int value)", &Manager::lua_Condition_addModStat);
+	registerMemberFunction("Condition", "addModStat(PlayerStatType type, int value)", &Manager::lua_Condition_addModStat);
 	registerMemberFunction("Condition", "addModPercentStat(PlayerStatType type, int percent)", &Manager::lua_Condition_addModPercentStat);
-	registerMemberFunction("Condition", "addModSkill(int value)", &Manager::lua_Condition_addModSkill);
+	registerMemberFunction("Condition", "addModSkill(SkillType type, int value)", &Manager::lua_Condition_addModSkill);
 	registerMemberFunction("Condition", "addModPercentSkill(SkillType type, int percent)", &Manager::lua_Condition_addModPercentSkill);
 	registerMemberFunction("Condition", "addShapeShift(table outfit)", &Manager::lua_Condition_addShapeShift);
 	registerMemberFunction("Condition", "addLight(int level, int color)", &Manager::lua_Condition_addLight);
@@ -3199,8 +3199,9 @@ int LuaState::lua_Condition_addSpeed()
 int LuaState::lua_Condition_addModStat()
 {
 	int32_t value = popInteger();
+	PlayerStatType type = popEnum<PlayerStatType>();
 	Condition* condition = popCondition();
-	condition->addEffect(Condition::Effect::createModStat(value));
+	condition->addEffect(Condition::Effect::createModStat(type, value));
 	pushBoolean(true);
 	return 1;
 }
@@ -3218,8 +3219,9 @@ int LuaState::lua_Condition_addModPercentStat()
 int LuaState::lua_Condition_addModSkill()
 {
 	int32_t value = popInteger();
+	SkillType type = popEnum<SkillType>();
 	Condition* condition = popCondition();
-	condition->addEffect(Condition::Effect::createModSkill(value));
+	condition->addEffect(Condition::Effect::createModSkill(type, value));
 	pushBoolean(true);
 	return 1;
 }

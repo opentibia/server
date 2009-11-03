@@ -382,6 +382,8 @@ public:
 	int lua_Creature_internalAddCondition();
 	int lua_createCondition();
 
+	int lua_internalCastSpell();
+
 	int lua_getCreatureByName();
 	int lua_getCreaturesByName();
 

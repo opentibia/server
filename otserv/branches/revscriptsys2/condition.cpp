@@ -207,6 +207,11 @@ IconType Condition::getIcon() const
 
 bool Condition::onBegin(Creature* creature)
 {
+	if(g_game.onConditionBegin(creature, this)){
+		//handled by script
+		return false;
+	}
+
 	for(std::list<Effect>::iterator it = effectList.begin(); it != effectList.end(); ++it){
 		if(!(*it).onBegin(creature)){
 			return false;
@@ -221,6 +226,8 @@ void Condition::onEnd(Creature* creature, ConditionEnd reason)
 	for(std::list<Effect>::iterator it = effectList.begin(); it != effectList.end(); ++it){
 		(*it).onEnd(creature, reason);
 	}
+
+	g_game.onConditionEnd(creature, this, reason);
 }
 
 bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
@@ -277,6 +284,11 @@ bool Condition::onUpdate(Creature* creature, const Condition* addCondition)
 
 bool Condition::onTick(Creature* creature, uint32_t interval)
 {
+	if(g_game.onConditionTick(creature, this, ticks)){
+		//handled by script
+		return false;
+	}
+
 	for(std::list<Effect>::iterator it = effectList.begin(); it != effectList.end(); ++it){
 		if(!(*it).onTick(creature, interval)){
 			return false;
@@ -509,10 +521,13 @@ bool Condition::Effect::onBegin(Creature* creature)
 
 		case Effect::SCRIPT:
 		{
-			if(g_game.onConditionBegin(creature, owner_condition)){
+			//TODO:
+			/*
+			if(g_game.onConditionScriptBegin(creature, owner_condition)){
 				//handled by script
 				return false;
 			}
+			*/
 			break;
 		}
 		default:
@@ -575,10 +590,13 @@ bool Condition::Effect::onEnd(Creature* creature, ConditionEnd reason)
 
 		case Effect::SCRIPT:
 		{
-			if(g_game.onConditionEnd(creature, owner_condition, reason)){
+			//TODO:
+			/*
+			if(g_game.onConditionScriptEnd(creature, owner_condition, reason)){
 				//handled by script
 				return false;
 			}
+			*/
 			break;
 		}
 
@@ -749,10 +767,13 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 
 			case Effect::SCRIPT:
 			{
-				if(g_game.onConditionTick(creature, owner_condition, ticks)){
+				//TODO:
+				/*
+				if(g_game.onConditionScriptTick(creature, owner_condition, ticks)){
 					//handled by script
 					return false;
 				}
+				*/
 				break;
 			}
 
@@ -775,6 +796,7 @@ bool Condition::Effect::onTick(Creature* creature, uint32_t ticks)
 	}
 	return true;
 }
+
 bool Condition::Effect::unserialize(PropStream& propStream)
 {
 	uint32_t value;
