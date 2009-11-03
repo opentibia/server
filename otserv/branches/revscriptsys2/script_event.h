@@ -74,8 +74,7 @@ namespace Script {
 		bool call(Manager& stae, Environment& environment, Listener_ptr listener);
 	protected:
 
-		uint32_t eventID;
-		static uint32_t eventID_counter;
+		int reference;
 		bool propagate_by_default;
 
 	};

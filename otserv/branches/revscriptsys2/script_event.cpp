@@ -30,14 +30,12 @@
 #include "combat.h"
 #include "item.h"
 
-uint32_t Script::Event::eventID_counter = 0;
-
 using namespace Script;
 
 ///////////////////////////////////////////////////////////////////////////////
 // General Event class
 
-Event::Event() : eventID(++eventID_counter), propagate_by_default(false)
+Event::Event() : reference(0), propagate_by_default(false)
 {
 }
 
@@ -58,14 +56,10 @@ bool Event::call(Manager& state, Environment& environment, Listener_ptr listener
 		return false;
 	}
 
-	std::ostringstream lua_tag_stream;
-	lua_tag_stream << "EI_" << eventID; // Event instance tag
-	std::string lua_tag = lua_tag_stream.str();
-
 	// Push event
 	thread->pushEvent(*this);
 	thread->duplicate();
-	thread->setRegistryItem(lua_tag);
+	reference = thread->addReference();
 
 
 	// Run thread
@@ -74,13 +68,12 @@ bool Event::call(Manager& state, Environment& environment, Listener_ptr listener
 		state.scheduleThread(ms, thread);
 
 	if(thread->ok() == false) {
-		state.pushNil();
-		state.setRegistryItem(lua_tag);
+		reference = state.unReference(reference);
 		return false;
 	}
 
 	// Retrieve event info
-	thread->getRegistryItem(lua_tag);
+	thread->getReference(reference);
 
 	// Update this instance with values from lua
 	update_instance(state, environment, thread);
@@ -100,9 +93,9 @@ bool Event::call(Manager& state, Environment& environment, Listener_ptr listener
 	}
 
 	// clean up
-	thread->pushNil();
-	thread->setRegistryItem(lua_tag);
-	thread->pop(); // pop event table, will be garbage collected as we cleared the registry from it
+	reference = state.unReference(reference);
+	// removing everything from the stack, we're done
+	thread->clearStack(); 
 
 	return !propagate;
 }

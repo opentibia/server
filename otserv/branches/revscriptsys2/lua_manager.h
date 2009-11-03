@@ -116,6 +116,11 @@ public:
 	void getGlobal(const std::string& gname) {getField(LUA_GLOBALSINDEX, gname);}
 	void getRegistryItem(const std::string& rname) {getField(LUA_REGISTRYINDEX, rname);}
 
+	// Use of references
+	int addReference() {return luaL_ref(state, LUA_REGISTRYINDEX);}
+	int unReference(int reference) {luaL_unref(state, reference, LUA_REGISTRYINDEX); return 0;}
+	void getReference(int reference) {lua_rawgeti(state, LUA_REGISTRYINDEX, reference);}
+
 	// Check
 	bool isNil(int32_t index = -1);
 	bool isBoolean(int32_t index = -1);
