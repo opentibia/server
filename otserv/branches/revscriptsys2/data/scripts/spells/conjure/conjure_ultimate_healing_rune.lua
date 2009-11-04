@@ -1,15 +1,15 @@
-local UltimateHealingRune = Spell:new("Ultimate Healing Rune")
+local conjureUltimateHealingRune = Spell:new("Conjure Ultimate Healing Rune")
 
-UltimateHealingRune.words       = "adura vita"
-UltimateHealingRune.vocation    = Player.isDruid
-UltimateHealingRune.level       = 22
-UltimateHealingRune.mana        = 400
-UltimateHealingRune.health      = 0
+conjureUltimateHealingRune.words         = "adura vita"
+conjureUltimateHealingRune.vocation      = {"Druid", "Elder Druid"}
+conjureUltimateHealingRune.level         = 24
+conjureUltimateHealingRune.mana          = 400
+conjureUltimateHealingRune.soul          = 3
 
-UltimateHealingRune.effect = MAGIC_EFFECT_MAGIC_BLUE
+conjureUltimateHealingRune.reagent       = 2260
+conjureUltimateHealingRune.product.id    = 2273
+conjureUltimateHealingRune.product.count = 1
 
-UltimateHealingRune.reagent       = 2260
-UltimateHealingRune.product.id    = 2273
-UltimateHealingRune.product.count = 1
+conjureUltimateHealingRune.effect        = MAGIC_EFFECT_MAGIC_ENERGY
 
-UltimateHealingRune:register()
+conjureUltimateHealingRune:register()

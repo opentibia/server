@@ -7,7 +7,7 @@ function Creature:addCondition(cond)
 	local co = coroutine.create(otstd.conditions.makeConditionObject)
 	state, cond = coroutine.resume(co, obj, cond)
 	if not state then
-		obj:destory()
+		obj:destroy()
 		error(cond) -- Propagate the error
 	end
 	-- Success!

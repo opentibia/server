@@ -243,7 +243,7 @@ function otstd.onSaySpell(event)
 
 	if otstd.onSpellCheck(event) and otstd.onInstantSpellCheck(event) then
 		-- Check extra conditions
-		if (not spell.internalBeginCast or spell:internalBeginCast(event)) and (not spell.onBeginCast or spell:onBeginCast(event)) then
+		if (not spell.internalBeginCast or spell.internalBeginCast(event)) and (not spell.onBeginCast or spell.onBeginCast(event)) then
 			
 			-- Cast the spell!
 			if spell.onCast then
@@ -378,6 +378,10 @@ function otstd.onCastConjureSpell(event)
 			count = count - math.min(100, count)
 		until count <= 0
 	end
+
+	if caster and spell.effect ~= MAGIC_EFFECT_NONE then
+		sendMagicEffect(caster:getPosition(), spell.effect)
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -402,6 +406,7 @@ function Spell:register()
 			else
 				self.product.count = 1
 			end
+			
 			self.internalBeginCast  = otstd.onBeginCastConjureSpell
 			self.internalFinishCast = otstd.onCastConjureSpell
 		end
@@ -411,10 +416,6 @@ function Spell:register()
 			event:propagate()
 			
 			local param = string.strip_whitespace(string.sub(event.text, self.words:len()+1) or "")
-			--if param:len() > 0 and param:sub(1, 1) ~= "\"" then
-			--	return
-			--end
-			
 			event.spell = self
 			event.caster = event.creature
 			if needTarget then

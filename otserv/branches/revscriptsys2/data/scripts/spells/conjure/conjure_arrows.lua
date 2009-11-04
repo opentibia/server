@@ -1,14 +1,14 @@
-local conjure_arrows = Spell:new("Conjure Arrows")
+local conjureArrows = Spell:new("Conjure Arrows")
 
-conjure_arrows.words       = "exevo con"
-conjure_arrows.vocation    = Player.isPaladin
-conjure_arrows.level       = 8
-conjure_arrows.mana        = 30
-conjure_arrows.health      = 3
+conjureArrows.words         = "exevo con"
+conjureArrows.vocation      = {"Paladin", "Royal Paladin"}
+conjureArrows.level         = 13
+conjureArrows.mana          = 100
+conjureArrows.soul          = 3
 
-conjure_arrows.effect = MAGIC_EFFECT_MAGIC_BLUE
+conjureArrows.product.id    = 2544
+conjureArrows.product.count = 10
 
-conjure_arrows.product.id    = 2544
-conjure_arrows.product.count = 15
+conjureArrows.effect        = MAGIC_EFFECT_MAGIC_ENERGY
 
-conjure_arrows:register()
+conjureArrows:register()
