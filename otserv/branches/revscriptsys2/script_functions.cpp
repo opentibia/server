@@ -196,6 +196,9 @@ void Manager::registerClasses() {
 	registerMemberFunction("Condition", "setMechanicType(MechanicType type)", &Manager::lua_Condition_setMechanicType);
 	registerMemberFunction("Condition", "setTicks(int ticks)", &Manager::lua_Condition_setTicks);
 	registerMemberFunction("Condition", "setFlags(int flags)", &Manager::lua_Condition_setFlags);
+	registerMemberFunction("Condition", "destroy()", &Manager::lua_Condition_destroy);
+
+	registerGlobalFunction("createCondition()", &Manager::lua_createCondition);
 
 	registerMemberFunction("Condition", "addPeriodicHeal(int interval, int value, int rounds)", &Manager::lua_Condition_addPeriodicHeal);
 	registerMemberFunction("Condition", "addPeriodicDamage(int interval, CombatType type, int value, int rounds)", &Manager::lua_Condition_addPeriodicDamage);
@@ -244,7 +247,6 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getDamageImmunities()", &Manager::lua_Creature_getDamageImmunities);
 	registerMemberFunction("Creature", "internalAddCondition(Condition condition)", &Manager::lua_Creature_internalAddCondition);
 
-	registerGlobalFunction("createCondition()", &Manager::lua_createCondition);
 	registerGlobalFunction("internalCastSpell(CombatType type, Creature caster, Creature target, int amount \
 		[, boolean blockedByShield [, boolean blockedByArmor \
 		[, boolean showEffect [, MagicEffect hitEffect [, TextColor hitTextColor]]]]])", &Manager::lua_internalCastSpell);
@@ -3023,6 +3025,28 @@ int LuaState::lua_Tile_hasProperty()
 ///////////////////////////////////////////////////////////////////////////////
 // Class Condition
 
+int LuaState::lua_createCondition()
+{
+	Condition* condition = Condition::createCondition("", 0, MECHANIC_NONE, COMBAT_NONE, 0);
+	pushCondition(condition);
+	return 1;
+}
+
+int LuaState::lua_Condition_destroy()
+{
+	Condition* condition = popCondition();
+	/* REVSCRIPT TODO
+	 Check if condition is attached to a creature and prevent destruction in that case
+	if(condition->attached()){
+		throw Error("Can not destroy ");
+	}
+	*/
+	environment->removeObject(condition);
+	delete condition;
+	pushBoolean(true);
+	return 1;
+}
+
 int LuaState::lua_Condition_setName()
 {
 	std::string name = popString();
@@ -3497,13 +3521,6 @@ int LuaState::lua_Creature_internalAddCondition()
 	return 1;
 }
 
-int LuaState::lua_createCondition()
-{
-	Condition* condition = Condition::createCondition("", 0, MECHANIC_NONE, COMBAT_NONE, 0);
-	pushCondition(condition);
-	return 1;
-}
-
 int LuaState::lua_internalCastSpell()
 {
 	bool blockedByShield = false;
@@ -3526,8 +3543,8 @@ int LuaState::lua_internalCastSpell()
 		blockedByShield = popBoolean();
 	}
 	int32_t amount = popInteger();
-	Creature* target = popCreature();
-	Creature* caster = popCreature();
+	Creature* target = popCreature(ERROR_PASS);
+	Creature* caster = popCreature(ERROR_PASS);
 	CombatType combatType = popEnum<CombatType>();
 	
 	CombatSource combatSource(caster);

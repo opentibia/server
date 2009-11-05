@@ -7,6 +7,7 @@ greatFireball.aggressive  = true
 greatFireball.level       = 30
 greatFireball.magicLevel  = 4
 greatFireball.areaEffect  = MAGIC_EFFECT_FIRE_AREA
+greatFireball.shootEffect = SHOOT_EFFECT_FIRE
 
 greatFireball.area        = {
 		{" ", " ", "a", "a", "a", " ", " "},

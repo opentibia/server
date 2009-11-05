@@ -327,6 +327,9 @@ public:
 	int lua_getThingByID();
 
 	// - - Condition
+	int lua_createCondition();
+	int lua_Condition_destroy();
+
 	int lua_Condition_setName();
 	int lua_Condition_setCombatType();
 	int lua_Condition_setMechanicType();
@@ -380,7 +383,6 @@ public:
 	int lua_Creature_setRawCustomValue();
 	int lua_Creature_getRawCustomValue();
 	int lua_Creature_internalAddCondition();
-	int lua_createCondition();
 
 	int lua_internalCastSpell();
 

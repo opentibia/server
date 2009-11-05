@@ -8,7 +8,6 @@ energyWave.level       = 38
 energyWave.magicLevel  = 40
 energyWave.mana        = 170
 energyWave.aggressive  = true
-energyWave.directional = true
 energyWave.areaEffect  = MAGIC_EFFECT_ENERGY_AREA
 
 energyWave.area        =

@@ -530,7 +530,10 @@ function NPC:make(name_or_actor, where)
 	
 	npc.events.onThink = registerOnCreatureThink(actor, 
 		function(event)
-			npc:onThinkHandler(event)
+			print(">> " .. collectgarbage("count") .. " \tKB")
+			collectgarbage("collect")
+			return
+			--npc:onThinkHandler(event)
 		end
 	)
 	

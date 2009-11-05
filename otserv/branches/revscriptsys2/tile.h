@@ -316,7 +316,7 @@ public:
 	uint32_t items_topCount() const  {return std::distance(items_topBegin(), items_topEnd()); }
 	uint32_t items_downCount() const {return std::distance(items_downBegin(), items_downEnd());}
 	Item* items_firstDown() {return *items_downBegin();}
-	Item* items_firstTop() { return (items_topCount() > 0 ? *(items_topEnd() - 1) : NULL);}
+	Item* items_firstTop() {return (items_topCount() > 0 ? *(items_topEnd() - 1) : NULL);}
 	//
 
 	//

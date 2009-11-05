@@ -560,12 +560,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::cout << "[done]" << std::endl;
 
-	// Setup scripts
-	std::cout << "::" << std::endl;
-	std::cout << ":: Loading Scripts ..." << std::endl;
-	g_game.loadScripts();
-	std::cout << std::endl << "::" << std::endl;
-
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 
 	if(asLowerCaseString(worldType) == "pvp")
@@ -615,7 +609,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	if(g_config.getString(ConfigManager::PASSWORD_SALT) != "")
 		std::cout << " [salted]";
 	std::cout << std::endl;
-
 	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE))){
 		// ok ... so we didn't succeed in loading the map.
 		// perhaps the path to map didn't include path to data directory?
@@ -630,6 +623,13 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 
 	g_game.setGameState(GAME_STATE_INIT);
+
+	// Setup scripts
+	std::cout << "::" << std::endl;
+	std::cout << ":: Loading Scripts ..." << std::endl;
+	g_game.loadScripts();
+	std::cout << std::endl << "::" << std::endl;
+
 	g_game.runStartupScripts(true);
 
 	// Tie ports and register services

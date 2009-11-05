@@ -38,7 +38,17 @@ end
 
 function table.serialize(x, recur)
 	local t = type(x)
-	if getmetatable(x) then
+	recur = recur or {}
+	
+	if t == nil then
+		return "nil"
+	elseif t == "string" then
+		return string.format("%q", x)
+	elseif t == "number" then
+		return tostring(x)
+	elseif t == "boolean" then
+		return t and "true" or "false"
+	elseif getmetatable(x) then
 		error("Can not serialize a table that has a metatable associated with it.")
 	elseif t == "table" then
 		if table.find(recur, x) then
@@ -53,14 +63,6 @@ function table.serialize(x, recur)
 		end
 		s = s .. "}"
 		return s
-	elseif t == "string" then
-		return string.format("%q", x)
-	elseif t == "number" then
-		return tostring(x)
-	elseif t == "boolean" then
-		return t and "true" or false
-	elseif t == "nil" then
-		return "nil"
 	else
 		error("Can not serialize value of type '" .. t .. "'.")
 	end

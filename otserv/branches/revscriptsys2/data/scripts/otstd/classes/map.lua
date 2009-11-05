@@ -15,10 +15,15 @@ function Map:type() return "Map" end
 __internal_getParentTile = getParentTile
 getParentTile = nil
 
+-- Store all towns when we start the server, for faster reference (they never change)
 map.towns = getAllTowns()
 
 -- Get a tile on the map!
 function Map:getTile(x, y, z)
+	if x == nil then
+		return nil
+	end
+	
 	if y == nil and z == nil then
 		return __internal_getParentTile(x["x"], x["y"], x["z"])
 	else
@@ -26,6 +31,10 @@ function Map:getTile(x, y, z)
 	end
 end
 
+-- Can also be called as map(x,y,z)
+Map_meta.__call = Map.getTile
+
+-- Alias some builtin functions
 function Map:getWaypoint(name)
 	return getWaypointByName(name)
 end
@@ -34,6 +43,7 @@ function Map:getTowns()
 	return getAllTowns()
 end
 
+-- getTown has no native implementation
 function Map:getTown(name)
 	if typeof(name, Town) then
 		return name
@@ -71,7 +81,4 @@ function Map:getTownWildcard(name)
 	end
 	return nil
 end
-
--- Can also be called as map(x,y,z)
-Map_meta.__call = Map.getTile
 
