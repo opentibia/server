@@ -1764,77 +1764,79 @@ void OnTradeEnd::Event::update_instance(Manager& state, Environment& environment
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// OnCondition Event
+// OnConditionEffect Event
 ///////////////////////////////////////////////////////////////////////////////
-// Triggered when a condition is added/removed or ticks
+// Triggered when a condition effect is added/removed or ticks
 
-OnCondition::Event::Event(Creature* creature, Condition* condition) :
+OnConditionEffect::Event::Event(Creature* creature, ConditionEffect& effect) :
 	creature(creature),
-	condition(condition),
+	effect(effect),
 	eventType(EVENT_BEGIN)
 {
 	propagate_by_default = true;
 }
 
-OnCondition::Event::Event(Creature* creature, Condition* condition, ConditionEnd reason) :
+OnConditionEffect::Event::Event(Creature* creature, ConditionEffect& effect, ConditionEnd reason) :
 	creature(creature),
-	condition(condition),
+	effect(effect),
 	reason(reason),
 	eventType(EVENT_END)
 {
 	propagate_by_default = true;
 }
 
-OnCondition::Event::Event(Creature* creature, Condition* condition, uint32_t ticks) :
+OnConditionEffect::Event::Event(Creature* creature, ConditionEffect& effect, uint32_t ticks) :
 	creature(creature),
-	condition(condition),
+	effect(effect),
 	reason(reason),
 	eventType(EVENT_TICK)
 {
 	propagate_by_default = true;
 }
 
-OnCondition::Event::~Event()
+OnConditionEffect::Event::~Event()
 {
 }
 
-bool OnCondition::Event::check_match(const ScriptInformation& info)
+bool OnConditionEffect::Event::check_match(const ScriptInformation& info)
 {
 	switch(info.method) {
 		case FILTER_BEGIN:
-			return eventType == EVENT_BEGIN && (condition->getName() == info.name);
+			return eventType == EVENT_BEGIN && (effect.getName() == info.name);
 		case FILTER_END:
-			return eventType == EVENT_END && (condition->getName() == info.name);
+			return eventType == EVENT_END && (effect.getName() == info.name);
 		case FILTER_TICK:
-			return eventType == EVENT_TICK && (condition->getName() == info.name);
+			return eventType == EVENT_TICK && (effect.getName() == info.name);
 		default: break;
 	}
 
 	return false;
 }
 
-bool OnCondition::Event::dispatch(Manager& state, Environment& environment)
+bool OnConditionEffect::Event::dispatch(Manager& state, Environment& environment)
 {
 	if(creature){
 		ListenerList list = creature->getListeners(ON_CONDITION_LISTENER);
-		if(dispatchEvent<OnCondition::Event, ScriptInformation>
+		if(dispatchEvent<OnConditionEffect::Event, ScriptInformation>
 				(this, state, environment, list))
 			return true;
 	}
 
-	if(dispatchEvent<OnCondition::Event, ScriptInformation>
-			(this, state, environment, environment.Generic.OnCondition))
+	if(dispatchEvent<OnConditionEffect::Event, ScriptInformation>
+			(this, state, environment, environment.Generic.OnConditionEffect))
 		return true;
 
 	return false;
 }
 
-void OnCondition::Event::push_instance(LuaState& state, Environment& environment)
+void OnConditionEffect::Event::push_instance(LuaState& state, Environment& environment)
 {
-	state.pushClassTableInstance("OnConditionEvent");
+	state.pushClassTableInstance("OnConditionEffectEvent");
 	state.pushThing(creature);
 	state.setField(-2, "creature");
-	state.pushCondition(condition);
+	state.pushString(effect.getName());
+	state.setField(-2, "effect");
+	state.pushCondition(effect.getOwner());
 	state.setField(-2, "condition");
 
 	if(eventType == EVENT_BEGIN){
@@ -1850,7 +1852,7 @@ void OnCondition::Event::push_instance(LuaState& state, Environment& environment
 	}
 }
 
-void OnCondition::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+void OnConditionEffect::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
 	;
 }

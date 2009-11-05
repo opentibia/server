@@ -1419,27 +1419,27 @@ void Game::onCreatureHear(Creature* listener, Creature* speaker, const SpeakClas
 	}
 }
 
-bool Game::onConditionBegin(Creature* creature, Condition* condition)
+bool Game::onConditionEffectBegin(Creature* creature, ConditionEffect& effect)
 {
 	if(!script_system)
 		return false; // Not handled
-	Script::OnCondition::Event evt(creature, condition);
+	Script::OnConditionEffect::Event evt(creature, effect);
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onConditionEnd(Creature* creature, Condition* condition, ConditionEnd reason)
+bool Game::onConditionEffectEnd(Creature* creature, ConditionEffect& effect, ConditionEnd reason)
 {
 	if(!script_system)
 		return false; // Not handled
-	Script::OnCondition::Event evt(creature, condition, reason);
+	Script::OnConditionEffect::Event evt(creature, effect, reason);
 	return script_system->dispatchEvent(evt);
 }
 
-bool Game::onConditionTick(Creature* creature, Condition* condition, uint32_t ticks)
+bool Game::onConditionEffectTick(Creature* creature, ConditionEffect& effect, uint32_t ticks)
 {
 	if(!script_system)
 		return false; // Not handled
-	Script::OnCondition::Event evt(creature, condition, ticks);
+	Script::OnConditionEffect::Event evt(creature, effect, ticks);
 	return script_system->dispatchEvent(evt);
 }
 
@@ -4705,7 +4705,7 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource,
 bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, CombatEffect combatEffect,
 	Creature* target, int32_t healthChange)
 {
-	// Don't send events for script (undefined) damage
+	// Don't send events for undefined damage
 	if(combatType != COMBAT_UNDEFINEDDAMAGE && g_game.onCreatureDamage(combatType, combatSource, target, healthChange)){
 		//handled by script
 		return false;
@@ -5566,12 +5566,16 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 
 void Game::unscriptThing(Thing* thing)
 {
-	script_environment->removeThing(thing);
+	if(script_environment){
+		script_environment->removeThing(thing);
+	}
 }
 
 void Game::unscript(void* v)
 {
-	script_environment->removeObject(v);
+	if(script_environment){
+		script_environment->removeObject(v);
+	}
 }
 
 // Shortens compilation time as it can be called without including game.h

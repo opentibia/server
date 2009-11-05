@@ -941,10 +941,10 @@ namespace Script {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
-	// OnCondition event
-	// Triggered when a condition is added/removed or tick
+	// OnConditionEffect event
+	// Triggered when a condition effect is added/removed or ticks
 
-	namespace OnCondition {
+	namespace OnConditionEffect {
 		enum FilterType {
 			FILTER_BEGIN,
 			FILTER_END,
@@ -958,12 +958,12 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Creature* creature, Condition* condition);
-			Event(Creature* creature, Condition* condition, ConditionEnd reason);
-			Event(Creature* creature, Condition* condition, uint32_t ticks);
+			Event(Creature* creature, ConditionEffect& effect);
+			Event(Creature* creature, ConditionEffect& effect, ConditionEnd reason);
+			Event(Creature* creature, ConditionEffect& effect, uint32_t ticks);
 			~Event();
 
-			std::string getName() const {return "OnCondition";}
+			std::string getName() const {return "OnConditionEffect";}
 
 			// Runs the event
 			bool dispatch(Manager& state, Environment& environment);
@@ -977,7 +977,7 @@ namespace Script {
 
 		protected:
 			Creature* creature;
-			Condition* condition;
+			ConditionEffect& effect;
 			ConditionEnd reason;
 			uint32_t ticks;
 

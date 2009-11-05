@@ -279,8 +279,7 @@ public:
 	int lua_registerSpecificEvent_OnCreatureThink();
 	int lua_registerGenericEvent_OnCreatureTurn();
 	int lua_registerGenericEvent_OnServerLoad();
-	int lua_registerGenericEvent_OnCondition();
-	int lua_registerSpecificEvent_OnCondition();
+	int lua_registerGenericEvent_OnConditionEffect();
 	int lua_registerGenericEvent_OnAttack();
 	int lua_registerSpecificEvent_OnAttack();
 	int lua_registerGenericEvent_OnDamage();
@@ -346,7 +345,6 @@ public:
 	int lua_Condition_addRegenPercentMana();
 	int lua_Condition_addRegenSoul();
 	int lua_Condition_addRegenPercentSoul();
-	//int lua_Condition_addPeriodicTrigger();
 	int lua_Condition_addSpeed();
 	int lua_Condition_addModStat();
 	int lua_Condition_addModPercentStat();
@@ -354,6 +352,7 @@ public:
 	int lua_Condition_addModPercentSkill();
 	int lua_Condition_addShapeShift();
 	int lua_Condition_addLight();
+	int lua_Condition_addDispel();
 	int lua_Condition_addScript();
 
 	// - - Creature

@@ -102,7 +102,7 @@ namespace Script {
 			ListenerList OnTradeEnd;
 			ListenerItemMap OnMoveItem;
 			ListenerList OnMoveItemOnItem;
-			ListenerList OnCondition;
+			ListenerList OnConditionEffect;
 			ListenerList OnAttack;
 			ListenerList OnDamage;
 			ListenerList OnKilled;

@@ -827,8 +827,17 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		list.push_back(DeathEntry(lhc, 0, Combat::isUnjustKill(lhc, this))); // Final Hit killer
 	}
 	else{
-		// REVSCRIPT TODO convert to "fire" instead of "COMBAT_FIRE"
-		list.push_back(DeathEntry(lastDamageSource.toString(), 0));
+		std::vector<std::string> damageSourceNameList = lastDamageSource.toStrings();
+		std::string damageSourceName = "";
+		if(!damageSourceNameList.empty()){
+			if(damageSourceNameList.size() > 1){
+				damageSourceName = damageSourceNameList[1];
+			}
+			else{
+				damageSourceName = damageSourceNameList[0];
+			}
+		}
+		list.push_back(DeathEntry(damageSourceName, 0));
 	}
 
 	if(assist_count == 0){
@@ -1265,8 +1274,10 @@ void Creature::onAddCombatCondition(const Condition* condition, bool preAdd /*= 
 
 void Creature::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 {
-	if(!preEnd && condition->getName() == CONDITION_INVISIBLE.toString() && !hasCondition(CONDITION_INVISIBLE)){
-		g_game.internalCreatureChangeVisible(this, true);
+	if(!preEnd){
+		if(condition->getName() == CONDITION_INVISIBLE.toString() && !hasCondition(CONDITION_INVISIBLE)){
+			g_game.internalCreatureChangeVisible(this, true);
+		}
 	}
 }
 

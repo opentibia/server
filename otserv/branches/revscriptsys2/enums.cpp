@@ -78,27 +78,6 @@ template<> void CombatType__Base::initialize()
 	initAddValue(enums::COMBAT_DEATHDAMAGE, "death", false);
 }
 
-template<> bool CombatParam__Base::initialized = false;
-template<> std::string CombatParam__Base::enum_name = "CombatParam";
-template<> CombatParam__Base::EnumToString CombatParam__Base::enum_to_string = CombatParam__Base::EnumToString();
-template<> CombatParam__Base::StringToEnum CombatParam__Base::string_to_enum = CombatParam__Base::StringToEnum();
-template<> CombatParam__Base::StringToEnum CombatParam__Base::lstring_to_enum= CombatParam__Base::StringToEnum();
-template<> void CombatParam__Base::initialize()
-{
-	initAddValue(enums::COMBATPARAM_COMBATTYPE, "COMBATPARAM_COMBATTYPE", true);
-	initAddValue(enums::COMBATPARAM_EFFECT, "COMBATPARAM_EFFECT", true);
-	initAddValue(enums::COMBATPARAM_DISTANCEEFFECT, "COMBATPARAM_DISTANCEEFFECT", true);
-	initAddValue(enums::COMBATPARAM_BLOCKEDBYSHIELD, "COMBATPARAM_BLOCKEDBYSHIELD", true);
-	initAddValue(enums::COMBATPARAM_BLOCKEDBYARMOR, "COMBATPARAM_BLOCKEDBYARMOR", true);
-	initAddValue(enums::COMBATPARAM_TARGETCASTERORTOPMOST, "COMBATPARAM_TARGETCASTERORTOPMOST", true);
-	initAddValue(enums::COMBATPARAM_CREATEITEM, "COMBATPARAM_CREATEITEM", true);
-	initAddValue(enums::COMBATPARAM_AGGRESSIVE, "COMBATPARAM_AGGRESSIVE", true);
-	initAddValue(enums::COMBATPARAM_DISPEL, "COMBATPARAM_DISPEL", true);
-	initAddValue(enums::COMBATPARAM_USECHARGES, "COMBATPARAM_USECHARGES", true);
-	initAddValue(enums::COMBATPARAM_HITEFFECT, "COMBATPARAM_HITEFFECT", true);
-	initAddValue(enums::COMBATPARAM_HITTEXTCOLOR, "COMBATPARAM_HITTEXTCOLOR", true);
-}
-
 template<> bool BlockType__Base::initialized = false;
 template<> std::string BlockType__Base::enum_name = "BlockType";
 template<> BlockType__Base::EnumToString BlockType__Base::enum_to_string = BlockType__Base::EnumToString();

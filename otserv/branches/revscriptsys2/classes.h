@@ -49,6 +49,7 @@ class House;
 class Spawn;
 class RSA;
 class Party;
+class ConditionEffect;
 class Condition;
 class Position;
 class PositionEx;

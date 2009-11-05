@@ -91,7 +91,7 @@ void Environment::cleanupUnusedListeners(ListenerItemMap& list)
 	cleanupUnusedListeners(Generic.OnTradeEnd);
 	cleanupUnusedListeners(Generic.OnMoveItem);
 	cleanupUnusedListeners(Generic.OnMoveItemOnItem);
-	cleanupUnusedListeners(Generic.OnCondition);
+	cleanupUnusedListeners(Generic.OnConditionEffect);
 	cleanupUnusedListeners(Generic.OnAttack);
 	cleanupUnusedListeners(Generic.OnDamage);
 	cleanupUnusedListeners(Generic.OnKilled);
