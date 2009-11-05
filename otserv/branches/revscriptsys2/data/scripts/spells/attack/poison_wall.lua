@@ -11,12 +11,11 @@ poisonWall.shootEffect = SHOOT_EFFECT_POISONFIELD
 poisonWall.field       = 1496
 
 poisonWall.area        = {
-		{"[ne][sw]", "        ", "[e][w]", "        ", "[nw][se]"},
-		{"        ", "[ne][sw]", "[e][w]", "[nw][se]", "        "},
-		{"[s][n]  ", "[s][n]  ","  [a]  ", "[s][n]  ", "[s][n]  "},
-		{"        ", "[nw][se]", "[e][w]", "[ne][sw]", "        "},
-		{"[nw][se]", "        ", "[e][w]", "        ", "[ne][sw]"}
+		{"[sw][ne]", "                      ", "[e][w]", "                      ", "[se][nw]"},
+		{"[sw][ne]", "      [sw][ne]        ", "[e][w]", "              [se][nw]", "[se][nw]"},
+		{"[s][n]  ", "[s][n][sw][ne][se][nw]", "a     ", "[s][n][sw][ne][se][nw]", "[s][n]  "},
+		{"[se][nw]", "              [se][nw]", "[e][w]", "      [sw][ne]        ", "[sw][ne]"},
+		{"[se][nw]", "                      ", "[e][w]", "                      ", "[sw][ne]"}
     }
-    
 
 poisonWall:register()
