@@ -2,6 +2,7 @@ otstd = {}
 
 require("otstd/classes/config")
 
+require("otstd/intrinistic/debug")
 require("otstd/intrinistic/functional")
 require("otstd/intrinistic/string")
 require("otstd/intrinistic/table")

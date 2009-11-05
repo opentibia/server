@@ -46,7 +46,7 @@ function Spell:new(name)
 		
 		-- Rune spells
 		rune            = 0,
-		range           = 0,
+		range           = nil,
 		
 		-- Conjure spells
 		reagent         = 0,
@@ -73,7 +73,7 @@ end
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- The logic behind spell casting is somewhat convuluted, this tries to explain it
 --
--- When a spell is registered, a lambda callback (is created to attach additional information to the event, see Spell.register)
+-- When a spell is registered, a lambda callback is created to attach additional information to the event, see Spell.register
 -- The lambda callback then calls the function otstd.onSpell, which is the same for all types of spells, only the information attached
 --   to the event itself (or the spell) affects what this function does.
 -- First it calls otstd.onSpellCheck, which checks all 'normal' conditions for spellcasting, such as the player having enough mana etc.
@@ -81,7 +81,7 @@ end
 --   and checks certain pre-conditions. Some types of spells don't use this at all.
 -- After that the custom onBeginCast function is called on the spell, you can override this to add additional conditions for casting the spell
 -- If one of the above calls returned false, the 'failEffect' is created on the tile, else the actual casting begins.
--- If the spell has defined a custom cast function spell.onCast, that function is called, and after that casting finishes, otherwise the standard
+-- If the spell has defined a custom cast function spell.onCast, that function is called and after that casting finishes. Otherwise the standard
 --    function otstd.onCastSpell is called, onCastSpell then removes mana, soul points, charges from the rune etc. for the spell, then it calculates
 --    the area of the spell to be hit, and loops through it calling onHitCreature, onHitTile and creates magic effects & fields as applicable.
 -- After the default handling has been done, any custom spell.onFinishCast function is called, if none is defined, the internal spell.internalFinishCast
@@ -197,11 +197,11 @@ function otstd.onCastSpell(event)
 						end
 						if internalCastSpell(spell.damageType, caster, target, amount, spell.blockedByShield, spell.blockedByArmor) then
 							if spell.onHitCreature then
-								spell.onHitCreature(target)
+								spell.onHitCreature(target, event)
 							end
 						end
 					elseif spell.onHitCreature then
-						spell.onHitCreature(target)
+						spell.onHitCreature(target, event)
 					end
 				end
 			end
@@ -218,7 +218,7 @@ function otstd.onCastSpell(event)
 			
 			-- Call the tile hit callback
 			if spell.onHitTile then
-				spell.onHitTile(targetTile)
+				spell.onHitTile(targetTile, event)
 			end
 		end
 		
@@ -267,7 +267,7 @@ function otstd.onBeginCastRuneSpell(event)
 				player:sendCancel(RET_FIRSTGODOWNSTAIRS)
 				return false
 			else
-				if spell.range > 0 then
+				if spell.range and spell.range > 0 then
 					--if not Map:canThrowObjectTo(playerPos, toPos, true, range, range) then
 					--	player:sendCancel(RET_DESTINATIONOUTOFREACH)
 					--	return false;
@@ -407,7 +407,7 @@ function Spell:getAffectedArea(centerPos, caster)
 		local centerY = (areaHeight - 1) / 2
 
 		local dir = nil
-		if typeof(caster, "Player") then
+		if typeof(caster, "Creature") then
 			local casterPos = caster:getPosition()
 			
 			local dx = centerPos.x - casterPos.x
@@ -431,16 +431,17 @@ function Spell:getAffectedArea(centerPos, caster)
 				else
 					dir = SOUTH
 				end
+			else
+				dir = caster:getDirection()
 			end
 		else
 			dir = caster
 		end
-
+		
 		
 		-- Go through the area array, and assemble all tiles that match the direction
 		for rowIndex, rows in pairs(self.area) do
 			for colIndex, value in ipairs(rows) do
-				
 				if		(value:find("a") or value:find("%[a%]") ) or
 						(dir == NORTHWEST and ( value:find("%[nw%]") or value:find("%[wn%]")) ) or
 						(dir == NORTHEAST and ( value:find("%[ne%]") or value:find("%[en%]")) ) or
@@ -497,6 +498,8 @@ function Spell:register()
 			
 			self.internalBeginCast  = otstd.onBeginCastConjureSpell
 			self.internalFinishCast = otstd.onCastConjureSpell
+		else
+			-- Other instant spell (attack)
 		end
 		
 		-- Lamba callback to include what spell is being cast
@@ -544,6 +547,8 @@ function Spell:register()
 	else
 		error("Unknown spell type, spell must be either instant (words) or rune type")
 	end
+	
+	otstd.spells[self.name] = self
 end
 
 function Spell:unregister()

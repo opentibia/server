@@ -100,14 +100,15 @@ function Item:getAttack(extra)
 	end
 	return a
 end
-function Item:getDefaultAttack() return items[self:getItemID()].attack end
+function Item:getDefaultAttack() return Items[self:getItemID()].attack end
 function Item:setAttack(v) return self:setIntegerAttribute("attack", v) end
 
 function Item:getArmor() return self:getIntegerAttribute("armor") or self:getDefaultArmor() end
-function Item:getDefaultArmor() return items[self:getItemID()].armor end
+function Item:getDefaultArmor() return Items[self:getItemID()].armor end
 function Item:setArmor(v) return self:setIntegerAttribute("attack", v) end
 
 function Item:getAttack() return self:getIntegerAttribute("attack") or self:getDefaultAttack() end
-function Item:getDefaultAttack() return items[self:getItemID()].itemid end
+function Item:getDefaultAttack() return Items[self:getItemID()].itemid end
 function Item:setAttack(v) return self:setIntegerAttribute("attack", v) end
 
+function Item:isCorpse() return Items[self:getItemID()].corpseType ~= RACE_NONE end

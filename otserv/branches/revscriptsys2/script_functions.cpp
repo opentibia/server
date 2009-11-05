@@ -301,8 +301,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Actor", "openShop(Player who, table list)", &Manager::lua_Actor_openShop);
 	registerMemberFunction("Actor", "closeShop(Player who)", &Manager::lua_Actor_closeShop);
 
-	registerGlobalFunction("createMonster(string monstertypename, table pos)", &Manager::lua_createMonster);
-	registerGlobalFunction("createActor(string name, table pos)", &Manager::lua_createActor);
+	registerGlobalFunction("createMonster(string monstertypename, position pos)", &Manager::lua_createMonster);
+	registerGlobalFunction("createActor(string name, position pos)", &Manager::lua_createActor);
 
 	// Player
 	registerMemberFunction("Player", "getFood()", &Manager::lua_Player_getFood);
@@ -401,6 +401,7 @@ void Manager::registerClasses() {
 
 	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
 	registerMemberFunction("Tile", "getItemCount(int itemid)", &Manager::lua_Tile_getItemCount);
+	registerMemberFunction("Tile", "getItem(int index)", &Manager::lua_Tile_getItem);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItemsWithItemID()", &Manager::lua_Tile_getItemsWithItemID);
@@ -2881,6 +2882,48 @@ int LuaState::lua_Tile_getItems()
 		setField(-2, n);
 	}
 
+	return 1;
+}
+
+int LuaState::lua_Tile_getItem()
+{
+	int32_t index = popInteger(); // lua indices start at 1, but we don't give a crap!
+	Tile* tile = popTile();
+
+	// -1 is top item
+	int lastindex = tile->items_count() + (tile->ground != NULL ? 1 : 0);
+	if(index < 0) {
+		index = lastindex + index;
+	}
+	if(index > lastindex) {
+		throw Error("Tile:getItem: Index out of range!");
+	}
+	assert(index >= 0);
+
+	if(tile->ground){
+		if(index == 0){
+			pushThing(tile->ground);
+			return 1;
+		}
+
+		--index;
+	}
+
+	uint32_t topItemSize = tile->items_topCount();
+	if(uint32_t(index) < topItemSize){
+		pushThing(tile->items_get(tile->items_downCount() + index));
+		return 1;
+	}
+
+	index -= topItemSize;
+	index -= uint32_t(tile->creatures_count());
+
+	if(uint32_t(index) < tile->items_downCount()){
+		pushThing(tile->items_get(index));
+		return 1;
+	}
+
+	pushNil();
 	return 1;
 }
 

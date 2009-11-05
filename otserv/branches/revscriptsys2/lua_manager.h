@@ -555,6 +555,7 @@ public:
 	int lua_Tile_getThing();
 	int lua_Tile_getCreatures();
 	int lua_Tile_getMoveableItems();
+	int lua_Tile_getItem();
 	int lua_Tile_getItems();
 	int lua_Tile_getItemsWithActionID();
 	int lua_Tile_getItemsWithItemID();

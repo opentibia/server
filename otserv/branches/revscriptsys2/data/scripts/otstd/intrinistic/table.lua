@@ -17,7 +17,7 @@ end
 
 function table.findf(t, comparator)
 	for k, v in pairs(t) do
-		if comparator(val) then
+		if comparator(v) then
 			return k
 		end
 	end
@@ -58,8 +58,8 @@ function table.serialize(x, recur)
 		
 		local s = "{"
 		for k, v in pairs(x) do
-			s = s .. "[" .. table.serialize(k) .. "]"
-			s = s .. " = " .. table.serialize(v) .. ";"
+			s = s .. "[" .. table.serialize(k, recur) .. "]"
+			s = s .. " = " .. table.serialize(v, recur) .. ";"
 		end
 		s = s .. "}"
 		return s
