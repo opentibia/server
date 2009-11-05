@@ -342,6 +342,106 @@ function otstd.onCastConjureSpell(event)
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Common formulas
+
+-- minFloor and maxFloor are optional
+function formulaLevelMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelta, maxFloor)
+	if maxDelta == nil and maxFloor == nil then
+		-- None are set
+		-- Move arguments down and set defaults
+		maxDelta = maxAbsolute
+		maxAbsolute = minFloor
+		minFloor = 0
+		maxFloor = 0
+	elseif maxDelta == nil then
+		-- 6th argument is set by 5th is not
+		error("formulaLevelMagic takes 4 or 6 paramaters")
+	else
+		-- Both 5th and 6th are set
+	end
+	
+	return function(player)
+		return -math.random(
+				math.max(minFloor, minAbsolute + (player:getLevel() / 5 + player:getMagicLevel()) * minDelta),
+				math.max(maxFloor, maxAbsolute + (player:getLevel() / 5 + player:getMagicLevel()) * maxDelta))
+	end
+end
+
+function formulaOldLevelMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelta, maxFloor)
+	if maxDelta == nil and maxFloor == nil then
+		-- None are set
+		-- Move arguments down and set defaults
+		maxDelta = maxAbsolute
+		maxAbsolute = minFloor
+		minFloor = 0
+		maxFloor = 0
+	elseif maxDelta == nil then
+		-- 6th argument is set by 5th is not
+		error("formulaLevelMagic takes 4 or 6 paramaters")
+	else
+		-- Both 5th and 6th are set
+	end
+	
+	return function(player)
+		return -math.random(
+				math.max(minFloor, minAbsolute + (player:getLevel() / 3 + player:getMagicLevel() * 2) * minDelta),
+				math.max(maxFloor, maxAbsolute + (player:getLevel() / 3 + player:getMagicLevel() * 2) * maxDelta))
+	end
+end
+
+function formulaLevel(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelta, maxFloor)
+	if maxDelta == nil and maxFloor == nil then
+		-- None are set
+		-- Move arguments down and set defaults
+		maxDelta = maxAbsolute
+		maxAbsolute = minFloor
+		minFloor = 0
+		maxFloor = 0
+	elseif maxDelta == nil then
+		-- 6th argument is set by 5th is not
+		error("formulaLevelMagic takes 4 or 6 paramaters")
+	else
+		-- Both 5th and 6th are set
+	end
+	
+	return function(player)
+		return -math.random(
+				math.max(minFloor, minAbsolute + player:getLevel() * minDelta),
+				math.max(maxFloor, maxAbsolute + player:getLevel() * maxDelta))
+	end
+end
+
+function formulaMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelta, maxFloor)
+	if maxDelta == nil and maxFloor == nil then
+		-- None are set
+		-- Move arguments down and set defaults
+		maxDelta = maxAbsolute
+		maxAbsolute = minFloor
+		minFloor = 0
+		maxFloor = 0
+	elseif maxDelta == nil then
+		-- 6th argument is set by 5th is not
+		error("formulaLevelMagic takes 4 or 6 paramaters")
+	else
+		-- Both 5th and 6th are set
+	end
+	
+	return function(player)
+		return -math.random(
+				math.max(minFloor, minAbsolute + player:getMagicLevel() * minDelta),
+				math.max(maxFloor, maxAbsolute + player:getMagicLevel() * maxDelta))
+	end
+end
+
+function formulaStatic(minFloor, maxFloor)
+	return function(player)
+		return -math.random(
+				minFloor,
+				maxFloor)
+	end
+end
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Interface for spells,
 
 -- Cast a spell, with or without a caster

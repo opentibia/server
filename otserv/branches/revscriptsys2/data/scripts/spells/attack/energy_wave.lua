@@ -1,4 +1,3 @@
-
 local energyWave = Spell:new("Energy Wave")
 
 energyWave.words       = "exevo mort hur"
@@ -25,10 +24,6 @@ energyWave.area        =
 		{" ", " ", " ", " ", "s", "s", "s", " ", " ", " ", " "},
 	}
 	
-energyWave.formula = 
-	function(player)
-		return -math.random(player:getLevel()/5 + player:getMagicLevel() * 4.5,
-						   player:getLevel()/5 + player:getMagicLevel() * 9)
-	end
+energyWave.formula = formulaLevelMagic(0, 4.5, 0, 9.0)
 
 energyWave:register()
