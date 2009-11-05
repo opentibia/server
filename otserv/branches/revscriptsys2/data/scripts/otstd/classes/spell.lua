@@ -441,7 +441,7 @@ function Spell:getAffectedArea(centerPos, caster)
 		for rowIndex, rows in pairs(self.area) do
 			for colIndex, value in ipairs(rows) do
 				
-				if		(value == "a" or value:find("%[a%]") ) or
+				if		(value:find("a") or value:find("%[a%]") ) or
 						(dir == NORTHWEST and ( value:find("%[nw%]") or value:find("%[wn%]")) ) or
 						(dir == NORTHEAST and ( value:find("%[ne%]") or value:find("%[en%]")) ) or
 						(dir == SOUTHWEST and ( value:find("%[sw%]") or value:find("%[ws%]")) ) or
