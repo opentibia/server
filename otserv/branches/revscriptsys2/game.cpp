@@ -1747,10 +1747,26 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 	if(toCylinder){
 		if(toCylinder->getCreature()){
 			Player* player = toCylinder->getCreature()->getPlayer();
-			Script::OnEquipItem::Event evt(player, item, SlotType(index), true, ret);
-			if(script_system->dispatchEvent(evt)){
-				//handled by script
-				return ret;
+			SlotType slot = SLOT_WHEREEVER;
+
+			if(index == INDEX_WHEREEVER || index == SLOT_WHEREEVER.value()){
+				Item* toItem = NULL;
+				int32_t rawSlot = INDEX_WHEREEVER;
+				toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
+				if(rawSlot != INDEX_WHEREEVER){
+					slot = SlotType(rawSlot);	
+				}
+			}
+			else{
+				slot = SlotType(index);
+			}
+
+			if(slot != SLOT_WHEREEVER){
+				Script::OnEquipItem::Event evt(player, item, slot, true, ret);
+				if(script_system->dispatchEvent(evt)){
+					//handled by script
+					return ret;
+				}
 			}
 		}
 		else if(toCylinder->getTile()){
@@ -1926,10 +1942,26 @@ ReturnValue Game::internalAddItem(Creature* actor, Cylinder* toCylinder, Item* i
 	ReturnValue ret = RET_NOERROR;
 	if(toCylinder->getCreature()){
 		Player* player = toCylinder->getCreature()->getPlayer();
-		Script::OnEquipItem::Event evt(player, item, SlotType(index), true, ret);
-		if(script_system->dispatchEvent(evt)){
-			//handled by script
-			return ret;
+		SlotType slot = SLOT_WHEREEVER;
+
+		if(index == INDEX_WHEREEVER || index == SLOT_WHEREEVER.value()){
+			Item* toItem = NULL;
+			int32_t rawSlot = index;
+			toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
+			if(rawSlot != INDEX_WHEREEVER){
+				slot = SlotType(rawSlot);	
+			}
+		}
+		else{
+			slot = SlotType(index);
+		}
+
+		if(slot != SLOT_WHEREEVER){
+			Script::OnEquipItem::Event evt(player, item, slot, true, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				return ret;
+			}
 		}
 	}
 	else if(toCylinder->getTile()){

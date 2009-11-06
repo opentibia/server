@@ -408,23 +408,49 @@ void OnUseItem::Event::update_instance(Manager& state, Environment& environment,
 OnEquipItem::Event::Event(Player* user, Item* item, SlotType slot, bool equip) :
 	user(user),
 	item(item),
-	slot(slot),
 	equip(equip),
 	postEvent(true),
 	retval(dummyRetVal)
 {
 	propagate_by_default = true;
+
+	switch(slot.value()){
+		case ::enums::SLOT_HEAD:     slotPos = SLOTPOSITION_HEAD;     break;
+		case ::enums::SLOT_NECKLACE: slotPos = SLOTPOSITION_NECKLACE; break;
+		case ::enums::SLOT_BACKPACK: slotPos = SLOTPOSITION_BACKPACK; break;
+		case ::enums::SLOT_ARMOR:    slotPos = SLOTPOSITION_ARMOR;    break;
+		case ::enums::SLOT_RIGHT:    slotPos = SLOTPOSITION_RIGHT;    break;
+		case ::enums::SLOT_LEFT:     slotPos = SLOTPOSITION_LEFT;     break;
+		case ::enums::SLOT_LEGS:     slotPos = SLOTPOSITION_LEGS;     break;
+		case ::enums::SLOT_FEET:     slotPos = SLOTPOSITION_FEET;     break;
+		case ::enums::SLOT_RING:     slotPos = SLOTPOSITION_RING;     break;
+		case ::enums::SLOT_AMMO:     slotPos = SLOTPOSITION_AMMO;     break;
+		default:                     slotPos = SLOTPOSITION_NONE;     break;
+	}
 }
 
 OnEquipItem::Event::Event(Player* user, Item* item, SlotType slot, bool equip, ReturnValue& retval) :
 	user(user),
 	item(item),
-	slot(slot),
 	equip(equip),
 	postEvent(false),
 	retval(retval)
 {
 	propagate_by_default = true;
+
+	switch(slot.value()){
+		case ::enums::SLOT_HEAD:     slotPos = SLOTPOSITION_HEAD;     break;
+		case ::enums::SLOT_NECKLACE: slotPos = SLOTPOSITION_NECKLACE; break;
+		case ::enums::SLOT_BACKPACK: slotPos = SLOTPOSITION_BACKPACK; break;
+		case ::enums::SLOT_ARMOR:    slotPos = SLOTPOSITION_ARMOR;    break;
+		case ::enums::SLOT_RIGHT:    slotPos = SLOTPOSITION_RIGHT;    break;
+		case ::enums::SLOT_LEFT:     slotPos = SLOTPOSITION_LEFT;     break;
+		case ::enums::SLOT_LEGS:     slotPos = SLOTPOSITION_LEGS;     break;
+		case ::enums::SLOT_FEET:     slotPos = SLOTPOSITION_FEET;     break;
+		case ::enums::SLOT_RING:     slotPos = SLOTPOSITION_RING;     break;
+		case ::enums::SLOT_AMMO:     slotPos = SLOTPOSITION_AMMO;     break;
+		default:                     slotPos = SLOTPOSITION_NONE;     break;
+	}
 }
 
 OnEquipItem::Event::~Event()
@@ -433,8 +459,7 @@ OnEquipItem::Event::~Event()
 
 bool OnEquipItem::Event::check_match(const ScriptInformation& info)
 {
-
-	if(((info.slot.value() & slot.value()) != slot.value()) || info.equip != equip || info.postEvent != postEvent){
+	if(!hasBitSet(slotPos.value(), info.slotPos.value()) || info.equip != equip || info.postEvent != postEvent){
 		return false;
 	}
 
@@ -463,8 +488,6 @@ void OnEquipItem::Event::push_instance(LuaState& state, Environment& environment
 	state.setField(-2, "player");
 	state.pushThing(item);
 	state.setField(-2, "item");
-	state.pushEnum(slot);
-	state.setField(-2, "slot");
 	state.pushEnum(retval);
 	state.setField(-2, "retval");
 }

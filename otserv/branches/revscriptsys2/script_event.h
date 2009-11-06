@@ -257,7 +257,7 @@ namespace Script {
 		struct ScriptInformation {
 			FilterType method;
 			int32_t id;
-			SlotPosition slot;
+			SlotPosition slotPos;
 			bool equip;
 			bool postEvent;
 		};
@@ -290,7 +290,7 @@ namespace Script {
 		protected:
 			Player* user;
 			Item* item;
-			SlotType slot;
+			SlotPosition slotPos;
 			bool equip;
 			bool postEvent;
 			ReturnValue& retval;

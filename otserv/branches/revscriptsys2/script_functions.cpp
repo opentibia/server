@@ -1127,7 +1127,7 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	// Store callback
 	insert(-5);
 
-	SlotPosition slot = popEnum<SlotPosition>();
+	SlotPosition slotPos = popEnum<SlotPosition>();
 	int32_t id = popInteger();
 	std::string method = popString();
 	bool postEvent = true;
@@ -1162,7 +1162,7 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	}
 
 	si_onequip.id = id;
-	si_onequip.slot = slot;
+	si_onequip.slotPos = slotPos;
 	si_onequip.equip = true;
 	si_onequip.postEvent = postEvent;
 
@@ -1183,7 +1183,7 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	// Store callback
 	insert(-5);
 
-	SlotPosition slot = popEnum<SlotPosition>();
+	SlotPosition slotPos = popEnum<SlotPosition>();
 	int32_t id = popInteger();
 	std::string method = popString();
 	bool postEvent = true;
@@ -1218,7 +1218,7 @@ int LuaState::lua_registerGenericEvent_OnDeEquipItem() {
 	}
 
 	si_ondeequip.id = id;
-	si_ondeequip.slot = slot;
+	si_ondeequip.slotPos = slotPos;
 	si_ondeequip.equip = false;
 	si_ondeequip.postEvent = postEvent;
 
