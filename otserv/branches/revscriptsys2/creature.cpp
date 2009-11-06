@@ -827,17 +827,7 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		list.push_back(DeathEntry(lhc, 0, Combat::isUnjustKill(lhc, this))); // Final Hit killer
 	}
 	else{
-		std::vector<std::string> damageSourceNameList = lastDamageSource.toStrings();
-		std::string damageSourceName = "";
-		if(!damageSourceNameList.empty()){
-			if(damageSourceNameList.size() > 1){
-				damageSourceName = damageSourceNameList[1];
-			}
-			else{
-				damageSourceName = damageSourceNameList[0];
-			}
-		}
-		list.push_back(DeathEntry(damageSourceName, 0));
+		list.push_back(DeathEntry(combatTypeToString(lastDamageSource), 0));
 	}
 
 	if(assist_count == 0){

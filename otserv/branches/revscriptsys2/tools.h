@@ -30,7 +30,6 @@ enum DistributionType_t {
 	DISTRO_NORMAL
 };
 
-bool fileExists(const char* filename);
 void replaceString(std::string& str, const std::string sought, const std::string replacement);
 void trim_right(std::string& source, const std::string& t = "\n\t ");
 void trim_left(std::string& source, const std::string& t = "\n\t ");
@@ -51,28 +50,17 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 bool readXMLContentString(xmlNodePtr node, std::string& value);
 std::vector<std::string> explodeString(const std::string& inString, const std::string& separator);
 bool hasBitSet(uint32_t flag, uint32_t flags);
-
 int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM);
-
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
-
-std::string urlEncode(const char* str);
-std::string urlEncode(const std::string& str);
-
 bool passwordTest(std::string plain, std::string &hash);
-
 std::string convertIPToString(uint32_t ip);
-//buffer should have at least 21 bytes. dd/mm/yyyy  hh:mm:ss
 void formatDate(time_t time, char* buffer);
-//buffer should have at least 16 bytes
 void formatDateShort(time_t time, char* buffer);
-
 std::string getViolationReasonString(int32_t reasonId);
 std::string getViolationActionString(ViolationAction actionId, bool ipBanishment);
 std::string playerSexAdjectiveString(PlayerSex sex);
 std::string playerSexSubjectString(PlayerSex sex);
-
+std::string combatTypeToString(CombatType type);
 uint32_t adlerChecksum(uint8_t *data, int32_t len);
-
 #endif

@@ -939,11 +939,9 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 	if(it.abilities.elementType != COMBAT_NONE && it.charges != 0){
 		s << " It is temporarily enchanted with ";
-		std::string strElement = "";
+		std::string strElement = combatTypeToString(it.abilities.elementType);
 		int32_t elementDamage = it.abilities.elementDamage;
-
-		// REVSCRIPT TODO fix so it uses "fire" instead of "COMBAT_FIRE"
-		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << it.abilities.elementType.toString() << " damage).";
+		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
 	}
 
 	if(item && item->getSpecialDescription() != ""){

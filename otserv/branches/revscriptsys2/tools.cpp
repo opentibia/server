@@ -27,16 +27,6 @@
 
 extern ConfigManager g_config;
 
-bool fileExists(const char* filename)
-{
-	FILE* f = fopen(filename, "rb");
-	bool exists = (f != NULL);
-	if(f != NULL)
-		fclose(f);
-
-	return exists;
-}
-
 void replaceString(std::string& str, const std::string sought, const std::string replacement)
 {
 	size_t pos = 0;
@@ -322,31 +312,6 @@ char upchar(char c)
 	return c;
 }
 
-std::string urlEncode(const std::string& str)
-{
-	return urlEncode(str.c_str());
-}
-
-std::string urlEncode(const char* str)
-{
-	std::string out;
-	const char* it;
-	for(it = str; *it != 0; it++){
-		char ch = *it;
-		if(!(ch >= '0' && ch <= '9') &&
-			!(ch >= 'A' && ch <= 'Z') &&
-			!(ch >= 'a' && ch <= 'z')){
-				char tmp[4];
-				sprintf(tmp, "%%%02X", ch);
-				out = out + tmp;
-			}
-		else{
-			out = out + *it;
-		}
-	}
-	return out;
-}
-
 bool passwordTest(std::string plain, std::string &hash)
 {
 	// Salt it beforehand
@@ -527,6 +492,16 @@ std::string playerSexSubjectString(PlayerSex sex)
 		return "She";
 	else
 		return "He";
+}
+
+std::string combatTypeToString(CombatType type)
+{
+	std::vector<std::string> vector = type.toStrings();
+	if(vector.empty()){
+		return "";
+	}
+
+	return (vector.size() == 1 ? vector[0] : vector[1]);
 }
 
 #define MOD_ADLER 65521

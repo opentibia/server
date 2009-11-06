@@ -290,7 +290,7 @@ namespace Script {
 		protected:
 			Player* user;
 			Item* item;
-			SlotPosition equipslot;
+			SlotType slot;
 			bool equip;
 			bool postEvent;
 			ReturnValue& retval;

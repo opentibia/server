@@ -1328,8 +1328,7 @@ std::ostream& Abilities::Absorb::getDescription(std::ostream& os, bool& first, C
 {
 	if(resistances[type.index()] == 0)
 		return os;
-	// REVSCRIPT TODO: Print "fire" instead of "COMBAT_FIRE"
-	os << (first? " " : ", ") << type;
+	os << (first? " " : ", ") << combatTypeToString(type);
 	os << " " << std::noshowpos << resistances[type.index()] << "%";
 	first = false;
 	return os;
