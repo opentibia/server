@@ -210,7 +210,7 @@ void Game::loadGameState()
 
 	DBResult* result = db->storeQuery("SELECT `id`, `value` FROM `global_storage`");
 	if(!result){
-		std::cout << "Could not load global game state." << std::endl;
+		// No global storage at all
 		return;
 	}
 	
