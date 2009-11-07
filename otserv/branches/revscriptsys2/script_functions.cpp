@@ -2123,7 +2123,7 @@ int LuaState::lua_registerSpecificEvent_OnDamage() {
 	if(isNil(-1)) {
 		pop();
 	}
-	if(isString(-1)){
+	else if(isString(-1)){
 		name = popString();
 	}
 	else if(isTable(-1)){

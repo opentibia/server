@@ -2004,8 +2004,9 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "creature");
 	state.pushThing(combatSource.getSourceCreature());
 	state.setField(-2, "attacker");
-	state.pushEnum(combatType);
-	state.setField(-2, "combatType");
+	//TODO: Be able to export BitEnum
+	//state.pushEnum(combatType);
+	//state.setField(-2, "combatType");
 	state.pushThing(combatSource.getSourceItem());
 	state.setField(-2, "item");
 	state.pushBoolean(combatSource.isSourceCondition());
@@ -2016,6 +2017,8 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 
 void OnDamage::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
+	/*
+	//TODO: Be able to export BitEnum
 	thread->getField(-1, "combatType");
 	if(thread->isTable()) {
 		try{
@@ -2029,6 +2032,7 @@ void OnDamage::Event::update_instance(Manager& state, Environment& environment, 
 		thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of 'combatType'");
 		thread->pop();
 	}
+	*/
 
 	thread->getField(-1, "value");
 	if(thread->isNumber()) {

@@ -13,6 +13,7 @@ function Spell:new(name)
 		health          = 0,
 		soul            = 0,
 		premium         = false,
+		condition       = nil,
 		
 		-- Area spells use this
 		area            = nil,
@@ -190,18 +191,28 @@ function otstd.onCastSpell(event)
 		if targetTile and canCast then
 			for _, target in ipairs(creatures) do
 				if otstd.canCastSpellOnCreature(spell, target) then
-					if damageType ~= COMBAT_NONE then
+					if spell.damageType ~= COMBAT_NONE then
 						local amount = 0
 						if spell.formula then
 							amount = spell.formula(caster)
 						end
 						if internalCastSpell(spell.damageType, caster, target, amount, spell.blockedByShield, spell.blockedByArmor) then
+							if spell.condition then
+								target:addCondition(spell.condition)
+							end
+
 							if spell.onHitCreature then
 								spell.onHitCreature(target, event)
 							end
 						end
-					elseif spell.onHitCreature then
-						spell.onHitCreature(target, event)
+					else
+						if spell.condition then
+							target:addCondition(spell.condition)
+						end
+						
+						if spell.onHitCreature then
+							spell.onHitCreature(target, event)
+						end
 					end
 				end
 			end
@@ -223,7 +234,7 @@ function otstd.onCastSpell(event)
 		end
 		
 		-- Area effects should be displayed even if the tile did not exist, but not if it's PZ (and the spell is aggressive)
-		if canCast and spell.areaEffect then
+		if canCast and spell.areaEffect ~= MAGIC_EFFECT_NONE then
 			sendMagicEffect(pos, spell.areaEffect)
 		end
 	end

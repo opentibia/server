@@ -5,19 +5,26 @@ function Creature:addCondition(cond)
 	local obj = createCondition()
 	-- Use coroutine to guarantee no leaks due to script errors
 	local co = coroutine.create(otstd.conditions.makeConditionObject)
-	state, cond = coroutine.resume(co, obj, cond)
+	state, obj = coroutine.resume(co, obj, cond)
 	if not state then
-		obj:destroy()
-		error(cond) -- Propagate the error
+		if obj then
+			obj:destroy()
+		end
+		error(obj) -- Propagate the error
+		return false
 	end
 	-- Success!
-	if not typeof(cond, "Condition") then
-		obj:destroy()
+	if not typeof(obj, "Condition") then
+		if obj then
+			obj:destroy()
+		end
 		error("Expected return value from conditions.makeConditionObject to be a Condition object")
+		return false
 	end
 
 	-- Apply it
-	self:addConditionInternal(cond)
+	self:internalAddCondition(obj)
+	return true
 end
  
 otstd.conditions.effectParsers = {
@@ -71,8 +78,8 @@ otstd.conditions.effectParsers = {
 	end;
 	
 	["stamina"] = function(obj, effect)
-		local interval = assert(effect.interval or effect[1], "Missing 'interval' [1] parameter to Damage effect.")
-		local value = assert(effect.value or effect.amount or effect[2], "Missing 'amount'/'value' [2] parameter to Damage effect.")
+		local interval = assert(effect.interval or effect[1], "Missing 'interval' [1] parameter to Stamina effect.")
+		local value = assert(effect.value or effect.amount or effect[2], "Missing 'amount'/'value' [2] parameter to Stamina effect.")
 		obj:addModStamina(interval, value)
 	end;
 	
@@ -138,18 +145,24 @@ otstd.conditions.effectParsers = {
 		obj:addShapeShift(outfit)
 	end;
 	
+	["dispel"] = function(obj, name)
+		local name = assert(effect.name or effect[1], "Missing 'name' [1] to Dispel effect.")
+		
+		obj:addDispel(name)
+	end;
+
 	["script"] = function(obj, effect)
-		local interval = assert(effect.interval or effect[1], "Missing 'interval' [1] parameter to Script effect.")
-		assert(effect.callback and type(event.callback) == "function")
-		-- Can't be bound yet
-		obj:addScript(interval)
+		local name = assert(effect.name or effect[1], "Missing 'name' [1] to Script effect.")
+		local interval = effect.interval or effect[2] or nil
+
+		obj:addScript(name, interval)
 	end;
 }
  
 function otstd.conditions.parseEffect(obj, name, effect)
 	local parser = otstd.conditions.effectParsers[name]
 	if not parser then
-		error("Unknown codition effect type '" .. tostring(name) .. "'")
+		error("Unknown condition effect type '" .. tostring(name) .. "'")
 	end
 	parser(obj, effect)
 end
@@ -157,29 +170,28 @@ end
 function otstd.conditions.makeConditionObject(obj, condition)
 	local id = assert(condition.id or condition[1], "Missing 'id' [1] for Condition.")
 	local duration = assert(tonumber(condition.duration) or tonumber(condition[2]), "Missing 'duration' [2] for Condition")
-	
-	
-	for k, v in ipairs(condition) do
+		
+	for k, v in pairs(condition) do
 		if type(v) == "table" then
 			otstd.conditions.parseEffect(obj, k, v)
 		end
 	end
 	
-	obj:setID(condition.id)
-	obj:setTicks()
+	obj:setName(condition.id)
+	obj:setTicks(duration)
 	return obj
 end
  
  --[[
 condition = {
 	"Fire", duration=20000,
-	light = {level=20, color=50}, -- Light with level 20 color 50
-	healing = {interval=1000, rounds=10, amount=50}, -- 50 health 10 times every 1000ms
-	damage = {COMBAT_FIRE, 10, 10},
-	regeneration = {interval=2000, mana="1%", health=10},
-	stamina = {interval=2000, amount=5},
-	soul = {interval=5000, amount=1},
-	speed = {amount=40, percent=110},
-	shapeshift = {outfit={type=2}}
+	["light"] = {level=20, color=50}, -- Light with level 20 color 50
+	["healing"] = {interval=1000, rounds=10, amount=50}, -- 50 health 10 times every 1000ms
+	["damage"] = {COMBAT_FIRE, 10, 10},
+	["regeneration"] = {interval=2000, mana="1%", health=10},
+	["stamina"] = {interval=2000, amount=5},
+	["soul"] = {interval=5000, amount=1},
+	["speed"] = {amount=40, percent=110},
+	["shapeshift"] = {outfit={type=2}}
 }
 ]]--
