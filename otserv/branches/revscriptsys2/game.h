@@ -594,19 +594,13 @@ public:
 
 	bool combatBlockHit(CombatType combatType, CombatSource combatSource, Creature* target,
 		int32_t& healthChange, bool checkDefense, bool checkArmor);
-	bool combatChangeHealth(CombatType combatType, Creature* attacker,
-		Creature* target, int32_t healthChange, bool showEffect = true);
-	bool combatChangeHealth(CombatType combatType, CombatSource combatSource,
-		Creature* target, int32_t healthChange, bool showEffect = true);
-	bool combatChangeHealth(CombatType combatType, CombatSource combatSource, CombatEffect combatEffect,
-		Creature* target, int32_t healthChange);
 
-	bool combatChangeMana(Creature* attacker, Creature* target,
-		int32_t manaChange, bool showEffect = true);
-	bool combatChangeMana(CombatSource combatSource, Creature* target,
-		int32_t manaChange, bool showEffect = true);
-	bool combatChangeMana(CombatSource combatSource, CombatEffect combatEffect,
-		Creature* target, int32_t manaChange);
+	bool combatDamage(CombatType combatType, Creature* attacker,
+		Creature* target, int32_t amount, bool showEffect = true);
+	bool combatDamage(CombatType combatType, CombatSource combatSource,
+		Creature* target, int32_t amount, bool showEffect = true);
+	bool combatDamage(CombatType combatType, CombatSource combatSource,
+		CombatEffect combatEffect, Creature* target, int32_t amount);
 
 protected:
 	// Action helper function

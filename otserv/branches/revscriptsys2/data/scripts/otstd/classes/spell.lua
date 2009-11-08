@@ -185,7 +185,7 @@ function otstd.onCastSpell(event)
 	
 	-- We got a list of all tiles, loop through and apply spell effect
 	for pos, creatures in pairs(hitTiles) do
-		local position targetTile = map(pos)
+		local targetTile = map:getTile(pos)
 		local canCast = not targetTile or otstd.canCastSpellOnTile(spell, targetTile)
 		
 		if targetTile and canCast then

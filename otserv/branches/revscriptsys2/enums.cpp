@@ -60,12 +60,14 @@ template<> void CombatType__Base::initialize()
 	initAddValue(enums::COMBAT_EARTHDAMAGE, "earth", false);
 	initAddValue(enums::COMBAT_FIREDAMAGE, "COMBAT_FIREDAMAGE", true);
 	initAddValue(enums::COMBAT_FIREDAMAGE, "fire", false);
-	initAddValue(enums::COMBAT_UNDEFINEDDAMAGE, "COMBAT_UNDEFINEDDAMAGE", true);
-	initAddValue(enums::COMBAT_UNDEFINEDDAMAGE, "undefined", false);
+	initAddValue(enums::COMBAT_SCRIPTED_HEALTH, "COMBAT_SCRIPTED_HEALTH", true);
+	initAddValue(enums::COMBAT_SCRIPTED_HEALTH, "scriptedhealth", false);
+	initAddValue(enums::COMBAT_SCRIPTED_MANA, "COMBAT_SCRIPTED_MANA", true);
+	initAddValue(enums::COMBAT_SCRIPTED_MANA, "scriptedmana", false);
 	initAddValue(enums::COMBAT_LIFEDRAIN, "COMBAT_LIFEDRAIN", true);
-	initAddValue(enums::COMBAT_LIFEDRAIN, "life drain", false);
+	initAddValue(enums::COMBAT_LIFEDRAIN, "lifedrain", false);
 	initAddValue(enums::COMBAT_MANADRAIN, "COMBAT_MANADRAIN", true);
-	initAddValue(enums::COMBAT_MANADRAIN, "mana drain", false);
+	initAddValue(enums::COMBAT_MANADRAIN, "manadrain", false);
 	initAddValue(enums::COMBAT_HEALING, "COMBAT_HEALING", true);
 	initAddValue(enums::COMBAT_HEALING, "healing", false);
 	initAddValue(enums::COMBAT_DROWNDAMAGE, "COMBAT_DROWNDAMAGE", true);

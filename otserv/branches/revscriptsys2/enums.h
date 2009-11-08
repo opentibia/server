@@ -66,20 +66,21 @@ namespace enums {
 		COMBAT_ENERGYDAMAGE = 2,
 		COMBAT_EARTHDAMAGE = 4,
 		COMBAT_FIREDAMAGE = 8,
-		COMBAT_UNDEFINEDDAMAGE = 16,
-		COMBAT_LIFEDRAIN = 32,
-		COMBAT_MANADRAIN = 64,
-		COMBAT_HEALING = 128,
-		COMBAT_DROWNDAMAGE = 256,
-		COMBAT_ICEDAMAGE = 512,
-		COMBAT_HOLYDAMAGE = 1024,
-		COMBAT_DEATHDAMAGE = 2048,
+		COMBAT_SCRIPTED_HEALTH = 16,
+		COMBAT_SCRIPTED_MANA = 32,
+		COMBAT_LIFEDRAIN = 64,
+		COMBAT_MANADRAIN = 128,
+		COMBAT_HEALING = 256,
+		COMBAT_DROWNDAMAGE = 512,
+		COMBAT_ICEDAMAGE = 1024,
+		COMBAT_HOLYDAMAGE = 2048,
+		COMBAT_DEATHDAMAGE = 4096,
 	}; // end enum
 } // end namespace
 
-typedef BitEnum<enums::CombatType, 12> CombatType;
+typedef BitEnum<enums::CombatType, 13> CombatType;
 
-typedef Enum<enums::CombatType, 12> CombatType__Base;
+typedef Enum<enums::CombatType, 13> CombatType__Base;
 
 //begin enum definitions
 	const CombatType COMBAT_NONE(enums::COMBAT_NONE);
@@ -87,7 +88,8 @@ typedef Enum<enums::CombatType, 12> CombatType__Base;
 	const CombatType COMBAT_ENERGYDAMAGE(enums::COMBAT_ENERGYDAMAGE);
 	const CombatType COMBAT_EARTHDAMAGE(enums::COMBAT_EARTHDAMAGE);
 	const CombatType COMBAT_FIREDAMAGE(enums::COMBAT_FIREDAMAGE);
-	const CombatType COMBAT_UNDEFINEDDAMAGE(enums::COMBAT_UNDEFINEDDAMAGE);
+	const CombatType COMBAT_SCRIPTED_HEALTH(enums::COMBAT_SCRIPTED_HEALTH);
+	const CombatType COMBAT_SCRIPTED_MANA(enums::COMBAT_SCRIPTED_MANA);
 	const CombatType COMBAT_LIFEDRAIN(enums::COMBAT_LIFEDRAIN);
 	const CombatType COMBAT_MANADRAIN(enums::COMBAT_MANADRAIN);
 	const CombatType COMBAT_HEALING(enums::COMBAT_HEALING);

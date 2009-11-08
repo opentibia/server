@@ -643,52 +643,49 @@ bool ConditionEffect::onTick(Creature* creature, uint32_t ticks)
 					int32_t heal = modPeriodicDamage.value;
 					//std::cout << "Healing " << heal << " to " << creature->getName() << std::endl;
 					if(!g_game.combatBlockHit(COMBAT_HEALING, combatSource, creature, heal, false, false)){
-						g_game.combatChangeHealth(COMBAT_HEALING, combatSource, creature, heal);
+						g_game.combatDamage(COMBAT_HEALING, combatSource, creature, heal);
 					}
 				}
 				else{
 					int32_t damage = -modPeriodicDamage.value;
 					//std::cout << "Dealing " << damage << " "  << modPeriodicDamage.type.toString() << " to " << creature->getName() << std::endl;
 					if(!g_game.combatBlockHit(modPeriodicDamage.type, combatSource, creature, damage, false, false)){
-						g_game.combatChangeHealth(modPeriodicDamage.type, combatSource, creature, damage);
+						g_game.combatDamage(modPeriodicDamage.type, combatSource, creature, damage);
 					}
 				}
 
-				bool skip = false;
 				if(const MagicField* field = creature->getParentTile()->getFieldItem()){
 					if(field->getCombatType() == modPeriodicDamage.type){
 						//The creature is still standing in the field so the damage should
 						//not be counted towards the total damage.
-						skip = true;
+						return true;
 					}
 				}
 
-				if(!skip){
-					//average damage
-					if(modPeriodicDamage.total != 0){
-						//total damage done
-						modPeriodicDamage.sum += modPeriodicDamage.value;
+				//average damage
+				if(modPeriodicDamage.total != 0){
+					//total damage done
+					modPeriodicDamage.sum += modPeriodicDamage.value;
 
-						//number of rounds done
-						modPeriodicDamage.roundCompleted++;
+					//number of rounds done
+					modPeriodicDamage.roundCompleted++;
 
-						int32_t curRounds = (int32_t)std::ceil(((float)modPeriodicDamage.percent) / modPeriodicDamage.value);
-						if(modPeriodicDamage.roundCompleted >= curRounds){
-							modPeriodicDamage.roundCompleted = 0;
-							--modPeriodicDamage.value;
-						}
-
-						if(modPeriodicDamage.sum >= modPeriodicDamage.total || modPeriodicDamage.value == 0){
-							return false;
-						}
+					int32_t curRounds = (int32_t)std::ceil(((float)modPeriodicDamage.percent) / modPeriodicDamage.value);
+					if(modPeriodicDamage.roundCompleted >= curRounds){
+						modPeriodicDamage.roundCompleted = 0;
+						--modPeriodicDamage.value;
 					}
-					else{
-						//number of rounds
-						modPeriodicDamage.roundCompleted++;
 
-						if(modPeriodicDamage.roundCompleted >= modPeriodicDamage.rounds ){
-							return false;
-						}
+					if(modPeriodicDamage.sum >= modPeriodicDamage.total || modPeriodicDamage.value == 0){
+						return false;
+					}
+				}
+				else{
+					//number of rounds
+					modPeriodicDamage.roundCompleted++;
+
+					if(modPeriodicDamage.roundCompleted >= modPeriodicDamage.rounds ){
+						return false;
 					}
 				}
 				break;

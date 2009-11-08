@@ -3323,10 +3323,10 @@ int LuaState::lua_Creature_setHealth()
 	Creature* c = popCreature();
 
 	if(newval >= c->getHealth()){
-		g_game.combatChangeHealth(COMBAT_HEALING, NULL, c, newval - c->getHealth(), false);
+		g_game.combatDamage(COMBAT_HEALING, NULL, c, newval - c->getHealth(), false);
 	}
 	else{
-		g_game.combatChangeHealth(COMBAT_UNDEFINEDDAMAGE, NULL, c, newval - c->getHealth(), false);
+		g_game.combatDamage(COMBAT_SCRIPTED_HEALTH, NULL, c, newval - c->getHealth(), false);
 	}
 
 	push(true);
@@ -3553,14 +3553,7 @@ int LuaState::lua_internalCastSpell()
 		return 1;
 	}
 
-	bool result = false;
-	if(combatType != COMBAT_MANADRAIN){
-		result = g_game.combatChangeHealth(combatType, combatSource, combatEffect, target, amount);
-	}
-	else{
-		result = g_game.combatChangeMana(combatSource, combatEffect, target, amount);
-	}
-
+	bool result = g_game.combatDamage(combatType, combatSource, combatEffect, target, amount);
 	pushBoolean(result);
 	return 1;
 }
@@ -4120,7 +4113,7 @@ int LuaState::lua_Player_setMana()
 {
 	int32_t newval = popInteger();
 	Player* p = popPlayer();
-	g_game.combatChangeMana(NULL, p, newval - p->getMana(), false);
+	g_game.combatDamage(COMBAT_MANADRAIN, NULL, p, newval - p->getMana(), false);
 	push(true);
 	return 1;
 }
