@@ -4692,7 +4692,7 @@ bool Game::combatBlockHit(CombatType combatType, CombatSource combatSource, Crea
 		return true;
 	}
 	else if(blockType == BLOCK_ARMOR){
-		addMagicEffect(list, targetPos, MAGIC_EFFECT_BLOCKHIT);
+		addMagicEffect(list, targetPos, MAGIC_EFFECT_YELLOW_SPARK);
 		return true;
 	}
 	else if(blockType == BLOCK_IMMUNITY){
@@ -4705,11 +4705,11 @@ bool Game::combatBlockHit(CombatType combatType, CombatSource combatSource, Crea
 				combatType == COMBAT_PHYSICALDAMAGE &&
 				combatType == COMBAT_ICEDAMAGE &&
 				combatType == COMBAT_DEATHDAMAGE)
-			hitEffect = MAGIC_EFFECT_BLOCKHIT;
+			hitEffect = MAGIC_EFFECT_YELLOW_SPARK;
 		else if(combatType == COMBAT_EARTHDAMAGE)
-			hitEffect = MAGIC_EFFECT_POISON_RINGS;
+			hitEffect = MAGIC_EFFECT_GREEN_RING;
 		else if(combatType == COMBAT_HOLYDAMAGE)
-			hitEffect = MAGIC_EFFECT_HOLYDAMAGE;
+			hitEffect = MAGIC_EFFECT_HOLY_HIT;
 
 		addMagicEffect(list, targetPos, hitEffect);
 
@@ -4763,26 +4763,10 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, 
 
 		int32_t damage = -healthChange;
 		if(damage != 0){
-			if(target->hasCondition(CONDITION_MANASHIELD) && combatType != COMBAT_UNDEFINEDDAMAGE){
-				int32_t manaDamage = std::min(target->getMana(), damage);
-				damage = std::max((int32_t)0, damage - manaDamage);
-
-				if(manaDamage != 0){
-					target->drainMana(combatSource, manaDamage, combatEffect.showEffect);
-
-					std::stringstream ss;
-					ss << manaDamage;
-					if(combatEffect.showEffect){
-						addMagicEffect(list, targetPos, MAGIC_EFFECT_LOSE_ENERGY);
-						addAnimatedText(list, targetPos, TEXTCOLOR_BLUE, ss.str());
-					}
-				}
-			}
-
 			damage = std::min(target->getHealth(), damage);
 			if(damage > 0){
 				if(target->getHealth() - damage <= 0){
-					// If event handler changes health we shouldn't
+					// If event handler changes health we should not
 					int ohealth = target->getHealth();
 					if(onCreatureKill(target, combatSource)){
 						//prevent death
@@ -4802,54 +4786,54 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, 
 
 						if(race == RACE_VENOM){
 							textColor = TEXTCOLOR_LIGHTGREEN;
-							hitEffect = MAGIC_EFFECT_POISON;
+							hitEffect = MAGIC_EFFECT_GREEN_SPARK;
 						}
 						else if(race == RACE_BLOOD){
 							textColor = TEXTCOLOR_RED;
-							hitEffect = MAGIC_EFFECT_BLOOD;
+							hitEffect = MAGIC_EFFECT_RED_SPARK;
 						}
 						else if(race == RACE_UNDEAD){
 							textColor = TEXTCOLOR_LIGHTGREY;
-							hitEffect = MAGIC_EFFECT_HIT_AREA;
+							hitEffect = MAGIC_EFFECT_BLACK_SPARK;
 						}
 						else if(race == RACE_FIRE){
 							textColor = TEXTCOLOR_ORANGE;
-							hitEffect = MAGIC_EFFECT_BLOOD;
+							hitEffect = MAGIC_EFFECT_RED_SPARK;
 						}
 						else if(race == RACE_ENERGY){
 							textColor = TEXTCOLOR_PURPLE;
-							hitEffect = MAGIC_EFFECT_ENERGY_DAMAGE;
+							hitEffect = MAGIC_EFFECT_ENERGY_HIT;
 						}
 					}
 					else if(combatType == COMBAT_ENERGYDAMAGE)
 					{
 						textColor = TEXTCOLOR_PURPLE;
-						hitEffect = MAGIC_EFFECT_ENERGY_DAMAGE;
+						hitEffect = MAGIC_EFFECT_ENERGY_HIT;
 					}
 					else if(combatType == COMBAT_EARTHDAMAGE)
 					{
 						textColor = TEXTCOLOR_LIGHTGREEN;
-						hitEffect = MAGIC_EFFECT_POISON_RINGS;
+						hitEffect = MAGIC_EFFECT_GREEN_RING;
 					}
 					else if(combatType == COMBAT_DROWNDAMAGE)
 					{
 						textColor = TEXTCOLOR_LIGHTBLUE;
-						hitEffect = MAGIC_EFFECT_LOSE_ENERGY;
+						hitEffect = MAGIC_EFFECT_BLUE_RING;
 					}
 					else if(combatType == COMBAT_FIREDAMAGE)
 					{
 						textColor = TEXTCOLOR_ORANGE;
-						hitEffect = MAGIC_EFFECT_HITBY_FIRE;
+						hitEffect = MAGIC_EFFECT_FIRE_HIT;
 					}
 					else if(combatType == COMBAT_ICEDAMAGE)
 					{
 						textColor = TEXTCOLOR_LIGHTBLUE;
-						hitEffect = MAGIC_EFFECT_ICEATTACK;
+						hitEffect = MAGIC_EFFECT_ICE_HIT;
 					}
 					else if(combatType == COMBAT_HOLYDAMAGE)
 					{
 						textColor = TEXTCOLOR_YELLOW;
-						hitEffect = MAGIC_EFFECT_HOLYDAMAGE;
+						hitEffect = MAGIC_EFFECT_HOLY_HIT;
 					}
 					else if(combatType == COMBAT_DEATHDAMAGE)
 					{
@@ -4859,7 +4843,7 @@ bool Game::combatChangeHealth(CombatType combatType, CombatSource combatSource, 
 					else if(combatType == COMBAT_LIFEDRAIN)
 					{
 						textColor = TEXTCOLOR_RED;
-						hitEffect = MAGIC_EFFECT_MAGIC_BLOOD;
+						hitEffect = MAGIC_EFFECT_RED_SHIMMER;
 					}
 
 					if(combatEffect.hitEffect != MAGIC_EFFECT_UNK)
@@ -5555,7 +5539,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 	if(targetPlayer && removeNotations > 0){
 		targetPlayer->sendTextMessage(MSG_INFO_DESCR, "You have been banished.");
-		addMagicEffect(targetPlayer->getPosition(), MAGIC_EFFECT_MAGIC_POISON);
+		addMagicEffect(targetPlayer->getPosition(), MAGIC_EFFECT_GREEN_SHIMMER);
 
 		uint32_t targetId = targetPlayer->getID();
 		g_scheduler.addEvent(createSchedulerTask(1000, boost::bind(

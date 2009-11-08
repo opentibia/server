@@ -881,8 +881,8 @@ void Actor::onThinkDefense(uint32_t interval)
 
 					addSummon(summon);
 					if(g_game.placeCreature(summon, summonPos)){
-						g_game.addMagicEffect(summon->getPosition(), MAGIC_EFFECT_TELEPORT);
-						g_game.addMagicEffect(getPosition(), MAGIC_EFFECT_MAGIC_ENERGY);
+						g_game.addMagicEffect(summon->getPosition(), MAGIC_EFFECT_BLUE_BUBBLE);
+						g_game.addMagicEffect(getPosition(), MAGIC_EFFECT_BLUE_BUBBLE);
 					}
 					else{
 						removeSummon(summon);
@@ -1045,7 +1045,7 @@ void Actor::pushCreatures(Tile* tile)
 		}
 
 		if(removeCount > 0){
-			g_game.addMagicEffect(tile->getPosition(), MAGIC_EFFECT_BLOCKHIT);
+			g_game.addMagicEffect(tile->getPosition(), MAGIC_EFFECT_YELLOW_SPARK);
 		}
 	}
 }

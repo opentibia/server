@@ -1,5 +1,9 @@
 otstd.conditions = {}
 
+function Condition:type()
+	return self.__name
+end
+
 function Creature:addCondition(cond)
 	-- Create the actual condition
 	local obj = createCondition()
