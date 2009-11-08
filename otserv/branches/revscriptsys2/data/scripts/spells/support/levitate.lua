@@ -5,7 +5,7 @@ levitate.vocation    = "any"
 levitate.level       = 9
 levitate.mana        = 20
 
-levitate.effect = MAGIC_EFFECT_TELEPORT
+levitate.effect = MAGIC_EFFECT_BLUE_BUBBLE
 
 function levitate:onBeginCast(event)
 	local caster = event.caster

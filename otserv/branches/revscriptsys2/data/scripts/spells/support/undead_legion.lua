@@ -5,7 +5,7 @@ undeadLegion.vocation    = "druid"
 undeadLegion.level       = 30
 undeadLegion.mana        = 500
 undeadLegion.premium = true
-undeadLegion.areaEffect  = MAGIC_EFFECT_MAGIC_BLOOD
+undeadLegion.areaEffect  = MAGIC_EFFECT_RED_SHIMMER
 
 undeadLegion.area        =
 	{

@@ -66,10 +66,10 @@ function otstd.furniture.bedKitHandler(event)
 	local newbed = kit.newbed
 	
 	bed[1]:setItemID(newbed[bed[1]:getBedDirection()])
-	sendMagicEffect(bed[1]:getPosition(), MAGIC_EFFECT_BLOCKHIT)	
+	sendMagicEffect(bed[1]:getPosition(), MAGIC_EFFECT_YELLOW_SPARK)	
 
 	bed[2]:setItemID(newbed[bed[2]:getBedDirection()])
-	sendMagicEffect(bed[2]:getPosition(), MAGIC_EFFECT_BLOCKHIT)	
+	sendMagicEffect(bed[2]:getPosition(), MAGIC_EFFECT_YELLOW_SPARK)	
 	
 	bedKitItem:destroy()
 	event:skip()
@@ -172,7 +172,7 @@ function otstd.furniture.standardKitHandler(event)
 	local kit = event.kit
 
 	item:setItemID(kit.newid)
-	sendMagicEffect(item:getPosition(), MAGIC_EFFECT_BLOCKHIT)	
+	sendMagicEffect(item:getPosition(), MAGIC_EFFECT_YELLOW_SPARK)	
 	event:skip()
 	return true
 end

@@ -10,6 +10,6 @@ conjureUltimateHealingRune.reagent       = 2260
 conjureUltimateHealingRune.product.id    = 2273
 conjureUltimateHealingRune.product.count = 1
 
-conjureUltimateHealingRune.effect        = MAGIC_EFFECT_MAGIC_ENERGY
+conjureUltimateHealingRune.effect        = MAGIC_EFFECT_RED_SHIMMER
 
 conjureUltimateHealingRune:register()

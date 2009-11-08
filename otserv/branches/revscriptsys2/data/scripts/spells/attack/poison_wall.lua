@@ -5,7 +5,7 @@ poisonWall.damageType  = COMBAT_EARTHDAMAGE
 poisonWall.aggressive  = true
 poisonWall.level       = 14
 poisonWall.magicLevel  = 0
-poisonWall.areaEffect  = MAGIC_EFFECT_POISON_RINGS
+poisonWall.areaEffect  = MAGIC_EFFECT_GREEN_RING
 poisonWall.shootEffect = SHOOT_EFFECT_POISONFIELD
 
 poisonWall.field       = 1496

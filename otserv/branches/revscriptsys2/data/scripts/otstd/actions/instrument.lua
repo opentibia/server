@@ -3,9 +3,9 @@ otstd.instrument = {}
 function otstd.instrument.piano_handler(event)
 	local item = event.item
 	if math.random(0, 1) == 1 then
-		sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_RED)
+		sendMagicEffect(item:getPosition(), MAGIC_EFFECT_RED_NOTE)
 	else
-		sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_BLUE)
+		sendMagicEffect(item:getPosition(), MAGIC_EFFECT_BLUE_NOTE)
 	end
 	return true
 end
@@ -29,15 +29,15 @@ otstd.instruments = {
 		[2083] = {handler = piano_handler},
 		[2084] = {},
 		[2085] = {},
-		[2095] = {effect = MAGIC_EFFECT_SOUND_YELLOW},
+		[2095] = {effect = MAGIC_EFFECT_YELLOW_NOTE},
 		[2332] = {},
 		[2364] = {},		
-		[2367] = {effect = MAGIC_EFFECT_SOUND_PURPLE},
+		[2367] = {effect = MAGIC_EFFECT_PURPLE_NOTE},
 		[2368] = {},
 		[2369] = {handler =
 			function(event)
 				local item = event.item
-				sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
+				sendMagicEffect(item:getPosition(), MAGIC_EFFECT_GREEN_NOTE)
 				for i = 1, 11 do
 					local grape = createItem(2681)
 					event.player:addItem(grape)
@@ -48,14 +48,14 @@ otstd.instruments = {
 			},
 		[2370] = {},
 		[2372] = {},
-		[2373] = {effect = MAGIC_EFFECT_SOUND_RED},
+		[2373] = {effect = MAGIC_EFFECT_RED_NOTE},
 		[2374] = {},
 		
 		[3952] = {handler =
 			function(event)
 				local item = event.item
 				if math.random(1, 10) == 1 then
-					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
+					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_GREEN_NOTE)
 				end
 				return true
 			end
@@ -65,10 +65,10 @@ otstd.instruments = {
 			function(event)
 				local item = event.item
 				if math.random(1, 10) == 1 then
-					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_RED)
+					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_RED_NOTE)
 					item:destroy()
 				else
-					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_PURPLE)
+					sendMagicEffect(item:getPosition(), MAGIC_EFFECT_PURPLE_NOTE)
 					--TODO: summon wolf
 				end
 				return true
@@ -78,7 +78,7 @@ otstd.instruments = {
 			function(event)
 				local item = event.item
 				event.player:sendMessage(MSG_STATUS_CONSOLE_ORANGE, "TOOOOOOT")
-				sendMagicEffect(item:getPosition(), MAGIC_EFFECT_SOUND_GREEN)
+				sendMagicEffect(item:getPosition(), MAGIC_EFFECT_GREEN_NOTE)
 				item:setItemID(6573)
 				item:startDecaying()
 				return true
@@ -89,7 +89,7 @@ otstd.instruments = {
 function otstd.instrument.standardInstrumentHandler(event)
 	local item = event.item
 	local effect = event.instrument.effect
-	sendMagicEffect(item:getPosition(), effect or MAGIC_EFFECT_SOUND_GREEN)
+	sendMagicEffect(item:getPosition(), effect or MAGIC_EFFECT_GREEN_NOTE)
 	return true
 end
 

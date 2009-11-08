@@ -168,7 +168,7 @@ function otstd.enchant.disenchant_handler(event)
 					player:addItem(dust)
 					sendMagicEffect(disenchantItem:getPosition(), MAGIC_EFFECT_STUN)
 				else
-					sendMagicEffect(disenchantItem:getPosition(), MAGIC_EFFECT_BLOCKHIT)
+					sendMagicEffect(disenchantItem:getPosition(), MAGIC_EFFECT_YELLOW_SPARK)
 				end
 
 				disenchantItem:setItemID(newid)

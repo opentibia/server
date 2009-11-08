@@ -6,7 +6,7 @@ otstd.pick_spots = {
 			function(event)
 				local pick_spot = event.pick_spot
 				pick_spot:setItemID(7236)
-				sendMagicEffect(pick_spot:getPosition(), MAGIC_EFFECT_BLOCKHIT)
+				sendMagicEffect(pick_spot:getPosition(), MAGIC_EFFECT_YELLOW_SPARK)
 			end
 			},
 	}

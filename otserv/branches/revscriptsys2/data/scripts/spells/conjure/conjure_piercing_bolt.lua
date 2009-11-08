@@ -10,6 +10,6 @@ conjurePiercingBolt.premium       = true
 conjurePiercingBolt.product.id    = 7363
 conjurePiercingBolt.product.count = 5
 
-conjurePiercingBolt.effect        = MAGIC_EFFECT_MAGIC_ENERGY
+conjurePiercingBolt.effect        = MAGIC_EFFECT_RED_SHIMMER
 
 conjurePiercingBolt:register()

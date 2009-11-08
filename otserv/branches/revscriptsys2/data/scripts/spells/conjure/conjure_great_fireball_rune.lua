@@ -10,7 +10,6 @@ conjureGreatFireballRune.reagent       = 2260
 conjureGreatFireballRune.product.id    = 2304
 conjureGreatFireballRune.product.count = 4
 
-conjureGreatFireballRune.effect        = MAGIC_EFFECT_MAGIC_ENERGY
-
+conjureGreatFireballRune.effect        = MAGIC_EFFECT_RED_SHIMMER
 
 conjureGreatFireballRune:register()

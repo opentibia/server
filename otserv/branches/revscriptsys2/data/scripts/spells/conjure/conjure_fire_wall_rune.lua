@@ -10,6 +10,6 @@ conjureFireWallRune.reagent       = 2260
 conjureFireWallRune.product.id    = 2303
 conjureFireWallRune.product.count = 4
 
-conjureFireWallRune.effect        = MAGIC_EFFECT_MAGIC_ENERGY
+conjureFireWallRune.effect        = MAGIC_EFFECT_RED_SHIMMER
 
 conjureFireWallRune:register()

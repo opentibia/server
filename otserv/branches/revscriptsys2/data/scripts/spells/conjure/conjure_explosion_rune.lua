@@ -10,6 +10,6 @@ conjureExplosionRune.reagent       = 2260
 conjureExplosionRune.product.id    = 2313
 conjureExplosionRune.product.count = 6
 
-conjureExplosionRune.effect        = MAGIC_EFFECT_MAGIC_ENERGY
+conjureExplosionRune.effect        = MAGIC_EFFECT_RED_SHIMMER
 
 conjureExplosionRune:register()
