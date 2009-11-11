@@ -7,6 +7,12 @@ function onStepIn(cid, item, pos, frompos)
 	local stair = getTileThingByTopOrder(stair_pos, 2)
 
 	if isInArray(STAIRS_EAST, stair.itemid) == TRUE then
+
+		local canGo = (queryTileAddThing(cid, stair_pos, 0) == RETURNVALUE_NOERROR)
+		if not(canGo) then
+			return FALSE
+		end
+
 		doSetCreatureDirection(cid, WEST)
 		doTeleportThing(cid, {x = pos.x - 2, y = pos.y, z = pos.z + 1, stackpos = 0})
 	end
@@ -15,6 +21,12 @@ function onStepIn(cid, item, pos, frompos)
 	stair = getTileThingByTopOrder(stair_pos, 2)
 
 	if isInArray(STAIRS_SOUTH, stair.itemid) == TRUE then
+		
+		local canGo = (queryTileAddThing(cid, stair_pos, 0) == RETURNVALUE_NOERROR)
+		if not(canGo) then
+			return FALSE
+		end
+		
 		doSetCreatureDirection(cid, NORTH)
 		doTeleportThing(cid, {x = pos.x, y = pos.y - 2, z = pos.z + 1, stackpos = 0})
 	end
