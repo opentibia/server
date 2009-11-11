@@ -257,6 +257,10 @@ function Player:hasInfiniteMana()
 	return self:hasGroupFlag(PlayerFlag_HasInfiniteMana)
 end
 
+function Player:hasInfiniteSoul()
+	return self:hasGroupFlag(PlayerFlag_HasInfiniteSoul)
+end
+
 function Player:canUseSpells()
 	return not self:hasGroupFlag(PlayerFlag_CannotUseSpells)
 end

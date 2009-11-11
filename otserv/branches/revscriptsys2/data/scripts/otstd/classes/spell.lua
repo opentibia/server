@@ -13,6 +13,7 @@ function Spell:new(name)
 		health          = 0,
 		soul            = 0,
 		premium         = false,
+		maybeTarget     = false,
 		condition       = nil,
 		
 		-- Area spells use this
@@ -161,7 +162,6 @@ end
 function otstd.onCastSpell(event)
 	local caster = event.caster
 	local casterPos = caster and caster:getPosition()
-	--local toPos = casterPos
 	local target = event.targetCreature
 	local spell = event.spell
 	
@@ -181,7 +181,15 @@ function otstd.onCastSpell(event)
 	-- default spell handling
 	local centerPos = event.targetPosition or casterPos
 	
-	local hitTiles = spell:getAffectedArea(centerPos, caster)
+	local hitTiles = {}
+	
+	if spell.maybeTarget and event.targetCreature then
+		local targetPos = event.targetCreature:getPosition()
+		local targetTile = map:getTile(targetPos)
+		hitTiles[targetPos] = {[1] = event.targetCreature}
+	else
+		hitTiles = spell:getAffectedArea(centerPos, caster)
+	end
 	
 	-- We got a list of all tiles, loop through and apply spell effect
 	for pos, creatures in pairs(hitTiles) do
@@ -278,6 +286,11 @@ function otstd.onBeginCastRuneSpell(event)
 				player:sendCancel(RET_FIRSTGODOWNSTAIRS)
 				return false
 			else
+				if spell.needTarget and not spell.targetCreature then
+					caster:sendCancel(RET_CANONLYUSETHISRUNEONCREATURES)
+					return false
+				end
+				
 				if spell.range and spell.range > 0 then
 					--if not Map:canThrowObjectTo(playerPos, toPos, true, range, range) then
 					--	player:sendCancel(RET_DESTINATIONOUTOFREACH)
@@ -373,8 +386,8 @@ function formulaLevelMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelt
 	
 	return function(player)
 		return -math.random(
-				math.max(minFloor, minAbsolute + (player:getLevel() / 5 + player:getMagicLevel()) * minDelta),
-				math.max(maxFloor, maxAbsolute + (player:getLevel() / 5 + player:getMagicLevel()) * maxDelta))
+				math.max(minFloor, minAbsolute + (player:getLevel() / 5 + player:getMagicLevel() * minDelta)),
+				math.max(maxFloor, maxAbsolute + (player:getLevel() / 5 + player:getMagicLevel() * maxDelta)))
 	end
 end
 
@@ -480,6 +493,8 @@ function Spell:cast(caster, target)
 		local param = string.strip_whitespace(string.sub(event.text, self.words:len()+1) or "")
 		if self.needTarget then
 			event.targetCreature = getPlayerByName(param)
+		elseif self.maybeTarget then
+			event.targetCreature = caster:getTarget()
 		end
 		
 		if self.onSay then
@@ -547,8 +562,7 @@ function Spell:getAffectedArea(centerPos, caster)
 			end
 		else
 			dir = caster
-		end
-		
+		end		
 		
 		-- Go through the area array, and assemble all tiles that match the direction
 		for rowIndex, rows in pairs(self.area) do
@@ -622,6 +636,8 @@ function Spell:register()
 			event.caster = event.creature
 			if self.needTarget then
 				event.targetCreature = getPlayerByName(param)
+			elseif self.maybeTarget then
+				event.targetCreature = event.creature:getTarget()
 			end
 			
 			if self.onSay then

@@ -1,7 +1,7 @@
 local energyWave = Spell:new("Energy Wave")
 
 energyWave.words       = "exevo mort hur"
-energyWave.vocation    = "sorcerer"
+energyWave.vocation    = {"Sorcerer", "Master Sorcerer"}
 energyWave.damageType  = COMBAT_ENERGYDAMAGE
 energyWave.level       = 38
 energyWave.magicLevel  = 40
