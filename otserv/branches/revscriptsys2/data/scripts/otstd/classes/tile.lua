@@ -32,6 +32,14 @@ function Tile:getTopItem()
 	return self:getItem(-1)
 end
 
+function Tile:getTopCreature()
+	local creatures = self:getCreatures()
+	
+	for __,creature in ipairs(creatures) do
+		return creature
+	end
+end
+
 function Tile:getTopMoveableThing()
 	local t = self:getThing(-1)
 	if t and not t:isMoveable() then

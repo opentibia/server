@@ -110,6 +110,7 @@ template<> void MagicEffect__Base::initialize()
 	initAddValue(enums::MAGIC_EFFECT_YELLOW_RING, "yellowring", false);
 	initAddValue(enums::MAGIC_EFFECT_GREEN_RING, "MAGIC_EFFECT_GREEN_RING", true);
 	initAddValue(enums::MAGIC_EFFECT_GREEN_RING, "greenring", false);
+	initAddValue(enums::MAGIC_EFFECT_GREEN_RING, "greenbubble", false);
 	initAddValue(enums::MAGIC_EFFECT_BLACK_SPARK, "MAGIC_EFFECT_BLACK_SPARK", true);
 	initAddValue(enums::MAGIC_EFFECT_BLACK_SPARK, "blackspark", false);
 	initAddValue(enums::MAGIC_EFFECT_BLACK_SPARK, "deathhit", false);

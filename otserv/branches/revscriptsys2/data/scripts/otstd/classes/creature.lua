@@ -49,6 +49,18 @@ function Creature:isCombatExhausted()
 	return false
 end
 
+function Creature:isSummon()
+	return self:getMaster() ~= nil
+end
+
+function Creature:isPlayerSummon()
+	return typeof(self:getMaster(), "Player")
+end
+
+function Creature:getDirection()
+	return self:getOrientation()
+end
+
 function Creature:canSee(what, multifloor)
 	local myX = self:getX()
 	local myY = self:getY()

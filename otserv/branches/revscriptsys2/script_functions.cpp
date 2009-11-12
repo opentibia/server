@@ -224,7 +224,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getRawCustomValue(string key)", &Manager::lua_Creature_getRawCustomValue);
 
 	registerMemberFunction("Creature", "addSummon(Actor other)", &Manager::lua_Creature_addSummon);
-	registerMemberFunction("Creature", "getDirection()", &Manager::lua_Creature_getOrientation);
+	registerMemberFunction("Creature", "getMaster()", &Manager::lua_Creature_getMaster);
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
 	registerMemberFunction("Creature", "setHealth(integer newval)", &Manager::lua_Creature_setHealth);
@@ -346,6 +346,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "hasGroupFlag(integer flag)", &Manager::lua_Player_hasGroupFlag);
 	registerMemberFunction("Player", "internalWalkTo(position pos)", &Manager::lua_Player_internalWalkTo);
 	registerMemberFunction("Player", "internalPickup(Item item)", &Manager::lua_Player_internalPickup);
+	registerMemberFunction("Player", "hasAttacked(Player who)", &Manager::lua_Player_hasAttacked);
 
 	registerMemberFunction("Player", "countMoney()", &Manager::lua_Player_countMoney);
 	registerMemberFunction("Player", "addMoney(int amount)", &Manager::lua_Player_addMoney);
@@ -3333,6 +3334,13 @@ int LuaState::lua_Creature_setHealth()
 	return 1;
 }
 
+int LuaState::lua_Creature_getMaster()
+{
+	Creature* c = popCreature();
+	pushThing(c->getMaster());
+	return 1;
+}
+
 int LuaState::lua_Creature_addSummon()
 {
 	Actor* summon = popActor();
@@ -4333,6 +4341,14 @@ int LuaState::lua_Player_internalPickup()
 	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
 	return 2;
+}
+
+int LuaState::lua_Player_hasAttacked()
+{
+	Player* who = popPlayer();
+	Player* player = popPlayer();
+	pushBoolean(player->hasAttacked(who));
+	return 1;
 }
 
 int LuaState::lua_Player_countMoney()

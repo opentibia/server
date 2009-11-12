@@ -273,10 +273,21 @@ function Player:ignoreWeaponCheck()
 	return self:hasGroupFlag(PlayerFlag_IgnoreWeaponCheck)
 end
 
+function Player:ignoreProtectionZone()
+	return self:hasGroupFlag(PlayerFlag_IgnoreProtectionZone)
+end
+
 function Player:isInvulnerable()
 	return self:hasGroupFlag(PlayerFlag_CannotBeAttacked)
 end
 
+function Player:cannotAttackPlayer()
+	return self:hasGroupFlag(PlayerFlag_CannotAttackPlayer)
+end
+
+function Player:cannotAttackMonster()
+	return self:hasGroupFlag(PlayerFlag_CannotAttackMonster)
+end
 
 -- Login / Logout
 function otstd.Player.LoginHandler(event)

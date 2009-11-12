@@ -14,6 +14,7 @@ function Spell:new(name)
 		soul            = 0,
 		premium         = false,
 		maybeTarget     = false,
+		needTarget      = false,
 		condition       = nil,
 		
 		-- Area spells use this
@@ -22,7 +23,6 @@ function Spell:new(name)
 		
 		-- Damaging spells
 		damageType      = COMBAT_NONE,
-		needTarget      = false,
 		aggressive      = false,
 		blockedByArmor  = false,
 		blockedByShield = false,
@@ -59,16 +59,93 @@ function Spell:new(name)
 end
 
 -- Some standard checks for availiability of targets
-function otstd.canCastSpellOnTile(spell, tile)
-	if spell.aggressive and tile:isPz()  then
-		return false
+function otstd.canCastSpellOnTile(spell, caster, tile)
+	if not tile then
+		return true, RET_NOERROR
+	end
+	
+	--if tile:blockProjectile() then
+	--	return false, RET_NOTENOUGHROOM
+	--}
+
+	--if(tile:floorChange()){
+	--	return false, RET_NOTENOUGHROOM
+	--end
+
+	--if(tile:){
+	--	return false, RET_NOTENOUGHROOM
+	--end
+
+	if typeof(caster, "Player") then
+		local playerPos = caster:getPosition()
+		local toPos = tile:getPosition()
+		if playerPos.z > toPos.z then
+			return false, RET_FIRSTGOUPSTAIRS
+		elseif playerPos.z < toPos.z then
+			return false, RET_FIRSTGODOWNSTAIRS
+		end
+
+		if caster:ignoreProtectionZone() then
+			return RET_NOERROR, true
+		end
 	end
 
-	return true
+	if spell.aggressive and tile:isPz() then
+		return false, RET_ACTIONNOTPERMITTEDINPROTECTIONZONE
+	end
+
+	return true, RET_NOERROR
 end
 
-function otstd.canCastSpellOnCreature(spell, creature)
-	return true
+function otstd.canCastSpellOnCreature(spell, caster, creature)
+	if caster and spell.aggressive then
+		if creature:getID() == caster:getID() then
+			return false, RET_YOUMAYNOTATTACKTHISPERSON
+		end
+		
+		caster = (typeof(caster, "Player") and caster) or caster:getMaster()
+		if typeof(caster, "Player") then
+			if typeof(creature, "Player") then
+				if creature:isInvulnerable() then
+					return false, RET_YOUMAYNOTATTACKTHISPERSON
+				elseif creature:getParentTile():isPz() then
+					return false, RET_ACTIONNOTPERMITTEDINANONPVPZONE
+				end
+			
+				if caster:cannotAttackPlayer() then
+					return false, RET_YOUMAYNOTATTACKTHISPERSON
+				end
+				
+				if caster:getSkull() == SKULL_BLACK then
+					if creature:getSkull() == SKULL_NONE and not creature:hasAttacked(caster) then
+						return false, RET_YOUMAYNOTATTACKTHISPERSON
+					end
+				end
+
+				--[[
+				if getWorldType() == WORLD_TYPE_NOPVP then
+					if target->getPlayer() then
+						if(!isInPvpZone(attacker, target)){
+							return false, RET_YOUMAYNOTATTACKTHISPERSON
+						}
+					}
+
+					if(target->isPlayerSummon()){
+						if(!isInPvpZone(attacker, target)){
+							return false, RET_YOUMAYNOTATTACKTHISCREATURE
+						}
+					}
+				}
+				]]--
+			end
+		elseif typeof(caster, "Actor") then
+			if caster:cannotAttackMonster() then
+				return false, RET_YOUMAYNOTATTACKTHISCREATURE
+			end
+		end
+	end
+	
+	return true, RET_NOERROR
 end
 
 
@@ -123,7 +200,7 @@ function otstd.onSpellCheck(event)
 	local spell = event.spell
 	local tile = map:getTile(caster:getPosition())
 	
-	if caster and typeof(caster, "Player") then
+	if typeof(caster, "Player") then
 		if caster:canUseSpells() == false then
 			caster:sendCancel("You cannot cast spells.")
 		elseif caster:ignoreSpellCheck() then
@@ -179,7 +256,7 @@ function otstd.onCastSpell(event)
 	end
 	
 	-- default spell handling
-	local centerPos = event.targetPosition or casterPos
+	local centerPos = (event.targetCreature and event.targetCreature:getPosition()) or event.targetPosition or casterPos
 	
 	local hitTiles = {}
 	
@@ -194,11 +271,11 @@ function otstd.onCastSpell(event)
 	-- We got a list of all tiles, loop through and apply spell effect
 	for pos, creatures in pairs(hitTiles) do
 		local targetTile = map:getTile(pos)
-		local canCast = not targetTile or otstd.canCastSpellOnTile(spell, targetTile)
+		local canCast = not targetTile or otstd.canCastSpellOnTile(spell, caster, targetTile)
 		
 		if targetTile and canCast then
 			for _, target in ipairs(creatures) do
-				if otstd.canCastSpellOnCreature(spell, target) then
+				if otstd.canCastSpellOnCreature(spell, caster, target) then
 					if spell.damageType ~= COMBAT_NONE then
 						local amount = 0
 						if spell.formula then
@@ -272,13 +349,12 @@ end
 function otstd.onBeginCastRuneSpell(event)
 	local caster = event.caster
 	local toPos = event.targetPosition
-	local tile = map(toPos)
+	local tile = map:getTile(toPos)
 	local spell = event.spell
 	
-	if caster and typeof(caster, "Player") then
-		local playerPos = caster:getPosition()
-		
+	if typeof(caster, "Player") then
 		if tile then
+			local playerPos = caster:getPosition()
 			if playerPos.z > toPos.z then
 				player:sendCancel(RET_FIRSTGOUPSTAIRS)
 				return false
@@ -286,19 +362,72 @@ function otstd.onBeginCastRuneSpell(event)
 				player:sendCancel(RET_FIRSTGODOWNSTAIRS)
 				return false
 			else
-				if spell.needTarget and not spell.targetCreature then
+				if spell.needTarget and not event.targetCreature then
 					caster:sendCancel(RET_CANONLYUSETHISRUNEONCREATURES)
 					return false
 				end
 				
-				if spell.range and spell.range > 0 then
-					--if not Map:canThrowObjectTo(playerPos, toPos, true, range, range) then
-					--	player:sendCancel(RET_DESTINATIONOUTOFREACH)
-					--	return false;
+				if spell.range and spell.range ~= 0 then
+					--if not map:rayCast(playerPos, toPos, true, spell.range, spell.range) then
+					--	return false, RET_DESTINATIONOUTOFREACH
 					--end
+				end
+				
+				local result, retval = otstd.canCastSpellOnTile(spell, caster, tile)
+				if not result then
+					caster:sendCancel(retval)
+					return false
 				end
 
 				--TODO: Additional checks like black skull, safe-mode
+				--[[
+				if(blockingCreature && tile->getTopVisibleCreature(player) != NULL){
+					player->sendCancelMessage(RET_NOTENOUGHROOM);
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+				else if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
+					player->sendCancelMessage(RET_NOTENOUGHROOM);
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+
+				if(needTarget && tile->getTopVisibleCreature(player) == NULL){
+					player->sendCancelMessage(RET_CANONLYUSETHISRUNEONCREATURES);
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+					return false;
+				}
+
+				#ifdef __SKULLSYSTEM__
+				if(player->getSkull() == SKULL_BLACK && isAggressive){
+					if(!hasArea()){
+						Creature* targetCreature = tile->getTopVisibleCreature(player);
+						if(targetCreature){
+							Player* targetPlayer = targetCreature->getPlayer();
+							if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(player)){
+								player->sendCancelMessage(RET_YOUMAYNOTATTACKTHISPERSON);
+								g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+								return false;
+							}
+						}
+					}
+					else{
+						player->sendCancelMessage(RET_NOTPOSSIBLE);
+						g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+						return false;
+					}
+				}
+				#endif
+
+				if(player->hasSafeMode() && isAggressive && needTarget && tile->getTopVisibleCreature(player)){
+					Player* targetPlayer = tile->getTopVisibleCreature(player)->getPlayer();
+					if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->isPartner(player)){
+						player->sendCancelMessage(RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS);
+						g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+						return false;
+					}
+				}
+				]]--
 			end
 		end
 	end
@@ -664,6 +793,10 @@ function Spell:register()
 
 			event.caster = event.player
 			event.spell = self
+			if self.needTarget then
+				local tile = map:getTile(event.targetPosition)
+				event.targetCreature = tile and tile:getTopCreature()
+			end
 			
 			event.caster:sendNote("Casting rune spell " .. self.name)
 			

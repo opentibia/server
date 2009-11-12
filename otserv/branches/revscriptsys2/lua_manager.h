@@ -359,6 +359,7 @@ public:
 	int lua_Creature_getID();
 	int lua_Creature_getOrientation();
 	int lua_Creature_getHealth();
+	int lua_Creature_getMaster();
 	int lua_Creature_getHealthMax();
 	int lua_Creature_setHealth();
 	int lua_Creature_getName();
@@ -372,6 +373,7 @@ public:
 	int lua_Creature_getArmor();
 	int lua_Creature_getDefense();
 	int lua_Creature_getBaseSpeed();
+	int lua_Creature_isSummon();
 	int lua_Creature_isPushable();
 	int lua_Creature_getTarget();
 	int lua_Creature_isImmuneToCombat();
@@ -508,6 +510,7 @@ public:
 	int lua_Player_getItemCount();
 	int lua_Player_internalWalkTo();
 	int lua_Player_internalPickup();
+	int lua_Player_hasAttacked();
 
 	int lua_Player_sendMessage();
 
