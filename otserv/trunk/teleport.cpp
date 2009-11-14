@@ -102,7 +102,7 @@ void Teleport::__addThing(int32_t index, Thing* thing)
 	Tile* destTile = g_game.getTile(getDestPos().x, getDestPos().y, getDestPos().z);
 	if(destTile){
 		if(Creature* creature = thing->getCreature()){
-			getTile()->moveCreature(creature, destTile, true);
+			creature->getTile()->moveCreature(creature, destTile, true);
 			g_game.addMagicEffect(destTile->getPosition(), NM_ME_TELEPORT);
 		}
 		else if(Item* item = thing->getItem()){
