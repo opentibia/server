@@ -178,7 +178,7 @@ public:
 	std::string getAccountName() const {return accountName;}
 	uint32_t getAccountId() const {return accountId;}
 	uint32_t getLevel() const {return level;}
-	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
+	int32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
 	int16_t getAccessLevel() const {return accessLevel;}
 	int16_t getViolationLevel() const {return violationLevel;}
 	std::string getGroupName() const {return groupName;}

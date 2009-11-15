@@ -119,15 +119,15 @@ public:
 
 	int32_t getManaCost(const Player* player) const;
 	int32_t getSoulCost(const Player* player) const;
-	uint32_t getLevel() const { return level;}
-	int32_t getMagicLevel() const { return magLevel;}
-	int32_t getMana() const { return mana;}
-	int32_t getManaPercent() const { return manaPercent;}
+	uint32_t getLevel() const {return level;}
+	int32_t getMagicLevel() const {return magLevel;}
+	int32_t getMana() const {return mana;}
+	int32_t getManaPercent() const {return manaPercent;}
 	const bool isPremium() const {return premium;}
 	bool hasArea() const {return areaSpell;}
 	void setArea(bool b) {areaSpell = b;}
 	virtual bool isInstant() const = 0;
-	bool isLearnable() const { return learnable;}
+	bool isLearnable() const {return learnable;}
 
 	static ReturnValue CreateIllusion(Creature* creature, const Outfit_t outfit, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, const std::string& name, int32_t time);
