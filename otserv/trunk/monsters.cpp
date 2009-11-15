@@ -1333,7 +1333,7 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 		return false;
 	}
 
-	if(readXMLInteger(node, "countmax", intValue)){
+	if(readXMLInteger(node, "countmax", intValue) && intValue > 0){
 		lootBlock.countmax = intValue;
 
 		if(lootBlock.countmax > 100){
