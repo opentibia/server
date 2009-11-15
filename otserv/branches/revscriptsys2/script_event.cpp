@@ -2228,3 +2228,121 @@ void OnDeath::Event::update_instance(Manager& state, Environment& environment, L
 {
 	;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// OnActorLoadSpell Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when an Actor casts a spell
+
+
+OnActorLoadSpell::Event::Event(const SpellBlock& spell) :
+	spell(spell)
+{
+	propagate_by_default = true;
+}
+
+OnActorLoadSpell::Event::~Event()
+{
+}
+
+bool OnActorLoadSpell::Event::dispatch(Manager& state, Environment& environment)
+{
+	if(dispatchEvent<OnActorLoadSpell::Event>
+			(this, state, environment, environment.Generic.OnActorLoadSpell))
+		return true;
+	return false;
+}
+
+void OnActorLoadSpell::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnActorLoadSpellEvent");
+
+	state.push(spell.name);
+	state.setField(-2, "name");
+
+	//state.push(spell.damageType);
+	//state.setField(-2, "damageType");
+
+	state.push(spell.needTarget);
+	state.setField(-2, "needTarget");
+
+	state.push(spell.range);
+	state.setField(-2, "range");
+
+	state.push(spell.radius);
+	state.setField(-2, "radius");
+
+	state.push(spell.spread);
+	state.setField(-2, "spread");
+
+	state.push(spell.length);
+	state.setField(-2, "length");
+
+	state.push(spell.blockedByShield);
+	state.setField(-2, "blockedByShield");
+
+	state.push(spell.blockedByArmor);
+	state.setField(-2, "blockedByArmor");
+
+	state.push(spell.min);
+	state.setField(-2, "min");
+
+	state.push(spell.max);
+	state.setField(-2, "max");
+
+	state.push(spell.shootEffect);
+	state.setField(-2, "shootEffect");
+
+	state.push(spell.areaEffect);
+	state.setField(-2, "areaEffect");
+
+	state.push(spell.field);
+	state.setField(-2, "field");
+}
+
+void OnActorLoadSpell::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// OnActorCastSpell Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when an Actor casts a spell
+
+
+OnActorCastSpell::Event::Event(Actor* actor, Creature* target, const std::string name) :
+	actor(actor),
+	target(target),
+	name(name)
+{
+	propagate_by_default = true;
+}
+
+OnActorCastSpell::Event::~Event()
+{
+}
+
+bool OnActorCastSpell::Event::dispatch(Manager& state, Environment& environment)
+{
+	if(dispatchEvent<OnActorCastSpell::Event>
+			(this, state, environment, environment.Generic.OnActorCastSpell))
+		return true;
+	return false;
+}
+
+void OnActorCastSpell::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnActorCastSpellEvent");
+	state.pushThing(actor);
+	state.setField(-2, "actor");
+	state.pushThing(target);
+	state.setField(-2, "targetCreature");
+	state.pushString(name);
+	state.setField(-2, "spell");
+}
+
+void OnActorCastSpell::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	;
+}

@@ -54,33 +54,63 @@ struct LootBlock{
 	}
 };
 
-struct summonBlock_t{
+struct SummonBlock{
 	std::string name;
 	uint32_t chance;
 	uint32_t speed;
 };
 
-struct spellBlock_t{
-	//BaseSpell* spell;
+struct SpellBlock{
+	SpellBlock()
+	{
+		chance = 100;
+		speed = 2000;
+		name = "";
+		damageType = COMBAT_NONE;
+		range = 0;
+		min = 0;
+		max = 0;
+		blockedByShield = false;
+		blockedByArmor = false;
+		needTarget = false;
+		spread = 0;
+		length = 0;
+		radius = 0;
+		field = 0;
+
+		shootEffect = SHOOT_EFFECT_NONE;
+		areaEffect = MAGIC_EFFECT_NONE;
+	}
+
 	uint32_t chance;
 	uint32_t speed;
+
+	std::string name;
+	CombatType damageType;
 	uint32_t range;
-	int32_t minCombatValue;
-	int32_t maxCombatValue;
-	bool combatSpell;
-	bool isMelee;
+	int32_t min;
+	int32_t max;
+	bool blockedByShield;
+	bool blockedByArmor;
+	bool needTarget;
+	uint32_t spread;
+	uint32_t length;
+	uint32_t radius;
+	uint32_t field;
+
+	ShootEffect shootEffect;
+	MagicEffect areaEffect;
 };
 
-struct voiceBlock_t{
+struct VoiceBlock{
 	std::string text;
 	bool yellText;
 };
 
 typedef std::list<LootBlock> LootItems;
-typedef std::list<summonBlock_t> SummonList;
-typedef std::list<spellBlock_t> SpellList;
-typedef std::vector<voiceBlock_t> VoiceVector;
-//typedef std::list<std::string> MonsterScriptList;
+typedef std::list<SummonBlock> SummonList;
+typedef std::vector<VoiceBlock> VoiceVector;
+typedef std::list<SpellBlock> SpellList;
 typedef std::map<CombatType, int32_t> ElementMap;
 
 class CreatureType{

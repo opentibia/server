@@ -85,8 +85,6 @@ public:
 	int32_t changeTargetSpeed;
 	int32_t changeTargetChance;
 
-	//MonsterScriptList scriptList;
-
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
 	Item* createLootItem(const LootBlock& lootblock);

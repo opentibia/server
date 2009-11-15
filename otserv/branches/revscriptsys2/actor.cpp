@@ -80,9 +80,6 @@ Actor::Actor(CreatureType _cType) : Creature(), cType(_cType)
 	internalLight.level = cType.lightLevel();
 	internalLight.color = cType.lightColor();
 
-	minCombatValue = 0;
-	maxCombatValue = 0;
-
 	targetTicks = 0;
 	targetChangeTicks = 0;
 	targetChangeCooldown = 0;
@@ -173,7 +170,7 @@ void Actor::onAttackedCreatureDissapear(bool isLogout)
 #endif
 
 	attackTicks = 0;
-	extraMeleeAttack = true;
+	//extraMeleeAttack = true;
 }
 
 void Actor::onFollowCreatureDissapear(bool isLogout)
@@ -727,29 +724,24 @@ void Actor::doAttacking(uint32_t interval)
 					updateLook = false;
 				}
 
-				minCombatValue = it->minCombatValue;
-				maxCombatValue = it->maxCombatValue;
-				// REVSCRIPT TODO Monsters should cast spells
-				//it->spell->castSpell(this, attackedCreature);
+				g_game.onActorCastSpell(this, attackedCreature, (*it).name);
+				/*
 				if(it->isMelee){
 					extraMeleeAttack = false;
 				}
-
-#ifdef __DEBUG__
-				static uint64_t prevTicks = OTSYS_TIME();
-				std::cout << "doAttacking ticks: " << OTSYS_TIME() - prevTicks << std::endl;
-				prevTicks = OTSYS_TIME();
-#endif
+				*/
 			}
 		}
 
 		if(inRange){
 			outOfRange = false;
 		}
+		/*
 		else if(it->isMelee){
 			//melee swing out of reach
 			extraMeleeAttack = true;
 		}
+		*/
 	}
 
 	if(updateLook){
@@ -778,11 +770,12 @@ bool Actor::canUseAttack(const Position& pos, const Creature* target) const
 }
 
 bool Actor::canUseSpell(const Position& pos, const Position& targetPos,
-	const spellBlock_t& sb, uint32_t interval, bool& inRange)
+	const SpellBlock& sb, uint32_t interval, bool& inRange)
 {
 	inRange = true;
 
-	if(!sb.isMelee || !extraMeleeAttack){
+	//if(!sb.isMelee || !extraMeleeAttack){
+	if(!extraMeleeAttack){
 		if(sb.speed > attackTicks){
 			resetTicks = false;
 			return false;
@@ -851,10 +844,7 @@ void Actor::onThinkDefense(uint32_t interval)
 		}
 
 		if((it->chance >= (uint32_t)random_range(1, 100))){
-			minCombatValue = it->minCombatValue;
-			maxCombatValue = it->maxCombatValue;
-			// REVSCRIPT TODO Monsters should cast spells
-			// it->spell->castSpell(this, this);
+			g_game.onActorCastSpell(this, NULL, (*it).name);
 		}
 	}
 
@@ -907,7 +897,7 @@ void Actor::onThinkYell(uint32_t interval)
 
 			if(!cType.voiceVector().empty() && (cType.yellChance() >= (uint32_t)random_range(1, 100))){
 				uint32_t index = random_range(0, cType.voiceVector().size() - 1);
-				const voiceBlock_t& vb = cType.voiceVector()[index];
+				const VoiceBlock& vb = cType.voiceVector()[index];
 
 				if(vb.yellText){
 					g_game.internalCreatureSay(this, SPEAK_MONSTER_YELL, vb.text);
@@ -1302,17 +1292,6 @@ bool Actor::inDespawnRange(const Position& pos)
 bool Actor::despawn()
 {
 	return inDespawnRange(getPosition());
-}
-
-bool Actor::getCombatValues(int32_t& min, int32_t& max)
-{
-	if(minCombatValue == 0 && maxCombatValue == 0){
-		return false;
-	}
-
-	min = minCombatValue;
-	max = maxCombatValue;
-	return true;
 }
 
 void Actor::updateLookDirection()

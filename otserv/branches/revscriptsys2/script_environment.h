@@ -109,6 +109,8 @@ namespace Script {
 			ListenerList OnKill;
 			ListenerList OnDeathBy;
 			ListenerList OnDeath;
+			ListenerList OnActorLoadSpell;
+			ListenerList OnActorCastSpell;
 		} Generic;
 		SpecificListenerMap specific_listeners;
 

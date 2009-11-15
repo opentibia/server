@@ -72,6 +72,7 @@ class InternalCreatureType;
 class ServiceManager;
 class Commands;
 class ChatChannel;
+struct SpellBlock;
 struct OutfitType;
 struct Outfit;
 class Waypoint;

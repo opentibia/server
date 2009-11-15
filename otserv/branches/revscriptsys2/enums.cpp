@@ -406,6 +406,8 @@ template<> void Script::ListenerType__Base::initialize()
 	initAddValue(Script::enums::ON_ATTACK_LISTENER, "ON_ATTACK_LISTENER", true);
 	initAddValue(Script::enums::ON_DAMAGE_LISTENER, "ON_DAMAGE_LISTENER", true);
 	initAddValue(Script::enums::ON_CONDITION_LISTENER, "ON_CONDITION_LISTENER", true);
+	initAddValue(Script::enums::ON_ACTOR_LOAD_SPELL_LISTENER, "ON_ACTOR_LOAD_SPELL_LISTENER", true);
+	initAddValue(Script::enums::ON_ACTOR_CAST_SPELL_LISTENER, "ON_ACTOR_CAST_SPELL_LISTENER", true);
 	initAddValue(Script::enums::ON_THINK_LISTENER, "ON_THINK_LISTENER", true);
 	initAddValue(Script::enums::ON_HEAR_LISTENER, "ON_HEAR_LISTENER", true);
 	initAddValue(Script::enums::ON_SPOT_CREATURE_LISTENER, "ON_SPOT_CREATURE_LISTENER", true);

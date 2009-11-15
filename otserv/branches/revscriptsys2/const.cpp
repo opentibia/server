@@ -104,10 +104,12 @@ template<> void MagicEffect__Base::initialize()
 	initAddValue(enums::MAGIC_EFFECT_EXPLOSION_AREA, "explosionarea", false);
 	initAddValue(enums::MAGIC_EFFECT_EXPLOSION_HIT, "MAGIC_EFFECT_EXPLOSION_HIT", true);
 	initAddValue(enums::MAGIC_EFFECT_EXPLOSION_HIT, "explosionhit", false);
+	initAddValue(enums::MAGIC_EFFECT_EXPLOSION_HIT, "explosion", false);
 	initAddValue(enums::MAGIC_EFFECT_FIRE_AREA, "MAGIC_EFFECT_FIRE_AREA", true);
 	initAddValue(enums::MAGIC_EFFECT_FIRE_AREA, "firearea", false);
 	initAddValue(enums::MAGIC_EFFECT_YELLOW_RING, "MAGIC_EFFECT_YELLOW_RING", true);
 	initAddValue(enums::MAGIC_EFFECT_YELLOW_RING, "yellowring", false);
+	initAddValue(enums::MAGIC_EFFECT_YELLOW_RING, "yellowbubble", false);
 	initAddValue(enums::MAGIC_EFFECT_GREEN_RING, "MAGIC_EFFECT_GREEN_RING", true);
 	initAddValue(enums::MAGIC_EFFECT_GREEN_RING, "greenring", false);
 	initAddValue(enums::MAGIC_EFFECT_GREEN_RING, "greenbubble", false);
@@ -119,6 +121,7 @@ template<> void MagicEffect__Base::initialize()
 	initAddValue(enums::MAGIC_EFFECT_BLUE_BUBBLE, "teleport", false);
 	initAddValue(enums::MAGIC_EFFECT_ENERGY_HIT, "MAGIC_EFFECT_ENERGY_HIT", true);
 	initAddValue(enums::MAGIC_EFFECT_ENERGY_HIT, "energyhit", false);
+	initAddValue(enums::MAGIC_EFFECT_ENERGY_HIT, "energy", false);
 	initAddValue(enums::MAGIC_EFFECT_BLUE_SHIMMER, "MAGIC_EFFECT_BLUE_SHIMMER", true);
 	initAddValue(enums::MAGIC_EFFECT_BLUE_SHIMMER, "blueshimmer", false);
 	initAddValue(enums::MAGIC_EFFECT_RED_SHIMMER, "MAGIC_EFFECT_RED_SHIMMER", true);
@@ -134,6 +137,7 @@ template<> void MagicEffect__Base::initialize()
 	initAddValue(enums::MAGIC_EFFECT_DEATH_AREA, "MAGIC_EFFECT_DEATH_AREA", true);
 	initAddValue(enums::MAGIC_EFFECT_DEATH_AREA, "deatharea", false);
 	initAddValue(enums::MAGIC_EFFECT_DEATH_AREA, "blackbubble", false);
+	initAddValue(enums::MAGIC_EFFECT_DEATH_AREA, "mortarea", false);
 	initAddValue(enums::MAGIC_EFFECT_GREEN_NOTE, "MAGIC_EFFECT_GREEN_NOTE", true);
 	initAddValue(enums::MAGIC_EFFECT_GREEN_NOTE, "greennote", false);
 	initAddValue(enums::MAGIC_EFFECT_RED_NOTE, "MAGIC_EFFECT_RED_NOTE", true);
@@ -174,6 +178,7 @@ template<> void MagicEffect__Base::initialize()
 	initAddValue(enums::MAGIC_EFFECT_HEART, "heart", false);
 	initAddValue(enums::MAGIC_EFFECT_FIRE_SPARK, "MAGIC_EFFECT_FIRE_SPARK", true);
 	initAddValue(enums::MAGIC_EFFECT_FIRE_SPARK, "firespark", false);
+	initAddValue(enums::MAGIC_EFFECT_FIRE_SPARK, "fireattack", false);
 	initAddValue(enums::MAGIC_EFFECT_ENERGY_AREA, "MAGIC_EFFECT_ENERGY_AREA", true);
 	initAddValue(enums::MAGIC_EFFECT_ENERGY_AREA, "energyarea", false);
 	initAddValue(enums::MAGIC_EFFECT_SMALLCLOUDS, "MAGIC_EFFECT_SMALLCLOUDS", true);
@@ -188,6 +193,7 @@ template<> void MagicEffect__Base::initialize()
 	initAddValue(enums::MAGIC_EFFECT_ICE_TORNADO, "icetornado", false);
 	initAddValue(enums::MAGIC_EFFECT_ICE_HIT, "MAGIC_EFFECT_ICE_HIT", true);
 	initAddValue(enums::MAGIC_EFFECT_ICE_HIT, "icehit", false);
+	initAddValue(enums::MAGIC_EFFECT_ICE_HIT, "iceattack", false);
 	initAddValue(enums::MAGIC_EFFECT_STONES, "MAGIC_EFFECT_STONES", true);
 	initAddValue(enums::MAGIC_EFFECT_STONES, "stones", false);
 	initAddValue(enums::MAGIC_EFFECT_SMALLPLANTS, "MAGIC_EFFECT_SMALLPLANTS", true);
@@ -202,6 +208,7 @@ template<> void MagicEffect__Base::initialize()
 	initAddValue(enums::MAGIC_EFFECT_HOLY_AREA, "holyarea", false);
 	initAddValue(enums::MAGIC_EFFECT_ROOTS, "MAGIC_EFFECT_ROOTS", true);
 	initAddValue(enums::MAGIC_EFFECT_ROOTS, "roots", false);
+	initAddValue(enums::MAGIC_EFFECT_ROOTS, "bigplants", false);
 	initAddValue(enums::MAGIC_EFFECT_CAKE, "MAGIC_EFFECT_CAKE", true);
 	initAddValue(enums::MAGIC_EFFECT_CAKE, "cake", false);
 	initAddValue(enums::MAGIC_EFFECT_ICE_SPIKE, "MAGIC_EFFECT_ICE_SPIKE", true);

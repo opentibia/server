@@ -299,6 +299,8 @@ public:
 	int lua_registerSpecificEvent_OnTradeBegin();
 	int lua_registerGenericEvent_OnTradeEnd();
 	int lua_registerSpecificEvent_OnTradeEnd();
+	int lua_registerGenericEvent_onActorLoadSpell();
+	int lua_registerGenericEvent_onActorCastSpell();
 
 	int lua_stopListener();
 
@@ -442,22 +444,6 @@ public:
 	int lua_Actor_setDamageImmunities();
 	int lua_Actor_openShop();
 	int lua_Actor_closeShop();
-
-	/*
-	TODO:
-	SummonList summonList;
-	LootItems lootItems;
-	ElementMap elementMap;
-	SpellList spellAttackList;
-	SpellList spellDefenseList;
-
-	uint32_t yellChance;
-	uint32_t yellSpeedTicks;
-	VoiceVector voiceVector;
-
-	int32_t changeTargetSpeed;
-	int32_t changeTargetChance;
-	*/
 
 	// - - - Player
 	int lua_Player_getFood();

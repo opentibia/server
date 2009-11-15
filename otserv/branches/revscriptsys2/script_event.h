@@ -1178,6 +1178,57 @@ namespace Script {
 			Creature* killer;
 		};
 	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnActorLoadSpell event
+	// Triggered while loading a spell (happens during startup/reload)
+
+	namespace OnActorLoadSpell {
+		class Event : public Script::Event {
+		public:
+			Event(const SpellBlock& spell);
+			~Event();
+
+			std::string getName() const {return "OnActorLoadSpell";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Actor* actor;
+			const SpellBlock& spell;
+		};
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	// OnActorCastSpell event
+	// Triggered when an Actor casts a spell
+
+	namespace OnActorCastSpell {
+		class Event : public Script::Event {
+		public:
+			Event(Actor* actor, Creature* target, const std::string name);
+			~Event();
+
+			std::string getName() const {return "OnActorCastSpell";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Actor* actor;
+			Creature* target;
+			std::string name;
+		};
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

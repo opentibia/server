@@ -151,6 +151,8 @@ void Manager::registerClasses() {
 	registerClass("OnConditionEffectEvent", "Event");
 	registerClass("OnAttackEvent", "Event");
 	registerClass("OnDamageEvent", "Event");
+	registerClass("OnActorLoadSpellEvent", "Event");
+	registerClass("OnActorCastSpellEvent", "Event");
 
 	registerClass("Thing");
 	registerClass("Creature", "Thing");
@@ -566,6 +568,9 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnDeath([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnDeath);
 	registerGlobalFunction("registerOnCreatureDeath(Creature creature [, string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDeath);
 
+	// OnActorLoadSpell/OnActorCastSpell
+	registerGlobalFunction("registerOnActorLoadSpell(function callback)", &Manager::lua_registerGenericEvent_onActorLoadSpell);
+	registerGlobalFunction("registerOnActorCastSpell(function callback)", &Manager::lua_registerGenericEvent_onActorCastSpell);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
@@ -2631,6 +2636,32 @@ int LuaState::lua_registerSpecificEvent_OnDeath() {
 
 	environment->registerSpecificListener(listener);
 	who->addListener(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_onActorLoadSpell() {
+	Listener_ptr listener(new Listener(ON_ACTOR_LOAD_SPELL_LISTENER, boost::any(), *manager));
+
+	environment->Generic.OnActorLoadSpell.push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_onActorCastSpell() {
+	Listener_ptr listener(new Listener(ON_ACTOR_CAST_SPELL_LISTENER, boost::any(), *manager));
+
+	environment->Generic.OnActorCastSpell.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());

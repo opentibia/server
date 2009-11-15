@@ -172,11 +172,11 @@ end
 function otstd.onSpell(event)
 	local caster = event.caster
 	local spell = event.spell
-			
+	
 	if otstd.onSpellCheck(event) then
 		-- Check extra conditions
 		if (not spell.internalBeginCast or spell.internalBeginCast(event)) and (not spell.onBeginCast or spell.onBeginCast(event)) then
-			
+		
 			-- Cast the spell!
 			if spell.onCast then
 				-- Normal (low-level) cast function has been overridden
@@ -514,7 +514,7 @@ function formulaLevelMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelt
 	end
 	
 	return function(player)
-		return -math.random(
+		return math.random(
 				math.max(minFloor, minAbsolute + (player:getLevel() / 5 + player:getMagicLevel() * minDelta)),
 				math.max(maxFloor, maxAbsolute + (player:getLevel() / 5 + player:getMagicLevel() * maxDelta)))
 	end
@@ -536,7 +536,7 @@ function formulaOldLevelMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxD
 	end
 	
 	return function(player)
-		return -math.random(
+		return math.random(
 				math.max(minFloor, minAbsolute + (player:getLevel() / 3 + player:getMagicLevel() * 2) * minDelta),
 				math.max(maxFloor, maxAbsolute + (player:getLevel() / 3 + player:getMagicLevel() * 2) * maxDelta))
 	end
@@ -558,7 +558,7 @@ function formulaLevel(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelta, ma
 	end
 	
 	return function(player)
-		return -math.random(
+		return math.random(
 				math.max(minFloor, minAbsolute + player:getLevel() * minDelta),
 				math.max(maxFloor, maxAbsolute + player:getLevel() * maxDelta))
 	end
@@ -580,18 +580,20 @@ function formulaMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelta, ma
 	end
 	
 	return function(player)
-		return -math.random(
+		return math.random(
 				math.max(minFloor, minAbsolute + player:getMagicLevel() * minDelta),
 				math.max(maxFloor, maxAbsolute + player:getMagicLevel() * maxDelta))
 	end
 end
 
 function formulaStatic(minFloor, maxFloor)
-	return function(player)
-		return -math.random(
-				minFloor,
-				maxFloor)
+	if minFloor > maxFloor then
+		local v = maxFloor
+		maxFloor = minFloor
+		minFloor = v
 	end
+	
+	return function(player) return math.random(minFloor, maxFloor) end	
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -603,42 +605,52 @@ end
 function Spell:cast(caster, target)
 	local spellThread = nil
 	
+	-- Construct a virtual event
+	local event = {}
+	
 	if self.words then
 		-- Instant spell
 		
-		-- Construct a virtual event
-		local event = {}
+		event.class = SPEAK_SAY
 		if type(target) == "string" then
 			event.text = target
+
+			local param = string.strip_whitespace(string.sub(event.text, self.words:len()+1) or "")
+			if self.needTarget then
+				event.targetCreature = getPlayerByName(param)
+			elseif self.maybeTarget then
+				event.targetCreature = caster:getTarget()
+			end
 		else
 			event.text = ""
+			if typeof(target, "Creature") then
+				event.targetCreature = target
+			elseif typeof(target, "Position") then
+				event.targetPosition = target
+			end
 		end
 		
 		event.spell = self
 		event.caster = caster
 		event.creature = caster
-		event.class = SPEAK_SAY
-		
-		local param = string.strip_whitespace(string.sub(event.text, self.words:len()+1) or "")
-		if self.needTarget then
-			event.targetCreature = getPlayerByName(param)
-		elseif self.maybeTarget then
-			event.targetCreature = caster:getTarget()
-		end
 		
 		if self.onSay then
 			spellThread = coroutine.create(self.onSay)
 		else
-			spellThread = coroutine.create(otstd.onSaySpell)
+			spellThread = coroutine.create(otstd.onSpell)
 		end
 	elseif self.rune ~= 0 and self.rune then
 		-- Rune spell
+		return false
 	end
 	
 	-- Invoke the coroutine
 	while true do
-		status, ret, param = coroutine.resume(spellThread, event)
-		assert(status, "Casting spell " .. self.name .. " failed.")
+		state, ret = coroutine.resume(spellThread, event)
+		if not state then
+			error(ret)
+			break
+		end
 		
 		if ret == "WAIT" then
 			-- Pass waits on

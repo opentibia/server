@@ -24,6 +24,9 @@
 #include "condition.h"
 #include "tools.h"
 #include "item.h"
+#include "game.h"
+
+extern Game g_game;
 
 CreatureManager::CreatureManager()
 {
@@ -34,7 +37,7 @@ CreatureManager::~CreatureManager()
 {
 }
 
-bool CreatureManager::loadFromXml(const std::string& _datadir,bool reloading /*= false*/)
+bool CreatureManager::loadFromXml(const std::string& _datadir, bool reloading /*= false*/)
 {
 	loaded = false;
 	datadir = _datadir;
@@ -86,25 +89,10 @@ bool CreatureManager::reload()
 	return loadFromXml(datadir, true);
 }
 
-/*
-bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description)
+bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 {
-	sb.chance = 100;
-	sb.speed = 2000;
-	sb.range = 0;
-	sb.minCombatValue = 0;
-	sb.maxCombatValue = 0;
-	sb.combatSpell = false;
-	sb.isMelee = false;
-
 	std::string name = "";
-	std::string scriptName = "";
-	bool isScripted = false;
-
-	if(readXMLString(node, "script", scriptName)){
-		isScripted = true;
-	}
-	else if(!readXMLString(node, "name", name)){
+	if(!readXMLString(node, "name", name)){
 		return false;
 	}
 
@@ -119,7 +107,7 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 			intValue = 100;
 		}
 
-		sb.chance(intValue);
+		sb.chance = intValue;
 	}
 
 	if(readXMLInteger(node, "range", intValue)){
@@ -131,387 +119,344 @@ bool CreatureDatabase::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const
 			intValue = Map::maxViewportX * 2;
 		}
 
-		sb.range(intValue);
+		sb.range = intValue;
 	}
 
 	if(readXMLInteger(node, "min", intValue)){
-		sb.minCombatValue(intValue);
+		sb.min = intValue;
 	}
 
 	if(readXMLInteger(node, "max", intValue)){
-		sb.maxCombatValue(intValue);
+		sb.max = intValue;
+	}
 
-		//normalize values
-		if(std::abs(sb.minCombatValue) > std::abs(sb.maxCombatValue)){
-			int32_t value = sb.maxCombatValue;
-			sb.maxCombatValue = sb.minCombatValue;
-			sb.minCombatValue = value;
+	//normalize values
+	if(std::abs(sb.min) > std::abs(sb.max)){
+		std::swap(sb.max, sb.min);
+	}
+
+	if(readXMLInteger(node, "length", intValue)){
+		sb.length = intValue;
+
+		if(sb.length > 0){
+			sb.spread = 3;
+
+			//need direction spell
+			if(readXMLInteger(node, "spread", intValue)){
+				sb.spread = std::max(0, intValue);
+			}
 		}
 	}
 
-	if((sb.spell = g_spells->getSpellByName(name))){
-		return true;
-	}
+	if(readXMLInteger(node, "radius", intValue)){
+		sb.radius = intValue;
 
-	CombatSpell* combatSpell = NULL;
-	bool needTarget = false;
-	bool needDirection = false;
-
-	if(isScripted){
-		if(readXMLInteger(node, "direction", intValue)){
-			needDirection = (intValue == 1);
-		}
-
+		//target spell
 		if(readXMLInteger(node, "target", intValue)){
-			needTarget = (intValue != 0);
+			sb.needTarget = (intValue != 0);
 		}
-
-		combatSpell = new CombatSpell(NULL, needTarget, needDirection);
-
-		std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
-		if(!combatSpell->loadScript(datadir + g_spells->getScriptBaseName() + "/scripts/" + scriptName)){
-			return false;
-		}
-
-		if(!combatSpell->loadScriptCombat()){
-			return false;
-		}
-
-		combatSpell->getCombat()->setPlayerCombatValues(FORMULA_VALUE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
 	}
-	else{
-		Combat* combat = new Combat;
-		sb.combatSpell = true;
 
-		if(readXMLInteger(node, "length", intValue)){
-			int32_t length(intValue);
-
-			if(length > 0){
-				int32_t spread = 3;
-
-				//need direction spell
-				if(readXMLInteger(node, "spread", intValue)){
-					spread = std::max(0, intValue);
-				}
-
-				CombatArea* area = new CombatArea();
-				area->setupArea(length, spread);
-				combat->setArea(area);
-
-				needDirection = true;
+	if(asLowerCaseString(name) == "melee"){
+		int32_t attackValue = 0;
+		int32_t attackSkill = 0;
+		if(readXMLInteger(node, "attack", attackValue)){
+			if(readXMLInteger(node, "skill", attackSkill)){
+				sb.min = 0;
+				sb.max = -(int32_t)std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5));
 			}
 		}
 
-		if(readXMLInteger(node, "radius", intValue)){
-			int32_t radius(intValue);
+		/*
+		ConditionType conditionType = CONDITION_NONE;
+		int32_t minDamage = 0;
+		int32_t maxDamage = 0;
+		int32_t startDamage = 0;
+		uint32_t tickInterval = 2000;
 
-			//target spell
-			if(readXMLInteger(node, "target", intValue)){
-				needTarget = (intValue != 0);
-			}
+		if(readXMLInteger(node, "fire", intValue)){
+			conditionType = CONDITION_FIRE;
 
-			CombatArea* area = new CombatArea();
-			area->setupArea(radius);
-			combat->setArea(area);
+			minDamage(intValue);
+			maxDamage(intValue);
+			tickInterval = 10000;
+		}
+		else if(readXMLInteger(node, "poison", intValue)){
+			conditionType = CONDITION_POISON;
+
+			minDamage(intValue);
+			maxDamage(intValue);
+			tickInterval = 5000;
+		}
+		else if(readXMLInteger(node, "energy", intValue)){
+			conditionType = CONDITION_ENERGY;
+
+			minDamage(intValue);
+			maxDamage(intValue);
+			tickInterval = 10000;
+		}
+		else if(readXMLInteger(node, "drown", intValue)){
+			conditionType = CONDITION_DROWN;
+
+			minDamage(intValue);
+			maxDamage(intValue);
+			tickInterval = 10000;
+		}
+		else if(readXMLInteger(node, "freeze", intValue)){
+			conditionType = CONDITION_FREEZING;
+
+			minDamage(intValue);
+			maxDamage(intValue);
+			tickInterval = 10000;
+		}
+		else if(readXMLInteger(node, "dazzle", intValue)){
+			conditionType = CONDITION_DAZZLED;
+
+			minDamage(intValue);
+			maxDamage(intValue);
+			tickInterval = 10000;
+		}
+		else if(readXMLInteger(node, "curse", intValue)){
+			conditionType = CONDITION_CURSED;
+
+			minDamage(intValue);
+			maxDamage(intValue);
+			tickInterval = 10000;
 		}
 
-		if(asLowerCaseString(name) == "melee"){
-			int attack = 0;
-			int skill = 0;
-			sb.isMelee = true;
-			if(readXMLInteger(node, "attack", attack)){
-				if(readXMLInteger(node, "skill", skill)){
-					sb.minCombatValue = 0;
-					sb.maxCombatValue = -Weapons::getMaxMeleeDamage(skill, attack);
-				}
-			}
-
-			ConditionType conditionType = CONDITION_NONE;
-			int32_t minDamage = 0;
-			int32_t maxDamage = 0;
-			int32_t startDamage = 0;
-			uint32_t tickInterval = 2000;
-
-			if(readXMLInteger(node, "fire", intValue)){
-				conditionType = CONDITION_FIRE;
-
-				minDamage(intValue);
-				maxDamage(intValue);
-				tickInterval = 10000;
-			}
-			else if(readXMLInteger(node, "poison", intValue)){
-				conditionType = CONDITION_POISON;
-
-				minDamage(intValue);
-				maxDamage(intValue);
-				tickInterval = 5000;
-			}
-			else if(readXMLInteger(node, "energy", intValue)){
-				conditionType = CONDITION_ENERGY;
-
-				minDamage(intValue);
-				maxDamage(intValue);
-				tickInterval = 10000;
-			}
-			else if(readXMLInteger(node, "drown", intValue)){
-				conditionType = CONDITION_DROWN;
-
-				minDamage(intValue);
-				maxDamage(intValue);
-				tickInterval = 10000;
-			}
-			else if(readXMLInteger(node, "freeze", intValue)){
-				conditionType = CONDITION_FREEZING;
-
-				minDamage(intValue);
-				maxDamage(intValue);
-				tickInterval = 10000;
-			}
-			else if(readXMLInteger(node, "dazzle", intValue)){
-				conditionType = CONDITION_DAZZLED;
-
-				minDamage(intValue);
-				maxDamage(intValue);
-				tickInterval = 10000;
-			}
-			else if(readXMLInteger(node, "curse", intValue)){
-				conditionType = CONDITION_CURSED;
-
-				minDamage(intValue);
-				maxDamage(intValue);
-				tickInterval = 10000;
-			}
-
-			if(readXMLInteger(node, "tick", intValue) && intValue > 0){
-				tickInterval(intValue);
-			}
-
-			if(conditionType != CONDITION_NONE){
-				Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
-				combat->setCondition(condition);
-			}
-
-			sb.range = 1;
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_PHYSICALDAMAGE);
-			combat->setParam(COMBATPARAM_BLOCKEDBYARMOR, 1);
-			combat->setParam(COMBATPARAM_BLOCKEDBYSHIELD, 1);
+		if(readXMLInteger(node, "tick", intValue) && intValue > 0){
+			tickInterval(intValue);
 		}
-		else if(asLowerCaseString(name) == "physical"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_PHYSICALDAMAGE);
-			combat->setParam(COMBATPARAM_BLOCKEDBYARMOR, 1);
-		}
-		else if(asLowerCaseString(name) == "poison" || asLowerCaseString(name) == "earth"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_EARTHDAMAGE);
-		}
-		else if(asLowerCaseString(name) == "fire"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_FIREDAMAGE);
-		}
-		else if(asLowerCaseString(name) == "energy"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_ENERGYDAMAGE);
-		}
-		else if(asLowerCaseString(name) == "drown"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DROWNDAMAGE);
-		}
-		else if(asLowerCaseString(name) == "ice"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_ICEDAMAGE);
-		}
-		else if(asLowerCaseString(name) == "holy"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_HOLYDAMAGE);
-		}
-		else if(asLowerCaseString(name) == "death"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_DEATHDAMAGE);
-		}
-		else if(asLowerCaseString(name) == "lifedrain"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_LIFEDRAIN);
-		}
-		else if(asLowerCaseString(name) == "manadrain"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_MANADRAIN);
-		}
-		else if(asLowerCaseString(name) == "healing"){
-			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_HEALING);
-			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
-		}
-		else if(asLowerCaseString(name) == "speed"){
-			int32_t speedChange = 0;
-			int32_t duration = 10000;
 
-			if(readXMLInteger(node, "duration", intValue)){
-				duration(intValue);
-			}
-
-			if(readXMLInteger(node, "speedchange", intValue)){
-				speedChange(intValue);
-
-				if(speedChange < -1000){
-					//cant be slower than 100%
-					speedChange = -1000;
-				}
-			}
-
-			ConditionType conditionType;
-			if(speedChange > 0){
-				conditionType = CONDITION_HASTE;
-				combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
-			}
-			else{
-				conditionType = CONDITION_PARALYZE;
-			}
-
-			ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, duration, 0));
-			condition->setFormulaVars(speedChange / 1000.0, 0, speedChange / 1000.0, 0);
-			combat->setCondition(condition);
-		}
-		else if(asLowerCaseString(name) == "outfit"){
-			int32_t duration = 10000;
-
-			if(readXMLInteger(node, "duration", intValue)){
-				duration(intValue);
-			}
-
-			if(readXMLString(node, "monster", strValue)){
-				MonsterType* mType = g_creature_types.getMonsterType(strValue);
-				if(mType){
-					ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
-					condition->addOutfit(mType->outfit);
-					combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
-					combat->setCondition(condition);
-				}
-			}
-			else if(readXMLInteger(node, "item", intValue)){
-				OutfitType outfit;
-				outfit.lookTypeEx(intValue);
-
-				ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
-				condition->addOutfit(outfit);
-				combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
-				combat->setCondition(condition);
-			}
-		}
-		else if(asLowerCaseString(name) == "invisible"){
-			int32_t duration = 10000;
-
-			if(readXMLInteger(node, "duration", intValue)){
-				duration(intValue);
-			}
-
-			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
-			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
-			combat->setCondition(condition);
-		}
-		else if(asLowerCaseString(name) == "drunk"){
-			int32_t duration = 10000;
-
-			if(readXMLInteger(node, "duration", intValue)){
-				duration(intValue);
-			}
-
-			Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, 0);
-			combat->setCondition(condition);
-		}
-		else if(asLowerCaseString(name) == "firefield"){
-			combat->setParam(COMBATPARAM_CREATEITEM, 1492);
-		}
-		else if(asLowerCaseString(name) == "poisonfield"){
-			combat->setParam(COMBATPARAM_CREATEITEM, 1496);
-		}
-		else if(asLowerCaseString(name) == "energyfield"){
-			combat->setParam(COMBATPARAM_CREATEITEM, 1495);
-		}
-		else if(asLowerCaseString(name) == "firecondition" ||
-				asLowerCaseString(name) == "poisoncondition" ||
-				asLowerCaseString(name) == "energycondition" ||
-				asLowerCaseString(name) == "drowncondition"){
-			ConditionType conditionType = CONDITION_NONE;
-			uint32_t tickInterval = 2000;
-
-			if(name == "firecondition"){
-				conditionType = CONDITION_FIRE;
-				tickInterval = 10000;
-			}
-			else if(name == "poisoncondition"){
-				conditionType = CONDITION_POISON;
-				tickInterval = 5000;
-			}
-			else if(name == "energycondition"){
-				conditionType = CONDITION_ENERGY;
-				tickInterval = 10000;
-			}
-			else if(name == "drowncondition"){
-				conditionType = CONDITION_DROWN;
-				tickInterval = 5000;
-			}
-
-			if(readXMLInteger(node, "tick", intValue) && intValue > 0){
-				tickInterval(intValue);
-			}
-
-			int32_t minDamage = std::abs(sb.minCombatValue);
-			int32_t maxDamage = std::abs(sb.maxCombatValue);
-			int32_t startDamage = 0;
-
-			if(readXMLInteger(node, "start", intValue)){
-				intValue = std::abs(intValue);
-
-				if(intValue <= minDamage){
-					startDamage(intValue);
-				}
-			}
-
+		if(conditionType != CONDITION_NONE){
 			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
 			combat->setCondition(condition);
 		}
-		else if(asLowerCaseString(name) == "strength"){
-			//
+
+		sb.range = 1;
+		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_PHYSICALDAMAGE);
+		combat->setParam(COMBATPARAM_BLOCKEDBYARMOR, 1);
+		combat->setParam(COMBATPARAM_BLOCKEDBYSHIELD, 1);
+		*/
+	}
+	else if(asLowerCaseString(name) == "physical"){
+		sb.damageType = COMBAT_PHYSICALDAMAGE;
+		sb.blockedByArmor = true;
+	}
+	else if(asLowerCaseString(name) == "poison" || asLowerCaseString(name) == "earth"){
+		sb.damageType = COMBAT_EARTHDAMAGE;
+	}
+	else if(asLowerCaseString(name) == "fire"){
+		sb.damageType = COMBAT_FIREDAMAGE;
+	}
+	else if(asLowerCaseString(name) == "energy"){
+		sb.damageType = COMBAT_ENERGYDAMAGE;
+	}
+	else if(asLowerCaseString(name) == "drown"){
+		sb.damageType = COMBAT_DROWNDAMAGE;
+	}
+	else if(asLowerCaseString(name) == "ice"){
+		sb.damageType = COMBAT_ICEDAMAGE;
+	}
+	else if(asLowerCaseString(name) == "holy"){
+		sb.damageType = COMBAT_HOLYDAMAGE;
+	}
+	else if(asLowerCaseString(name) == "death"){
+		sb.damageType = COMBAT_DEATHDAMAGE;
+	}
+	else if(asLowerCaseString(name) == "lifedrain"){
+		sb.damageType = COMBAT_LIFEDRAIN;
+	}
+	else if(asLowerCaseString(name) == "manadrain"){
+		sb.damageType = COMBAT_MANADRAIN;
+	}
+	else if(asLowerCaseString(name) == "healing"){
+		sb.damageType = COMBAT_HEALING;
+	}
+	else if(asLowerCaseString(name) == "speed" || asLowerCaseString(name) == "paralyze"){
+		int32_t speedChange = 0;
+		int32_t duration = 10000;
+
+		if(readXMLInteger(node, "duration", intValue)){
+			duration = intValue;
+		}
+
+		if(readXMLInteger(node, "speedchange", intValue)){
+			speedChange = intValue;
+
+			if(speedChange < -1000){
+				//cant be slower than 100%
+				speedChange = -1000;
+			}
+		}
+
+		/*
+		ConditionType conditionType;
+		if(speedChange > 0){
+			conditionType = CONDITION_HASTE;
+			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
 		}
 		else{
-			std::cout << "Error: [CreatureDatabase::deserializeSpell] - " << description <<  " - Unknown spell name: " << name << std::endl;
-			delete combat;
-			return false;
+			conditionType = CONDITION_PARALYZE;
 		}
 
-		combat->setPlayerCombatValues(FORMULA_VALUE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
-		combatSpell = new CombatSpell(combat, needTarget, needDirection);
+		ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, duration, 0));
+		condition->setFormulaVars(speedChange / 1000.0, 0, speedChange / 1000.0, 0);
+		combat->setCondition(condition);
+		*/
+	}
+	else if(asLowerCaseString(name) == "outfit"){
+		int32_t duration = 10000;
 
-		xmlNodePtr attributeNode = node->children;
+		if(readXMLInteger(node, "duration", intValue)){
+			duration = intValue;
+		}
 
-		while(attributeNode){
-			if(xmlStrcmp(attributeNode->name, (const xmlChar*)"attribute") == 0){
-				if(readXMLString(attributeNode, "key", strValue)){
-					if(asLowerCaseString(strValue) == "shooteffect"){
-						if(readXMLString(attributeNode, "value", strValue)){
-							ShootType_t shoot = getShootType(strValue);
-							if(shoot != SHOOT_EFFECT_UNK){
-								combat->setParam(COMBATPARAM_DISTANCEEFFECT, shoot);
-							}
-							else{
-								std::cout << "Warning: [CreatureDatabase::deserializeSpell] - "  << description << " - Unknown shootEffect: " << strValue << std::endl;
-							}
+		if(readXMLString(node, "monster", strValue)){
+			/*
+			MonsterType* mType = g_creature_types.getMonsterType(strValue);
+			if(mType){
+				ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
+				condition->addOutfit(mType->outfit);
+				combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
+				combat->setCondition(condition);
+			}
+			*/
+		}
+		else if(readXMLInteger(node, "item", intValue)){
+			OutfitType outfit;
+			outfit.lookTypeEx = intValue;
+		
+			/*
+			ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
+			condition->addOutfit(outfit);
+			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
+			combat->setCondition(condition);
+			*/
+		}
+	}
+	else if(asLowerCaseString(name) == "invisible"){
+		int32_t duration = 10000;
+
+		if(readXMLInteger(node, "duration", intValue)){
+			duration = intValue;
+		}
+
+		/*
+		Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
+		combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
+		combat->setCondition(condition);
+		*/
+	}
+	else if(asLowerCaseString(name) == "drunk"){
+		int32_t duration = 10000;
+
+		if(readXMLInteger(node, "duration", intValue)){
+			duration = intValue;
+		}
+
+		/*
+		Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, 0);
+		combat->setCondition(condition);
+		*/
+	}
+	else if(asLowerCaseString(name) == "firefield"){
+		sb.field = 1492;
+	}
+	else if(asLowerCaseString(name) == "poisonfield"){
+		sb.field = 1496;
+	}
+	else if(asLowerCaseString(name) == "energyfield"){
+		sb.field = 1495;
+	}
+	else if(asLowerCaseString(name) == "firecondition" ||
+			asLowerCaseString(name) == "poisoncondition" ||
+			asLowerCaseString(name) == "energycondition" ||
+			asLowerCaseString(name) == "drowncondition"){
+		/*
+		ConditionType conditionType = CONDITION_NONE;
+		uint32_t tickInterval = 2000;
+
+		if(name == "firecondition"){
+			conditionType = CONDITION_FIRE;
+			tickInterval = 10000;
+		}
+		else if(name == "poisoncondition"){
+			conditionType = CONDITION_POISON;
+			tickInterval = 5000;
+		}
+		else if(name == "energycondition"){
+			conditionType = CONDITION_ENERGY;
+			tickInterval = 10000;
+		}
+		else if(name == "drowncondition"){
+			conditionType = CONDITION_DROWN;
+			tickInterval = 5000;
+		}
+
+		if(readXMLInteger(node, "tick", intValue) && intValue > 0){
+			tickInterval(intValue);
+		}
+
+		int32_t minDamage = std::abs(sb.minCombatValue);
+		int32_t maxDamage = std::abs(sb.maxCombatValue);
+		int32_t startDamage = 0;
+
+		if(readXMLInteger(node, "start", intValue)){
+			intValue = std::abs(intValue);
+
+			if(intValue <= minDamage){
+				startDamage(intValue);
+			}
+		}
+
+		Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
+		combat->setCondition(condition);
+		*/
+	}
+	else if(asLowerCaseString(name) == "strength" || asLowerCaseString(name) == "effect"){
+		//
+	}
+	else{
+		std::cout << "Error: [CreatureManager::deserializeSpell]. " << sb.name << std::endl;
+		return false;
+	}
+
+	xmlNodePtr attributeNode = node->children;
+	while(attributeNode){
+		if(xmlStrcmp(attributeNode->name, (const xmlChar*)"attribute") == 0){
+			if(readXMLString(attributeNode, "key", strValue)){
+				if(asLowerCaseString(strValue) == "shooteffect"){
+					if(readXMLString(attributeNode, "value", strValue)){
+						try{
+							sb.shootEffect = ShootEffect::fromString(asLowerCaseString(strValue));
+							//
+						} catch(enum_conversion_error& e){
+							std::cout << "Warning: [CreatureManager::deserializeSpell]. "  << sb.name << " - Unknown shootEffect " << e.what() << std::endl;
 						}
 					}
-					else if(asLowerCaseString(strValue) == "areaeffect"){
-						if(readXMLString(attributeNode, "value", strValue)){
-							MagicEffect effect = getMagicEffect(strValue);
-							if(effect != MAGIC_EFFECT_UNK){
-								combat->setParam(COMBATPARAM_EFFECT, effect);
-							}
-							else{
-								std::cout << "Warning: [CreatureDatabase::deserializeSpell] - "  << description << " - Unknown areaEffect: " << strValue << std::endl;
-							}
+				}
+				else if(asLowerCaseString(strValue) == "areaeffect"){
+					if(readXMLString(attributeNode, "value", strValue)){
+						try{
+							sb.areaEffect = MagicEffect::fromString(asLowerCaseString(strValue));
+							//
+						} catch(enum_conversion_error& e){
+							std::cout << "Warning: [CreatureManager::deserializeSpell]. "  << sb.name << " - Unknown areaEffect " << e.what() << std::endl;
 						}
 					}
 				}
 			}
-
-			attributeNode = attributeNode->next;
 		}
+
+		attributeNode = attributeNode->next;
 	}
 
-	sb.spell = combatSpell;
 	return true;
 }
-*/
-#define SHOW_XML_WARNING(desc) std::cout << "Warning: [CreatureDatabase::loadMonster]. " << desc << ". " << file << std::endl;
-#define SHOW_XML_ERROR(desc) std::cout << "Error: [CreatureDatabase::loadMonster]. " << desc << ". " << file << std::endl;
+
+#define SHOW_XML_WARNING(desc) std::cout << "Warning: [CreatureManager::loadMonster]. " << desc << ". " << file << std::endl;
+#define SHOW_XML_ERROR(desc) std::cout << "Error: [CreatureManager::loadMonster]. " << desc << ". " << file << std::endl;
 
 bool CreatureManager::loadMonsterType(const std::string& file, const std::string& monster_name, bool reloading /*= false*/)
 {
@@ -520,7 +465,6 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 
 	bool monsterLoad;
 	CreatureType* mType = NULL;
-
 
 	// If another creature has been loaded from the same file before (reload?)
 	TypeMap::iterator iter = creature_types.begin();
@@ -771,20 +715,23 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){
 				xmlNodePtr tmpNode = p->children;
+				uint32_t index = 1;
 				while(tmpNode){
-					// REVSCRIPT TODO Add monster spells
-					/*
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
 
-						spellBlock_t sb;
-						if(deserializeSpell(tmpNode, sb, monster_name)){
-							mType->spellAttackList.push_back(sb);
+						std::stringstream ss;
+						ss << monster_name << "_attack_" << index;
+						SpellBlock sb;
+						sb.name = ss.str();
+						if(deserializeSpell(tmpNode, sb)){
+							mType->spellAttackList().push_back(sb);
+							g_game.onActorLoadSpell(sb);
+							++index;
 						}
 						else{
 							SHOW_XML_WARNING("Cant load spell");
 						}
 					}
-					*/
 					tmpNode = tmpNode->next;
 				}
 			}
@@ -798,20 +745,23 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 				}
 
 				xmlNodePtr tmpNode = p->children;
+				uint32_t index = 1;
 				while(tmpNode){
-					// REVSCRIPT TODO Add monster spells
-					/*
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"defense") == 0){
 
-						spellBlock_t sb;
-						if(deserializeSpell(tmpNode, sb, monster_name)){
-							mType->spellDefenseList.push_back(sb);
+						std::stringstream ss;
+						ss << monster_name << "_defense_" << index;
+						SpellBlock sb;
+						sb.name = ss.str();
+						if(deserializeSpell(tmpNode, sb)){
+							mType->spellDefenseList().push_back(sb);
+							g_game.onActorLoadSpell(sb);
+							++index;
 						}
 						else{
 							SHOW_XML_WARNING("Cant load spell");
 						}
 					}
-					*/
 					tmpNode = tmpNode->next;
 				}
 			}
@@ -973,7 +923,7 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"voice") == 0){
 
-						voiceBlock_t vb;
+						VoiceBlock vb;
 						vb.text = "";
 						vb.yellText = false;
 
@@ -1017,9 +967,6 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"element") == 0){
-						//CombatType type = COMBAT_NONE;
-						//int32_t percent = 0;
-
 						if(readXMLInteger(tmpNode, "physicalPercent", intValue)){
 							mType->elementMap()[COMBAT_PHYSICALDAMAGE] = intValue;
 						}
@@ -1070,7 +1017,7 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 						}
 
 						if(readXMLString(tmpNode, "name", strValue)){
-							summonBlock_t sb;
+							SummonBlock sb;
 							sb.name = strValue;
 							sb.speed = speed;
 							sb.chance = chance;
@@ -1203,7 +1150,7 @@ bool CreatureManager::loadLootContainer(xmlNodePtr node, LootBlock& lBlock)
 
 CreatureType* CreatureManager::getMonsterType(const std::string& name)
 {
-	TypeMap::iterator finder = creature_types.find(name);
+	TypeMap::iterator finder = creature_types.find(asLowerCaseString(name));
 	if(finder == creature_types.end())
 		return NULL;
 

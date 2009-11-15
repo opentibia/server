@@ -545,6 +545,8 @@ public:
 	bool onCreatureDamage(CombatType& combatType, CombatSource& combatSource, Creature* creature, int32_t& value);
 	bool onCreatureKill(Creature* creature, CombatSource& combatSource);
 	bool onCreatureDeath(Creature* creature, Item* corpse, Creature* killer);
+	bool onActorLoadSpell(const SpellBlock& spell);
+	bool onActorCastSpell(Actor* actor, Creature* target, const std::string& spellName);
 
 	void cleanup();
 	void shutdown();

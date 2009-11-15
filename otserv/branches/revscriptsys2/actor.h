@@ -113,7 +113,6 @@ public:
 	virtual bool convinceCreature(Creature* creature);
 
 	virtual void setNormalCreatureLight();
-	virtual bool getCombatValues(int32_t& min, int32_t& max);
 
 	virtual void doAttacking(uint32_t interval);
 	virtual bool hasExtraSwing() {return extraMeleeAttack;}
@@ -137,8 +136,6 @@ private:
 
 	CreatureType cType;
 
-	int32_t minCombatValue;
-	int32_t maxCombatValue;
 	uint32_t attackTicks;
 	uint32_t targetTicks;
 	uint32_t targetChangeTicks;
@@ -182,7 +179,7 @@ private:
 
 	bool canUseAttack(const Position& pos, const Creature* target) const;
 	bool canUseSpell(const Position& pos, const Position& targetPos,
-		const spellBlock_t& sb, uint32_t interval, bool& inRange);
+		const SpellBlock& sb, uint32_t interval, bool& inRange);
 	bool getRandomStep(const Position& creaturePos, Direction& dir);
 	bool getDanceStep(const Position& creaturePos, Direction& dir,
 		bool keepAttack = true, bool keepDistance = true);

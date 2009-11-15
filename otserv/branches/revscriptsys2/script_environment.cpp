@@ -98,6 +98,8 @@ void Environment::cleanupUnusedListeners(ListenerItemMap& list)
 	cleanupUnusedListeners(Generic.OnKill);
 	cleanupUnusedListeners(Generic.OnDeathBy);
 	cleanupUnusedListeners(Generic.OnDeath);
+	cleanupUnusedListeners(Generic.OnActorLoadSpell);
+	cleanupUnusedListeners(Generic.OnActorCastSpell);
 }
 
 void Environment::registerSpecificListener(Listener_ptr listener)
@@ -236,6 +238,12 @@ bool Environment::stopListener(ListenerType type, uint32_t id)
 				return true;
 		case enums::ON_DEATH_LISTENER:
 			if(stopListener(Generic.OnDeath, id))
+				return true;
+		case enums::ON_ACTOR_LOAD_SPELL_LISTENER:
+			if(stopListener(Generic.OnActorLoadSpell, id))
+				return true;
+		case enums::ON_ACTOR_CAST_SPELL_LISTENER:
+			if(stopListener(Generic.OnActorCastSpell, id))
 				return true;
 		default:
 			break;

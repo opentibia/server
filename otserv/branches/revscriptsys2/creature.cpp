@@ -228,7 +228,7 @@ void Creature::onAttacking(uint32_t interval)
 		onAttacked();
 		attackedCreature->onAttacked();
 
-		if(!g_game.onCreatureAttack(this, attackedCreature)){
+		if(g_game.onCreatureAttack(this, attackedCreature)){
 			//handled by script
 			return;
 		}

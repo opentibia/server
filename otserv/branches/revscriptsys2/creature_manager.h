@@ -38,8 +38,7 @@ public:
 	static uint32_t getLootRandom();
 
 private:
-	//bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "");
-
+	bool deserializeSpell(xmlNodePtr node, SpellBlock& sb);
 	bool loadMonsterType(const std::string& file, const std::string& monster_name, bool reloading = false);
 
 	bool loadLootContainer(xmlNodePtr, LootBlock&);

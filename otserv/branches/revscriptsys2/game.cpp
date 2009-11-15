@@ -1475,6 +1475,22 @@ bool Game::onCreatureDeath(Creature* creature, Item* corpse, Creature* killer)
 	return script_system->dispatchEvent(evt);
 }
 
+bool Game::onActorLoadSpell(const SpellBlock& spell)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnActorLoadSpell::Event evt(spell);
+	return script_system->dispatchEvent(evt);
+}
+
+bool Game::onActorCastSpell(Actor* actor, Creature* target, const std::string& spellName)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnActorCastSpell::Event evt(actor, target, spellName);
+	return script_system->dispatchEvent(evt);
+}
+
 ReturnValue Game::internalMoveCreature(Creature* actor, Creature* creature, Direction direction, uint32_t flags /*= 0*/)
 {
 	Cylinder* fromTile = creature->getParentTile();
