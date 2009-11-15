@@ -105,6 +105,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[SQL_DB] = getGlobalString(L, "sql_db");
 		m_confString[SQL_TYPE] = getGlobalString(L, "sql_type");
 		m_confInteger[SQL_PORT] = getGlobalNumber(L, "sql_port");
+		m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	}
 
 	m_confString[LOGIN_MSG] = getGlobalString(L, "loginmsg", "Welcome.");
@@ -189,7 +190,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATE_EXPERIENCE_PVP] = getGlobalNumber(L, "rate_exp_pvp", 1);
 	m_confInteger[ADDONS_ONLY_FOR_PREMIUM] = getGlobalBoolean(L, "addons_only_for_premium", true);
 
-	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
 	m_isLoaded = true;
 	return true;
