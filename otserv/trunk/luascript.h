@@ -110,12 +110,13 @@ public:
 
 	void getEventInfo(int32_t& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, int32_t& callbackId, bool& timerEvent);
 
+	static void addTempItem(ScriptEnviroment* env, Item* item);
+	static void removeTempItem(ScriptEnviroment* env, Item* item);
+	static void removeTempItem(Item* item);
 	static void addUniqueThing(Thing* thing);
 	static void removeUniqueThing(Thing* thing);
 	uint32_t addThing(Thing* thing);
 	void insertThing(uint32_t uid, Thing* thing);
-	void addTempItem(Item* item);
-	void removeTempItem(Item* item);
 
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
@@ -178,7 +179,8 @@ private:
 	ThingMap m_localMap;
 
 	//temporary item list
-	ItemList m_tempItems;
+	typedef std::map<ScriptEnviroment*, ItemList> TempItemListMap;
+	static TempItemListMap m_tempItems;
 
 	//area map
 	static uint32_t m_lastAreaId;

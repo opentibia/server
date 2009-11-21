@@ -65,6 +65,7 @@ uint32_t ScriptEnviroment::m_lastCombatId = 0;
 ScriptEnviroment::ConditionMap ScriptEnviroment::m_conditionMap;
 uint32_t ScriptEnviroment::m_lastConditionId = 0;
 ScriptEnviroment::StorageMap ScriptEnviroment::m_globalStorageMap;
+ScriptEnviroment::TempItemListMap ScriptEnviroment::m_tempItems;
 
 ScriptEnviroment::ScriptEnviroment()
 : m_curNpc(NULL), m_curSpell(NULL)
@@ -98,11 +99,15 @@ void ScriptEnviroment::resetEnv()
 	m_interface = NULL;
 	m_localMap.clear();
 
-	for(std::list<Item*>::iterator it = m_tempItems.begin(); it != m_tempItems.end(); ++it){
-		if((*it)->getParent() == VirtualCylinder::virtualCylinder){
-			delete *it;
+	for(TempItemListMap::iterator mit = m_tempItems.begin(); mit != m_tempItems.end(); ++mit){
+		ItemList& itemList = mit->second;
+		for(ItemList::iterator it = itemList.begin(); it != itemList.end(); ++it){
+			if((*it)->getParent() == VirtualCylinder::virtualCylinder){
+				g_game.FreeThing(*it);
+			}
 		}
 	}
+
 	m_tempItems.clear();
 
 	m_realPos.x = 0;
@@ -407,16 +412,29 @@ Condition* ScriptEnviroment::getConditionObject(uint32_t conditionId)
 	return NULL;
 }
 
-void ScriptEnviroment::addTempItem(Item* item)
+void ScriptEnviroment::addTempItem(ScriptEnviroment* env, Item* item)
 {
-	m_tempItems.push_back(item);
+	m_tempItems[env].push_back(item);
+}
+
+void ScriptEnviroment::removeTempItem(ScriptEnviroment* env, Item* item)
+{
+	ItemList& itemList = m_tempItems[env];
+	ItemList::iterator it = std::find(itemList.begin(), itemList.end(), item);
+	if(it != itemList.end()){
+		itemList.erase(it);
+	}
 }
 
 void ScriptEnviroment::removeTempItem(Item* item)
 {
-	ItemList::iterator it = std::find(m_tempItems.begin(), m_tempItems.end(), item);
-	if(it != m_tempItems.end()){
-		m_tempItems.erase(it);
+	for(TempItemListMap::iterator mit = m_tempItems.begin(); mit != m_tempItems.end(); ++mit){
+		ItemList& itemList = mit->second;
+		ItemList::iterator it = std::find(itemList.begin(), itemList.end(), item);
+		if(it != itemList.end()){
+			itemList.erase(it);
+			break;
+		}
 	}
 }
 
@@ -3797,7 +3815,7 @@ int LuaScriptInterface::luaDoCreateItemEx(lua_State *L)
 	}
 
 	newItem->setParent(VirtualCylinder::virtualCylinder);
-	env->addTempItem(newItem);
+	env->addTempItem(env, newItem);
 
 	uint32_t uid = env->addThing(newItem);
 	lua_pushnumber(L, uid);
