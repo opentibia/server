@@ -2380,7 +2380,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 		return false;
 	}
 
-	if(!item->isUseable()){
+	if(item->isUseable()){
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
