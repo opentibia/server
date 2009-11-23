@@ -143,20 +143,20 @@ function otstd.getLineArea(length, spread)
 end
 
 function Actor.onLoadSpell(event)
-	print("loading spell - " .. event.name)
+	--print("loading spell - " .. event.name)
 
 	local spell = Spell:new(event.name)
 
-	spell.aggressive  = true
+	spell.aggressive  = event.aggressive
 	spell.words       = event.name
-	spell.damageType  = COMBAT_FIREDAMAGE
-	spell.needTarget  = event.needTarget
+	spell.damageType  = event.damageType or COMBAT_FIREDAMAGE
+	spell.needTarget  = event.needTarget or (event.radius == 0 and event.length == 0)
 	spell.areaEffect  = event.areaEffect
 	spell.shootEffect = event.shootEffect
 	spell.field       = event.field
 	spell.min         = event.min
 	spell.max         = event.max
-	
+
 	if event.radius > 0 then
 		spell.area = otstd.getCircleArea(event.radius)
 	elseif event.length > 0 then
@@ -164,12 +164,78 @@ function Actor.onLoadSpell(event)
 	end
 	
 	spell.formula = formulaStatic(event.min, event.max)
+	
+	if event.condition then
+		--print("condition " .. event.condition.type:value())
+		--print("duration " .. event.condition.duration )
+		
+		if event.condition.effect then
+			local effect = event.condition.effect
+
+			--for k, v in pairs(effect) do
+			--	print(k, v)
+			--end
+			
+			if effect.name == "damage" then
+				spell.condition = {id = "fire", duration = event.condition.duration}
+				if effect.rounds then
+					spell.condition[effect.name] = {
+						effect.interval,
+						COMBAT_FIREDAMAGE,
+						rounds = effect.rounds,
+						min = effect.min,
+						max = effect.max
+					}
+				else
+					spell.condition[effect.name] = {
+						effect.interval,
+						COMBAT_FIREDAMAGE,
+						first = effect.first,
+						min = effect.min,
+						max = effect.max
+					}
+				end
+			elseif effect.name == "shapeshift" then
+				spell.condition = {id = "shapeshift", duration = event.condition.duration}
+				spell.condition[effect.name] = {
+					outfit = {
+						type = effect.type,
+						head = effect.head,
+						body = effect.body,
+						legs = effect.legs,
+						feet = effect.feet,
+						item = effect.item,
+						addons = effect.addons
+					}
+				}
+			elseif effect.name == "speed" then
+				spell.condition = {id = "speed", duration = event.condition.duration}
+				spell.condition[effect.name] = {
+					amount = effect.amount,
+					percent = effect.percent
+				}
+			elseif effect.name == "invisible" then
+				spell.condition = {id = "invisible", duration = event.condition.duration}
+				spell.condition["script"] = {
+					name = "invisible"
+				}
+			elseif effect.name == "drunk" then
+				spell.condition = {id = "drunk", duration = event.condition.duration, icon = ICON_DRUNK }
+				spell.condition["script"] = {
+					name = "drunk"
+				}
+			else
+				print("Not supported yet - " .. effect.name)
+			end
+		end
+	end
 
 	spell:register()
 end
 
 function Actor.onCastSpell(event)
 	local caster = event.actor
+	event:skip()
 
 	for _, spell in pairs(otstd.spells) do
 		if string.find(spell.name, event.spell) == 1 then

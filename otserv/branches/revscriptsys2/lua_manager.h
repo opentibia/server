@@ -85,6 +85,7 @@ public:
 
 	// Table manipulation
 	void newTable();
+	void setTable(int32_t index);
 
 	// Top value as value, index is position of the target table on the stack
 	void setField(int32_t index, const std::string& field_name);
@@ -347,7 +348,7 @@ public:
 	int lua_Condition_addRegenPercentMana();
 	int lua_Condition_addRegenSoul();
 	int lua_Condition_addRegenPercentSoul();
-	int lua_Condition_addSpeed();
+	int lua_Condition_addModSpeed();
 	int lua_Condition_addModStat();
 	int lua_Condition_addModPercentStat();
 	int lua_Condition_addModSkill();

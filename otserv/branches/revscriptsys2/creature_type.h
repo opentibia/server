@@ -23,6 +23,7 @@
 
 #include "classes.h"
 #include "outfit.h"
+#include "condition.h"
 #include "condition_attributes.h"
 
 #define MAX_LOOTCHANCE 100000
@@ -73,6 +74,7 @@ struct SpellBlock{
 		blockedByShield = false;
 		blockedByArmor = false;
 		needTarget = false;
+		aggressive = true;
 		spread = 0;
 		length = 0;
 		radius = 0;
@@ -80,6 +82,10 @@ struct SpellBlock{
 
 		shootEffect = SHOOT_EFFECT_NONE;
 		areaEffect = MAGIC_EFFECT_NONE;
+
+		condition.type = CONDITION_NONE;
+		condition.interval = 0;
+		condition.duration = 0;
 	}
 
 	uint32_t chance;
@@ -93,6 +99,7 @@ struct SpellBlock{
 	bool blockedByShield;
 	bool blockedByArmor;
 	bool needTarget;
+	bool aggressive;
 	uint32_t spread;
 	uint32_t length;
 	uint32_t radius;
@@ -100,6 +107,13 @@ struct SpellBlock{
 
 	ShootEffect shootEffect;
 	MagicEffect areaEffect;
+
+	struct{
+		ConditionId type;
+		int32_t interval;
+		int32_t duration;
+		ConditionEffect effect;
+	} condition;
 };
 
 struct VoiceBlock{

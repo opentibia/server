@@ -11,7 +11,7 @@ function Creature:addCondition(cond)
 	local co = coroutine.create(otstd.conditions.makeConditionObject)
 	state, obj = coroutine.resume(co, obj, cond)
 	if not state then
-		if obj then
+		if typeof(obj, "Condition") then
 			obj:destroy()
 		end
 		error(obj) -- Propagate the error
@@ -40,26 +40,34 @@ otstd.conditions.effectParsers = {
 	
 	["healing"] = function(obj, effect)
 		local interval = assert(effect.interval or effect[1], "Missing 'interval' [1] parameter to Healing effect.")
-		local value = assert(effect.value or effect.amount or effect[2], "Missing 'value'/'amount' [2] parameter to Healing effect.")
-		local rounds = assert(effect.rounds or effect[3], "Missing 'rounds' [3] parameter to Healing effect.")
-		obj:addPeriodicHeal(interval, value, rounds)
+		local rounds = assert(effect.rounds or effect[2], "Missing 'rounds' [2] parameter to Healing effect.")
+		local min = assert(effect.min or effect.damage or effect.amount or effect[3], "Missing 'total' or 'min' parameter to Healing effect.")
+		local max = assert(effect.min or effect.damage or effect.amount or effect[4] or min, "Missing 'total' or 'max' parameter to Healing effect.")
+		
+		obj:addPeriodicHeal(interval, min, max, rounds)
 	end;
 	
 	["damage"] = function(obj, effect)
+		--["damage"] = {1000, COMBAT_NONE, rounds = 5, amount = 100}
+		--["damage"] = {1000, COMBAT_NONE, rounds = 5, min = 10, max = 100}			
+		--["damage"] = {1000, COMBAT_NONE, first = 5, amount = 100}
+		--["damage"] = {1000, COMBAT_NONE, first = 10, min = 100, max = 200}
+		
 		local interval = assert(effect.interval or effect[1], "Missing 'interval' [1] parameter to Damage effect.")
-		local type = effect.type or COMBAT_UNDEFINEDDAMAGE
-		if (effect.damage or effect.amount or effect[2]) and (effect.rounds or effect[3]) then
-			local damage = assert(effect.damage or effect.amount or effect[2], "Missing 'damage'/'amount' [2] parameter to Damage effect.")
+		local type = assert(effect.type or effect[2], "Missing 'type' [2] parameter to Damage effect.")
+		
+		if (effect.rounds or effect[3]) and not effect.first then
 			local rounds = assert(effect.rounds or effect[3], "Missing 'rounds' [3] parameter to Damage effect.")
-			
-			obj:addPeriodicDamage(interval, type, damage, rounds)
+			local min = assert(effect.min or effect.damage or effect.amount or effect[4], "Missing 'total' or 'min' parameter to Damage effect.")
+			local max = assert(effect.min or effect.damage or effect.amount or effect[5] or min, "Missing 'total' or 'max' parameter to Damage effect.")
+			obj:addPeriodicDamage(interval, type or COMBAT_UNDEFINEDDAMAGE, min, max, rounds)
 		end
 		
-		if effect.total and effect.first then
-			local total = assert(effect.total, "Missing 'total' parameter to Damage effect.")
-			local first = assert(effect.first, "Missing 'first' parameter to Damage effect.")
-			
-			obj:addAveragePeriodicDamage(interval, type or COMBAT_UNDEFINEDDAMAGE, total, first)
+		if effect.first then
+			local first = assert(effect.first, "Missing 'first' [3] parameter to Damage effect.")
+			local min = assert(effect.min or effect.total or effect[4], "Missing 'total' or 'min' parameter to Damage effect.")
+			local max = assert(effect.max or effect.total or effect[5] or min, "Missing 'total' or 'max' parameter to Damage effect.")			
+			obj:addAveragePeriodicDamage(interval, type or COMBAT_UNDEFINEDDAMAGE, min, max, first)
 		end
 	end;
 	
@@ -105,6 +113,13 @@ otstd.conditions.effectParsers = {
 	["speed"] = function(obj, effect)
 		local percent = effect.percent
 		local value = effect.value or effect.amount
+		if not effect.icon then
+			if percent < 0 or value < 0 then
+				effect.icon = ICON_PARALYZE
+			else
+				effect.icon = ICON_HASTE
+			end
+		end
 		
 		assert(percent or value, "Expected either 'percent' or 'amount'/'value' to Speed effect.")
 		
@@ -174,15 +189,20 @@ end
 function otstd.conditions.makeConditionObject(obj, condition)
 	local id = assert(condition.id or condition[1], "Missing 'id' [1] for Condition.")
 	local duration = assert(tonumber(condition.duration) or tonumber(condition[2]), "Missing 'duration' [2] for Condition")
-		
+	local icons = 0
+	
 	for k, v in pairs(condition) do
 		if type(v) == "table" then
 			otstd.conditions.parseEffect(obj, k, v)
+			if v.icon then
+				icons = bit.ubor(icons, v.icon:value())
+			end
 		end
 	end
 	
-	obj:setName(condition.id)
+	obj:setName(id)
 	obj:setTicks(duration)
+	obj:setFlags(icons)
 	return obj
 end
  

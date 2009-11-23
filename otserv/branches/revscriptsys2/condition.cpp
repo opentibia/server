@@ -27,45 +27,6 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
-Condition* Condition::createPeriodDamageCondition(ConditionId id, uint32_t interval,
-	int32_t damage, uint32_t rounds)
-{
-	if(rounds == 0){
-		return NULL;
-	}
-
-	Condition* condition = Condition::createCondition(id, 0);
-	if(condition){
-		damage = std::abs(damage);
-		ConditionEffect effect = ConditionEffect::createPeriodicDamage(interval, condition->getCombatType(),
-			0, 0, damage, rounds);
-		condition->addEffect(effect);
-		return condition;
-	}
-
-	return NULL;
-}
-
-Condition* Condition::createPeriodAverageDamageCondition(ConditionId id, uint32_t interval,
-	int32_t startDamage, int32_t totalDamage)
-{
-	if(startDamage == 0){
-		return NULL;
-	}
-
-	Condition* condition = Condition::createCondition(id, 0);
-	if(condition){
-		startDamage = std::abs(startDamage);
-		totalDamage = std::abs(totalDamage);
-		ConditionEffect effect = ConditionEffect::createPeriodicDamage(interval, condition->getCombatType(),
-			totalDamage, (totalDamage / startDamage), startDamage, 0);
-		condition->addEffect(effect);
-		return condition;
-	}
-
-	return NULL;
-}
-
 Condition* Condition::createCondition(ConditionId id, uint32_t ticks, uint32_t sourceId /*= 0*/, uint32_t flags /*= 0*/)
 {
 	switch(id.value()){
@@ -104,15 +65,15 @@ Condition* Condition::createCondition(ConditionId id, uint32_t ticks, uint32_t s
 		}
 
 		case enums::CONDITION_INFIGHT:
-			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, FLAG_INFIGHT);
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, enums::ICON_SWORDS);
 		case enums::CONDITION_HASTE:
-			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, FLAG_HASTE);
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, enums::ICON_HASTE);
 		case enums::CONDITION_PARALYZED:
-			return Condition::createCondition(id.toString(), ticks, MECHANIC_PARALYZED, COMBAT_NONE, sourceId, FLAG_SLOW);
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_PARALYZED, COMBAT_NONE, sourceId, enums::ICON_PARALYZE);
 		case enums::CONDITION_DRUNK:
-			return Condition::createCondition(id.toString(), ticks, MECHANIC_DRUNK, COMBAT_NONE, sourceId, FLAG_DRUNK);
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_DRUNK, COMBAT_NONE, sourceId, enums::ICON_DRUNK);
 		case enums::CONDITION_MANASHIELD:
-			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, FLAG_MANASHIELD);
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId, enums::ICON_MANASHIELD);
 
 		case enums::CONDITION_SILENCED:
 		case enums::CONDITION_MUTED_CHAT:
@@ -186,19 +147,23 @@ IconType Condition::getIcon() const
 			break;
 	}
 
-	if(hasBitSet(FLAG_INFIGHT, flags)){
+	if(hasBitSet(ICON_SWORDS.value(), flags)){
 		icons |= ICON_SWORDS;
 	}
 
-	if(hasBitSet(FLAG_STRENGTHENED, flags)){
+	if(hasBitSet(ICON_PARTY_BUFF.value(), flags)){
 		icons |= ICON_PARTY_BUFF;
 	}
 
-	if(hasBitSet(FLAG_HASTE, flags)){
+	if(hasBitSet(ICON_PARALYZE.value(), flags)){
+		icons |= ICON_PARALYZE;
+	}
+	
+	if(hasBitSet(ICON_HASTE.value(), flags)){
 		icons |= ICON_HASTE;
 	}
 
-	if(hasBitSet(FLAG_MANASHIELD, flags)){
+	if(hasBitSet(ICON_MANASHIELD.value(), flags)){
 		icons |= ICON_MANASHIELD;
 	}
 
@@ -466,6 +431,24 @@ bool ConditionEffect::onBegin(Creature* creature)
 	}
 
 	switch(type){
+		case ConditionEffect::PERIODIC_HEAL:
+		case ConditionEffect::PERIODIC_DAMAGE:
+		{
+			ConditionEffect::ModPeriodicDamage& modPeriodicDamage = getModEffect<ConditionEffect::ModPeriodicDamage>();
+
+			if(modPeriodicDamage.rounds == 0){
+				//average damage
+				modPeriodicDamage.total = random_range(modPeriodicDamage.min, modPeriodicDamage.max);
+				modPeriodicDamage.percent = modPeriodicDamage.total / modPeriodicDamage.first;
+			}
+			else{
+				//periodic damage
+				modPeriodicDamage.value = random_range(modPeriodicDamage.min, modPeriodicDamage.max);
+			}
+
+			break;
+		}
+
 		case ConditionEffect::MOD_SPEED:
 		{
 			ConditionEffect::ModSpeed& modSpeed = getModEffect<ConditionEffect::ModSpeed>();
@@ -617,7 +600,8 @@ bool ConditionEffect::onUpdate(Creature* creature, const ConditionEffect& addEff
 
 	data = addEffect.data;
 	interval = addEffect.interval;
-	return true;
+
+	return onBegin(creature);
 }
 
 bool ConditionEffect::onTick(Creature* creature, uint32_t ticks)
@@ -665,18 +649,18 @@ bool ConditionEffect::onTick(Creature* creature, uint32_t ticks)
 				//average damage
 				if(modPeriodicDamage.total != 0){
 					//total damage done
-					modPeriodicDamage.sum += modPeriodicDamage.value;
+					modPeriodicDamage.sum += modPeriodicDamage.first;
 
 					//number of rounds done
 					modPeriodicDamage.roundCompleted++;
 
-					int32_t curRounds = (int32_t)std::ceil(((float)modPeriodicDamage.percent) / modPeriodicDamage.value);
+					int32_t curRounds = (int32_t)std::ceil(((float)modPeriodicDamage.percent) / modPeriodicDamage.first);
 					if(modPeriodicDamage.roundCompleted >= curRounds){
 						modPeriodicDamage.roundCompleted = 0;
-						--modPeriodicDamage.value;
+						--modPeriodicDamage.first;
 					}
 
-					if(modPeriodicDamage.sum >= modPeriodicDamage.total || modPeriodicDamage.value == 0){
+					if(modPeriodicDamage.sum >= modPeriodicDamage.total || modPeriodicDamage.first == 0){
 						return false;
 					}
 				}
@@ -784,13 +768,22 @@ bool ConditionEffect::unserialize(PropStream& propStream)
 			}
 			mod.type = CombatType::fromInteger(value);
 
+			if(!propStream.GET_VALUE(mod.min)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.max)){
+				return false;
+			}
+			if(!propStream.GET_VALUE(mod.value)){
+				return false;
+			}
 			if(!propStream.GET_VALUE(mod.total)){
 				return false;
 			}
 			if(!propStream.GET_VALUE(mod.percent)){
 				return false;
 			}
-			if(!propStream.GET_VALUE(mod.value)){
+			if(!propStream.GET_VALUE(mod.first)){
 				return false;
 			}
 			if(!propStream.GET_VALUE(mod.rounds)){
@@ -993,9 +986,12 @@ bool ConditionEffect::serialize(PropWriteStream& propWriteStream)
 			ConditionEffect::ModPeriodicDamage& mod = getModEffect<ConditionEffect::ModPeriodicDamage>();
 			propWriteStream.ADD_USHORT(1); //revision
 			propWriteStream.ADD_VALUE((uint32_t)mod.type.value());
+			propWriteStream.ADD_VALUE(mod.min);
+			propWriteStream.ADD_VALUE(mod.max);
+			propWriteStream.ADD_VALUE(mod.value);
 			propWriteStream.ADD_VALUE(mod.total);
 			propWriteStream.ADD_VALUE(mod.percent);
-			propWriteStream.ADD_VALUE(mod.value);
+			propWriteStream.ADD_VALUE(mod.first);
 			propWriteStream.ADD_VALUE(mod.rounds);
 			break;
 		}

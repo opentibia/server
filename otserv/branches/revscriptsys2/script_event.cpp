@@ -28,6 +28,7 @@
 #include "creature.h"
 #include "actor.h"
 #include "combat.h"
+#include "condition.h"
 #include "item.h"
 
 using namespace Script;
@@ -2266,6 +2267,9 @@ void OnActorLoadSpell::Event::push_instance(LuaState& state, Environment& enviro
 	state.push(spell.needTarget);
 	state.setField(-2, "needTarget");
 
+	state.push(spell.aggressive);
+	state.setField(-2, "aggressive");
+
 	state.push(spell.range);
 	state.setField(-2, "range");
 
@@ -2298,6 +2302,132 @@ void OnActorLoadSpell::Event::push_instance(LuaState& state, Environment& enviro
 
 	state.push(spell.field);
 	state.setField(-2, "field");
+
+	if(spell.condition.type != CONDITION_NONE){
+		state.newTable();
+
+		state.pushEnum(spell.condition.type);
+		state.setField(-2, "type");
+
+		state.pushInteger(spell.condition.duration);
+		state.setField(-2, "duration");
+
+		switch(spell.condition.type.value()){
+			case ::enums::CONDITION_BURNING:
+			case ::enums::CONDITION_POISONED:
+			case ::enums::CONDITION_ELECTRIFIED:
+			case ::enums::CONDITION_DROWNING:
+			case ::enums::CONDITION_FREEZING:
+			case ::enums::CONDITION_DAZZLED:
+			case ::enums::CONDITION_CURSED:
+			{
+				const ConditionEffect::ModPeriodicDamage& modPeriodicDamage = spell.condition.effect.getModEffect<const ConditionEffect::ModPeriodicDamage>();
+
+				state.newTable();
+					state.pushString("damage");
+					state.setField(-2, "name");
+
+					//state.pushEnum(spell.damageType);
+
+					state.pushInteger(spell.condition.interval);
+					state.setField(-2, "interval");
+
+					state.pushInteger(modPeriodicDamage.min);
+					state.setField(-2, "min");
+					state.pushInteger(modPeriodicDamage.max);
+					state.setField(-2, "max");
+
+					if(modPeriodicDamage.rounds > 0){
+						state.pushInteger(modPeriodicDamage.rounds);
+						state.setField(-2, "rounds");
+					}
+					else{
+						state.pushInteger(modPeriodicDamage.first);
+						state.setField(-2, "first");
+					}
+				state.setField(-2, "effect");
+				break;
+			}
+
+			case ::enums::CONDITION_HASTE:
+			{
+				const ConditionEffect::ModSpeed& modSpeed = spell.condition.effect.getModEffect<const ConditionEffect::ModSpeed>();
+
+				state.newTable();
+					state.pushString("speed");
+					state.setField(-2, "name");
+					state.pushInteger(modSpeed.percent);
+					state.setField(-2, "percent");
+					state.pushInteger(modSpeed.value);
+					state.setField(-2, "amount");
+				state.setField(-2, "effect");
+				break;
+			}
+			case ::enums::CONDITION_PARALYZED:
+			{
+				const ConditionEffect::ModSpeed& modSpeed = spell.condition.effect.getModEffect<const ConditionEffect::ModSpeed>();
+				
+				state.newTable();
+					state.pushString("speed");
+					state.setField(-2, "name");
+					state.pushInteger(modSpeed.percent);
+					state.setField(-2, "percent");
+					state.pushInteger(modSpeed.value);
+					state.setField(-2, "amount");
+				state.setField(-2, "effect");
+				break;
+			}
+			case ::enums::CONDITION_SHAPESHIFT:
+			{
+				const ConditionEffect::ModShapeShift& modShapeShift = spell.condition.effect.getModEffect<const ConditionEffect::ModShapeShift>();
+				
+				state.newTable();
+					state.pushString("shapeshift");
+					state.setField(-2, "name");
+					state.pushInteger(modShapeShift.lookType);
+					state.setField(-2, "type");
+					state.pushInteger(modShapeShift.lookHead);
+					state.setField(-2, "head");
+					state.pushInteger(modShapeShift.lookBody);
+					state.setField(-2, "body");
+					state.pushInteger(modShapeShift.lookLegs);
+					state.setField(-2, "legs");
+					state.pushInteger(modShapeShift.lookFeet);
+					state.setField(-2, "feet");
+					state.pushInteger(modShapeShift.lookTypeEx);
+					state.setField(-2, "item");
+					state.pushInteger(modShapeShift.lookAddons);
+					state.setField(-2, "addons");
+				state.setField(-2, "effect");
+				break;
+			}
+			case ::enums::CONDITION_INVISIBLE:
+			{
+				state.newTable();
+					state.pushString("invisible");
+					state.setField(-2, "name");
+				state.setField(-2, "effect");
+				break;
+			}
+			case ::enums::CONDITION_DRUNK:
+			{
+				state.newTable();
+					state.pushString("drunk");
+					state.setField(-2, "name");
+				state.setField(-2, "effect");
+				break;
+			}
+
+			default:
+			{
+				state.newTable();
+				state.setField(-2, "effect");
+				break;
+			}
+		}
+
+		state.setField(-2, "condition");
+	}
 }
 
 void OnActorLoadSpell::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)

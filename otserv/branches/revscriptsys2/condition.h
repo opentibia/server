@@ -70,19 +70,25 @@ public:
 
 	struct ModPeriodicDamage{
 		ModPeriodicDamage() {}
-		ModPeriodicDamage(CombatType type, int32_t total, int32_t percent, int32_t value, int32_t rounds) : 
+		ModPeriodicDamage(CombatType type, int32_t min, int32_t max, int32_t value, bool isAverage = false) : 
 			type(type),
-			total(total),
-			percent(percent),
-			value(value),
-			rounds(rounds),
+			min(min),
+			max(max),
+			value(0),
+			total(0),
+			percent(0),
+			first((isAverage ? value : 0)),
+			rounds((!isAverage ? value : 0)),
 			sum(0),
 			roundCompleted(0) {}
 
 		CombatType type;
+		int32_t min;
+		int32_t max;
+		int32_t value;
 		int32_t total;
 		int32_t percent;
-		int32_t value;
+		int32_t first;
 		int32_t rounds;
 
 		//
@@ -206,16 +212,15 @@ public:
 		std::string name;
 	};
 
-	static ConditionEffect createPeriodicHeal(uint32_t interval, int32_t value, int32_t rounds)
+	static ConditionEffect createPeriodicHeal(uint32_t interval, int32_t min, int32_t max, int32_t rounds)
 	{
-		ModPeriodicDamage mod(COMBAT_HEALING, 0, 0, value, rounds);
+		ModPeriodicDamage mod(COMBAT_HEALING, min, max, rounds);
 		return ConditionEffect(ConditionEffect::PERIODIC_HEAL, interval, mod);
 	}
 
-	static ConditionEffect createPeriodicDamage(uint32_t interval, CombatType type, int32_t total,
-		int32_t percent, int32_t value, int32_t rounds)
+	static ConditionEffect createPeriodicDamage(uint32_t interval, CombatType type, int32_t min, int32_t max, int32_t value, bool isAverage = false)
 	{
-		ModPeriodicDamage mod(type, total, percent, value, rounds);
+		ModPeriodicDamage mod(type, min, max, value, isAverage);
 		return ConditionEffect(ConditionEffect::PERIODIC_DAMAGE, interval, mod);
 	}
 
@@ -377,6 +382,7 @@ public:
 
 	ConditionEffect::Type getEffectType() const {return type;}
 	template<typename T> T& getModEffect() {return boost::any_cast<T&>(data);}
+	template<typename T> T& getModEffect() const {return boost::any_cast<T&>(data);}
 
 	//serialization
 	bool unserialize(PropStream& propStream);
@@ -400,12 +406,6 @@ protected:
 
 class Condition{
 public:
-	static Condition* createPeriodDamageCondition(ConditionId id, uint32_t interval,
-		int32_t damage, uint32_t rounds);
-
-	static Condition* createPeriodAverageDamageCondition(ConditionId id, uint32_t interval,
-		int32_t startDamage, int32_t total);
-
 	static Condition* createCondition(ConditionId id, uint32_t ticks, uint32_t sourceId = 0, uint32_t flags = 0);
 
 	static Condition* createCondition(const std::string& name, uint32_t ticks,
@@ -413,16 +413,6 @@ public:
 		uint32_t sourceId = 0, uint32_t flags = 0);
 
 	static Condition* createCondition(PropStream& propStream);
-
-	enum Flag{
-		FLAG_INFIGHT		= 1,
-		FLAG_SLOW			= 2,
-		FLAG_HASTE			= 4,
-		FLAG_STRENGTHENED	= 8,
-		FLAG_MANASHIELD		= 16,
-		FLAG_DRUNK			= 32,
-		//FLAG_PERSISTENT	= 64
-	};
 
 	Condition(const std::string& name,
 			CombatType combatType,

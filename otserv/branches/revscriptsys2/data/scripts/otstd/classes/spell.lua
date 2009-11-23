@@ -137,10 +137,10 @@ function otstd.canCastSpellOnCreature(spell, caster, creature)
 					}
 				}
 				]]--
-			end
-		elseif typeof(caster, "Actor") then
-			if caster:cannotAttackMonster() then
-				return false, RET_YOUMAYNOTATTACKTHISCREATURE
+			elseif typeof(creature, "Actor") then
+				if caster:cannotAttackMonster() then
+					return false, RET_YOUMAYNOTATTACKTHISCREATURE
+				end
 			end
 		end
 	end
@@ -277,11 +277,12 @@ function otstd.onCastSpell(event)
 			for _, target in ipairs(creatures) do
 				if otstd.canCastSpellOnCreature(spell, caster, target) then
 					if spell.damageType ~= COMBAT_NONE then
+						--print("Damaging " .. target:getName())
 						local amount = 0
 						if spell.formula then
 							amount = spell.formula(caster)
 						end
-						if internalCastSpell(spell.damageType, caster, target, amount, spell.blockedByShield, spell.blockedByArmor) then
+						if amount == 0 or internalCastSpell(spell.damageType, caster, target, amount, spell.blockedByShield, spell.blockedByArmor) then
 							if spell.condition then
 								target:addCondition(spell.condition)
 							end
@@ -291,6 +292,7 @@ function otstd.onCastSpell(event)
 							end
 						end
 					else
+						--print("Casting spell on " .. target:getName())
 						if spell.condition then
 							target:addCondition(spell.condition)
 						end
@@ -299,6 +301,8 @@ function otstd.onCastSpell(event)
 							spell.onHitCreature(target, event)
 						end
 					end
+				else
+					--print("Cannot attack - " .. target:getName())
 				end
 			end
 				

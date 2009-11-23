@@ -9,6 +9,7 @@
 
 namespace enums {
 	enum ConditionId {
+		CONDITION_NONE,
 		CONDITION_POISONED,
 		CONDITION_BURNING,
 		CONDITION_ELECTRIFIED,
@@ -43,6 +44,7 @@ typedef Enum<enums::ConditionId, enums::CONDITION_HUNTING + 1> ConditionId;
 typedef Enum<enums::ConditionId, enums::CONDITION_HUNTING + 1> ConditionId__Base;
 
 //begin enum definitions
+	const ConditionId CONDITION_NONE(enums::CONDITION_NONE);
 	const ConditionId CONDITION_POISONED(enums::CONDITION_POISONED);
 	const ConditionId CONDITION_BURNING(enums::CONDITION_BURNING);
 	const ConditionId CONDITION_ELECTRIFIED(enums::CONDITION_ELECTRIFIED);

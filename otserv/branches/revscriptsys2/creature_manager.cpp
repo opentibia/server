@@ -167,77 +167,63 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 			}
 		}
 
-		/*
-		ConditionType conditionType = CONDITION_NONE;
-		int32_t minDamage = 0;
-		int32_t maxDamage = 0;
-		int32_t startDamage = 0;
-		uint32_t tickInterval = 2000;
+		sb.range = 1;
+		sb.blockedByShield = true;
+		sb.blockedByArmor = true;
+		sb.needTarget = true;
+		sb.damageType = COMBAT_PHYSICALDAMAGE;
 
+		uint32_t interval = 10000;
+		int32_t startDamage = 10;
+		int32_t totalDamage = 0;
+
+		CombatType conditionDamageType = COMBAT_NONE;
 		if(readXMLInteger(node, "fire", intValue)){
-			conditionType = CONDITION_FIRE;
-
-			minDamage(intValue);
-			maxDamage(intValue);
-			tickInterval = 10000;
+			conditionDamageType = COMBAT_FIREDAMAGE;
+			sb.condition.type = CONDITION_BURNING;
 		}
 		else if(readXMLInteger(node, "poison", intValue)){
-			conditionType = CONDITION_POISON;
-
-			minDamage(intValue);
-			maxDamage(intValue);
-			tickInterval = 5000;
+			conditionDamageType = COMBAT_EARTHDAMAGE;
+			sb.condition.type = CONDITION_POISONED;
+			totalDamage = intValue;
+			startDamage = 5;
+			interval = 5000;
 		}
 		else if(readXMLInteger(node, "energy", intValue)){
-			conditionType = CONDITION_ENERGY;
-
-			minDamage(intValue);
-			maxDamage(intValue);
-			tickInterval = 10000;
+			conditionDamageType = COMBAT_ENERGYDAMAGE;
+			sb.condition.type = CONDITION_ELECTRIFIED;
+			startDamage = 20;
+			totalDamage = intValue;
 		}
 		else if(readXMLInteger(node, "drown", intValue)){
-			conditionType = CONDITION_DROWN;
-
-			minDamage(intValue);
-			maxDamage(intValue);
-			tickInterval = 10000;
+			conditionDamageType = COMBAT_DROWNDAMAGE;
+			sb.condition.type = CONDITION_DROWNING;
+			totalDamage = intValue;
 		}
 		else if(readXMLInteger(node, "freeze", intValue)){
-			conditionType = CONDITION_FREEZING;
-
-			minDamage(intValue);
-			maxDamage(intValue);
-			tickInterval = 10000;
+			conditionDamageType = COMBAT_ICEDAMAGE;
+			sb.condition.type = CONDITION_FREEZING;
+			totalDamage = intValue;
 		}
 		else if(readXMLInteger(node, "dazzle", intValue)){
-			conditionType = CONDITION_DAZZLED;
-
-			minDamage(intValue);
-			maxDamage(intValue);
-			tickInterval = 10000;
+			conditionDamageType = COMBAT_HOLYDAMAGE;
+			sb.condition.type = CONDITION_DAZZLED;
+			totalDamage = intValue;
 		}
 		else if(readXMLInteger(node, "curse", intValue)){
-			conditionType = CONDITION_CURSED;
-
-			minDamage(intValue);
-			maxDamage(intValue);
-			tickInterval = 10000;
+			conditionDamageType = COMBAT_DEATHDAMAGE;
+			sb.condition.type = CONDITION_CURSED;
+			totalDamage = intValue;
 		}
 
 		if(readXMLInteger(node, "tick", intValue) && intValue > 0){
-			tickInterval(intValue);
+			interval = intValue;
 		}
 
-		if(conditionType != CONDITION_NONE){
-			Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
-			combat->setCondition(condition);
+		if(sb.condition.type != CONDITION_NONE){
+			sb.condition.interval = interval;
+			sb.condition.effect = ConditionEffect::createPeriodicDamage(interval, conditionDamageType, totalDamage, totalDamage, startDamage);
 		}
-
-		sb.range = 1;
-		combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_PHYSICALDAMAGE);
-		combat->setParam(COMBATPARAM_BLOCKEDBYARMOR, 1);
-		combat->setParam(COMBATPARAM_BLOCKEDBYSHIELD, 1);
-		*/
 	}
 	else if(asLowerCaseString(name) == "physical"){
 		sb.damageType = COMBAT_PHYSICALDAMAGE;
@@ -275,10 +261,10 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 	}
 	else if(asLowerCaseString(name) == "speed" || asLowerCaseString(name) == "paralyze"){
 		int32_t speedChange = 0;
-		int32_t duration = 10000;
+		sb.condition.duration = 10000;
 
 		if(readXMLInteger(node, "duration", intValue)){
-			duration = intValue;
+			sb.condition.duration = intValue;
 		}
 
 		if(readXMLInteger(node, "speedchange", intValue)){
@@ -290,20 +276,15 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 			}
 		}
 
-		/*
-		ConditionType conditionType;
 		if(speedChange > 0){
-			conditionType = CONDITION_HASTE;
-			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
+			sb.condition.type = CONDITION_HASTE;
+			sb.aggressive = false;
 		}
 		else{
-			conditionType = CONDITION_PARALYZE;
+			sb.condition.type = CONDITION_PARALYZED;
 		}
 
-		ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(Condition::createCondition(CONDITIONID_COMBAT, conditionType, duration, 0));
-		condition->setFormulaVars(speedChange / 1000.0, 0, speedChange / 1000.0, 0);
-		combat->setCondition(condition);
-		*/
+		sb.condition.effect = ConditionEffect::createModSpeed(std::floor(speedChange / 10.0), 0);
 	}
 	else if(asLowerCaseString(name) == "outfit"){
 		int32_t duration = 10000;
@@ -313,106 +294,102 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 		}
 
 		if(readXMLString(node, "monster", strValue)){
-			/*
-			MonsterType* mType = g_creature_types.getMonsterType(strValue);
-			if(mType){
-				ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
-				condition->addOutfit(mType->outfit);
-				combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
-				combat->setCondition(condition);
+			CreatureType* cType = getMonsterType(strValue);
+			if(cType){
+				sb.condition.type = CONDITION_SHAPESHIFT;
+				sb.condition.duration = duration;
+				sb.condition.effect = ConditionEffect::createModShapeShift(cType->outfit());
+				sb.aggressive = false;
 			}
-			*/
 		}
 		else if(readXMLInteger(node, "item", intValue)){
 			OutfitType outfit;
 			outfit.lookTypeEx = intValue;
 		
-			/*
-			ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(Condition::createCondition(CONDITIONID_COMBAT, CONDITION_OUTFIT, duration, 0));
-			condition->addOutfit(outfit);
-			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
-			combat->setCondition(condition);
-			*/
+			sb.condition.type = CONDITION_SHAPESHIFT;
+			sb.condition.duration = duration;
+			sb.condition.effect = ConditionEffect::createModShapeShift(outfit);
+			sb.aggressive = false;
 		}
 	}
 	else if(asLowerCaseString(name) == "invisible"){
-		int32_t duration = 10000;
+		sb.condition.type = CONDITION_INVISIBLE;
+		sb.condition.duration = 10000;
+		sb.aggressive = false;
 
 		if(readXMLInteger(node, "duration", intValue)){
-			duration = intValue;
+			sb.condition.duration = intValue;
 		}
 
-		/*
-		Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_INVISIBLE, duration, 0);
-		combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
-		combat->setCondition(condition);
-		*/
+		//sb.condition.effect = ConditionEffect::createModScript("invisible");
 	}
 	else if(asLowerCaseString(name) == "drunk"){
-		int32_t duration = 10000;
+		sb.condition.type = CONDITION_DRUNK;
+		//sb.condition.effect = ConditionEffect::createModDrunk();
+		sb.condition.duration = 10000;
 
 		if(readXMLInteger(node, "duration", intValue)){
-			duration = intValue;
+			sb.condition.duration = intValue;
 		}
 
-		/*
-		Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_DRUNK, duration, 0);
-		combat->setCondition(condition);
-		*/
+		//sb.condition.effect = ConditionEffect::createModScript("drunk");
 	}
 	else if(asLowerCaseString(name) == "firefield"){
-		sb.field = 1492;
+		sb.field = ITEM_FIREFIELD_PVP;
 	}
 	else if(asLowerCaseString(name) == "poisonfield"){
-		sb.field = 1496;
+		sb.field = ITEM_POISONFIELD_PVP;
 	}
 	else if(asLowerCaseString(name) == "energyfield"){
-		sb.field = 1495;
+		sb.field = ITEM_ENERGYFIELD_PVP;
 	}
 	else if(asLowerCaseString(name) == "firecondition" ||
 			asLowerCaseString(name) == "poisoncondition" ||
 			asLowerCaseString(name) == "energycondition" ||
 			asLowerCaseString(name) == "drowncondition"){
-		/*
-		ConditionType conditionType = CONDITION_NONE;
-		uint32_t tickInterval = 2000;
+		sb.condition.type = CONDITION_NONE;
 
+		CombatType conditionDamageType = COMBAT_NONE;
+		uint32_t interval = 2000;
 		if(name == "firecondition"){
-			conditionType = CONDITION_FIRE;
-			tickInterval = 10000;
+			conditionDamageType = COMBAT_FIREDAMAGE;
+			sb.condition.type = CONDITION_BURNING;
+			interval = 10000;
 		}
 		else if(name == "poisoncondition"){
-			conditionType = CONDITION_POISON;
-			tickInterval = 5000;
+			conditionDamageType = COMBAT_EARTHDAMAGE;
+			sb.condition.type = CONDITION_POISONED;
+			interval = 5000;
 		}
 		else if(name == "energycondition"){
-			conditionType = CONDITION_ENERGY;
-			tickInterval = 10000;
+			conditionDamageType = COMBAT_ENERGYDAMAGE;
+			sb.condition.type = CONDITION_ELECTRIFIED;
+			interval = 10000;
 		}
 		else if(name == "drowncondition"){
-			conditionType = CONDITION_DROWN;
-			tickInterval = 5000;
+			conditionDamageType = COMBAT_DROWNDAMAGE;
+			sb.condition.type = CONDITION_DROWNING;
+			interval = 5000;
 		}
 
 		if(readXMLInteger(node, "tick", intValue) && intValue > 0){
-			tickInterval(intValue);
+			interval = intValue;
 		}
 
-		int32_t minDamage = std::abs(sb.minCombatValue);
-		int32_t maxDamage = std::abs(sb.maxCombatValue);
+		int32_t minDamage = std::abs(sb.min);
+		int32_t maxDamage = std::abs(sb.max);
 		int32_t startDamage = 0;
 
 		if(readXMLInteger(node, "start", intValue)){
 			intValue = std::abs(intValue);
 
 			if(intValue <= minDamage){
-				startDamage(intValue);
+				startDamage = intValue;
 			}
 		}
 
-		Condition* condition = getDamageCondition(conditionType, maxDamage, minDamage, startDamage, tickInterval);
-		combat->setCondition(condition);
-		*/
+		sb.condition.interval = interval;
+		sb.condition.effect = ConditionEffect::createPeriodicDamage(interval, conditionDamageType, minDamage, maxDamage, startDamage);
 	}
 	else if(asLowerCaseString(name) == "strength" || asLowerCaseString(name) == "effect"){
 		//

@@ -23,6 +23,7 @@ BeginEnumFile("condition_attributes")
 
 enum ("ConditionId",
 	-- special conditions
+	{"CONDITION_NONE", "none", "unknown"},
 	{"CONDITION_POISONED", "poisoned"},
 	{"CONDITION_BURNING", "burning"},
 	{"CONDITION_ELECTRIFIED", "electrified"},

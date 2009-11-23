@@ -201,9 +201,9 @@ void Manager::registerClasses() {
 
 	registerGlobalFunction("createCondition()", &Manager::lua_createCondition);
 
-	registerMemberFunction("Condition", "addPeriodicHeal(int interval, int value, int rounds)", &Manager::lua_Condition_addPeriodicHeal);
-	registerMemberFunction("Condition", "addPeriodicDamage(int interval, CombatType type, int value, int rounds)", &Manager::lua_Condition_addPeriodicDamage);
-	registerMemberFunction("Condition", "addAveragePeriodicDamage(int interval, CombatType type, int totalDamage, int startDamage)", &Manager::lua_Condition_addAveragePeriodicDamage);
+	registerMemberFunction("Condition", "addPeriodicHeal(int interval, int min, int max, int rounds)", &Manager::lua_Condition_addPeriodicHeal);
+	registerMemberFunction("Condition", "addPeriodicDamage(int interval, CombatType type, int min, int max, int rounds)", &Manager::lua_Condition_addPeriodicDamage);
+	registerMemberFunction("Condition", "addAveragePeriodicDamage(int interval, CombatType type, int min, int max, int first)", &Manager::lua_Condition_addAveragePeriodicDamage);
 	registerMemberFunction("Condition", "addModStamina(int interval, int value)", &Manager::lua_Condition_addModStamina);
 	registerMemberFunction("Condition", "addRegenHealth(int interval, int value)", &Manager::lua_Condition_addRegenHealth);
 	registerMemberFunction("Condition", "addRegenPercentHealth(int interval, PlayerStatType type, int percent)", &Manager::lua_Condition_addRegenPercentHealth);
@@ -211,7 +211,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Condition", "addRegenPercentMana(int interval, PlayerStatType type, int percent)", &Manager::lua_Condition_addRegenPercentMana);
 	registerMemberFunction("Condition", "addRegenSoul(int interval, int value)", &Manager::lua_Condition_addRegenSoul);
 	registerMemberFunction("Condition", "addRegenPercentSoul(int interval, PlayerStatType type, int percent)", &Manager::lua_Condition_addRegenPercentSoul);
-	registerMemberFunction("Condition", "addModSpeed(int percent, int value)", &Manager::lua_Condition_addSpeed);
+	registerMemberFunction("Condition", "addModSpeed(int percent, int value)", &Manager::lua_Condition_addModSpeed);
 	registerMemberFunction("Condition", "addModStat(PlayerStatType type, int value)", &Manager::lua_Condition_addModStat);
 	registerMemberFunction("Condition", "addModPercentStat(PlayerStatType type, int percent)", &Manager::lua_Condition_addModPercentStat);
 	registerMemberFunction("Condition", "addModSkill(SkillType type, int value)", &Manager::lua_Condition_addModSkill);
@@ -3082,6 +3082,11 @@ int LuaState::lua_Condition_destroy()
 int LuaState::lua_Condition_setName()
 {
 	std::string name = popString();
+	try{
+		ConditionId id = ConditionId::fromString(asLowerCaseString(name));
+		name = id.toString();
+	}catch(enum_conversion_error&){}
+
 	Condition* condition = popCondition();
 	condition->setName(name);
 	pushBoolean(true);
@@ -3127,10 +3132,11 @@ int LuaState::lua_Condition_setFlags()
 int LuaState::lua_Condition_addPeriodicHeal()
 {
 	int32_t rounds = popInteger();
-	int32_t value = std::abs(popInteger());
+	int32_t min = std::abs(popInteger());
+	int32_t max = std::abs(popInteger());
 	uint32_t interval = popUnsignedInteger();
 	Condition* condition = popCondition();
-	condition->addEffect(ConditionEffect::createPeriodicHeal(interval, value, rounds));
+	condition->addEffect(ConditionEffect::createPeriodicHeal(interval, min, max, rounds));
 	pushBoolean(true);
 	return 1;
 }
@@ -3138,23 +3144,25 @@ int LuaState::lua_Condition_addPeriodicHeal()
 int LuaState::lua_Condition_addPeriodicDamage()
 {
 	int32_t rounds = popInteger();
-	int32_t value = std::abs(popInteger());
+	int32_t min = std::abs(popInteger());
+	int32_t max = std::abs(popInteger());
 	CombatType combatType = popEnum<CombatType>();
 	uint32_t interval = popUnsignedInteger();
 	Condition* condition = popCondition();
-	condition->addEffect(ConditionEffect::createPeriodicDamage(interval, combatType, 0, 0, value, rounds));
+	condition->addEffect(ConditionEffect::createPeriodicDamage(interval, combatType, min, max, rounds));
 	pushBoolean(true);
 	return 1;
 }
 
 int LuaState::lua_Condition_addAveragePeriodicDamage()
 {
-	int32_t startDamage = std::abs(popInteger());
-	int32_t totalDamage = std::abs(popInteger());
+	int32_t first = std::abs(popInteger());
+	int32_t min = std::abs(popInteger());
+	int32_t max = std::abs(popInteger());
 	CombatType combatType = popEnum<CombatType>();
 	uint32_t interval = popUnsignedInteger();
 	Condition* condition = popCondition();
-	condition->addEffect(ConditionEffect::createPeriodicDamage(interval, combatType, totalDamage, (totalDamage / startDamage), startDamage, 0));
+	condition->addEffect(ConditionEffect::createPeriodicDamage(interval, combatType, min, max, first, true));
 	pushBoolean(true);
 	return 1;
 }
@@ -3232,7 +3240,7 @@ int LuaState::lua_Condition_addRegenPercentSoul()
 	return 1;
 }
 
-int LuaState::lua_Condition_addSpeed()
+int LuaState::lua_Condition_addModSpeed()
 {
 	int32_t value = popInteger();
 	int32_t percent = popInteger();

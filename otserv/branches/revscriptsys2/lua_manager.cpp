@@ -94,6 +94,11 @@ void LuaState::newTable()
 	lua_newtable(state);
 }
 
+void LuaState::setTable(int32_t index)
+{
+	lua_settable(state, index);
+}
+
 bool LuaState::iterateTable(int32_t index)
 {
 	return lua_next(state, index) != 0;

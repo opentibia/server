@@ -13,6 +13,9 @@ template<> ConditionId__Base::StringToEnum ConditionId__Base::string_to_enum = C
 template<> ConditionId__Base::StringToEnum ConditionId__Base::lstring_to_enum= ConditionId__Base::StringToEnum();
 template<> void ConditionId__Base::initialize()
 {
+	initAddValue(enums::CONDITION_NONE, "CONDITION_NONE", true);
+	initAddValue(enums::CONDITION_NONE, "none", false);
+	initAddValue(enums::CONDITION_NONE, "unknown", false);
 	initAddValue(enums::CONDITION_POISONED, "CONDITION_POISONED", true);
 	initAddValue(enums::CONDITION_POISONED, "poisoned", false);
 	initAddValue(enums::CONDITION_BURNING, "CONDITION_BURNING", true);
