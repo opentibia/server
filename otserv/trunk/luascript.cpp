@@ -2455,7 +2455,7 @@ int LuaScriptInterface::luaDoPlayerRemoveItem(lua_State *L)
 int LuaScriptInterface::luaDoFeedPlayer(lua_State *L)
 {
 	//doFeedPlayer(uid, food)
-	int32_t food = (int32_t)popNumber(L);
+	uint32_t food = popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();

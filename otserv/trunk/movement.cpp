@@ -774,7 +774,7 @@ uint32_t MoveEvent::EquipItem(MoveEvent* moveEvent, Player* player, Item* item, 
 	//Enable item only when requirements are complete
 	//This includes item transforming
 	if(!player->hasFlag(PlayerFlag_IgnoreWeaponCheck) && moveEvent->getWieldInfo() != 0){
-		if((int32_t)player->getLevel() < moveEvent->getReqLevel()
+		if(player->getLevel() < moveEvent->getReqLevel()
 			|| player->getMagicLevel() < moveEvent->getReqMagLv() ||
 			(!player->isPremium() && moveEvent->isPremium())){
 			return 1;
@@ -1091,7 +1091,7 @@ ReturnValue MoveEvent::canPlayerWearEquip(Player* player, slots_t slot)
 	if(vocMap.find(player->getVocationId()) == vocMap.end()){
 		return RET_NOTREQUIREDPROFESSION;
 	}
-	if((int32_t)player->getLevel() < getReqLevel()){
+	if(player->getLevel() < getReqLevel()){
 		return RET_NOTREQUIREDLEVEL;
 	}
 	if(player->getMagicLevel() < getReqMagLv()){

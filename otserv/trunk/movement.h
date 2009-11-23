@@ -117,8 +117,8 @@ public:
 	ReturnValue canPlayerWearEquip(Player* player, slots_t slot);
 
 	//onEquip information
-	int32_t getReqLevel() const {return reqLevel;}
-	int32_t getReqMagLv() const {return reqMagLevel;}
+	uint32_t getReqLevel() const {return reqLevel;}
+	uint32_t getReqMagLv() const {return reqMagLevel;}
 	bool isPremium() const {return premium;}
 	const std::string& getVocationString() const {return vocationString;}
 	uint32_t getWieldInfo() const {return wieldInfo;}
@@ -142,8 +142,8 @@ protected:
 	uint32_t slot;
 
 	//onEquip information
-	int32_t reqLevel;
-	int32_t reqMagLevel;
+	uint32_t reqLevel;
+	uint32_t reqMagLevel;
 	bool premium;
 	std::string vocationString;
 	uint32_t wieldInfo;

@@ -454,7 +454,7 @@ bool CombatSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 Spell::Spell()
 {
 	level = 0;
-	magLevel = -1;
+	magLevel = 0;
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
@@ -646,7 +646,7 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
-		if((player->getMagicLevel()) < magLevel){
+		if(player->getMagicLevel() < magLevel){
 			player->sendCancelMessage(RET_NOTENOUGHMAGICLEVEL);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;

@@ -133,7 +133,7 @@ public:
 	void addList();
 	void kickPlayer();
 
-	static uint64_t getExpForLevel(int32_t level)
+	static uint64_t getExpForLevel(uint32_t level)
 	{
 		level--;
 		return ((50ULL * level * level * level) - (150ULL * level * level) + (400ULL * level))/3ULL;
@@ -178,7 +178,7 @@ public:
 	std::string getAccountName() const {return accountName;}
 	uint32_t getAccountId() const {return accountId;}
 	uint32_t getLevel() const {return level;}
-	int32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
+	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
 	int16_t getAccessLevel() const {return accessLevel;}
 	int16_t getViolationLevel() const {return violationLevel;}
 	std::string getGroupName() const {return groupName;}

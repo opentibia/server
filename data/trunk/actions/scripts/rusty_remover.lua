@@ -41,7 +41,7 @@ function onUse(cid, item, frompos, item2, topos)
 		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You removed the rust, revealing a " .. getItemName(revealedItem) )
 	end
 
-	doRemoveItem(item.uid)
+	doRemoveItem(item.uid, 1)
 
 	return TRUE
 end

@@ -120,7 +120,7 @@ public:
 	int32_t getManaCost(const Player* player) const;
 	int32_t getSoulCost(const Player* player) const;
 	uint32_t getLevel() const {return level;}
-	int32_t getMagicLevel() const {return magLevel;}
+	uint32_t getMagicLevel() const {return magLevel;}
 	int32_t getMana() const {return mana;}
 	int32_t getManaPercent() const {return manaPercent;}
 	const bool isPremium() const {return premium;}
@@ -143,7 +143,7 @@ protected:
 	bool enabled;
 	bool premium;
 	uint32_t level;
-	int32_t magLevel;
+	uint32_t magLevel;
 
 	int32_t mana;
 	int32_t manaPercent;
