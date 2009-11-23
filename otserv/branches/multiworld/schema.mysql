@@ -103,7 +103,7 @@ CREATE TABLE `guild_ranks` (
 	FOREIGN KEY `guild_fk` (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-ALTER TABLE `players` ADD FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`);
+ALTER TABLE `players` ADD FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`) ON UPDATE SET NULL;
 
 CREATE TABLE `player_viplist` (
 	`player_id` INT UNSIGNED NOT NULL COMMENT 'id of player whose viplist entry it is',
