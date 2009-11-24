@@ -280,6 +280,9 @@ function otstd.onCastSpell(event)
 						local amount = 0
 						if spell.formula then
 							amount = spell.formula(caster)
+							if spell.aggressive then
+								amount = -amount
+							end
 						end
 						if amount == 0 or internalCastSpell(spell.damageType, caster, target, amount, spell.blockedByShield, spell.blockedByArmor) then
 							if spell.condition then
