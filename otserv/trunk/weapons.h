@@ -84,7 +84,7 @@ public:
 	virtual int32_t getElementDamage(const Player* player, const Creature* target) const {return 0;}
 
 	const uint32_t getReqLevel() const {return level;}
-	const int32_t getReqMagLv() const {return magLevel;}
+	const uint32_t getReqMagLv() const {return magLevel;}
 	const bool hasExhaustion() const {return (exhaustion != 0);}
 	const bool isWieldedUnproperly() const {return wieldUnproperly;}
 	const bool isPremium() const {return premium;}
@@ -107,8 +107,8 @@ protected:
 	bool premium;
 	int32_t exhaustion;
 	bool wieldUnproperly;
-	int32_t level;
-	int32_t magLevel;
+	uint32_t level;
+	uint32_t magLevel;
 	int32_t mana;
 	int32_t manaPercent;
 	int32_t soul;
