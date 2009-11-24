@@ -492,7 +492,7 @@ bool SingleSpawnEvent::executeEvent()
 		return false;
 	}
 
-	if(!g_game.placeCreature(monster, m_position)){
+	if(!g_game.placeCreature(monster, m_position, false, true)){
 		delete monster;
 		std::cout << "[Error] Raids: Cant place monster " << m_monsterName << std::endl;
 		return false;
@@ -682,7 +682,7 @@ bool AreaSpawnEvent::executeEvent()
 				pos.y = random_range(m_fromPos.y, m_toPos.y);
 				pos.z = random_range(m_fromPos.z, m_toPos.z);
 
-				if(g_game.placeCreature(monster, pos)){
+				if(g_game.placeCreature(monster, pos, false, true)){
 					success = true;
 					break;
 				}
