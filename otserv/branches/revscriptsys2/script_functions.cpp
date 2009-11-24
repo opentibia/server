@@ -21,6 +21,7 @@
 #include "script_manager.h"
 #include "script_event.h"
 #include "script_listener.h"
+#include "creature_manager.h"
 #include "configmanager.h"
 #include "housetile.h"
 #include "player.h"
@@ -37,6 +38,7 @@
 extern ConfigManager g_config;
 extern Game g_game;
 extern Vocations g_vocations;
+extern CreatureManager g_creature_types;
 
 using namespace Script;
 
@@ -546,7 +548,7 @@ void Manager::registerFunctions() {
 
 	// OnCondition
 	registerGlobalFunction("registerOnConditionEffect(string name, string method, function callback)", &Manager::lua_registerGenericEvent_OnConditionEffect);
-	//registerGlobalFunction("registerOnCreatureCondition(Creature creature, string name, string method, function callback)", &Manager::lua_registerSpecificEvent_OnConditionEffect);
+	//registerGlobalFunction("registerOnCreatureConditionEffect(Creature creature, string name, string method, function callback)", &Manager::lua_registerSpecificEvent_OnConditionEffect);
 
 	// OnAttack
 	registerGlobalFunction("registerOnAttack([string what = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnAttack);
@@ -571,6 +573,7 @@ void Manager::registerFunctions() {
 	// OnActorLoadSpell/OnActorCastSpell
 	registerGlobalFunction("registerOnActorLoadSpell(function callback)", &Manager::lua_registerGenericEvent_onActorLoadSpell);
 	registerGlobalFunction("registerOnActorCastSpell(function callback)", &Manager::lua_registerGenericEvent_onActorCastSpell);
+	registerGlobalFunction("configureActorSpells()", &Manager::lua_configureActorSpells);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
@@ -2668,6 +2671,12 @@ int LuaState::lua_registerGenericEvent_onActorCastSpell() {
 
 	// Return listener
 	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_configureActorSpells() {
+	bool result = g_creature_types.configureSpells();
+	pushBoolean(result);
 	return 1;
 }
 

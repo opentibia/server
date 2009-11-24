@@ -31,6 +31,7 @@ public:
 
 	bool loadFromXml(const std::string& _datadir, bool reloading = false);
 	bool isLoaded(){return loaded;}
+	bool configureSpells();
 	bool reload();
 
 	CreatureType* getMonsterType(const std::string& name);

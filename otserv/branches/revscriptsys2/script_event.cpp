@@ -2267,6 +2267,9 @@ void OnActorLoadSpell::Event::push_instance(LuaState& state, Environment& enviro
 	state.push(spell.needTarget);
 	state.setField(-2, "needTarget");
 
+	state.push(spell.configureSpell);
+	state.setField(-2, "configureSpell");
+
 	state.push(spell.aggressive);
 	state.setField(-2, "aggressive");
 

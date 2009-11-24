@@ -1248,11 +1248,9 @@ void Creature::onAddCondition(const Condition* condition, bool preAdd /*= true*/
 		g_game.internalCreatureChangeVisible(this, false);
 	}
 	else if(condition->getMechanicType() == MECHANIC_PARALYZED){
-		//TODO: Remove all conditions with FLAG_HASTE
 		removeCondition(CONDITION_HASTE);
 	}
-	else if(condition->getName() == CONDITION_HASTE.toString()){
-		//TODO: If FLAG_HASTE is set remove paralyze
+	else if(condition->getName() == "haste" ){
 		removeCondition(MECHANIC_PARALYZED);
 	}
 }

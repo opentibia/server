@@ -277,7 +277,6 @@ function otstd.onCastSpell(event)
 			for _, target in ipairs(creatures) do
 				if otstd.canCastSpellOnCreature(spell, caster, target) then
 					if spell.damageType ~= COMBAT_NONE then
-						--print("Damaging " .. target:getName())
 						local amount = 0
 						if spell.formula then
 							amount = spell.formula(caster)
@@ -292,7 +291,6 @@ function otstd.onCastSpell(event)
 							end
 						end
 					else
-						--print("Casting spell on " .. target:getName())
 						if spell.condition then
 							target:addCondition(spell.condition)
 						end
@@ -301,8 +299,6 @@ function otstd.onCastSpell(event)
 							spell.onHitCreature(target, event)
 						end
 					end
-				else
-					--print("Cannot attack - " .. target:getName())
 				end
 			end
 				
@@ -814,8 +810,7 @@ function Spell:register()
 				event.targetCreature = tile and tile:getTopCreature()
 			end
 			
-			event.caster:sendNote("Casting rune spell " .. self.name)
-			
+			event.caster:sendNote("Casting rune spell " .. self.name)			
 			otstd.onSpell(event)
 		end
 

@@ -75,6 +75,7 @@ struct SpellBlock{
 		blockedByArmor = false;
 		needTarget = false;
 		aggressive = true;
+		configureSpell = true;
 		spread = 0;
 		length = 0;
 		radius = 0;
@@ -100,6 +101,7 @@ struct SpellBlock{
 	bool blockedByArmor;
 	bool needTarget;
 	bool aggressive;
+	bool configureSpell;
 	uint32_t spread;
 	uint32_t length;
 	uint32_t radius;

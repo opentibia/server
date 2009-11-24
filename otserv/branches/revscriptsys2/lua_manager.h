@@ -302,6 +302,7 @@ public:
 	int lua_registerSpecificEvent_OnTradeEnd();
 	int lua_registerGenericEvent_onActorLoadSpell();
 	int lua_registerGenericEvent_onActorCastSpell();
+	int lua_configureActorSpells();
 
 	int lua_stopListener();
 

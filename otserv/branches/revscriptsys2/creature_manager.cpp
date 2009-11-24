@@ -84,9 +84,29 @@ bool CreatureManager::loadFromXml(const std::string& _datadir, bool reloading /*
 	return loaded;
 }
 
+bool CreatureManager::configureSpells()
+{
+	for(TypeMap::iterator iter = creature_types.begin(); iter != creature_types.end(); ++iter){
+		CreatureType* cType = iter->second;
+		for(SpellList::const_iterator it = cType->spellAttackList().begin(), spell_attack_list_end = cType->spellAttackList().end(); it != spell_attack_list_end; ++it){
+			g_game.onActorLoadSpell(*it);
+		}
+
+		for(SpellList::const_iterator it = cType->spellDefenseList().begin(), spell_defense_list_end = cType->spellDefenseList().end(); it != spell_defense_list_end; ++it){
+			g_game.onActorLoadSpell(*it);
+		}
+	}
+
+	return true;
+}
 bool CreatureManager::reload()
 {
-	return loadFromXml(datadir, true);
+	if(loadFromXml(datadir, true)){
+		configureSpells();
+		return true;
+	}
+
+	return false;
 }
 
 bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
@@ -147,8 +167,7 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 			}
 		}
 	}
-
-	if(readXMLInteger(node, "radius", intValue)){
+	else if(readXMLInteger(node, "radius", intValue)){
 		sb.radius = intValue;
 
 		//target spell
@@ -156,6 +175,8 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 			sb.needTarget = (intValue != 0);
 		}
 	}
+
+	sb.needTarget = sb.needTarget || (sb.radius == 0 && sb.length == 0);
 
 	if(asLowerCaseString(name) == "melee"){
 		int32_t attackValue = 0;
@@ -395,8 +416,8 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 		//
 	}
 	else{
-		std::cout << "Error: [CreatureManager::deserializeSpell]. " << sb.name << std::endl;
-		return false;
+		sb.configureSpell = false;
+		return true;
 	}
 
 	xmlNodePtr attributeNode = node->children;
@@ -702,7 +723,6 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 						sb.name = ss.str();
 						if(deserializeSpell(tmpNode, sb)){
 							mType->spellAttackList().push_back(sb);
-							g_game.onActorLoadSpell(sb);
 							++index;
 						}
 						else{
@@ -732,7 +752,6 @@ bool CreatureManager::loadMonsterType(const std::string& file, const std::string
 						sb.name = ss.str();
 						if(deserializeSpell(tmpNode, sb)){
 							mType->spellDefenseList().push_back(sb);
-							g_game.onActorLoadSpell(sb);
 							++index;
 						}
 						else{
