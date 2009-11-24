@@ -1715,7 +1715,7 @@ void Player::openShopWindow(const std::list<ShopInfo>& shop)
 	sendSaleItemList();
 }
 
-void Player::closeShopWindow()
+void Player::closeShopWindow(bool sendCloseShopWindow /*= true*/)
 {
 	//unreference callbacks
 	int32_t onBuy;
@@ -1725,7 +1725,10 @@ void Player::closeShopWindow()
 	if(npc){
 		setShopOwner(NULL, -1, -1);
 		npc->onPlayerEndTrade(this, onBuy, onSell);
-		sendCloseShop();
+
+		if(sendCloseShopWindow){
+			sendCloseShop();
+		}
 	}
 	shopItemList.clear();
 }

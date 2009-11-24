@@ -643,7 +643,7 @@ public:
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
 	void openShopWindow(const std::list<ShopInfo>& shop);
-	void closeShopWindow();
+	void closeShopWindow(bool sendCloseShopWindow = true);
 	void updateSaleShopList(uint32_t itemId);
 	bool hasShopItemForSale(uint32_t itemId, uint8_t subType);
 
