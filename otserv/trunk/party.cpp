@@ -381,7 +381,7 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 void Party::shareExperience(uint64_t experience, bool fromMonster)
 {
 	double member_factor = g_config.getNumber(ConfigManager::PARTY_MEMBER_EXP_BONUS);
-	double xpgained = experience / (memberList.size() + 1) + experience * (member_factor / 100.);
+	double xpgained = (experience + (experience * (member_factor / 100.))) / (memberList.size() + 1);
 
 	if(xpgained < 0)
 		return;
