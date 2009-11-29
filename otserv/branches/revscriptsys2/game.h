@@ -557,7 +557,7 @@ public:
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
 		int32_t rangex = Map_maxClientViewportX, int32_t rangey = Map_maxClientViewportY);
-	bool isSightClear(const Position& fromPos, const Position& toPos, bool sameFloor);
+	bool isSightClear(const Position& fromPos, const Position& toPos, bool floorCheck);
 
 	bool getPathTo(const Creature* creature, const Position& destPos,
 		std::list<Direction>& listDir, int32_t maxSearchDist = -1);
@@ -608,9 +608,9 @@ protected:
 	// Action helper function
 	ReturnValue canUseItem(const Player* player, const Position& pos, bool checkLineOfSight = false);
 	ReturnValue internalUseItem(Player* player, const Position& pos,
-		uint8_t index, Item* item, uint32_t creatureId);
+		uint8_t index, Item* item);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-		Item* item, bool isHotkey, uint32_t creatureId);
+		Item* item, Creature* targetCreature, Item* targetItem, bool isHotkey);
 
 	bool openContainer(Player* player, Container* container, const uint8_t index);
 	void showUseHotkeyMessage(Player* player, const ItemType& it, uint32_t itemCount);

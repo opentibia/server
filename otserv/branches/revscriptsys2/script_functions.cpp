@@ -235,6 +235,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getID()", &Manager::lua_Creature_getID);
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getOutfit()", &Manager::lua_Creature_getOutfit);
+	registerMemberFunction("Creature", "getZone()", &Manager::lua_Creature_getZone);	
 	registerMemberFunction("Creature", "say(string msg)", &Manager::lua_Creature_say);
 	registerMemberFunction("Creature", "setOutfit(table outfit)", &Manager::lua_Creature_setOutfit);
 	registerMemberFunction("Creature", "walk(Direction direction)", &Manager::lua_Creature_walk);
@@ -348,6 +349,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "setTown(Town town)", &Manager::lua_Player_setTown);
 	registerMemberFunction("Player", "setVocation(int vocationid)", &Manager::lua_Player_setVocation);
 	registerMemberFunction("Player", "hasGroupFlag(integer flag)", &Manager::lua_Player_hasGroupFlag);
+	registerMemberFunction("Player", "hasSafeMode()", &Manager::lua_Player_hasSafeMode);
 	registerMemberFunction("Player", "internalWalkTo(position pos)", &Manager::lua_Player_internalWalkTo);
 	registerMemberFunction("Player", "internalPickup(Item item)", &Manager::lua_Player_internalPickup);
 	registerMemberFunction("Player", "hasAttacked(Player who)", &Manager::lua_Player_hasAttacked);
@@ -402,7 +404,7 @@ void Manager::registerClasses() {
 
 	// Tile
 	registerMemberFunction("Tile", "getThing(int index)", &Manager::lua_Tile_getThing);
-	registerMemberFunction("Tile", "getCreatures()", &Manager::lua_Tile_getCreatures);
+	registerMemberFunction("Tile", "getCreatures([Creature who = nil])", &Manager::lua_Tile_getCreatures);
 
 	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
 	registerMemberFunction("Tile", "getItemCount(int itemid)", &Manager::lua_Tile_getItemCount);
@@ -578,7 +580,13 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
 
 	// Game/Map functions
+	// map:rayCast()
+	registerGlobalFunction("rayCast(position from, position to, boolean checkfloor)", &Manager::lua_rayCast);
+	// map:canThrowObjectTo:rayCast()
+	registerGlobalFunction("canThrowObjectTo(position from, position to, boolean checkLineOfSight [, int rangex [,int rangey]])", &Manager::lua_canThrowObjectTo);
+	// map:canThrowObjectTo:getParentTile()
 	registerGlobalFunction("getParentTile(int x, int y, int z)", &Manager::lua_getTile);
+
 	registerGlobalFunction("sendMagicEffect(position where, MagicEffect type)", &Manager::lua_sendMagicEffect);
 	registerGlobalFunction("sendDistanceEffect([Creature c = nil], position from, position to, ShootEffect type)", &Manager::lua_sendDistanceEffect);
 	registerGlobalFunction("sendAnimatedText(position where, int color, string text)", &Manager::lua_sendAnimatedText);
@@ -2881,13 +2889,19 @@ int LuaState::lua_Tile_getThing()
 
 int LuaState::lua_Tile_getCreatures()
 {
+	Creature* creature = NULL;
+	if(getStackSize() > 1) {
+		creature = popCreature();
+	}
 	Tile* tile = popTile();
 
 	newTable();
 	int n = 1;
 	for(CreatureIterator it = tile->creatures_begin(), end_iter = tile->creatures_end(); it != end_iter; ++it, ++n){
-		pushThing(*it);
-		setField(-2, n);
+		if(creature == NULL || creature->canSeeCreature(*it)){
+			pushThing(*it);
+			setField(-2, n);
+		}
 	}
 	return 1;
 }
@@ -3631,6 +3645,13 @@ int LuaState::lua_Creature_getOutfit()
 	return 1;
 }
 
+int LuaState::lua_Creature_getZone()
+{
+	Creature* creature = popCreature();
+	pushEnum(creature->getZone());
+	return 1;
+}
+
 int LuaState::lua_Creature_setOutfit()
 {
 	OutfitType outfit = popOutfit();
@@ -4308,13 +4329,20 @@ int LuaState::lua_Player_getSkullType()
 #endif
 	return 1;
 }
+int LuaState::lua_Player_hasSafeMode()
+{
+	Player* p = popPlayer();
+	pushBoolean(p->hasSafeMode());
+	return 1;
+}
+
 int LuaState::lua_Player_hasGroupFlag()
 {
 	PlayerFlag f = popEnum<PlayerFlag>();
-	Player* player = popPlayer();
+	Player* p = popPlayer();
 	if(!f.exists())
 		throw Error("Invalid player flag passed to function Player.hasGroupFlag!");
-	pushBoolean(player->hasFlag((PlayerFlags)f));
+	pushBoolean(p->hasFlag((PlayerFlags)f));
 	return 1;
 }
 
@@ -5387,6 +5415,36 @@ int LuaState::lua_sendAnimatedText()
 
 	g_game.addAnimatedText(pos, color, text);
 	pushBoolean(1);
+	return 1;
+}
+
+int LuaState::lua_rayCast()
+{
+	bool checkFloor = popBoolean();
+	Position toPos = popPosition();
+	Position fromPos = popPosition();
+
+	bool result = g_game.isSightClear(fromPos, toPos, checkFloor);
+	pushBoolean(result);
+	return 1;
+}
+
+int LuaState::lua_canThrowObjectTo()
+{
+	int32_t rangex = Map::maxClientViewportX;
+	int32_t rangey = Map::maxClientViewportY;
+
+	if(getStackSize() > 4)
+		rangey = popInteger();
+	if(getStackSize() > 3)
+		rangex = popInteger();
+
+	bool checkLineOfSight = popBoolean();
+	Position toPos = popPosition();
+	Position fromPos = popPosition();
+
+	bool result = g_game.canThrowObjectTo(fromPos, toPos, checkLineOfSight, rangex, rangey);
+	pushBoolean(result);
 	return 1;
 }
 

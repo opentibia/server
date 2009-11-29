@@ -19,6 +19,6 @@ greatFireball.area        = {
 		{" ", " ", "a", "a", "a", " ", " "}
 	}
 	
-greatFireball.formula = formulaLevelMagic(0, 1.4, 40, 0, 2.8, 70)
+greatFireball.formula = formulaLevelMagic(40, 1.4, 70, 2.8)
 
 greatFireball:register()

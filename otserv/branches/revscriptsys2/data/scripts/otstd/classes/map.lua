@@ -15,6 +15,12 @@ function Map:type() return "Map" end
 __internal_getParentTile = getParentTile
 getParentTile = nil
 
+__internal_rayCast = rayCast
+rayCast = nil
+
+__internal_canThrowObjectTo = canThrowObjectTo
+canThrowObjectTo = nil
+
 -- Store all towns when we start the server, for faster reference (they never change)
 map.towns = getAllTowns()
 
@@ -60,6 +66,21 @@ function Map:getTown(name)
 		end
 	end
 	return nil
+end
+
+function Map:rayCast(from, to, checkfloor)
+	if not checkfloor then
+		checkfloor = true
+	end
+	return __internal_rayCast(from, to, checkfloor)
+end
+
+function Map:canThrowObjectTo(from, to, checkLineOfSight, rangex, rangey)
+	if not rangex and not rangey then	
+		return __internal_canThrowObjectTo(from, to, checkLineOfSight)
+	else
+		return __internal_canThrowObjectTo(from, to, checkLineOfSight, rangex, rangey)
+	end
 end
 
 function Map:getTownWildcard(name)

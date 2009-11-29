@@ -369,6 +369,7 @@ public:
 	int lua_Creature_getName();
 	int lua_Creature_getNameDescription();
 	int lua_Creature_getOutfit();
+	int lua_Creature_getZone();
 	int lua_Creature_say();
 	int lua_Creature_setOutfit();
 	int lua_Creature_walk();
@@ -476,6 +477,7 @@ public:
 	int lua_Player_getSkullType();
 	int lua_Player_getLastLogin();
 	int lua_Player_hasGroupFlag();
+	int lua_Player_hasSafeMode();
 
 	int lua_Player_getGuildID();
 	int lua_Player_getGuildName();
@@ -600,6 +602,8 @@ public:
 	int lua_sendMagicEffect();
 	int lua_sendDistanceEffect();
 	int lua_sendAnimatedText();
+	int lua_rayCast();
+	int lua_canThrowObjectTo();
 	int lua_getTile();
 	int lua_getTowns();
 	int lua_sendMailTo();

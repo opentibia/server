@@ -308,10 +308,11 @@ void OnHear::Event::update_instance(Manager& state, Environment& environment, Lu
 ///////////////////////////////////////////////////////////////////////////////
 // Triggered when a player use an item
 
-OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos, Item* targetItem, ReturnValue& retval) :
+OnUseItem::Event::Event(Player* user, Item* item, const PositionEx* toPos, Creature* targetCreature, Item* targetItem, ReturnValue& retval) :
 	user(user),
 	item(item),
 	targetPos(toPos),
+	targetCreature(targetCreature),
 	targetItem(targetItem),
 	retval(retval)
 {
@@ -322,6 +323,7 @@ OnUseItem::Event::Event(Player* user, Item* item, ReturnValue& retval) :
 	user(user),
 	item(item),
 	targetPos(NULL),
+	targetCreature(NULL),
 	targetItem(NULL),
 	retval(retval)
 {
@@ -378,12 +380,18 @@ void OnUseItem::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "item");
 	state.pushEnum(retval);
 	state.setField(-2, "retval");
-	if(targetPos) {
+	if(targetPos){
 		state.pushPosition(*targetPos);
 	} else {
 		state.pushNil();
 	}
 	state.setField(-2, "targetPosition");
+	if(targetCreature){
+		state.pushThing(targetCreature);
+	} else {
+		state.pushNil();
+	}
+	state.setField(-2, "targetCreature");
 	state.pushThing(targetItem);
 	state.setField(-2, "targetInventoryItem");
 }

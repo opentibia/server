@@ -121,13 +121,9 @@ function Player:isMale()
 	return self:getSex() == MALE
 end
 
--- 
-
 function Player:getTown()
 	return map:getTown(self:getTownID())
 end
-
---
 
 function Player:addMana(howmuch)
 	r = true
@@ -137,14 +133,28 @@ function Player:addMana(howmuch)
 	self:setMana(math.max(0, self:getMana() + howmuch))
 	return r
 end
-function Player:removeMana(howmuch) return self:addMana(-howmuch) end
+
+function Player:removeMana(howmuch)
+	return self:addMana(-howmuch)
+end
 
 function Player:spendMana(howmuch)
 	self:removeMana(howmuch)
 	self:addManaSpent(howmuch)
 end
 
---
+function Player:addSoul(howmuch)
+	r = true
+	if howmuch < 0 then
+		r = self:getSoulPoints() < howmuch
+	end
+	self:setSoulPoints(math.max(0, self:getSoulPoints() + howmuch))
+	return r
+end
+
+function Player:removeSoul(howmuch)
+	return self:addSoul(-howmuch)
+end
 
 function Player:addItemOfType(itemid, subtype, count, itemModFunc)
 	local item_type = Items[itemid]
@@ -287,6 +297,20 @@ end
 
 function Player:cannotAttackMonster()
 	return self:hasGroupFlag(PlayerFlag_CannotAttackMonster)
+end
+
+function Player:canGetExhausted()
+	return self:hasGroupFlag(PlayerFlag_HasNoExhaustion)	
+end
+
+function Player:addCombatExhaustion(time)
+	--local condition = { id = CONDITION_EXHAUST_DAMAGE, duration = time}
+	--self:addCondition(condition)
+end
+
+function Player:addHealExhaustion(time)
+	--local condition = { id = CONDITION_EXHAUST_DAMAGE, duration = time}
+	--self:addCondition(condition)
 end
 
 -- Login / Logout

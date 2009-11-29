@@ -32,8 +32,8 @@ function Tile:getTopItem()
 	return self:getItem(-1)
 end
 
-function Tile:getTopCreature()
-	local creatures = self:getCreatures()
+function Tile:getTopCreature(who)
+	local creatures = self:getCreatures(who)
 	
 	for __,creature in ipairs(creatures) do
 		return creature
@@ -78,6 +78,10 @@ end
 
 function Tile:floorChange()
 	return self:hasProperty(TILEPROP_FLOORCHANGE)
+end
+
+function Tile:positionChange()
+	return self:hasProperty(TILEPROP_POSITIONCHANGE)
 end
 
 function Tile:floorChangeDown()

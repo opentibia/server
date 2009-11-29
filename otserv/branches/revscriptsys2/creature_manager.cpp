@@ -184,7 +184,7 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 		if(readXMLInteger(node, "attack", attackValue)){
 			if(readXMLInteger(node, "skill", attackSkill)){
 				sb.min = 0;
-				sb.max = -(int32_t)std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5));
+				sb.max = (int32_t)std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5));
 			}
 		}
 

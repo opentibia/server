@@ -474,7 +474,7 @@ ReturnValue Game::canUseItem(const Player* player, const Position& pos, bool che
 	return RET_NOERROR;
 }
 
-ReturnValue Game::internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item, uint32_t creatureId)
+ReturnValue Game::internalUseItem(Player* player, const Position& pos, uint8_t index, Item* item)
 {
 	ReturnValue retval = canUseItem(player, pos);
 	if(retval != RET_NOERROR){
@@ -525,7 +525,7 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos, uint8_t i
 }
 
 ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-	Item* item, bool isHotkey, uint32_t creatureId)
+	Item* item, Creature* targetCreature, Item* targetItem, bool isHotkey)
 {
 	ReturnValue retval = canUseItem(player, fromPosEx);
 	if(retval != RET_NOERROR){
@@ -533,15 +533,20 @@ ReturnValue Game::internalUseItemEx(Player* player, const PositionEx& fromPosEx,
 	}
 
 	if(script_system){
-		if(toPosEx.x == 0xFFFF){
-			Item* toItem = internalGetItem(player, toPosEx, toPosEx.stackpos);
-			Script::OnUseItem::Event evt(player, item, NULL, toItem, retval);
+		if(targetCreature){
+			Script::OnUseItem::Event evt(player, item, NULL, targetCreature, NULL, retval);
+			if(script_system->dispatchEvent(evt)) {
+				return retval;
+			}
+		}
+		else if(targetItem){
+			Script::OnUseItem::Event evt(player, item, NULL, NULL, targetItem, retval);
 			if(script_system->dispatchEvent(evt)) {
 				return retval;
 			}
 		}
 		else{
-			Script::OnUseItem::Event evt(player, item, &toPosEx, NULL, retval);
+			Script::OnUseItem::Event evt(player, item, &toPosEx, NULL, NULL, retval);
 			if(script_system->dispatchEvent(evt)) {
 				return retval;
 			}
@@ -2932,7 +2937,7 @@ bool Game::playerUseItem(uint32_t playerId, Position pos, uint8_t stackPos,
 	player->setNextActionTask(NULL);
 	player->stopWalk();
 
-	ReturnValue ret = internalUseItem(player, pos, index, item, 0);
+	ReturnValue ret = internalUseItem(player, pos, index, item);
 	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONTIME));
 
 	if(isHotkey){
@@ -2999,7 +3004,12 @@ bool Game::playerUseItemEx(uint32_t playerId, Position fromPos, uint8_t fromStac
 	player->setNextActionTask(NULL);
 	player->stopWalk();
 
-	ReturnValue ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(toPos, toStackPos), item, isHotkey, 0);
+	Item* targetItem = NULL;
+	if(toPos.x == 0xFFFF){
+		targetItem = internalGetItem(player, toPos, toStackPos);
+	}
+
+	ReturnValue ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(toPos, toStackPos), item, NULL, targetItem, isHotkey);
 	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
 
 	if(isHotkey){
@@ -3014,7 +3024,7 @@ bool Game::playerUseItemEx(uint32_t playerId, Position fromPos, uint8_t fromStac
 			if(ret == RET_NOERROR){
 				//changing the position since its now in the inventory of the player
 				internalGetPosition(moveItem, fromPos, fromStackPos);
-				ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(toPos, toStackPos), item, isHotkey, 0);
+				ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(toPos, toStackPos), item, NULL, NULL, isHotkey);
 			}
 		}
 
@@ -3105,7 +3115,9 @@ bool Game::playerUseBattleWindow(uint32_t playerId, Position fromPos, uint8_t fr
 	player->setNextActionTask(NULL);
 	player->stopWalk();
 
-	ReturnValue ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(creature->getPosition(), 0), item, isHotkey, creatureId);
+	Creature* targetCreature = getCreatureByID(creatureId);
+
+	ReturnValue ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(creature->getPosition(), 0), item, targetCreature, NULL, isHotkey);
 	player->setNextAction(OTSYS_TIME() + g_config.getNumber(ConfigManager::MIN_ACTIONEXTIME));
 
 	if(isHotkey){
@@ -3120,7 +3132,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, Position fromPos, uint8_t fr
 			if(ret == RET_NOERROR){
 				//changing the position since its now in the inventory of the player
 				internalGetPosition(moveItem, fromPos, fromStackPos);
-				ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(creature->getPosition(), 0), item, isHotkey, creatureId);
+				ret = internalUseItemEx(player, PositionEx(fromPos, fromStackPos), PositionEx(creature->getPosition(), 0), item, targetCreature, NULL, isHotkey);
 			}
 		}
 
@@ -3131,7 +3143,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, Position fromPos, uint8_t fr
 					this, player->getID(), listDir)));
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseBattleWindow, this,
-			playerId, fromPos, fromStackPos, creatureId, spriteId, isHotkey));
+					playerId, fromPos, fromStackPos, creatureId, spriteId, isHotkey));
 				player->setNextWalkActionTask(task);
 				return true;
 			}

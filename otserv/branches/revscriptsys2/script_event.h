@@ -219,7 +219,7 @@ namespace Script {
 
 		class Event : public Script::Event {
 		public:
-			Event(Player* user, Item* item, const PositionEx* toPos, Item* toItem, ReturnValue& retval);
+			Event(Player* user, Item* item, const PositionEx* toPos, Creature* targetCreature, Item* targetItem, ReturnValue& retval);
 			Event(Player* user, Item* item, ReturnValue& retval);
 			~Event();
 
@@ -239,6 +239,7 @@ namespace Script {
 			Player* user;
 			Item* item;
 			const PositionEx* targetPos;
+			Creature* targetCreature;
 			Item* targetItem;
 			ReturnValue& retval;
 		};

@@ -39,7 +39,10 @@ function Creature:addHealth(howmuch)
 	self:setHealth(math.max(0, self:getHealth() + howmuch))
 	return r
 end
-function Creature:removeHealth(howmuch) return self:addHealth(-howmuch) end
+
+function Creature:removeHealth(howmuch)
+	return self:addHealth(-howmuch)
+end
 
 function Creature:isHealExhausted()
 	return false

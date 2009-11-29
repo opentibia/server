@@ -35,7 +35,7 @@ otstd.conditions.effectParsers = {
 	["light"] = function(obj, effect)
 		local level = assert(effect.level or effect[1], "Missing light 'level' [1] parameter to Light effect.")
 		local color = assert(effect.color or effect.colour or effect[2], "Missing light 'color'/'colour' [2] parameter to Light effect.")
-		obj:addLightEffect(level, color)
+		obj:addLight(level, color)
 	end;
 	
 	["healing"] = function(obj, effect)
