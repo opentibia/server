@@ -29,7 +29,9 @@
 #define CURRENT_SCHEMA_VERSION 19
 
 #if defined __MINGW32__
-	#define XML_GCC_FREE
+	#ifndef XML_GCC_FREE
+		#define XML_GCC_FREE
+	#endif
 	//Cross-compiling
 	#ifndef __WINDOWS__
 		#define __WINDOWS__
@@ -151,24 +153,6 @@ enum passwordType_t{
 #define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
-	#if __GNUC__ < 4
-		#include <ext/hash_map>
-		#include <ext/hash_set>
-		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
-		#define OTSERV_HASH_SET __gnu_cxx::hash_set
-	#else
-		#ifndef __GXX_EXPERIMENTAL_CXX0X__
-			#include <tr1/unordered_map>
-			#include <tr1/unordered_set>
-		#else
-			// these only work, for some reason, with c++0x standard enabled
-			#include <unordered_map>
-			#include <unordered_set>
-		#endif
-
-		#define OTSERV_HASH_MAP std::tr1::unordered_map
-		#define OTSERV_HASH_SET std::tr1::unordered_set
-	#endif
 	#include <assert.h>
 	#include <stdint.h>
 	#define ATOI64 atoll
@@ -185,9 +169,6 @@ enum passwordType_t{
 	#include <limits>
 	#include <assert.h>
 	#include <time.h>
-
-	#define OTSERV_HASH_MAP stdext::hash_map
-	#define OTSERV_HASH_SET stdext::hash_set
 
 	#include <cstring>
 	inline int strcasecmp(const char *s1, const char *s2)
@@ -222,25 +203,6 @@ enum passwordType_t{
 	#include <stdint.h>
 	#include <string.h>
 	#include <assert.h>
-
-	#if __GNUC__ < 4
-		#include <ext/hash_map>
-		#include <ext/hash_set>
-		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
-		#define OTSERV_HASH_SET __gnu_cxx::hash_set
-	#else
-		#ifndef __GXX_EXPERIMENTAL_CXX0X__
-			#include <tr1/unordered_map>
-			#include <tr1/unordered_set>
-		#else
-			// these only work, for some reason, with c++0x standard enabled
-			#include <unordered_map>
-			#include <unordered_set>
-		#endif
-
-		#define OTSERV_HASH_MAP std::tr1::unordered_map
-		#define OTSERV_HASH_SET std::tr1::unordered_set
-	#endif
 	#define ATOI64 atoll
 
 #endif

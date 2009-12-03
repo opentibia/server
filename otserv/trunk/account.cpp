@@ -28,7 +28,8 @@
 
 Account::Account()
 {
-	number = warnings = 0;
+	number = 0;
+	warnings = 0;
 	premEnd = 0;
 }
 
@@ -43,5 +44,5 @@ uint16_t Account::getPremiumDaysLeft(int32_t _premEnd)
 		return 0;
 	}
 
-	return (uint16_t)std::ceil((double)(_premEnd - time(NULL)) / 86400);
+	return (uint16_t)std::ceil((double)((_premEnd - time(NULL)) / 86400));
 }

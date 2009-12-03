@@ -36,7 +36,8 @@ public:
 
 	static uint16_t getPremiumDaysLeft(int32_t _premEnd);
 
-	uint32_t number, warnings;
+	uint32_t number;
+	uint32_t warnings;
 	std::string name, password;
 
 	time_t premEnd; // < current time is none, (time_t)(-1) is infinite.

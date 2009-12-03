@@ -3884,7 +3884,7 @@ void Player::onTargetCreatureGainHealth(Creature* target, int32_t points)
 	}
 }
 
-void Player::onKilledCreature(Creature* target)
+void Player::onKilledCreature(Creature* target, bool lastHit)
 {
 	if(hasFlag(PlayerFlag_NotGenerateLoot)){
 		target->setDropLoot(false);
@@ -3909,7 +3909,7 @@ void Player::onKilledCreature(Creature* target)
 		addCondition(condition);
 	}
 
-	Creature::onKilledCreature(target);
+	Creature::onKilledCreature(target, lastHit);
 }
 
 void Player::gainExperience(uint64_t& gainExp, bool fromMonster)

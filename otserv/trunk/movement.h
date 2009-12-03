@@ -24,6 +24,7 @@
 #include "luascript.h"
 #include "baseevents.h"
 #include <map>
+#include <boost/unordered_map.hpp>
 
 enum MoveEvent_t{
 	MOVE_EVENT_STEP_IN = 0,
@@ -63,7 +64,7 @@ public:
 	void onAddTileItem(const Tile* tile, Item* item);
 
 protected:
-	typedef OTSERV_HASH_MAP<int32_t, MoveEventList> MoveListMap;
+	typedef boost::unordered_map<int32_t, MoveEventList> MoveListMap;
 	typedef std::map<Position, MoveEventList> MovePosListMap;
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();

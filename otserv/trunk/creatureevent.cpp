@@ -45,7 +45,7 @@ void CreatureEvents::clear()
 	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
 		it->second->clearEvent();
 	}
-	
+
 	//clear lua state
 	m_scriptInterface.reInitState();
 }
@@ -340,7 +340,7 @@ uint32_t CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 	}
 }
 
-uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target)
+uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool lastHit)
 {
 	//onKill(cid, target)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -363,14 +363,15 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target)
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, targetId);
+		lua_pushnumber(L, (lastHit ? LUA_TRUE : LUA_FALSE) );
 
-		int32_t result = m_scriptInterface->callFunction(2);
+		int32_t result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 
 		return (result != LUA_FALSE);
 	}
 	else{
-		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnKill" << std::endl;
+		std::cout << "[Error] __ENABLE_SERVER_DIAGNOSTIC__Call stack overflow. CreatureEvent::executeOnKill" << std::endl;
 		return 0;
 	}
 }

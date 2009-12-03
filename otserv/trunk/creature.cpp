@@ -743,7 +743,7 @@ void Creature::onDie()
 		if(it->isCreatureKill()){
 			Creature* attacker = it->getKillerCreature();
 			if(attacker){
-				attacker->onKilledCreature(this);
+				attacker->onKilledCreature(this, (it == killers.begin()));
 			}
 		}
 	}
@@ -971,7 +971,7 @@ void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t 
 {
 	lastDamageSource = combatType;
 	changeHealth(-damage);
-	
+
 	if(attacker){
 		attacker->onAttackedCreatureDrainHealth(this, damage);
 	}
@@ -1275,17 +1275,17 @@ void Creature::onAttackedCreatureKilled(Creature* target)
 	}
 }
 
-void Creature::onKilledCreature(Creature* target)
+void Creature::onKilledCreature(Creature* target, bool lastHit)
 {
 	if(getMaster()){
-		getMaster()->onKilledCreature(target);
+		getMaster()->onKilledCreature(target, lastHit);
 	}
 
 	//scripting event - onKill
 	CreatureEventList killEvents = getCreatureEvents(CREATURE_EVENT_KILL);
 	for(CreatureEventList::iterator it = killEvents.begin(); it != killEvents.end(); ++it)
 	{
-		(*it)->executeOnKill(this, target);
+		(*it)->executeOnKill(this, target, lastHit);
 	}
 }
 

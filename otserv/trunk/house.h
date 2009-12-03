@@ -25,7 +25,8 @@
 #include <list>
 #include <map>
 
-#include "boost/regex.hpp"
+#include <boost/regex.hpp>
+#include <boost/unordered_set.hpp>
 
 #include "definitions.h"
 #include "position.h"
@@ -51,7 +52,7 @@ public:
 	void getList(std::string& _list) const;
 
 private:
-	typedef OTSERV_HASH_SET<uint32_t> PlayerList;
+	typedef boost::unordered_set<uint32_t> PlayerList;
 	typedef std::list< std::pair<uint32_t, std::string> > GuildList;
 
 	typedef std::list<std::string> ExpressionList;
@@ -278,7 +279,7 @@ public:
 		if(it != houseMap.end()){
 			return it->second;
 		}
-		
+
 		if(add){
 			House* house = new House(houseid);
 			houseMap[houseid] = house;

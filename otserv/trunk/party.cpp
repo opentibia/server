@@ -89,7 +89,7 @@ bool Party::invitePlayer(Player* player)
 	}
 
 	std::stringstream ss;
-	
+
 	if(!(inviteList.empty() && memberList.empty())) {
 		ss << player->getName() << " has been invited.";
 	} else {
@@ -386,7 +386,7 @@ void Party::shareExperience(uint64_t experience, bool fromMonster)
 	if(xpgained < 0)
 		return;
 	uint64_t shareExp = (uint64_t)std::ceil(xpgained);
-	
+
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
 		(*it)->onGainSharedExperience(shareExp, fromMonster);
 	}
