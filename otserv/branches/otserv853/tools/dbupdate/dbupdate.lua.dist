@@ -1,0 +1,15 @@
+-- SQL type
+-- options: mysql, sqlite, odbc or pgsql
+sql_type = "mysql"
+
+--- SQL connection part
+-- sql_db   = "db.s3db"
+sql_db = "otserv" --use this one for MySQL or PgSQL
+--- sql_db = "Your Source" -- use this for ODBC
+
+-- there settings are not used by SQLite
+sql_host = "localhost"
+sql_port = 3306
+--- sql_port = 5432 // use this for PgSQL
+sql_user = "root"
+sql_pass = ""
