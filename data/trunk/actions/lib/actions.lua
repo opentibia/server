@@ -48,7 +48,8 @@ FOODS = {
 	[7374] = {0, "Yummy."},	[7375] = {0, "Yummy."}, [7376] = {0, "Yummy."}, [7377] = {0, "Yummy."},
 	[7963] = {720, "Munch."},  [8838] = {120, "Gulp."}, [8839] = {60, "Yum."}, [8840] = {12, "Yum."},
 	[8841] = {12, "Urgh."}, [8842] = {84, "Munch."}, [8843] = {60, "Crunch."}, [8844] = {12, "Gulp."},
-	[8868] = {108, "Smack."}, [9005] = {88, "Slurp."}, [9996] = {0, "Slurp."}, [10454] = {0, "Your head begins to feel better."}
+	[8845] = {60, "Munch."}, [8847] = {132, "Yum."}, [9005] = {88, "Slurp."}, [9996] = {0, "Slurp."},
+	[10454] = {0, "Your head begins to feel better."}
 }
 
 SPECIAL_FOODS = {

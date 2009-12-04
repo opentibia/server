@@ -152,6 +152,7 @@
 	<action itemid="2795" script="foods/food.lua"/>
 	<action itemid="2796" script="foods/food.lua"/>
 	<action itemid="5097" script="foods/food.lua"/>
+	<action itemid="5678" script="foods/food.lua"/>
 	<action itemid="6125" script="foods/food.lua"/>
 	<action itemid="6278" script="foods/food.lua"/>
 	<action itemid="6279" script="foods/food.lua"/>
@@ -180,7 +181,8 @@
 	<action itemid="8842" script="foods/food.lua"/>
 	<action itemid="8843" script="foods/food.lua"/>
 	<action itemid="8844" script="foods/food.lua"/>
-	<action itemid="8868" script="foods/food.lua"/>
+	<action itemid="8845" script="foods/food.lua"/>
+	<action itemid="8847" script="foods/food.lua"/>
 	<action itemid="9005" script="foods/food.lua"/>
 	<action itemid="9992" script="foods/rotworm_stew.lua"/>
 	<action itemid="9993" script="foods/hydra_tongue_salad.lua"/>
