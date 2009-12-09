@@ -26,7 +26,6 @@
 #include <map>
 
 #include <boost/regex.hpp>
-#include <boost/unordered_set.hpp>
 
 #include "definitions.h"
 #include "position.h"
@@ -52,7 +51,7 @@ public:
 	void getList(std::string& _list) const;
 
 private:
-	typedef boost::unordered_set<uint32_t> PlayerList;
+	typedef UNORDERED_SET<uint32_t> PlayerList;
 	typedef std::list< std::pair<uint32_t, std::string> > GuildList;
 
 	typedef std::list<std::string> ExpressionList;

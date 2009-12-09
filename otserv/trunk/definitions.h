@@ -153,6 +153,32 @@ enum passwordType_t{
 #define _WIN32_WINNT 0x0501
 
 #ifdef __GNUC__
+	#if __GNUC__ < 4
+		#include <boost/version.hpp>
+		#if BOOST_VERSION >= 103600
+			#include <boost/unordered_map.hpp>
+			#include <boost/unordered_set.hpp>
+			#define UNORDERED_MAP boost::unordered_map
+			#define UNORDERED_SET boost::unordered_set
+		#else
+			#include <ext/hash_map>
+			#include <ext/hash_set>
+			#define UNORDERED_MAP __gnu_cxx::hash_map
+			#define UNORDERED_SET __gnu_cxx::hash_set
+		#endif
+	#else
+		#ifndef __GXX_EXPERIMENTAL_CXX0X__
+			#include <tr1/unordered_map>
+			#include <tr1/unordered_set>
+		#else
+			// these only work, for some reason, with c++0x standard enabled
+			#include <unordered_map>
+			#include <unordered_set>
+		#endif
+
+		#define UNORDERED_MAP std::tr1::unordered_map
+		#define UNORDERED_SET std::tr1::unordered_set
+	#endif
 	#include <assert.h>
 	#include <stdint.h>
 	#define ATOI64 atoll
@@ -164,11 +190,14 @@ enum passwordType_t{
 		#define NOMINMAX
 	#endif
 
-	#include <hash_map>
-	#include <hash_set>
 	#include <limits>
 	#include <assert.h>
 	#include <time.h>
+
+	#include <hash_map>
+	#include <hash_set>
+	#define UNORDERED_MAP stdext::hash_map
+	#define UNORDERED_SET stdext::hash_set
 
 	#include <cstring>
 	inline int strcasecmp(const char *s1, const char *s2)
@@ -203,6 +232,33 @@ enum passwordType_t{
 	#include <stdint.h>
 	#include <string.h>
 	#include <assert.h>
+
+	#if __GNUC__ < 4
+		#include <boost/version.hpp>
+		#if BOOST_VERSION >= 103600
+			#include <boost/unordered_map.hpp>
+			#include <boost/unordered_set.hpp>
+			#define UNORDERED_MAP boost::unordered_map
+			#define UNORDERED_SET boost::unordered_set
+		#else
+			#include <ext/hash_map>
+			#include <ext/hash_set>
+			#define UNORDERED_MAP __gnu_cxx::hash_map
+			#define UNORDERED_SET __gnu_cxx::hash_set
+		#endif
+	#else
+		#ifndef __GXX_EXPERIMENTAL_CXX0X__
+			#include <tr1/unordered_map>
+			#include <tr1/unordered_set>
+		#else
+			// these only work, for some reason, with c++0x standard enabled
+			#include <unordered_map>
+			#include <unordered_set>
+		#endif
+
+		#define UNORDERED_MAP std::tr1::unordered_map
+		#define UNORDERED_SET std::tr1::unordered_set
+	#endif
 	#define ATOI64 atoll
 
 #endif
