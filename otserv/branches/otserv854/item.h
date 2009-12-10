@@ -332,7 +332,7 @@ public:
 	void getLight(LightInfo& lightInfo);
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
-	bool isBlocking() const {return items[id].blockSolid;}
+	bool isBlocking(const Creature* creature) const {return items[id].blockSolid;}
 	bool isStackable() const {return items[id].stackable;}
 	bool isRune() const {return items[id].isRune();}
 	bool isFluidContainer() const {return (items[id].isFluidContainer());}

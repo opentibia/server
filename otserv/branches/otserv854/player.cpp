@@ -1017,6 +1017,23 @@ bool Player::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+bool Player::canWalkthrough(const Creature* creature) const
+{
+	if(!creature->getPlayer()){
+		return false;
+	}
+
+	if(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+		return true;
+	}
+
+	if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+		return true;
+	}
+
+	return false;
+}
+
 void Player::onReceiveMail(uint32_t depotId)
 {
 	if(isNearDepotBox(depotId)){

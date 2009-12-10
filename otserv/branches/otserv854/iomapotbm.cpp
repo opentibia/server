@@ -66,7 +66,7 @@ Tile* IOMapOTBM::createTile(Item*& ground, Item* item, int px, int py, int pz)
 {
 	Tile* tile;
 	if(ground){
-		if((item && item->isBlocking()) || ground->isBlocking()){
+		if((item && item->isBlocking(NULL)) || ground->isBlocking(NULL)){
 			// Tile is blocking with possibly some decoration, should be static
 			tile = new StaticTile(px, py, pz);
 		}

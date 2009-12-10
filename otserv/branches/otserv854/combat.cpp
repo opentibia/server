@@ -714,18 +714,24 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 		}
 		if(p_caster){
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
-				if(itemId == ITEM_FIREFIELD_PVP){
-					itemId = ITEM_FIREFIELD_NOPVP;
+				if(itemId == ITEM_FIREFIELD){
+					itemId = ITEM_FIREFIELD_SAFE;
 				}
-				else if(itemId == ITEM_POISONFIELD_PVP){
-					itemId = ITEM_POISONFIELD_NOPVP;
+				else if(itemId == ITEM_POISONFIELD){
+					itemId = ITEM_POISONFIELD_SAFE;
 				}
-				else if(itemId == ITEM_ENERGYFIELD_PVP){
-					itemId = ITEM_ENERGYFIELD_NOPVP;
+				else if(itemId == ITEM_ENERGYFIELD){
+					itemId = ITEM_ENERGYFIELD_SAFE;
+				}
+				else if(itemId == ITEM_MAGICWALL){
+					itemId = ITEM_MAGICWALL_SAFE;
+				}
+				else if(itemId == ITEM_WILDGROWTH){
+					itemId = ITEM_WILDGROWTH_SAFE;
 				}
 			} else if(params.isAggressive){
 				const ItemType& it = Item::items[itemId];
-				if(!it.blockSolid){
+				if(!it.blockPathFind){
 					p_caster->addInFightTicks(g_game.getInFightTicks(), true);
 				}
 				else{
@@ -1520,10 +1526,19 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 
 //**********************************************************
 
+bool MagicField::isBlocking(const Creature* creature) const
+{
+	if(id != ITEM_MAGICWALL_SAFE && id != ITEM_WILDGROWTH_SAFE){
+		return Item::isBlocking(creature);
+	}
+
+	return (!creature || !creature->getPlayer());
+}
+
 void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 {
 	//remove magic walls/wild growth
-	if(isBlocking()){
+	if(id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE || isBlocking(creature)){
 		g_game.internalRemoveItem(this, 1);
 	}
 	else{

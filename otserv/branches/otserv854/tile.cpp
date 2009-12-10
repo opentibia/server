@@ -564,8 +564,9 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					Creature* creature;
 					for(uint32_t i = 0; i < creatures->size(); ++i){
 						creature = creatures->at(i);
-						if(creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+						if(monster->canWalkthrough(creature)){
 							continue;
+						}
 
 						if( !creature->getMonster() ||
 							!creature->isPushable() ||
@@ -578,7 +579,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 			else if(creatures && !creatures->empty()){
 				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+					if(!monster->canWalkthrough(*cit)){
 						return RET_NOTENOUGHROOM;
 					}
 				}
@@ -599,7 +600,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 
 			MagicField* field = getFieldItem();
-			if(field && !field->isBlocking()){
+			if(field && !field->isBlocking(monster)){
 				CombatType_t combatType = field->getCombatType();
 				//There is 3 options for a monster to enter a magic field
 				//1) Monster is immune
@@ -623,7 +624,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		else if(const Player* player = creature->getPlayer()){
 			if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+					if(!player->canWalkthrough(*cit)){
 						return RET_NOTENOUGHROOM; //RET_NOTPOSSIBLE
 					}
 				}
@@ -655,7 +656,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		else{
 			if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 				for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+					if(!creature->canWalkthrough(*cit)){
 						return RET_NOTENOUGHROOM;
 					}
 				}
@@ -663,6 +664,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 
 		if(items){
+			MagicField* field = getFieldItem();
+			if(field && field->isBlocking(creature)){
+				return RET_NOTPOSSIBLE;
+			}
+
 			if(!hasBitSet(FLAG_IGNOREBLOCKITEM, flags)){
 				//If the FLAG_IGNOREBLOCKITEM bit isn't set we dont have to iterate every single item
 				if(hasFlag(TILESTATE_BLOCKSOLID)){
@@ -673,7 +679,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				//FLAG_IGNOREBLOCKITEM is set
 				if(ground){
 					const ItemType& iiType = Item::items[ground->getID()];
-					if(iiType.blockSolid && (!iiType.moveable || ground->getUniqueId() != 0)){
+					if(ground->isBlocking(creature) && (!iiType.moveable || ground->getUniqueId() != 0)){
 						return RET_NOTPOSSIBLE;
 					}
 				}
@@ -683,7 +689,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
 						iitem = (*it);
 						const ItemType& iiType = Item::items[iitem->getID()];
-						if(iiType.blockSolid && (!iiType.moveable || iitem->getUniqueId() != 0)){
+						if(iitem->isBlocking(creature) && (!iiType.moveable || iitem->getUniqueId() != 0)){
 							return RET_NOTPOSSIBLE;
 						}
 					}
@@ -711,9 +717,9 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOTPOSSIBLE;
 		}
 
-		if(creatures && !creatures->empty() && item->isBlocking() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+		if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+				if((!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)) && item->isBlocking(*cit)){
 					return RET_NOTENOUGHROOM;
 				}
 			}
@@ -1270,7 +1276,7 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 	}
 
 	if(const CreatureVector* creatures = getCreatures()){
-		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+		for(CreatureVector::const_reverse_iterator cit = creatures->rbegin(); cit != creatures->rend(); ++cit){
 			if((*cit) == thing || player->canSeeCreature(*cit)){
 				++n;
 			}
