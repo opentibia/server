@@ -23945,7 +23945,6 @@
 	</item>
 	<item id="10782" article="a" name="gate of expertise">
 		<attribute key="type" value="door"/>
-		<attribute key="levelDoor" value="1000"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="10783" article="a" name="gate of expertise">
@@ -23972,7 +23971,6 @@
 	</item>
 	<item id="10791" article="a" name="gate of expertise">
 		<attribute key="type" value="door"/>
-		<attribute key="levelDoor" value="1000"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
 	<item id="10792" article="a" name="gate of expertise">
