@@ -2924,7 +2924,7 @@ void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopInfo item)
 	const ItemType& it = Item::items[item.itemId];
 	msg->AddU16(it.clientId);
 
-	if(it.stackable || it.isRune()){
+	if(it.stackable || it.charges != 0){
 		msg->AddByte(item.subType);
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
