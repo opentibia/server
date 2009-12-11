@@ -387,6 +387,7 @@ enum item_t {
 
 	ITEM_DEPOT            = 2594,
 	ITEM_LOCKER1          = 2589,
+	ITEM_GLOWING_SWITCH   = 10552,
 
 	ITEM_MALE_CORPSE      = 6080,
 	ITEM_FEMALE_CORPSE    = 6081,

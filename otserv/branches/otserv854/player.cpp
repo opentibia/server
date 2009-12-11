@@ -1028,7 +1028,7 @@ bool Player::canWalkthrough(const Creature* creature) const
 	}
 
 	if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-		return true;
+		return getTile()->ground->getID() != ITEM_GLOWING_SWITCH;
 	}
 
 	return false;

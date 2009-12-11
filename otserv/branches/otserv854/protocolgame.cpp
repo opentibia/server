@@ -2584,7 +2584,7 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 		msg->AddByte(0x00); // guild war emblem
 	}
 
-	msg->AddByte(player->canWalkthrough(creature)); // impassable
+	msg->AddByte(!player->canWalkthrough(creature));
 }
 
 void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)
