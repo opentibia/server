@@ -362,6 +362,8 @@
 	<moveevent event="StepOut" itemid="447" script="switch_tile.lua" />
 	<moveevent event="StepIn" itemid="3216" script="switch_tile.lua" />
 	<moveevent event="StepOut" itemid="3217" script="switch_tile.lua" />
+	<moveevent event="StepIn" itemid="10551" script="switch_tile.lua" />
+	<moveevent event="StepOut" itemid="10552" script="switch_tile.lua" />
 
 	<!-- Traps -->
 	<moveevent event="StepIn" itemid="1510" script="trap.lua" />

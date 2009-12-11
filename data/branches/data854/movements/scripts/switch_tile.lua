@@ -1,4 +1,4 @@
-local SWITCHES = { {416, 417}, {426, 425}, {446, 447}, {3216, 3217} }
+local SWITCHES = { {416, 417}, {426, 425}, {446, 447}, {3216, 3217}, {10551, 10552} }
 
 local function doTransformTile(item)
 	for i, v in pairs(SWITCHES) do
