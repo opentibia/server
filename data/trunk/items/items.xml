@@ -1251,13 +1251,13 @@
 			<attribute key="damage" value="100"/>
 		</attribute>
 	</item>
-	<item id="1497" article="a" name="magic wall" editorsuffix=" (Not decaying)">
-		<attribute key="type" value="magicfield"/>
-	</item>
-	<item id="1498" article="a" name="magic wall">
+	<item id="1497" article="a" name="magic wall">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="20"/>
+	</item>
+	<item id="1498" article="a" name="magic wall" editorsuffix=" (Not decaying)">
+		<attribute key="type" value="magicfield"/>
 	</item>
 	<item id="1499" article="a" name="rush wood">
 		<attribute key="type" value="magicfield"/>
@@ -23928,6 +23928,110 @@
 	</item>
 	<item id="10543" article="a" name="silver lightbearer's trophy">
 		<attribute key="weight" value="900"/>
+	</item>
+	<item id="10551" name="glowing switch">
+		<attribute key="walkStack" value="0"/>
+	</item>
+	<item id="10552" name="glowing switch">
+		<attribute key="walkStack" value="0"/>
+	</item>
+	<item id="10777" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+		<attribute key="description" value="It is locked."/>
+	</item>
+	<item id="10778" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="10779" article="an" name="open door">
+		<attribute key="type" value="door"/>
+	</item>
+	<item id="10782" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="levelDoor" value="1000"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="10783" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+	</item>
+	<item id="10784" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="10785" article="a" name="open door">
+		<attribute key="type" value="door"/>
+	</item>
+	<item id="10786" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+		<attribute key="description" value="It is locked."/>
+	</item>
+	<item id="10787" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="10788" article="an" name="open door">
+		<attribute key="type" value="door"/>
+	</item>
+	<item id="10791" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+		<attribute key="levelDoor" value="1000"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="10792" article="a" name="gate of expertise">
+		<attribute key="type" value="door"/>
+	</item>
+	<item id="10793" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="10794" article="a" name="open door">
+		<attribute key="type" value="door"/>
+	</item>
+	<item fromid="11056" toid="11067" article="a" name="window"/>
+	<item id="11094" article="a" name="magic wall" editorsuffix=" (Non PvP)">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="20"/>
+	</item>
+	<item id="11095" article="a" name="rush wood" editorsuffix=" (Non PvP)">
+		<attribute key="type" value="magicfield"/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="45"/>
+	</item>
+	<item id="11114" article="a" name="heart backpack">
+		<attribute key="weight" value="1800"/>
+		<attribute key="containerSize" value="20"/>
+		<attribute key="slotType" value="backpack"/>
+	</item>
+	<item id="11116" article="a" name="stone stairs">
+		<attribute key="floorchange" value="north"/>
+	</item>
+	<item id="11234" article="a" name="expedition backpack">
+		<attribute key="weight" value="1800"/>
+		<attribute key="containerSize" value="20"/>
+		<attribute key="slotType" value="backpack"/>
+	</item>
+	<item id="11235" article="a" name="expedition bag">
+		<attribute key="weight" value="800"/>
+		<attribute key="containerSize" value="8"/>
+		<attribute key="slotType" value="backpack"/>
+	</item>
+	<item id="11236" article="a" name="lizard backpack">
+		<attribute key="weight" value="1800"/>
+		<attribute key="containerSize" value="20"/>
+		<attribute key="slotType" value="backpack"/>
+	</item>
+	<item id="11237" article="a" name="minotaur backpack">
+		<attribute key="weight" value="1800"/>
+		<attribute key="containerSize" value="20"/>
+		<attribute key="slotType" value="backpack"/>
+	</item>
+	<item id="11256" article="a" name="fluffy santa backpack">
+		<attribute key="weight" value="1800"/>
+		<attribute key="containerSize" value="20"/>
+		<attribute key="slotType" value="backpack"/>
 	</item>
 	<item id="20001" name="water"/>
 	<item id="20002" name="blood"/>
