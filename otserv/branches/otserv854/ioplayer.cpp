@@ -19,14 +19,13 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "ioplayer.h"
 #include "ioaccount.h"
 #include "item.h"
 #include "town.h"
 #include "configmanager.h"
 #include "tools.h"
-#include "definitions.h"
+#include "guild.h"
 
 #include <iostream>
 #include <iomanip>
@@ -51,8 +50,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
-		`skull_type`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
-		`loss_items`, `loss_containers`, `rank_id`, `town_id`, `balance`, `stamina` \
+		`skull_type`, `loss_experience`, `loss_mana`, `loss_skills`, \
+		`loss_items`, `loss_containers`, `town_id`, `balance`, `stamina` \
 		FROM `players` \
 		LEFT JOIN `accounts` ON `account_id` = `accounts`.`id`\
 		LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` \
@@ -195,29 +194,31 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		player->loginPosition = player->masterPos;
 	}
 
-	uint32_t rankid = result->getDataInt("rank_id");
-
 	// place it here and now we can drop all additional query instances as all data were loaded
 	player->balance = result->getDataInt("balance");
 	player->stamina = result->getDataInt("stamina");
-
-	player->setGuildNick(result->getDataString("guildnick"));
 	db->freeResult(result);
 
-	if(rankid){
-		query << "SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, `guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` FROM `guild_ranks`, `guilds` WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds`.`id`";
-		if((result = db->storeQuery(query.str()))){
-			player->setGuildName(result->getDataString("guildname"));
-			player->setGuildLevel(result->getDataInt("level"));
-			player->setGuildId(result->getDataInt("guildid"));
-			player->setGuildRank(result->getDataString("rank"));
+	query.str("");
+	query << "SELECT `guild_members`.`guild_nick` as `guild_nick`, `guild_members`.`guild_id` as `guild_id`, \
+			 `guild_ranks`.`name` as `rank_name`, `guild_ranks`.`level` as `rank_level`, \
+			 `guilds`.`name` as `guild_name` FROM `guild_members`, `guilds`, `guild_ranks` \
+			 WHERE `guild_members`.`player_id` = " << player->getGUID() << " AND `guild_ranks`.`id` = `guild_members`.`rank_id`";
+	if((result = db->storeQuery(query.str()))){
+		Guild* guild = new Guild();
 
-			db->freeResult(result);
-		}
-		query.str("");
+		guild->setGuildName(result->getDataString("guild_name"));
+		guild->setGuildRank(result->getDataString("rank_name"));
+		guild->setGuildNick(result->getDataString("guild_nick"));
+		guild->setGuildLevel(result->getDataInt("rank_level"));
+		guild->setGuildId(result->getDataInt("guild_id"));
+
+		player->setGuild(guild);
+		db->freeResult(result);
 	}
 
 	//get password
+	query.str("");
 	query << "SELECT `password`, `premend` FROM `accounts` WHERE `id` = " << player->accountId;
 	if(!(result = db->storeQuery(query.str()))){
 		return false;
