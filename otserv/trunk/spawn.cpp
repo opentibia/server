@@ -159,7 +159,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-						
+
 						if(interval >= MINSPAWN_INTERVAL){
 							spawn->addMonster(name, pos, dir, interval);
 						}
@@ -426,14 +426,14 @@ void Spawn::cleanup()
 			}
 
 			monster->releaseThing2();
-			spawnedMap.erase(it++);
+			it = spawnedMap.erase(it);
 		}
-		else if(!isInSpawnZone(monster->getPosition()) && spawnId != 0) {
-			spawnedMap.insert(spawned_pair(0, monster));
-			spawnedMap.erase(it++);
-		}
-		else{
-			++it;
+		else {
+			if(spawnId != 0 && !isInSpawnZone(monster->getPosition()) && monster->getIdleStatus()) {
+				g_game.internalTeleport(monster, monster->getMasterPos(), FLAG_NOLIMIT);
+			}
+
+			++it
 		}
 	}
 }
