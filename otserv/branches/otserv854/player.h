@@ -30,6 +30,7 @@
 #include "enums.h"
 #include "vocation.h"
 #include "protocolgame.h"
+#include "guild.h"
 
 #include <vector>
 #include <ctime>
@@ -139,13 +140,21 @@ public:
 		return ((50ULL * level * level * level) - (150ULL * level * level) + (400ULL * level))/3ULL;
 	}
 
-	uint32_t getGuildId() const {return guildId;}
-	const std::string& getGuildName() const {return guildName;}
-	const std::string& getGuildRank() const {return guildRank;}
-	const std::string& getGuildNick() const {return guildNick;}
+	//guild settings
+	void setGuild(Guild* _guild) { guild = _guild; }
+	Guild* getGuild() const { return guild; }
+	uint32_t getGuildId() const;
+	std::string getGuildName() const;
+	std::string getGuildRank() const;
+	std::string getGuildNick() const;
+	void setGuildName(const std::string& _guildName);
+	void setGuildRank(const std::string& _guildRank);
+	void setGuildNick(const std::string& _guildNick);
+	void setGuildLevel(uint32_t _guildLevel);
+	void setGuildId(uint32_t _guildId);
 
-	void setGuildRank(const std::string& rank) {guildRank = rank;}
-	void setGuildNick(const std::string& nick) {guildNick = nick;}
+	//guild war system
+	GuildEmblem_t getWarEmblem(const Player* player) const;
 
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
@@ -820,11 +829,7 @@ protected:
 	uint32_t town;
 
 	//guild variables
-	uint32_t guildId;
-	std::string guildName;
-	std::string guildRank;
-	std::string guildNick;
-	uint32_t guildLevel;
+	Guild* guild;
 
 	StorageMap storageMap;
 	LightInfo itemsLight;

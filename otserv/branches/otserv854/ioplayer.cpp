@@ -201,16 +201,16 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->balance = result->getDataInt("balance");
 	player->stamina = result->getDataInt("stamina");
 
-	player->guildNick = result->getDataString("guildnick");
+	player->setGuildNick(result->getDataString("guildnick"));
 	db->freeResult(result);
 
 	if(rankid){
 		query << "SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, `guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` FROM `guild_ranks`, `guilds` WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds`.`id`";
 		if((result = db->storeQuery(query.str()))){
-			player->guildName = result->getDataString("guildname");
-			player->guildLevel = result->getDataInt("level");
-			player->guildId = result->getDataInt("guildid");
-			player->guildRank = result->getDataString("rank");
+			player->setGuildName(result->getDataString("guildname"));
+			player->setGuildLevel(result->getDataInt("level"));
+			player->setGuildId(result->getDataInt("guildid"));
+			player->setGuildRank(result->getDataString("rank"));
 
 			db->freeResult(result);
 		}
@@ -664,12 +664,12 @@ bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
 bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 {
 	Database* db = Database::instance();
-	
+
 	DBQuery q;
 	DBTransaction transaction(db);
 	transaction.begin();
 	std::ostringstream query;
-	
+
 	// First insert the actual death
 	{
 		DBInsert death_stmt(db);
@@ -681,7 +681,7 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 		if(!death_stmt.execute())
 			return false;
 	}
-	
+
 	uint64_t death_id = db->getLastInsertedRowID();
 
 	// Then insert the killers...
@@ -699,7 +699,7 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 		uint64_t kill_id = db->getLastInsertedRowID();
 
 		const DeathEntry& de = *dli;
-		
+
 		std::string name;
 		if(de.isCreatureKill()){
 			Creature* c = de.getKillerCreature();
@@ -1063,12 +1063,12 @@ void IOPlayer::updateLoginInfo(Player* player)
 {
 	Database* db = Database::instance();
 	DBQuery query;
-	
+
 	query << "UPDATE `players` SET `lastlogin` = " << player->lastLoginSaved
 			<< ", `lastip` = " << player->lastip
 			<< ", `online` = 1"
 			<< " WHERE `id` = " << player->getGUID();
-			
+
 	db->executeQuery(query.str());
 }
 
@@ -1076,11 +1076,11 @@ void IOPlayer::updateLogoutInfo(Player* player)
 {
 	Database* db = Database::instance();
 	DBQuery query;
-	
+
 	query << "UPDATE `players` SET `lastlogout` = " << player->lastLogout
 			<< ", `online` = 0"
 			<< " WHERE `id` = " << player->getGUID();
-			
+
 	db->executeQuery(query.str());
 }
 

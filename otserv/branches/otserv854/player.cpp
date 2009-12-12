@@ -77,8 +77,6 @@ Creature()
 	manaSpent  = 0;
 	soul       = 0;
 	soulMax    = 100;
-	guildId    = 0;
-	guildLevel = 0;
 
 	level      = 1;
 	levelPercent = 0;
@@ -176,6 +174,7 @@ Creature()
 	saleCallback = -1;
 
 	setParty(NULL);
+	setGuild(NULL);
 
 #ifdef __SKULLSYSTEM__
 	lastSkullTime = 0;
@@ -276,8 +275,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 			s << " has no vocation.";
 	}
 
-	if(guildId)
-	{
+	if(getGuild()){
 		if(lookDistance == -1){
 			s << " You are ";
 		}
@@ -285,15 +283,18 @@ std::string Player::getDescription(int32_t lookDistance) const
 			s << " " << playerSexSubjectString(getSex()) << " is ";
 		}
 
-		if(guildRank.length())
-			s << guildRank;
-		else
+		if(getGuildRank().length()){
+			s << getGuildRank();
+		}
+		else{
 			s << "a member";
+		}
 
-		s << " of the " << guildName;
+		s << " of the " << getGuildName();
 
-		if(guildNick.length())
-			s << " (" << guildNick << ")";
+		if(getGuildNick().length()){
+			s << " (" << getGuildNick() << ")";
+		}
 
 		s << ".";
 	}
@@ -2631,6 +2632,82 @@ void Player::kickPlayer()
 	else{
 		g_game.removeCreature(this);
 	}
+}
+
+uint32_t Player::getGuildId() const
+{
+	if(getGuild()){
+		return getGuild()->getGuildId();
+	}
+	return 0;
+}
+
+std::string Player::getGuildName() const
+{
+	if(getGuild()){
+		return getGuild()->getGuildName();
+	}
+	return "";
+}
+
+std::string Player::getGuildRank() const
+{
+	if(getGuild()){
+		return getGuild()->getGuildRank();
+	}
+	return "";
+}
+
+std::string Player::getGuildNick() const
+{
+	if(getGuild()){
+		return getGuild()->getGuildNick();
+	}
+	return "";
+}
+
+void Player::setGuildName(const std::string& _guildName)
+{
+	if(getGuild()){
+		getGuild()->setGuildName(_guildName);
+	}
+}
+
+void Player::setGuildRank(const std::string& _guildRank)
+{
+	if(getGuild()){
+		getGuild()->setGuildRank(_guildRank);
+	}
+}
+
+void Player::setGuildNick(const std::string& _guildNick)
+{
+	if(getGuild()){
+		getGuild()->setGuildNick(_guildNick);
+	}
+}
+
+void Player::setGuildLevel(uint32_t _guildLevel)
+{
+	if(getGuild()){
+		getGuild()->setGuildLevel(_guildLevel);
+	}
+}
+
+void Player::setGuildId(uint32_t _guildId)
+{
+	if(getGuild()){
+		getGuild()->setGuildId(_guildId);
+	}
+}
+
+GuildEmblem_t Player::getWarEmblem(const Player* player) const
+{
+	if(!player){
+		return EMBLEM_NONE;
+	}
+
+	return EMBLEM_NONE;
 }
 
 void Player::notifyLogIn(Player* login_player)
