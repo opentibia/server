@@ -112,15 +112,7 @@ otstd.conditions.effectParsers = {
 		
 	["speed"] = function(obj, effect)
 		local percent = effect.percent
-		local value = effect.value or effect.amount
-		if not effect.icon then
-			if percent < 0 or value < 0 then
-				effect.icon = ICON_PARALYZE
-			else
-				effect.icon = ICON_HASTE
-			end
-		end
-		
+		local value = effect.value or effect.amount		
 		assert(percent or value, "Expected either 'percent' or 'amount'/'value' to Speed effect.")
 		
 		obj:addModSpeed(percent or 100, value or 0)
@@ -160,7 +152,7 @@ otstd.conditions.effectParsers = {
 	
 	["shapeshift"] = function(obj, effect)
 		local outfit = assert(effect.outfit or effect[1], "Missing 'outfit' [1] parameter to Outfit effect.")
-		
+				
 		obj:addShapeShift(outfit)
 	end;
 	
@@ -173,7 +165,7 @@ otstd.conditions.effectParsers = {
 	["script"] = function(obj, effect)
 		local name = assert(effect.name or effect[1], "Missing 'name' [1] to Script effect.")
 		local interval = effect.interval or effect[2] or nil
-
+		
 		obj:addScript(name, interval)
 	end;
 }
@@ -189,10 +181,12 @@ end
 function otstd.conditions.makeConditionObject(obj, condition)
 	local id = assert(condition.id or condition[1], "Missing 'id' [1] for Condition.")
 	local duration = assert(tonumber(condition.duration) or tonumber(condition[2]), "Missing 'duration' [2] for Condition")
+	local combatType = condition.damage or condition[3] or COMBAT_NONE
+	local mechanicType = condition.mechanic or condition[4] or MECHANIC_NONE
 	local icons = 0
 	
 	for k, v in pairs(condition) do
-		if type(v) == "table" then
+		if type(v) == "table" and not v.__name then
 			otstd.conditions.parseEffect(obj, k, v)
 			if v.icon then
 				icons = bit.ubor(icons, v.icon:value())
@@ -202,6 +196,8 @@ function otstd.conditions.makeConditionObject(obj, condition)
 	
 	obj:setName(id)
 	obj:setTicks(duration)
+	obj:setCombatType(combatType)
+	obj:setMechanicType(mechanicType)
 	obj:setFlags(icons)
 	return obj
 end

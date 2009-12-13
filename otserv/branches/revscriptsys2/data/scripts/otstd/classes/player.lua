@@ -303,14 +303,29 @@ function Player:canGetExhausted()
 	return self:hasGroupFlag(PlayerFlag_HasNoExhaustion)	
 end
 
+function Player:cannotGainInFight()
+	return self:hasGroupFlag(PlayerFlag_NotGainInFight)
+end
+
 function Player:addCombatExhaustion(time)
-	--local condition = { id = CONDITION_EXHAUST_DAMAGE, duration = time}
-	--self:addCondition(condition)
+	local condition = {"CONDITION_EXHAUST_DAMAGE", time}
+	return self:addCondition(condition)
 end
 
 function Player:addHealExhaustion(time)
-	--local condition = { id = CONDITION_EXHAUST_DAMAGE, duration = time}
-	--self:addCondition(condition)
+	local condition = {"CONDITION_EXHAUST_DAMAGE", time}
+	return self:addCondition(condition)
+end
+
+function Player:addInFight(time)
+	local condition = {"CONDITION_INFIGHT", time,
+			["script"] = {
+				name = "effect_infight",
+				icon = ICON_SWORDS
+			}
+		}
+		
+	return self:addCondition(condition)
 end
 
 -- Login / Logout

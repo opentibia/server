@@ -103,8 +103,10 @@ void Game::start(ServiceManager* servicer)
 
 Game::~Game()
 {
-	script_environment->cleanup();
-	delete script_environment;
+	if(script_environment){
+		script_environment->cleanup();
+		delete script_environment;
+	}
 	delete script_system;
 	if(map){
 		delete map;
@@ -296,6 +298,7 @@ bool Game::loadScripts()
 		script_system = NULL;
 
 		g_scheduler.stopEvent(waitingScriptEvent);
+		waitingScriptEvent = 0;
 		is_reload = true;
 	}
 
@@ -307,7 +310,7 @@ bool Game::loadScripts()
 
 		waitingScriptEvent = g_scheduler.addEvent(createSchedulerTask(EVENT_SCRIPT_TIMER_INTERVAL,
 			boost::bind(&Game::runWaitingScripts, this)));
-	} catch(Script::Error&) {
+	} catch(Script::Error& err) {
 		// Clear any listeners that were tied before the exception was thrown
 		for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
 			it != Game::listCreature.list.end();
@@ -322,7 +325,7 @@ bool Game::loadScripts()
 		script_environment = NULL;
 		script_system = NULL;
 
-		return false;
+		throw err;
 	}
 	return true;
 }
@@ -1747,54 +1750,56 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 	}
 
 	ReturnValue ret = retVal;
-	if(fromCylinder){
-		if(fromCylinder->getCreature()){
-			Player* player = fromCylinder->getCreature()->getPlayer();
-			Script::OnEquipItem::Event evt(player, item, SlotType(fromCylinder->__getIndexOfThing(item)), false, ret);
-			if(script_system->dispatchEvent(evt)){
-				//handled by script
-				return ret;
-			}
-		}
-		else if(fromCylinder->getTile()){
-			Script::OnMoveItem::Event evt(actor, item, fromCylinder->getTile(), false, ret);
-			if(script_system->dispatchEvent(evt)){
-				//handled by script
-				return ret;
-			}
-		}
-	}
-
-	if(toCylinder){
-		if(toCylinder->getCreature()){
-			Player* player = toCylinder->getCreature()->getPlayer();
-			SlotType slot = SLOT_WHEREEVER;
-
-			if(index == INDEX_WHEREEVER || index == SLOT_WHEREEVER.value()){
-				Item* toItem = NULL;
-				int32_t rawSlot = INDEX_WHEREEVER;
-				toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
-				if(rawSlot != INDEX_WHEREEVER){
-					slot = SlotType(rawSlot);	
+	if(script_system){
+		if(fromCylinder){
+			if(fromCylinder->getCreature()){
+				Player* player = fromCylinder->getCreature()->getPlayer();
+				Script::OnEquipItem::Event evt(player, item, SlotType(fromCylinder->__getIndexOfThing(item)), false, ret);
+				if(script_system->dispatchEvent(evt)){
+					//handled by script
+					return ret;
 				}
 			}
-			else{
-				slot = SlotType(index);
-			}
-
-			if(slot != SLOT_WHEREEVER){
-				Script::OnEquipItem::Event evt(player, item, slot, true, ret);
+			else if(fromCylinder->getTile()){
+				Script::OnMoveItem::Event evt(actor, item, fromCylinder->getTile(), false, ret);
 				if(script_system->dispatchEvent(evt)){
 					//handled by script
 					return ret;
 				}
 			}
 		}
-		else if(toCylinder->getTile()){
-			Script::OnMoveItem::Event evt(actor, item, toCylinder->getTile(), true, ret);
-			if(script_system->dispatchEvent(evt)){
-				//handled by script
-				return ret;
+
+		if(toCylinder){
+			if(toCylinder->getCreature()){
+				Player* player = toCylinder->getCreature()->getPlayer();
+				SlotType slot = SLOT_WHEREEVER;
+
+				if(index == INDEX_WHEREEVER || index == SLOT_WHEREEVER.value()){
+					Item* toItem = NULL;
+					int32_t rawSlot = INDEX_WHEREEVER;
+					toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
+					if(rawSlot != INDEX_WHEREEVER){
+						slot = SlotType(rawSlot);	
+					}
+				}
+				else{
+					slot = SlotType(index);
+				}
+
+				if(slot != SLOT_WHEREEVER){
+					Script::OnEquipItem::Event evt(player, item, slot, true, ret);
+					if(script_system->dispatchEvent(evt)){
+						//handled by script
+						return ret;
+					}
+				}
+			}
+			else if(toCylinder->getTile()){
+				Script::OnMoveItem::Event evt(actor, item, toCylinder->getTile(), true, ret);
+				if(script_system->dispatchEvent(evt)){
+					//handled by script
+					return ret;
+				}
 			}
 		}
 	}
@@ -1961,35 +1966,37 @@ ReturnValue Game::internalAddItem(Creature* actor, Cylinder* toCylinder, Item* i
 	}
 
 	ReturnValue ret = RET_NOERROR;
-	if(toCylinder->getCreature()){
-		Player* player = toCylinder->getCreature()->getPlayer();
-		SlotType slot = SLOT_WHEREEVER;
+	if(script_system){
+		if(toCylinder->getCreature()){
+			Player* player = toCylinder->getCreature()->getPlayer();
+			SlotType slot = SLOT_WHEREEVER;
 
-		if(index == INDEX_WHEREEVER || index == SLOT_WHEREEVER.value()){
-			Item* toItem = NULL;
-			int32_t rawSlot = index;
-			toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
-			if(rawSlot != INDEX_WHEREEVER){
-				slot = SlotType(rawSlot);	
+			if(index == INDEX_WHEREEVER || index == SLOT_WHEREEVER.value()){
+				Item* toItem = NULL;
+				int32_t rawSlot = index;
+				toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
+				if(rawSlot != INDEX_WHEREEVER){
+					slot = SlotType(rawSlot);	
+				}
+			}
+			else{
+				slot = SlotType(index);
+			}
+
+			if(slot != SLOT_WHEREEVER){
+				Script::OnEquipItem::Event evt(player, item, slot, true, ret);
+				if(script_system->dispatchEvent(evt)){
+					//handled by script
+					return ret;
+				}
 			}
 		}
-		else{
-			slot = SlotType(index);
-		}
-
-		if(slot != SLOT_WHEREEVER){
-			Script::OnEquipItem::Event evt(player, item, slot, true, ret);
+		else if(toCylinder->getTile()){
+			Script::OnMoveItem::Event evt(actor, item, toCylinder->getTile(), true, ret);
 			if(script_system->dispatchEvent(evt)){
 				//handled by script
 				return ret;
 			}
-		}
-	}
-	else if(toCylinder->getTile()){
-		Script::OnMoveItem::Event evt(actor, item, toCylinder->getTile(), true, ret);
-		if(script_system->dispatchEvent(evt)){
-			//handled by script
-			return ret;
 		}
 	}
 
@@ -2072,19 +2079,21 @@ ReturnValue Game::internalRemoveItem(Creature* actor, Item* item, int32_t count 
 	}
 
 	ReturnValue ret = RET_NOERROR;
-	if(cylinder->getCreature()){
-		Player* player = cylinder->getCreature()->getPlayer();
-		Script::OnEquipItem::Event evt(player, item, SlotType(cylinder->__getIndexOfThing(item)), false, ret);
-		if(script_system->dispatchEvent(evt)){
-			//handled by script
-			return ret;
+	if(script_system){
+		if(cylinder->getCreature()){
+			Player* player = cylinder->getCreature()->getPlayer();
+			Script::OnEquipItem::Event evt(player, item, SlotType(cylinder->__getIndexOfThing(item)), false, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				return ret;
+			}
 		}
-	}
-	else if(cylinder->getTile()){
-		Script::OnMoveItem::Event evt(actor, item, cylinder->getTile(), false, ret);
-		if(script_system->dispatchEvent(evt)){
-			//handled by script
-			return ret;
+		else if(cylinder->getTile()){
+			Script::OnMoveItem::Event evt(actor, item, cylinder->getTile(), false, ret);
+			if(script_system->dispatchEvent(evt)){
+				//handled by script
+				return ret;
+			}
 		}
 	}
 
@@ -4162,18 +4171,22 @@ bool Game::checkReload(Player* player, const std::string& text)
 			std::cout << "================================================================================\n";
 
 			runShutdownScripts(false);
-			g_game.loadScripts();
-			runStartupScripts(false);
+			try{
+				g_game.loadScripts();
+				runStartupScripts(false);
 
-			for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
-				it != Game::listCreature.list.end();
-				++it)
-			{
-				Actor* a = it->second->getActor();
-				if(a && a->shouldReload()){
-					Script::OnSpawn::Event e(a, true);
-					script_system->dispatchEvent(e);
+				for(AutoList<Creature>::listiterator it = Game::listCreature.list.begin();
+					it != Game::listCreature.list.end();
+					++it)
+				{
+					Actor* a = it->second->getActor();
+					if(a && a->shouldReload()){
+						Script::OnSpawn::Event e(a, true);
+						script_system->dispatchEvent(e);
+					}
 				}
+			} catch(Script::Error& err) {
+				std::cout << err.what() << std::endl;
 			}
 
 			std::cout << ":: Reloaded Scripts " << (script_system == NULL? "[ Failed ]" : "") << std::endl;

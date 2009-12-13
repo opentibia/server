@@ -183,15 +183,16 @@ function Actor.onLoadSpell(event)
 				if effect.name == "damage" then
 					spell.condition = {id = "fire", duration = event.condition.duration}
 					if effect.rounds then
-						spell.condition[effect.name] = {
+						spell.condition["damage"] = {
 							effect.interval,
 							COMBAT_FIREDAMAGE,
 							rounds = effect.rounds,
 							min = effect.min,
-							max = effect.max
+							max = effect.max,
+							icon = ICON_BURN
 						}
 					else
-						spell.condition[effect.name] = {
+						spell.condition["damage"] = {
 							effect.interval,
 							COMBAT_FIREDAMAGE,
 							first = effect.first,
@@ -200,8 +201,8 @@ function Actor.onLoadSpell(event)
 						}
 					end
 				elseif effect.name == "shapeshift" then
-					spell.condition = {id = "shapeshift", duration = event.condition.duration}
-					spell.condition[effect.name] = {
+					spell.condition = {id = "shapeshift", duration = event.condition.duration, mechanic = MECHANIC_SHAPESHIFT}
+					spell.condition["shapeshift"] = {
 						outfit = {
 							type = effect.type,
 							head = effect.head,
@@ -213,20 +214,31 @@ function Actor.onLoadSpell(event)
 						}
 					}
 				elseif effect.name == "speed" then
-					spell.condition = {id = "speed", duration = event.condition.duration}
-					spell.condition[effect.name] = {
+					local icon = ICON_NONE
+					if effect.percent < 0 or effect.amount < 0 then
+						effect.mechanic = MECHANIC_PARALYZED
+						effect.icon = ICON_PARALYZE
+					else
+						effect.mechanic = MECHANIC_NONE
+						effect.icon = ICON_HASTE
+					end
+
+					spell.condition = {id = "speed", duration = event.condition.duration, mechanic = effect.mechanic}					
+					spell.condition["speed"] = {
 						amount = effect.amount,
-						percent = effect.percent
+						percent = effect.percent,
+						icon = effect.icon
 					}
+					
 				elseif effect.name == "invisible" then
-					spell.condition = {id = "invisible", duration = event.condition.duration}
+					spell.condition = {id = "invisible", duration = event.condition.duration, mechanic = MECHANIC_INVISIBLE }
 					spell.condition["script"] = {
-						name = "invisible"
+						name = "effect_invisible"
 					}
 				elseif effect.name == "drunk" then
-					spell.condition = {id = "drunk", duration = event.condition.duration, icon = ICON_DRUNK }
+					spell.condition = {id = "drunk", duration = event.condition.duration}
 					spell.condition["script"] = {
-						name = "drunk"
+						name = "effect_drunk"
 					}
 				else
 					print("Not supported yet - " .. effect.name)
@@ -263,7 +275,7 @@ function Actor.onCastSpell(event)
 		if event.targetCreature and spell.needTarget then
 			spell:cast(caster, event.targetCreature)
 		else
-			spell:cast(caster)
+			spell:cast(caster, caster)
 		end
 	end
 end

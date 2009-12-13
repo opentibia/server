@@ -2135,6 +2135,7 @@ bool Player::hasShield() const
 
 	return result;
 }
+
 BlockType Player::blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
 	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
@@ -3502,7 +3503,8 @@ void Player::onAddCondition(const Condition* condition, bool preAdd /*= true*/)
 	sendIcons();
 }
 
-void Player::onAddCombatCondition(const Condition* condition, bool preAdd /*= true*/)
+/*
+void Player::onAddCombatCondition(const Condition* condition, bool preAdd)
 {
 	if(condition->getCombatType() == COMBAT_EARTHDAMAGE){
 		sendTextMessage(MSG_STATUS_DEFAULT, "You are poisoned.");
@@ -3517,6 +3519,7 @@ void Player::onAddCombatCondition(const Condition* condition, bool preAdd /*= tr
 		sendTextMessage(MSG_STATUS_DEFAULT, "You are drunk.");
 	}
 }
+*/
 
 void Player::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 {

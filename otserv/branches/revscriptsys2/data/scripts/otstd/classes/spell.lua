@@ -105,7 +105,7 @@ function otstd.canCastSpellOnCreature(spell, caster, target)
 
 				if target:isInvulnerable() then
 					return false, RET_YOUMAYNOTATTACKTHISPERSON
-				elseif target:getParentTile():isPz() then
+				elseif not caster:ignoreProtectionZone() and target:getParentTile():isPz() then
 					return false, RET_ACTIONNOTPERMITTEDINANONPVPZONE
 				end
 				
@@ -238,9 +238,10 @@ function otstd.onCastSpell(event)
 	local caster = event.caster
 	local casterPos = caster and caster:getPosition()
 	local target = event.targetCreature
+	local targetPos = event.targetPosition or (target and target:getPosition())
 	local spell = event.spell
 	
-	if caster and typeof(caster, "Player") then
+	if typeof(caster, "Player") then
 		-- All spell checks have been done, remove mana etc.
 		if not caster:hasInfiniteMana() then
 			caster:spendMana(spell.mana)
@@ -261,17 +262,19 @@ function otstd.onCastSpell(event)
 				caster:addHealExhaustion(config["heal_exhausted"])
 			end
 		end
+		
+		if spell.aggressive and not caster:cannotGainInFight() then
+			caster:addInFight(config["in_fight_duration"])
+		end
 	end
 	
 	-- default spell handling
-	local centerPos = (event.targetCreature and event.targetCreature:getPosition()) or event.targetPosition or casterPos
-	
+	local centerPos = (target and target:getPosition()) or targetPos or casterPos
 	local hitTiles = {}
 	
-	if event.targetCreature and (spell.maybeTarget or spell.needTarget) then
-		local targetPos = event.targetCreature:getPosition()
+	if target and (spell.maybeTarget or spell.needTarget) then
 		local targetTile = map:getTile(targetPos)
-		hitTiles[targetPos] = {[1] = event.targetCreature}
+		hitTiles[targetPos] = {[1] = target}
 	else
 		hitTiles = spell:getAffectedArea(centerPos, caster)
 	end
@@ -309,6 +312,10 @@ function otstd.onCastSpell(event)
 						if spell.onHitCreature then
 							spell.onHitCreature(target, event)
 						end
+					end
+
+					if spell.aggressive and typeof(target, "Player") then
+						target:addInFight(config["in_fight_duration"])
 					end
 				end
 			end

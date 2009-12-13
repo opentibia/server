@@ -425,7 +425,8 @@ public:
 		mechanicType(mechanicType),
 		sourceId(sourceId),
 		ticks(ticks),
-		flags(flags)
+		flags(flags),
+		attached(false)
 		{}
 	Condition(const Condition& rhs);
 	~Condition();
@@ -445,6 +446,7 @@ public:
 	void setTicks(uint32_t _ticks) {ticks = _ticks;}
 	void setSource(const CombatSource& _combatSource) {combatSource = _combatSource;}
 	void setFlags(uint32_t _flags) {flags = _flags;}
+	void setAttached(bool _attached) {attached = _attached;}
 
 	bool onBegin(Creature* creature);
 	void onEnd(Creature* creature, ConditionEnd reason);
@@ -454,7 +456,8 @@ public:
 	void addEffect(ConditionEffect effect);
 
 	Condition* clone()  const { return new Condition(*this); }
-
+	
+	bool isAttached() const {return attached;}
 	//serialization
 	bool isPersistent() const;
 	bool unserialize(PropStream& propStream);
@@ -471,6 +474,7 @@ protected:
 
 	//variables that should not be serialized
 	CombatSource combatSource;
+	bool attached;
 
 	friend class ConditionEffect;
 };

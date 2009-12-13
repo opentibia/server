@@ -27,6 +27,7 @@
 #include "ioplayer.h"
 #include "game.h"
 #include "vocation.h"
+#include "lua_manager.h"
 #include "creature_manager.h"
 #include "protocolgame.h"
 #include "protocolold.h"
@@ -627,9 +628,13 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	// Setup scripts
 	std::cout << "::" << std::endl;
 	std::cout << ":: Loading Scripts ..." << std::endl;
-	g_game.loadScripts();
-	std::cout << std::endl << "::" << std::endl;
-
+	try {
+		g_game.loadScripts();
+		std::cout << std::endl << "::" << std::endl;
+	} catch(Script::Error& err){
+		std::cout << std::endl << err.what() << std::endl;
+		exit(-1);
+	}
 	g_game.runStartupScripts(true);
 
 	// Tie ports and register services

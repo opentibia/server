@@ -232,8 +232,6 @@ public:
 	virtual double getDefenseFactor() const {return 1.0;}
 
 	bool addCondition(Condition* condition);
-	bool addCombatCondition(Condition* condition);
-
 	void removeCondition(Condition* condition);
 	void removeCondition(const std::string& name);
 	void removeCondition(ConditionId id);
@@ -280,7 +278,6 @@ public:
 
 	//combat event functions
 	virtual void onAddCondition(const Condition* condition, bool preAdd = true);
-	virtual void onAddCombatCondition(const Condition* condition, bool preAdd = true);
 	virtual void onEndCondition(const Condition* condition, bool preEnd = true);
 	virtual void onCombatRemoveCondition(const CombatSource& combatSource, Condition* condition);
 	virtual void onAttackedCreature(Creature* target) {};

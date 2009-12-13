@@ -236,7 +236,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getOutfit()", &Manager::lua_Creature_getOutfit);
 	registerMemberFunction("Creature", "getZone()", &Manager::lua_Creature_getZone);	
-	registerMemberFunction("Creature", "say(string msg)", &Manager::lua_Creature_say);
+	registerMemberFunction("Creature", "say(string msg [, SpeakClass type])", &Manager::lua_Creature_say);
 	registerMemberFunction("Creature", "setOutfit(table outfit)", &Manager::lua_Creature_setOutfit);
 	registerMemberFunction("Creature", "walk(Direction direction)", &Manager::lua_Creature_walk);
 	registerMemberFunction("Creature", "getSpeed()", &Manager::lua_Creature_getSpeed);
@@ -581,7 +581,7 @@ void Manager::registerFunctions() {
 
 	// Game/Map functions
 	// map:rayCast()
-	registerGlobalFunction("rayCast(position from, position to, boolean checkfloor)", &Manager::lua_rayCast);
+	registerGlobalFunction("rayCast(position from, position to [, boolean checkfloor])", &Manager::lua_rayCast);
 	// map:canThrowObjectTo:rayCast()
 	registerGlobalFunction("canThrowObjectTo(position from, position to, boolean checkLineOfSight [, int rangex [,int rangey]])", &Manager::lua_canThrowObjectTo);
 	// map:canThrowObjectTo:getParentTile()
@@ -3090,12 +3090,9 @@ int LuaState::lua_createCondition()
 int LuaState::lua_Condition_destroy()
 {
 	Condition* condition = popCondition();
-	/* REVSCRIPT TODO
-	 Check if condition is attached to a creature and prevent destruction in that case
-	if(condition->attached()){
+	if(condition->isAttached()){
 		throw Error("Can not destroy ");
 	}
-	*/
 	environment->removeObject(condition);
 	delete condition;
 	pushBoolean(true);
@@ -3105,12 +3102,14 @@ int LuaState::lua_Condition_destroy()
 int LuaState::lua_Condition_setName()
 {
 	std::string name = popString();
+	Condition* condition = popCondition();
+
+	//check if its any of the the default conditions
 	try{
 		ConditionId id = ConditionId::fromString(asLowerCaseString(name));
 		name = id.toString();
 	}catch(enum_conversion_error&){}
 
-	Condition* condition = popCondition();
 	condition->setName(name);
 	pushBoolean(true);
 	return 1;
@@ -3630,10 +3629,16 @@ int LuaState::lua_internalCastSpell()
 
 int LuaState::lua_Creature_say()
 {
+	SpeakClass talkType = SPEAK_SAY;
+
+	if(getStackSize() > 2) {
+		talkType = popEnum<SpeakClass>();
+	}
+
 	std::string msg = popString();
 	Creature* creature = popCreature();
 
-	bool ret = g_game.internalCreatureSay(creature, SPEAK_SAY, msg);
+	bool ret = g_game.internalCreatureSay(creature, talkType, msg);
 	pushBoolean(ret);
 	return 1;
 }
@@ -5420,7 +5425,10 @@ int LuaState::lua_sendAnimatedText()
 
 int LuaState::lua_rayCast()
 {
-	bool checkFloor = popBoolean();
+	bool checkFloor = true;
+	if(getStackSize() > 2)
+		checkFloor = popBoolean();
+
 	Position toPos = popPosition();
 	Position fromPos = popPosition();
 

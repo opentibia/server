@@ -88,9 +88,10 @@ Creature::~Creature()
 	std::list<Creature*>::iterator cit;
 	destroySummons();
 
-	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		(*it)->onEnd(this, CONDITIONEND_CLEANUP);
 		delete *it;
+		it = conditions.erase(it);
 	}
 
 	conditions.clear();
@@ -1255,11 +1256,6 @@ void Creature::onAddCondition(const Condition* condition, bool preAdd /*= true*/
 	}
 }
 
-void Creature::onAddCombatCondition(const Condition* condition, bool preAdd /*= true*/)
-{
-	//
-}
-
 void Creature::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 {
 	if(!preEnd){
@@ -1399,32 +1395,8 @@ bool Creature::addCondition(Condition* condition)
 	if(condition->onBegin(this)){
 		onAddCondition(condition);
 		conditions.push_back(condition);
+		condition->setAttached(true);
 		onAddCondition(condition, false);
-		return true;
-	}
-
-	return false;
-}
-
-bool Creature::addCombatCondition(Condition* condition)
-{
-	if(condition == NULL){
-		return false;
-	}
-
-	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->onUpdate(this, condition)){
-			delete condition;
-			return true;
-		}
-	}
-
-	if(condition->onBegin(this)){
-		onAddCondition(condition);
-		onAddCombatCondition(condition);
-		conditions.push_back(condition);
-		onAddCondition(condition, false);
-		onAddCombatCondition(condition, false);
 		return true;
 	}
 

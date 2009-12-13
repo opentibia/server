@@ -143,11 +143,11 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 	}
 
 	if(readXMLInteger(node, "min", intValue)){
-		sb.min = intValue;
+		sb.min = std::abs(intValue);
 	}
 
 	if(readXMLInteger(node, "max", intValue)){
-		sb.max = intValue;
+		sb.max = std::abs(intValue);
 	}
 
 	//normalize values

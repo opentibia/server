@@ -88,7 +88,7 @@ Condition* Condition::createCondition(ConditionId id, uint32_t ticks, uint32_t s
 			return Condition::createCondition(id.toString(), ticks, MECHANIC_DISARMED, COMBAT_NONE, sourceId);
 
 		default:
-			break;
+			return Condition::createCondition(id.toString(), ticks, MECHANIC_NONE, COMBAT_NONE, sourceId);
 	}
 
 	return NULL;
@@ -132,7 +132,13 @@ Condition::Condition(const Condition& rhs)
 
 IconType Condition::getIcon() const
 {
-	IconType icons;
+	IconType icons = ICON_NONE;
+
+	for(IconType::iterator i = ICON_POISON; i != IconType::end(); ++i){
+		if(hasBitSet((*i).value(), flags)){
+			icons |= *i;
+		}
+	}
 
 	switch(combatType.value()){
 		case enums::COMBAT_ENERGYDAMAGE: icons |= ICON_ENERGY; break;
@@ -145,26 +151,6 @@ IconType Condition::getIcon() const
 
 		default:
 			break;
-	}
-
-	if(hasBitSet(ICON_SWORDS.value(), flags)){
-		icons |= ICON_SWORDS;
-	}
-
-	if(hasBitSet(ICON_PARTY_BUFF.value(), flags)){
-		icons |= ICON_PARTY_BUFF;
-	}
-
-	if(hasBitSet(ICON_PARALYZE.value(), flags)){
-		icons |= ICON_PARALYZE;
-	}
-	
-	if(hasBitSet(ICON_HASTE.value(), flags)){
-		icons |= ICON_HASTE;
-	}
-
-	if(hasBitSet(ICON_MANASHIELD.value(), flags)){
-		icons |= ICON_MANASHIELD;
 	}
 
 	return icons;
@@ -249,7 +235,7 @@ bool Condition::onTick(Creature* creature, uint32_t interval)
 	}
 
 	if(ticks != 0){
-		if(ticks - interval <= 0){
+		if((((int64_t)ticks) - ((int64_t)interval)) <= 0){
 			return false;
 		}
 
@@ -440,6 +426,7 @@ bool ConditionEffect::onBegin(Creature* creature)
 				//average damage
 				modPeriodicDamage.total = random_range(modPeriodicDamage.min, modPeriodicDamage.max);
 				modPeriodicDamage.percent = modPeriodicDamage.total / modPeriodicDamage.first;
+				modPeriodicDamage.value = modPeriodicDamage.first;
 			}
 			else{
 				//periodic damage
@@ -658,6 +645,7 @@ bool ConditionEffect::onTick(Creature* creature, uint32_t ticks)
 					if(modPeriodicDamage.roundCompleted >= curRounds){
 						modPeriodicDamage.roundCompleted = 0;
 						--modPeriodicDamage.first;
+						modPeriodicDamage.value = modPeriodicDamage.first;
 					}
 
 					if(modPeriodicDamage.sum >= modPeriodicDamage.total || modPeriodicDamage.first == 0){

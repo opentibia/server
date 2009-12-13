@@ -32,13 +32,31 @@ otstd.fluid_containers = {
 -- Fluid effect callbacks
 
 function otstd.fluid_container.Alcohol(player, fluid)
-	--TODO: Inebriation
+	local condition = {"drunk", 60000, COMBAT_NONE, MECHANIC_DRUNK,
+		["script"] = {
+				name = "effect_drunk",
+			}
+	}
+	
+	player:addCondition(condition)
 end
 local Alcohol = otstd.fluid_container.Alcohol
 
 function otstd.fluid_container.Toxic(player, fluid)
-	--TODO: Poison
+	local condition = {"poisoned", 0, COMBAT_EARTHDAMAGE,
+		["damage"] = {
+				4000,
+				COMBAT_EARTHDAMAGE,
+				first = -5,
+				min = -50,
+				max = -120,
+				icon = ICON_POISON
+			}
+	}
+	
+	player:addCondition(condition)
 end
+
 local Toxic = otstd.fluid_container.Toxic
 
 function otstd.fluid_container.ManaRegen(player, fluid)
@@ -91,7 +109,7 @@ function Player:drink(item)
 			fluid.callback(self, item)
 		end
 	end
-	sendAnimatedText(self:getPosition(), fluid and fluid.color or TEXTCOLOR_ORANGE, fluid and fluid.text or "Gulp.")
+	self:say(fluid and fluid.text or "Gulp.", SPEAK_MONSTER_SAY)
 	
 	item:setSubtype(FLUID_NONE)
 end

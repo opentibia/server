@@ -807,8 +807,9 @@ bool LuaStateManager::loadFile(std::string file)
 	// REVSCRIPT TODO a better error handler here
 	ret = lua_pcall(state, 0, 0, 0);
 	if(ret != 0) {
-		std::cout << "Lua Error: Failed to load file " << file << " - " << popString() << std::endl;
-		return false;
+		std::stringstream error;
+		error << "Lua Error: Failed to load file " << file << " - " << popString();
+		throw Script::Error(error.str());
 	}
 	return true;
 }
@@ -822,9 +823,15 @@ bool LuaStateManager::loadDirectory(std::string dir_path)
 	for(recursive_directory_iterator itr(dir_path); itr != end_itr; ++itr){
 		std::string s = itr->string();
 		s = (s.size() >= 4? s.substr(s.size() - 4) : "");
-		if(s == ".lua")
-			if(!loadFile(itr->string())) // default construction yields past-the-endath()))
+		if(s == ".lua"){
+			try {
+				if(!loadFile(itr->string()))
+					return false; // default construction yields past-the-endath()))
+			} catch(Script::Error& err) {
+				std::cout << err.what();
 				return false;
+			}
+		}
 	}
 	return true;
 }
