@@ -2707,6 +2707,21 @@ GuildEmblem_t Player::getWarEmblem(const Player* player) const
 		return EMBLEM_NONE;
 	}
 
+	if(getGuild()->isGuildAtWar() || player->getGuild()->isGuildAtWar()){
+		if(player == this){
+			return EMBLEM_GREEN;
+		}
+		else if(player->getGuildId() == getGuildId()){
+			return EMBLEM_GREEN;
+		}
+		else if(getGuild()->isGuildEnemy(player->getGuildId())){
+			return EMBLEM_RED;
+		}
+		else if(player->getGuild()->isGuildAtWar()){
+			return EMBLEM_BLUE;
+		}
+	}
+
 	return EMBLEM_NONE;
 }
 

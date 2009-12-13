@@ -203,7 +203,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	query << "SELECT `guild_members`.`guild_nick` as `guild_nick`, `guild_members`.`guild_id` as `guild_id`, \
 			 `guild_ranks`.`name` as `rank_name`, `guild_ranks`.`level` as `rank_level`, \
 			 `guilds`.`name` as `guild_name` FROM `guild_members`, `guilds`, `guild_ranks` \
-			 WHERE `guild_members`.`player_id` = " << player->getGUID() << " AND `guild_ranks`.`id` = `guild_members`.`rank_id`";
+			 WHERE `guild_members`.`player_id` = " << player->getGUID() << " \
+			 AND `guild_ranks`.`id` = `guild_members`.`rank_id` AND `guilds`.`id` = `guild_members`.`guild_id`";
 	if((result = db->storeQuery(query.str()))){
 		Guild* guild = new Guild();
 
@@ -212,6 +213,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		guild->setGuildNick(result->getDataString("guild_nick"));
 		guild->setGuildLevel(result->getDataInt("rank_level"));
 		guild->setGuildId(result->getDataInt("guild_id"));
+		guild->setAtWar();
 
 		player->setGuild(guild);
 		db->freeResult(result);

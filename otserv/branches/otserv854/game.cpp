@@ -64,6 +64,7 @@ extern Monsters g_monsters;
 extern MoveEvents* g_moveEvents;
 extern Npcs g_npcs;
 extern CreatureEvents* g_creatureEvents;
+extern Guilds g_guilds;
 
 Game::Game()
 {

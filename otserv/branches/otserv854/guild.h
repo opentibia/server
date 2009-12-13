@@ -25,13 +25,34 @@
 #include "const.h"
 
 #include <string>
+#include <map>
 #include <set>
+
+struct GuildWar {
+	uint32_t guildId;
+	uint32_t opponentId;
+	uint16_t killLimit;
+	uint16_t guildKills;
+	uint16_t opponentKills;
+	uint32_t guildFee;
+	uint32_t enemyGuildFee;
+	//time_t duration;
+};
+
+typedef std::map<uint32_t, GuildWar* > GuildWarsMap;
+typedef std::set<uint32_t> GuildSet;
 
 class Guild
 {
 public:
 	Guild();
 	~Guild(){};
+
+	void setAtWar();
+	bool isPlayerEnemy(uint32_t _guildId) const;
+	bool isGuildAtWar() const;
+	bool isGuildEnemy(uint32_t _guildId) const;
+	void endWar();
 
 	void setGuildName(const std::string& _guildName) { guildName = _guildName; }
 	void setGuildRank(const std::string& _guildRank) { guildRank = _guildRank; }
@@ -51,6 +72,8 @@ protected:
 	std::string guildNick;
 	uint32_t guildLevel;
 	uint32_t guildId;
+	GuildSet enemyGuilds;
+	std::set<uint32_t> warIds;
 };
 
 class Guilds
@@ -59,11 +82,12 @@ public:
 	Guilds();
 	~Guilds(){};
 
-	void disband(){};
+	bool isGuildAtWar(uint32_t _guildId) const;
+	void setGuildsAtWar();
+	bool clearWar(uint32_t _warId) const;
 
-protected:
-	typedef std::set<uint32_t> GuildSet;
-	GuildSet guildMembers;
+	GuildWarsMap guildWars;
+	GuildSet guildsAtWar;
 };
 
 #endif

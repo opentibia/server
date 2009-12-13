@@ -107,12 +107,12 @@ CREATE TABLE `war_declaration` (
 	`guild_id` INT UNSIGNED NOT NULL COMMENT 'the guild wich declared the war',
 	`opponent_id` INT UNSIGNED NOT NULL COMMENT 'the enemy guild at war',
 	`frag_limit` INT UNSIGNED NOT NULL DEFAULT 10 COMMENT 'kills needed to win the war',
-	`frag_count` INT UNSIGNED NOT NULL DEFAULT 0,
 	`war_duration` INT UNSIGNED NOT NULL COMMENT 'how much time the war will last',
 	`guild_fee` INT UNSIGNED NOT NULL DEFAULT 1000 COMMENT 'amount of money the guild has to pay if loses the war',
 	`opponent_fee` INT UNSIGNED NOT NULL DEFAULT 1000 COMMENT 'amount of money the enemy guild has to pay if loses the war',
 	`comment` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'the guild leader can leave a message for the other guild',
 	`declaration_date` INT UNSIGNED NOT NULL,
+	`active` TINYINT(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`opponent_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
@@ -121,7 +121,8 @@ CREATE TABLE `war_declaration` (
 CREATE TABLE `guild_wars` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`war_id` INT UNSIGNED NOT NULL,
-	`guild_id` INT UNSIGNED NOT NULL,
+	`guild_frags` INT UNSIGNED NOT NULL DEFAULT 0,
+	`opponent_frags` INT UNSIGNED NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`war_id`) REFERENCES `war_declaration` (`id`) ON DELETE CASCADE
