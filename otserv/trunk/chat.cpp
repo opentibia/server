@@ -362,7 +362,7 @@ bool Chat::deleteChannel(Party* party)
 
 bool Chat::addUserToChannel(Player* player, uint16_t channelId)
 {
-	ChatChannel *channel = getChannel(player, channelId);
+	ChatChannel* channel = getChannel(player, channelId);
 	if(!channel)
 		return false;
 
@@ -374,7 +374,7 @@ bool Chat::addUserToChannel(Player* player, uint16_t channelId)
 
 bool Chat::removeUserFromChannel(Player* player, uint16_t channelId)
 {
-	ChatChannel *channel = getChannel(player, channelId);
+	ChatChannel* channel = getChannel(player, channelId);
 	if(!channel)
 		return false;
 
@@ -412,7 +412,7 @@ void Chat::removeUserFromAllChannels(Player* player)
 
 bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& text, uint16_t channelId)
 {
-	ChatChannel *channel = getChannel(player, channelId);
+	ChatChannel* channel = getChannel(player, channelId);
 	if(!channel) {
 		return false;
 	}
@@ -461,7 +461,7 @@ bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& t
 
 std::string Chat::getChannelName(Player* player, uint16_t channelId)
 {
-	ChatChannel *channel = getChannel(player, channelId);
+	ChatChannel* channel = getChannel(player, channelId);
 	if(channel)
 		return channel->getName();
 	else
@@ -477,7 +477,7 @@ ChannelList Chat::getChannelList(Player* player)
 
 	// If has guild
 	if(player->getGuildId() && player->getGuildName().length()){
-		ChatChannel *channel = getChannel(player, CHANNEL_GUILD);
+		ChatChannel* channel = getChannel(player, CHANNEL_GUILD);
 
 		if(channel)
 			list.push_back(channel);
@@ -486,7 +486,7 @@ ChannelList Chat::getChannelList(Player* player)
 	}
 
 	if(player->getParty()){
-		ChatChannel *channel = getChannel(player, CHANNEL_PARTY);
+		ChatChannel* channel = getChannel(player, CHANNEL_PARTY);
 
 		if(channel)
 			list.push_back(channel);
@@ -559,9 +559,12 @@ ChatChannel* Chat::getChannel(Player* player, uint16_t channelId)
 
 	NormalChannelMap::iterator nit = m_normalChannels.find(channelId);
 	if(nit != m_normalChannels.end()){
-		if(channelId == CHANNEL_RULE_REP && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations)){ //Rule violations channel
+		if(channelId == CHANNEL_RULE_REP && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations))
 			return NULL;
-		}
+		else if(channelId == CHANNEL_TRADE && player->getVocationId() == 0)
+			return NULL;
+		else if(channelId == CHANNEL_TRADE_ROOK && player->getVocationId() != 0)
+			return NULL;
 
 		return nit->second;
 	}
