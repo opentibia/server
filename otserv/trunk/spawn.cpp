@@ -420,20 +420,20 @@ void Spawn::cleanup()
 		spawnId = it->first;
 		monster = it->second;
 
-		if(monster->isRemoved()) {
+		if(monster->isRemoved()){
 			if(spawnId != 0) {
 				spawnMap[spawnId].lastSpawn = OTSYS_TIME();
 			}
 
 			monster->releaseThing2();
-			it = spawnedMap.erase(it);
+			spawnedMap.erase(it++);
 		}
-		else {
+		else{
 			if(spawnId != 0 && !isInSpawnZone(monster->getPosition()) && monster->getIdleStatus()) {
 				g_game.internalTeleport(monster, monster->getMasterPos(), FLAG_NOLIMIT);
 			}
 
-			++it
+			++it;
 		}
 	}
 }
