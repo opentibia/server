@@ -143,17 +143,15 @@ public:
 	//guild settings
 	void setGuild(Guild* _guild) { guild = _guild; }
 	Guild* getGuild() const { return guild; }
-	uint32_t getGuildId() const;
-	std::string getGuildName() const;
-	std::string getGuildRank() const;
-	std::string getGuildNick() const;
-	void setGuildName(const std::string& _guildName);
-	void setGuildRank(const std::string& _guildRank);
-	void setGuildNick(const std::string& _guildNick);
-	void setGuildLevel(uint32_t _guildLevel);
-	void setGuildId(uint32_t _guildId);
+	uint32_t getGuildId() const { return guild->getGuildId(); }
+	std::string getGuildName() const { return guild->getGuildName(); }
+	std::string getGuildRank() const { return guild->getGuildRank(); }
+	std::string getGuildNick() const { return guild->getGuildNick(); }
+	void setGuildRank(const std::string& _guildRank) { guild->setGuildNick(_guildRank); }
+	void setGuildNick(const std::string& _guildNick) { guild->setGuildNick(_guildNick); }
 
 	//guild war system
+	bool isEnemy(const Player* player) const;
 	GuildEmblem_t getWarEmblem(const Player* player) const;
 
 	void setFlags(uint64_t flags){ groupFlags = flags;}
@@ -812,6 +810,7 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
+
 	//shop variables
 	Npc* shopOwner;
 	int32_t purchaseCallback;

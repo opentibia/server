@@ -208,6 +208,8 @@ Player::~Player()
 	setEditHouse(NULL);
 	setNextWalkActionTask(NULL);
 
+	delete guild;
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	playerCount--;
 #endif
@@ -1029,6 +1031,9 @@ bool Player::canWalkthrough(const Creature* creature) const
 	}
 
 	if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+		if(isEnemy(creature->getPlayer())){
+			return false;
+		}
 		return getTile()->ground->getID() != ITEM_GLOWING_SWITCH;
 	}
 
@@ -2634,71 +2639,12 @@ void Player::kickPlayer()
 	}
 }
 
-uint32_t Player::getGuildId() const
+bool Player::isEnemy(const Player* player) const
 {
-	if(getGuild()){
-		return getGuild()->getGuildId();
+	if(getGuild()->isGuildEnemy(player->getGuildId())){
+		return true;
 	}
-	return 0;
-}
-
-std::string Player::getGuildName() const
-{
-	if(getGuild()){
-		return getGuild()->getGuildName();
-	}
-	return "";
-}
-
-std::string Player::getGuildRank() const
-{
-	if(getGuild()){
-		return getGuild()->getGuildRank();
-	}
-	return "";
-}
-
-std::string Player::getGuildNick() const
-{
-	if(getGuild()){
-		return getGuild()->getGuildNick();
-	}
-	return "";
-}
-
-void Player::setGuildName(const std::string& _guildName)
-{
-	if(getGuild()){
-		getGuild()->setGuildName(_guildName);
-	}
-}
-
-void Player::setGuildRank(const std::string& _guildRank)
-{
-	if(getGuild()){
-		getGuild()->setGuildRank(_guildRank);
-	}
-}
-
-void Player::setGuildNick(const std::string& _guildNick)
-{
-	if(getGuild()){
-		getGuild()->setGuildNick(_guildNick);
-	}
-}
-
-void Player::setGuildLevel(uint32_t _guildLevel)
-{
-	if(getGuild()){
-		getGuild()->setGuildLevel(_guildLevel);
-	}
-}
-
-void Player::setGuildId(uint32_t _guildId)
-{
-	if(getGuild()){
-		getGuild()->setGuildId(_guildId);
-	}
+	return false;
 }
 
 GuildEmblem_t Player::getWarEmblem(const Player* player) const
@@ -2707,17 +2653,14 @@ GuildEmblem_t Player::getWarEmblem(const Player* player) const
 		return EMBLEM_NONE;
 	}
 
-	if(getGuild()->isGuildAtWar() || player->getGuild()->isGuildAtWar()){
-		if(player == this){
-			return EMBLEM_GREEN;
-		}
-		else if(player->getGuildId() == getGuildId()){
+	if(player->getGuild()->isGuildAtWar()){
+		if(player->getGuildId() == getGuildId()){
 			return EMBLEM_GREEN;
 		}
 		else if(getGuild()->isGuildEnemy(player->getGuildId())){
 			return EMBLEM_RED;
 		}
-		else if(player->getGuild()->isGuildAtWar()){
+		else{
 			return EMBLEM_BLUE;
 		}
 	}
@@ -3870,6 +3813,7 @@ void Player::onAttackedCreature(Creature* target)
 
 #ifdef __SKULLSYSTEM__
 				if( !isPartner(targetPlayer) &&
+					!isEnemy(targetPlayer) &&
 					!Combat::isInPvpZone(this, targetPlayer) &&
 					!targetPlayer->hasAttacked(this)){
 
@@ -4669,6 +4613,10 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 
 bool Player::checkPzBlockOnCombat(Player* targetPlayer)
 {
+	if(isEnemy(targetPlayer)){
+		return true;
+	}
+
 	#ifdef __SKULLSYSTEM__
 	if(targetPlayer->hasAttacked(this) && !g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK)){
 		return false;

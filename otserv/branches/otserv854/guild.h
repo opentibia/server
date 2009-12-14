@@ -36,7 +36,6 @@ struct GuildWar {
 	uint16_t opponentKills;
 	uint32_t guildFee;
 	uint32_t enemyGuildFee;
-	//time_t duration;
 };
 
 typedef std::map<uint32_t, GuildWar* > GuildWarsMap;
@@ -49,10 +48,11 @@ public:
 	~Guild(){};
 
 	void setAtWar();
+	void killEnemy(uint32_t _guildId);
 	bool isPlayerEnemy(uint32_t _guildId) const;
-	bool isGuildAtWar() const;
+	bool isGuildAtWar() const { return !enemyGuilds.empty(); }
 	bool isGuildEnemy(uint32_t _guildId) const;
-	void endWar();
+	void endWar(uint32_t _warId, uint32_t _guildKills, uint32_t opponentKills);
 
 	void setGuildName(const std::string& _guildName) { guildName = _guildName; }
 	void setGuildRank(const std::string& _guildRank) { guildRank = _guildRank; }
@@ -72,14 +72,15 @@ protected:
 	std::string guildNick;
 	uint32_t guildLevel;
 	uint32_t guildId;
+	bool warAsRequester;
 	GuildSet enemyGuilds;
-	std::set<uint32_t> warIds;
+	std::map<uint32_t, uint32_t> warOpponents;
 };
 
 class Guilds
 {
 public:
-	Guilds();
+	Guilds(){};
 	~Guilds(){};
 
 	bool isGuildAtWar(uint32_t _guildId) const;

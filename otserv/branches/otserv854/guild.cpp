@@ -40,20 +40,48 @@ void Guild::setAtWar()
 		GuildWarsMap::iterator it;
 		for(it = warMap.begin(); it != warMap.end(); ++it){
 			if(it->second->guildId == guildId){
-				enemyGuilds.insert(it->second->guildId);
-				warIds.insert(it->first);
+				enemyGuilds.insert(it->second->opponentId);
+				warOpponents[it->first] = it->second->opponentId;
 			}
 			else if(it->second->opponentId == guildId){
-				enemyGuilds.insert(it->second->opponentId);
-				warIds.insert(it->first);
+				enemyGuilds.insert(it->second->guildId);
+				warOpponents[it->first] = it->second->guildId;
 			}
 		}
 	}
 }
 
-bool Guild::isGuildAtWar() const
+void Guild::killEnemy(uint32_t _guildId)
 {
-	return enemyGuilds.size() != 0;
+	if(isGuildEnemy(_guildId)){
+		GuildWarsMap warMap = g_guilds.guildWars;
+		uint32_t warId;
+
+		std::map<uint32_t, uint32_t>::iterator it;
+		for(it = warOpponents.begin(); it != warOpponents.end(); ++it){
+			if(it->second == _guildId){
+				warId = it->first;
+				break;
+			}
+		}
+
+		GuildWarsMap::iterator itt = warMap.find(warId);
+		if(itt != warMap.end()){
+			uint32_t killLimit = itt->second->killLimit;
+			uint32_t guildKills;
+			uint32_t opponentKills;
+			if(itt->second->guildId == guildId){
+				guildKills = itt->second->guildKills++;
+			}
+			else{
+				opponentKills = itt->second->opponentKills++;
+			}
+
+			if(guildKills + opponentKills >= killLimit){
+				endWar(warId, guildKills, opponentKills);
+			}
+		}
+	}
 }
 
 bool Guild::isGuildEnemy(uint32_t _guildId) const
@@ -64,14 +92,9 @@ bool Guild::isGuildEnemy(uint32_t _guildId) const
 	return false;
 }
 
-void Guild::endWar()
+void Guild::endWar(uint32_t _warId, uint32_t _guildKills, uint32_t opponentKills)
 {
 
-}
-
-Guilds::Guilds()
-{
-	//
 }
 
 void Guilds::setGuildsAtWar()
@@ -85,7 +108,8 @@ void Guilds::setGuildsAtWar()
 		  << ", `war_declaration`.`guild_fee` as `guild_fee`, `war_declaration`.`opponent_fee` as `opponent_fee`"
 		  << ", `guild_wars`.`guild_frags` as `guild_frags`, `guild_wars`.`opponent_frags` as `opponent_frags`"
 		  << " FROM `war_declaration`, `guild_wars`"
-		  << " WHERE `war_declaration`.`active` = 1 AND `war_declaration`.`id` = `guild_wars`.`war_id`";
+		  << " WHERE `war_declaration`.`active` = 1 AND `war_declaration`.`id` = `guild_wars`.`war_id`"
+		  << " AND `war_declaration`.`war_duration` < " << std::time(NULL);
 	if((result = db->storeQuery(query.str()))){
 		do{
 			uint32_t wid = result->getDataInt("wid");

@@ -137,7 +137,7 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 			}
 		}
 	}
-	
+
 	if(formulaType == FORMULA_VALUE){
 		min = (int32_t)mina;
 		max = (int32_t)maxa;
@@ -378,6 +378,7 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 	if(	attackerPlayer == NULL ||
 		targetPlayer == NULL ||
 		attackerPlayer->isPartner(targetPlayer) ||
+		attackerPlayer->isEnemy(targetPlayer) ||
 		Combat::isInPvpZone(attackerPlayer, targetPlayer) ||
 		targetPlayer->hasAttacked(attackerPlayer) ||
 		targetPlayer->getSkull() != SKULL_NONE ||
@@ -405,11 +406,17 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					attackerPlayer->isLoginAttackLocked(targetPlayer->getID())){
 					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
+
 #ifdef __SKULLSYSTEM__
-				if(attackerPlayer->getSkull() == SKULL_BLACK){
+				if(	(attackerPlayer->getSkull() == SKULL_BLACK) &&
+					(!attackerPlayer->isEnemy(targetPlayer))){
 					if(targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(attackerPlayer)){
 						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
+				}
+#else
+				if(!attackerPlayer->getGuild()->isGuildEnemy(targetPlayer->getGuildId())){
+					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
 #endif
 			}
@@ -435,15 +442,19 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 			}
 
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-				if(target->getPlayer()){
-					if(!isInPvpZone(attacker, target)){
-						return RET_YOUMAYNOTATTACKTHISPERSON;
+				if(const Player* targetPlayer = target->getPlayer()){
+					if(!targetPlayer->isEnemy(attacker->getPlayer())){
+						if(!isInPvpZone(attacker, target)){
+							return RET_YOUMAYNOTATTACKTHISCREATURE;
+						}
 					}
 				}
 
 				if(target->isPlayerSummon()){
-					if(!isInPvpZone(attacker, target)){
-						return RET_YOUMAYNOTATTACKTHISCREATURE;
+					if(!target->getPlayerMaster()->isEnemy(attacker->getPlayer())){
+						if(!isInPvpZone(attacker, target)){
+							return RET_YOUMAYNOTATTACKTHISCREATURE;
+						}
 					}
 				}
 			}
