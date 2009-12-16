@@ -10,28 +10,31 @@ What is this?
 	based on the CIPSoft's Tibia.
 
 How does it work?
-	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 7.8 and then 7.81.
-	OTServ is now played using Tibia 8.11.
+	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 7.8, 7.81, ,7.82, 7.9, 7.92, 8.0, 8.1, 8.11, 8.2 ,8.21, 8.22, 8.3, 8.4, 8.41, 8.42, 8.5, 8.51, 8.52.
+	OTServ is now played using Tibia 8.54.
 
 	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here 
-	http://otfans.net/attachment.php?attachmentid=1149 or http://otfans.net/showthread.php?t=20767.
+	http://www.otchanger.net/
 
 	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
-	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier,
-	then go to Options and Network and tick off "Test Server Login". Then login with the
+	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier
+	.
+	Then login with the
 	following:
 		Account Number: 111111
 		Password: tibia
+	To do so u have to execute some sql queries from schema.mysql.(they are commented at the end)
 	And check it out. Once you are done, have a look around in the folders
-	and take a look at the config. :)
+	and take a look at the config.lua :)
 
 	NEVER ever enter your real acc# and/or password when
 	not connecting to the CIP servers.
 	Then you are logged in.
 
-	Whats New in 0.6.2?
+	Whats New in 0.6.3?
 Features?
-	- Not much
+    many ...(almost all are here):
+	http://otfans.net/wiki/index.php/Talk:OTServ_Roadmap
 
 How do I use this new stuff?
 	I'm just going over what might not be familiar to you here.
@@ -49,7 +52,9 @@ How do I use this new stuff?
 	Binary map, well this seems quite new doesn't it. For a long time maps have been in xml format
 	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
 	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
-
+	(Xml maps was in 7.4-7.1 ?)
+    Binary house storage it is also new feature in otserv before it was relational storage (u can change storage in config.lua)
+	which takes long to save tiles in houses so otserv team make it in db but in binary storage.
 
 Credits?
 	Tliff				Developer, some kind of project leader, Forum administrator

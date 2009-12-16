@@ -4,7 +4,7 @@ How do I compile OTServ?
 	selected as database engine. It doesn't require any configuration from you, OTServ is configured for it by default and all what you need is to provide SQLite library for it.
 	
 		Instructions to compile OTServ: http://otfans.net/wiki/index.php/Compiling_OTServ
-
+		
 MySQL Server
 	By default OTServ uses SQLite database which doesn't require any configuration from you. However it is
 	possible to use MySQL database instead of SQLite - MySQL is more powerful database system which is
@@ -13,7 +13,7 @@ MySQL Server
 
 
 		Instructions to setup a server:
-			1. Download XAMPP (not XAMPP Lite) (http://www.apachefriends.org/download.php?xampp-win32-1.5.3a-installer.exe)
+			1. Download XAMPP (not XAMPP Lite) (http://sourceforge.net/projects/xampp/files/XAMPP%20Windows/xampp-win32-1.7.2.exe/download)
 			2. Install
 			3. Open "xampp-control.exe"
 			4. Click on the buttons Start to open "MySQL" and "Apache"
@@ -29,10 +29,10 @@ MySQL Server
 			13. Start the server and login.
 
 		Instructions to compile OTServ with MySQL:
-			1. Download MySQL client libraries libraries from http://dev.mysql.com/ (or just install them from packages in your Linux distro).
+            1. Download MySQL client libraries libraries from http://dev.mysql.com/ (or just install them from packages in your Linux distro)(libmysqlclient15-dev).
 			2. Compile your OTServ against MySQL:
 				a) On Windows use -D__USE_MYSQL__ -lmysqlclient
-				b) On POSIX systems use ./configure --enable-mysql
+				b) On POSIX(linux like) systems use ./configure --enable-mysql
 
 PostgreSQL Server
 	PostgreSQL is, after MySQL, probably most popular open-source database system. It provides huge possibilities and
@@ -40,7 +40,7 @@ PostgreSQL Server
 
 		Instructions to compile OTServ with PostgreSQL driver:
 				a) On Windows use -D__USE_PGSQL__ -lpg
-				b) On POSIX systems use ./configure --enable-pgsql
+				b) On POSIX(linux like) systems use ./configure --enable-pgsql
 
 ODBC data sources
 	OTServ contains also ODBC database driver. It allows to connect throught unified ODBC connection mechanism
@@ -52,7 +52,7 @@ ODBC data sources
 
 		Instructions to compile OTServ with ODBC driver:
 				a) On Windows use -D__USE_ODBC__ -lodbc
-				b) On POSIX systems use ./configure --enable-odbc
+				b) On POSIX(linux like) systems use ./configure --enable-odbc
 
 SQLite with other drivers
 	By default any alternative driver like MySQL disables SQLite support. However sometimes you might want
@@ -63,7 +63,7 @@ SQLite with other drivers
 			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
 			2. Compile your OTServ against SQLite:
 				a) On Windows use -D__USE_SQLITE__ -lsqlite3 -D__USE_MYSQL__ -lmysqlclient
-				b) On POSIX systems use ./configure --enable-mysql --enable-sqlite
+				b) On POSIX systems use ./configure --enable-sqlite
 
 What about old XML files?
 	If you have your old database in XML format and want to switch to SQL database, there is XML2SQL project in our SVN tree.
@@ -97,7 +97,7 @@ KDE KDevelop compilation
 If you find any problem using kdevelop file, please go to http://otserv.org/index.php?title=Compiling_with_KDevelop
 
 Problems?
-	The server is now stable nowadays, but if you do find bugs you can report them at the 
-	OpenTibia Project Tools forum at OTFans(http://otfans.net/project.php?projectid=1). When the
+	The server is stable now-a-days, but if you do find bugs, you can report them at the 
+	OpenTibia Project Tools forum at OTFans (http://otfans.net/project.php?projectid=1). When the
 	server crashes, you should get a report generated at your Otserv folder named report.txt, 
-	you should also report this at the Project Tools forum, this report will help solving bugs a lot.
+	you should also report this at the Project Tools forum, this report will help us in resolving the bugs.
