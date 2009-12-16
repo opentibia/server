@@ -1159,7 +1159,7 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerPremiumDays(cid)
 	lua_register(m_luaState, "getPlayerPremiumDays", LuaScriptInterface::luaGetPlayerPremiumDays);
 
-	//getPlayerSkullType(cid)
+	//getPlayerSkullType(cid, <optional> viewer)
 	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
 
 	//getPlayerSkullEndTime(cid)
@@ -2108,7 +2108,23 @@ int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L)
 
 int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
 {
-	return internalGetPlayerInfo(L, PlayerInfoSkullType);
+    //getPlayerSkullType(cid, <optional> viewer)
+    int32_t parameters = lua_gettop(L);
+	if(parameters == 1){ //If no viewer, just use internalGetPlayerInfo
+        return internalGetPlayerInfo(L, PlayerInfoSkullType);
+	}
+    uint32_t viewer = popNumber(L);
+    uint32_t cid = popNumber(L);
+    ScriptEnviroment* env = getScriptEnv();
+    Player* player = env->getPlayerByUID(cid);
+    Player* playerViewing = env->getPlayerByUID(viewer);
+    if(!player || !playerViewing) {
+        reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+        lua_pushnumber(L,LUA_ERROR);
+        return 1;
+    }
+    lua_pushnumber(L,(uint32_t)playerViewing->getSkullClient(player));
+    return 1;
 }
 
 int LuaScriptInterface::luaGetPlayerSkullEndTime(lua_State *L)
