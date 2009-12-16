@@ -823,7 +823,9 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		if(it.abilities.absorb.any()){
 			s << ", protection";
 			it.abilities.absorb.getDescription(s);
-		}
+		}if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
+				s << ", magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+			}
 		s << ").";
 	}
 	else if(it.isFluidContainer()){
