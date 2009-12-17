@@ -55,6 +55,8 @@ class Mission
 		bool isStarted(Player* player) const;
 		std::string getName(Player* player);
 		std::string getDescription(Player* player);
+
+		MissionState* mainState;
 		StateList state;
 
 	private:

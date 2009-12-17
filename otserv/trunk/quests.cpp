@@ -35,6 +35,7 @@ Mission::Mission(std::string _missionName, uint32_t _storageID, uint32_t _startV
 	endValue = _endValue;
 	startValue = _startValue;
 	storageID = _storageID;
+	mainState = NULL;
 }
 
 Mission::~Mission()
@@ -47,18 +48,29 @@ Mission::~Mission()
 
 std::string Mission::getDescription(Player* player)
 {
+	int32_t value;
+	player->getStorageValue(storageID, value);
+	if(mainState != NULL){
+		std::stringstream s;
+		s << value;
+
+		std::string desc = mainState->getMissionDescription();
+		replaceString(desc, "|STATE|", s.str());
+		return desc;
+	}
+
 	uint32_t current = endValue;
-	uint32_t value;
 	while(current >= startValue){
-		player->getStorageValue(storageID, (int32_t&)value);
-		if(value == current){
-			StateList::const_iterator it2;
-			it2 = state.find(current);
-			if(it2 != state.end())
-				return it2->second->getMissionDescription();
+		player->getStorageValue(storageID, value);
+		if(value == (int32_t)current){
+			StateList::const_iterator sit = state.find(current);
+			if(sit != state.end())
+				return sit->second->getMissionDescription();
 		}
+
 		current--;
 	}
+
 	return "An error has occurred, please contact a gamemaster.";
 }
 
@@ -197,7 +209,7 @@ bool Quests::loadFromXml(const std::string& _filename)
 					xmlNodePtr tmpNode = p->children;
 					while(tmpNode){
 						if(xmlStrcmp(tmpNode->name, (const xmlChar*)"mission") == 0){
-							std::string missionName;
+							std::string missionName, missionState;
 							uint32_t storageID = 0, startValue = 0, endValue = 0;
 							if(readXMLString(tmpNode, "name", strValue))
 								missionName = strValue;
@@ -210,21 +222,29 @@ bool Quests::loadFromXml(const std::string& _filename)
 							
 							if(readXMLInteger(tmpNode, "endvalue", intValue))
 								endValue = intValue;
-							
-							xmlNodePtr tmpNode2 = tmpNode->children;
 
-							Mission *mission = new Mission(missionName, storageID, startValue, endValue);
-							while(tmpNode2){
-								if(xmlStrcmp(tmpNode2->name, (const xmlChar*)"missionstate") == 0){
-									std::string description;
-									uint32_t missionID = 0;
-									if(readXMLInteger(tmpNode2, "id", intValue))
-										missionID = intValue;
-									if(readXMLString(tmpNode2, "description", strValue))
-										description = strValue;
-									mission->state[missionID] = new MissionState(description, missionID);
+							if(readXMLString(tmpNode, "description", strValue))
+								missionState = strValue;
+
+							Mission* mission = new Mission(missionName, storageID, startValue, endValue);
+							if(missionState.empty()){
+								// parse sub-states only if there's no main one
+								xmlNodePtr tmpNode2 = tmpNode->children;
+								while(tmpNode2){
+									if(xmlStrcmp(tmpNode2->name, (const xmlChar*)"missionstate") == 0){
+										std::string description;
+										uint32_t missionID = 0;
+										if(readXMLInteger(tmpNode2, "id", intValue))
+											missionID = intValue;
+										if(readXMLString(tmpNode2, "description", strValue))
+											description = strValue;
+										mission->state[missionID] = new MissionState(description, missionID);
+									}
+									tmpNode2 = tmpNode2->next;
 								}
-								tmpNode2 = tmpNode2->next;
+							}
+							else {
+								mission->mainState = new MissionState(missionState, 0);
 							}
 							quest->addMission(mission);
 						}
