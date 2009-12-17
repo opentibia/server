@@ -222,7 +222,6 @@ enum PlayerInfo_t{
 	PlayerInfoTown,
 	PlayerInfoGUID,
 	PlayerInfoPremiumDays,
-	PlayerInfoSkullType,
 	PlayerInfoSkullEndTime,
 	PlayerInfoUnjustKills,
 	PlayerInfoBalance,

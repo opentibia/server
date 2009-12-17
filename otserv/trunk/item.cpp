@@ -808,7 +808,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		s << ".";
 	}
-	else if(it.armor != 0 || it.abilities.absorb.any()){
+	else if(it.armor != 0 || it.abilities.absorb.any() || it.abilities.stats[STAT_MAGICPOINTS] != 0 || it.abilities.speed != 0){
 		if(it.showCharges){
 			if(subType > 1){
 				s << " that has " << (int32_t)subType << " charges left";
@@ -817,15 +817,44 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 				s << " that has 1 charge left";
 			}
 		}
+		else if(it.showDuration){
+			if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
+				int32_t duration = item->getDuration() / 1000;
+				s << " that has energy for ";
 
-		s << " (Arm:" << it.armor;
+				if(duration >= 120){
+					s << duration / 60 << " minutes left.";
+				}
+				else if(duration > 60){
+					s << "1 minute left.";
+				}
+				else{
+					s << "less than a minute left.";
+				}
+			}
+			else{
+				s << " that is brand-new.";
+			}
+		}
+
+		s << " (";
+		if(it.armor != 0){
+			s << "Arm:" << it.armor;
+		}
 
 		if(it.abilities.absorb.any()){
 			s << ", protection";
 			it.abilities.absorb.getDescription(s);
-		}if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
-				s << ", magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
-			}
+		}
+
+		if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
+			s << ", magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+		}
+
+		if(it.abilities.speed != 0){
+			s << ", speed " << std::showpos << (int32_t)(it.abilities.speed / 2) << std::noshowpos;
+		}
+
 		s << ").";
 	}
 	else if(it.isFluidContainer()){

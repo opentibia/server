@@ -1926,14 +1926,6 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoPremiumDays:
 			value = player->getPremiumDays();
 			break;
-		case PlayerInfoSkullType:
-			#ifdef __SKULLSYSTEM__
-			value = (uint32_t)player->getSkull();
-			#else
-			value = 0;
-			#endif
-			break;
-
 		case PlayerInfoSkullEndTime:
 		{
 			#ifdef __SKULLSYSTEM__
@@ -2106,27 +2098,6 @@ int LuaScriptInterface::luaGetPlayerPremiumDays(lua_State *L)
 	return internalGetPlayerInfo(L, PlayerInfoPremiumDays);
 }
 
-int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
-{
-    //getPlayerSkullType(cid, <optional> viewer)
-    int32_t parameters = lua_gettop(L);
-	if(parameters == 1){ //If no viewer, just use internalGetPlayerInfo
-        return internalGetPlayerInfo(L, PlayerInfoSkullType);
-	}
-    uint32_t viewer = popNumber(L);
-    uint32_t cid = popNumber(L);
-    ScriptEnviroment* env = getScriptEnv();
-    Player* player = env->getPlayerByUID(cid);
-    Player* playerViewing = env->getPlayerByUID(viewer);
-    if(!player || !playerViewing) {
-        reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-        lua_pushnumber(L,LUA_ERROR);
-        return 1;
-    }
-    lua_pushnumber(L,(uint32_t)playerViewing->getSkullClient(player));
-    return 1;
-}
-
 int LuaScriptInterface::luaGetPlayerSkullEndTime(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoSkullEndTime);
@@ -2162,6 +2133,45 @@ int LuaScriptInterface::luaGetPlayerIp(lua_State *L)
 	return internalGetPlayerInfo(L, PlayerInfoIp);
 }
 //
+
+int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
+{
+	//getPlayerSkullType(cid, <optional> viewer)
+	#ifdef __SKULLSYSTEM__
+
+	uint32_t viewer = 0;
+	if(lua_gettop(L) > 1){
+		viewer = popNumber(L);
+	}
+
+	uint32_t cid = popNumber(L);
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	if(viewer == 0){
+		lua_pushnumber(L, player->getSkull());
+		return 1;
+	}
+
+	Player* viewingPlayer = env->getPlayerByUID(viewer);
+	if(!viewingPlayer){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	lua_pushnumber(L, viewingPlayer->getSkullClient(player));
+	#else
+	lua_pushnumber(L, 0);
+	#endif
+	return 1;
+}
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
 {

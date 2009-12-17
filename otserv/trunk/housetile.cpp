@@ -40,6 +40,10 @@ HouseTile::~HouseTile()
 void HouseTile::__addThing(int32_t index, Thing* thing)
 {
 	Tile::__addThing(index, thing);
+	if(thing->getParent() == NULL){
+		// happens when placing a magic field on an existing one which is non-replaceable
+		return;
+	}
 
 	if(Item* item = thing->getItem()){
 		updateHouse(item);
@@ -49,6 +53,10 @@ void HouseTile::__addThing(int32_t index, Thing* thing)
 void HouseTile::__internalAddThing(uint32_t index, Thing* thing)
 {
 	Tile::__internalAddThing(index, thing);
+	if(thing->getParent() == NULL){
+		// happens when placing a magic field on an existing one which is non-replaceable
+		return;
+	}
 
 	if(Item* item = thing->getItem()){
 		updateHouse(item);
