@@ -139,11 +139,11 @@
 	<moveevent event="StepIn" itemid="7473" function="onStepInField" />
 	<moveevent event="AddItem" itemid="7473" function="onAddField" />
 
-	<moveevent event="StepIn" itemid="11094" function="onStepInField" />
-	<moveevent event="AddItem" itemid="11094" function="onAddField" />
-
 	<moveevent event="StepIn" itemid="11095" function="onStepInField" />
 	<moveevent event="AddItem" itemid="11095" function="onAddField" />
+
+	<moveevent event="StepIn" itemid="11096" function="onStepInField" />
+	<moveevent event="AddItem" itemid="11096" function="onAddField" />
 
 	<!-- Walkable waters -->
 	<moveevent event="StepIn" itemid="4820" script="swimmingpool_swim.lua" />
@@ -367,8 +367,8 @@
 	<moveevent event="StepOut" itemid="447" script="switch_tile.lua" />
 	<moveevent event="StepIn" itemid="3216" script="switch_tile.lua" />
 	<moveevent event="StepOut" itemid="3217" script="switch_tile.lua" />
-	<moveevent event="StepIn" itemid="10551" script="switch_tile.lua" />
-	<moveevent event="StepOut" itemid="10552" script="switch_tile.lua" />
+	<moveevent event="StepIn" itemid="11059" script="switch_tile.lua" />
+	<moveevent event="StepOut" itemid="11060" script="switch_tile.lua" />
 
 	<!-- Traps -->
 	<moveevent event="StepIn" itemid="1510" script="trap.lua" />

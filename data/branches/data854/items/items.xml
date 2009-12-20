@@ -23929,65 +23929,60 @@
 	<item id="10543" article="a" name="silver lightbearer's trophy">
 		<attribute key="weight" value="900"/>
 	</item>
-	<item id="10551" name="glowing switch" editorsuffix=" (no players stacking)"/>
-	<item id="10552" name="glowing switch" editorsuffix=" (no players stacking)"/>
-	<item id="10777" article="a" name="closed door">
+	<item id="10774" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
 		<attribute key="description" value="It is locked."/>
 	</item>
-	<item id="10778" article="a" name="closed door">
+	<item id="10775" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="10779" article="an" name="open door">
+	<item id="10776" article="an" name="open door">
 		<attribute key="type" value="door"/>
 	</item>
-	<item id="10782" article="a" name="gate of expertise">
+	<item id="10779" article="a" name="gate of expertise">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="10783" article="a" name="gate of expertise">
+	<item id="10780" article="a" name="gate of expertise">
 		<attribute key="type" value="door"/>
+	</item>
+	<item id="10781" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+	</item>
+	<item id="10782" article="a" name="open door">
+		<attribute key="type" value="door"/>
+	</item>
+	<item id="10783" article="a" name="closed door">
+		<attribute key="type" value="door"/>
+		<attribute key="blockprojectile" value="1"/>
+		<attribute key="description" value="It is locked."/>
 	</item>
 	<item id="10784" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="10785" article="a" name="open door">
+	<item id="10785" article="an" name="open door">
 		<attribute key="type" value="door"/>
 	</item>
-	<item id="10786" article="a" name="closed door">
-		<attribute key="type" value="door"/>
-		<attribute key="blockprojectile" value="1"/>
-		<attribute key="description" value="It is locked."/>
-	</item>
-	<item id="10787" article="a" name="closed door">
+	<item id="10788" article="a" name="gate of expertise">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="10788" article="an" name="open door">
+	<item id="10789" article="a" name="gate of expertise">
 		<attribute key="type" value="door"/>
 	</item>
-	<item id="10791" article="a" name="gate of expertise">
-		<attribute key="type" value="door"/>
-		<attribute key="blockprojectile" value="1"/>
-	</item>
-	<item id="10792" article="a" name="gate of expertise">
-		<attribute key="type" value="door"/>
-	</item>
-	<item id="10793" article="a" name="closed door">
+	<item id="10790" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
 	</item>
-	<item id="10794" article="a" name="open door">
+	<item id="10791" article="a" name="open door">
 		<attribute key="type" value="door"/>
 	</item>
-	<item id="11056" article="a" name="window"/>
-	<item id="11057" article="a" name="window"/>
-	<item id="11058" article="a" name="window"/>
-	<item id="11059" article="a" name="window"/>
-	<item id="11060" article="a" name="window"/>
+	<item id="11059" article="a" name="glowing switch" editorsuffix=" (no players stacking)"/>
+	<item id="11060" article="a" name="glowing switch" editorsuffix=" (no players stacking)"/>
 	<item id="11061" article="a" name="window"/>
 	<item id="11062" article="a" name="window"/>
 	<item id="11063" article="a" name="window"/>
@@ -23995,45 +23990,50 @@
 	<item id="11065" article="a" name="window"/>
 	<item id="11066" article="a" name="window"/>
 	<item id="11067" article="a" name="window"/>
-	<item id="11094" article="a" name="magic wall" editorsuffix=" (Non PvP)">
+	<item id="11068" article="a" name="window"/>
+	<item id="11069" article="a" name="window"/>
+	<item id="11070" article="a" name="window"/>
+	<item id="11071" article="a" name="window"/>
+	<item id="11072" article="a" name="window"/>
+	<item id="11095" article="a" name="magic wall" editorsuffix=" (Non PvP)">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="20"/>
 	</item>
-	<item id="11095" article="a" name="rush wood" editorsuffix=" (Non PvP)">
+	<item id="11096" article="a" name="rush wood" editorsuffix=" (Non PvP)">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="11114" article="a" name="heart backpack">
+	<item id="11115" article="a" name="heart backpack">
 		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="20"/>
 		<attribute key="slotType" value="backpack"/>
 	</item>
-	<item id="11116" article="a" name="stone stairs">
+	<item id="11117" article="a" name="stone stairs">
 		<attribute key="floorchange" value="north"/>
 	</item>
-	<item id="11234" article="a" name="expedition backpack">
+	<item id="11235" article="a" name="expedition backpack">
 		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="20"/>
 		<attribute key="slotType" value="backpack"/>
 	</item>
-	<item id="11235" article="a" name="expedition bag">
+	<item id="11236" article="a" name="expedition bag">
 		<attribute key="weight" value="800"/>
 		<attribute key="containerSize" value="8"/>
 		<attribute key="slotType" value="backpack"/>
 	</item>
-	<item id="11236" article="a" name="lizard backpack">
+	<item id="11237" article="a" name="lizard backpack">
 		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="20"/>
 		<attribute key="slotType" value="backpack"/>
 	</item>
-	<item id="11237" article="a" name="minotaur backpack">
+	<item id="11238" article="a" name="minotaur backpack">
 		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="20"/>
 		<attribute key="slotType" value="backpack"/>
 	</item>
-	<item id="11256" article="a" name="fluffy santa backpack">
+	<item id="11257" article="a" name="fluffy santa backpack">
 		<attribute key="weight" value="1800"/>
 		<attribute key="containerSize" value="20"/>
 		<attribute key="slotType" value="backpack"/>
