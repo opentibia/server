@@ -1383,8 +1383,8 @@ void LuaScriptInterface::registerFunctions()
 	//doAddContainerItemEx(uid, virtuid)
 	lua_register(m_luaState, "doAddContainerItemEx", LuaScriptInterface::luaAddContainerItemEx);
 
-	//doRelocate(pos, posTo)
-	//Moves all moveable objects from pos to posTo
+	//doRelocate(pos, posTo, <optional> moveUnmoveable)
+	//Moves all objects from pos to posTo
 	lua_register(m_luaState, "doRelocate", LuaScriptInterface::luaDoRelocate);
 
 	//doCreateTeleport(teleportID, positionToGo, createPosition)
@@ -3046,8 +3046,14 @@ int LuaScriptInterface::luaAddContainerItemEx(lua_State *L)
 
 int LuaScriptInterface::luaDoRelocate(lua_State *L)
 {
-	//doRelocate(pos, posTo)
-	//Moves all moveable objects from pos to posTo
+	//doRelocate(pos, posTo, <optional> moveUnmoveable)
+	//Moves all objects from pos to posTo
+	int32_t parameters = lua_gettop(L);
+
+	bool moveUnmoveable = false;
+	if(parameters > 2){
+		moveUnmoveable = popNumber(L) == 1;
+	}
 
 	PositionEx toPos;
 	popPosition(L, toPos);
@@ -3079,7 +3085,8 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 				if(Item* item = thing->getItem()){
 					const ItemType& it = Item::items[item->getID()];
 					if(!it.isGroundTile() && !it.alwaysOnTop && !it.isMagicField()){
-						g_game.internalTeleport(item, toPos, FLAG_IGNORENOTMOVEABLE);
+						uint32_t flags = moveUnmoveable ? FLAG_IGNORENOTMOVEABLE : 0;
+						g_game.internalTeleport(item, toPos, flags);
 					}
 				}
 				else if(Creature* creature = thing->getCreature()){
