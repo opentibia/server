@@ -1692,3 +1692,12 @@ void Tile::updateTileFlags(Item* item, bool removed)
 		}
 	}
 }
+
+bool Tile::isMoveableBlocking() const
+{
+	if(!ground || hasFlag(TILESTATE_BLOCKSOLID)){
+		return true;
+	}
+
+	return false;
+}

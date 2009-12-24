@@ -446,6 +446,11 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 		return false;
 	}
 
+	Tile* tile = g_game.getTile(_pos);
+	if(!tile || tile->isMoveableBlocking()){
+		std::cout << "Warning: [Spawn::addMonster] Position " << _pos << " is not valid. Could not place " << _name << "." << std::endl;
+	}
+
 	if(_interval < interval){
 		interval = _interval;
 	}
