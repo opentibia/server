@@ -28,9 +28,9 @@
 					<Add option="-llibsqlite3" />
 					<Add option="-lgmp" />
 					<Add option="-llua" />
-					<Add option="-lboost_system-mgw44-mt-1_40" />
-					<Add option="-lboost_thread-mgw44-mt-1_40" />
-					<Add option="-llibboost_regex-mgw44-mt-1_40" />
+					<Add option="-llibboost_system-mgw44-mt-1_41" />
+					<Add option="-llibboost_thread-mgw44-mt-1_41" />
+					<Add option="-llibboost_regex-mgw44-mt-1_41" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
@@ -44,10 +44,10 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-O3" />
 					<Add option="-D__USE_SQLITE__" />
 					<Add option="-D__USE_MYSQL__" />
 					<Add option="-D__SKULLSYSTEM__" />
+					<Add option="-D__ENABLE_SERVER_DIAGNOSTIC__" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -56,9 +56,9 @@
 					<Add option="-llibsqlite3" />
 					<Add option="-lgmp" />
 					<Add option="-llua" />
-					<Add option="-lboost_system-mgw44-mt-1_40" />
-					<Add option="-lboost_thread-mgw44-mt-1_40" />
-					<Add option="-llibboost_regex-mgw44-mt-1_40" />
+					<Add option="-llibboost_system-mgw44-mt-1_41" />
+					<Add option="-llibboost_thread-mgw44-mt-1_41" />
+					<Add option="-llibboost_regex-mgw44-mt-1_41" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 				</Linker>
