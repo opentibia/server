@@ -44,7 +44,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-O3" />
+					<Add option="-O2" />
 					<Add option="-D__USE_SQLITE__" />
 					<Add option="-D__USE_MYSQL__" />
 					<Add option="-D__SKULLSYSTEM__" />
@@ -56,9 +56,9 @@
 					<Add option="-llibsqlite3" />
 					<Add option="-lgmp" />
 					<Add option="-llua" />
-					<Add option="-lboost_system-mgw44-mt-1_40" />
-					<Add option="-lboost_thread-mgw44-mt-1_40" />
-					<Add option="-llibboost_regex-mgw44-mt-1_40" />
+					<Add option="-llibboost_system-mgw44-mt-1_41" />
+					<Add option="-llibboost_thread-mgw44-mt-1_41" />
+					<Add option="-llibboost_regex-mgw44-mt-1_41" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 				</Linker>
@@ -202,6 +202,8 @@
 		<Unit filename="..\fileloader.h" />
 		<Unit filename="..\game.cpp" />
 		<Unit filename="..\game.h" />
+		<Unit filename="..\guild.cpp" />
+		<Unit filename="..\guild.h" />
 		<Unit filename="..\house.cpp" />
 		<Unit filename="..\house.h" />
 		<Unit filename="..\housetile.cpp" />
