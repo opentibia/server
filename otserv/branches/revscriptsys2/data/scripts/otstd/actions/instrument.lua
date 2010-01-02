@@ -94,9 +94,6 @@ function otstd.instrument.standardInstrumentHandler(event)
 end
 
 function otstd.instrument.handler(event)
-	local player = event.player
-	local item = event.item
-
 	if event.instrument.handler and event.instrument.handler(event) or otstd.instrument.standardInstrumentHandler(event) then
 		event:skip()
 	end

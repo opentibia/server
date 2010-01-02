@@ -266,8 +266,7 @@ bool Condition::unserialize(PropStream& propStream)
 	uint8_t attr_type;
 	while(propStream.GET_UCHAR(attr_type) && attr_type != CONDITIONATTR_END.value()){
 		
-		if(attr_type == enums::CONDITIONATTRIBUTE_MECHANIC)
-		{
+		if(attr_type == enums::CONDITIONATTRIBUTE_MECHANIC){
 			int32_t value = 0;
 			if(!propStream.GET_VALUE(value)){
 				return false;
@@ -275,9 +274,7 @@ bool Condition::unserialize(PropStream& propStream)
 
 			mechanicType = (MechanicType)value;
 		}
-
-		if(attr_type == enums::CONDITIONATTRIBUTE_COMBAT)
-		{
+		else if(attr_type == enums::CONDITIONATTRIBUTE_COMBAT){
 			int32_t value = 0;
 			if(!propStream.GET_VALUE(value)){
 				return false;
@@ -286,9 +283,7 @@ bool Condition::unserialize(PropStream& propStream)
 			combatType = (CombatType)value;
 			return true;
 		}
-
-		if(attr_type == enums::CONDITIONATTRIBUTE_TICKS)
-		{
+		else if(attr_type == enums::CONDITIONATTRIBUTE_TICKS){
 			uint32_t value = 0;
 			if(!propStream.GET_VALUE(value)){
 				return false;
@@ -296,9 +291,7 @@ bool Condition::unserialize(PropStream& propStream)
 
 			ticks = value;
 		}
-
-		if(attr_type == enums::CONDITIONATTRIBUTE_NAME)
-		{
+		else if(attr_type == enums::CONDITIONATTRIBUTE_NAME){
 			std::string value;
 			if(!propStream.GET_STRING(value)){
 				return false;
@@ -306,9 +299,7 @@ bool Condition::unserialize(PropStream& propStream)
 
 			name = value;
 		}
-
-		if(attr_type == enums::CONDITIONATTRIBUTE_FLAGS)
-		{
+		else if(attr_type == enums::CONDITIONATTRIBUTE_FLAGS){
 			uint32_t value = 0;
 			if(!propStream.GET_VALUE(value)){
 				return false;
@@ -316,9 +307,7 @@ bool Condition::unserialize(PropStream& propStream)
 
 			flags = value;
 		}
-
-		if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT)
-		{
+		else if(attr_type == enums::CONDITIONATTRIBUTE_EFFECT){
 			ConditionEffect effect;
 			if(!effect.unserialize(propStream)){
 				return false;
@@ -326,12 +315,12 @@ bool Condition::unserialize(PropStream& propStream)
 
 			effectList.push_back(effect);
 		}
-
-		if(attr_type == enums::CONDITIONATTR_END)
-			return true;
+		else{
+			return false;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 bool Condition::serialize(PropWriteStream& propWriteStream)

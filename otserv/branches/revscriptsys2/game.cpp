@@ -350,7 +350,9 @@ void Game::runShutdownScripts(bool real_shutdown)
 
 void Game::scriptCleanup()
 {
-	script_environment->cleanupUnusedListeners();
+	if(script_environment){
+		script_environment->cleanupUnusedListeners();
+	}
 
 	g_scheduler.addEvent(createSchedulerTask(EVENT_SCRIPT_CLEANUP_INTERVAL,
 		boost::bind(&Game::scriptCleanup, this)));

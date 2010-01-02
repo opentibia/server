@@ -308,17 +308,17 @@ function Player:cannotGainInFight()
 end
 
 function Player:addCombatExhaustion(time)
-	local condition = {"CONDITION_EXHAUST_DAMAGE", time}
+	local condition = {"CONDITION_EXHAUST_DAMAGE", time or config["fight_exhausted"]}
 	return self:addCondition(condition)
 end
 
 function Player:addHealExhaustion(time)
-	local condition = {"CONDITION_EXHAUST_DAMAGE", time}
+	local condition = {"CONDITION_EXHAUST_DAMAGE", time or config["heal_exhausted"]}
 	return self:addCondition(condition)
 end
 
 function Player:addInFight(time)
-	local condition = {"CONDITION_INFIGHT", time,
+	local condition = {"CONDITION_INFIGHT", time or config["in_fight_duration"],
 			["script"] = {
 				name = "effect_infight",
 				icon = ICON_SWORDS

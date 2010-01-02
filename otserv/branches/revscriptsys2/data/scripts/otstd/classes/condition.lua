@@ -181,9 +181,14 @@ end
 function otstd.conditions.makeConditionObject(obj, condition)
 	local id = assert(condition.id or condition[1], "Missing 'id' [1] for Condition.")
 	local duration = assert(tonumber(condition.duration) or tonumber(condition[2]), "Missing 'duration' [2] for Condition")
-	local combatType = condition.damage or condition[3] or COMBAT_NONE
+	local combatType = condition.school or condition[3] or COMBAT_NONE
 	local mechanicType = condition.mechanic or condition[4] or MECHANIC_NONE
 	local icons = 0
+	
+	--print("id: " .. id)
+	--print("duration: " .. duration)
+	--print("combatType: " .. combatType:value())
+	--print("mechanicType: " .. mechanicType:value())
 	
 	for k, v in pairs(condition) do
 		if type(v) == "table" and not v.__name then

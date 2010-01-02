@@ -1,30 +1,257 @@
-local magic_field = {}
+otstd.magic_field = {}
 
-function magic_field.callback(event)
-	local target = event.creature
-	
+function otstd.burnTarget(target, interval, rounds, min, max)
 	local condition = {"burning", 0, COMBAT_FIREDAMAGE,
 		["damage"] = {
-				10000,
+				interval,
 				COMBAT_FIREDAMAGE,
-				rounds = 7,
-				min = -10,
-				max = -10,
+				rounds = rounds,
+				min = min,
+				max = max,
 				icon = ICON_BURN
 			}
 	}
+
+	target:addInFight()
+	target:addCondition(condition)
+end
+
+
+function otstd.poisonTarget(target, interval, start, min, max)
+	local condition = {"poisoned", 0, COMBAT_EARTHDAMAGE,
+		["damage"] = {
+				5000,
+				COMBAT_EARTHDAMAGE,
+				first = start,
+				min = -100,
+				max = -100,
+				icon = ICON_POISON
+			}
+	}
 	
-	if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -20) then
-		target:addCondition(condition)
+	target:addInFight()
+	target:addCondition(condition)
+end
+
+function otstd.electrifyTarget(target, interval, rounds, min, max)
+	local condition = {"electrified", 0, COMBAT_ENERGYDAMAGE,
+		["damage"] = {
+				interval,
+				COMBAT_ENERGYDAMAGE,
+				rounds = rounds,
+				min = min,
+				max = max,
+				icon = ICON_ENERGY
+			}
+	}
+
+	target:addInFight()
+	target:addCondition(condition)
+end
+
+otstd.fields = {
+		[1423] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -20) then
+					otstd.burnTarget(target, 4000, 2, -10, -10)
+				end
+			end
+			},
+		[1424] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -20) then
+					otstd.burnTarget(target, 4000, 2, -10, -10)
+				end
+			end
+			},
+		[1425] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -20) then
+					otstd.burnTarget(target, 4000, 2, -10, -10)
+				end
+			end
+			},
+		[1487] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -20) then
+					otstd.burnTarget(target, 10000, 7, -10, -10)
+				end
+			end
+			},
+		[1488] = {handler =
+			function(event)
+				local target = event.creature
+				otstd.burnTarget(target, 10000, 7, -10, -10)
+			end
+			},
+		[1490] = {handler =
+			function(event)
+				local target = event.creature
+				otstd.poisonTarget(target, 5000, -5, -100, -100)
+			end
+			},
+		[1491] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_ENERGYDAMAGE, nil, target, -30) then
+					otstd.electrifyTarget(target, 10000, 1, -25, -25)
+				end
+			end
+			},
+		[1492] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -20) then
+					otstd.burnTarget(target, 10000, 7, -10, -10)
+				end
+			end
+			},
+		[1493] = {handler =
+			function(event)
+				local target = event.creature
+				otstd.burnTarget(target, 10000, 7, -10, -10)
+			end
+			},
+		[1495] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_ENERGYDAMAGE, nil, target, -30) then
+					otstd.electrifyTarget(target, 10000, 1, -25, -25)
+				end
+			end
+			},
+		[1496] = {handler =
+			function(event)
+				local target = event.creature
+				otstd.poisonTarget(target, 5000, -5, -100, -100)
+			end
+			},
+		[1500] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -20) then
+					otstd.burnTarget(target, 10000, 7, -10, -10)
+				end
+			end
+			},
+		[1501] = {handler =
+			function(event)
+				local target = event.creature
+				otstd.burnTarget(target, 10000, 7, -10, -10)
+			end
+			},
+		[1503] = {handler =
+			function(event)
+				local target = event.creature
+				otstd.poisonTarget(target, 5000, -5, -100, -100)
+			end
+			},
+		[1504] = {handler =
+			function(event)
+				local target = event.creature
+				if internalCastSpell(COMBAT_ENERGYDAMAGE, nil, target, -30) then
+					otstd.electrifyTarget(target, 10000, 1, -25, -25)
+				end
+			end
+			},
+		[1506] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[1507] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7465] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7466] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7467] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7468] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7469] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7470] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7471] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7472] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[7473] = {handler =
+			function(event)
+				local target = event.creature
+				internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -300)
+			end
+			},
+		[8062] = {handler =
+			function(event)
+				local target = event.creature
+				otstd.poisonTarget(target, 5000, -5, -50, -50)
+			end
+			}
+	}
+
+
+function otstd.magic_field.callback(event)
+	if event.field.handler and event.field.handler(event) then
+		event:skip()
 	end
 end
 
-function magic_field.registerHandler()
-	if magic_field.listener then
-		stopListener(magic_field.listener)
+function otstd.magic_field.registerHandler()
+	for id, data in pairs(otstd.fields) do
+		if data.listener then
+			stopListener(data.listener)
+		end
+
+		local function lamba_callback(event)
+			event.field = data
+			otstd.magic_field.callback(event)
+		end
+		data.listener =
+			registerOnAnyCreatureMoveIn("itemid", id, lamba_callback)
 	end
-	magic_field.listener =
-		registerOnAnyCreatureMoveIn("itemid", 1492, magic_field.callback)
 end
 
-magic_field.registerHandler()
+otstd.magic_field.registerHandler()
