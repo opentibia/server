@@ -515,6 +515,10 @@ LuaScriptInterface::LuaScriptInterface(std::string interfaceName)
 
 LuaScriptInterface::~LuaScriptInterface()
 {
+	for(LuaTimerEvents::iterator it = m_timerEvents.begin(); it != m_timerEvents.end(); ++it){
+		g_scheduler.stopEvent(it->second.eventId);
+	}
+
 	closeState();
 }
 
@@ -7448,9 +7452,11 @@ int LuaScriptInterface::luaAddEvent(lua_State *L)
 	eventDesc.scriptId = env->getScriptId();
 
 	script_interface->m_lastEventTimerId++;
-	script_interface->m_timerEvents[script_interface->m_lastEventTimerId] = eventDesc;
 
-	g_scheduler.addEvent(createSchedulerTask(delay, boost::bind(&LuaScriptInterface::executeTimerEvent, script_interface, script_interface->m_lastEventTimerId)));
+	eventDesc.eventId = g_scheduler.addEvent(createSchedulerTask(delay, boost::bind(&LuaScriptInterface::executeTimerEvent,
+		script_interface, script_interface->m_lastEventTimerId)));
+
+	script_interface->m_timerEvents[script_interface->m_lastEventTimerId] = eventDesc;
 
 	lua_pushnumber(L, script_interface->m_lastEventTimerId);
 	return 1;
@@ -7471,6 +7477,7 @@ int LuaScriptInterface::luaStopEvent(lua_State *L)
 
 	LuaTimerEvents::iterator it = script_interface->m_timerEvents.find(eventId);
 	if(it != script_interface->m_timerEvents.end()){
+		g_scheduler.stopEvent(it->second.eventId);
 		for(std::list<int>::iterator lt = it->second.parameters.begin(); lt != it->second.parameters.end(); ++lt){
 			luaL_unref(script_interface->m_luaState, LUA_REGISTRYINDEX, *lt);
 		}

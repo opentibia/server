@@ -666,6 +666,7 @@ private:
 		int32_t scriptId;
 		int function;
 		std::list<int> parameters;
+		uint32_t eventId;
 	};
 	uint32_t m_lastEventTimerId;
 
