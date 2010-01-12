@@ -1,0 +1,23 @@
+============================================
+========= PHP OpenTibia Framework ==========
+============================================
+===== www.otserv.org	www.otfans.net =====
+============================================
+
+- About
+	POF means PHP OpenTibia Framework. It has been built to turn easy tasks like creating an AAC (Automatic Account Creator) from scratch.
+	Since in OpenTibia we need to be focused in the server, the server administrator doesn't have to waste time creating a website without 
+	any vulnerabilities and bugs, so that is where POF enters in.
+	
+	What makes POF special is the fact that we work with the newest standards from the market. Examples of that are the MVC (Model-View-Controller)
+	and some ideas retired from Ruby On Rails witch is a success in all over the world. The objective isn't to make a complete AAC but to provide 
+	a good way of doing it without worrying with sanitization issues.
+	
+- Features
+	Coming soon...
+	
+- Credits
+	* Nostradamus <thomaz.yuji@gmail.com> - Project leader
+	* Cisneiros <alexandre@cisneiros.com> - Developer
+	
+
