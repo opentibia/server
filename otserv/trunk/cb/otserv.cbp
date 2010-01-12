@@ -28,9 +28,9 @@
 					<Add option="-llibsqlite3" />
 					<Add option="-lgmp" />
 					<Add option="-llua" />
-					<Add option="-lboost_system-mgw44-mt-1_40" />
-					<Add option="-lboost_thread-mgw44-mt-1_40" />
-					<Add option="-llibboost_regex-mgw44-mt-1_40" />
+					<Add option="-llibboost_system-mgw44-mt-1_41" />
+					<Add option="-llibboost_thread-mgw44-mt-1_41" />
+					<Add option="-llibboost_regex-mgw44-mt-1_41" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
@@ -202,8 +202,6 @@
 		<Unit filename="..\fileloader.h" />
 		<Unit filename="..\game.cpp" />
 		<Unit filename="..\game.h" />
-		<Unit filename="..\guild.cpp" />
-		<Unit filename="..\guild.h" />
 		<Unit filename="..\house.cpp" />
 		<Unit filename="..\house.h" />
 		<Unit filename="..\housetile.cpp" />

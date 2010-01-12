@@ -124,7 +124,6 @@ CREATE TABLE `guild_wars` (
 	`guild_frags` INT UNSIGNED NOT NULL DEFAULT 0,
 	`opponent_frags` INT UNSIGNED NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
-	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`war_id`) REFERENCES `war_declaration` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;	
 	
