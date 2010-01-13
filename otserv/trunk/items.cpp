@@ -656,6 +656,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.maxTextLen = intValue;
 								}
 							}
+							else if(asLowerCaseString(strValue) == "allowdistread"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.allowDistRead = intValue != 0;
+								}
+							}
 							else if(asLowerCaseString(strValue) == "writeonceitemid"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.writeOnceItemId = intValue;
