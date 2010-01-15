@@ -683,7 +683,8 @@ bool AreaSpawnEvent::executeEvent()
 				pos.z = random_range(m_fromPos.z, m_toPos.z);
 
 				Tile* tile = g_game.getMap()->getTile(pos);
-				if(tile && !tile->isMoveableBlocking() && tile->getTopCreature() == NULL && g_game.placeCreature(monster, pos, false, true)){
+				if(tile && !tile->isMoveableBlocking() && !tile->hasFlag(TILESTATE_PROTECTIONZONE) &&
+					tile->getTopCreature() == NULL && g_game.placeCreature(monster, pos, false, true)){
 					success = true;
 					break;
 				}
@@ -694,6 +695,7 @@ bool AreaSpawnEvent::executeEvent()
 			}
 		}
 	}
+
 	return true;
 }
 
