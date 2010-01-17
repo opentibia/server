@@ -40,7 +40,37 @@ enum DistributionType_t {
 	DISTRO_NORMAL
 };
 
-bool fileExists(const char* filename);
+inline uint16_t swap_uint16(uint16_t x)
+{
+	return (x & 0xFF00) >> 8 | (x & 0x00FF) << 8;
+}
+
+inline uint32_t swap_uint32(uint32_t x)
+{
+	return (x & 0xFF000000) >> 24
+		 | (x & 0x00FF0000) >> 8
+		 | (x & 0x0000FF00) << 8
+		 | (x & 0x000000FF) << 24;
+}
+
+inline int16_t swap_int16(int16_t x)
+{
+	return (int16_t)swap_uint16((uint16_t)x);
+}
+
+inline int32_t swap_int32(int32_t x)
+{
+	return (int32_t)swap_uint32((uint32_t)x);
+}
+
+inline float swap_float32(float x)
+{
+	uint32_t ui = *((uint32_t*)&x);
+	ui = swap_uint32(ui);
+
+	return *((float *)&ui);
+}
+
 void replaceString(std::string& str, const std::string sought, const std::string replacement);
 void trim_right(std::string& source, const std::string& t = "\n\t ");
 void trim_left(std::string& source, const std::string& t = "\n\t ");

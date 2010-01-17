@@ -457,7 +457,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 				return false;
 			}
 
-			propWriteStream.ADD_UCHAR(CONDITIONATTR_END);
+			propWriteStream.ADD_UINT8(CONDITIONATTR_END);
 		}
 	}
 

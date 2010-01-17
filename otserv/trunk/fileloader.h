@@ -187,36 +187,68 @@ public:
 
 	int64_t size(){return end-p;}
 
-	template <typename T>
-	inline bool GET_STRUCT(T* &ret){
-		if(size() < (long)sizeof(T)){
-			ret = NULL;
-			return false;
-		}
-		ret = (T*)p;
-		p = p + sizeof(T);
-		return true;
-	}
-
-	template <typename T>
-	inline bool GET_VALUE(T &ret){
-		if(size() < (long)sizeof(T)){
-			return false;
-		}
-		ret = *((T*)p);
-		p = p + sizeof(T);
-		return true;
-	}
-
-	inline bool GET_ULONG(uint32_t &ret){
+#ifndef __SWAP_ENDIAN__
+	inline bool GET_UINT32(uint32_t& ret){
 		return GET_VALUE(ret);
 	}
 
-	inline bool GET_USHORT(uint16_t &ret){
+	inline bool GET_INT32(int32_t &ret){
 		return GET_VALUE(ret);
 	}
 
-	inline bool GET_UCHAR(uint8_t &ret){
+	inline bool GET_UINT16(uint16_t& ret){
+		return GET_VALUE(ret);
+	}
+
+	inline bool GET_INT16(int16_t& ret){
+		return GET_VALUE(ret);
+	}
+
+	inline bool GET_FLOAT(float& ret){
+		return GET_VALUE(ret);
+	}
+
+#else
+	inline bool GET_UINT32(uint32_t& ret){
+		bool b = GET_VALUE(ret);
+		swap_uint32(ret);
+		return b;
+	}
+
+	inline bool GET_INT32(int32_t& ret){
+		bool b = GET_VALUE(ret);
+		swap_int32(ret);
+		return b;
+	}
+
+	inline bool GET_UINT16(uint16_t& ret){
+		bool b = GET_VALUE(ret);
+		swap_uint16(ret);
+		return b;
+	}
+
+	inline bool GET_INT16(int16_t& ret){
+		bool b = GET_VALUE(ret);
+		swap_int16(ret);
+		return b;
+	}
+
+	inline bool GET_FLOAT(float& ret){
+		bool b = GET_VALUE(ret);
+		swap_float(ret);
+		return b;
+	}
+#endif
+
+	inline bool GET_UINT8(uint8_t& ret){
+		return GET_VALUE(ret);
+	}
+
+	inline bool GET_INT8(int8_t& ret){
+		return GET_VALUE(ret);
+	}
+
+	inline bool GET_CHAR(int8_t& ret){
 		return GET_VALUE(ret);
 	}
 
@@ -224,7 +256,7 @@ public:
 		char* str;
 		uint16_t str_len;
 
-		if(!GET_USHORT(str_len)){
+		if(!GET_VALUE(str_len)){
 			return false;
 		}
 		if(size() < (int32_t)str_len){
@@ -243,7 +275,7 @@ public:
 		char* str;
 		uint32_t str_len;
 
-		if(!GET_ULONG(str_len)){
+		if(!GET_VALUE(str_len)){
 			return false;
 		}
 		if(size() < (int32_t)str_len){
@@ -258,7 +290,7 @@ public:
 		return true;
 	}
 
-	inline bool GET_NSTRING(unsigned short str_len, std::string& ret){
+	inline bool GET_NSTRING(std::string& ret, unsigned short str_len){
 		char* str;
 
 		if(size() < (int32_t)str_len){
@@ -273,6 +305,15 @@ public:
 		return true;
 	}
 
+	inline bool GET_RAWSTRING(char* buffer, unsigned short str_len){
+		if(size() < (int32_t)str_len){
+			return false;
+		}
+		memcpy(&buffer[0], p, str_len);
+		p = p + str_len;
+		return true;
+	}
+
 	inline bool SKIP_N(int32_t n){
 		if(size() < n){
 			return false;
@@ -281,8 +322,17 @@ public:
 		return true;
 	}
 
-
 protected:
+	template <typename T>
+	inline bool GET_VALUE(T& ret){
+		if(size() < (long)sizeof(T)){
+			return false;
+		}
+		ret = *((T*)p);
+		p = p + sizeof(T);
+		return true;
+	}
+
 	const char* p;
 	const char* end;
 };
@@ -297,48 +347,65 @@ public:
 		return buffer;
 	}
 
-	//TODO: might need temp buffer and zero fill the memory chunk allocated by realloc
-	template <typename T>
-	inline void ADD_TYPE(T* add){
-		if((buffer_size - size) < sizeof(T)){
-			buffer_size = buffer_size + ((sizeof(T) + 0x1F) & 0xFFFFFFE0);
-			buffer = (char*)realloc(buffer, buffer_size);
-		}
-
-		memcpy(&buffer[size], (char*)add, sizeof(T));
-		size = size + sizeof(T);
-	}
-
-	template <typename T>
-	inline void ADD_VALUE(T add){
-		if((buffer_size - size) < sizeof(T)){
-			buffer_size = buffer_size + ((sizeof(T) + 0x1F) & 0xFFFFFFE0);
-			buffer = (char*)realloc(buffer,buffer_size);
-		}
-
-		memcpy(&buffer[size], &add, sizeof(T));
-		size = size + sizeof(T);
-	}
-
-	inline void ADD_ULONG(uint32_t ret){
+#ifndef __SWAP_ENDIAN__
+	inline void ADD_UINT32(uint32_t ret){
 		ADD_VALUE(ret);
 	}
 
-	inline void ADD_USHORT(uint16_t ret){
+	inline void ADD_INT32(int32_t ret){
 		ADD_VALUE(ret);
 	}
 
-	inline void ADD_UCHAR(uint8_t ret){
+	inline void ADD_UINT16(uint16_t ret){
+		ADD_VALUE(ret);
+	}
+
+	inline void ADD_INT16(int16_t ret){
+		ADD_VALUE(ret);
+	}
+
+	inline void ADD_FLOAT(float ret){
+		ADD_VALUE(ret);
+	}
+
+#else
+	inline void ADD_UINT32(uint32_t ret){
+		ADD_VALUE(swap_uint32(ret));
+	}
+
+	inline void ADD_INT32(int32_t ret){
+		ADD_VALUE(swap_int32(ret));
+	}
+
+	inline void ADD_UINT16(uint16_t ret){
+		ADD_VALUE(swap_uint16(ret));
+	}
+
+	inline void ADD_INT16(int16_t ret){
+		ADD_VALUE(swap_int16(ret));
+	}
+
+	inline void ADD_FLOAT(float ret){
+		ADD_VALUE(swap_float(ret));
+	}
+
+#endif
+
+	inline void ADD_UINT8(uint8_t ret){
+		ADD_VALUE(ret);
+	}
+
+	inline void ADD_INT8(int8_t ret){
 		ADD_VALUE(ret);
 	}
 
 	inline void ADD_STRING(const std::string& add){
 		uint16_t str_len = (uint16_t)add.size();
 
-		ADD_USHORT(str_len);
+		ADD_VALUE(str_len);
 
 		if((buffer_size - size) < str_len){
-			buffer_size = buffer_size + ((str_len + 0x1F) & 0xFFFFFFE0);
+			buffer_size = buffer_size + str_len + 0x1F;
 			buffer = (char*)realloc(buffer, buffer_size);
 		}
 
@@ -349,10 +416,10 @@ public:
 	inline void ADD_LSTRING(const std::string& add){
 		uint32_t str_len = (uint32_t)add.size();
 
-		ADD_ULONG(str_len);
+		ADD_VALUE(str_len);
 
 		if((buffer_size - size) < str_len){
-			buffer_size = buffer_size + ((str_len + 0x1F) & 0xFFFFFFE0);
+			buffer_size = buffer_size + str_len + 0x1F;
 			buffer = (char*)realloc(buffer, buffer_size);
 		}
 
@@ -361,6 +428,17 @@ public:
 	}
 
 protected:
+	template <typename T>
+	inline void ADD_VALUE(T add){
+		if((buffer_size - size) < sizeof(T)){
+			buffer_size = buffer_size + sizeof(T) + 0x1F;
+			buffer = (char*)realloc(buffer,buffer_size);
+		}
+
+		memcpy(&buffer[size], &add, sizeof(T));
+		size = size + sizeof(T);
+	}
+
 	char* buffer;
 	uint32_t buffer_size;
 	uint32_t size;

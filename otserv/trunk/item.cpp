@@ -96,7 +96,7 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 1*/)
 Item* Item::CreateItem(PropStream& propStream)
 {
 	uint16_t _id;
-	if(!propStream.GET_USHORT(_id)){
+	if(!propStream.GET_UINT16(_id)){
 		return NULL;
 	}
 
@@ -332,7 +332,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_COUNT:
 		{
 			uint8_t _count = 0;
-			if(!propStream.GET_UCHAR(_count)){
+			if(!propStream.GET_UINT8(_count)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -343,7 +343,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_ACTION_ID:
 		{
 			uint16_t _actionid = 0;
-			if(!propStream.GET_USHORT(_actionid)){
+			if(!propStream.GET_UINT16(_actionid)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -354,7 +354,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_UNIQUE_ID:
 		{
 			uint16_t _uniqueid;
-			if(!propStream.GET_USHORT(_uniqueid)){
+			if(!propStream.GET_UINT16(_uniqueid)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -376,7 +376,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_WRITTENDATE:
 		{
 			uint32_t _writtenDate;
-			if(!propStream.GET_ULONG(_writtenDate)){
+			if(!propStream.GET_UINT32(_writtenDate)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -409,7 +409,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_RUNE_CHARGES:
 		{
 			uint8_t _charges = 1;
-			if(!propStream.GET_UCHAR(_charges)){
+			if(!propStream.GET_UINT8(_charges)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -420,7 +420,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_CHARGES:
 		{
 			uint16_t _charges = 1;
-			if(!propStream.GET_USHORT(_charges)){
+			if(!propStream.GET_UINT16(_charges)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -431,7 +431,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_DURATION:
 		{
 			uint32_t duration = 0;
-			if(!propStream.GET_ULONG(duration)){
+			if(!propStream.GET_UINT32(duration)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -445,7 +445,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_DECAYING_STATE:
 		{
 			uint8_t state = 0;
-			if(!propStream.GET_UCHAR(state)){
+			if(!propStream.GET_UINT8(state)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -463,7 +463,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_DEPOT_ID:
 		{
 			uint16_t _depotId;
-			if(!propStream.GET_USHORT(_depotId)){
+			if(!propStream.GET_UINT16(_depotId)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -474,7 +474,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_HOUSEDOORID:
 		{
 			uint8_t _doorId;
-			if(!propStream.GET_UCHAR(_doorId)){
+			if(!propStream.GET_UINT8(_doorId)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -485,7 +485,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_SLEEPERGUID:
 		{
 			uint32_t _guid;
-			if(!propStream.GET_ULONG(_guid)){
+			if(!propStream.GET_UINT32(_guid)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -495,7 +495,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_SLEEPSTART:
 		{
 			uint32_t sleep_start;
-			if(!propStream.GET_ULONG(sleep_start)){
+			if(!propStream.GET_UINT32(sleep_start)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -505,8 +505,11 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		//Teleport class
 		case ATTR_TELE_DEST:
 		{
-			TeleportDest* tele_dest;
-			if(!propStream.GET_STRUCT(tele_dest)){
+			TeleportDest tele_dest;
+			if(		!propStream.GET_UINT16(tele_dest._x) ||
+					!propStream.GET_UINT16(tele_dest._y) ||
+					!propStream.GET_UINT8(tele_dest._z))
+			{
 				return ATTR_READ_ERROR;
 			}
 
@@ -517,7 +520,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_CONTAINER_ITEMS:
 		{
 			uint32_t count;
-			if(!propStream.GET_ULONG(count)){
+			if(!propStream.GET_UINT32(count)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -537,7 +540,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 bool Item::unserializeAttr(PropStream& propStream)
 {
 	uint8_t attr_type;
-	while(propStream.GET_UCHAR(attr_type) && attr_type != 0){
+	while(propStream.GET_UINT8(attr_type) && attr_type != 0){
 		Attr_ReadValue ret = readAttr((AttrTypes_t)attr_type, propStream);
 		if(ret == ATTR_READ_ERROR){
 			return false;
@@ -560,58 +563,58 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream) const
 {
 	if(isStackable() || isFluidContainer() || isSplash()){
 		uint8_t _count = getSubType();
-		propWriteStream.ADD_UCHAR(ATTR_COUNT);
-		propWriteStream.ADD_UCHAR(_count);
+		propWriteStream.ADD_UINT8(ATTR_COUNT);
+		propWriteStream.ADD_UINT8(_count);
 	}
 
 	if(hasCharges()){
 		uint16_t _count = getCharges();
-		propWriteStream.ADD_UCHAR(ATTR_CHARGES);
-		propWriteStream.ADD_USHORT(_count);
+		propWriteStream.ADD_UINT8(ATTR_CHARGES);
+		propWriteStream.ADD_UINT16(_count);
 	}
 
 	if(!isNotMoveable() /*moveable*/){
 		uint16_t _actionId = getActionId();
 		if(_actionId){
-			propWriteStream.ADD_UCHAR(ATTR_ACTION_ID);
-			propWriteStream.ADD_USHORT(_actionId);
+			propWriteStream.ADD_UINT8(ATTR_ACTION_ID);
+			propWriteStream.ADD_UINT16(_actionId);
 		}
 	}
 
 	const std::string& _text = getText();
 	if(_text.length() > 0){
-		propWriteStream.ADD_UCHAR(ATTR_TEXT);
+		propWriteStream.ADD_UINT8(ATTR_TEXT);
 		propWriteStream.ADD_STRING(_text);
 	}
 
 	const time_t _writtenDate = getWrittenDate();
 	if(_writtenDate > 0){
-		propWriteStream.ADD_UCHAR(ATTR_WRITTENDATE);
-		propWriteStream.ADD_ULONG(_writtenDate);
+		propWriteStream.ADD_UINT8(ATTR_WRITTENDATE);
+		propWriteStream.ADD_UINT32(_writtenDate);
 	}
 
 	const std::string& _writer = getWriter();
 	if(_writer.length() > 0){
-		propWriteStream.ADD_UCHAR(ATTR_WRITTENBY);
+		propWriteStream.ADD_UINT8(ATTR_WRITTENBY);
 		propWriteStream.ADD_STRING(_writer);
 	}
 
 	const std::string& _specialDesc = getSpecialDescription();
 	if(_specialDesc.length() > 0){
-		propWriteStream.ADD_UCHAR(ATTR_DESC);
+		propWriteStream.ADD_UINT8(ATTR_DESC);
 		propWriteStream.ADD_STRING(_specialDesc);
 	}
 
 	if(hasAttribute(ATTR_ITEM_DURATION)){
 		uint32_t duration = getDuration();
-		propWriteStream.ADD_UCHAR(ATTR_DURATION);
-		propWriteStream.ADD_ULONG(duration);
+		propWriteStream.ADD_UINT8(ATTR_DURATION);
+		propWriteStream.ADD_UINT32(duration);
 	}
 
 	uint32_t decayState = getDecaying();
 	if(decayState == DECAYING_TRUE || decayState == DECAYING_PENDING){
-		propWriteStream.ADD_UCHAR(ATTR_DECAYING_STATE);
-		propWriteStream.ADD_UCHAR(decayState);
+		propWriteStream.ADD_UINT8(ATTR_DECAYING_STATE);
+		propWriteStream.ADD_UINT8(decayState);
 	}
 
 	return true;

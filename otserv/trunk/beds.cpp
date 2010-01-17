@@ -48,7 +48,7 @@ Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_SLEEPERGUID:
 		{
 			uint32_t _guid;
-			if(!propStream.GET_ULONG(_guid)){
+			if(!propStream.GET_UINT32(_guid)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -67,7 +67,7 @@ Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_SLEEPSTART:
 		{
 			uint32_t sleep_start;
-			if(!propStream.GET_ULONG(sleep_start)){
+			if(!propStream.GET_UINT32(sleep_start)){
 				return ATTR_READ_ERROR;
 			}
 			sleepStart = (time_t)sleep_start;
@@ -83,10 +83,10 @@ Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
 
 bool BedItem::serializeAttr(PropWriteStream& propWriteStream) const
 {
-	propWriteStream.ADD_UCHAR(ATTR_SLEEPERGUID);
-	propWriteStream.ADD_ULONG(sleeperGUID);
-	propWriteStream.ADD_UCHAR(ATTR_SLEEPSTART);
-	propWriteStream.ADD_ULONG((int32_t)sleepStart);
+	propWriteStream.ADD_UINT8(ATTR_SLEEPERGUID);
+	propWriteStream.ADD_UINT32(sleeperGUID);
+	propWriteStream.ADD_UINT8(ATTR_SLEEPSTART);
+	propWriteStream.ADD_UINT32((uint32_t)sleepStart);
 
 	return true;
 }

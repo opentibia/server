@@ -433,16 +433,16 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 			uint16_t x = 0, y = 0;
 			uint8_t z = 0;
 
-			propStream.GET_USHORT(x);
-			propStream.GET_USHORT(y);
-			propStream.GET_UCHAR(z);
+			propStream.GET_UINT16(x);
+			propStream.GET_UINT16(y);
+			propStream.GET_UINT8(z);
 
 			if(house && house->getPendingDepotTransfer()){
 				Player* player = g_game.getPlayerByGuidEx(house->getHouseOwner());
 				if(player){
 					Depot* depot = player->getDepot(player->getTown(), true);
 					
-					propStream.GET_ULONG(item_count);
+					propStream.GET_UINT32(item_count);
 					while(item_count--){
 						loadItem(propStream, depot, true);
 					}
@@ -460,7 +460,7 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 					break;
 				}
 	 
-				propStream.GET_ULONG(item_count);
+				propStream.GET_UINT32(item_count);
 				while(item_count--){
 					loadItem(propStream, tile);
 				}
@@ -484,7 +484,7 @@ bool IOMapSerialize::loadContainer(PropStream& propStream, Container* container)
 	}
 
 	uint8_t endAttr = 0;
-	propStream.GET_UCHAR(endAttr);
+	propStream.GET_UINT8(endAttr);
 
 	if(endAttr != 0x00){
 		std::cout << "WARNING: Unserialization error for containing item in IOMapSerialize::loadContainer() - " << container->getID() << std::endl;
@@ -499,7 +499,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent, bool dep
 	Item* item = NULL;
 	
 	uint16_t id = 0;
-	propStream.GET_USHORT(id);
+	propStream.GET_UINT16(id);
 
 	const ItemType& iType = Item::items[id];
 
@@ -663,19 +663,19 @@ bool IOMapSerialize::saveItem(PropWriteStream& stream, const Item* item)
 	const Container* container = item->getContainer();
 	
 	// Write ID & props
-	stream.ADD_USHORT(item->getID());
+	stream.ADD_UINT16(item->getID());
 	item->serializeAttr(stream);
 
 	if(container){
 		// Hack our way into the attributes
-		stream.ADD_UCHAR(ATTR_CONTAINER_ITEMS);
-		stream.ADD_ULONG(container->size());
+		stream.ADD_UINT8(ATTR_CONTAINER_ITEMS);
+		stream.ADD_UINT32(container->size());
 		for(ItemList::const_reverse_iterator i = container->getReversedItems(); i != container->getReversedEnd(); ++i){
 			saveItem(stream, *i);
 		}
 	}
 
-	stream.ADD_UCHAR(0x00); // attr end
+	stream.ADD_UINT8(0x00); // attr end
 
 	return true;
 }
@@ -701,10 +701,10 @@ bool IOMapSerialize::saveTile(PropWriteStream& stream, const Tile* tile)
 	}
 
 	if(items.size() > 0) {
-		stream.ADD_USHORT(tile->getPosition().x);
-		stream.ADD_USHORT(tile->getPosition().y);
-		stream.ADD_UCHAR(tile->getPosition().z);
-		stream.ADD_ULONG(items.size());
+		stream.ADD_UINT16(tile->getPosition().x);
+		stream.ADD_UINT16(tile->getPosition().y);
+		stream.ADD_UINT8(tile->getPosition().z);
+		stream.ADD_UINT32(items.size());
 
 		for(std::vector<Item*>::iterator iter = items.begin();
 			iter != items.end();

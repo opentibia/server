@@ -33,16 +33,6 @@
 
 extern ConfigManager g_config;
 
-bool fileExists(const char* filename)
-{
-	FILE* f = fopen(filename, "rb");
-	bool exists = (f != NULL);
-	if(f != NULL)
-		fclose(f);
-
-	return exists;
-}
-
 void replaceString(std::string& str, const std::string sought, const std::string replacement)
 {
 	size_t pos = 0;

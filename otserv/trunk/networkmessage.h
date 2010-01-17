@@ -57,13 +57,12 @@ public:
 
 	// simply read functions for incoming message
 	uint8_t  GetByte(){return m_MsgBuf[m_ReadPos++];}
+
+#ifndef __SWAP_ENDIAN__
 	uint16_t GetU16(){
 		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
 		m_ReadPos += 2;
 		return v;
-	}
-	uint16_t GetSpriteId(){
-		return GetU16();
 	}
 	uint32_t GetU32(){
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
@@ -74,6 +73,27 @@ public:
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		return v;
 	}
+#else
+	uint16_t GetU16(){
+		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
+		m_ReadPos += 2;
+		return swap_uint16(v);
+	}
+	uint32_t GetU32(){
+		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+		m_ReadPos += 4;
+		return swap_uint32(v);
+	}
+	uint32_t PeekU32(){
+		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+		return swap_uint32(v);
+	}
+#endif
+
+	uint16_t GetSpriteId(){
+		return GetU16();
+	}
+
 	std::string GetString();
 	std::string GetRaw();
 	Position GetPosition();
@@ -88,6 +108,8 @@ public:
 		m_MsgBuf[m_ReadPos++] = value;
 		m_MsgSize++;
 	}
+
+#ifndef __SWAP_ENDIAN__
 	void AddU16(uint16_t value){
 		if(!canAdd(2))
 			return;
@@ -100,6 +122,21 @@ public:
 		*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
 		m_ReadPos += 4; m_MsgSize += 4;
 	}
+#else
+	void AddU16(uint16_t value){
+		if(!canAdd(2))
+			return;
+		*(uint16_t*)(m_MsgBuf + m_ReadPos) = swap_uint16(value);
+		m_ReadPos += 2; m_MsgSize += 2;
+	}
+	void AddU32(uint32_t value){
+		if(!canAdd(4))
+			return;
+		*(uint32_t*)(m_MsgBuf + m_ReadPos) = swap_uint32(value);
+		m_ReadPos += 4; m_MsgSize += 4;
+	}
+#endif
+
 	void AddBytes(const char* bytes, uint32_t size);
 	void AddPaddingBytes(uint32_t n);
 
