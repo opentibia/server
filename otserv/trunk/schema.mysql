@@ -76,9 +76,10 @@ CREATE TABLE `players` (
 CREATE TABLE `guilds` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COMMENT 'guild name - nothing else needed here',
-	`ownerid` INT NOT NULL,
+	`ownerid` INT UNSIGNED NOT NULL,
 	`creationdata` INT NOT NULL,
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`ownerid`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guild_ranks` (
@@ -178,7 +179,8 @@ CREATE TABLE `bans` (
 	`statement` VARCHAR(255) NOT NULL DEFAULT '',
 	PRIMARY KEY  (`id`),
 	KEY (`type`, `value`),
-	KEY (`expires`)
+	KEY (`expires`),
+	FOREIGN KEY (`admin_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tiles` (
@@ -188,7 +190,8 @@ CREATE TABLE `tiles` (
 	`y` INT(5) UNSIGNED NOT NULL,
 	`z` INT(2) UNSIGNED NOT NULL,
 	PRIMARY KEY(`id`),
-	KEY(`x`, `y`, `z`)
+	KEY(`x`, `y`, `z`),
+	FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE NO ACTION
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tile_items` (
@@ -200,7 +203,7 @@ CREATE TABLE `tile_items` (
 	`attributes` BLOB NOT NULL,
 	FOREIGN KEY (`tile_id`) REFERENCES `tiles` (`id`) ON DELETE CASCADE,
 	INDEX (`sid`)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB;	
 
 CREATE TABLE `map_store` (
 	`house_id` INT UNSIGNED NOT NULL,
@@ -265,7 +268,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 19);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 20);
 
 DELIMITER |
 
@@ -321,6 +324,6 @@ END|
 DELIMITER ;
 
 # uncomment to add a single player
-#INSERT INTO `groups` VALUES (1, 'Group 1', 0, 3, 0, 10, 10);
+#INSERT INTO `groups` VALUES (1, 'Player', 0, 3, 0, 10, 10);
 #INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0);
-#INSERT INTO `players` (`id`, `name`, `account_id`, `group_id`, `vocation`, `experience`, `level`, `maglevel`, `direction`, `posx`, `posy`, `posz`, `conditions`, `rank_id`, `town_id`) VALUES (2, 'OTSCMS', 1, 1, 1, 2252770, 53, 8, 2, 116, 106, 7, '', 0, 0);
+#INSERT INTO `players` (`id`, `name`, `account_id`, `group_id`, `vocation`, `experience`, `level`, `maglevel`, `direction`, `posx`, `posy`, `posz`, `conditions`, `rank_id`, `town_id`) VALUES (2, 'Hurz', 1, 1, 1, 2252770, 53, 8, 2, 116, 106, 7, '', 0, 0);
