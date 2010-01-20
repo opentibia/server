@@ -135,7 +135,7 @@ CREATE TABLE "killers" (
 	FOREIGN KEY ("death_id") REFERENCES "player_deaths" ("id")
 );
 
-CREATE TABLE `environment_killers` (
+CREATE TABLE "environment_killers" (
 	"kill_id" INTEGER NOT NULL,
 	"name" VARCHAR(255) NOT NULL,
 	FOREIGN KEY ("kill_id") REFERENCES "killers" ("id")
