@@ -186,7 +186,8 @@ CREATE TABLE "tiles" (
 	"house_id" INTEGER NOT NULL DEFAULT 0,
 	"x" INTEGER NOT NULL,
 	"y" INTEGER NOT NULL,
-	"z" INTEGER NOT NULL
+	"z" INTEGER NOT NULL,
+	FOREIGN KEY ("house_id" REFERENCES "houses" ("id")
 );
 
 CREATE TABLE "tile_items" (
@@ -247,7 +248,7 @@ CREATE TABLE "schema_info" (
 	UNIQUE ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 19);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 20);
 
 CREATE TRIGGER "oncreate_guilds"
 AFTER INSERT ON "guilds"

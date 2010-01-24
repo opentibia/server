@@ -26,7 +26,7 @@
 #define OTSERV_VERSION "0.6.3_SVN"
 #define OTSERV_NAME "OTServ"
 #define OTSERV_CLIENT_VERSION "8.50"
-#define CURRENT_SCHEMA_VERSION 19
+#define CURRENT_SCHEMA_VERSION 20
 
 #if defined __MINGW32__
 	#ifndef XML_GCC_FREE

@@ -78,7 +78,8 @@ CREATE TABLE "guilds" (
 	"name" VARCHAR(255) NOT NULL,
 	"ownerid" INT NOT NULL,
 	"creationdata" INT NOT NULL,
-	PRIMARY KEY ("id")
+	PRIMARY KEY ("id"),
+	FOREIGN KEY ("ownerid") REFERENCES "players" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "guild_ranks" (
@@ -184,7 +185,8 @@ CREATE TABLE "tiles" (
 	"x" INT(6) NOT NULL,
 	"y" INT(6) NOT NULL,
 	"z" INT(3) NOT NULL,
-	PRIMARY KEY("id")
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("house_id") REFERENCES "houses" ("id") ON DELETE NO ACTION
 );
 
 CREATE TABLE "tile_items" (
@@ -259,7 +261,7 @@ CREATE TABLE "schema_info" (
 	PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 19);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 20);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
