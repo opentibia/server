@@ -2844,13 +2844,19 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 		}
 
 		if(!isSuccess){
-			std::string errorDescription = getTradeErrorDescription(ret1, tradeItem1);
-			tradePartner->sendTextMessage(MSG_INFO_DESCR, errorDescription);
-			tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
+			std::string errorDescription;
 
-			errorDescription = getTradeErrorDescription(ret2, tradeItem2);
-			player->sendTextMessage(MSG_INFO_DESCR, errorDescription);
-			player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
+			if(tradePartner->tradeItem){
+				errorDescription = getTradeErrorDescription(ret1, tradeItem1);
+				tradePartner->sendTextMessage(MSG_INFO_DESCR, errorDescription);
+				tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
+			}
+	
+			if(player->tradeItem){
+				errorDescription = getTradeErrorDescription(ret2, tradeItem2);
+				player->sendTextMessage(MSG_INFO_DESCR, errorDescription);
+				player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
+			}
 		}
 
 		player->setTradeState(TRADE_NONE);
@@ -2872,28 +2878,31 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 std::string Game::getTradeErrorDescription(ReturnValue ret, Item* item)
 {
 	std::stringstream ss;
-	if(ret == RET_NOTENOUGHCAPACITY){
-		ss << "You do not have enough capacity to carry";
-		if(item->isStackable() && item->getItemCount() > 1){
-			ss << " these objects.";
+	if(item){
+		if(ret == RET_NOTENOUGHCAPACITY){
+			ss << "You do not have enough capacity to carry";
+			if(item->isStackable() && item->getItemCount() > 1){
+				ss << " these objects.";
+			}
+			else{
+				ss << " this object." ;
+			}
+			ss << std::endl << " " << item->getWeightDescription();
 		}
-		else{
-			ss << " this object." ;
+		else if(ret == RET_NOTENOUGHROOM || ret == RET_CONTAINERNOTENOUGHROOM){
+			ss << "You do not have enough room to carry";
+			if(item->isStackable() && item->getItemCount() > 1){
+				ss << " these objects.";
+			}
+			else{
+				ss << " this object.";
+			}
 		}
-		ss << std::endl << " " << item->getWeightDescription();
+
+		return ss.str();
 	}
-	else if(ret == RET_NOTENOUGHROOM || ret == RET_CONTAINERNOTENOUGHROOM){
-		ss << "You do not have enough room to carry";
-		if(item->isStackable() && item->getItemCount() > 1){
-			ss << " these objects.";
-		}
-		else{
-			ss << " this object.";
-		}
-	}
-	else{
-		ss << "Trade could not be completed.";
-	}
+
+	ss << "Trade could not be completed.";
 	return ss.str();
 }
 
