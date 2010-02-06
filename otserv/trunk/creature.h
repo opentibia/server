@@ -223,6 +223,7 @@ public:
 
 	virtual int32_t getHealth() const {return health;}
 	virtual int32_t getMaxHealth() const {return healthMax;}
+	virtual bool hasHiddenHealth() const { return false; }
 	virtual int32_t getMana() const {return mana;}
 	virtual int32_t getMaxMana() const {return manaMax;}
 

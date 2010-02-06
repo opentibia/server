@@ -446,6 +446,7 @@ enum PlayerFlags{
 	PlayerFlag_CanReportBugs,               //2^44 = 17592186044416
 	PlayerFlag_CanSeeSpecialDescription,    //2^45 = 35184372088832
 	PlayerFlag_CannotBeSeen,                //2^46 = 70368744177664
+	PlayerFlag_HideHealth,                  //2^47 = 140737488355328
 	//add new flags here
 	PlayerFlag_LastFlag
 };

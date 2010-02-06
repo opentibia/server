@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -63,7 +63,7 @@ public:
 	static AutoList<Monster> listMonster;
 	void removeList(){listMonster.removeList(getID());}
 	void addList() {listMonster.addList(this);}
-	
+
 	virtual const std::string& getName() const {return mType->name;}
 	virtual const std::string& getNameDescription() const {return mType->nameDescription;}
 	virtual std::string getDescription(int32_t lookDistance) const {return strDescription + '.';}
@@ -79,7 +79,7 @@ public:
 	bool canPushCreatures() const {return mType->canPushCreatures;}
 	bool isHostile() const { return mType->isHostile;}
 	virtual bool canSeeInvisibility() const {return Creature::isImmune(CONDITION_INVISIBLE);}
-	uint32_t getManaCost() const {return mType->manaCost;}	
+	uint32_t getManaCost() const {return mType->manaCost;}
 	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
@@ -120,6 +120,8 @@ public:
 	bool isTarget(Creature* creature);
 	bool getIdleStatus() const { return isIdle;}
 	bool isFleeing() const {return getHealth() <= mType->runAwayHealth;}
+
+	virtual bool hasHiddenHealth() const { return mType->hideHealth; }
 
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
