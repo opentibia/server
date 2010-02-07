@@ -85,7 +85,7 @@ public:
 		std::string statement, uint32_t reason, violationAction_t action) const;
 	bool addPlayerStatement(uint32_t playerId, uint32_t adminid, std::string comment,
 		std::string statement, uint32_t reason, violationAction_t action) const;
-	bool BanManager::addPlayerNameReport(uint32_t playerId, uint32_t adminid, std::string comment,
+	bool addPlayerNameReport(uint32_t playerId, uint32_t adminid, std::string comment,
     	std::string statement, uint32_t reason, violationAction_t action) const;
 	bool addAccountBan(uint32_t account, int32_t time, uint32_t adminid, std::string comment,
 		std::string statement, uint32_t reason, violationAction_t action) const;
