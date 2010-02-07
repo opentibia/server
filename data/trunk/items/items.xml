@@ -1164,7 +1164,6 @@
 	<item id="1486" article="a" name="stone coal basin"/>
 	<item id="1487" article="a" name="fire field" editorsuffix=" (Not decaying)">
 		<attribute key="type" value="magicfield"/>
-		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
 			<attribute key="damage" value="20"/>
 			<attribute key="ticks" value="10000"/>
@@ -1174,7 +1173,6 @@
 	</item>
 	<item id="1488" article="a" name="fire field" editorsuffix=" (Not decaying)">
 		<attribute key="type" value="magicfield"/>
-		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire">
 			<attribute key="ticks" value="10000"/>
 			<attribute key="count" value="7"/>
@@ -1183,12 +1181,10 @@
 	</item>
 	<item id="1489" article="a" name="fire field" editorsuffix=" (Not decaying)">
 		<attribute key="type" value="magicfield"/>
-		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="fire"/>
 	</item>
 	<item id="1490" article="a" name="poison field" editorsuffix=" (Not decaying)">
 		<attribute key="type" value="magicfield"/>
-		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="poison">
 			<attribute key="ticks" value="5000"/>
 			<attribute key="start" value="5"/>
@@ -1197,7 +1193,6 @@
 	</item>
 	<item id="1491" article="an" name="energy field" editorsuffix=" (Not decaying)">
 		<attribute key="type" value="magicfield"/>
-		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="energy">
 			<attribute key="damage" value="30"/>
 			<attribute key="ticks" value="10000"/>
