@@ -2477,27 +2477,27 @@
 	<item id="2015" article="a" name="beer bottle">
 		<attribute key="weight" value="250"/>
 	</item>
-	<item id="2016" article="a" name="pool">
+	<item id="2016" article="a" name="water splash">
 		<attribute key="decayTo" value="2017"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="2017" article="a" name="pool">
+	<item id="2017" article="a" name="water splash">
 		<attribute key="decayTo" value="2018"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="2018" article="a" name="pool">
+	<item id="2018" article="a" name="water splash">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="2019" article="a" name="pool">
+	<item id="2019" article="a" name="water splash">
 		<attribute key="decayTo" value="2020"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="2020" article="a" name="pool">
+	<item id="2020" article="a" name="water splash">
 		<attribute key="decayTo" value="2021"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="2021" article="a" name="pool">
+	<item id="2021" article="a" name="water splash">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="60"/>
 	</item>
@@ -2510,30 +2510,12 @@
 	<item id="2024" article="a" name="broken brown glass">
 		<attribute key="weight" value="100"/>
 	</item>
-	<item id="2025" article="a" name="pool">
-		<attribute key="decayTo" value="2026"/>
-		<attribute key="duration" value="45"/>
-	</item>
-	<item id="2026" article="a" name="pool">
-		<attribute key="decayTo" value="2027"/>
-		<attribute key="duration" value="45"/>
-	</item>
-	<item id="2027" article="a" name="pool">
-		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="60"/>
-	</item>
-	<item id="2028" article="a" name="pool">
-		<attribute key="decayTo" value="2029"/>
-		<attribute key="duration" value="45"/>
-	</item>
-	<item id="2029" article="a" name="pool">
-		<attribute key="decayTo" value="2030"/>
-		<attribute key="duration" value="45"/>
-	</item>
-	<item id="2030" article="a" name="pool">
-		<attribute key="decayTo" value="0"/>
-		<attribute key="duration" value="60"/>
-	</item>
+	<item id="2025" article="a" name="pool"/>
+	<item id="2026" article="a" name="pool"/>
+	<item id="2027" article="a" name="pool"/>
+	<item id="2028" article="a" name="pool"/>
+	<item id="2029" article="a" name="pool"/>
+	<item id="2030" article="a" name="pool"/>
 	<item id="2031" article="a" name="waterskin">
 		<attribute key="weight" value="700"/>
 	</item>
