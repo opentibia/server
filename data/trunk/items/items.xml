@@ -4154,7 +4154,6 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="extradef" value="1"/>
 		<attribute key="elementEarth" value="8"/>
-		<attribute key="charges" value="5" />
 	</item>
 	<item id="2410" article="a" name="throwing knife" plural="throwing knives">
 		<attribute key="weight" value="500"/>
@@ -4368,13 +4367,13 @@
 		<attribute key="defense" value="12"/>
 		<attribute key="attack" value="21"/>
 		<attribute key="weaponType" value="club"/>
-		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="2440" article="a" name="daramanian waraxe">
 		<attribute key="weight" value="5250"/>
 		<attribute key="defense" value="15"/>
 		<attribute key="attack" value="39"/>
 		<attribute key="weaponType" value="axe"/>
+		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="2442" article="a" name="heavy machete">
 		<attribute key="weight" value="1840"/>
@@ -4549,7 +4548,7 @@
 		<attribute key="slotType" value="legs"/>
 	</item>
 	<item id="2470" name="golden legs">
-		<attribute key="weight" value="65000"/>
+		<attribute key="weight" value="5600"/>
 		<attribute key="armor" value="9"/>
 		<attribute key="slotType" value="legs"/>
 	</item>
@@ -4677,7 +4676,7 @@
 		<attribute key="slotType" value="body"/>
 	</item>
 	<item id="2495" name="demon legs">
-		<attribute key="weight" value="70000"/>
+		<attribute key="weight" value="7000"/>
 		<attribute key="armor" value="9"/>
 		<attribute key="slotType" value="legs"/>
 	</item>
@@ -5249,7 +5248,7 @@
 		<attribute key="slotType" value="feet"/>
 	</item>
 	<item id="2646" name="golden boots">
-		<attribute key="weight" value="31000"/>
+		<attribute key="weight" value="3100"/>
 		<attribute key="armor" value="4"/>
 		<attribute key="slotType" value="feet"/>
 	</item>
