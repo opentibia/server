@@ -59,14 +59,15 @@ CREATE TABLE "players" (
 	"loss_skills" INTEGER NOT NULL DEFAULT 100,
 	"loss_items" INTEGER NOT NULL DEFAULT 10,
 	"loss_containers" INTEGER NOT NULL DEFAULT 100,
-	"rank_id" INTEGER NOT NULL,
+	"rank_id" INTEGER NULL,
 	"town_id" INTEGER NOT NULL,
 	"balance" INTEGER NOT NULL DEFAULT 0,
 	"stamina" INTEGER NOT NULL DEFAULT 151200000,
 	"online" BOOLEAN NOT NULL DEFAULT 0,
 	UNIQUE ("name"),
 	FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
-	FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
+	FOREIGN KEY ("group_id") REFERENCES "groups" ("id"),
+	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id")
 );
 
 CREATE TABLE "guilds" (

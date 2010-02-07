@@ -61,7 +61,7 @@ CREATE TABLE "players" (
 	"loss_skills" INT NOT NULL DEFAULT 100,
 	"loss_items" INT NOT NULL DEFAULT 10,
 	"loss_containers" INT NOT NULL DEFAULT 100,
-	"rank_id" INT NOT NULL,
+	"rank_id" INT NULL,
 	"town_id" INT NOT NULL,
 	"balance" INT NOT NULL DEFAULT 0,
 	"stamina" INT NOT NULL DEFAULT 151200000,
@@ -70,7 +70,8 @@ CREATE TABLE "players" (
 	UNIQUE ("name"),
 	KEY ("online"),
 	FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
+	FOREIGN KEY ("group_id") REFERENCES "groups" ("id"),
+	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id")
 );
 
 CREATE TABLE "guilds" (
