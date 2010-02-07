@@ -15,6 +15,10 @@ AC_LANG(C++)
 AC_ARG_ENABLE(debug, [  --enable-debug      enable debuging], 
 	[DEBUG_FLAGS="-D__DEBUG__MOVESYS__ -D__DEBUG_HOUSES__ -D__DEBUG_MAILBOX__ -D__DEBUG_LUASCRIPTS__ -D__DEBUG_NET__"]
 )
+# check if we want verbose debuging
+AC_ARG_ENABLE(net-debug, [  --enable-net-debug  enable verbose net debuging], 
+    [DEBUG_FLAGS="$DEBUG_FLAGS -D__DEBUG_NET_DETAIL__"]
+)
 AC_SUBST(DEBUG_FLAGS)
 
 # check if we want server diagnostics enabled
