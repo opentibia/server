@@ -2192,12 +2192,12 @@ int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 
  	ScriptEnviroment* env = getEnv();
 
-	Creature* creature = env->getCreatureByUID(cid);
+	Player* player = env->getPlayerByUID(cid);
 
-	if(creature){
-	    creature->setSkull(skull); 
-		g_game.updateCreatureSkull(creature); 
-		lua_pushnumber(L, LUA_ERROR);
+	if(player){
+			player->setSkull(skull); 
+			g_game.updateCreatureSkull(creature); 
+			lua_pushnumber(L, LUA_ERROR);
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
