@@ -122,8 +122,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confString[MOTD] = getGlobalString(L, "motd");
 	m_confInteger[MOTD_NUM] = getGlobalNumber(L, "motdnum");
 	m_confInteger[MAX_PLAYERS] = getGlobalNumber(L, "maxplayers");
-	m_confInteger[EXHAUSTED] = getGlobalNumber(L, "exhausted", 1000);
-	m_confInteger[EXHAUSTED_ADD] = getGlobalNumber(L, "exhaustedadd", 0);
+	m_confInteger[EXHAUSTED] = getGlobalNumber(L, "exhausted", 30000);
+	m_confInteger[EXHAUSTED_ADD] = getGlobalNumber(L, "exhaustedadd", 5000);
 	m_confInteger[COMBAT_EXHAUSTED] = getGlobalNumber(L, "fightexhausted", 2000);
 	m_confInteger[HEAL_EXHAUSTED] = getGlobalNumber(L, "healexhausted", 1000);
 	m_confInteger[STAIRHOP_EXHAUSTED] = getGlobalNumber(L, "stairhop_exhausted", 2*1000);
