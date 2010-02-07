@@ -31,7 +31,7 @@ setConditionParam(poison, CONDITION_PARAM_TICKINTERVAL, 4000) -- Delay between d
 setConditionParam(poison, CONDITION_PARAM_FORCEUPDATE, TRUE) -- Re-update condition when adding it(ie. min/max value)
 
 local exhaust = createConditionObject(CONDITION_EXHAUSTED)
-setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))
+setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('minactionexinterval'))
 
 function onUse(cid, item, frompos, item2, topos)
 	if(topos.x == 0 and topos.y == 0 and topos.z == 0) then
@@ -72,7 +72,7 @@ function onUse(cid, item, frompos, item2, topos)
 				return FALSE
 			end
 		else
-			doCreatureSay(cid, "Glup.", TALKTYPE_ORANGE_1)
+			doCreatureSay(cid, "Gulp.", TALKTYPE_ORANGE_1)
 		end
 		doAddCondition(cid, exhaust)
 		doChangeTypeItem(item.uid, TYPE_EMPTY)
