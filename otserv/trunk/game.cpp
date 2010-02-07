@@ -4724,8 +4724,8 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 
 		case ACTION_NAMEREPORT:
 		{
-			g_bans.addPlayerBan(guid, -1, player->getGUID(), comment, statement, reasonId, actionType);
-			removeNotations = 1;
+			g_bans.addPlayerNameReport(guid, player->getGUID(), comment, statement, reasonId, actionType);
+			removeNotations = 0;
 			break;
 		}
 
