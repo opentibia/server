@@ -300,7 +300,7 @@ bool BanManager::addPlayerNameReport(uint32_t playerId, uint32_t adminid, std::s
     stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
 
     DBQuery query;
-    query << BAN_NAME << ", " << playerId << ", " << -1 << ", " << std::time(NULL) << ", " << adminid << ", ";
+    query << BAN_NAMELOCK << ", " << playerId << ", " << -1 << ", " << std::time(NULL) << ", " << adminid << ", ";
     query << db->escapeString(comment) << ", " << db->escapeString(statement) << ", " << reason << ", " << action;
 
     if(!stmt.addRow(query.str())) return false;
