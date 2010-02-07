@@ -17,7 +17,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 	
-	doPlayerAddQuestReward(cid, parameters)
+	doPlayerAddQuestReward( parameters)
 	
 	return TRUE
 end
@@ -130,7 +130,7 @@ function doPlayerAddQuestReward(cid, parameters)
 		local ret = doPlayerAddItemEx(cid, rItem.uid)
 		local failed = false
 		if(ret == RETURNVALUE_NOTENOUGHCAPACITY) then
-			str = str .. " weighing " .. getItemWeigh(rItem) .. " oz it's too heavy"
+			str = str .. " weighing " .. getItemWeight(rItem) .. " oz it's too heavy"
 			failed = true
 		elseif(ret == RETURNVALUE_NOTENOUGHROOM or ret == RETURNVALUE_NEEDEXCHANGE) then
 			str = str .. " but you do not have space to take it"
