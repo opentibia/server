@@ -2190,13 +2190,13 @@ int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 	Skulls_t skull = (Skulls_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
- 	ScriptEnviroment* env = getEnv();
+ 	ScriptEnviroment* env = getScriptEnv();
 
 	Player* player = env->getPlayerByUID(cid);
 
 	if(player){
 			player->setSkull(skull); 
-			g_game.updateCreatureSkull(creature); 
+			g_game.updateCreatureSkull(player); 
 			lua_pushnumber(L, LUA_ERROR);
 	}
 	else{
