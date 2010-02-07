@@ -6567,10 +6567,10 @@ int LuaScriptInterface::luaDoPlayerSetSex(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Creature* creature = env->getCreatureByUID(cid);
+	Player* player = env->getPlayerByUID(cid);
 
-	if(creature){
-		player->setSex(sex);
+	if(player){
+		player->setSex((playersex_t)sex);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
