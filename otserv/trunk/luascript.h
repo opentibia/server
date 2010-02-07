@@ -383,6 +383,7 @@ protected:
 	static int luaDoPlayerAddSoul(lua_State *L);
 	static int luaDoPlayerAddExp(lua_State *L);
 	static int luaDoPlayerRemoveExp(lua_State *L);
+	static int luaDoPlayerSetSex(lua_State *L);
 	static int luaDoPlayerSetGuildRank(lua_State *L);
 	static int luaDoPlayerSetGuildNick(lua_State *L);
 	static int luaDoSetCreatureLight(lua_State *L);
