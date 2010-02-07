@@ -1166,6 +1166,9 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerSkullType(cid, <optional> viewer)
 	lua_register(m_luaState, "getPlayerSkullType", LuaScriptInterface::luaGetPlayerSkullType);
 
+	//setPlayerSkullType(cid, skull_type)
+	lua_register(m_luaState, "setPlayerSkullType", LuaScriptInterface::luaSetPlayerSkullType);
+
 	//getPlayerSkullEndTime(cid)
 	lua_register(m_luaState, "getPlayerSkullEndTime", LuaScriptInterface::luaGetPlayerSkullEndTime);
 
@@ -2179,6 +2182,34 @@ int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
 	#endif
 	return 1;
 }
+int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
+{
+ 	//setPlayerSkullType(cid, skull_type)
+	#ifdef __SKULLSYSTEM__
+	
+	Skulls_t skull = (Skulls_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+ 	ScriptEnviroment* env = getEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+
+	if(creature){
+	    creature->setSkull(skull); 
+		g_game.updateCreatureSkull(creature); 
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	 	
+	#else
+	lua_pushnumber(L, 0);
+	#endif;
+	return 1;
+}
+
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
 {
