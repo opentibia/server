@@ -19,14 +19,13 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "ioplayer.h"
 #include "ioaccount.h"
 #include "item.h"
 #include "town.h"
 #include "configmanager.h"
 #include "tools.h"
-#include "definitions.h"
+#include "guild.h"
 
 #include <iostream>
 #include <iomanip>
@@ -51,8 +50,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
-		`skull_type`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
-		`loss_items`, `loss_containers`, `rank_id`, `town_id`, `balance`, `stamina` \
+		`skull_type`, `loss_experience`, `loss_mana`, `loss_skills`, \
+		`loss_items`, `loss_containers`, `town_id`, `balance`, `stamina` \
 		FROM `players` \
 		LEFT JOIN `accounts` ON `account_id` = `accounts`.`id`\
 		LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` \
@@ -195,29 +194,32 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		player->loginPosition = player->masterPos;
 	}
 
-	uint32_t rankid = result->getDataInt("rank_id");
-
 	// place it here and now we can drop all additional query instances as all data were loaded
 	player->balance = result->getDataInt("balance");
 	player->stamina = result->getDataInt("stamina");
-
-	player->guildNick = result->getDataString("guildnick");
 	db->freeResult(result);
 
-	if(rankid){
-		query << "SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, `guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` FROM `guild_ranks`, `guilds` WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds`.`id`";
-		if((result = db->storeQuery(query.str()))){
-			player->guildName = result->getDataString("guildname");
-			player->guildLevel = result->getDataInt("level");
-			player->guildId = result->getDataInt("guildid");
-			player->guildRank = result->getDataString("rank");
-
-			db->freeResult(result);
-		}
-		query.str("");
+	//guild system
+	Guild* guild = new Guild();
+	query.str("");
+	query << "SELECT `guild_members`.`guild_nick` as `guild_nick`, `guild_members`.`guild_id` as `guild_id`, \
+			 `guild_ranks`.`name` as `rank_name`, `guild_ranks`.`level` as `rank_level`, \
+			 `guilds`.`name` as `guild_name` FROM `guild_members`, `guilds`, `guild_ranks` \
+			 WHERE `guild_members`.`player_id` = " << player->getGUID() << " \
+			 AND `guild_ranks`.`id` = `guild_members`.`rank_id` AND `guilds`.`id` = `guild_members`.`guild_id`";
+	if((result = db->storeQuery(query.str()))){
+		guild->setGuildName(result->getDataString("guild_name"));
+		guild->setGuildRank(result->getDataString("rank_name"));
+		guild->setGuildNick(result->getDataString("guild_nick"));
+		guild->setGuildLevel(result->getDataInt("rank_level"));
+		guild->setGuildId(result->getDataInt("guild_id"));
+		guild->setAtWar();
+		db->freeResult(result);
 	}
+	player->setGuild(guild);
 
 	//get password
+	query.str("");
 	query << "SELECT `password`, `premend` FROM `accounts` WHERE `id` = " << player->accountId;
 	if(!(result = db->storeQuery(query.str()))){
 		return false;
@@ -664,12 +666,12 @@ bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
 bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 {
 	Database* db = Database::instance();
-	
+
 	DBQuery q;
 	DBTransaction transaction(db);
 	transaction.begin();
 	std::ostringstream query;
-	
+
 	// First insert the actual death
 	{
 		DBInsert death_stmt(db);
@@ -681,7 +683,7 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 		if(!death_stmt.execute())
 			return false;
 	}
-	
+
 	uint64_t death_id = db->getLastInsertedRowID();
 
 	// Then insert the killers...
@@ -699,7 +701,7 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 		uint64_t kill_id = db->getLastInsertedRowID();
 
 		const DeathEntry& de = *dli;
-		
+
 		std::string name;
 		if(de.isCreatureKill()){
 			Creature* c = de.getKillerCreature();
@@ -1063,12 +1065,12 @@ void IOPlayer::updateLoginInfo(Player* player)
 {
 	Database* db = Database::instance();
 	DBQuery query;
-	
+
 	query << "UPDATE `players` SET `lastlogin` = " << player->lastLoginSaved
 			<< ", `lastip` = " << player->lastip
 			<< ", `online` = 1"
 			<< " WHERE `id` = " << player->getGUID();
-			
+
 	db->executeQuery(query.str());
 }
 
@@ -1076,11 +1078,11 @@ void IOPlayer::updateLogoutInfo(Player* player)
 {
 	Database* db = Database::instance();
 	DBQuery query;
-	
+
 	query << "UPDATE `players` SET `lastlogout` = " << player->lastLogout
 			<< ", `online` = 0"
 			<< " WHERE `id` = " << player->getGUID();
-			
+
 	db->executeQuery(query.str());
 }
 

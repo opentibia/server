@@ -1,4 +1,4 @@
-CREATE TABLE `groups` (
+﻿CREATE TABLE `groups` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COMMENT 'group name',
 	`flags` BIGINT UNSIGNED NOT NULL DEFAULT 0,
@@ -55,13 +55,11 @@ CREATE TABLE `players` (
 	`conditions` BLOB NOT NULL COMMENT 'drunk, poisoned etc',
 	`skull_type` INT NOT NULL DEFAULT 0,
 	`skull_time` INT UNSIGNED NOT NULL DEFAULT 0,
-	`guildnick` VARCHAR(255) NOT NULL DEFAULT '',
 	`loss_experience` INT NOT NULL DEFAULT 100,
 	`loss_mana` INT NOT NULL DEFAULT 100,
 	`loss_skills` INT NOT NULL DEFAULT 100,
 	`loss_items` INT NOT NULL DEFAULT 10,
 	`loss_containers` INT NOT NULL DEFAULT 100,
-	`rank_id` INT DEFAULT NULL COMMENT 'by this field everything with guilds is done - player has a rank which belongs to certain guild',
 	`town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
 	`balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
 	`stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds',
@@ -77,10 +75,11 @@ CREATE TABLE `players` (
 CREATE TABLE `guilds` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COMMENT 'guild name - nothing else needed here',
-	`ownerid` INT UNSIGNED NOT NULL,
-	`creationdata` INT NOT NULL,
+	`owner_id` INT UNSIGNED NOT NULL,
+	`creationdate` INT NOT NULL,
 	PRIMARY KEY (`id`),
-	FOREIGN KEY (`ownerid`) REFERENCES `players` (`id`) ON DELETE CASCADE
+	UNIQUE (`name`),
+	FOREIGN KEY (`owner_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guild_ranks` (
@@ -92,6 +91,43 @@ CREATE TABLE `guild_ranks` (
 	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
+CREATE TABLE `guild_members` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`player_id` INT UNSIGNED NOT NULL,
+	`guild_id` INT UNSIGNED NOT NULL,
+	`rank_id` INT UNSIGNED NOT NULL COMMENT 'a rank which belongs to certain guild',
+	`guild_nick` VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id`),
+	UNIQUE (`player_id`),
+	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `war_declaration` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`guild_id` INT UNSIGNED NOT NULL COMMENT 'the guild wich declared the war',
+	`opponent_id` INT UNSIGNED NOT NULL COMMENT 'the enemy guild at war',
+	`frag_limit` INT UNSIGNED NOT NULL DEFAULT 10 COMMENT 'kills needed to win the war',
+	`war_duration` INT UNSIGNED NOT NULL COMMENT 'how much time the war will last',
+	`guild_fee` INT UNSIGNED NOT NULL DEFAULT 1000 COMMENT 'amount of money the guild has to pay if loses the war',
+	`opponent_fee` INT UNSIGNED NOT NULL DEFAULT 1000 COMMENT 'amount of money the enemy guild has to pay if loses the war',
+	`comment` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'the guild leader can leave a message for the other guild',
+	`declaration_date` INT UNSIGNED NOT NULL,
+	`active` TINYINT(1) NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`opponent_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `guild_wars` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`war_id` INT UNSIGNED NOT NULL,
+	`guild_frags` INT UNSIGNED NOT NULL DEFAULT 0,
+	`opponent_frags` INT UNSIGNED NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`war_id`) REFERENCES `war_declaration` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;	
+	
 CREATE TABLE `player_viplist` (
 	`player_id` INT UNSIGNED NOT NULL COMMENT 'id of player whose viplist entry it is',
 	`vip_id` INT UNSIGNED NOT NULL COMMENT 'id of target player of viplist entry',
@@ -325,6 +361,7 @@ END|
 DELIMITER ;
 
 # uncomment to add a single player
-#INSERT INTO `groups` VALUES (1, 'Player', 0, 3, 0, 10, 10);
-#INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0);
-#INSERT INTO `players` (`id`, `name`, `account_id`, `group_id`, `vocation`, `experience`, `level`, `maglevel`, `direction`, `posx`, `posy`, `posz`, `conditions`, `rank_id`, `town_id`) VALUES (2, 'Hurz', 1, 1, 1, 2252770, 53, 8, 2, 116, 106, 7, '', 0, 0);
+#INSERT INTO `groups` VALUES (1, 'Group 1', 0, 3, 10, 10);
+#INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0, 0);
+#INSERT INTO `players` VALUES (2, 'OTSCMS', 1, 1, 0, 1, 2252770, 53, 8, 11970, 11970, 11820, 11820, 1847, 100, 2, 10, 10, 10, 10, 128, 0, 116, 106, 7, 9980, 1221452439, 102017216, 1, '', 0, 0, '', 10, 10, 10, 10, 0, 1, 10000000);
+

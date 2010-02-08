@@ -77,8 +77,6 @@ Creature()
 	manaSpent  = 0;
 	soul       = 0;
 	soulMax    = 100;
-	guildId    = 0;
-	guildLevel = 0;
 
 	level      = 1;
 	levelPercent = 0;
@@ -176,6 +174,7 @@ Creature()
 	saleCallback = -1;
 
 	setParty(NULL);
+	setGuild(NULL);
 
 #ifdef __SKULLSYSTEM__
 	lastSkullTime = 0;
@@ -208,6 +207,8 @@ Player::~Player()
 	setWriteItem(NULL);
 	setEditHouse(NULL);
 	setNextWalkActionTask(NULL);
+
+	delete guild;
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	playerCount--;
@@ -276,8 +277,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 			s << " has no vocation.";
 	}
 
-	if(guildId)
-	{
+	if(getGuild()){
 		if(lookDistance == -1){
 			s << " You are ";
 		}
@@ -285,15 +285,18 @@ std::string Player::getDescription(int32_t lookDistance) const
 			s << " " << playerSexSubjectString(getSex()) << " is ";
 		}
 
-		if(guildRank.length())
-			s << guildRank;
-		else
+		if(getGuildRank().length()){
+			s << getGuildRank();
+		}
+		else{
 			s << "a member";
+		}
 
-		s << " of the " << guildName;
+		s << " of the " << getGuildName();
 
-		if(guildNick.length())
-			s << " (" << guildNick << ")";
+		if(getGuildNick().length()){
+			s << " (" << getGuildNick() << ")";
+		}
 
 		s << ".";
 	}
@@ -1015,6 +1018,26 @@ bool Player::canSeeCreature(const Creature* creature) const
 	}
 
 	return true;
+}
+
+bool Player::canWalkthrough(const Creature* creature) const
+{
+	if(!creature->getPlayer()){
+		return false;
+	}
+
+	if(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+		return true;
+	}
+
+	if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+		if(isEnemy(creature->getPlayer())){
+			return false;
+		}
+		return getTile()->ground->getID() != ITEM_GLOWING_SWITCH;
+	}
+
+	return false;
 }
 
 void Player::onReceiveMail(uint32_t depotId)
@@ -2616,6 +2639,35 @@ void Player::kickPlayer()
 	}
 }
 
+bool Player::isEnemy(const Player* player) const
+{
+	if(getGuild()->isGuildEnemy(player->getGuildId())){
+		return true;
+	}
+	return false;
+}
+
+GuildEmblem_t Player::getWarEmblem(const Player* player) const
+{
+	if(!player){
+		return EMBLEM_NONE;
+	}
+
+	if(player->getGuild()->isGuildAtWar()){
+		if(player->getGuildId() == getGuildId()){
+			return EMBLEM_GREEN;
+		}
+		else if(getGuild()->isGuildEnemy(player->getGuildId())){
+			return EMBLEM_RED;
+		}
+		else{
+			return EMBLEM_BLUE;
+		}
+	}
+
+	return EMBLEM_NONE;
+}
+
 void Player::notifyLogIn(Player* login_player)
 {
 	if(client){
@@ -3761,6 +3813,7 @@ void Player::onAttackedCreature(Creature* target)
 
 #ifdef __SKULLSYSTEM__
 				if( !isPartner(targetPlayer) &&
+					!isEnemy(targetPlayer) &&
 					!Combat::isInPvpZone(this, targetPlayer) &&
 					!targetPlayer->hasAttacked(this)){
 
@@ -4564,6 +4617,10 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 
 bool Player::checkPzBlockOnCombat(Player* targetPlayer)
 {
+	if(isEnemy(targetPlayer)){
+		return true;
+	}
+
 	#ifdef __SKULLSYSTEM__
 	if(targetPlayer->hasAttacked(this) && !g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK)){
 		return false;

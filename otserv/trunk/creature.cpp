@@ -166,6 +166,14 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+bool Creature::canWalkthrough(const Creature* creature) const
+{
+	if(creature->getPlayer()){
+		return creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen);
+	}
+	return false;
+}
+
 int64_t Creature::getTimeSinceLastMove() const
 {
 	if(lastStep){

@@ -64,6 +64,7 @@ extern Monsters g_monsters;
 extern MoveEvents* g_moveEvents;
 extern Npcs g_npcs;
 extern CreatureEvents* g_creatureEvents;
+extern Guilds g_guilds;
 
 Game::Game()
 {
@@ -919,6 +920,11 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 			return false;
 		}
 		else if(movingCreature->getZone() == ZONE_PROTECTION && !toTile->hasFlag(TILESTATE_PROTECTIONZONE)){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			return false;
+		}
+		else if(toTile->getCreatures() && !toTile->getCreatures()->empty()
+			&& !player->hasFlag(PlayerFlag_CanPushAllCreatures)){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			return false;
 		}

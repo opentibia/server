@@ -723,8 +723,8 @@ void ProtocolGame::GetTileDescription(const Tile* tile, NetworkMessage_ptr msg)
 		}
 
 		if(creatures){
-			CreatureVector::const_iterator cit;
-			for(cit = creatures->begin(); ((cit != creatures->end()) && (count < 10)); ++cit){
+			CreatureVector::const_reverse_iterator cit;
+			for(cit = creatures->rbegin(); ((cit != creatures->rend()) && (count < 10)); ++cit){
 				if(player->canSeeCreature(*cit)){
 					bool known;
 					uint32_t removedKnown;
@@ -2582,6 +2582,11 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 	msg->AddByte(SKULL_NONE);
 #endif
 	msg->AddByte(player->getPartyShield(creature->getPlayer()));
+	if(!known){
+		msg->AddByte(player->getWarEmblem(creature->getPlayer())); // guild war emblem
+	}
+
+	msg->AddByte(!player->canWalkthrough(creature));
 }
 
 void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)

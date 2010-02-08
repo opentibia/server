@@ -354,8 +354,10 @@ public:
 	MagicField(uint16_t _type) : Item(_type) {createTime = OTSYS_TIME();}
 	~MagicField() {}
 
-	virtual MagicField* getMagicField() {return this;};
-	virtual const MagicField* getMagicField() const {return this;};
+	virtual MagicField* getMagicField() {return this;}
+	virtual const MagicField* getMagicField() const {return this;}
+
+	virtual bool isBlocking(const Creature* creature) const;
 
 	bool isReplaceable() const {return Item::items[getID()].replaceable;}
 	CombatType_t getCombatType() const {

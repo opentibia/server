@@ -87,6 +87,7 @@ Monsters g_monsters;
 Npcs g_npcs;
 BanManager g_bans;
 Vocations g_vocations;
+Guilds g_guilds;
 IPList serverIPs;
 
 boost::mutex g_loaderLock;
@@ -620,6 +621,10 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		ErrorMessage(errormsg.str().c_str());
 		exit(-1);
 	}
+	std::cout << "[done]" << std::endl;
+
+	std::cout << ":: Setting up guilds in war " << std::flush;
+	g_guilds.setGuildsAtWar();
 	std::cout << "[done]" << std::endl;
 
 	#ifdef __SKULLSYSTEM__

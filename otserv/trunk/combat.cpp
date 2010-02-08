@@ -137,7 +137,7 @@ bool Combat::getMinMaxValues(Creature* creature, Creature* target, int32_t& min,
 			}
 		}
 	}
-	
+
 	if(formulaType == FORMULA_VALUE){
 		min = (int32_t)mina;
 		max = (int32_t)maxa;
@@ -378,6 +378,7 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 	if(	attackerPlayer == NULL ||
 		targetPlayer == NULL ||
 		attackerPlayer->isPartner(targetPlayer) ||
+		attackerPlayer->isEnemy(targetPlayer) ||
 		Combat::isInPvpZone(attackerPlayer, targetPlayer) ||
 		targetPlayer->hasAttacked(attackerPlayer) ||
 		targetPlayer->getSkull() != SKULL_NONE ||
@@ -405,11 +406,17 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					attackerPlayer->isLoginAttackLocked(targetPlayer->getID())){
 					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
+
 #ifdef __SKULLSYSTEM__
-				if(attackerPlayer->getSkull() == SKULL_BLACK){
+				if(	(attackerPlayer->getSkull() == SKULL_BLACK) &&
+					(!attackerPlayer->isEnemy(targetPlayer))){
 					if(targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(attackerPlayer)){
 						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
+				}
+#else
+				if(!attackerPlayer->getGuild()->isGuildEnemy(targetPlayer->getGuildId())){
+					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
 #endif
 			}
@@ -435,15 +442,19 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 			}
 
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-				if(target->getPlayer()){
-					if(!isInPvpZone(attacker, target)){
-						return RET_YOUMAYNOTATTACKTHISPERSON;
+				if(const Player* targetPlayer = target->getPlayer()){
+					if(!targetPlayer->isEnemy(attacker->getPlayer())){
+						if(!isInPvpZone(attacker, target)){
+							return RET_YOUMAYNOTATTACKTHISCREATURE;
+						}
 					}
 				}
 
 				if(target->isPlayerSummon()){
-					if(!isInPvpZone(attacker, target)){
-						return RET_YOUMAYNOTATTACKTHISCREATURE;
+					if(!target->getPlayerMaster()->isEnemy(attacker->getPlayer())){
+						if(!isInPvpZone(attacker, target)){
+							return RET_YOUMAYNOTATTACKTHISCREATURE;
+						}
 					}
 				}
 			}
@@ -714,18 +725,24 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 		}
 		if(p_caster){
 			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
-				if(itemId == ITEM_FIREFIELD_PVP){
-					itemId = ITEM_FIREFIELD_NOPVP;
+				if(itemId == ITEM_FIREFIELD){
+					itemId = ITEM_FIREFIELD_SAFE;
 				}
-				else if(itemId == ITEM_POISONFIELD_PVP){
-					itemId = ITEM_POISONFIELD_NOPVP;
+				else if(itemId == ITEM_POISONFIELD){
+					itemId = ITEM_POISONFIELD_SAFE;
 				}
-				else if(itemId == ITEM_ENERGYFIELD_PVP){
-					itemId = ITEM_ENERGYFIELD_NOPVP;
+				else if(itemId == ITEM_ENERGYFIELD){
+					itemId = ITEM_ENERGYFIELD_SAFE;
+				}
+				else if(itemId == ITEM_MAGICWALL){
+					itemId = ITEM_MAGICWALL_SAFE;
+				}
+				else if(itemId == ITEM_WILDGROWTH){
+					itemId = ITEM_WILDGROWTH_SAFE;
 				}
 			} else if(params.isAggressive){
 				const ItemType& it = Item::items[itemId];
-				if(!it.blockSolid){
+				if(!it.blockPathFind){
 					p_caster->addInFightTicks(g_game.getInFightTicks(), true);
 				}
 				else{
@@ -1520,10 +1537,19 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 
 //**********************************************************
 
+bool MagicField::isBlocking(const Creature* creature) const
+{
+	if(id != ITEM_MAGICWALL_SAFE && id != ITEM_WILDGROWTH_SAFE){
+		return Item::isBlocking(creature);
+	}
+
+	return (!creature || !creature->getPlayer());
+}
+
 void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 {
 	//remove magic walls/wild growth
-	if(isBlocking()){
+	if(id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE || isBlocking(creature)){
 		g_game.internalRemoveItem(this, 1);
 	}
 	else{
