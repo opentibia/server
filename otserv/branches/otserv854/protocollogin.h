@@ -57,7 +57,6 @@ public:
 
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
 	
-	void parsePacket(NetworkMessage&);
 protected:
 	void disconnectClient(uint8_t error, const char* message);
 	

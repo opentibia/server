@@ -90,8 +90,6 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(key);
 
-	printf("Key %d %d %d %d\n", key[0],key[1],key[2],key[3]);
-
 	std::string accname = msg.GetString();
 	std::string password = msg.GetString();
 
@@ -102,10 +100,10 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		return false;
 	}
 
-	/*if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
+	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
 		return false;
-	}*/
+	}
 
 	if(g_game.getGameState() == GAME_STATE_STARTUP){
 		disconnectClient(0x0A, "Gameworld is starting up. Please wait.");
@@ -145,7 +143,6 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
 		TRACK_MESSAGE(output);
-		#if 0
 		//Add MOTD
 		std::stringstream motd;
 		output->AddByte(0x14);
@@ -166,21 +163,6 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		output->AddU16(Account::getPremiumDaysLeft(account.premEnd));//output->AddU16(0);
 
 		OutputMessagePool::getInstance()->send(output);
-		#else
-		output->AddByte(0x1E); // patching
-
-		output->AddByte(0x01);
-		output->AddU32(0x00000036);
-
-		output->AddByte(0x20); 
-		
-		const char patch[] = {0xC2,0x7A, 0x61}; // 7A 60
-		output->AddU16(sizeof(patch));
-		output->AddBytes(patch,sizeof(patch));
-
-		OutputMessagePool::getInstance()->send(output);
-
-		#endif
 	}
 	getConnection()->closeConnection();
 
@@ -191,20 +173,3 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 {
 	parseFirstPacket(msg);
 }
-
-void ProtocolLogin::parsePacket(NetworkMessage&msg)
-{
-	uint32_t l = msg.getMessageLength();	
-	char* c = msg.getBuffer();
-uint32_t key[4];
-	getXTEAKey(key);	
-	printf("%s (%d %d %d %d) => ", __PRETTY_FUNCTION__, key[0], key[1], key[2], key[3]);
-	for(int i=0; i<l; i++)
-	{
-		printf("%02x ", c[i]);
-	}
-	printf("\n");
-	
-	//Protocol::onRecvMessage(msg);	
-}
-

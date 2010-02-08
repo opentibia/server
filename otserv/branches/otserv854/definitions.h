@@ -268,6 +268,4 @@ enum passwordType_t{
 	#define __SKULLSYSTEM__
 #endif
 
-#define __DEBUG_NET_DETAIL__ 1
-
 #endif
