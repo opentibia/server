@@ -1945,15 +1945,13 @@ void Player::onThink(uint32_t interval)
 		}
 	}
 
-	if(canLogout()){
-		if(OTSYS_TIME() - last_pong >= 60000){
+	if(OTSYS_TIME() - last_pong >= 60000){
+		if(canLogout()){
 			if(client){
 				client->logout(true);
 			}
 			else{
-				//Occurs when the player closes the game without logging out (x-logging).
-				if(g_creatureEvents->playerLogOut(this))
-					g_game.removeCreature(this, true);
+				g_game.removeCreature(this, true);
 			}
 		}
 	}
@@ -2608,6 +2606,8 @@ void Player::addList()
 
 void Player::kickPlayer()
 {
+	g_creatureEvents->playerLogOut(this);
+
 	if(client){
 		client->logout(true);
 	}
@@ -4407,6 +4407,10 @@ bool Player::canLogout()
 	}
 
 	if(getTile()->hasFlag(TILESTATE_NOLOGOUT)){
+		return false;
+	}
+
+	if(!g_creatureEvents->playerLogOut(this)){
 		return false;
 	}
 

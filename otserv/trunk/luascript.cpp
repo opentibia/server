@@ -2148,7 +2148,6 @@ int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
 {
 	//getPlayerSkullType(cid, <optional> viewer)
 	#ifdef __SKULLSYSTEM__
-
 	uint32_t viewer = 0;
 	if(lua_gettop(L) > 1){
 		viewer = popNumber(L);
@@ -2182,12 +2181,12 @@ int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
 	#endif
 	return 1;
 }
+
 int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 {
  	//setPlayerSkullType(cid, skull_type)
 	#ifdef __SKULLSYSTEM__
-	
-	Skulls_t skull = (Skulls_t)popNumber(L);
+	uint32_t skull = popNumber(L);
 	uint32_t cid = popNumber(L);
 
  	ScriptEnviroment* env = getScriptEnv();
@@ -2195,21 +2194,25 @@ int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 	Player* player = env->getPlayerByUID(cid);
 
 	if(player){
-			player->setSkull(skull); 
-			g_game.updateCreatureSkull(player); 
+		if(skull < SKULL_LAST){
+			player->setSkull((Skulls_t)skull);
+			g_game.updateCreatureSkull(player);
+			lua_pushnumber(L, LUA_NO_ERROR);
+		}
+		else{
+			reportErrorFunc("No valid skull type.");
 			lua_pushnumber(L, LUA_ERROR);
+		}
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
-	 	
 	#else
 	lua_pushnumber(L, 0);
 	#endif;
 	return 1;
 }
-
 
 int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
 {
@@ -6561,12 +6564,12 @@ int LuaScriptInterface::luaGetPlayerDepotItems(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerSetSex(lua_State *L)
 {
- 	//doPlayerSetSex(cid, sex)
+	//doPlayerSetSex(cid, sex)
 	uint32_t sex = popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	Player* player = env->getPlayerByUID(cid);
 
 	if(player){

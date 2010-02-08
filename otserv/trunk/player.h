@@ -234,7 +234,7 @@ public:
 		}
 	}
 
-    virtual bool hasHiddenHealth() const {return hasFlag(PlayerFlag_HideHealth);}
+	virtual bool hasHiddenHealth() const {return hasFlag(PlayerFlag_HideHealth);}
 	virtual int32_t getMaxHealth() const {return getPlayerInfo(PLAYERINFO_MAXHEALTH);}
 	virtual int32_t getMaxMana() const {return getPlayerInfo(PLAYERINFO_MAXMANA);}
 

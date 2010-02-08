@@ -289,10 +289,6 @@ bool ProtocolGame::logout(bool forced)
 				return false;
 			}
 		}
-		else{
-			//execute the script even when we log out
-			g_creatureEvents->playerLogOut(player);
-		}
 	}
 
 	if(Connection_ptr connection = getConnection()){
@@ -2559,11 +2555,11 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 	}
 
 	int32_t healthToSend;
-    if (!creature->hasHiddenHealth())
-        healthToSend = (int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1));
-    else
-        healthToSend = 0;
-    msg->AddByte(healthToSend);
+	if (!creature->hasHiddenHealth())
+		healthToSend = (int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1));
+	else
+		healthToSend = 0;
+	msg->AddByte(healthToSend);
 
 	msg->AddByte((uint8_t)creature->getDirection());
 	if(creature->isInvisible()){
