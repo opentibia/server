@@ -270,6 +270,7 @@ void Connection::acceptConnection()
 
 void Connection::parseHeader(const boost::system::error_code& error)
 {
+	printf("PARSEHEADER\n");
 	m_connectionLock.lock();
 	m_readTimer.cancel();
 
@@ -310,6 +311,7 @@ void Connection::parseHeader(const boost::system::error_code& error)
 
 void Connection::parsePacket(const boost::system::error_code& error)
 {
+	printf("PARSEPACKET\n");
 	m_connectionLock.lock();
 	m_readTimer.cancel();
 
@@ -317,6 +319,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 		handleReadError(error);
 	}
 
+	printf("pass 1\n");
 	if(m_connectionState != CONNECTION_STATE_OPEN || m_readError){
 		closeConnection();
 		m_connectionLock.unlock();
@@ -325,6 +328,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 
 	--m_pendingRead;
 
+	printf("pass 2\n");
 	//Check packet checksum
 	uint32_t recvChecksum = m_msg.PeekU32();
 	uint32_t checksum = 0;
@@ -333,11 +337,14 @@ void Connection::parsePacket(const boost::system::error_code& error)
 		checksum = adlerChecksum((uint8_t*)(m_msg.getBuffer() + m_msg.getReadPos() + 4), len);
 	}
 
+	printf("pass 3\n");
 	if(recvChecksum == checksum)
 		// remove the checksum
 		m_msg.GetU32();
 
+	printf("pass 4\n");
 	if(!m_receivedFirst){
+		printf("pass 5\n");
 		m_receivedFirst = true;
 		// First message received
 		if(!m_protocol){ // Game protocol has already been created at this point
@@ -356,10 +363,12 @@ void Connection::parsePacket(const boost::system::error_code& error)
 		m_protocol->onRecvFirstMessage(m_msg);
 	}
 	else{
+		printf("pass 6\n");
 		// Send the packet to the current protocol
 		m_protocol->onRecvMessage(m_msg);
 	}
 
+	printf("pass 7\n");
 	try{
 		++m_pendingRead;
 		m_readTimer.expires_from_now(boost::posix_time::seconds(Connection::read_timeout));
@@ -379,6 +388,7 @@ void Connection::parsePacket(const boost::system::error_code& error)
 		}
 	}
 
+	printf("pass 8\n");
 	m_connectionLock.unlock();
 }
 
