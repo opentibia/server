@@ -60,8 +60,7 @@ CREATE TABLE "players" (
 	"loss_mana" INT NOT NULL DEFAULT 100,
 	"loss_skills" INT NOT NULL DEFAULT 100,
 	"loss_items" INT NOT NULL DEFAULT 10,
-	"loss_containers" INT NOT NULL DEFAULT 100,
-	"rank_id" INT NULL,
+	"loss_containers" INT NOT NULL DEFAULT 100
 	"town_id" INT NOT NULL,
 	"balance" INT NOT NULL DEFAULT 0,
 	"stamina" INT NOT NULL DEFAULT 151200000,
@@ -70,17 +69,17 @@ CREATE TABLE "players" (
 	UNIQUE ("name"),
 	KEY ("online"),
 	FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("group_id") REFERENCES "groups" ("id"),
-	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id")
+	FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
 );
 
 CREATE TABLE "guilds" (
 	"id" SERIAL,
 	"name" VARCHAR(255) NOT NULL,
-	"ownerid" INT NOT NULL,
-	"creationdata" INT NOT NULL,
+	"owner_id" INT NOT NULL,
+	"creationdate" INT NOT NULL,
 	PRIMARY KEY ("id"),
-	FOREIGN KEY ("ownerid") REFERENCES "players" ("id") ON DELETE CASCADE
+	UNIQUE ("name"),
+	FOREIGN KEY ("owner_id") REFERENCES "players" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "guild_ranks" (
@@ -91,6 +90,43 @@ CREATE TABLE "guild_ranks" (
 	PRIMARY KEY ("id"),
 	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
 );
+
+CREATE TABLE "guild_members" (
+	"id" SERIAL,
+	"player_id" INT NOT NULL,
+	"guild_id" INT NOT NULL,
+	"rank_id" INT NOT NULL,
+	"guild_nick" VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY ("id"),
+	UNIQUE ("player_id"),
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
+);
+
+CREATE TABLE "war_declaration" (
+	"id" SERIAL,
+	"guild_id" INT NOT NULL,
+	"opponent_id" INT NOT NULL,
+	"frag_limit" BIGINT NOT NULL DEFAULT 10,
+	"war_duration" BIGINT NOT NULL,
+	"guild_fee" BIGINT NOT NULL DEFAULT 1000,
+	"opponent_fee" BIGINT NOT NULL DEFAULT 1000,
+	"comment" VARCHAR(255) NOT NULL DEFAULT '',
+	"declaration_date" INT NOT NULL,
+	"active" SMALLINT NOT NULL DEFAULT 0,
+	PRIMARY KEY ("id"),
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("opponent_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
+);
+
+CREATE TABLE "guild_wars" (
+	"id" SERIAL,
+	"war_id" INT NOT NULL,
+	"guild_frags" INT NOT NULL DEFAULT 0,
+	"opponent_frags" INT NOT NULL DEFAULT 0,
+	PRIMARY KEY ("id"),
+	FOREIGN KEY ("war_id") REFERENCES "war_declaration" ("id") ON DELETE CASCADE
+);	
 
 CREATE TABLE "player_viplist" (
 	"player_id" INT NOT NULL,
@@ -155,7 +191,7 @@ CREATE TABLE "house_auctions" (
 	"limit" INT NOT NULL DEFAULT 0,
 	"endtime" BIGINT NOT NULL DEFAULT 0,
 	FOREIGN KEY ("house_id") REFERENCES "houses" ("id") ON DELETE CASCADE,
-	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "house_lists" (

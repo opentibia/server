@@ -68,8 +68,7 @@ CREATE TABLE `players` (
 	UNIQUE (`name`),
 	KEY (`online`),
 	FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
-	FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
-	FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`)
+	FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guilds` (

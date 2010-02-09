@@ -58,24 +58,23 @@ CREATE TABLE "players" (
 	"loss_mana" INTEGER NOT NULL DEFAULT 100,
 	"loss_skills" INTEGER NOT NULL DEFAULT 100,
 	"loss_items" INTEGER NOT NULL DEFAULT 10,
-	"loss_containers" INTEGER NOT NULL DEFAULT 100,
-	"rank_id" INTEGER NULL,
+	"loss_containers" INTEGER NOT NULL DEFAULT 100
 	"town_id" INTEGER NOT NULL,
 	"balance" INTEGER NOT NULL DEFAULT 0,
 	"stamina" INTEGER NOT NULL DEFAULT 151200000,
 	"online" BOOLEAN NOT NULL DEFAULT 0,
 	UNIQUE ("name"),
 	FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
-	FOREIGN KEY ("group_id") REFERENCES "groups" ("id"),
-	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id")
+	FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
 );
 
 CREATE TABLE "guilds" (
 	"id" INTEGER PRIMARY KEY,
 	"name" VARCHAR(255) NOT NULL,
-	"ownerid" INTEGER NOT NULL,
-	"creationdata" INTEGER NOT NULL,
-	FOREIGN KEY ("ownerid") REFERENCES "players" ("id")
+	"owner_id" INTEGER NOT NULL,
+	"creationdate" INTEGER NOT NULL,
+	UNIQUE ("name"),
+	FOREIGN KEY ("owner_id") REFERENCES "players" ("id")
 );
 
 CREATE TABLE "guild_ranks" (
@@ -84,6 +83,47 @@ CREATE TABLE "guild_ranks" (
 	"name" VARCHAR(255) NOT NULL,
 	"level" INTEGER NOT NULL,
 	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
+);
+
+CREATE TABLE "guild_members" (
+	"id" INTEGER PRIMARY KEY,
+	"player_id" INTEGER NOT NULL,
+	"guild_id" INTEGER NOT NULL,
+	"rank_id" INTEGER NOT NULL,
+	"guild_nick" VARCHAR(255) NOT NULL DEFAULT '',
+	UNIQUE ("player_id"),
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
+);
+
+CREATE TABLE "war_declaration" (
+	"id" INTEGER PRIMARY KEY,
+	"guild_id" INTEGER NOT NULL,
+	"opponent_id" INTEGER NOT NULL,
+	"frag_limit" INTEGER NOT NULL DEFAULT 10,
+	"war_duration" INTEGER NOT NULL,
+	"guild_fee" INTEGER NOT NULL DEFAULT 1000,
+	"opponent_fee" INTEGER NOT NULL DEFAULT 1000,
+	"comment" VARCHAR(255) NOT NULL DEFAULT '',
+	"declaration_date" INTEGER NOT NULL,
+	"active" BOOLEAN NOT NULL DEFAULT 0,
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("opponent_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
+);
+
+CREATE TABLE "guild_wars" (
+	"id" INTEGER PRIMARY KEY,
+	"war_id" INTEGER NOT NULL,
+	"guild_frags" INTEGER NOT NULL DEFAULT 0,
+	"opponent_frags" INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("war_id") REFERENCES "war_declaration" ("id") ON DELETE CASCADE
+);	
+
+CREATE TABLE "player_viplist" (
+	"player_id" INT NOT NULL,
+	"vip_id" INT NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("vip_id") REFERENCES "players" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "houses" (
