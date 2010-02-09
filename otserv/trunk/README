@@ -1,5 +1,5 @@
 ============================================
-========== OpenTibia Server 0.6.2 ==========
+========== OpenTibia Server 0.6.3 ==========
 ============================================
 ===== www.otserv.org	www.otfans.net =====
 ============================================
@@ -19,19 +19,16 @@ How does it work?
 	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
 	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier
 	.
-	Then login with the
-	following:
+	Then login with the following:
 		Account Number: 111111
 		Password: tibia
-	To do so u have to execute some sql queries from schema.mysql.(they are commented at the end)
+	To do so you have to execute some sql queries from schema.mysql, schema.pgsql or even schema.sqlite.
 	And check it out. Once you are done, have a look around in the folders
 	and take a look at the config.lua :)
 
-	NEVER ever enter your real acc# and/or password when
-	not connecting to the CIP servers.
+	NEVER ever enter your real acc# and/or password when not connecting to the CIP servers.
 	Then you are logged in.
 
-	Whats New in 0.6.3?
 Features?
     many ...(almost all are here):
 	http://otfans.net/wiki/index.php/Talk:OTServ_Roadmap
@@ -53,51 +50,67 @@ How do I use this new stuff?
 	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
 	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
 	(Xml maps was in 7.4-7.1 ?)
-    Binary house storage it is also new feature in otserv before it was relational storage (u can change storage in config.lua)
+    	Binary house storage it is also new feature in otserv before it was relational storage (u can change storage in config.lua)
 	which takes long to save tiles in houses so otserv team make it in db but in binary storage.
 
 Credits?
-	Tliff				Developer, some kind of project leader, Forum administrator
-	SimOne				Developer
-	Snack				Developer
-	Primer				Developer
-	Spin				Developer
-	Remere				Developer
-	Anstice				Developer
-	Pedro B.			Developer, Scripting
-	Wrzasq				Developer
-	GriZzm0				Scripting
+
+	-Project Admins
+
+	Tliff			 	(Inactive)
+	Sim0ne			
+	Spin				(Inactive)
+	Remere				
+	SimOne				
+	Shi'Voc				(Inactive)
+
+	-Forum Administrators
+
+	Tliff				(Inactive)
+	Yorick				(Inactive)
+	Pekay				(Inactive)
+	Nuker				(Inactive)
+	verkon				(Inactive)
+	GriZzm0				
+	Evo		
+	Stormer	
+
+	-Active Developers
+
+	Khaos				YATC
+	nfries88			YATC/OpenTibia
+	Nostradamus			POT/OpenTibia
+	rafaelhamdan			OpenTibia
+	hackerpotato			OpenTibia
+	Kilouco				YATC
+	Assassina			OpenTibia
+
+	-Inactive Developers
+
+	Acrimon				Initial project developer
+	Snack				OpenTibia
+	Reebow				Special protocol support
+	Aire				OpenTibia
+	Haktivex			Initial project developer
+	Fandoras			Initial project developer
+	TiMMit				OpenTibia
+	Decar				Fansite
+	Matkus				Developer
+	Privateer			Documentation on the protocol
+	Torvik				Item list
+	j4K3xBl4sT3r			OpenTibia/OTClient
+	Smygflik			OpenTibia
+	Heliton				OpenTibia (scripting)
+	the fike			Advisory, optimization
+	Vitor				Advisory, optimization
+	Primer				OpenTibia/OTClient
+	GriZzm0				OpenTibia (scripting)
 	Jiddo				Scripting
-	the fike			Developer (advisory/optimization)
-	Vitor				Developer (advisory/optimization)
-	Arkold Thos			Linux porter
-	bruno				ODBC driver
-	rafaelhamdan			Developer
-	hackerpotato			Developer
-
-	Yorick				Fansite , Forum administrator
-	Pekay				README Documentation, Forum administrator
-	Nuker				Forum administrator
-	verkon				Forum administrator
-	GriZzm0				Forum administrator
-	Evo					Forum administrator
-	Stormer				Forum administrator
-
-	Shi'Voc				Initial project developer (Inactive)
-	Acrimon				Initial project developer (Inactive)
-	Reebow				Developer, special protocol support (Inactive)
-	Aire				Developer (Inactive)
-	Haktivex			Developer (Inactive)
-	Fandoras			Developer (Inactive)
-	TiMMit				Developer (Inactive)
-	Decar				Fansite (Inactive)
-	Matkus				Developer (Inactive)
-	Privateer			Documentation on the protocol (Inactive)
-	Torvik				Item list (Inactive)
-	j4K3xBl4sT3r			Developer (Inactive)
-	Smygflik			Developer (Inactive)
-	Nostradamus			Scripting (Inactive)
-	Heliton				Scripting (Inactive)
+	Arkold Thos			OpenTibia (Linux porter)
+	bruno				OpenTibia (ODBC driver)
+	Anstice				OpenTibia
+	Pedro B.			OpenTibia
+	Wrzasq				POT/OpenTibia (database structure)
 
 	And special thanks to all otfans.net moderators.
 
