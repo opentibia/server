@@ -154,6 +154,9 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	if(root_header.minorVersionItems > (unsigned long)Items::dwMinorVersion){
 		std::cout << "Warning: [OTBM loader] This map needs an updated items.otb." <<std::endl;
 	}
+	if(root_header.minorVersionItems == CLIENT_VERSION_854_BAD){
+		std::cout << "Warning: [OTBM loader] This map needs uses an incorrect version of items.otb." <<std::endl;
+	}
 
 	std::cout << "Map size: " << root_header.width << "x" << root_header.height << std::endl;
 	map->mapWidth = root_header.width;
@@ -161,7 +164,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 
 	NODE nodeMap = f.getChildNode(root, type);
 
-	if(type != OTBM_MAP_DATA){
+	if(type != OTBM_MAP_DATA){ 
 		setLastErrorString("Could not read data node.");
 		return false;
 	}

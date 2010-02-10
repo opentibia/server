@@ -70,7 +70,12 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->accessLevel = result->getDataInt("access");
 	player->violationLevel = result->getDataInt("violationaccess");
 	player->maxDepotLimit = result->getDataInt("maxdepotitems");
-	player->maxVipLimit = result->getDataInt("maxviplist");
+	int vipLimit = result->getDataInt("maxviplist");
+	if(vipLimit > 100){
+		vipLimit = 100;
+		std::cout << "Warning: When loading player, maximum size of VIP list is 100." << std::endl;
+	}
+	player->maxVipLimit = vipLimit;
 	player->setFlags(result->getDataLong("groupflags"));
 
 	if(preload){
