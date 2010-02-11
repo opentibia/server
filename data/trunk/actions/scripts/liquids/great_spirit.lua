@@ -17,7 +17,7 @@ setCombatParam(combatMana, COMBAT_PARAM_AGGRESSIVE, FALSE)
 setCombatFormula(combatMana, COMBAT_FORMULA_DAMAGE, MANA_REGEN[1], 0, MANA_REGEN[2], 0)
 
 local exhaust = createConditionObject(CONDITION_EXHAUSTED)
-setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))
+setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('minactionexinterval'))
 
 function onUse(cid, item, frompos, item2, topos)
 	if(isPlayer(item2.uid) == FALSE)then

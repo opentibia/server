@@ -3,7 +3,7 @@ setConditionParam(condition, CONDITION_PARAM_TICKS, 60 * 60 * 1000)
 setConditionParam(condition, CONDITION_PARAM_STAT_MAGICPOINTS, 5)
 
 local exhaust = createConditionObject(CONDITION_EXHAUSTED)
-setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('exhausted'))
+setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('minactionexinterval'))
 
 function onUse(cid, item, frompos, item2, topos)
 	if SPECIAL_FOODS[item.itemid] == nil then
