@@ -2210,7 +2210,7 @@ int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 	}
 	#else
 	lua_pushnumber(L, 0);
-	#endif;
+	#endif
 	return 1;
 }
 
