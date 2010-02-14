@@ -704,11 +704,14 @@ void Monster::doAttacking(uint32_t interval)
 	resetTicks = interval != 0;
 	attackTicks += interval;
 
-	const Position& myPos = getPosition();
-	const Position& targetPos = attackedCreature->getPosition();
-
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
 		bool inRange = false;
+		/* actualizes positions and check if there is still an attackedCreature 
+		   as it all may be changed at the previous spell - don't move it to outside the loop!!!*/
+		if (!attackedCreature) 
+			break;
+		const Position& myPos = getPosition(); 
+		const Position& targetPos = attackedCreature->getPosition();
 		if(canUseSpell(myPos, targetPos, *it, interval, inRange)){
 			if(it->chance >= (uint32_t)random_range(1, 100)){
 				if(updateLook){
@@ -720,12 +723,10 @@ void Monster::doAttacking(uint32_t interval)
 				maxCombatValue = it->maxCombatValue;
 				/*we need to check attackedCreature again, as a previous calling for castSpell at this
 				loop could have set attackedCreature to NULL*/
-				if (attackedCreature)
-					it->spell->castSpell(this, attackedCreature);
+				it->spell->castSpell(this, attackedCreature);
 				if(it->isMelee){
 					extraMeleeAttack = false;
 				}
-
 #ifdef __DEBUG__
 				static uint64_t prevTicks = OTSYS_TIME();
 				std::cout << "doAttacking ticks: " << OTSYS_TIME() - prevTicks << std::endl;
