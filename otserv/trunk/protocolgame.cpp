@@ -2555,7 +2555,7 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 	}
 
 	int32_t healthToSend;
-	if ((!creature->hasHiddenHealth()) || (creature == player))
+	if(!creature->hasHiddenHealth() || (creature == player))
 		healthToSend = (int32_t)std::ceil(((float)creature->getHealth()) * 100 / std::max(creature->getMaxHealth(), (int32_t)1));
 	else
 		healthToSend = 0;

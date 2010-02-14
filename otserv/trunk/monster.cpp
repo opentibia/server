@@ -144,7 +144,7 @@ void Monster::onAttackedCreature(Creature* target)
 void Monster::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	Creature::onAttackedCreatureDrainHealth(target, points);
-	
+
 	if(isSummon()){
 		getMaster()->onSummonAttackedCreatureDrainHealth(this, target, points);
 	}
@@ -706,12 +706,15 @@ void Monster::doAttacking(uint32_t interval)
 
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
 		bool inRange = false;
-		/* update positions and check if there is still an attackedCreature 
-		   as it all may be changed at the previous spell - don't move it to outside the loop!!!*/
-		if (!attackedCreature) 
+
+		/* actualizes positions and check if there is still an attackedCreature
+		   as it all may be changed at the previous spell (if the spell teleports attacked creature) */
+		if(!attackedCreature){
 			break;
-		const Position& myPos = getPosition(); 
+		}
+		const Position& myPos = getPosition();
 		const Position& targetPos = attackedCreature->getPosition();
+
 		if(canUseSpell(myPos, targetPos, *it, interval, inRange)){
 			if(it->chance >= (uint32_t)random_range(1, 100)){
 				if(updateLook){
@@ -1446,7 +1449,7 @@ bool Monster::convinceCreature(Creature* creature)
 			return false;
 		}
 	}
-	
+
 	if(isPlayerSummon()){
 		return false;
 	}
