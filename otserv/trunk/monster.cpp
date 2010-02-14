@@ -706,7 +706,7 @@ void Monster::doAttacking(uint32_t interval)
 
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
 		bool inRange = false;
-		/* actualizes positions and check if there is still an attackedCreature 
+		/* update positions and check if there is still an attackedCreature 
 		   as it all may be changed at the previous spell - don't move it to outside the loop!!!*/
 		if (!attackedCreature) 
 			break;
