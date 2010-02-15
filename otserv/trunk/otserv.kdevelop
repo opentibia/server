@@ -15,20 +15,20 @@
     <projectname>otserv</projectname>
     <projectdirectory>.</projectdirectory>
     <absoluteprojectpath>false</absoluteprojectpath>
-    <description></description>
-    <defaultencoding></defaultencoding>
+    <description/>
+    <defaultencoding/>
   </general>
   <kdevautoproject>
     <general>
       <activetarget>src/otserv</activetarget>
-      <useconfiguration>debug</useconfiguration>
+      <useconfiguration>default</useconfiguration>
     </general>
     <run>
-      <mainprogram></mainprogram>
+      <mainprogram/>
       <terminal>true</terminal>
-      <programargs></programargs>
-      <globaldebugarguments></globaldebugarguments>
-      <globalcwd></globalcwd>
+      <programargs/>
+      <globaldebugarguments/>
+      <globalcwd/>
       <useglobalprogram>false</useglobalprogram>
       <autocompile>false</autocompile>
       <autoinstall>false</autoinstall>
@@ -51,14 +51,14 @@
         <f77compiler>kdevg77options</f77compiler>
         <cxxflags>-O1 -g3</cxxflags>
         <envvars/>
-        <topsourcedir></topsourcedir>
-        <cppflags></cppflags>
-        <ldflags></ldflags>
-        <ccompilerbinary></ccompilerbinary>
-        <cxxcompilerbinary></cxxcompilerbinary>
-        <f77compilerbinary></f77compilerbinary>
-        <cflags></cflags>
-        <f77flags></f77flags>
+        <topsourcedir/>
+        <cppflags/>
+        <ldflags/>
+        <ccompilerbinary/>
+        <cxxcompilerbinary/>
+        <f77compilerbinary/>
+        <cflags/>
+        <f77flags/>
       </debug>
     </configurations>
     <make>
@@ -144,7 +144,7 @@
     <projectdoc>
       <docsystem>Doxygen Documentation Collection</docsystem>
       <docurl>otserv.tag</docurl>
-      <usermanualurl></usermanualurl>
+      <usermanualurl/>
     </projectdoc>
   </kdevdocumentation>
   <substmap>
@@ -168,7 +168,7 @@
       <root></root>
       <designerintegration>EmbeddedKDevDesigner</designerintegration>
       <qmake>/usr/bin/qmake</qmake>
-      <designer>/usr/bin/designer</designer>
+      <designer></designer>
       <designerpluginpaths/>
     </qt>
     <references/>
@@ -196,7 +196,7 @@
       <includePaths>.;</includePaths>
     </codecompletion>
     <creategettersetter>
-      <prefixGet></prefixGet>
+      <prefixGet/>
       <prefixSet>set</prefixSet>
       <prefixVariable>m_,_</prefixVariable>
       <parameterName>theValue</parameterName>
@@ -212,17 +212,17 @@
   <dist>
     <custom>false</custom>
     <bzip>false</bzip>
-    <archname></archname>
+    <archname/>
     <appname>OTServ</appname>
     <version>0.6.2_SVN</version>
-    <release></release>
-    <vendor></vendor>
-    <licence></licence>
-    <summary></summary>
-    <group></group>
-    <packager></packager>
-    <description></description>
-    <changelog></changelog>
+    <release/>
+    <vendor/>
+    <licence/>
+    <summary/>
+    <group/>
+    <packager/>
+    <description/>
+    <changelog/>
     <devpackage>false</devpackage>
     <docspackage>false</docspackage>
     <appicon>false</appicon>
@@ -231,7 +231,7 @@
     <useRPM>false</useRPM>
     <ftpkde>false</ftpkde>
     <appskde>false</appskde>
-    <url></url>
+    <url/>
   </dist>
   <cppsupportpart>
     <filetemplates>
@@ -241,11 +241,11 @@
   </cppsupportpart>
   <kdevdebugger>
     <general>
-      <gdbpath></gdbpath>
-      <dbgshell></dbgshell>
-      <configGdbScript></configGdbScript>
-      <runShellScript></runShellScript>
-      <runGdbScript></runGdbScript>
+      <gdbpath/>
+      <dbgshell/>
+      <configGdbScript/>
+      <runShellScript/>
+      <runGdbScript/>
       <breakonloadinglibs>true</breakonloadinglibs>
       <separatetty>false</separatetty>
       <floatingtoolbar>false</floatingtoolbar>
@@ -258,7 +258,7 @@
     </display>
   </kdevdebugger>
   <ctagspart>
-    <customArguments></customArguments>
+    <customArguments/>
     <customTagfilePath>/media/data/Desktop/Other/sourceforge/opentibia/otserv/trunk/tags</customTagfilePath>
     <activeTagsFiles/>
   </ctagspart>
