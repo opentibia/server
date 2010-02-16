@@ -12,30 +12,30 @@ local ITEM_MECHANICAL_FISHING_ROD = 10223
 local ITEM_GREEN_PERCH = 7159
 local ITEM_RAINBOW_TROUT = 7158
 local ITEM_NORTHERN_PIKE = 2669
-local ITEM_WATER_ELEMENTAL_CORPSE = 2025
+local ITEM_WATER_ELEMENTAL_CORPSE = 10499
 
 -- lootList should be like it: {itemid, countmax, chanceToGetOne}
 -- the sum of all chances is supposed to be one, but if it is not, it reescalate chances to make it sum up one
 -- you can also set a chance for the monster not to drop anything (simply use itemid == 0):
 -- example: {{0, 1, 0.5}, {2148, 10, 0.5}} means 50% of chances of not droping anything and 50% of dropping 1..10 gold coins
 local WATER_ELEMENTAL_LOOT = {
-	{2148, 1, 400/5265},--gold coins
-	{2152, 1, 610/5265},--platinum coins
-	{2376, 1, 1420/5265},--sword
-	{2509, 1, 420/5265},--steel shield
-	{2238, 1, 380/5265},--worn leather boots
-	{2226, 1, 370/5265},--fishbone
-	{7588, 1, 460/5265},--strong health potion
-	{7589, 1, 550/5265},--strong mana potion
-	{9812, 1, 160/5265},--rusty legs(Semi-Rare)
-	{9809, 1, 130/5265},--rusty armor(Semi-Rare)
-	{2168, 1, 90/5265},--life ring
-	{2149, 1, 80/5265},--small emerald
-	{2146, 1, 60/5265},--small sapphire
-	{2167, 1, 40/5265},--energy ring
-	{7632, 1, 80/5265},--giant shimmering pearl
-	{5928, 1, 5/5265},--goldfish bowl
-	{10220, 1, 10/5265}--Leviathan's amulet
+	{2148, 1, 400/4845},--gold coins
+	{2152, 1, 610/4845},--platinum coins
+	{2376, 1, 1420/4845},--sword
+	{2509, 1, 420/4845},--steel shield
+	{2238, 1, 380/4845},--worn leather boots
+	{2226, 1, 370/4845},--fishbone
+	{7588, 1, 460/4845},--strong health potion
+	{7589, 1, 550/4845},--strong mana potion
+	{9812, 1, 160/4845},--rusty legs(Semi-Rare)
+	{9809, 1, 130/4845},--rusty armor(Semi-Rare)
+	{2168, 1, 90/4845},--life ring
+	{2149, 1, 80/4845},--small emerald
+	{2146, 1, 60/4845},--small sapphire
+	{2167, 1, 40/4845},--energy ring
+	{7632, 1, 80/4845},--giant shimmering pearl
+	{5928, 1, 5/4845},--goldfish bowl
+	{10220, 1, 10/4845}--Leviathan's amulet
 }
 
 local function calculateWidth(lootList, index)
@@ -107,15 +107,13 @@ function onUse(cid, item, frompos, item2, topos)
 		return TRUE
 	end
 
-	local newPos = {x = topos.x, y = topos.y, z = topos.z, stackpos = 1}
-	local groundItem = getThingFromPos(newPos)
-
-	if (groundItem.itemid == ITEM_WATER_ELEMENTAL_CORPSE) then
+	if (item2.itemid == ITEM_WATER_ELEMENTAL_CORPSE) then
 		local monsterLoot = getMonsterLoot(WATER_ELEMENTAL_LOOT)
 		if monsterLoot ~= nil then 
 			doPlayerAddItem(cid, monsterLoot[1], monsterLoot[2])
 		end
-		doTransformItem(groundItem.uid, groundItem.itemid + 1)
+		doSendMagicEffect(topos, CONST_ME_WATERSPLASH)
+		doTransformItem(item2.uid, item2.itemid + 1)
 		return TRUE
 	end
 

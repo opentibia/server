@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <items>
 	<item id="100" name="void"/>
 	<item id="101" name="earth"/>
@@ -23790,6 +23790,18 @@
 	<item id="10496" name="pavement"/>
 	<item id="10497" name="pavement"/>
 	<item id="10498" name="pavement"/>
+	<item id="10499" name="remains of a water elemental">
+		<attribute key="description" value="Something is wobbling inside. Maybe with a fishing rod you could reach it."/>
+		<attribute key="decayTo" value="500"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="water"/>
+	</item>
+	<item id="10500" name="remains of a water elemental" >
+		<attribute key="description" value="It has already been emptied of the treasure it held."/>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="3"/>
+		<attribute key="corpseType" value="water"/>
+	</item>
 	<item id="10502" article="a" name="engraved wedding Ring">
 		<attribute key="weight" value="40"/>
 		<attribute key="slotType" value="ring"/>
