@@ -14,51 +14,86 @@ local ITEM_RAINBOW_TROUT = 7158
 local ITEM_NORTHERN_PIKE = 2669
 local ITEM_WATER_ELEMENTAL_CORPSE = 2025
 
+-- lootList should be like it: {itemid, countmax, chanceToGetOne}
+-- the sum of all chances is supposed to be one, but if it is not, it reescalate chances to make it sum up one
+-- you can also set a chance for the monster not to drop anything (simply use itemid == 0):
+-- example: {{0, 1, 0.5}, {2148, 10, 0.5}} means 50% of chances of not droping anything and 50% of dropping 1..10 gold coins
 local WATER_ELEMENTAL_LOOT = {
-	{2148, 100, 55000},
-	{2152, 100, 45000},
-	{2376, 1, 30000},
-	{2509, 1, 20000},
-	{2238, 1, 15000},
-	{2226, 1, 10000},
-	{7588, 1, 5500},
-	{7589, 1, 5000},
-	{9812, 1, 3900},
-	{9809, 1, 3600},
-	{2168, 1, 3000},
-	{2149, 100, 2300},
-	{2146, 100, 2300},
-	{2167, 1, 1700},
-	{7632, 1, 1200},
-	{5928, 1, 1000},
-	{10220, 1, 600}
+	{2148, 1, 400/5265},--gold coins
+	{2152, 1, 610/5265},--platinum coins
+	{2376, 1, 1420/5265},--sword
+	{2509, 1, 420/5265},--steel shield
+	{2238, 1, 380/5265},--worn leather boots
+	{2226, 1, 370/5265},--fishbone
+	{7588, 1, 460/5265},--strong health potion
+	{7589, 1, 550/5265},--strong mana potion
+	{9812, 1, 160/5265},--rusty legs(Semi-Rare)
+	{9809, 1, 130/5265},--rusty armor(Semi-Rare)
+	{2168, 1, 90/5265},--life ring
+	{2149, 1, 80/5265},--small emerald
+	{2146, 1, 60/5265},--small sapphire
+	{2167, 1, 40/5265},--energy ring
+	{7632, 1, 80/5265},--giant shimmering pearl
+	{5928, 1, 5/5265},--goldfish bowl
+	{10220, 1, 10/5265}--Leviathan's amulet
 }
 
-local function getMonsterLoot(lootList)
-	-- lootList should be like it: {itemid, countmax, chance}
-	local monsterLoot = {}
-	local listSize = listSize or #lootList
-	local maxChance = 0
-
-	for i = 1, listSize do
-		if lootList[i][3] > maxChance then
-			maxChance = lootList[i][3]
+local function calculateWidth(lootList, index)
+	if lootList[index][2] > 0 and lootList[index][3] > 0 then
+		local ret = lootList[index][3] * 100000
+		if lootList[index][1] == 0 then --not drop anything
+			ret = ret / getConfigValue("rate_loot")
+		else
+			ret = ret * (2/(lootList[index][2]+1))
 		end
+		return math.max(math.ceil(ret),1)
+	else
+		return 0
 	end
-
-	maxChance = math.random(0, maxChance) / getConfigValue("rate_loot")
-
-	for i = 1, listSize do
-		if lootList[i][3] >= maxChance then
-			monsterLoot[i] = {
-				lootList[i][1],
-				math.random(1, lootList[i][2])
-			}
-		end
-	end
-
-	return monsterLoot
 end
+
+local function calculateTotalWidth(lootList)
+	local ret = 0
+	local listSize = table.getn(lootList)
+	for aux = 1, listSize do
+		ret = ret + calculateWidth(lootList,aux)
+	end
+	return ret
+end
+
+local totalArray = {}
+local function getTotal(lootList)
+	if totalArray[lootList] == nil then
+		totalArray[lootList] = calculateTotalWidth(lootList)
+	end
+	return totalArray[lootList]
+end
+
+local function getMonsterLoot(lootList)
+	local pos = 0
+	local total = getTotal(lootList)
+	if total == 0 then
+		return nil --no loot
+	end
+	local rand = math.random(1, total)
+	local listSize = table.getn(lootList)
+	local index = 1
+	while index <= listSize do
+		local w = calculateWidth(lootList, index)
+		pos = pos + w
+		if rand <= pos and w ~= 0 then
+			if lootList[index][1] == 0 then --it means not drop anything
+				return nil
+			end
+			local count = math.max(math.random(1, lootList[index][2] * getConfigValue("rate_loot")),1)
+			count = math.min(lootList[index][2], count)
+			return {lootList[index][1], count}
+		end
+		index = index + 1
+	end
+	return nil --it shouldn't ever get here, but just in case	
+end
+
 
 function onUse(cid, item, frompos, item2, topos)
 
@@ -77,8 +112,9 @@ function onUse(cid, item, frompos, item2, topos)
 
 	if (groundItem.itemid == ITEM_WATER_ELEMENTAL_CORPSE) then
 		local monsterLoot = getMonsterLoot(WATER_ELEMENTAL_LOOT)
-		monsterLoot = monsterLoot[math.random(1, #monsterLoot)]
-		doPlayerAddItem(cid, monsterLoot[1], monsterLoot[2])
+		if monsterLoot ~= nil then 
+			doPlayerAddItem(cid, monsterLoot[1], monsterLoot[2])
+		end
 		doTransformItem(groundItem.uid, groundItem.itemid + 1)
 		return TRUE
 	end
