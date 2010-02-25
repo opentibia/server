@@ -1850,6 +1850,12 @@ void LuaScriptInterface::registerFunctions()
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 
+	//isMonsterName(name)
+	lua_register(m_luaState, "isMonsterName", LuaScriptInterface::luaIsMonsterName);
+
+	//isValidItemId(itemid)
+	lua_register(m_luaState, "isValidItemId", LuaScriptInterface::luaIsValidItemId);
+
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
 	luaL_register(m_luaState, "bit", LuaScriptInterface::luaBitReg);
@@ -7979,7 +7985,6 @@ int LuaScriptInterface::luaGetItemIdByName(lua_State *L)
 
 	int32_t itemid = Item::items.getItemIdByName(name);
 	if(itemid == -1){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -8000,6 +8005,31 @@ int LuaScriptInterface::luaIsSightClear(lua_State *L)
 	lua_pushnumber(L, (result ? LUA_TRUE : LUA_FALSE));
 	return 1;
 }
+
+int LuaScriptInterface::luaIsMonsterName(lua_State *L)
+{
+    //isMonsterName(name)
+    std::string name = popString(L);
+    MonsterType *mType = g_monsters.getMonsterType(name);
+    if (!mType)
+        lua_pushnumber(L, LUA_FALSE);
+    else
+        lua_pushnumber(L, LUA_TRUE);
+    return 1;
+}
+
+int LuaScriptInterface::luaIsValidItemId(lua_State *L)
+{
+    //isValidItemId(itemid)
+    uint32_t itemId = popNumber(L);
+    const ItemType& it = Item::items[itemId];
+    if (it.id == 0)
+        lua_pushnumber(L, LUA_FALSE);
+    else
+        lua_pushnumber(L, LUA_TRUE);
+    return(1);
+}
+
 
 // Bans
 

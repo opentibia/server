@@ -511,6 +511,8 @@ protected:
 	static int luaGetGuildId(lua_State *L);
 
 	//type validation
+	static int luaIsMonsterName(lua_State *L);
+	static int luaIsValidItemId(lua_State *L);
 	static int luaIsCreature(lua_State *L);
 	static int luaIsContainer(lua_State *L);
 	static int luaIsCorpse(lua_State *L);

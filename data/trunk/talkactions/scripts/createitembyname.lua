@@ -39,11 +39,17 @@ function onSay(cid, words, param)
 	if stringPos3 ~= length then
 		if stringPos3 + 1 ~= length then
 			itemcount = tonumber(string.sub(param, stringPos3 + 1, length))
+			if itemcount == nil then itemcount = 1 end
 			itemcount = math.min(itemcount, 100)
 		end
 	end
 
 	local itemid = getItemIdByName(itemname)
+	if itemid == LUA_ERROR then
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "There isn't any item named "..itemname..".")
+		doSendMagicEffect(playerPos, CONST_ME_POFF)
+		return FALSE
+	end
 	local item = doCreateItemEx(itemid, itemcount)
 	if item ~= LUA_ERROR then
 		if doPlayerAddItemEx(cid, item, TRUE) ~= RETURNVALUE_NOERROR then
