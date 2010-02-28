@@ -3,10 +3,12 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
 		return FALSE
 	end
+
 	if isMonsterName(param) == FALSE then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "There isn't any monster named "..param..".")
 		return FALSE
 	end
+
 	local monster = doSummonCreature(param, getPlayerPosition(cid))
 	if monster ~= LUA_ERROR then
 		doSendMagicEffect(getCreaturePosition(monster), CONST_ME_MAGIC_RED)

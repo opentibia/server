@@ -14,10 +14,11 @@ function onSay(cid, words, param)
 	local count = math.min(itemcount, 100)
 	
 	if isValidItemId(itemid) == FALSE then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Invalid itemid.")	
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Invalid item id.")	
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
 		return FALSE
 	end
+
 	local item = doCreateItemEx(itemid, itemcount)
 	if item ~= LUA_ERROR then
 		if doPlayerAddItemEx(cid, item, TRUE) ~= RETURNVALUE_NOERROR then

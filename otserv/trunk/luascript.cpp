@@ -8008,31 +8008,29 @@ int LuaScriptInterface::luaIsSightClear(lua_State *L)
 
 int LuaScriptInterface::luaIsMonsterName(lua_State *L)
 {
-    //isMonsterName(name)
-    std::string name = popString(L);
-    MonsterType *mType = g_monsters.getMonsterType(name);
-    if (!mType)
-        lua_pushnumber(L, LUA_FALSE);
-    else
-        lua_pushnumber(L, LUA_TRUE);
+	//isMonsterName(name)
+	std::string name = popString(L);
+	MonsterType *mType = g_monsters.getMonsterType(name);
+	if (!mType)
+		lua_pushnumber(L, LUA_FALSE);
+	else
+		lua_pushnumber(L, LUA_TRUE);
     return 1;
 }
 
 int LuaScriptInterface::luaIsValidItemId(lua_State *L)
 {
-    //isValidItemId(itemid)
-    uint32_t itemId = popNumber(L);
-    const ItemType& it = Item::items[itemId];
-    if (it.id == 0)
-        lua_pushnumber(L, LUA_FALSE);
-    else
-        lua_pushnumber(L, LUA_TRUE);
-    return(1);
+	//isValidItemId(itemid)
+	uint32_t itemId = popNumber(L);
+	const ItemType& it = Item::items[itemId];
+	if (it.id == 0)
+		lua_pushnumber(L, LUA_FALSE);
+	else
+		lua_pushnumber(L, LUA_TRUE);
+	return 1;
 }
 
-
 // Bans
-
 int LuaScriptInterface::luaAddPlayerBan(lua_State *L)
 {
 	//addPlayerBan(playerName[, length[, admin[, comment]]])
