@@ -314,7 +314,7 @@
 	<instant name="Cancel Invisibility" words="exana ina" lvl="26" mana="200" prem="1" selftarget="1" script="support/cancel_invisibility.lua">
 		<vocation name="Sorcerer"/> <vocation name="Master Sorcerer"/>
 	</instant>
-	<instant name="Ultimate Light" words="utevo vis lux" lvl="26" mana="140" prem="1" selftarget="1" script="support/ultimate_light.lua">
+	<instant name="Ultimate Light" words="utevo vis lux" lvl="26" mana="140" prem="1" selftarget="1" aggressive="0" script="support/ultimate_light.lua">
 		<vocation name="Sorcerer"/> <vocation name="Master Sorcerer"/>
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 	</instant>
