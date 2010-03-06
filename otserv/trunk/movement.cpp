@@ -133,7 +133,7 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 		return false;
 
 	bool success = true;
-	int id;
+	int32_t id, toId;
 	std::string str;
 
 	MoveEvent_t eventType = moveEvent->getEventType();
@@ -152,22 +152,34 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 		}
 	}
 
-	if(readXMLInteger(p,"itemid",id)){
-		if(moveEvent->getEventType() == MOVE_EVENT_EQUIP){
-			ItemType& it = Item::items.getItemType(id);
-			it.wieldInfo = moveEvent->getWieldInfo();
-			it.minReqLevel = moveEvent->getReqLevel();
-			it.minReqMagicLevel = moveEvent->getReqMagLv();
-			it.vocationString = moveEvent->getVocationString();
-		}
+	if(readXMLInteger(p,"itemid",id) || readXMLInteger(p,"fromitemid",id) || readXMLInteger(p,"fromid",id)){
+		if(!readXMLInteger(p,"toitemid",toId) && !readXMLInteger(p,"toid",toId))
+			toId = id;
+		for(; toId >= id; --toId){
+			if(moveEvent->getEventType() == MOVE_EVENT_EQUIP){
+				ItemType& it = Item::items.getItemType(toId);
+				it.wieldInfo = moveEvent->getWieldInfo();
+				it.minReqLevel = moveEvent->getReqLevel();
+				it.minReqMagicLevel = moveEvent->getReqMagLv();
+				it.vocationString = moveEvent->getVocationString();
+			}
 
-		addEvent(moveEvent, id, m_itemIdMap);
+			addEvent(moveEvent, toId, m_itemIdMap);
+		}
 	}
-	else if(readXMLInteger(p,"uniqueid",id)){
-		addEvent(moveEvent, id, m_uniqueIdMap);
+	else if(readXMLInteger(p,"uniqueid",id) || readXMLInteger(p,"fromuniqueid",id)){
+		if(!readXMLInteger(p,"touniqueid",toId))
+			toId = id;
+		for(; toId >= id; --toId){
+			addEvent(moveEvent, toId, m_uniqueIdMap);
+		}
 	}
-	else if(readXMLInteger(p,"actionid",id)){
-		addEvent(moveEvent, id, m_actionIdMap);
+	else if(readXMLInteger(p,"actionid",id) || readXMLInteger(p,"fromactionid",id)){
+		if(!readXMLInteger(p,"toactionid",toId))
+			toId = id;
+		for(; toId >= id; --toId){
+			addEvent(moveEvent, toId, m_actionIdMap);
+		}
 	}
 	else if(readXMLString(p,"pos",str)){
 		std::vector<std::string> posList = explodeString(str, ";");

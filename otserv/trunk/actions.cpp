@@ -103,15 +103,27 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 	if(!action)
 		return false;
 
-	int value;
-	if(readXMLInteger(p,"itemid",value)){
-		useItemMap[value] = action;
+	int32_t id, toId;
+	if(readXMLInteger(p,"itemid",id) || readXMLInteger(p,"fromitemid",id) || readXMLInteger(p,"fromid",id)){
+		if(!readXMLInteger(p,"toitemid",toId) && !readXMLInteger(p,"toid",toId))
+			toId = id;
+		for(; toId >= id; --toId){
+			useItemMap[toId] = action;
+		}
 	}
-	else if(readXMLInteger(p,"uniqueid",value)){
-		uniqueItemMap[value] = action;
+	else if(readXMLInteger(p,"uniqueid",id) || readXMLInteger(p,"fromuniqueid",id)){
+		if(!readXMLInteger(p,"touniqueid",toId))
+			toId = id;
+		for(; toId >= id; --toId){
+			uniqueItemMap[toId] = action;
+		}
 	}
-	else if(readXMLInteger(p,"actionid",value)){
-		actionItemMap[value] = action;
+	else if(readXMLInteger(p,"actionid",id) || readXMLInteger(p,"fromactionid",id)){
+		if(!readXMLInteger(p,"toactionid",toId))
+			toId = id;
+		for(; toId >= id; --toId){
+			actionItemMap[toId] = action;
+		}
 	}
 	else{
 		return false;

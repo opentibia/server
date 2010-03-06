@@ -412,7 +412,7 @@ uint32_t Npc::loadParams(xmlNodePtr node)
 			}
 			else if(asLowerCaseString(*it) == "lowlevel"){
 				 params |= RESPOND_LOWLEVEL;
-			} 	 
+			}
 			else if(asLowerCaseString(*it) == "highlevel"){
 				 params |= RESPOND_HIGHLEVEL;
 			}
@@ -1888,6 +1888,8 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "amount = " << npcState->amount << ',' << std::endl;
 						scriptstream << "price = " << npcState->price << ',' << std::endl;
 						scriptstream << "level = " << npcState->level << ',' << std::endl;
+						scriptstream << "buywithbackpack = " << npcState->buyWithBackpack << ',' << std::endl;
+						scriptstream << "ignorecapacity = " << npcState->ignoreCapacity << ',' << std::endl;
 						scriptstream << "spellname = \"" << LuaScriptInterface::escapeString(npcState->spellName) << "\"" << ',' << std::endl;
 						scriptstream << "listname = \"" << LuaScriptInterface::escapeString(npcState->listName) << "\"" << ',' << std::endl;
 						scriptstream << "listpname = \"" << LuaScriptInterface::escapeString(npcState->listPluralName) << "\"" << ',' << std::endl;
@@ -3397,7 +3399,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 		return 1;
 	}
 
-	//Close any eventual other shop window currently open. 	 
+	//Close any eventual other shop window currently open.
 	player->closeShopWindow(false);
 
 	if(!npc){
