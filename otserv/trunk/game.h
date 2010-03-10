@@ -51,9 +51,9 @@ enum stackPosType_t{
 };
 
 enum WorldType_t {
-	WORLD_TYPE_NO_PVP = 1,
-	WORLD_TYPE_PVP = 2,
-	WORLD_TYPE_PVP_ENFORCED = 3
+	WORLD_TYPE_OPTIONAL_PVP = 1,
+	WORLD_TYPE_OPEN_PVP = 2,
+	WORLD_TYPE_HARDCORE_PVP = 3
 };
 
 enum GameState_t {
@@ -92,7 +92,18 @@ private:
 	RuleViolation(const RuleViolation&);
 };
 
+struct GuildWar {
+	uint32_t guildId;
+	uint32_t opponentId;
+	uint32_t guildFrags;
+	uint32_t opponentFrags;
+	uint32_t guildFee;
+	uint32_t opponentFee;
+	uint32_t fragLimit;
+};
+
 typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
+typedef std::map<uint32_t, GuildWar> GuildWarsMap;
 typedef std::vector<Player*> PlayerVector;
 
 #define EVENT_LIGHTINTERVAL  10000
@@ -546,6 +557,17 @@ public:
 
 	void showUseHotkeyMessage(Player* player, Item* item);
 
+	//Guilds
+	void loadGuildWars();
+	void clearGuildWars();
+	bool endGuildWar(uint32_t warId);
+	bool doGuildTransfer(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee);
+	bool setWarStatus(uint32_t warId, int32_t statusId);
+	GuildWarsMap& getGuildWars() {return guildWars;}
+
+	Guild* getGuildById(uint32_t guildId);
+	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
+
 protected:
 
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
@@ -611,6 +633,11 @@ protected:
 
 	ServiceManager* service_manager;
 	Map* map;
+
+	//Guilds
+	typedef std::map<uint32_t, Guild*> GuildsMap; //guild id, guild class
+	GuildsMap loadedGuilds;
+	GuildWarsMap guildWars;
 
 };
 

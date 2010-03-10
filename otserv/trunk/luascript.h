@@ -218,6 +218,7 @@ enum PlayerInfo_t{
 	PlayerInfoGuildName,
 	PlayerInfoGuildRank,
 	PlayerInfoGuildNick,
+	PlayerInfoGuildLevel,
 	PlayerInfoSex,
 	PlayerInfoTown,
 	PlayerInfoGUID,
@@ -383,7 +384,6 @@ protected:
 	static int luaDoPlayerAddSoul(lua_State *L);
 	static int luaDoPlayerAddExp(lua_State *L);
 	static int luaDoPlayerRemoveExp(lua_State *L);
-	static int luaDoPlayerSetSex(lua_State *L);
 	static int luaDoPlayerSetGuildRank(lua_State *L);
 	static int luaDoPlayerSetGuildNick(lua_State *L);
 	static int luaDoSetCreatureLight(lua_State *L);
@@ -468,6 +468,7 @@ protected:
 	static int luaGetPlayerGuildName(lua_State *L);
 	static int luaGetPlayerGuildRank(lua_State *L);
 	static int luaGetPlayerGuildNick(lua_State *L);
+	static int luaGetPlayerGuildLevel(lua_State *L);
 	static int luaGetPlayerSex(lua_State *L);
 	static int luaGetPlayerGUID(lua_State *L);
 	static int luaGetPlayerFlagValue(lua_State *L);

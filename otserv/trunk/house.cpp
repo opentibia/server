@@ -553,7 +553,7 @@ bool AccessList::addPlayer(std::string& name)
 bool AccessList::addGuild(const std::string& guildName, const std::string& rank)
 {
 	uint32_t guildId;
-	if(IOPlayer::instance()->getGuildIdByName(guildId, guildName)){
+	if(g_game.getGuildIdByName(guildId, guildName)){
 		if(guildId != 0){
 			for(GuildList::iterator it = guildList.begin(); it != guildList.end(); ++it){
 				if(it->first == guildId && strcasecmp(rank.c_str(), it->second.c_str()) == 0){
@@ -641,7 +641,7 @@ bool AccessList::isInList(const Player* player)
 		return true;
 
 	for(GuildList::iterator it = guildList.begin(); it != guildList.end(); ++it){
-		if(it->first == player->getGuildId() && strcasecmp(player->getGuildRank().c_str(), it->second.c_str()) == 0){
+		if((player->getGuild() && it->first == player->getGuildId()) && strcasecmp(player->guildRank.c_str(), it->second.c_str()) == 0){
 			return true;
 		}
 	}

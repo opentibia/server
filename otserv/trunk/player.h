@@ -140,19 +140,17 @@ public:
 		return ((50ULL * level * level * level) - (150ULL * level * level) + (400ULL * level))/3ULL;
 	}
 
-	//guild settings
+	//[ guild settings
 	void setGuild(Guild* _guild) { guild = _guild; }
 	Guild* getGuild() const { return guild; }
-	uint32_t getGuildId() const { return guild->getGuildId(); }
-	std::string getGuildName() const { return guild->getGuildName(); }
-	std::string getGuildRank() const { return guild->getGuildRank(); }
-	std::string getGuildNick() const { return guild->getGuildNick(); }
-	void setGuildRank(const std::string& _guildRank) { guild->setGuildNick(_guildRank); }
-	void setGuildNick(const std::string& _guildNick) { guild->setGuildNick(_guildNick); }
+	uint32_t getGuildId() const;
 
-	//guild war system
-	bool isEnemy(const Player* player) const;
-	GuildEmblem_t getWarEmblem(const Player* player) const;
+	bool isGuildEnemy(const Player* player) const;
+	GuildEmblems_t getGuildEmblem(const Player* player) const;
+
+	std::string guildRank, guildNick;
+	uint32_t guildLevel;
+	//]
 
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
@@ -378,7 +376,7 @@ public:
 	void addInFightTicks(uint32_t ticks, bool pzlock = false);
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual uint64_t getGainedExperience(Creature* attacker) const;
+	virtual uint64_t getGainedExperience(Creature* attacker) const { return 0; }
 	void getGainExperience(uint64_t& gainExp, bool fromMonster);
 
 	//combat event functions
@@ -828,7 +826,7 @@ protected:
 
 	uint32_t town;
 
-	//guild variables
+	//Guild
 	Guild* guild;
 
 	StorageMap storageMap;

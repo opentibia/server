@@ -358,7 +358,7 @@ enum PartyShields_t{
 	SHIELD_YELLOW_NOSHAREDEXP = 10
 };
 
-enum GuildEmblem_t{
+enum GuildEmblems_t{
 	EMBLEM_NONE = 0,
 	EMBLEM_GREEN = 1,
 	EMBLEM_RED = 2,

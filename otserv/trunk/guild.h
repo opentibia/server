@@ -26,69 +26,34 @@
 
 #include <string>
 #include <map>
-#include <set>
-
-struct GuildWar {
-	uint32_t guildId;
-	uint32_t opponentId;
-	uint16_t killLimit;
-	uint16_t guildKills;
-	uint16_t opponentKills;
-	uint32_t guildFee;
-	uint32_t enemyGuildFee;
-};
-
-typedef std::map<uint32_t, GuildWar* > GuildWarsMap;
-typedef std::set<uint32_t> GuildSet;
 
 class Guild
 {
 public:
 	Guild();
-	~Guild(){};
+	~Guild();
 
-	void setAtWar();
-	void killEnemy(uint32_t _guildId);
-	bool isPlayerEnemy(uint32_t _guildId) const;
-	bool isGuildAtWar() const { return !enemyGuilds.empty(); }
-	bool isGuildEnemy(uint32_t _guildId) const;
-	void endWar(uint32_t _warId, uint32_t _guildKills, uint32_t opponentKills);
+	void setId(uint32_t _id){ id = _id; }
+	void setName(std::string _name){ name = _name; };
 
-	void setGuildName(const std::string& _guildName) { guildName = _guildName; }
-	void setGuildRank(const std::string& _guildRank) { guildRank = _guildRank; }
-	void setGuildNick(const std::string& _guildNick) { guildNick = _guildNick; }
-	void setGuildLevel(uint32_t _guildLevel) { guildLevel = _guildLevel; }
-	void setGuildId(uint32_t _guildId) { guildId = _guildId; }
+	uint32_t getId() const { return id; }
+	std::string getName() const { return name; }
 
-	std::string getGuildName() const { return guildName; }
-	std::string getGuildRank() const { return guildRank; }
-	std::string getGuildNick() const { return guildNick; }
-	uint32_t getGuildLevel() const { return guildLevel; }
-	uint32_t getGuildId() const { return guildId; }
+	void addFrag(uint32_t enemyId) const;
+	bool isAtWar() const { return !enemyGuilds.empty(); }
+	bool hasDeclaredWar(uint32_t warId) const;
+
+	uint32_t isEnemy(uint32_t enemyId) const;
+	void addEnemy(uint32_t enemyId, uint32_t warId);
+	void removeEnemy(uint32_t enemyId);
+	void clearEnemies(){ enemyGuilds.clear(); }
 
 protected:
-	std::string guildName;
-	std::string guildRank;
-	std::string guildNick;
-	uint32_t guildLevel;
-	uint32_t guildId;
-	bool warAsRequester;
-	GuildSet enemyGuilds;
-	std::map<uint32_t, uint32_t> warOpponents;
-};
+	uint32_t id;
+	std::string name;
 
-class Guilds
-{
-public:
-	Guilds(){};
-	~Guilds(){};
-
-	bool isGuildAtWar(uint32_t _guildId) const;
-	void setGuildsAtWar();
-	bool clearWar(uint32_t _warId) const;
-
-	GuildWarsMap guildWars;
-	GuildSet guildsAtWar;
+	typedef std::map<uint32_t, uint32_t> EnemyGuildsMap; //enemy guild id, war id
+	EnemyGuildsMap enemyGuilds;
 };
 
 #endif

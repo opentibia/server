@@ -70,7 +70,6 @@ public:
 	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
 	bool getDefaultTown(std::string& name, uint32_t& townId);
 	bool getNameByGuid(uint32_t guid, std::string& name);
-	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 	bool playerExists(std::string name);
 	bool getLastIP(uint32_t& ip, uint32_t guid);
 	bool hasFlag(PlayerFlags flag, uint32_t guid);

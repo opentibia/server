@@ -156,6 +156,10 @@ Creature()
 	premiumDays = 0;
 	balance = 0;
 
+	guildLevel = 0;
+	guildRank = "";
+	guildNick = "";
+
 	sex = PLAYERSEX_LAST;
  	vocation_id = (Vocation_t)0;
 
@@ -207,8 +211,6 @@ Player::~Player()
 	setWriteItem(NULL);
 	setEditHouse(NULL);
 	setNextWalkActionTask(NULL);
-
-	delete guild;
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	playerCount--;
@@ -285,17 +287,17 @@ std::string Player::getDescription(int32_t lookDistance) const
 			s << " " << playerSexSubjectString(getSex()) << " is ";
 		}
 
-		if(getGuildRank().length()){
-			s << getGuildRank();
+		if(guildRank.length()){
+			s << guildRank;
 		}
 		else{
 			s << "a member";
 		}
 
-		s << " of the " << getGuildName();
+		s << " of the " << getGuild()->getName();
 
-		if(getGuildNick().length()){
-			s << " (" << getGuildNick() << ")";
+		if(guildNick.length()){
+			s << " (" << guildNick << ")";
 		}
 
 		s << ".";
@@ -1030,11 +1032,12 @@ bool Player::canWalkthrough(const Creature* creature) const
 		return true;
 	}
 
-	if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-		if(isEnemy(creature->getPlayer())){
+	if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP){
+		if(isGuildEnemy(creature->getPlayer())){
 			return false;
 		}
-		return getTile()->ground->getID() != ITEM_GLOWING_SWITCH;
+
+		return (getTile() && getTile()->ground->getID() != ITEM_GLOWING_SWITCH);
 	}
 
 	return false;
@@ -1661,7 +1664,7 @@ void Player::onAttackedCreatureChangeZone(ZoneType_t zone)
 	}
 	else if(zone == ZONE_NORMAL){
 		//attackedCreature can leave a pvp zone if not pzlocked
-		if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+		if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP){
 			if(attackedCreature->getPlayer()){
 				setAttackedCreature(NULL);
 				onAttackedCreatureDissapear(false);
@@ -2380,10 +2383,10 @@ void Player::onDie()
 
 		DeathList killers = getKillers(g_config.getNumber(ConfigManager::DEATH_ASSIST_COUNT));
 		IOPlayer::instance()->addPlayerDeath(this, killers);
+		std::set<uint32_t> tmpList;
 
-		#ifdef __SKULLSYSTEM__
 		for(DeathList::const_iterator it = killers.begin(); it != killers.end(); ++it){
-			if(it->isCreatureKill() && it->isUnjustKill()){
+			if(it->isCreatureKill()){
 				Creature* attacker = it->getKillerCreature();
 				Player* attackerPlayer = attacker->getPlayer();
 
@@ -2392,11 +2395,21 @@ void Player::onDie()
 				}
 
 				if(attackerPlayer){
-					attackerPlayer->addUnjustifiedDead(this);
+					if(getGuild() && attackerPlayer->getGuild()){
+						if(tmpList.find(attackerPlayer->getGuildId()) == tmpList.end()){
+							attackerPlayer->getGuild()->addFrag(getGuildId());
+							tmpList.insert(attackerPlayer->getGuildId());
+						}
+					}
+
+					#ifdef __SKULLSYSTEM__
+					if(it->isUnjustKill()){
+						attackerPlayer->addUnjustifiedDead(this);
+					}
+					#endif
 				}
 			}
 		}
-		#endif
 	}
 
 	Creature::onDie();
@@ -2639,33 +2652,45 @@ void Player::kickPlayer()
 	}
 }
 
-bool Player::isEnemy(const Player* player) const
+uint32_t Player::getGuildId() const
 {
-	if(getGuild()->isGuildEnemy(player->getGuildId())){
+	if(getGuild()){
+		return getGuild()->getId();
+	}
+	else{
+		return 0;
+	}
+}
+
+bool Player::isGuildEnemy(const Player* player) const
+{
+	if(!player || !player->getGuild() || !getGuild()){
+		return false;
+	}
+
+	if(getGuild()->isEnemy(player->getGuildId()) != 0){
 		return true;
 	}
+
 	return false;
 }
 
-GuildEmblem_t Player::getWarEmblem(const Player* player) const
+GuildEmblems_t Player::getGuildEmblem(const Player* player) const
 {
-	if(!player){
+	if(!player || !player->getGuild() || !player->getGuild()->isAtWar()){
 		return EMBLEM_NONE;
 	}
 
-	if(player->getGuild()->isGuildAtWar()){
+	if(getGuild()){
 		if(player->getGuildId() == getGuildId()){
 			return EMBLEM_GREEN;
 		}
-		else if(getGuild()->isGuildEnemy(player->getGuildId())){
+		else if(isGuildEnemy(player)){
 			return EMBLEM_RED;
-		}
-		else{
-			return EMBLEM_BLUE;
 		}
 	}
 
-	return EMBLEM_NONE;
+	return EMBLEM_BLUE;
 }
 
 void Player::notifyLogIn(Player* login_player)
@@ -3604,31 +3629,6 @@ void Player::doAttacking(uint32_t interval)
 	}
 }
 
-uint64_t Player::getGainedExperience(Creature* attacker) const
-{
-	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
-		Player* attackerPlayer = attacker->getPlayer();
-		if(attackerPlayer && attackerPlayer != this && skillLoss){
-				/*Formula
-				a = attackers level * 0.9
-				b = victims level
-				c = victims experience
-
-				y = (1 - (a / b)) * 0.05 * c
-				*/
-
-				uint32_t a = (int32_t)std::floor(attackerPlayer->getLevel() * 0.9);
-				uint32_t b = getLevel();
-				uint64_t c = getExperience();
-
-				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor(getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ));
-				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP);
-		}
-	}
-
-	return 0;
-}
-
 void Player::onFollowCreature(const Creature* creature)
 {
 	if(!creature){
@@ -3763,7 +3763,7 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 		remove = false;
 
 		//Means the condition is from an item, id == slot
-		if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
+		if(g_game.getWorldType() == WORLD_TYPE_HARDCORE_PVP){
 			Item* item = getInventoryItem((slots_t)condition->getId());
 			if(item){
 				//25% chance to destroy the item
@@ -3805,15 +3805,16 @@ void Player::onAttackedCreature(Creature* target)
 	Creature::onAttackedCreature(target);
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
+		bool doPzLock = false;
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
 				if(checkPzBlockOnCombat(targetPlayer)){
-					pzLocked = true;
+					doPzLock = true;
 				}
 
-#ifdef __SKULLSYSTEM__
+				#ifdef __SKULLSYSTEM__
 				if( !isPartner(targetPlayer) &&
-					!isEnemy(targetPlayer) &&
+					!isGuildEnemy(targetPlayer) &&
 					!Combat::isInPvpZone(this, targetPlayer) &&
 					!targetPlayer->hasAttacked(this)){
 
@@ -3831,11 +3832,11 @@ void Player::onAttackedCreature(Creature* target)
 						targetPlayer->sendCreatureSkull(this);
 					}
 				}
-#endif
+				#endif
 			}
 		}
 
-		addInFightTicks(g_game.getInFightTicks());
+		addInFightTicks(g_game.getInFightTicks(), doPzLock);
 	}
 }
 
@@ -4230,7 +4231,7 @@ Skulls_t Player::getSkullClient(const Player* player) const
 		}
 	}
 
-	if(player->getSkull() == SKULL_NONE && isPartner(player) && g_game.getWorldType() != WORLD_TYPE_NO_PVP){
+	if(player->getSkull() == SKULL_NONE && isPartner(player) && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP){
 		return SKULL_GREEN;
 	}
 
@@ -4617,7 +4618,7 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 
 bool Player::checkPzBlockOnCombat(Player* targetPlayer)
 {
-	if(isEnemy(targetPlayer)){
+	if(isGuildEnemy(targetPlayer)){
 		return true;
 	}
 

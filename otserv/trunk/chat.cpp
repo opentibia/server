@@ -71,7 +71,7 @@ void PrivateChatChannel::invitePlayer(Player* player, Player* invitePlayer)
 		std::stringstream msg;
 		msg << player->getName() << " invites you to " << playerSexAdjectiveString(player->getSex())
 			<<  " private chat channel.";
-		
+
 		invitePlayer->sendTextMessage(MSG_INFO_DESCR, msg.str().c_str());
 
 		msg.str("");
@@ -275,7 +275,7 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 		return NULL;
 
 	if(channelId == CHANNEL_GUILD){
-		ChatChannel *newChannel = new ChatChannel(channelId, player->getGuildName());
+		ChatChannel *newChannel = new ChatChannel(channelId, player->getGuild()->getName());
 		m_guildChannels[player->getGuildId()] = newChannel;
 		return newChannel;
 	}
@@ -407,7 +407,7 @@ void Chat::removeUserFromAllChannels(Player* player)
 
 	for(GuildChannelMap::iterator it = m_guildChannels.begin(); it != m_guildChannels.end(); ++it){
 		it->second->removeUser(player);
-	}	
+	}
 }
 
 bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& text, uint16_t channelId)
@@ -476,7 +476,7 @@ ChannelList Chat::getChannelList(Player* player)
 	bool gotPrivate = false;
 
 	// If has guild
-	if(player->getGuildId() && player->getGuildName().length()){
+	if(player->getGuild() && player->getGuild()->getName().length()){
 		ChatChannel* channel = getChannel(player, CHANNEL_GUILD);
 
 		if(channel)

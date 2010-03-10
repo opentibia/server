@@ -73,7 +73,7 @@ CREATE TABLE `players` (
 
 CREATE TABLE `guilds` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`name` VARCHAR(255) NOT NULL COMMENT 'guild name - nothing else needed here',
+	`name` VARCHAR(255) NOT NULL,
 	`owner_id` INT UNSIGNED NOT NULL,
 	`creationdate` INT NOT NULL,
 	PRIMARY KEY (`id`),
@@ -85,48 +85,38 @@ CREATE TABLE `guild_ranks` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`guild_id` INT UNSIGNED NOT NULL COMMENT 'guild',
 	`name` VARCHAR(255) NOT NULL COMMENT 'rank name',
-	`level` INT NOT NULL COMMENT 'rank level - leader, vice, member, maybe something else',
+	`level` INT NOT NULL COMMENT 'rank level - leader, vice leader, member, maybe something else',
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guild_members` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`player_id` INT UNSIGNED NOT NULL,
-	`guild_id` INT UNSIGNED NOT NULL,
 	`rank_id` INT UNSIGNED NOT NULL COMMENT 'a rank which belongs to certain guild',
-	`guild_nick` VARCHAR(255) NOT NULL DEFAULT '',
-	PRIMARY KEY (`id`),
+	`nick` VARCHAR(255) NOT NULL DEFAULT '',
 	UNIQUE (`player_id`),
-	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE,
-	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE `war_declaration` (
+CREATE TABLE `guild_wars` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`guild_id` INT UNSIGNED NOT NULL COMMENT 'the guild wich declared the war',
+	`guild_id` INT UNSIGNED NOT NULL COMMENT 'the guild which declared the war',
 	`opponent_id` INT UNSIGNED NOT NULL COMMENT 'the enemy guild at war',
 	`frag_limit` INT UNSIGNED NOT NULL DEFAULT 10 COMMENT 'kills needed to win the war',
-	`war_duration` INT UNSIGNED NOT NULL COMMENT 'how much time the war will last',
+	`declaration_date` INT UNSIGNED NOT NULL,
+	`end_date` INT UNSIGNED NOT NULL,
 	`guild_fee` INT UNSIGNED NOT NULL DEFAULT 1000 COMMENT 'amount of money the guild has to pay if loses the war',
 	`opponent_fee` INT UNSIGNED NOT NULL DEFAULT 1000 COMMENT 'amount of money the enemy guild has to pay if loses the war',
+	`guild_frags` INT UNSIGNED NOT NULL DEFAULT 0,
+	`opponent_frags` INT UNSIGNED NOT NULL DEFAULT 0,
 	`comment` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'the guild leader can leave a message for the other guild',
-	`declaration_date` INT UNSIGNED NOT NULL,
-	`active` TINYINT(1) NOT NULL DEFAULT 0,
+	`status` INT NOT NULL DEFAULT 0 COMMENT '-1 -> will be ignored (finished or unaccepted) 0 -> to be started 1 -> started/not finished',
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`opponent_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE `guild_wars` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`war_id` INT UNSIGNED NOT NULL,
-	`guild_frags` INT UNSIGNED NOT NULL DEFAULT 0,
-	`opponent_frags` INT UNSIGNED NOT NULL DEFAULT 0,
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`war_id`) REFERENCES `war_declaration` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB;	
-	
 CREATE TABLE `player_viplist` (
 	`player_id` INT UNSIGNED NOT NULL COMMENT 'id of player whose viplist entry it is',
 	`vip_id` INT UNSIGNED NOT NULL COMMENT 'id of target player of viplist entry',
@@ -241,7 +231,7 @@ CREATE TABLE `tile_items` (
 	`attributes` BLOB NOT NULL,
 	FOREIGN KEY (`tile_id`) REFERENCES `tiles` (`id`) ON DELETE CASCADE,
 	INDEX (`sid`)
-) ENGINE = InnoDB;	
+) ENGINE = InnoDB;
 
 CREATE TABLE `map_store` (
 	`house_id` INT UNSIGNED NOT NULL,
@@ -316,14 +306,6 @@ ON `accounts`
 FOR EACH ROW
 BEGIN
 	DELETE FROM `bans` WHERE `type` = 3 AND `value` = OLD.`id`;
-END|
-
-CREATE TRIGGER `ondelete_guilds`
-BEFORE DELETE
-ON `guilds`
-FOR EACH ROW
-BEGIN
-	UPDATE `players` SET `guildnick` = '', `rank_id` = 0 WHERE `rank_id` IN (SELECT `id` FROM `guild_ranks` WHERE `guild_id` = OLD.`id`);
 END|
 
 CREATE TRIGGER `ondelete_players`

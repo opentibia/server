@@ -26,11 +26,13 @@
 #include "configmanager.h"
 #include "tools.h"
 #include "guild.h"
+#include "game.h"
 
 #include <iostream>
 #include <iomanip>
 
 extern ConfigManager g_config;
+extern Game g_game;
 
 #ifndef __GNUC__
 #pragma warning( disable : 4005)
@@ -205,23 +207,25 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	db->freeResult(result);
 
 	//guild system
-	Guild* guild = new Guild();
 	query.str("");
-	query << "SELECT `guild_members`.`guild_nick` as `guild_nick`, `guild_members`.`guild_id` as `guild_id`, \
-			 `guild_ranks`.`name` as `rank_name`, `guild_ranks`.`level` as `rank_level`, \
-			 `guilds`.`name` as `guild_name` FROM `guild_members`, `guilds`, `guild_ranks` \
-			 WHERE `guild_members`.`player_id` = " << player->getGUID() << " \
-			 AND `guild_ranks`.`id` = `guild_members`.`rank_id` AND `guilds`.`id` = `guild_members`.`guild_id`";
+	query << "SELECT `guild_members`.`nick`, `guild_ranks`.`name`, `guild_ranks`.`level`, `guilds`.`id` \
+		FROM `guild_members` \
+		LEFT JOIN `guild_ranks` ON `guild_members`.`rank_id` =  `guild_ranks`.`id` \
+		LEFT JOIN `guilds` ON `guilds`.`id` = `guild_ranks`.`guild_id` \
+		WHERE `guild_members`.`player_id` = " << player->getGUID();
+
 	if((result = db->storeQuery(query.str()))){
-		guild->setGuildName(result->getDataString("guild_name"));
-		guild->setGuildRank(result->getDataString("rank_name"));
-		guild->setGuildNick(result->getDataString("guild_nick"));
-		guild->setGuildLevel(result->getDataInt("rank_level"));
-		guild->setGuildId(result->getDataInt("guild_id"));
-		guild->setAtWar();
-		db->freeResult(result);
+		Guild* guild = g_game.getGuildById(result->getDataInt("id"));
+		if(guild){
+			player->setGuild(guild);
+
+			player->guildRank = result->getDataString("name");
+			player->guildLevel = result->getDataInt("level");
+			player->guildNick = result->getDataString("nick");
+
+			db->freeResult(result);
+		}
 	}
-	player->setGuild(guild);
 
 	//get password
 	query.str("");
@@ -979,20 +983,6 @@ bool IOPlayer::getDefaultTown(std::string& name, uint32_t& depotId)
 		return false;
 
 	depotId = result->getDataInt("town_id");
-	db->freeResult(result);
-	return true;
-}
-
-bool IOPlayer::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
-{
-	Database* db = Database::instance();
-	DBResult* result;
-	DBQuery query;
-
-	if(!(result = db->storeQuery("SELECT `id` FROM `guilds` WHERE `name` = " + db->escapeString(guildName))))
-		return false;
-
-	guildId = result->getDataInt("id");
 	db->freeResult(result);
 	return true;
 }

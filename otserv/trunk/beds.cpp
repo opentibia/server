@@ -189,7 +189,6 @@ void BedItem::wakeUp()
 			if(player->isOffline()){
 				IOPlayer::instance()->savePlayer(player);
 				delete player;
-				player = NULL;
 			}
 			else{
 				g_game.addCreatureHealth(player);

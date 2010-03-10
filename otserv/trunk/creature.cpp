@@ -171,6 +171,7 @@ bool Creature::canWalkthrough(const Creature* creature) const
 	if(creature->getPlayer()){
 		return creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen);
 	}
+
 	return false;
 }
 

@@ -87,7 +87,6 @@ Monsters g_monsters;
 Npcs g_npcs;
 BanManager g_bans;
 Vocations g_vocations;
-Guilds g_guilds;
 IPList serverIPs;
 
 boost::mutex g_loaderLock;
@@ -601,12 +600,12 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 
-	if(asLowerCaseString(worldType) == "pvp")
-		g_game.setWorldType(WORLD_TYPE_PVP);
-	else if(asLowerCaseString(worldType) == "no-pvp")
-		g_game.setWorldType(WORLD_TYPE_NO_PVP);
-	else if(asLowerCaseString(worldType) == "pvp-enforced")
-		g_game.setWorldType(WORLD_TYPE_PVP_ENFORCED);
+	if(asLowerCaseString(worldType) == "pvp" || asLowerCaseString(worldType) == "openpvp")
+		g_game.setWorldType(WORLD_TYPE_OPEN_PVP);
+	else if(asLowerCaseString(worldType) == "no-pvp" || asLowerCaseString(worldType) == "optionalpvp")
+		g_game.setWorldType(WORLD_TYPE_OPTIONAL_PVP);
+	else if(asLowerCaseString(worldType) == "pvp-enforced" || asLowerCaseString(worldType) == "hardcorepvp")
+		g_game.setWorldType(WORLD_TYPE_HARDCORE_PVP);
 	else{
 		ErrorMessage("Unknown world type!");
 		exit(-1);
@@ -623,8 +622,8 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::cout << "[done]" << std::endl;
 
-	std::cout << ":: Setting up guilds in war " << std::flush;
-	g_guilds.setGuildsAtWar();
+	std::cout << ":: Setting up guilds in war... " << std::flush;
+	g_game.loadGuildWars();
 	std::cout << "[done]" << std::endl;
 
 	#ifdef __SKULLSYSTEM__

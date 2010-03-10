@@ -20,131 +20,87 @@
 #include "otpch.h"
 
 #include "guild.h"
+#include "game.h"
 #include "database.h"
 
-extern Guilds g_guilds;
+extern Game g_game;
 
 Guild::Guild()
 {
-	guildName = "";
-	guildRank = "";
-	guildNick = "";
-	guildLevel= 0;
-	guildId = 0;
+	id = 0;
+	name = "";
 }
 
-void Guild::setAtWar()
+Guild::~Guild()
 {
-	if(g_guilds.isGuildAtWar(guildId)){
-		GuildWarsMap warMap = g_guilds.guildWars;
-		GuildWarsMap::iterator it;
-		for(it = warMap.begin(); it != warMap.end(); ++it){
-			if(it->second->guildId == guildId){
-				enemyGuilds.insert(it->second->opponentId);
-				warOpponents[it->first] = it->second->opponentId;
-			}
-			else if(it->second->opponentId == guildId){
-				enemyGuilds.insert(it->second->guildId);
-				warOpponents[it->first] = it->second->guildId;
-			}
-		}
-	}
+	clearEnemies();
 }
 
-void Guild::killEnemy(uint32_t _guildId)
+void Guild::addFrag(uint32_t enemyId) const
 {
-	if(isGuildEnemy(_guildId)){
-		GuildWarsMap warMap = g_guilds.guildWars;
-		uint32_t warId;
+	uint32_t warId = isEnemy(enemyId);
+	if(warId != 0){
+		GuildWarsMap::iterator it = g_game.getGuildWars().find(warId);
+		if(it != g_game.getGuildWars().end()){
+			Database* db = Database::instance();
+			DBQuery query;
+			query << "UPDATE `guild_wars` SET ";
 
-		std::map<uint32_t, uint32_t>::iterator it;
-		for(it = warOpponents.begin(); it != warOpponents.end(); ++it){
-			if(it->second == _guildId){
-				warId = it->first;
-				break;
-			}
-		}
-
-		GuildWarsMap::iterator itt = warMap.find(warId);
-		if(itt != warMap.end()){
-			uint32_t killLimit = itt->second->killLimit;
-			uint32_t guildKills;
-			uint32_t opponentKills;
-			if(itt->second->guildId == guildId){
-				guildKills = itt->second->guildKills++;
+			uint32_t frags;
+			if(hasDeclaredWar(warId)){
+				frags = ++it->second.guildFrags;
+				query << "`guild_frags` ";
 			}
 			else{
-				opponentKills = itt->second->opponentKills++;
+				frags = ++it->second.opponentFrags;
+				query << "`opponent_frags` ";
 			}
 
-			if(guildKills + opponentKills >= killLimit){
-				endWar(warId, guildKills, opponentKills);
+			query << "= " << frags << " WHERE `id` = " << warId;
+			db->executeQuery(query.str());
+
+			if(frags >= it->second.fragLimit){
+				g_game.endGuildWar(warId);
 			}
 		}
 	}
 }
 
-bool Guild::isGuildEnemy(uint32_t _guildId) const
+bool Guild::hasDeclaredWar(uint32_t warId) const
 {
-	if(enemyGuilds.find(_guildId) != enemyGuilds.end()){
-		return true;
+	GuildWarsMap::iterator it = g_game.getGuildWars().find(warId);
+	if(it != g_game.getGuildWars().end()){
+		if(it->second.guildId == getId()){
+			return true;
+		}
 	}
+
 	return false;
 }
 
-void Guild::endWar(uint32_t _warId, uint32_t _guildKills, uint32_t opponentKills)
+void Guild::addEnemy(uint32_t guildId, uint32_t warId)
 {
-
-}
-
-void Guilds::setGuildsAtWar()
-{
-	Database* db = Database::instance();
-	DBResult* result;
-	DBQuery query;
-
-	query << "SELECT `war_declaration`.`id` as `wid`, `war_declaration`.`guild_id` as `guild_id`"
-		  << ", `war_declaration`.`opponent_id` as `opponent_id`, `war_declaration`.`frag_limit` as `frag_limit`"
-		  << ", `war_declaration`.`guild_fee` as `guild_fee`, `war_declaration`.`opponent_fee` as `opponent_fee`"
-		  << ", `guild_wars`.`guild_frags` as `guild_frags`, `guild_wars`.`opponent_frags` as `opponent_frags`"
-		  << " FROM `war_declaration`, `guild_wars`"
-		  << " WHERE `war_declaration`.`active` = 1 AND `war_declaration`.`id` = `guild_wars`.`war_id`"
-		  << " AND `war_declaration`.`war_duration` < " << std::time(NULL);
-	if((result = db->storeQuery(query.str()))){
-		do{
-			uint32_t wid = result->getDataInt("wid");
-			guildWars[wid] = new GuildWar();
-
-			guildWars[wid]->guildId = result->getDataInt("guild_id");
-			guildsAtWar.insert(result->getDataInt("guild_id"));
-			guildWars[wid]->opponentId = result->getDataInt("opponent_id");
-			guildsAtWar.insert(result->getDataInt("opponent_id"));
-
-			guildWars[wid]->killLimit = result->getDataInt("frag_limit");
-			guildWars[wid]->guildKills = result->getDataInt("guild_frags");
-			guildWars[wid]->opponentKills = result->getDataInt("opponent_frags");
-			guildWars[wid]->guildFee = result->getDataInt("guild_fee");
-			guildWars[wid]->enemyGuildFee = result->getDataInt("opponent_fee");
-		}while(result->next());
-		db->freeResult(result);
+	if(isEnemy(guildId) == 0){
+		enemyGuilds[guildId] = warId;
 	}
 }
 
-bool Guilds::isGuildAtWar(uint32_t _guildId) const
+uint32_t Guild::isEnemy(uint32_t guildId) const
 {
-	if(guildsAtWar.find(_guildId) != guildsAtWar.end()){
-		return true;
+	EnemyGuildsMap::const_iterator it = enemyGuilds.find(guildId);
+	if(it != enemyGuilds.end()){
+		if(it->first == guildId){
+			return it->second;
+		}
 	}
-	return false;
+
+	return 0;
 }
 
-bool Guilds::clearWar(uint32_t _warId) const
+void Guild::removeEnemy(uint32_t enemyId)
 {
-	Database* db = Database::instance();
-	DBQuery query;
-
-	query << "DELETE FROM `guild_war`, `war_declaration`"
-		  << " WHERE `guild_war`.`war_id` = " << _warId
-		  << " AND `war_declaration`.`id` = " << _warId;
-	return db->executeQuery(query.str());
+	EnemyGuildsMap::iterator it = enemyGuilds.find(enemyId);
+	if(it != enemyGuilds.end()){
+		enemyGuilds.erase(it);
+	}
 }

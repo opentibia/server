@@ -367,7 +367,7 @@ bool Combat::isInPvpZone(const Creature* attacker, const Creature* target)
 
 bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 {
-#ifdef __SKULLSYSTEM__
+	#ifdef __SKULLSYSTEM__
 	const Player* attackerPlayer = attacker->getPlayer();
 	const Player* targetPlayer = target->getPlayer();
 
@@ -378,7 +378,7 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 	if(	attackerPlayer == NULL ||
 		targetPlayer == NULL ||
 		attackerPlayer->isPartner(targetPlayer) ||
-		attackerPlayer->isEnemy(targetPlayer) ||
+		attackerPlayer->isGuildEnemy(targetPlayer) ||
 		Combat::isInPvpZone(attackerPlayer, targetPlayer) ||
 		targetPlayer->hasAttacked(attackerPlayer) ||
 		targetPlayer->getSkull() != SKULL_NONE ||
@@ -387,10 +387,9 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 	}
 
 	return true;
-
-#else
+	#else
 	return false;
-#endif
+	#endif
 }
 
 ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target)
@@ -407,18 +406,14 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
 
-#ifdef __SKULLSYSTEM__
-				if(	(attackerPlayer->getSkull() == SKULL_BLACK) &&
-					(!attackerPlayer->isEnemy(targetPlayer))){
+				#ifdef __SKULLSYSTEM__
+				if(attackerPlayer->getSkull() == SKULL_BLACK &&
+					!attackerPlayer->isGuildEnemy(targetPlayer)){
 					if(targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(attackerPlayer)){
 						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
 				}
-#else
-				if(!attackerPlayer->getGuild()->isGuildEnemy(targetPlayer->getGuildId())){
-					return RET_YOUMAYNOTATTACKTHISPERSON;
-				}
-#endif
+				#endif
 			}
 
 			if(const Player* masterAttackerPlayer = attacker->getPlayerMaster()){
@@ -441,9 +436,9 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 				return RET_ACTIONNOTPERMITTEDINANONPVPZONE;
 			}
 
-			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+			if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP){
 				if(const Player* targetPlayer = target->getPlayer()){
-					if(!targetPlayer->isEnemy(attacker->getPlayer())){
+					if(!targetPlayer->isGuildEnemy(attacker->getPlayer())){
 						if(!isInPvpZone(attacker, target)){
 							return RET_YOUMAYNOTATTACKTHISCREATURE;
 						}
@@ -451,7 +446,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 				}
 
 				if(target->isPlayerSummon()){
-					if(!target->getPlayerMaster()->isEnemy(attacker->getPlayer())){
+					if(!target->getPlayerMaster()->isGuildEnemy(attacker->getPlayer())){
 						if(!isInPvpZone(attacker, target)){
 							return RET_YOUMAYNOTATTACKTHISCREATURE;
 						}
@@ -724,7 +719,7 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 			}
 		}
 		if(p_caster){
-			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
+			if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD){
 					itemId = ITEM_FIREFIELD_SAFE;
 				}
@@ -1559,7 +1554,7 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 			uint32_t owner = getOwner();
 			if(owner != 0 && purposeful){
 				bool harmfulField = true;
-				if(g_game.getWorldType() == WORLD_TYPE_NO_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE) ){
+				if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE) ){
 					Creature* creature = g_game.getCreatureByID(owner);
 					if(creature){
 						if(creature->getPlayer() || creature->isPlayerSummon()){

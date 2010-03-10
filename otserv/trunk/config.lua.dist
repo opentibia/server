@@ -58,8 +58,8 @@ owneremail = "otserv@tibia.de"
 worldname = "OpenTibia"
 
 -- world type
--- options: pvp, no-pvp, pvp-enforced
-worldtype = "pvp"
+-- options: openpvp/pvp, optionalpvp/no-pvp, hardcorepvp/pvp-enforced
+worldtype = "openpvp"
 
 -- does player rate (from lua functions) count on experience gained from killings players on pvp-e worlds?
 rates_for_player_killing = false

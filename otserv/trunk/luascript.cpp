@@ -1145,6 +1145,9 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerGuildNick(cid)
 	lua_register(m_luaState, "getPlayerGuildNick", LuaScriptInterface::luaGetPlayerGuildNick);
 
+	//getPlayerGuildNick(cid)
+	lua_register(m_luaState, "getPlayerGuildLevel", LuaScriptInterface::luaGetPlayerGuildLevel);
+
 	//getPlayerSex(cid)
 	lua_register(m_luaState, "getPlayerSex", LuaScriptInterface::luaGetPlayerSex);
 
@@ -1432,9 +1435,6 @@ void LuaScriptInterface::registerFunctions()
 
 	//getPlayerExperience(cid)
 	lua_register(m_luaState, "getPlayerExperience", LuaScriptInterface::luaGetPlayerExperience);
-
-	//doPlayerSetSex(cid, sex)
-	lua_register(m_luaState, "doPlayerSetSex", LuaScriptInterface::luaDoPlayerSetSex);
 
 	//doPlayerSetGuildRank(cid, rank)
 	lua_register(m_luaState, "doPlayerSetGuildRank", LuaScriptInterface::luaDoPlayerSetGuildRank);
@@ -1919,16 +1919,24 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			value = player->getGuildId();
 			break;
 		case PlayerInfoGuildName:
-			lua_pushstring(L, player->getGuildName().c_str());
+			if(player->getGuild()){
+				lua_pushstring(L, player->getGuild()->getName().c_str());
+			}
+			else{
+				lua_pushstring(L, "");
+			}
 			return 1;
 			break;
 		case PlayerInfoGuildRank:
-			lua_pushstring(L, player->getGuildRank().c_str());
+			lua_pushstring(L, player->guildRank.c_str());
 			return 1;
 			break;
 		case PlayerInfoGuildNick:
-			lua_pushstring(L, player->getGuildNick().c_str());
+			lua_pushstring(L, player->guildNick.c_str());
 			return 1;
+			break;
+		case PlayerInfoGuildLevel:
+			value = player->guildLevel;
 			break;
 		case PlayerInfoSex:
 			value = player->getSex();
@@ -2093,6 +2101,11 @@ int LuaScriptInterface::luaGetPlayerGuildRank(lua_State *L)
 int LuaScriptInterface::luaGetPlayerGuildNick(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoGuildNick);
+}
+
+int LuaScriptInterface::luaGetPlayerGuildLevel(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoGuildLevel);
 }
 
 int LuaScriptInterface::luaGetPlayerSex(lua_State *L)
@@ -4754,13 +4767,13 @@ int LuaScriptInterface::luaGetWorldType(lua_State *L)
 {
 	//getWorldType()
 	switch(g_game.getWorldType()){
-	case WORLD_TYPE_NO_PVP:
+	case WORLD_TYPE_OPTIONAL_PVP:
 		lua_pushnumber(L, 1);
 		break;
-	case WORLD_TYPE_PVP:
+	case WORLD_TYPE_OPEN_PVP:
 		lua_pushnumber(L, 2);
 		break;
-	case WORLD_TYPE_PVP_ENFORCED:
+	case WORLD_TYPE_HARDCORE_PVP:
 		lua_pushnumber(L, 3);
 		break;
 	default:
@@ -6568,27 +6581,6 @@ int LuaScriptInterface::luaGetPlayerDepotItems(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaDoPlayerSetSex(lua_State *L)
-{
-	//doPlayerSetSex(cid, sex)
-	uint32_t sex = popNumber(L);
-	uint32_t cid = popNumber(L);
-
-	ScriptEnviroment* env = getScriptEnv();
-
-	Player* player = env->getPlayerByUID(cid);
-
-	if(player){
-		player->setSex((playersex_t)sex);
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-	}
-	return 1;
-}
-
 int LuaScriptInterface::luaDoPlayerSetGuildRank(lua_State *L)
 {
 	//doPlayerSetGuildRank(cid, rank)
@@ -6598,7 +6590,7 @@ int LuaScriptInterface::luaDoPlayerSetGuildRank(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		player->setGuildRank(rank);
+		player->guildRank = rank;
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -6617,7 +6609,7 @@ int LuaScriptInterface::luaDoPlayerSetGuildNick(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		player->setGuildNick(nick);
+		player->guildNick = nick;
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -6630,10 +6622,10 @@ int LuaScriptInterface::luaDoPlayerSetGuildNick(lua_State *L)
 int LuaScriptInterface::luaGetGuildId(lua_State *L)
 {
 	//getGuildId(guild_name)
-	std::string name = popString(L);
+	std::string guildName = popString(L);
 
 	uint32_t guildId;
-	if(IOPlayer::instance()->getGuildIdByName(guildId, name)){
+	if(g_game.getGuildIdByName(guildId, guildName)){
 		lua_pushnumber(L, guildId);
 	}
 	else{
