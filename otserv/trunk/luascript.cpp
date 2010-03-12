@@ -3983,16 +3983,19 @@ int LuaScriptInterface::luaGetPlayerStorageValue(lua_State *L)
 		int32_t value;
 		if(player->getStorageValue(key, value)){
 			lua_pushnumber(L, value);
+			lua_pushnumber(L, LUA_TRUE);
 		}
 		else{
-			lua_pushnumber(L, -1);
+			lua_pushnumber(L, LUA_ERROR);
+			lua_pushnumber(L, LUA_FALSE);
 		}
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+		lua_pushnumber(L, LUA_FALSE);
 	}
-	return 1;
+	return 2;
 }
 
 int LuaScriptInterface::luaSetPlayerStorageValue(lua_State *L)
@@ -6537,11 +6540,13 @@ int LuaScriptInterface::luaGetGlobalStorageValue(lua_State *L)
 	int32_t value;
 	if(env->getGlobalStorageValue(key, value)){
 		lua_pushnumber(L, value);
+		lua_pushnumber(L, LUA_TRUE);
 	}
 	else{
-		lua_pushnumber(L, -1);
+		lua_pushnumber(L, LUA_ERROR);
+		lua_pushnumber(L, LUA_FALSE);
 	}
-	return 1;
+	return 2;
 }
 
 int LuaScriptInterface::luaSetGlobalStorageValue(lua_State *L)
