@@ -30,6 +30,7 @@
 
 class Player;
 class Party;
+class Guild;
 
 typedef std::map<uint32_t, Player*> UsersMap;
 

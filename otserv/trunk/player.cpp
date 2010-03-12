@@ -3631,7 +3631,7 @@ void Player::doAttacking(uint32_t interval)
 
 uint64_t Player::getGainedExperience(Creature* attacker) const
 {
-	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED && g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP) > 0){
+	if(g_game.getWorldType() == WORLD_TYPE_HARDCORE_PVP && g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP) > 0){
 		Player* attackerPlayer = attacker->getPlayer();
 		if(attackerPlayer && attackerPlayer != this && skillLoss){
 				/*Formula
