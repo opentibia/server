@@ -3629,6 +3629,31 @@ void Player::doAttacking(uint32_t interval)
 	}
 }
 
+uint64_t Player::getGainedExperience(Creature* attacker) const
+{
+	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED && g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP) > 0){
+		Player* attackerPlayer = attacker->getPlayer();
+		if(attackerPlayer && attackerPlayer != this && skillLoss){
+				/*Formula
+				a = attackers level * 0.9
+				b = victims level
+				c = victims experience
+
+				y = (1 - (a / b)) * 0.05 * c
+				*/
+
+				uint32_t a = (int32_t)std::floor(attackerPlayer->getLevel() * 0.9);
+				uint32_t b = getLevel();
+				uint64_t c = getExperience();
+
+				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor(getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ));
+				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP);
+		}
+	}
+
+	return 0;
+}
+
 void Player::onFollowCreature(const Creature* creature)
 {
 	if(!creature){
@@ -3808,9 +3833,7 @@ void Player::onAttackedCreature(Creature* target)
 		bool doPzLock = false;
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
-				if(checkPzBlockOnCombat(targetPlayer)){
-					doPzLock = true;
-				}
+				doPzLock = checkPzBlockOnCombat(targetPlayer);
 
 				#ifdef __SKULLSYSTEM__
 				if( !isPartner(targetPlayer) &&

@@ -536,6 +536,15 @@ ChatChannel* Chat::getChannel(Party* party)
 	return NULL;
 }
 
+ChatChannel* Chat::getChannel(Guild* guild)
+{
+	GuildChannelMap::iterator git = m_guildChannels.find(guild->getId());
+	if(git != m_guildChannels.end()){
+		return git->second;
+	}
+	return NULL;
+}
+
 ChatChannel* Chat::getChannel(Player* player, uint16_t channelId)
 {
 	if(channelId == CHANNEL_GUILD){

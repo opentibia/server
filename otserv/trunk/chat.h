@@ -120,6 +120,7 @@ public:
 	ChannelList getChannelList(Player* player);
 
 	ChatChannel* getChannel(Party* party);
+	ChatChannel* getChannel(Guild* guild);
 	ChatChannel* getChannel(Player* player, uint16_t channelId);
 	ChatChannel* getChannelById(uint16_t channelId);
 	PrivateChatChannel* getPrivateChannel(Player* player);

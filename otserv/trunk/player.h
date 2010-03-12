@@ -376,7 +376,7 @@ public:
 	void addInFightTicks(uint32_t ticks, bool pzlock = false);
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual uint64_t getGainedExperience(Creature* attacker) const { return 0; }
+	virtual uint64_t getGainedExperience(Creature* attacker) const;
 	void getGainExperience(uint64_t& gainExp, bool fromMonster);
 
 	//combat event functions
