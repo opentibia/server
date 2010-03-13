@@ -69,6 +69,7 @@ struct CombatParams{
 		blockedByShield = false;
 		targetCasterOrTopMost = false;
 		isAggressive = true;
+		pzBlock = false;
 		itemId = 0;
 		hitEffect = NM_ME_UNK;
 		hitTextColor = TEXTCOLOR_UNK;
@@ -89,6 +90,7 @@ struct CombatParams{
 	bool blockedByShield;
 	bool targetCasterOrTopMost;
 	bool isAggressive;
+	bool pzBlock;
 	uint32_t itemId;
 	MagicEffectClasses hitEffect;
 	TextColor_t hitTextColor;

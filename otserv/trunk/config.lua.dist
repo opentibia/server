@@ -91,6 +91,9 @@ field_ownership_duration = 5000
 -- When a player dies, how many of the assisting players (ie. how many of those who made damage) should be stored in database?
 death_assist_count = 19
 
+-- Should only the player who did the last hit get the 15-minute pz lock?
+last_hit_pzblock_only = true
+
 -- enable (advanced, item based) hotkeys?
 enablehotkeys = true
 

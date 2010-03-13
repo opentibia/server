@@ -1312,6 +1312,9 @@ void LuaScriptInterface::registerFunctions()
 	//doSendAnimatedText(pos, text, color)
 	lua_register(m_luaState, "doSendAnimatedText", LuaScriptInterface::luaDoSendAnimatedText);
 
+	//doPlayerAddInFightTicks(cid, ticks, <optional: default: 0> pzLock)
+	lua_register(m_luaState, "doPlayerAddInFightTicks", LuaScriptInterface::luaDoPlayerAddInFightTicks);
+
 	//doPlayerAddSkillTry(cid, skillid, n, <optional: default: 0> useMultiplier)
 	lua_register(m_luaState, "doPlayerAddSkillTry", LuaScriptInterface::luaDoPlayerAddSkillTry);
 
@@ -2768,6 +2771,33 @@ int LuaScriptInterface::luaDoChangeTypeItem(lua_State *L)
 	}
 
 	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerAddInFightTicks(lua_State *L)
+{
+	//doPlayerAddInFightTicks(cid, ticks, <optional: default: 0> pzLock)
+	int32_t parameters = lua_gettop(L);
+
+	bool doPzLock = false;
+	if(parameters > 2){
+		doPzLock = (popNumber(L) == LUA_TRUE);
+	}
+
+	uint32_t ticks = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->addInFightTicks(ticks, doPzLock);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
 	return 1;
 }
 
@@ -4769,28 +4799,14 @@ int LuaScriptInterface::luaCleanHouse(lua_State *L)
 int LuaScriptInterface::luaGetWorldType(lua_State *L)
 {
 	//getWorldType()
-	switch(g_game.getWorldType()){
-	case WORLD_TYPE_OPTIONAL_PVP:
-		lua_pushnumber(L, 1);
-		break;
-	case WORLD_TYPE_OPEN_PVP:
-		lua_pushnumber(L, 2);
-		break;
-	case WORLD_TYPE_HARDCORE_PVP:
-		lua_pushnumber(L, 3);
-		break;
-	default:
-		lua_pushnumber(L, LUA_ERROR);
-		break;
-	}
+	lua_pushnumber(L, g_game.getWorldType());
 	return 1;
 }
 
 int LuaScriptInterface::luaGetWorldTime(lua_State *L)
 {
 	//getWorldTime()
-	uint32_t time = g_game.getLightHour();
-	lua_pushnumber(L, time);
+	lua_pushnumber(L, g_game.getLightHour());
 	return 1;
 }
 

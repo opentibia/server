@@ -543,6 +543,12 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 			return true;
 		}
 
+		case COMBATPARAM_PZBLOCK:
+		{
+			params.pzBlock = (value != 0);
+			return true;
+		}
+
 		default:
 		{
 			break;
@@ -736,13 +742,7 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 					itemId = ITEM_WILDGROWTH_SAFE;
 				}
 			} else if(params.isAggressive){
-				const ItemType& it = Item::items[itemId];
-				if(!it.blockPathFind){
-					p_caster->addInFightTicks(g_game.getInFightTicks(), true);
-				}
-				else{
-					p_caster->addInFightTicks(g_game.getInFightTicks());
-				}
+				p_caster->addInFightTicks(g_game.getInFightTicks(), params.pzBlock);
 			}
 		}
 		Item* item = Item::CreateItem(itemId);

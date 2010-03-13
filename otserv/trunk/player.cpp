@@ -2593,8 +2593,11 @@ void Player::addInFightTicks(uint32_t ticks, bool pzlock /*= false*/)
 			pzLocked = true;
 			sendIcons();
 		}
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, ticks, 0);
-		addCondition(condition);
+
+		if(ticks > 0){
+			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, ticks, 0);
+			addCondition(condition);
+		}
 	}
 }
 
@@ -3972,8 +3975,8 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 			targetPlayer->setDropLoot(false);
 			targetPlayer->setLossSkill(false);
 		}
-		else if(!hasFlag(PlayerFlag_NotGainInFight)){
-			if(!Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
+		else if(!g_config.getNumber(ConfigManager::LAST_HIT_PZBLOCK_ONLY) || lastHit){
+			if(!hasFlag(PlayerFlag_NotGainInFight) && !Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
 				if(checkPzBlockOnCombat(targetPlayer)){
 					addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_SKULL_DURATION), true);
 				}

@@ -363,6 +363,7 @@ protected:
 	static int luaGetCreatureLight(lua_State *L);
 	static int luaGetCreatureLookDir(lua_State *L);
 
+	static int luaDoPlayerAddInFightTicks(lua_State *L);
 	static int luaDoPlayerAddSkillTry(lua_State *L);
 	static int luaDoPlayerAddManaSpent(lua_State *L);
 	static int luaDoPlayerAddMana(lua_State *L);

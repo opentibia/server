@@ -3,6 +3,7 @@ setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_FIREDAMAGE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_HITBYFIRE)
 setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_FIRE)
 setCombatParam(combat, COMBAT_PARAM_CREATEITEM, 1492)
+setCombatParam(combat, COMBATPARAM_PZBLOCK, TRUE)
 
 local area = createCombatArea(AREA_WALLFIELD, AREADIAGONAL_WALLFIELD)
 setCombatArea(combat, area)
