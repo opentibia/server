@@ -326,6 +326,8 @@ public:
 protected:
 	static void doCombatDefault(Creature* caster, Creature* target, const CombatParams& params);
 
+	static void onCreatureDoCombat(Creature* caster, Creature* target);
+
 	static void CombatFunc(Creature* caster, const Position& pos,
 		const AreaCombat* area, const CombatParams& params, COMBATFUNC func, void* data);
 
