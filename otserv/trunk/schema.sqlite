@@ -58,7 +58,7 @@ CREATE TABLE "players" (
 	"loss_mana" INTEGER NOT NULL DEFAULT 100,
 	"loss_skills" INTEGER NOT NULL DEFAULT 100,
 	"loss_items" INTEGER NOT NULL DEFAULT 10,
-	"loss_containers" INTEGER NOT NULL DEFAULT 100
+	"loss_containers" INTEGER NOT NULL DEFAULT 100,
 	"town_id" INTEGER NOT NULL,
 	"balance" INTEGER NOT NULL DEFAULT 0,
 	"stamina" INTEGER NOT NULL DEFAULT 151200000,
@@ -144,7 +144,7 @@ CREATE TABLE "houses" (
 );
 
 CREATE TABLE "house_auctions" (
-	"id" INTEGER PRIMARY KEY",
+	"id" INTEGER PRIMARY KEY,
 	"house_id" INTEGER NOT NULL,
 	"player_id" INTEGER NOT NULL,
 	"bid" INTEGER NOT NULL DEFAULT 0,
@@ -212,13 +212,6 @@ CREATE TABLE "player_storage" (
 	"key" INTEGER NOT NULL,
 	"value" INTEGER NOT NULL,
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
-);
-
-CREATE TABLE "player_viplist" (
-	"player_id" INTEGER NOT NULL,
-	"vip_id" INTEGER NOT NULL,
-	FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
-	FOREIGN KEY ("vip_id") REFERENCES "players" ("id")
 );
 
 CREATE TABLE "tiles" (
