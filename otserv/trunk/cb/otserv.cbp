@@ -251,6 +251,8 @@
 		<Unit filename="../outfit.h" />
 		<Unit filename="../outputmessage.cpp" />
 		<Unit filename="../outputmessage.h" />
+		<Unit filename="../parametersType.cpp" />
+		<Unit filename="../parametersType.h" />
 		<Unit filename="../party.cpp" />
 		<Unit filename="../party.h" />
 		<Unit filename="../pch.mak" />
