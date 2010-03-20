@@ -59,7 +59,8 @@ public:
 	bool checkScript(const std::string& datadir, const std::string& scriptsName, const std::string& scriptFile);
 	virtual bool loadScript(const std::string& scriptFile, bool reserveEnviroment = true);
 	virtual bool loadFunction(const std::string& functionName);
-		
+	int32_t getScriptId() { return m_scriptId; };
+	LuaScriptInterface* getScriptInterface() { return m_scriptInterface; };
 protected:
 	virtual std::string getScriptEventName() = 0;
 	

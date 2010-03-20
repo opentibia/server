@@ -277,21 +277,7 @@ bool Npc::loadFromXml(const std::string& filename)
 				currentOutfit = defaultOutfit;
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"parameters") == 0){
-
-				for(xmlNodePtr q = p->children; q != NULL; q = q->next){
-					if(xmlStrcmp(q->name, (const xmlChar*)"parameter") == 0){
-						std::string paramKey;
-						std::string paramValue;
-						if(!readXMLString(q, "key", paramKey)){
-							continue;
-						}
-						if(!readXMLString(q, "value", paramValue)){
-							continue;
-						}
-						m_parameters[paramKey] = paramValue;
-					}
-				}
-
+				m_parameters.readXMLParameters(p);
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"interaction") == 0){
 				if(readXMLInteger(p, "talkradius", intValue)){
@@ -3272,13 +3258,7 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 
 	Npc* npc = env->getNpc();
 	if(npc){
-		Npc::ParametersMap::iterator it = npc->m_parameters.find(paramKey);
-		if(it != npc->m_parameters.end()){
-			lua_pushstring(L, it->second.c_str());
-		}
-		else{
-			lua_pushnil(L);
-		}
+		npc->m_parameters.pushValueToLua(L, paramKey);
 	}
 	else{
 		lua_pushnil(L);

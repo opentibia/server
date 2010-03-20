@@ -86,6 +86,7 @@ void MonsterType::reset()
 	summonList.clear();
 	lootItems.clear();
 	elementMap.clear();
+	parameters.clear();
 
 	for(SpellList::iterator it = spellAttackList.begin(); it != spellAttackList.end(); ++it){
 		if(it->combatSpell){
@@ -278,7 +279,7 @@ ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType,
 	return condition;
 }
 
-bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description)
+bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description, const std::string& ownerName)
 {
 	sb.chance = 100;
 	sb.speed = 2000;
@@ -341,6 +342,9 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	}
 
 	if((sb.spell = g_spells->getSpellByName(name))){
+		if (!ownerName.empty()) {
+			sb.spell->parametersVector.readXMLParameters(node, ownerName);
+		}
 		return true;
 	}
 
@@ -368,6 +372,9 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			return false;
 		}
 
+		if (!ownerName.empty()) {
+			combatSpell->parametersVector.readXMLParameters(node, ownerName);
+		}
 		combatSpell->getCombat()->setPlayerCombatValues(FORMULA_VALUE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
 	}
 	else{
@@ -811,6 +818,9 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 					monsterLoad = false;
 				}
 			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"parameters") == 0){
+			    mType->parameters.readXMLParameters(p);
+			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"flags") == 0){
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
@@ -965,9 +975,8 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
-
 						spellBlock_t sb;
-						if(deserializeSpell(tmpNode, sb, monster_name)){
+						if(deserializeSpell(tmpNode, sb, monster_name, mType->name)){
 							mType->spellAttackList.push_back(sb);
 						}
 						else{

@@ -1859,6 +1859,15 @@ void LuaScriptInterface::registerFunctions()
 	//isValidItemId(itemid)
 	lua_register(m_luaState, "isValidItemId", LuaScriptInterface::luaIsValidItemId);
 
+	//getMonsterParameterByName(name, key)
+	lua_register(m_luaState, "getMonsterParameterByName", LuaScriptInterface::luaGetMonsterParameterByName);
+
+	//getNPCParameterByName(name, key)
+	lua_register(m_luaState, "getNPCParameterByName", LuaScriptInterface::luaGetNPCParameterByName);
+
+	//isNPCName(name)
+	lua_register(m_luaState, "isNPCName", LuaScriptInterface::luaIsNPCName);
+
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
 	luaL_register(m_luaState, "bit", LuaScriptInterface::luaBitReg);
@@ -8249,6 +8258,60 @@ int LuaScriptInterface::luaGetIPBanList(lua_State *L)
 		setField(L, "statement", ban.statement);
 		lua_settable(L, -3);
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsNPCName(lua_State *L)
+{
+	//isNPCName(name)
+	Npc* npc = NULL;
+	std::string name = popString(L);
+	for(AutoList<Npc>::listiterator it = Npc::listNpc.list.begin(); it != Npc::listNpc.list.end(); ++it){
+		if (it->second->getName()==name) {
+			npc = it->second;
+			break;
+		}
+	}
+	if (npc)
+		lua_pushnumber(L, LUA_TRUE);
+	else
+        	lua_pushnumber(L,LUA_FALSE);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetMonsterParameterByName(lua_State *L)
+{
+	//getMonsterParameterByName(name,key)
+	std::string key = popString(L);
+	std::string name = popString(L);
+	MonsterType *mType = g_monsters.getMonsterType(name);
+	if (!mType) {
+		reportErrorFunc((std::string)"There isn't a monster named: " + name + (std::string)".");
+		lua_pushnil(L);
+		return 1;
+		}
+	mType->parameters.pushValueToLua(L, key);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetNPCParameterByName(lua_State *L)
+{
+	//getNPCParameterByName(name,key)
+	Npc* npc = NULL;
+	std::string key = popString(L);
+	std::string name = popString(L);
+	for(AutoList<Npc>::listiterator it = Npc::listNpc.list.begin(); it != Npc::listNpc.list.end(); ++it){
+		if (it->second->getName()==name) {
+			npc = it->second;
+			break;
+			}
+		}
+	if (!npc) {
+		reportErrorFunc((std::string)"There isn't any NPC named: " + name + (std::string)".");
+		lua_pushnil(L);
+		return 1;
+	}
+	npc->m_parameters.pushValueToLua(L,key);
 	return 1;
 }
 

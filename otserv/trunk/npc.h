@@ -25,6 +25,9 @@
 #include "luascript.h"
 #include "templates.h"
 
+#include "parametersType.h"
+struct Parameters_t;
+
 //////////////////////////////////////////////////////////////////////
 // Defines an NPC...
 class Npc;
@@ -507,7 +510,7 @@ public:
 	void setCreatureFocus(Creature* creature);
 
 	NpcScriptInterface* getScriptInterface();
-
+	Parameters_t m_parameters;
 protected:
 	Npc(const std::string& _name);
 
@@ -559,9 +562,6 @@ protected:
 
 	void onPlayerEnter(Player* player, NpcState* state);
 	void onPlayerLeave(Player* player, NpcState* state);
-
-	typedef std::map<std::string, std::string> ParametersMap;
-	ParametersMap m_parameters;
 
 	uint32_t loadParams(xmlNodePtr node);
 	StorageCondition loadStorageCondition(xmlNodePtr node);

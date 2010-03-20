@@ -23,6 +23,7 @@
 
 #include <string>
 #include "creature.h"
+#include "parametersType.h"
 
 #define MAX_LOOTCHANCE 100000
 #define MAX_STATICWALK 100
@@ -122,6 +123,8 @@ public:
 	bool hideHealth;
 	bool isLureable;
 
+	Parameters_t parameters;
+
 	int lightLevel;
 	int lightColor;
 
@@ -164,7 +167,7 @@ public:
 private:
 	ConditionDamage* getDamageCondition(ConditionType_t conditionType,
 		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
-	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "");
+	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "", const std::string& nameOwner = "");
 
 	bool loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
 
