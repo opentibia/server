@@ -436,6 +436,10 @@ public:
 	void broadcastLoot(Creature* creature, Container* corpse);
 	bool checkPzBlockOnCombat(Player* targetPlayer);
 
+	//creature events
+	void onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
+	bool onLookEvent(Thing* target, uint32_t itemId);
+
 	//tile
 	//send methods
 	void sendAddTileItem(const Tile* tile, const Position& pos, const Item* item)

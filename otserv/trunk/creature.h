@@ -453,13 +453,17 @@ protected:
 	uint32_t blockTicks;
 
 	//creature script events
-	uint32_t scriptEventsBitField;
 	bool hasEventRegistered(CreatureEventType_t event){
 		return (0 != (scriptEventsBitField & ((uint32_t)1 << event)));
 	}
+	uint32_t scriptEventsBitField;
 	typedef std::list<CreatureEvent*> CreatureEventList;
 	CreatureEventList eventsList;
 	CreatureEventList getCreatureEvents(CreatureEventType_t type);
+	void onDieEvent(Item* corpse);
+	void onKillEvent(Creature* target, bool lastHit);
+	virtual void onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel){}
+	virtual bool onLookEvent(Thing* target, uint32_t itemId){ return false; }
 
 	void updateMapCache();
 #ifdef __DEBUG__

@@ -2936,11 +2936,12 @@ bool Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int ind
 		std::abs(player->getPosition().y - tradeItem->getPosition().y));
 
 	if(index == 0){
-		if (g_creatureEvents->executeLookAtEvent(player, tradeItem, tradeItem->getID()))
-			return(false);
-		std::stringstream ss;
-		ss << "You see " << tradeItem->getDescription(lookDistance);
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+		if(player->onLookEvent(tradeItem, tradeItem->getID())){
+			std::stringstream ss;
+			ss << "You see " << tradeItem->getDescription(lookDistance);
+			player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+		}
+
 		return false;
 	}
 
@@ -2974,11 +2975,11 @@ bool Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int ind
 	}
 
 	if(foundItem){
-		if (g_creatureEvents->executeLookAtEvent(player, tradeItem, tradeItem->getID()))
-			return(true);
-		std::stringstream ss;
-		ss << "You see " << tradeItem->getDescription(lookDistance);
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+		if(player->onLookEvent(tradeItem, tradeItem->getID())){
+			std::stringstream ss;
+			ss << "You see " << tradeItem->getDescription(lookDistance);
+			player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+		}
 	}
 
 	return foundItem;
@@ -3148,12 +3149,12 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 	else{
 		subType = count;
 	}
-	
-	if (g_creatureEvents->executeLookAtEvent(player, NULL, it.id))
-		return(true);
-	std::stringstream ss;
-	ss << "You see " << Item::getDescription(it, 1, NULL, subType);
-	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+
+	if(player->onLookEvent(NULL, it.id)){
+		std::stringstream ss;
+		ss << "You see " << Item::getDescription(it, 1, NULL, subType);
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
+	}
 
 	return true;
 }
@@ -3187,11 +3188,12 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 			lookDistance = lookDistance + 9 + 6;
 	}
 
-	uint16_t itemidPar = 0;
-	if (thing->getItem())
-		itemidPar = thing->getItem()->getID();
-	if (g_creatureEvents->executeLookAtEvent(player, thing, itemidPar))
-		return(true);
+	uint16_t itemId = 0;
+	if(thing->getItem())
+		itemId = thing->getItem()->getID();
+	if(!player->onLookEvent(thing, itemId))
+		return true;
+
 	std::stringstream ss;
 	ss << "You see " << thing->getDescription(lookDistance);
 

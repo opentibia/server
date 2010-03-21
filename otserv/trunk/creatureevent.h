@@ -44,9 +44,8 @@ public:
 	virtual ~CreatureEvents();
 
 	// global events
-	uint32_t playerLogIn(Player* player);
-	uint32_t playerLogOut(Player* player);
-	bool executeLookAtEvent(Player* player, Thing* target, uint16_t itemidPar);
+	bool playerLogIn(Player* player);
+	bool playerLogOut(Player* player);
 
 	CreatureEvent* getEventByName(const std::string& name, bool forceLoaded = true);
 
@@ -86,7 +85,7 @@ public:
 	uint32_t executeOnDie(Creature* creature, Item* corpse);
 	uint32_t executeOnKill(Creature* creature, Creature* target, bool lastHit);
 	uint32_t executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
-	uint32_t executeOnLook(Creature* creature, Thing* target, uint16_t itemIdPar);
+	uint32_t executeOnLook(Player* player, Thing* target, uint16_t itemId);
 	//
 
 protected:

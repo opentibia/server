@@ -728,11 +728,7 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 		sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
 
 		//scripting event - onAdvance
-		CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
-		for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
-		{
-			(*it)->executeOnAdvance(this, (levelTypes_t)skill, (skills[skill][SKILL_LEVEL] - 1), skills[skill][SKILL_LEVEL]);
-		}
+		onAdvanceEvent((levelTypes_t)skill, (skills[skill][SKILL_LEVEL] - 1), skills[skill][SKILL_LEVEL]);
 
 		sendSkills();
 	}
@@ -2098,11 +2094,7 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
 
 			//scripting event - onAdvance
-			CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
-			for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
-			{
-				(*it)->executeOnAdvance(this, LEVEL_MAGIC, (magLevel - 1), magLevel);
-			}
+			onAdvanceEvent(LEVEL_MAGIC, (magLevel - 1), magLevel);
 
 			sendStats();
 		}
@@ -2153,11 +2145,7 @@ void Player::addExperience(uint64_t exp)
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 
 		//scripting event - onAdvance
-		CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
-		for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it)
-		{
-			(*it)->executeOnAdvance(this, LEVEL_EXPERIENCE, prevLevel, newLevel);
-		}
+		onAdvanceEvent(LEVEL_EXPERIENCE, prevLevel, newLevel);
 	}
 
 	currLevelExp = Player::getExpForLevel(level);
@@ -4656,6 +4644,26 @@ bool Player::checkPzBlockOnCombat(Player* targetPlayer)
 
 	if(isPartner(targetPlayer)){
 		return false;
+	}
+
+	return true;
+}
+
+void Player::onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
+{
+	CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
+	for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it){
+		(*it)->executeOnAdvance(this, type, oldLevel, newLevel);
+	}
+}
+
+bool Player::onLookEvent(Thing* target, uint32_t itemId)
+{
+	CreatureEventList lookEvents = getCreatureEvents(CREATURE_EVENT_LOOK);
+	for(CreatureEventList::iterator it = lookEvents.begin(); it != lookEvents.end(); ++it){
+		if(!(*it)->executeOnLook(this, target, itemId)){
+			return false;
+		}
 	}
 
 	return true;

@@ -806,11 +806,7 @@ Item* Creature::dropCorpse()
 	}
 
 	//scripting event - onDie
-	CreatureEventList dieEvents = getCreatureEvents(CREATURE_EVENT_DIE);
-	for(CreatureEventList::iterator it = dieEvents.begin(); it != dieEvents.end(); ++it)
-	{
-		(*it)->executeOnDie(this, corpse);
-	}
+	this->onDieEvent(corpse);
 
 	return corpse;
 }
@@ -1291,11 +1287,7 @@ void Creature::onKilledCreature(Creature* target, bool lastHit)
 	}
 
 	//scripting event - onKill
-	CreatureEventList killEvents = getCreatureEvents(CREATURE_EVENT_KILL);
-	for(CreatureEventList::iterator it = killEvents.begin(); it != killEvents.end(); ++it)
-	{
-		(*it)->executeOnKill(this, target, lastHit);
-	}
+	this->onKillEvent(target, lastHit);
 }
 
 void Creature::onGainExperience(uint64_t gainExp, bool fromMonster)
@@ -1625,6 +1617,22 @@ CreatureEventList Creature::getCreatureEvents(CreatureEventType_t type)
 	}
 
 	return typeList;
+}
+
+void Creature::onDieEvent(Item* corpse)
+{
+	CreatureEventList dieEvents = getCreatureEvents(CREATURE_EVENT_DIE);
+	for(CreatureEventList::iterator it = dieEvents.begin(); it != dieEvents.end(); ++it){
+		(*it)->executeOnDie(this, corpse);
+	}
+}
+
+void Creature::onKillEvent(Creature* target, bool lastHit)
+{
+	CreatureEventList killEvents = getCreatureEvents(CREATURE_EVENT_KILL);
+	for(CreatureEventList::iterator it = killEvents.begin(); it != killEvents.end(); ++it){
+		(*it)->executeOnKill(this, target, lastHit);
+	}
 }
 
 FrozenPathingConditionCall::FrozenPathingConditionCall(const Position& _targetPos)
