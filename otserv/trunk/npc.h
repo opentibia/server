@@ -25,7 +25,7 @@
 #include "luascript.h"
 #include "templates.h"
 
-#include "parametersType.h"
+#include "params.h"
 struct Parameters_t;
 
 //////////////////////////////////////////////////////////////////////

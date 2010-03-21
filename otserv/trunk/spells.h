@@ -28,7 +28,7 @@
 #include "talkaction.h"
 #include "baseevents.h"
 
-#include "parametersType.h"
+#include "params.h"
 class SpellParametersVector_t;
 
 class InstantSpell;

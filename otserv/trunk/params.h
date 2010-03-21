@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_PARAMETERSTYPE_H__
-#define __OTSERV_PARAMETERSTYPE_H__
+#ifndef __OTSERV_PARAMS_H__
+#define __OTSERV_PARAMS_H__
 
 #include <string>
 #include <map>
@@ -42,28 +42,29 @@ typedef std::map<std::string, std::string> StringParameters_t;
 typedef std::map<std::string, int32_t> IntParameters_t;
 
 struct Parameters_t {
-    StringParameters_t stringParameters;
-    IntParameters_t intParameters;
-    void set(const std::string key, const std::string val);
-    void set(const std::string key, const int32_t val);
-    bool get(const std::string key, std::string &ret) const;
-    bool get(const std::string key, int32_t &ret) const;
-    bool isEmpty() const;
-    void clear() { stringParameters.clear();
-                    intParameters.clear(); };
-    void pushValueToLua(lua_State *L, const std::string key) const;
-    bool readXMLParameters(const xmlNodePtr node);
-    };
+	StringParameters_t stringParameters;
+	IntParameters_t intParameters;
+	void set(const std::string key, const std::string val);
+	void set(const std::string key, const int32_t val);
+	bool get(const std::string key, std::string &ret) const;
+	bool get(const std::string key, int32_t &ret) const;
+	bool isEmpty() const;
+	void clear() {
+			stringParameters.clear();
+			intParameters.clear();
+			};
+	void pushValueToLua(lua_State *L, const std::string key) const;
+	bool readXMLParameters(const xmlNodePtr node);
+};
 
 struct ParametersVector_t {
-    std::map<std::string, Parameters_t*> parametersVector;
-    void set(const std::string owner, const std::string key, const std::string val);
-    void set(const std::string owner, const std::string key, const int32_t val);
-    bool pushLuaExtraParametersTable(const std::string owner, LuaScriptInterface *env) const;
-    bool get(const std::string owner, const std::string key, std::string &ret) const;
-    bool get(const std::string owner, const std::string key, int32_t &ret) const;
-    bool readXMLParameters(const xmlNodePtr node, const std::string ownerName);
-    void reset();
-
-    };
+	std::map<std::string, Parameters_t*> parametersVector;
+	void set(const std::string owner, const std::string key, const std::string val);
+	void set(const std::string owner, const std::string key, const int32_t val);
+	bool pushLuaExtraParametersTable(const std::string owner, LuaScriptInterface *env) const;
+	bool get(const std::string owner, const std::string key, std::string &ret) const;
+	bool get(const std::string owner, const std::string key, int32_t &ret) const;
+	bool readXMLParameters(const xmlNodePtr node, const std::string ownerName);
+	void reset();
+	};
 #endif
