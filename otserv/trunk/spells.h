@@ -29,7 +29,6 @@
 #include "baseevents.h"
 
 #include "params.h"
-class SpellParametersVector_t;
 
 class InstantSpell;
 class ConjureSpell;

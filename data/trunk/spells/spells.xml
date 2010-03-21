@@ -350,7 +350,7 @@
 	<instant name="Terra Wave" words="exevo tera hur" lvl="38" mana="210" direction="1" script="attack/terra_wave.lua">
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 	</instant>
-	<instant name="Divine Missile" words="exori san" lvl="40" range="3" mana="20" prem="1" casterTargetOrDirection="1" script="attack/divine_missile.lua">
+	<instant name="Divine Missile" words="exori san" lvl="40" range="4" mana="20" prem="1" casterTargetOrDirection="1" script="attack/divine_missile.lua">
 		<vocation name="Paladin"/>  <vocation name="Royal Paladin"/>
 	</instant>
 	<instant name="Divine Caldera" words="exevo mas san" lvl="50" mana="160" prem="1" selftarget="1" script="attack/divine_caldera.lua">

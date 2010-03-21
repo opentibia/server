@@ -1509,11 +1509,11 @@ void ProtocolGame::sendCreatureSkull(const Creature* creature)
 			TRACK_MESSAGE(msg);
 			msg->AddByte(0x90);
 			msg->AddU32(creature->getID());
-#ifdef __SKULLSYSTEM__
+			#ifdef __SKULLSYSTEM__
 			msg->AddByte(player->getSkullClient(creature->getPlayer()));
-#else
+			#else
 			msg->AddByte(SKULL_NONE);
-#endif
+			#endif
 		}
 	}
 }
