@@ -1,4 +1,6 @@
 function onLogin(cid)
+	--registerCreatureEvent(cid, "PlayerLook")
+
 	--Register the kill/die event
 	registerCreatureEvent(cid, "RemoveBlesses")
 
