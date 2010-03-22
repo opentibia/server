@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Braindeath" nameDescription="a braindeath" race="undead" experience="895" speed="270" manacost="0">
+	<health now="1225" max="1225"/>
+	<look type="256" corpse="7256"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="5"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="60" attack="55"/>
+		<attack name="energy" interval="2000" chance="25" range="7" min="-45" max="-250">
+			<attribute key="shootEffect" value="energy"/>
+		</attack>
+		<attack name="fire" interval="2000" chance="20" range="7" min="-60" max="-80">
+			<attribute key="shootEffect" value="fire"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="20" range="7" min="-70" max="-290">
+			<attribute key="shootEffect" value="suddendeath"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="25" range="7" min="-30" max="-70">
+			<attribute key="shootEffect" value="poison"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="15" range="7" min="-75" max="-85">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="manadrain" interval="2000" chance="30" range="7" min="-20" max="-340">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="10" range="7" speedchange="-600" duration="20000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="13" defense="26">
+		<defense name="healing" interval="2000" chance="30" min="0" max="1">
+			<attribute key="areaEffect" value="energy"/>
+		</defense>
+	</defenses>
+		<elements>
+	<element icePercent="13"/>
+		<element physicalPercent="9"/>
+		<element holyPercent="-10"/>
+		<element firePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity earth="1"/>
+		<immunity death="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="3">
+		<summon name="Vampire" interval="2000" chance="10"/>
+	</summons>
+	<voices interval="5000" chance="10">
+		<voice sentence="You have disturbed my thoughts!"/>
+		<voice sentence="Let me turn you into something more useful!"/>
+		<voice sentence="Let me taste your brain!"/>
+		<voice sentence="You will be punished!"/>
+	</voices>
+	<loot>
+		<item id="2509" chance="6000"/><!-- steel shield -->
+		<item id="2148" countmax="45" chance="100000"/><!-- gold coin -->
+		<item id="2445" chance="400"/><!-- crystal mace -->
+		<item id="2397" chance="12000"/><!-- longsword -->
+		<item id="2518" chance="300"/><!-- beholder shield -->
+		<item id="2181" chance="1333"/><!-- terra rod -->
+		<item id="3972" chance="600"/><!-- beholder helmet -->
+		<item id="2451" chance="300"/><!-- djinn blade -->
+		<item id="5898" chance="1700" countmax="1"/><!-- beholder eye -->
+		<item id="1987" chance="80000"><!-- bag -->
+			<inside>
+				<item id="2377" chance="6000"/><!-- two handed sword -->
+				<item id="2175" chance="1000"/><!-- spellbook -->
+				<item id="2394" countmax="1" chance="10000"/><!-- morning star -->
+				<item id="2148" countmax="32" chance="80000"/><!-- gold coin -->
+				<item id="2148" countmax="90" chance="80000"/><!-- gold coin -->
+				<item id="2423" chance="5000"/><!-- clerical mace -->
+				<item id="2391" chance="1333"/><!-- war hammer -->
+			</inside>
+		</item>
+	</loot>
+</monster>

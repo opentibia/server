@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Priestess" nameDescription="a priestess" race="blood" experience="420" speed="220" manacost="0">
+	<health now="390" max="390"/>
+	<look type="58" corpse="6081"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="25" attack="20" poison="250"/>
+		<attack name="physical" interval="2000" chance="25" range="7" min="-55" max="-95">
+			<attribute key="shootEffect" value="suddendeath"/>
+		</attack>
+		<attack name="manadrain" interval="1000" chance="25" range="7" min="-60" max="-120">
+			<attribute key="areaEffect" value="redshimmer"/>
+	</attack>
+	</attacks>
+	<defenses armor="10" defense="19">
+		<defense name="healing" interval="1000" chance="15" min="34" max="56">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="40"/>
+		<element earthPercent="20"/>
+		<element deathPercent="20"/>
+		<element physicalPercent="-13"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="ghoul" interval="1000" chance="8" max="2"/>
+	</summons>
+	<voices interval="5000" chance="10">
+		<voice sentence="Your energy is mine."/>
+		<voice sentence="Now, your life has come to an end, hahahha!"/>
+		<voice sentence="Throw the soul on the altar!"/>
+	</voices>
+	<loot>
+		<item id="2674" countmax="2" chance="7500"/><!-- red apple -->
+		<item id="2148" countmax="10" chance="100000"/><!-- gold coin -->
+		<item id="2183" chance="1000"/><!-- hailstorm rod -->
+		<item id="1977" chance="7000"/><!-- book -->
+		<item id="2032" chance="10000"/><!-- bowl -->
+		<item id="2070" chance="3333"/><!-- flute -->
+		<item id="2529" chance="1818"/><!-- black shield -->
+		<item id="2423" chance="1500"/><!-- clerical mace -->
+		<item id="2379" chance="23000"/><!-- dagger -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2125" chance="600"/><!-- crystal necklace -->
+				<item id="2802" countmax="1" chance="14000"/><!-- sling herb -->
+				<item id="2803" countmax="1" chance="6000"/><!-- powder herb -->
+				<item id="2420" chance="10000"/><!-- machete -->
+				<item id="2143" countmax="2" chance="5000"/><!-- white pearl -->
+				<item id="2760" chance="5000"/><!-- goat grass -->
+				<item id="2791" countmax="1" chance="3500"/><!-- wood mushroom -->
+				<item id="2192" chance="2500"/><!-- crystal ball -->
+				<item id="2114" chance="2857"/><!-- piggy bank -->
+				<item id="2134" chance="3333"/><!-- silver brooch -->
+				<item id="2151" countmax="2" chance="4000"/><!-- talon -->
+				<item id="2145" countmax="2" chance="1666"/><!-- small diamond -->
+			</inside>
+		</item>
+	</loot>
+</monster>

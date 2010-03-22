@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Grimgor Guteater" nameDescription="grimgor guteater" race="blood" experience="670" speed="240" manacost="0">
+	<health now="1115" max="1115"/>
+	<look type="2" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-100" max="-235"/>
+		<attack name="physical" interval="4000" chance="60" min="-55" max="-130">
+			<attribute key="shootEffect" value="throwingstar"/>
+		</attack>
+	</attacks>
+	<defenses armor="45" defense="45"/>
+	<elements>
+		<element firePercent="100"/>
+		<element energyPercent="20"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="5">
+		<voice sentence="Dont run, You're burning off precious fat."/>
+	</voices>
+</monster>

@@ -1,0 +1,249 @@
+<?xml version="1.0"?>
+<npc name="Helmut" floorchange="0" walkinterval="7500">
+  <health now="150" max="150"/>
+  <look type="133" head="20" body="120" legs="75" feet="13"/>
+
+  <interaction range="3" idletimeout="30">
+
+    <interact keywords="hi" param="sorcerer" focus="1">
+      <!--These are the alternative keywords-->
+      <keywords>hello</keywords>
+
+      <response text="Oh, be welcome |NAME|."/>
+    </interact>
+
+    <interact keywords="hi" focus="1">
+      <!--These are the alternative keywords-->
+      <keywords>hello</keywords>
+
+      <response text="Hello..."/>
+    </interact>
+
+    <interact keywords="bye" focus="0">
+      <!--These are the alternative keywords-->
+      <keywords>farewell</keywords>
+
+      <response text="Farewell."/>
+    </interact>
+
+    <interact event="onBusy">
+      <response text="Wait |NAME|, please.">
+        <action name="addqueue" value="|PLAYER|"/>
+      </response>
+    </interact>
+
+    <interact event="onPlayerLeave" focus="0">
+      <response text="Goodbye."/>
+    </interact>
+
+    <interact keywords="job">
+      <response text="I am a teacher of powerful spells!"/>
+    </interact>
+
+    <interact keywords="name">
+      <response text="My friends call me Kohl, but it is really |NPCNAME|."/>
+    </interact>
+
+    <interact keywords="spell" param="sorcerer">
+      <response text="I can teach you rune spells and instant spells. What kind of spell do you wish to learn? You can also tell me for which level you would like to learn a spell, if you prefer that.">
+        <action name="topic" value="1"/>
+      </response>
+    </interact>
+
+    <interact keywords="spell">
+      <response text="Sorry, I only sell spells to Sorcerers."/>
+    </interact>
+
+    <interact topic="1" keywords="level">
+      <response text="For which level would you like to learn a spell?">
+        <action name="topic" value="2"/>
+      </response>
+    </interact>
+
+    <interact topic="1" keywords="instant;rune" >
+      <response text="I sell attack spells, healing spells, support spells and summon spells. Which of these interests you most?"/>
+    </interact>
+
+    <interact topic="1" keywords="attack;rune">
+      <response text="I sell missile rune spells, explosive rune spells, field rune spells, wall rune spells and bomb rune spells."/>
+    </interact>
+
+    <interact topic="1" keywords="support;rune">
+      <response text="In this category I have 'Destroy Field'."/>
+    </interact>
+
+    <interact topic="1" keywords="missile;rune;spell">
+      <response text="In this category I have 'Light Magic Missile', 'Heavy Magic Missile' and 'Sudden Death'."/>
+    </interact>
+
+    <interact topic="1" keywords=";rune;spell">
+      <response text="In this category I have 'Fireball', 'Great Fireball' and 'Explosion'."/>
+    </interact>
+
+    <interact topic="1" keywords="field;rune;spell">
+      <response text="In this category I have 'Poison Field', 'Fire Field' and 'Energy Field'."/>
+    </interact>
+
+    <interact topic="1" keywords="wall;rune;spell">
+      <response text="In this category I have 'Fire Wall', 'Poison Wall' and 'Energy Wall'."/>
+    </interact>
+
+    <interact topic="1" keywords="attack;spell">
+      <response text="In this category I have 'Fire Wave', 'Energy Wave', 'Energy Beam' and 'Great Energy Beam'."/>
+    </interact>
+
+    <interact topic="1" keywords="healing;spell">
+      <response text="In this category I have 'Light Healing', 'Intense Healing', 'Ultimate Healing' and 'Antidote'."/>
+    </interact>
+
+    <interact topic="1" keywords="support;spell">
+      <response text="In this category I have 'Find Person', 'Light', 'Great Light', 'Magic Shield', 'Creature Illusion' and 'Invisible'."/>
+    </interact>
+
+    <interact topic="1" keywords="summon;spell">
+      <response text="In this category I have 'Summon Creature'."/>
+    </interact>
+
+    <interact topic="2" keywords="8">
+      <response text="For level 8 I have 'Find Person' and 'Light'.">
+        <action name="topic" value="2"/>
+      </response>
+    </interact>
+
+    <interact topic="2" keywords="9">
+      <response text="For level 9 I have 'Light Healing'.">
+        <action name="topic" value="2"/>
+      </response>
+    </interact>
+
+    <interact topic="2" keywords="10">
+      <response text="For level 10 I have 'Antidote'.">
+        <action name="topic" value="2"/>
+      </response>
+    </interact>
+
+    <interact topic="2" keywords="11">
+      <response text="For level 11 I have 'Intense Healing'.">
+        <action name="topic" value="2"/>
+      </response>
+    </interact>
+
+    <interact topic="2" keywords="13">
+      <response text="For level 13 I have 'Great Light'.">
+        <action name="topic" value="2"/>
+      </response>
+    </interact>
+
+    <interact topic="2" keywords="14">
+      <response text="For level 14 I have 'Poison Field' and 'Magic Shield'.">
+        <action name="topic" value="2"/>
+      </response>
+    </interact>
+
+    <interact topic="2" keywords="|*|">
+      <response text="Hmm, I have no spells for this level, but for many levels from 8 to 14.">
+        <action name="topic" value="2"/>
+      </response>
+      </interact>
+
+    <interact keywords="find;person" param="sorcerer">
+      <response text="Do you want to learn the spell 'Find person' for |PRICE| gold?">
+        <action name="price" value="80"/>
+        <action name="spell" value="find person"/>
+        <action name="level" value="|SPELLLEVEL|"/>
+        <action name="topic" value="3"/>
+      </response>
+    </interact>
+
+    <interact keywords="light" param="sorcerer">
+      <response text="Do you want to learn the spell 'Light' for |PRICE| gold?">
+        <action name="price" value="100"/>
+        <action name="spell" value="light"/>
+        <action name="level" value="|SPELLLEVEL|"/>
+        <action name="topic" value="3"/>
+      </response>
+    </interact>
+
+    <interact keywords="light;healing" param="sorcerer">
+      <response text="Do you want to learn the spell 'Light Healing' for |PRICE| gold?">
+        <action name="price" value="170"/>
+        <action name="spell" value="light healing"/>
+        <action name="level" value="|SPELLLEVEL|"/>
+        <action name="topic" value="3"/>
+      </response>
+    </interact>
+
+    <interact keywords="antidote" param="sorcerer">
+      <response text="Do you want to learn the spell 'Antidote' for |PRICE| gold?">
+        <action name="price" value="150"/>
+        <action name="spell" value="antidote"/>
+        <action name="level" value="|SPELLLEVEL|"/>
+        <action name="topic" value="3"/>
+      </response>
+    </interact>
+
+    <interact keywords="intense;healing" param="sorcerer">
+      <response text="Do you want to learn the spell 'Intense Healing' for |PRICE| gold?">
+        <action name="price" value="350"/>
+        <action name="spell" value="intense healing"/>
+        <action name="level" value="|SPELLLEVEL|"/>
+        <action name="topic" value="3"/>
+      </response>
+    </interact>
+
+    <interact keywords="great;light" param="sorcerer">
+      <response text="Do you want to learn the spell 'Great Light' for |PRICE| gold?">
+        <action name="price" value="500"/>
+        <action name="spell" value="great light"/>
+        <action name="level" value="|SPELLLEVEL|"/>
+        <action name="topic" value="3"/>
+      </response>
+    </interact>
+
+    <interact keywords="poison;field" param="sorcerer">
+      <response text="Do you want to learn the spell 'Poison Field' for |PRICE| gold?">
+        <action name="price" value="500"/>
+        <action name="spell" value="poison field"/>
+        <action name="level" value="|SPELLLEVEL|"/>
+        <action name="topic" value="3"/>
+      </response>
+    </interact>
+
+    <interact keywords="magic;shield" param="sorcerer">
+      <response text="Do you want to learn the spell 'Poison Field' for |PRICE| gold?">
+        <action name="price" value="500"/>
+        <action name="spell" value="magic shield"/>
+        <action name="level" value="|SPELLLEVEL|"/>
+        <action name="topic" value="3"/>
+      </response>
+    </interact>
+
+    <!-- This is he actual selling of the spell -->
+    <interact topic="3" keywords="yes">
+      <response param="lowlevel" text="You need to be atleast level |LEVEL| to learn this spell!"/>
+      <response knowspell="|SPELL|" text="You already know this spell."/>
+      <response param="lowmoney" text="Come back when you have the money!"/>
+      <response text="Use your knowledge wisely.">
+        <action name="takemoney" value="|PRICE|"/>
+        <action name="teachspell" value="|SPELL|"/>
+        <action name="effect" value="redshimmer"/>
+      </response>
+    </interact>
+
+    <!-- Player is saying something else than expected-->
+    <interact topic="2" keywords="|*|">
+      <response text="Maybe some other time."/>
+    </interact>
+
+    <!-- Player is saying something else than expected-->
+    <interact topic="3" keywords="|*|">
+      <response text="Maybe some other time."/>
+    </interact>
+
+    <!-- Mainly for testing purposes, will trigger when we do not have any other response -->
+    <interact keywords="|*|">
+      <response text="I have no idea what your talking about."/>
+    </interact>
+
+  </interaction>
+</npc>
