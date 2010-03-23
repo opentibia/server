@@ -75,7 +75,7 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	cylinder.cpp	   logger.cpp	       protocolold.cpp	   waitlist.cpp \
 	database.cpp	   luascript.cpp       quests.cpp	   weapons.cpp \
 	mailbox.cpp	   raids.cpp \
-	guild.cpp          params.cpp
+	guild.cpp
 
 pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
 
