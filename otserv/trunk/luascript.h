@@ -638,9 +638,9 @@ protected:
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
 
-	static int luaGetMonsterParameterByName(lua_State *L);
-	static int luaIsNPCName(lua_State *L);
-	static int luaGetNPCParameterByName(lua_State *L);
+	static int luaIsNpcName(lua_State *L);
+	static int luaGetMonsterParameter(lua_State *L);
+	static int luaGetNpcParameter(lua_State *L);
 
 	static const luaL_Reg luaBitReg[13];
 	static int luaBitNot(lua_State *L);

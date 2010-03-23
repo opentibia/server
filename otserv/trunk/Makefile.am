@@ -50,8 +50,8 @@ EXTRA_DIST=autogen.sh \
 	database.h	 logger.h	   raids.h \
 	luascript.h	   rsa.h \
 	mailbox.h	   scheduler.h \
-	guild.h          params.h
-	
+	guild.h
+
 
 
 

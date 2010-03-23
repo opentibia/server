@@ -277,7 +277,19 @@ bool Npc::loadFromXml(const std::string& filename)
 				currentOutfit = defaultOutfit;
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"parameters") == 0){
-				m_parameters.readXMLParameters(p);
+				xmlNodePtr pchild = p->children;
+				while(pchild){
+					if(xmlStrcmp(pchild->name, (const xmlChar*)"parameter") == 0){
+						std::string key;
+						if(readXMLString(pchild, "key", key)){
+							std::string value;
+							if(readXMLString(pchild, "value", value))
+								m_parameters[key] = value;
+						}
+					}
+
+					pchild = pchild->next;
+				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"interaction") == 0){
 				if(readXMLInteger(p, "talkradius", intValue)){
@@ -2262,6 +2274,17 @@ void Npc::setCreatureFocus(Creature* creature)
 	}
 }
 
+bool Npc::getParameter(const std::string key, std::string& value)
+{
+	ParametersMap::const_iterator it = m_parameters.find(key);
+	if(it != m_parameters.end()){
+		value = it->second;
+		return true;
+	}
+
+	return false;
+}
+
 const NpcResponse* Npc::getResponse(const ResponseList& list, const Player* player,
 	NpcState* npcState, const std::string& text, bool exactMatch /*= false*/, NpcEvent_t eventType /*=EVENT_NONE*/)
 {
@@ -3258,11 +3281,14 @@ int NpcScriptInterface::luaGetNpcParameter(lua_State *L)
 
 	Npc* npc = env->getNpc();
 	if(npc){
-		npc->m_parameters.pushValueToLua(L, paramKey);
+		std::string value;
+		if(npc->getParameter(paramKey, value))
+			lua_pushstring(L, value.c_str());
+		else
+			lua_pushnil(L);
 	}
-	else{
+	else
 		lua_pushnil(L);
-	}
 
 	return 1;
 }

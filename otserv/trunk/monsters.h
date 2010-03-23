@@ -23,7 +23,6 @@
 
 #include <string>
 #include "creature.h"
-#include "params.h"
 
 #define MAX_LOOTCHANCE 100000
 #define MAX_STATICWALK 100
@@ -123,7 +122,8 @@ public:
 	bool hideHealth;
 	bool isLureable;
 
-	Parameters_t parameters;
+	ParametersMap m_parameters;
+	ParametersMap m_spellParameters;
 
 	int lightLevel;
 	int lightColor;
@@ -147,6 +147,8 @@ public:
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
 	Item* createLootItem(const LootBlock& lootblock);
+
+	bool getParameter(const std::string key, std::string& value);
 };
 
 class Monsters{
@@ -164,10 +166,13 @@ public:
 
 	static uint32_t getLootRandom();
 
+	void pushSpellParameters(const std::string name, LuaScriptInterface* env);
+
 private:
 	ConditionDamage* getDamageCondition(ConditionType_t conditionType,
 		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
-	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description = "", const std::string& nameOwner = "");
+	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* mType, const std::string& description = "");
+	void deserializeParameters(xmlNodePtr node, MonsterType* mType, bool fromSpell = false);
 
 	bool loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
 

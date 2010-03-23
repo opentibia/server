@@ -25,9 +25,6 @@
 #include "luascript.h"
 #include "templates.h"
 
-#include "params.h"
-struct Parameters_t;
-
 //////////////////////////////////////////////////////////////////////
 // Defines an NPC...
 class Npc;
@@ -508,9 +505,9 @@ public:
 
 	void turnToCreature(Creature* creature);
 	void setCreatureFocus(Creature* creature);
-
+	bool getParameter(const std::string key, std::string& value);
 	NpcScriptInterface* getScriptInterface();
-	Parameters_t m_parameters;
+
 protected:
 	Npc(const std::string& _name);
 
@@ -590,6 +587,7 @@ protected:
 	uint64_t lastResponseTime;
 	bool defaultPublic;
 	int32_t focusCreature;
+	ParametersMap m_parameters;
 
 	typedef std::list<Player*> ShopPlayerList;
 	ShopPlayerList shopPlayerList;

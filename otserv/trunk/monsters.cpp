@@ -86,7 +86,8 @@ void MonsterType::reset()
 	summonList.clear();
 	lootItems.clear();
 	elementMap.clear();
-	parameters.clear();
+	m_parameters.clear();
+	m_spellParameters.clear();
 
 	for(SpellList::iterator it = spellAttackList.begin(); it != spellAttackList.end(); ++it){
 		if(it->combatSpell){
@@ -124,6 +125,24 @@ MonsterType::~MonsterType()
 uint32_t Monsters::getLootRandom()
 {
 	return random_range(0, MAX_LOOTCHANCE)/g_config.getNumber(ConfigManager::RATE_LOOT);
+}
+
+void Monsters::pushSpellParameters(const std::string name, LuaScriptInterface* env)
+{
+	lua_State* L = env->getLuaState();
+
+	MonsterType* mType = getMonsterType(name);
+	if(!mType || mType->m_spellParameters.empty()){
+		lua_pushnil(L);
+		return;
+	}
+
+	lua_newtable(L);
+	ParametersMap::const_iterator it = mType->m_spellParameters.begin();
+	while(it != mType->m_spellParameters.end()){
+		env->setField(L, it->first.c_str(), it->second);
+		++it;
+	}
 }
 
 void MonsterType::createLoot(Container* corpse)
@@ -209,6 +228,17 @@ void MonsterType::createLootContainer(Container* parent, const LootBlock& lootbl
 	}
 }
 
+bool MonsterType::getParameter(const std::string key, std::string& value)
+{
+	ParametersMap::const_iterator it = m_parameters.find(key);
+	if(it != m_parameters.end()){
+		value = it->second;
+		return true;
+	}
+
+	return false;
+}
+
 Monsters::Monsters()
 {
 	loaded = false;
@@ -279,7 +309,7 @@ ConditionDamage* Monsters::getDamageCondition(ConditionType_t conditionType,
 	return condition;
 }
 
-bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::string& description, const std::string& ownerName)
+bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* mType, const std::string& description /*= ""*/)
 {
 	sb.chance = 100;
 	sb.speed = 2000;
@@ -342,9 +372,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	}
 
 	if((sb.spell = g_spells->getSpellByName(name))){
-		if (!ownerName.empty()) {
-			sb.spell->parametersVector.readXMLParameters(node, ownerName);
-		}
+		deserializeParameters(node->children, mType, true);
 		return true;
 	}
 
@@ -372,9 +400,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 			return false;
 		}
 
-		if (!ownerName.empty()) {
-			combatSpell->parametersVector.readXMLParameters(node, ownerName);
-		}
+		deserializeParameters(node->children, mType, true);
 		combatSpell->getCombat()->setPlayerCombatValues(FORMULA_VALUE, sb.minCombatValue, 0, sb.maxCombatValue, 0);
 	}
 	else{
@@ -708,6 +734,28 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, const std::st
 	return true;
 }
 
+void Monsters::deserializeParameters(xmlNodePtr node, MonsterType* mType, bool fromSpell /*= false*/)
+{
+	if(mType){
+		while(node){
+			if(xmlStrcmp(node->name, (const xmlChar*)"parameter") == 0){
+				std::string key;
+				if(readXMLString(node, "key", key)){
+					std::string value;
+					if(readXMLString(node, "value", value)){
+						if(fromSpell)
+							mType->m_spellParameters[key] = value;
+						else
+							mType->m_parameters[key] = value;
+					}
+				}
+			}
+
+			node = node->next;
+		}
+	}
+}
+
 #define SHOW_XML_WARNING(desc) std::cout << "Warning: [Monsters::loadMonster]. " << desc << ". " << file << std::endl;
 #define SHOW_XML_ERROR(desc) std::cout << "Error: [Monsters::loadMonster]. " << desc << ". " << file << std::endl;
 
@@ -819,7 +867,7 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"parameters") == 0){
-			    mType->parameters.readXMLParameters(p);
+				deserializeParameters(p->children, mType);
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"flags") == 0){
 				xmlNodePtr tmpNode = p->children;
@@ -976,7 +1024,7 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
 						spellBlock_t sb;
-						if(deserializeSpell(tmpNode, sb, monster_name, mType->name)){
+						if(deserializeSpell(tmpNode, sb, mType, monster_name)){
 							mType->spellAttackList.push_back(sb);
 						}
 						else{
@@ -1001,7 +1049,7 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"defense") == 0){
 
 						spellBlock_t sb;
-						if(deserializeSpell(tmpNode, sb, monster_name)){
+						if(deserializeSpell(tmpNode, sb, mType, monster_name)){
 							mType->spellDefenseList.push_back(sb);
 						}
 						else{

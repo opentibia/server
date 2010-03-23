@@ -28,8 +28,6 @@
 #include "talkaction.h"
 #include "baseevents.h"
 
-#include "params.h"
-
 class InstantSpell;
 class ConjureSpell;
 class RuneSpell;
@@ -84,7 +82,6 @@ public:
 
 	virtual bool castSpell(Creature* creature) = 0;
 	virtual bool castSpell(Creature* creature, Creature* target) = 0;
-	ParametersVector_t parametersVector;
 
 	//used by some child classes, like CombatSpell and InstantSpell
 	bool internalExecuteCastSpell(Event *event, Creature* creature, const LuaVariant& var, bool &result);

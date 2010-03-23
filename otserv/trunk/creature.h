@@ -115,6 +115,7 @@ struct DeathLessThan{
 };
 
 typedef std::vector<DeathEntry> DeathList;
+typedef std::map<std::string, std::string> ParametersMap;
 
 class Map;
 class Thing;

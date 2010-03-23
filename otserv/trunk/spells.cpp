@@ -161,7 +161,7 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 
 bool BaseSpell::internalExecuteCastSpell(Event *event, Creature* creature, const LuaVariant& var, bool &result)
 {
-	//onCastSpell(cid, var)
+	//onCastSpell(cid, var, extraParameters)
 	LuaScriptInterface *m_scriptInterface = event->getScriptInterface();
 	int32_t m_scriptId = event->getScriptId();
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -184,7 +184,11 @@ bool BaseSpell::internalExecuteCastSpell(Event *event, Creature* creature, const
 		lua_pushnumber(L, cid);
 		m_scriptInterface->pushVariant(L, var);
 
-		this->parametersVector.pushLuaExtraParametersTable(creature->getName(),m_scriptInterface);
+		if(creature->getMonster())
+			g_monsters.pushSpellParameters(creature->getName(), m_scriptInterface);
+		else
+			lua_pushnil(L);
+
 		result = (m_scriptInterface->callFunction(3) != LUA_ERROR);
 
 		m_scriptInterface->releaseScriptEnv();
@@ -453,7 +457,6 @@ bool CombatSpell::castSpell(Creature* creature, Creature* target)
 
 bool CombatSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 {
-	//onCastSpell(cid, var)
 	bool result;
 	if (!internalExecuteCastSpell((Event*) this,creature, var, result)) {
 		std::cout << "[Error] Call stack overflow. CombatSpell::executeCastSpell" << std::endl;
@@ -1332,7 +1335,6 @@ bool InstantSpell::internalCastSpell(Creature* creature, const LuaVariant& var)
 
 bool InstantSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 {
-	//onCastSpell(cid, var)
 	bool result;
 	if (!internalExecuteCastSpell((Event *)this, creature, var, result)) {
 		std::cout << "[Error] Call stack overflow. InstantSpell::executeCastSpell" << std::endl;
@@ -2336,7 +2338,6 @@ bool RuneSpell::internalCastSpell(Creature* creature, const LuaVariant& var)
 
 bool RuneSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 {
-	//onCastSpell(cid, var)
 	bool result;
 	if (!internalExecuteCastSpell((Event*) this, creature, var, result)) {
 		std::cout << "[Error] Call stack overflow. RuneSpell::executeCastSpell" << std::endl;

@@ -1859,14 +1859,14 @@ void LuaScriptInterface::registerFunctions()
 	//isValidItemId(itemid)
 	lua_register(m_luaState, "isValidItemId", LuaScriptInterface::luaIsValidItemId);
 
-	//getMonsterParameterByName(name, key)
-	lua_register(m_luaState, "getMonsterParameterByName", LuaScriptInterface::luaGetMonsterParameterByName);
+	//isNpcName(name)
+	lua_register(m_luaState, "isNpcName", LuaScriptInterface::luaIsNpcName);
 
-	//getNPCParameterByName(name, key)
-	lua_register(m_luaState, "getNPCParameterByName", LuaScriptInterface::luaGetNPCParameterByName);
+	//getMonsterParameter(name, key)
+	lua_register(m_luaState, "getMonsterParameter", LuaScriptInterface::luaGetMonsterParameter);
 
-	//isNPCName(name)
-	lua_register(m_luaState, "isNPCName", LuaScriptInterface::luaIsNPCName);
+	//getNpcParameter(name, key)
+	lua_register(m_luaState, "getNpcParameter", LuaScriptInterface::luaGetNpcParameter);
 
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
@@ -8261,57 +8261,70 @@ int LuaScriptInterface::luaGetIPBanList(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaIsNPCName(lua_State *L)
+int LuaScriptInterface::luaIsNpcName(lua_State *L)
 {
-	//isNPCName(name)
-	Npc* npc = NULL;
+	//isNpcName(name)
 	std::string name = popString(L);
+
 	for(AutoList<Npc>::listiterator it = Npc::listNpc.list.begin(); it != Npc::listNpc.list.end(); ++it){
-		if (it->second->getName()==name) {
+		if (it->second->getName() == name) {
+			lua_pushnumber(L, LUA_TRUE);
+			return 1;
+		}
+	}
+
+	lua_pushnumber(L, LUA_FALSE);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetMonsterParameter(lua_State *L)
+{
+	//getMonsterParameter(name, key)
+	std::string key = popString(L);
+	std::string name = popString(L);
+
+	MonsterType* mType = g_monsters.getMonsterType(name);
+	if(mType){
+		std::string value;
+		if(mType->getParameter(key, value))
+			lua_pushstring(L, value.c_str());
+		else
+			lua_pushnil(L);
+	}
+	else{
+		reportErrorFunc("Could not find monster by name given.");
+		lua_pushnil(L);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaGetNpcParameter(lua_State *L)
+{
+	//getNpcParameter(name, key)
+	Npc* npc = NULL;
+	std::string key = popString(L);
+	std::string name = popString(L);
+
+	for(AutoList<Npc>::listiterator it = Npc::listNpc.list.begin(); it != Npc::listNpc.list.end(); ++it){
+		if(it->second->getName() == name){
 			npc = it->second;
 			break;
 		}
 	}
-	if (npc)
-		lua_pushnumber(L, LUA_TRUE);
-	else
-        	lua_pushnumber(L,LUA_FALSE);
-	return 1;
-}
 
-int LuaScriptInterface::luaGetMonsterParameterByName(lua_State *L)
-{
-	//getMonsterParameterByName(name,key)
-	std::string key = popString(L);
-	std::string name = popString(L);
-	MonsterType *mType = g_monsters.getMonsterType(name);
-	if (!mType) {
-		reportErrorFunc((std::string)"There isn't a monster named: " + name + (std::string)".");
-		lua_pushnil(L);
-		return 1;
-		}
-	mType->parameters.pushValueToLua(L, key);
-	return 1;
-}
-
-int LuaScriptInterface::luaGetNPCParameterByName(lua_State *L)
-{
-	//getNPCParameterByName(name,key)
-	Npc* npc = NULL;
-	std::string key = popString(L);
-	std::string name = popString(L);
-	for(AutoList<Npc>::listiterator it = Npc::listNpc.list.begin(); it != Npc::listNpc.list.end(); ++it){
-		if (it->second->getName()==name) {
-			npc = it->second;
-			break;
-			}
-		}
-	if (!npc) {
-		reportErrorFunc((std::string)"There isn't any NPC named: " + name + (std::string)".");
-		lua_pushnil(L);
-		return 1;
+	if(npc){
+		std::string value;
+		if(npc->getParameter(key, value))
+			lua_pushstring(L, value.c_str());
+		else
+			lua_pushnil(L);
 	}
-	npc->m_parameters.pushValueToLua(L,key);
+	else{
+		reportErrorFunc("Could not find npc by name given.");
+		lua_pushnil(L);
+	}
+
 	return 1;
 }
 
