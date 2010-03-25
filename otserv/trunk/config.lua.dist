@@ -185,7 +185,7 @@ slow_rate_stamina_gain = 84
 -- Loss stamina rate - works as other rates
 rate_stamina_loss = 1
 -- For how many milliseconds (from 42 hours) you get extra experience from monsters
-stamina_extra_experience_duration = 60 * 60 * 1000
+stamina_extra_experience_duration = 2 * 60 * 60 * 1000
 -- How much extra XP you get 0.5 is 50% extra
 stamina_extra_experience_rate = 0.5
 -- If true, only premium players gain extra experience

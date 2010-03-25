@@ -1382,8 +1382,9 @@ void Monster::updateLookDirection()
 void Monster::dropLoot(Container* corpse)
 {
 	if(corpse && lootDrop){
-		mType->createLoot(corpse);
 		Player* killer = g_game.getPlayerByID(corpse->getCorpseOwner());
+		if(!killer || killer->getStaminaMinutes() > 840)
+			mType->createLoot(corpse);
 		if(killer)
 			killer->broadcastLoot(this, corpse->getContainer());
 	}
