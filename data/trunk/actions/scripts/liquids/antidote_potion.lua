@@ -7,7 +7,7 @@ setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, TRUE)
 setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
 setCombatParam(combat, COMBAT_PARAM_DISPEL, CONDITION_POISON)
 
-local exhaust = createConditionObject(CONDITION_EXHAUSTED)
+local exhaust = createConditionObject(CONDITION_EXHAUST_POTION)
 setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('minactionexinterval'))
 
 function onUse(cid, item, frompos, item2, topos)
@@ -15,7 +15,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	if(hasCondition(cid, CONDITION_EXHAUSTED) == TRUE) then
+	if(hasCondition(cid, CONDITION_EXHAUST_POTION) == TRUE) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_YOUAREEXHAUSTED)
 		return TRUE
 	end

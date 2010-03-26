@@ -757,8 +757,17 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						else if(strValue == "drunk"){
 							prop.condition = CONDITION_DRUNK;
 						}
-						else if(strValue == "exhausted"){
-							prop.condition = CONDITION_EXHAUSTED;
+						else if(strValue == "exhaust_yell"){
+							prop.condition = CONDITION_EXHAUST_YELL;
+						}
+						else if(strValue == "exhaust_potion"){
+							prop.condition = CONDITION_EXHAUST_POTION;
+						}
+						else if(strValue == "exhaust_combat"){
+							prop.condition = CONDITION_EXHAUST_COMBAT;
+						}
+						else if(strValue == "exhaust_heal"){
+							prop.condition = CONDITION_EXHAUST_HEAL;
 						}
 						else if(strValue == "regeneration"){
 							prop.condition = CONDITION_REGENERATION;

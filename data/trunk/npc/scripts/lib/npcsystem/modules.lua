@@ -297,7 +297,7 @@ if(Modules == nil) then
 			local z = nil
 			local cost = nil
 			local premium = false
-
+			local checkPzBlock = true
 
 			for temp in string.gmatch(destination, '[^,]+') do
 				if(i == 1) then
@@ -312,6 +312,8 @@ if(Modules == nil) then
 					cost = tonumber(temp)
 				elseif(i == 6) then
 					premium = temp == 'true'
+				elseif(i == 7) then
+					checkPzBlock = temp == 'true'
 				else
 					print('[Warning] NpcSystem:', 'Unknown parameter found in travel destination parameter.', temp, destination)
 				end
@@ -319,20 +321,21 @@ if(Modules == nil) then
 			end
 
 			if(name ~= nil and x ~= nil and y ~= nil and z ~= nil and cost ~= nil) then
-				self:addDestination(name, {x=x, y=y, z=z}, cost, premium)
+				self:addDestination(name, {x=x, y=y, z=z}, cost, premium, checkPzBlock)
 			else
 				print('[Warning] NpcSystem:', 'Parameter(s) missing for travel destination:', name, x, y, z, cost, premium)
 			end
 		end
 	end
 
-	function TravelModule:addDestination(name, position, price, premium)
+	function TravelModule:addDestination(name, position, price, premium, checkPzBlock)
 		table.insert(self.destinations, name)
 
 		local parameters = {
 				cost = price,
 				destination = position,
 				premium = premium,
+				checkPzBlock = checkPzBlock,
 				module = self
 			}
 		local keywords = {}
@@ -378,17 +381,21 @@ if(Modules == nil) then
 		local destination = parentParameters.destination
 		local premium = parentParameters.premium
 
-		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium ~= true) then
-			if(doPlayerRemoveMoney(cid, cost) ~= TRUE) then
-				npcHandler:say('You do not have enough money!', cid)
+		if(isPzLocked(cid) ~= TRUE or parameters.checkPzBlock ~= true) then
+			if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium ~= true) then
+				if(doPlayerRemoveMoney(cid, cost) ~= TRUE) then
+					npcHandler:say('You do not have enough money!', cid)
+				else
+					npcHandler:say('It was a pleasure doing business with you.', cid, true, false)
+					npcHandler:releaseFocus(cid)
+					doTeleportThing(cid, destination)
+					doSendMagicEffect(destination, 10)
+				end
 			else
-				npcHandler:say('It was a pleasure doing business with you.', cid, true, false)
-				npcHandler:releaseFocus(cid)
-				doTeleportThing(cid, destination)
-				doSendMagicEffect(destination, 10)
+				npcHandler:say('I can only allow premium players to travel there.', cid)
 			end
 		else
-			npcHandler:say('I can only allow premium players to travel there.', cid)
+			npcHandler:say('I will not take you there with this blood!', cid)
 		end
 
 		npcHandler:resetNpc()

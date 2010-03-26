@@ -268,7 +268,8 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_INFIGHT:
 		case CONDITION_HUNTING:
 		case CONDITION_DRUNK:
-		case CONDITION_EXHAUSTED:
+		case CONDITION_EXHAUST_YELL:
+		case CONDITION_EXHAUST_POTION:
 		case CONDITION_EXHAUST_COMBAT:
 		case CONDITION_EXHAUST_HEAL:
 		case CONDITION_MUTED:
@@ -1804,7 +1805,6 @@ bool ConditionOutfit::serialize(PropWriteStream& propWriteStream)
 
 	for(std::vector<Outfit_t>::const_iterator it = outfits.begin(); it != outfits.end(); ++it){
 		propWriteStream.ADD_UINT8(CONDITIONATTR_OUTFIT);
-		
 		propWriteStream.ADD_UINT32((*it).lookType);
 		propWriteStream.ADD_UINT32((*it).lookTypeEx);
 		propWriteStream.ADD_UINT32((*it).lookHead);

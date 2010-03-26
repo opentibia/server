@@ -45,7 +45,7 @@ enum ConditionType_t {
 	CONDITION_MANASHIELD     = 1 << 9,
 	CONDITION_INFIGHT        = 1 << 10,
 	CONDITION_DRUNK          = 1 << 11,
-	CONDITION_EXHAUSTED      = 1 << 12,
+	CONDITION_EXHAUST_YELL   = 1 << 12,
 	CONDITION_REGENERATION   = 1 << 13,
 	CONDITION_SOUL           = 1 << 14,
 	CONDITION_DROWN          = 1 << 15,
@@ -58,7 +58,8 @@ enum ConditionType_t {
 	CONDITION_EXHAUST_HEAL   = 1 << 22,
 	CONDITION_PACIFIED       = 1 << 23, // Cannot attack anything
 	CONDITION_HUNTING        = 1 << 24, // Killing monsters
-	CONDITION_TRADE_MUTED    = 1 << 25 // Cannot talk on trade channels
+	CONDITION_TRADE_MUTED    = 1 << 25, // Cannot talk on trade channels
+	CONDITION_EXHAUST_POTION = 1 << 26
 };
 
 enum ConditionEnd_t{

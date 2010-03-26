@@ -1197,7 +1197,7 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 							}
 						}
 						else{
-							SHOW_XML_WARNING("Unknown immunity " << strValue);
+							SHOW_XML_WARNING("Unknown immunity being used.");
 						}
 					}
 

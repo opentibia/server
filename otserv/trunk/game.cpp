@@ -3629,7 +3629,7 @@ bool Game::playerYell(Player* player, const std::string& text)
 {
 	uint32_t addExhaustion = 0;
 	bool isExhausted = false;
-	if(!player->hasCondition(CONDITION_EXHAUSTED)){
+	if(!player->hasCondition(CONDITION_EXHAUST_YELL)){
 		addExhaustion = getExhaustionTicks();
 		internalCreatureSay(player, SPEAK_YELL, asUpperCaseString(text));
 	}
@@ -3640,7 +3640,7 @@ bool Game::playerYell(Player* player, const std::string& text)
 	}
 
 	if(addExhaustion > 0){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, addExhaustion, 0);
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_YELL, addExhaustion, 0);
 		player->addCondition(condition);
 	}
 
