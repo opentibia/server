@@ -222,7 +222,7 @@ int Items::loadFromOtb(std::string file)
 		std::cout << "New version of items.otb detected, a newer version of the server is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
-	else if(Items::dwMinorVersion != CLIENT_VERSION_854){
+	else if(Items::dwMinorVersion != CLIENT_VERSION_855){
 		std::cout << "Another (client) version of items.otb is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -1487,7 +1487,7 @@ bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 			dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[c+1]) / 100.);
 		}
 	}
-	
+
 	return r;
 }
 

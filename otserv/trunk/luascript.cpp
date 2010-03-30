@@ -2030,7 +2030,7 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			value = 0;
 			break;
 		}
-		lua_pushnumber(L,value);
+		lua_pushnumber(L, value);
 		return 1;
 	}
 	else{
@@ -2208,7 +2208,7 @@ int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
 
 	lua_pushnumber(L, viewingPlayer->getSkullClient(player));
 	#else
-	lua_pushnumber(L, 0);
+	lua_pushnumber(L, SKULL_NONE);
 	#endif
 	return 1;
 }
@@ -2240,7 +2240,8 @@ int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 	}
 	#else
-	lua_pushnumber(L, 0);
+	reportErrorFunc("Skull system is not enabled.");
+	lua_pushnumber(L, LUA_ERROR);
 	#endif
 	return 1;
 }
@@ -2940,7 +2941,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 
 	bool canDropOnMap = true;
 	if(parameters > 3){
-		canDropOnMap = (popNumber(L) == 1);
+		canDropOnMap = popNumber(L) == LUA_TRUE;
 	}
 
 	uint32_t count = 1;
@@ -3026,7 +3027,7 @@ int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 
 	bool canDropOnMap = false;
 	if(parameters > 2){
-		canDropOnMap = popNumber(L) == 1;
+		canDropOnMap = popNumber(L) == LUA_TRUE;
 	}
 
 	uint32_t uid = (uint32_t)popNumber(L);
@@ -3041,7 +3042,6 @@ int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 	}
 
 	Item* item = env->getItemByUID(uid);
-
 	if(!item){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -3054,14 +3054,7 @@ int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 		return 1;
 	}
 
-	ReturnValue ret = RET_NOERROR;
-	if(canDropOnMap){
-		ret = g_game.internalPlayerAddItem(player, item);
-	}
-	else{
-		ret = g_game.internalAddItem(player, item);
-	}
-
+	ReturnValue ret = g_game.internalPlayerAddItem(player, item, canDropOnMap);
 	lua_pushnumber(L, ret);
 	return 1;
 }
@@ -3151,7 +3144,7 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 
 	bool moveUnmoveable = false;
 	if(parameters > 2){
-		moveUnmoveable = popNumber(L) == 1;
+		moveUnmoveable = popNumber(L) == LUA_TRUE;
 	}
 
 	PositionEx toPos;
@@ -3334,7 +3327,7 @@ int LuaScriptInterface::luaDoPlayerSetLossPercent(lua_State *L)
 int LuaScriptInterface::luaDoSetCreatureDropLoot(lua_State *L)
 {
 	//doSetCreatureDropLoot(cid, doDrop)
-	bool doDrop = popNumber(L) == 1;
+	bool doDrop = popNumber(L) == LUA_TRUE;
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -4056,7 +4049,7 @@ int LuaScriptInterface::luaSetPlayerStorageValue(lua_State *L)
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
 		player->addStorageValue(key,value);
-		lua_pushnumber(L, 0);
+		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
@@ -5102,7 +5095,7 @@ int LuaScriptInterface::luaGetPlayerItemById(lua_State *L)
 	}
 
 	int32_t itemId = (int32_t)popNumber(L);
-	bool deepSearch = popNumber(L) == 1;
+	bool deepSearch = popNumber(L) == LUA_TRUE;
 	uint32_t cid = popNumber(L);
 
 	Player* player = env->getPlayerByUID(cid);
@@ -7935,7 +7928,7 @@ int LuaScriptInterface::luaGetSpectators(lua_State *L)
 {
 	//getSpectators(centerPos, rangex, rangey, multifloor)
 
-	bool multifloor = popNumber(L) == 1;
+	bool multifloor = popNumber(L) == LUA_TRUE;
 	uint32_t rangey = popNumber(L);
 	uint32_t rangex = popNumber(L);
 
@@ -8019,7 +8012,7 @@ int LuaScriptInterface::luaIsSightClear(lua_State *L)
 {
 	//isSightClear(fromPos, toPos, floorCheck)
 	PositionEx fromPos, toPos;
-	bool floorCheck = (popNumber(L) == 1);
+	bool floorCheck = (popNumber(L) == LUA_TRUE);
 	popPosition(L, toPos);
 	popPosition(L, fromPos);
 

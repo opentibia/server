@@ -11,9 +11,9 @@ What is this?
 
 How does it work?
 	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 7.8, 7.81, ,7.82, 7.9, 7.92, 8.0, 8.1, 8.11, 8.2 ,8.21, 8.22, 8.3, 8.4, 8.41, 8.42, 8.5, 8.51, 8.52.
-	OTServ is now played using Tibia 8.54.
+	OTServ is now played using Tibia 8.55.
 
-	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here 
+	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here
 	http://www.otchanger.net/
 
 	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
@@ -58,10 +58,10 @@ Credits?
 	-Project Admins
 
 	Tliff			 	(Inactive)
-	Sim0ne			
+	Sim0ne
 	Spin				(Inactive)
-	Remere				
-	SimOne				
+	Remere
+	SimOne
 	Shi'Voc				(Inactive)
 
 	-Forum Administrators
@@ -71,9 +71,9 @@ Credits?
 	Pekay				(Inactive)
 	Nuker				(Inactive)
 	verkon				(Inactive)
-	GriZzm0				
-	Evo		
-	Stormer	
+	GriZzm0
+	Evo
+	Stormer
 
 	-Active Developers
 
@@ -129,11 +129,11 @@ Help?
 	Need to promote your server? Put it on servers list:
 	OTServList - http://www.otservlist.org
 		Official OTServ list, you dont need any other ;).
-	
+
 	Necesitas ayuda?
 	Tibia4 - http://otserv.es/
 		Official spanish-talking otserv site.
-		
+
 
 	Note that only websites mentioned in this document are treated as official support of OTServ.
 	No other websites are officialy affiliated with OTServ.

@@ -3477,7 +3477,7 @@ int NpcScriptInterface::luaDoSellItem(lua_State *L)
 
 	bool canDropOnMap = true;
 	if(parameters > 5){
-		canDropOnMap = (popNumber(L) == 1);
+		canDropOnMap = (popNumber(L) == LUA_TRUE);
 	}
 
 	uint32_t actionId = 0;
