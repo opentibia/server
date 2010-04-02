@@ -164,21 +164,21 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 				it.vocationString = moveEvent->getVocationString();
 			}
 
-			addEvent(moveEvent, toId, m_itemIdMap);
+			addEvent(moveEvent->clone(), toId, m_itemIdMap);
 		}
 	}
 	else if(readXMLInteger(p,"uniqueid",id) || readXMLInteger(p,"fromuniqueid",id)){
 		if(!readXMLInteger(p,"touniqueid",toId))
 			toId = id;
 		for(; toId >= id; --toId){
-			addEvent(moveEvent, toId, m_uniqueIdMap);
+			addEvent(moveEvent->clone(), toId, m_uniqueIdMap);
 		}
 	}
 	else if(readXMLInteger(p,"actionid",id) || readXMLInteger(p,"fromactionid",id)){
 		if(!readXMLInteger(p,"toactionid",toId))
 			toId = id;
 		for(; toId >= id; --toId){
-			addEvent(moveEvent, toId, m_actionIdMap);
+			addEvent(moveEvent->clone(), toId, m_actionIdMap);
 		}
 	}
 	else if(readXMLString(p,"pos",str)){
@@ -197,6 +197,8 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	else{
 		success = false;
 	}
+
+	delete event;
 	return success;
 }
 

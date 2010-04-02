@@ -939,13 +939,13 @@ void Spell::postCastSpell(Player* player, bool finishedCast /*= true*/, bool pay
 			if(exhaustion != 0){
 				if(isAggressive){
 					if(exhaustion == -1)
-						player->addCombatExhaust(g_game.getFightExhaustionTicks());
+						player->addCombatExhaust(g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED));
 					else
 						player->addCombatExhaust(exhaustion);
 				}
 				else{
 					if(exhaustion == -1)
-						player->addHealExhaust(g_game.getHealExhaustionTicks());
+						player->addHealExhaust(g_config.getNumber(ConfigManager::HEAL_EXHAUSTED));
 					else
 						player->addHealExhaust(exhaustion);
 				}
@@ -954,7 +954,7 @@ void Spell::postCastSpell(Player* player, bool finishedCast /*= true*/, bool pay
 
 		if(!player->hasFlag(PlayerFlag_NotGainInFight)){
 			if(isAggressive){
-				player->addInFightTicks(g_game.getInFightTicks());
+				player->addInFightTicks(g_config.getNumber(ConfigManager::IN_FIGHT_DURATION));
 			}
 		}
 	}

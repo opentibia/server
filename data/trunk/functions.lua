@@ -724,9 +724,9 @@ function doPlayerTakeItem(cid, itemid, count)
 end
 
 function doPlayerBuyItem(cid, itemid, count, cost, charges)
-    if(doPlayerRemoveMoney(cid, cost) == TRUE) then
-    	return doPlayerGiveItem(cid, itemid, count, charges)
-    end
+	if(doPlayerRemoveMoney(cid, cost) == TRUE) then
+		return doPlayerGiveItem(cid, itemid, count, charges)
+	end
 	return LUA_ERROR
 end
 

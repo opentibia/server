@@ -118,7 +118,6 @@ public:
 	virtual const Player* getPlayer() const {return this;}
 
 	static MuteCountMap muteCountMap;
-	static int32_t maxMessageBuffer;
 	static ChannelStatementMap channelStatementMap;
 	static uint32_t channelStatementGuid;
 

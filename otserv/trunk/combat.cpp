@@ -747,7 +747,7 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 					itemId = ITEM_WILDGROWTH_SAFE;
 				}
 			} else if(params.isAggressive){
-				p_caster->addInFightTicks(g_game.getInFightTicks(), params.pzBlock);
+				p_caster->addInFightTicks(g_config.getNumber(ConfigManager::IN_FIGHT_DURATION), params.pzBlock);
 			}
 		}
 		Item* item = Item::CreateItem(itemId);

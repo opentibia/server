@@ -108,27 +108,28 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 		if(!readXMLInteger(p,"toitemid",toId) && !readXMLInteger(p,"toid",toId))
 			toId = id;
 		for(; toId >= id; --toId){
-			useItemMap[toId] = action;
+			useItemMap[toId] = action->clone();
 		}
 	}
 	else if(readXMLInteger(p,"uniqueid",id) || readXMLInteger(p,"fromuniqueid",id)){
 		if(!readXMLInteger(p,"touniqueid",toId))
 			toId = id;
 		for(; toId >= id; --toId){
-			uniqueItemMap[toId] = action;
+			uniqueItemMap[toId] = action->clone();
 		}
 	}
 	else if(readXMLInteger(p,"actionid",id) || readXMLInteger(p,"fromactionid",id)){
 		if(!readXMLInteger(p,"toactionid",toId))
 			toId = id;
 		for(; toId >= id; --toId){
-			actionItemMap[toId] = action;
+			actionItemMap[toId] = action->clone();
 		}
 	}
 	else{
 		return false;
 	}
 
+	delete event;
 	return true;
 }
 

@@ -833,7 +833,7 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 
 		for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
 			const CountBlock_t& cb = it->second;
-			if(cb.total > mostDamage && (now - cb.ticks <= g_game.getInFightTicks())){
+			if(cb.total > mostDamage && (now - cb.ticks <= g_config.getNumber(ConfigManager::IN_FIGHT_DURATION))){
 				Creature* tmpDamageCreature = g_game.getCreatureByID(it->first);
 				if(tmpDamageCreature){
 					mdc = tmpDamageCreature;
@@ -857,7 +857,7 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		// Add all (recent) damagers to the list
 		for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
 			const CountBlock_t& cb = it->second;
-			if(now - cb.ticks <= g_game.getInFightTicks()){
+			if(now - cb.ticks <= g_config.getNumber(ConfigManager::IN_FIGHT_DURATION)){
 				Creature* mdc = g_game.getCreatureByID(it->first);
 				// Player who made last hit is not included in assist list
 				if(mdc && mdc != lhc){
@@ -922,7 +922,7 @@ bool Creature::hasBeenAttacked(uint32_t attackerId) const
 {
 	CountMap::const_iterator it = damageMap.find(attackerId);
 	if(it != damageMap.end()){
-		return (OTSYS_TIME() - it->second.ticks <= g_game.getInFightTicks());
+		return (OTSYS_TIME() - it->second.ticks <= g_config.getNumber(ConfigManager::IN_FIGHT_DURATION));
 	}
 
 	return false;

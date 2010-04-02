@@ -423,7 +423,7 @@ bool Party::canUseSharedExperience(const Player* player) const
 		}
 
 		uint64_t timeDiff = OTSYS_TIME() - it->second.ticks;
-		if(timeDiff > g_game.getInFightTicks()){
+		if(timeDiff > (uint32_t)g_config.getNumber(ConfigManager::IN_FIGHT_DURATION)){
 			//player has not attacked or healed anyone for a period of infight ticks
 			return false;
 		}

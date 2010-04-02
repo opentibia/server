@@ -52,7 +52,6 @@ extern CreatureEvents* g_creatureEvents;
 
 AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
-int32_t Player::maxMessageBuffer = 0;
 ChannelStatementMap Player::channelStatementMap;
 uint32_t Player::channelStatementGuid = 0;
 
@@ -1789,9 +1788,9 @@ void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const
 
 		if(teleport || (oldPos.z != newPos.z)){
 			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_PACIFIED,
-				g_game.getStairhopExhaustion()));
+				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
 			addCondition(Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_COMBAT,
-				g_game.getStairhopExhaustion()));
+				g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED)));
 		}
 	}
 }
@@ -2008,17 +2007,18 @@ uint32_t Player::getMuteTime()
 
 void Player::addMessageBuffer()
 {
-	if(MessageBufferCount > 0 && Player::maxMessageBuffer != 0 && !hasFlag(PlayerFlag_CannotBeMuted)){
+	if(MessageBufferCount > 0 && g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER) != 0 && !hasFlag(PlayerFlag_CannotBeMuted)){
 		MessageBufferCount -= 1;
 	}
 }
 
 void Player::removeMessageBuffer()
 {
-	if(!hasFlag(PlayerFlag_CannotBeMuted) && MessageBufferCount <= Player::maxMessageBuffer + 1 && Player::maxMessageBuffer != 0){
+	if(!hasFlag(PlayerFlag_CannotBeMuted) && g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER) != 0
+		&& MessageBufferCount <= g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER) + 1){
 		MessageBufferCount += 1;
 
-		if(MessageBufferCount > Player::maxMessageBuffer){
+		if(MessageBufferCount > g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER)){
 			uint32_t muteCount = 1;
 			MuteCountMap::iterator it = muteCountMap.find(getGUID());
 			if(it != muteCountMap.end()){
@@ -3850,7 +3850,7 @@ void Player::onAttackedCreature(Creature* target)
 			}
 		}
 
-		addInFightTicks(g_game.getInFightTicks(), doPzLock);
+		addInFightTicks(g_config.getNumber(ConfigManager::IN_FIGHT_DURATION), doPzLock);
 	}
 }
 
@@ -3866,7 +3866,7 @@ void Player::onAttacked()
 	Creature::onAttacked();
 
 	if(!hasFlag(PlayerFlag_NotGainInFight)){
-		addInFightTicks(g_game.getInFightTicks());
+		addInFightTicks(g_config.getNumber(ConfigManager::IN_FIGHT_DURATION));
 	}
 }
 

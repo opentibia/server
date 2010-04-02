@@ -507,7 +507,7 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 
 	if(!player->hasFlag(PlayerFlag_HasNoExhaustion) && hasExhaustion()){
 		if(exhaustion == -1)
-			player->addCombatExhaust(g_game.getFightExhaustionTicks());
+			player->addCombatExhaust(g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED));
 		else
 			player->addCombatExhaust(exhaustion);
 	}
@@ -841,7 +841,7 @@ bool WeaponDistance::interruptSwing() const
 	if(!g_config.getNumber(ConfigManager::DISTANCE_WEAPON_INTERRUPT_SWING)){
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -1014,7 +1014,7 @@ int32_t WeaponDistance::getWeaponDamage(const Player* player, const Creature* ta
 			minValue = (int32_t)std::ceil(player->getLevel() * 0.2);
 		}
 	}
-	
+
 	if(vocation && vocation->getMeleeBaseDamage(WEAPON_DIST) != 1.0){
 		minValue = int32_t(minValue * vocation->getMeleeBaseDamage(WEAPON_DIST));
 	}

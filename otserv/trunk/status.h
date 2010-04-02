@@ -79,12 +79,7 @@ public:
 
 	std::string getStatusString() const;
 	void getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const;
-
 	uint32_t getPlayersOnline() const {return m_playersonline;}
-	uint32_t getMaxPlayersOnline() const {return m_playersmax;}
-
-	void setMaxPlayersOnline(int max){m_playersmax = max;}
-
 	uint64_t getUptime() const;
 
 protected:
@@ -92,7 +87,7 @@ protected:
 
 private:
 	uint64_t m_start;
-	int m_playersmax, m_playersonline, m_playerspeak;
+	int m_playersonline, m_playerspeak;
 	std::string m_mapname, m_mapauthor;
 
 };

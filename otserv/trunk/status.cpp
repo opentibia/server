@@ -115,7 +115,6 @@ void ProtocolStatus::deleteProtocolTask()
 Status::Status()
 {
 	m_playersonline = 0;
-	m_playersmax = 0;
 	m_playerspeak = 0;
 	m_start = OTSYS_TIME();
 }
@@ -181,7 +180,7 @@ std::string Status::getStatusString() const
 	// players
 	p = xmlNewNode(NULL, (const xmlChar*)"players");
 	addXMLProperty(p, "online", m_playersonline);
-	addXMLProperty(p, "max", m_playersmax);
+	addXMLProperty(p, "max", g_config.getNumber(ConfigManager::MAX_PLAYERS));
 	addXMLProperty(p, "peak", m_playerspeak);
 	xmlAddChild(root, p);
 
@@ -278,7 +277,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 	if(requestedInfo & REQUEST_PLAYERS_INFO){
 		output->AddByte(0x20); // players info
 		output->AddU32(m_playersonline);
-		output->AddU32(m_playersmax);
+		output->AddU32(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 		output->AddU32(m_playerspeak);
 	}
 
@@ -325,7 +324,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 
 bool Status::hasSlot() const
 {
-	return m_playersonline < m_playersmax;
+	return m_playersonline < g_config.getNumber(ConfigManager::MAX_PLAYERS);
 }
 
 uint64_t Status::getUptime() const

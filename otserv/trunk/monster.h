@@ -51,8 +51,6 @@ public:
 
 	static Monster* createMonster(MonsterType* mType);
 	static Monster* createMonster(const std::string& name);
-	static int32_t despawnRange;
-	static int32_t despawnRadius;
 
 	virtual ~Monster();
 

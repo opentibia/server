@@ -89,6 +89,8 @@ public:
 	Action(LuaScriptInterface* _interface);
 	virtual ~Action();
 
+	Action* clone() const { return new Action(*this); }
+
 	virtual bool configureEvent(xmlNodePtr p);
 
 	//scripting

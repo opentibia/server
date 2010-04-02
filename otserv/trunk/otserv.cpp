@@ -751,9 +751,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	serverIPs.push_back(IpNetMask);
 	std::cout << ":: Starting Server... ";
 
-	Status* status = Status::instance();
-	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
-
 	if(command_opts.start_closed)
 		g_game.setGameState(GAME_STATE_CLOSED);
 	else

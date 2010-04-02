@@ -1,4 +1,4 @@
-local TILE_SAND 		= 	231
+local TILE_SAND 		= 	9059
 local ITEM_SCARAB_COIN 		= 	2159
 local TUMB_ENTRANCE		= 	100
 local SCARAB_TILE		=	101

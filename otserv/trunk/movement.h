@@ -96,6 +96,8 @@ public:
 	MoveEvent(LuaScriptInterface* _interface);
 	virtual ~MoveEvent();
 
+	MoveEvent* clone() const { return new MoveEvent(*this); }
+
 	MoveEvent_t getEventType() const;
 	void setEventType(MoveEvent_t type);
 

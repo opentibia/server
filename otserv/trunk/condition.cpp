@@ -269,9 +269,9 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_HUNTING:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUST_YELL:
-		case CONDITION_EXHAUST_POTION:
 		case CONDITION_EXHAUST_COMBAT:
 		case CONDITION_EXHAUST_HEAL:
+		case CONDITION_EXHAUST_OTHERS:
 		case CONDITION_MUTED:
 		case CONDITION_TRADE_MUTED:
 		case CONDITION_PACIFIED:

@@ -24,6 +24,9 @@
 
 #include "waitlist.h"
 #include "status.h"
+#include "configmanager.h"
+
+extern ConfigManager g_config;
 
 WaitingList::WaitingList()
 {
@@ -81,7 +84,7 @@ bool WaitingList::clientLogin(const Player* player)
 		return true;
 	}
 
-	if(waitList.empty() && Status::instance()->getPlayersOnline() < Status::instance()->getMaxPlayersOnline()){
+	if(waitList.empty() && Status::instance()->getPlayersOnline() < g_config.getNumber(ConfigManager::MAX_PLAYERS)){
 		//no waiting list and enough room
 		return true;
 	}
@@ -91,7 +94,7 @@ bool WaitingList::clientLogin(const Player* player)
 	uint32_t slot;
 	WaitListIterator it = findClient(player, slot);
 	if(it != waitList.end()){
-		if((Status::instance()->getPlayersOnline() + slot) <= Status::instance()->getMaxPlayersOnline()){
+		if((Status::instance()->getPlayersOnline() + slot) <= g_config.getNumber(ConfigManager::MAX_PLAYERS)){
 			//should be able to login now
 #ifdef __DEBUG__WATINGLIST__
 			std::cout << "Name: " << (*it)->name << " can now login" << std::endl;

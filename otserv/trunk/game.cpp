@@ -226,17 +226,6 @@ int Game::loadMap(std::string filename, std::string filekind)
 		map = new Map;
 	}
 
-	maxPlayers = g_config.getNumber(ConfigManager::MAX_PLAYERS);
-	inFightTicks = g_config.getNumber(ConfigManager::IN_FIGHT_DURATION);
-	exhaustionTicks = g_config.getNumber(ConfigManager::EXHAUSTED);
-	addExhaustionTicks = g_config.getNumber(ConfigManager::EXHAUSTED_ADD);
-	fightExhaustionTicks = g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED);
-	healExhaustionTicks = g_config.getNumber(ConfigManager::HEAL_EXHAUSTED);
-	stairhopExhaustion = g_config.getNumber(ConfigManager::STAIRHOP_EXHAUSTED);
-	Player::maxMessageBuffer = g_config.getNumber(ConfigManager::MAX_MESSAGEBUFFER);
-	Monster::despawnRange = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE);
-	Monster::despawnRadius = g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS);
-
 	return map->loadMap(filename, filekind);
 }
 
@@ -3630,12 +3619,12 @@ bool Game::playerYell(Player* player, const std::string& text)
 	uint32_t addExhaustion = 0;
 	bool isExhausted = false;
 	if(!player->hasCondition(CONDITION_EXHAUST_YELL)){
-		addExhaustion = getExhaustionTicks();
+		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED);
 		internalCreatureSay(player, SPEAK_YELL, asUpperCaseString(text));
 	}
 	else{
 		isExhausted = true;
-		addExhaustion = getAddExhaustionTicks();
+		addExhaustion = g_config.getNumber(ConfigManager::EXHAUSTED_ADD);
 		player->sendCancelMessage(RET_YOUAREEXHAUSTED);
 	}
 

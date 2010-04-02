@@ -39,9 +39,6 @@ extern Monsters g_monsters;
 
 AutoList<Monster>Monster::listMonster;
 
-int32_t Monster::despawnRange;
-int32_t Monster::despawnRadius;
-
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 uint32_t Monster::monsterCount = 0;
 #endif
@@ -1274,19 +1271,19 @@ Item* Monster::createCorpse()
 bool Monster::inDespawnRange(const Position& pos)
 {
 	if(spawn && !mType->isLureable){
-		if(Monster::despawnRadius == 0){
+		if(g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS) == 0){
 			return false;
 		}
 
-		if(!Spawns::getInstance()->isInZone(masterPos, Monster::despawnRadius, pos)){
+		if(!Spawns::getInstance()->isInZone(masterPos, g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRADIUS), pos)){
 			return true;
 		}
 
-		if(Monster::despawnRange == 0){
+		if(g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE) == 0){
 			return false;
 		}
 
-		if(std::abs(pos.z - masterPos.z) > Monster::despawnRange){
+		if(std::abs(pos.z - masterPos.z) > g_config.getNumber(ConfigManager::DEFAULT_DESPAWNRANGE)){
 			return true;
 		}
 
