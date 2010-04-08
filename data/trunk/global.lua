@@ -510,3 +510,13 @@ WORLD_TYPE_HARDCORE_PVP = 3
 PLAYER_ID_RANGE = 268435456 --0x10000000
 MONSTER_ID_RANGE = 1073741824 --0x40000000
 NPC_ID_RANGE = 2147483648 --0x80000000
+
+--flags for queries
+QUERYFLAG_NONE = 0			--Don't bypass any check
+QUERYFLAG_NOLIMIT = 1			--Bypass check limits like capacity/container limits, blocking items/creatures etc.
+QUERYFLAG_IGNOREBLOCKITEM = 2		--Bypass moveable blocking item checks
+QUERYFLAG_IGNOREBLOCKCREATURE = 4	--Bypass creature checks
+QUERYFLAG_CHILDISOWNER = 8		--Used by containers to query capacity of the carrier (player)
+QUERYFLAG_PATHFINDING = 16		--An additional check is done for floor changing/teleport items
+QUERYFLAG_IGNOREFIELDDAMAGE = 32	--Bypass field damage checks
+QUERYFLAG_IGNORENOTMOVEABLE = 64	--Bypass check for movability

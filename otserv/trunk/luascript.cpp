@@ -1412,7 +1412,7 @@ void LuaScriptInterface::registerFunctions()
 	//doRemoveCreature(cid)
 	lua_register(m_luaState, "doRemoveCreature", LuaScriptInterface::luaDoRemoveCreature);
 
-	//doMoveCreature(cid, direction)
+	//doMoveCreature(cid, direction, <optional>flags)
 	lua_register(m_luaState, "doMoveCreature", LuaScriptInterface::luaDoMoveCreature);
 
 	//doSetCreatureDirection(cid, direction)
@@ -6660,7 +6660,11 @@ int LuaScriptInterface::luaGetGuildId(lua_State *L)
 
 int LuaScriptInterface::luaDoMoveCreature(lua_State *L)
 {
-	//doMoveCreature(cid, direction)
+	//doMoveCreature(cid, direction, <optional>flags)
+	uint32_t flags = FLAG_NOLIMIT; //default value, to keep compatibility with old scripts
+	int32_t parameters = lua_gettop(L);
+	if (parameters>=3)
+		flags = popNumber(L);
 	uint32_t direction = popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -6684,7 +6688,7 @@ int LuaScriptInterface::luaDoMoveCreature(lua_State *L)
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
-		ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)direction, FLAG_NOLIMIT);
+		ReturnValue ret = g_game.internalMoveCreature(creature, (Direction)direction, flags);
 		lua_pushnumber(L, ret);
 	}
 	else{
