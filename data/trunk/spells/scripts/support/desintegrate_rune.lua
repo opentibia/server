@@ -1,18 +1,6 @@
-local function doRemoveObject(cid, pos)
-	pos.stackpos = 255
-	local object = getThingfromPos(pos)
-	local playerPos = getPlayerPosition(cid)
-
-	if(object.uid > 0 and isCreature(object.uid) == FALSE and isItemMoveable(object.itemid) == TRUE) then
-		doRemoveItem(object.uid)
-		doSendMagicEffect(pos, CONST_ME_BLOCKHIT)
-		return LUA_NO_ERROR
-	end
-
-	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
-	doSendMagicEffect(playerPos, CONST_ME_POFF)
-	return LUA_ERROR
-end
+local combat = createCombatObject()
+setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_BLOCKHIT)
+setCombatParam(combat, COMBAT_PARAM_PZBLOCK, TRUE)
 
 function onCastSpell(cid, var)
 	local pos = variantToPosition(var)
@@ -22,7 +10,9 @@ function onCastSpell(cid, var)
 	end
 
 	if(pos.x ~= 0 and pos.y ~= 0 and pos.z ~= 0) then
-		return doRemoveObject(cid, pos)
+		if(doCleanTileItemsByPos(pos, DESINTEGRATE_UNREMOVABLE) > 0) then
+			return doCombat(cid, combat, var)
+		end
 	end
 
 	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)

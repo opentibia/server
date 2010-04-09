@@ -3601,8 +3601,8 @@ int LuaScriptInterface::luaGetThingFromPos(lua_State *L)
 		else{
 			pushThing(L, NULL, 0);
 		}
-		return 1;
 
+		return 1;
 	}
 	else{
 		std::stringstream ss;

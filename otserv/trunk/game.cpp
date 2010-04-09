@@ -234,7 +234,6 @@ void Game::refreshMap(Map::TileMap::iterator* map_iter, int clean_max)
 	Tile* tile;
 	Item* item;
 
-
 	Map::TileMap::iterator begin_here = map->refreshTileMap.begin();
 	if(!map_iter)
 		map_iter = &begin_here;

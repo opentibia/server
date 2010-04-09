@@ -752,3 +752,44 @@ function getContainerCapById(itemid)
 		return LUA_ERROR
 	end
 end
+
+function isThingMoveable(uid)
+	if(isMoveable(uid) == TRUE and uid > 65535) then
+		return TRUE
+	end
+
+	return FALSE
+end
+
+function isThingDestroyable(thing)
+	if(thing.uid <= 0 or isCreature(thing.uid) == TRUE or isThingMoveable(thing.uid) == FALSE) then
+		return FALSE
+	end
+
+	return TRUE
+end
+
+function doCleanTileItemsByPos(pos, ignore)
+	local ignore = ignore or {}
+	local removed_items = 0
+	local founditem = true
+	local stackpos = 1
+
+	while founditem do
+		pos.stackpos = stackpos
+		local thing = getTileThingByPos(pos)
+
+		if(isThingDestroyable(thing) == TRUE and isInArray(ignore, thing.itemid) == FALSE) then
+			doRemoveItem(thing.uid)
+			removed_items = removed_items + 1
+		else
+			if thing.uid > 0 then
+				stackpos = stackpos + 1
+			else
+				founditem = false
+			end
+		end
+	end
+	
+	return removed_items
+end

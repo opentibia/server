@@ -746,8 +746,6 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 				else if(itemId == ITEM_WILDGROWTH){
 					itemId = ITEM_WILDGROWTH_SAFE;
 				}
-			} else if(params.isAggressive){
-				p_caster->addInFightTicks(g_config.getNumber(ConfigManager::IN_FIGHT_DURATION), params.pzBlock);
 			}
 		}
 		Item* item = Item::CreateItem(itemId);
@@ -776,8 +774,18 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 
 void Combat::postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params)
 {
-	if(caster && params.distanceEffect != NM_ME_NONE){
-		addDistanceEffect(caster, caster->getPosition(), pos, params.distanceEffect);
+	if(caster){
+		if(params.distanceEffect != NM_ME_NONE)
+			addDistanceEffect(caster, caster->getPosition(), pos, params.distanceEffect);
+
+		Player* p_caster = NULL;
+		if(caster->getPlayer())
+			p_caster = caster->getPlayer();
+		else if(caster->isPlayerSummon())
+			p_caster = caster->getPlayerMaster();
+
+		if(p_caster && !p_caster->hasFlag(PlayerFlag_NotGainInFight) && params.isAggressive)
+			p_caster->addInFightTicks(g_config.getNumber(ConfigManager::IN_FIGHT_DURATION), params.pzBlock);
 	}
 }
 

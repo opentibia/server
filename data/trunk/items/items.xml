@@ -24894,7 +24894,6 @@
 		<attribute key="speed" value="4"/>
 		<attribute key="weight" value="820"/>
 		<attribute key="slotType" value="necklace"/>
-		<attribute key="showattributes" value="1"/>
 	</item>
 	<item id="11375" article="a" name="dead lancer beetle" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
