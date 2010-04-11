@@ -62,7 +62,8 @@ enum GameState_t {
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
 	GAME_STATE_SHUTDOWN,
-	GAME_STATE_CLOSING
+	GAME_STATE_CLOSING,
+	GAME_STATE_LAST = GAME_STATE_CLOSING
 };
 
 enum LightState_t {
@@ -549,6 +550,8 @@ public:
 	bool closeRuleViolation(Player* player);
 
 	void showUseHotkeyMessage(Player* player, Item* item);
+
+	void reloadInfo(reloadTypes_t info);
 
 	//Guilds
 	void loadGuildWars();

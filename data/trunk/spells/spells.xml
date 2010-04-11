@@ -294,7 +294,7 @@
 		<vocation name="Sorcerer"/> <vocation name="Master Sorcerer"/>
 		<vocation name="Druid"/>    <vocation name="Elder Druid"/>
 	</instant>
-	<instant name="Challenge" words="exeta res" lvl="20" mana="30" prem="1" selftarget="1" script="support/challenge.lua">
+	<instant name="Challenge" words="exeta res" lvl="20" mana="30" prem="1" selftarget="1" aggressive="0" script="support/challenge.lua">
 		<vocation name="Elite Knight"/>
 	</instant>
 	<instant name="Energy Beam" words="exevo vis lux" lvl="23" mana="40" direction="1" script="attack/energy_beam.lua">

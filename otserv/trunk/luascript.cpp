@@ -1569,9 +1569,6 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayersOnlineList()
 	lua_register(m_luaState, "getPlayersOnlineList", LuaScriptInterface::luaGetPlayersOnlineList);
 
-	//broadcastMessage(message, <optional> messageClass)
-	lua_register(m_luaState, "broadcastMessage", LuaScriptInterface::luaBroadcastMessage);
-
 	//doPlayerBroadcastMessage(cid, message)
 	lua_register(m_luaState, "doPlayerBroadcastMessage", LuaScriptInterface::luaDoPlayerBroadcastMessage);
 
@@ -1849,6 +1846,15 @@ void LuaScriptInterface::registerFunctions()
 
 	//doSaveServer(payHouses)
 	lua_register(m_luaState, "doSaveServer", LuaScriptInterface::luaDoSaveServer);
+
+	//doSetGameState(gameState)
+	lua_register(m_luaState, "doSetGameState", LuaScriptInterface::luaDoSetGameState);
+	
+	//doReloadInfo(info)
+	lua_register(m_luaState, "doReloadInfo", LuaScriptInterface::luaDoReloadInfo);
+
+	//doRefreshMap()
+	lua_register(m_luaState, "doRefreshMap", LuaScriptInterface::luaDoRefreshMap);
 
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -4883,24 +4889,6 @@ int LuaScriptInterface::luaGetPlayersOnlineList(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaBroadcastMessage(lua_State *L)
-{
-	//broadcastMessage(message, <optional> messageClass)
-	uint32_t type = MSG_STATUS_WARNING;
-	if(lua_gettop(L) >= 2)
-		type = popNumber(L);
-	std::string message = popString(L);
-
-	if(g_game.anonymousBroadcastMessage((MessageClasses)type, message)){
-		lua_pushnumber(L, LUA_NO_ERROR);
-	}
-	else{
-		reportErrorFunc("Not valid messageClass.");
-		lua_pushnumber(L, LUA_ERROR);
-	}
-	return 1;
-}
-
 int LuaScriptInterface::luaDoPlayerBroadcastMessage(lua_State* L)
 {
 	//doPlayerBroadcastMessage(cid, message)
@@ -7664,6 +7652,44 @@ int LuaScriptInterface::luaDoSaveServer(lua_State *L)
 		return 1;
 	}
 
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoSetGameState(lua_State *L)
+{
+	//doSetGameState(gameState)
+	uint32_t gameState = popNumber(L);
+	if(gameState > GAME_STATE_LAST){
+		reportErrorFunc("Invalid game state.");
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	else{
+		g_game.setGameState((GameState_t)gameState);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoReloadInfo(lua_State *L)
+{
+	//doReloadInfo(info)
+	uint32_t info = popNumber(L);
+	if(info > RELOAD_TYPE_LAST){
+		reportErrorFunc("Invalid reloadable info.");
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	else{
+		g_dispatcher.addTask(
+			createTask(boost::bind(&Game::reloadInfo, &g_game, (reloadTypes_t)info)));
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoRefreshMap(lua_State *L)
+{
+	g_game.proceduralRefresh();
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }

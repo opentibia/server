@@ -53,7 +53,6 @@ CREATE TABLE "players" (
 	"conditions" BLOB NOT NULL,
 	"skull_type" INTEGER NOT NULL DEFAULT 0,
 	"skull_time" INTEGER NOT NULL DEFAULT 0,
-	"guildnick" VARCHAR(255) NOT NULL DEFAULT '',
 	"loss_experience" INTEGER NOT NULL DEFAULT 100,
 	"loss_mana" INTEGER NOT NULL DEFAULT 100,
 	"loss_skills" INTEGER NOT NULL DEFAULT 100,
@@ -86,38 +85,30 @@ CREATE TABLE "guild_ranks" (
 );
 
 CREATE TABLE "guild_members" (
-	"id" INTEGER PRIMARY KEY,
 	"player_id" INTEGER NOT NULL,
-	"guild_id" INTEGER NOT NULL,
 	"rank_id" INTEGER NOT NULL,
 	"guild_nick" VARCHAR(255) NOT NULL DEFAULT '',
 	UNIQUE ("player_id"),
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
-);
-
-CREATE TABLE "war_declaration" (
-	"id" INTEGER PRIMARY KEY,
-	"guild_id" INTEGER NOT NULL,
-	"opponent_id" INTEGER NOT NULL,
-	"frag_limit" INTEGER NOT NULL DEFAULT 10,
-	"war_duration" INTEGER NOT NULL,
-	"guild_fee" INTEGER NOT NULL DEFAULT 1000,
-	"opponent_fee" INTEGER NOT NULL DEFAULT 1000,
-	"comment" VARCHAR(255) NOT NULL DEFAULT '',
-	"declaration_date" INTEGER NOT NULL,
-	"active" BOOLEAN NOT NULL DEFAULT 0,
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("opponent_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
 );
 
 CREATE TABLE "guild_wars" (
 	"id" INTEGER PRIMARY KEY,
-	"war_id" INTEGER NOT NULL,
+	"guild_id" INTEGER NOT NULL,
+	"opponent_id" INTEGER NOT NULL,
+	"frag_limit" INTEGER NOT NULL DEFAULT 10,
+	"declaration_date" INTEGER NOT NULL,
+	"end_date" INTEGER NOT NULL,
+	"guild_fee" INTEGER NOT NULL DEFAULT 1000,
+	"opponent_fee" INTEGER NOT NULL DEFAULT 1000,
 	"guild_frags" INTEGER NOT NULL DEFAULT 0,
 	"opponent_frags" INTEGER NOT NULL DEFAULT 0,
-	FOREIGN KEY ("war_id") REFERENCES "war_declaration" ("id") ON DELETE CASCADE
-);	
+	"comment" VARCHAR(255) NOT NULL DEFAULT '',
+	"status" INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id"),
+	FOREIGN KEY ("opponent_id") REFERENCES "guilds" ("id")
+);
 
 CREATE TABLE "player_viplist" (
 	"player_id" INT NOT NULL,
@@ -283,14 +274,6 @@ CREATE TABLE "schema_info" (
 
 INSERT INTO "schema_info" ("name", "value") VALUES ('version', 20);
 
-CREATE TRIGGER "oncreate_guilds"
-AFTER INSERT ON "guilds"
-BEGIN
-	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Leader", 3, NEW."id");
-	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Vice-Leader", 2, NEW."id");
-	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Member", 1, NEW."id");
-END;
-
 CREATE TRIGGER "oncreate_players"
 AFTER INSERT
 ON "players"
@@ -302,15 +285,6 @@ BEGIN
 	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 4, 10);
 	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 5, 10);
 	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 6, 10);
-END;
-
-CREATE TRIGGER "ondelete_accounts"
-BEFORE DELETE
-ON "accounts"
-FOR EACH ROW
-BEGIN
-	DELETE FROM "players" WHERE "account_id" = OLD."id";
-	DELETE FROM "bans" WHERE "type" = 3 AND "value" = OLD."id";
 END;
 
 CREATE TRIGGER "ondelete_players"
@@ -328,7 +302,25 @@ BEGIN
 	DELETE FROM "player_depotitems" WHERE "player_id" = OLD."id";
 	DELETE FROM "player_spells" WHERE "player_id" = OLD."id";
 	DELETE FROM "bans" WHERE "type" = 2 AND "value" = OLD."id";
+	DELETE FROM "guild_members" WHERE "player_id" = OLD."id";
 	UPDATE "houses" SET "owner" = 0 WHERE "owner" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_accounts"
+BEFORE DELETE
+ON "accounts"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "players" WHERE "account_id" = OLD."id";
+	DELETE FROM "bans" WHERE "type" = 3 AND "value" = OLD."id";
+END;
+
+CREATE TRIGGER "oncreate_guilds"
+AFTER INSERT ON "guilds"
+BEGIN
+	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Leader", 3, NEW."id");
+	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Vice-Leader", 2, NEW."id");
+	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Member", 1, NEW."id");
 END;
 
 CREATE TRIGGER "ondelete_guilds"
@@ -336,8 +328,16 @@ BEFORE DELETE
 ON "guilds"
 FOR EACH ROW
 BEGIN
-	UPDATE "players" SET "guildnick" = '', "rank_id" = 0 WHERE "rank_id" IN (SELECT "id" FROM "guild_ranks" WHERE "guild_id" = OLD."id");
 	DELETE FROM "guild_ranks" WHERE "guild_id" = OLD."id";
+	DELETE FROM "guild_wars" WHERE "guild_id" = OLD."id" OR "opponent_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_guild_ranks"
+BEFORE DELETE
+ON "guild_ranks"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "guild_members" WHERE "rank_id" = OLD."id";
 END;
 
 CREATE TRIGGER "oninsert_players"
@@ -382,9 +382,9 @@ BEFORE INSERT
 ON "guilds"
 FOR EACH ROW
 BEGIN
-	SELECT RAISE(ROLLBACK, 'INSERT on table "guilds" violates foreign: "ownerid"')
-	WHERE NEW."ownerid" IS NULL
-		OR (SELECT "id" FROM "players" WHERE "id" = NEW."ownerid") IS NULL;
+	SELECT RAISE(ROLLBACK, 'INSERT on table "guilds" violates foreign: "owner_id"')
+	WHERE NEW."owner_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."owner_id") IS NULL;
 END;
 
 CREATE TRIGGER "onupdate_guilds"
@@ -392,25 +392,9 @@ BEFORE UPDATE
 ON "guilds"
 FOR EACH ROW
 BEGIN
-	SELECT RAISE(ROLLBACK, 'UPDATE on table "guilds" violates foreign: "ownerid"')
-	WHERE NEW."ownerid" IS NULL
-		OR (SELECT "id" FROM "players" WHERE "id" = NEW."ownerid") IS NULL;
-END;
-
-CREATE TRIGGER "ondelete_houses"
-BEFORE DELETE
-ON "houses"
-FOR EACH ROW
-BEGIN
-	DELETE FROM "house_lists" WHERE "house_id" = OLD."id";
-END;
-
-CREATE TRIGGER "ondelete_tiles"
-BEFORE DELETE
-ON "tiles"
-FOR EACH ROW
-BEGIN
-	DELETE FROM "tile_items" WHERE "tile_id" = OLD."id";
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "guilds" violates foreign: "owner_id"')
+	WHERE NEW."owner_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."owner_id") IS NULL;
 END;
 
 CREATE TRIGGER "oninsert_guild_ranks"
@@ -431,6 +415,50 @@ BEGIN
 	SELECT RAISE(ROLLBACK, 'UPDATE on table "guild_ranks" violates foreign: "guild_id"')
 	WHERE NEW."guild_id" IS NULL
 		OR (SELECT "id" FROM "guilds" WHERE "id" = NEW."guild_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_guild_members"
+BEFORE INSERT
+ON "guild_members"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "guild_members" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+
+	SELECT RAISE(ROLLBACK, 'INSERT on table "guild_members" violates foreign: "rank_id"')
+	WHERE NEW."rank_id" IS NULL
+		OR (SELECT "id" FROM "guild_ranks" WHERE "id" = NEW."rank_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_guild_members"
+BEFORE UPDATE
+ON "guild_members"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "guild_members" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "guild_members" violates foreign: "rank_id"')
+	WHERE NEW."rank_id" IS NULL
+		OR (SELECT "id" FROM "guild_ranks" WHERE "id" = NEW."rank_id") IS NULL;
+END;
+
+CREATE TRIGGER "ondelete_houses"
+BEFORE DELETE
+ON "houses"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "house_lists" WHERE "house_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_tiles"
+BEFORE DELETE
+ON "tiles"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "tile_items" WHERE "tile_id" = OLD."id";
 END;
 
 CREATE TRIGGER "oninsert_house_lists"

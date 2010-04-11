@@ -2,7 +2,6 @@
 getConfigInfo = getConfigValue
 doPlayerRemOutfit = doPlayerRemoveOutfit
 doPlayerRemOutfitEx = doPlayerRemoveOutfitEx
-broadcastMessageEx = broadcastMessage
 getThingfromPos = getThingFromPos
 getPlayerBalance = getPlayerAccountBalance
 
@@ -406,16 +405,19 @@ string.separate = function(separator, string)
 	return a
 end
 
-function string.explode(p, d)
-	local t, ll
+function string.explode(p, d, m)
+	local limit = m or 0
+	local t, ll, j
 	t={}
 	ll=0
+	j=0
 	if(#p == 1) then return p end
 		while true do
 			l=string.find(p,d,ll+1,true) -- find the next d in the string
-			if l~=nil then -- if "not not" found then..
+			if l~=nil and j < limit and limit ~= 0 then -- if "not not" found then..
 				table.insert(t, string.sub(p,ll,l-1)) -- Save it in our array.
 				ll=l+1 -- save just after where we found it for searching next time.
+				j=j+1 -- number of explosions
 			else
 				table.insert(t, string.sub(p,ll)) -- Save what's left in our array.
 				break -- Break at end, as it should be, according to the lua manual.
@@ -772,10 +774,9 @@ end
 function doCleanTileItemsByPos(pos, ignore)
 	local ignore = ignore or {}
 	local removed_items = 0
-	local founditem = true
 	local stackpos = 1
 
-	while founditem do
+	while true do
 		pos.stackpos = stackpos
 		local thing = getTileThingByPos(pos)
 
@@ -786,10 +787,25 @@ function doCleanTileItemsByPos(pos, ignore)
 			if thing.uid > 0 then
 				stackpos = stackpos + 1
 			else
-				founditem = false
+				break
 			end
 		end
 	end
 	
 	return removed_items
 end
+
+function doBroadcastMessage(message, class)
+	local messageClass = class or MESSAGE_STATUS_WARNING
+	if messageClass < MESSAGE_CLASS_FIRST or messageClass > MESSAGE_CLASS_LAST then
+		return LUA_ERROR
+	end
+
+	for i, cid in ipairs(getPlayersOnlineList()) do
+		doPlayerSendTextMessage(cid, messageClass, message)
+	end
+	return LUA_NO_ERROR
+end
+
+broadcastMessage = doBroadcastMessage
+broadcastMessageEx = broadcastMessage

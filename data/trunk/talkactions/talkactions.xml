@@ -10,11 +10,11 @@
 	<talkaction words="/cleanhouses" access="3" filter="first word" script="housecleaning.lua"/>
 	<talkaction words="/raid" access="3" filter="first word" function="forceRaid"/>
 	<talkaction words="/s" access="3" filter="first word" function="placeNpc"/>
-	<talkaction words="/openserver" access="3" filter="first word" function="openServer"/>
-	<talkaction words="/closeserver" access="3" filter="first word" function="closeServer"/>
-	<talkaction words="/shutdown" access="3" filter="first word" function="shutdownServer"/>
+	<talkaction words="/openserver" access="3" filter="first word" script="openserver.lua"/>
+	<talkaction words="/closeserver" access="3" filter="first word" script="closeserver.lua"/>
+	<talkaction words="/shutdown" access="3" filter="first word" script="shutdown.lua"/>
 	<talkaction words="/serverdiag" access="3" filter="first word" function="serverDiagnostic"/>
-	<talkaction words="/reload" access="3" filter="first word" function="reloadInfo"/>
+	<talkaction words="/reload" access="3" filter="first word" script="reload.lua"/>
 
 	<!-- Gamemasters -->
 	<talkaction words="/up" access="2" filter="first word" script="floorchange.lua"/>
@@ -27,7 +27,7 @@
 	<talkaction words="/summon" access="2" filter="first word" script="placesummon.lua"/>
 	<talkaction words="/m" access="2" filter="first word" script="placemonster.lua"/>
 	<talkaction words="/c" access="2" filter="first word" script="teleporthere.lua"/>
-	<talkaction words="/refreshmap" access="2" filter="first word" function="refreshmap"/>
+	<talkaction words="/refreshmap" access="2" filter="first word" script="refreshmap.lua"/>
 
 	<!-- Tutors -->
 	<talkaction words="/bc" access="1" filter="first word" script="broadcastclass.lua"/>

@@ -508,7 +508,6 @@ protected:
 	static int luaGetWorldCreatures(lua_State *L);
 	static int luaGetWorldUpTime(lua_State *L);
 	static int luaGetPlayersOnlineList(lua_State *L);
-	static int luaBroadcastMessage(lua_State *L);
 	static int luaDoPlayerBroadcastMessage(lua_State *L);
 	static int luaGetGuildId(lua_State *L);
 
@@ -633,6 +632,9 @@ protected:
 	static int luaDoPlayerSetDepotLimit(lua_State *L);
 	static int luaIsPzLocked(lua_State *L);
 	static int luaDoSaveServer(lua_State *L);
+	static int luaDoSetGameState(lua_State *L);
+	static int luaDoReloadInfo(lua_State *L);
+	static int luaDoRefreshMap(lua_State *L);
 	//
 	static int luaGetPlayerIp(lua_State *L);
 

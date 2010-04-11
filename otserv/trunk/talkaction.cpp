@@ -23,16 +23,11 @@
 #include "player.h"
 #include "tools.h"
 #include "game.h"
-#include "npc.h"
-#include "monsters.h"
 #include "house.h"
 #include "ioplayer.h"
 #include "configmanager.h"
 #include "town.h"
 #include "raids.h"
-#include "actions.h"
-#include "movement.h"
-#include "spells.h"
 #include "tools.h"
 #include <sstream>
 
@@ -51,13 +46,6 @@
 
 extern Game g_game;
 extern ConfigManager g_config;
-extern Actions* g_actions;
-extern Monsters g_monsters;
-extern Npcs g_npcs;
-extern MoveEvents* g_moveEvents;
-extern Spells* g_spells;
-extern CreatureEvents* g_creatureEvents;
-extern TalkActions* g_talkactions;
 
 TalkActions::TalkActions() :
 m_scriptInterface("TalkAction Interface")
@@ -247,29 +235,14 @@ bool TalkAction::configureEvent(xmlNodePtr p)
 
 bool TalkAction::loadFunction(const std::string& functionName)
 {
-	if(asLowerCaseString(functionName) == "shutdownserver"){
-		function = shutdownServer;
-	}
- 	else if(asLowerCaseString(functionName) == "placenpc"){
+ 	if(asLowerCaseString(functionName) == "placenpc"){
 		function = placeNpc;
- 	}
- 	else if(asLowerCaseString(functionName) == "reloadinfo"){
-		function = reloadInfo;
- 	}
- 	else if(asLowerCaseString(functionName) == "closeserver"){
-		function = closeServer;
- 	}
- 	else if(asLowerCaseString(functionName) == "openserver"){
-		function = openServer;
  	}
  	else if(asLowerCaseString(functionName) == "sellhouse"){
 		function = sellHouse;
  	}
  	else if(asLowerCaseString(functionName) == "forceraid"){
 		function = forceRaid;
- 	}
-	else if(asLowerCaseString(functionName) == "refreshmap"){
-		function = refreshMap;
  	}
  	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
  	else if(asLowerCaseString(functionName) == "serverdiagnostic"){
@@ -349,106 +322,6 @@ bool TalkAction::placeNpc(Player* player, const std::string& words, const std::s
 	}
 
 	return false;
-}
-
-bool TalkAction::reloadInfo(Player* player, const std::string& words, const std::string& param)
-{
-	if(!player || !player->hasFlag(PlayerFlag_CanReloadContent)){
-		return false;
-	}
-
-	if(param == "actions" || param == "action"){
-		g_actions->reload();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded actions.");
-	}
-	else if(param == "monsters" || param == "monster"){
-		g_monsters.reload();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded monsters.");
-	}
-	else if(param == "npc"){
-		g_npcs.reload();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded npcs.");
-	}
-	else if(param == "config"){
-		g_config.reload();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded config.");
-	}
-	else if(param == "talk" || param == "talkactions" || param == "talk actions" || param == "ta"){
-		g_talkactions->reload();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded talk actions.");
-	}
-	else if(param == "move" || param == "movement" || param == "movement actions"){
-		g_moveEvents->reload();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded movement actions.");
-	}
-	else if(param == "spells" || param == "spell"){
-		g_spells->reload();
-		g_monsters.reload();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded spells and monsters.");
-	}
-	else if(param == "raids" || param == "raid"){
-		Raids::getInstance()->reload();
-		Raids::getInstance()->startup();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded raids.");
-	}
-	else if(param == "creaturescripts" || param == "creature scripts" || param == "cs"){
-		g_creatureEvents->reload();
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded creature scripts.");
-	}
-	else{
-		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Option not found.");
-	}
-
-	return true;
-}
-
-bool TalkAction::closeServer(Player* player, const std::string& words, const std::string& param)
-{
-	if(!player){
-		return false;
-	}
-	
-	g_game.setGameState(GAME_STATE_CLOSED);
-
-	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
-	while(it != Player::listPlayer.list.end())
-	{
-		if(!(*it).second->hasFlag(PlayerFlag_CanAlwaysLogin)){
-			(*it).second->kickPlayer();
-			it = Player::listPlayer.list.begin();
-		}
-		else{
-			++it;
-		}
-	}
-
-	bool payHouses = (param == "serversave");
-	g_game.saveServer(payHouses);
-	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now closed.");
-
-	return true;
-}
-
-bool TalkAction::openServer(Player* player, const std::string& words, const std::string& param)
-{
-	if(!player){
-		return false;
-	}
-	
-	g_game.setGameState(GAME_STATE_NORMAL);
-	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Server is now open.");
-
-	return true;
-}
-
-bool TalkAction::shutdownServer(Player* player, const std::string& words, const std::string& param)
-{
-	if(!player){
-		return false;
-	}
-	
-	g_game.setGameState(GAME_STATE_SHUTDOWN);
-	return true;
 }
 
 bool TalkAction::sellHouse(Player* player, const std::string& words, const std::string& param)
@@ -591,17 +464,5 @@ bool TalkAction::forceRaid(Player* player, const std::string& words, const std::
 	}
 
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
-	return true;
-}
-
-bool TalkAction::refreshMap(Player* player, const std::string& words, const std::string& param)
-{
-	if(!player){
-		return false;
-	}
-
-	g_game.proceduralRefresh();
-	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Refreshed map.");
-	
 	return true;
 }

@@ -5135,3 +5135,22 @@ bool Game::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 
 	return false;
 }
+
+void Game::reloadInfo(reloadTypes_t info)
+{
+	switch(info){
+		case RELOAD_TYPE_ACTIONS: g_actions->reload();
+		case RELOAD_TYPE_MONSTERS: g_monsters.reload();
+		case RELOAD_TYPE_NPCS: g_npcs.reload();
+		case RELOAD_TYPE_CONFIG: g_config.reload();
+		case RELOAD_TYPE_TALKACTIONS: g_talkactions->reload();
+		case RELOAD_TYPE_MOVEMENTS: g_moveEvents->reload();
+		case RELOAD_TYPE_SPELLS: 
+			g_spells->reload();
+			g_monsters.reload();
+		case RELOAD_TYPE_RAIDS:
+			Raids::getInstance()->reload();
+			Raids::getInstance()->startup();
+		case RELOAD_TYPE_CREATURESCRIPTS: g_creatureEvents->reload();
+	}
+}

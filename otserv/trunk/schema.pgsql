@@ -55,7 +55,6 @@ CREATE TABLE "players" (
 	"conditions" BYTEA NOT NULL,
 	"skull_type" SMALLINT NOT NULL DEFAULT 0,
 	"skull_time" BIGINT NOT NULL DEFAULT 0,
-	"guildnick" VARCHAR(255) NOT NULL DEFAULT '',
 	"loss_experience" INT NOT NULL DEFAULT 100,
 	"loss_mana" INT NOT NULL DEFAULT 100,
 	"loss_skills" INT NOT NULL DEFAULT 100,
@@ -92,40 +91,30 @@ CREATE TABLE "guild_ranks" (
 );
 
 CREATE TABLE "guild_members" (
-	"id" SERIAL,
 	"player_id" INT NOT NULL,
-	"guild_id" INT NOT NULL,
 	"rank_id" INT NOT NULL,
 	"guild_nick" VARCHAR(255) NOT NULL DEFAULT '',
-	PRIMARY KEY ("id"),
 	UNIQUE ("player_id"),
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
-);
-
-CREATE TABLE "war_declaration" (
-	"id" SERIAL,
-	"guild_id" INT NOT NULL,
-	"opponent_id" INT NOT NULL,
-	"frag_limit" BIGINT NOT NULL DEFAULT 10,
-	"war_duration" BIGINT NOT NULL,
-	"guild_fee" BIGINT NOT NULL DEFAULT 1000,
-	"opponent_fee" BIGINT NOT NULL DEFAULT 1000,
-	"comment" VARCHAR(255) NOT NULL DEFAULT '',
-	"declaration_date" INT NOT NULL,
-	"active" SMALLINT NOT NULL DEFAULT 0,
-	PRIMARY KEY ("id"),
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("opponent_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "guild_wars" (
 	"id" SERIAL,
-	"war_id" INT NOT NULL,
-	"guild_frags" INT NOT NULL DEFAULT 0,
-	"opponent_frags" INT NOT NULL DEFAULT 0,
+	"guild_id" INT NOT NULL,
+	"opponent_id" INT NOT NULL,
+	"frag_limit" BIGINT NOT NULL DEFAULT 10,
+	"declaration_date" BIGINT NOT NULL,
+	"end_date" BIGINT NOT NULL,
+	"guild_fee" BIGINT NOT NULL DEFAULT 1000,
+	"opponent_fee" BIGINT NOT NULL DEFAULT 1000,
+	"guild_frags" BIGINT NOT NULL DEFAULT 0,
+	"opponent_frags" BIGINT NOT NULL DEFAULT 0,
+	"comment" VARCHAR(255) NOT NULL DEFAULT '',
+	"status" SMALLINT NOT NULL DEFAULT 0,
 	PRIMARY KEY ("id"),
-	FOREIGN KEY ("war_id") REFERENCES "war_declaration" ("id") ON DELETE CASCADE
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("opponent_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
 );	
 
 CREATE TABLE "player_viplist" (
@@ -316,22 +305,6 @@ BEFORE DELETE
 ON "accounts"
 FOR EACH ROW
 EXECUTE PROCEDURE "ondelete_accounts"();
-
-CREATE FUNCTION "ondelete_guilds"()
-RETURNS TRIGGER
-AS $$
-BEGIN
-	UPDATE "players" SET "guildnick" = '', "rank_id" = 0 WHERE "rank_id" IN (SELECT "id" FROM "guild_ranks" WHERE "guild_id" = OLD."id");
-
-	RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER "ondelete_guilds"
-BEFORE DELETE
-ON "guilds"
-FOR EACH ROW
-EXECUTE PROCEDURE "ondelete_guilds"();
 
 CREATE FUNCTION "ondelete_players"()
 RETURNS TRIGGER

@@ -87,14 +87,9 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 
-	static TalkActionFunction shutdownServer;
 	static TalkActionFunction placeNpc;
-	static TalkActionFunction reloadInfo;
-	static TalkActionFunction closeServer;
-	static TalkActionFunction openServer;
 	static TalkActionFunction sellHouse;
 	static TalkActionFunction forceRaid;
-	static TalkActionFunction refreshMap;
 	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static TalkActionFunction serverDiag;
 	#endif
