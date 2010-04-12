@@ -426,7 +426,7 @@ bool Weapon::useFist(Player* player, Creature* target)
 	if(Position::areInRange<1,1>(playerPos, targetPos)){
 		float attackFactor = player->getAttackFactor();
 		int32_t attackSkill = player->getSkill(SKILL_FIST, SKILL_LEVEL);
-		int32_t attackValue = 7;
+		int32_t attackValue = g_config.getNumber(ConfigManager::FIST_STRENGTH);
 
 		int32_t maxDamage = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 

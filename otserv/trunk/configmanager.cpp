@@ -190,7 +190,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATES_FOR_PLAYER_KILLING] = getGlobalBoolean(L, "rates_for_player_killing", false);
 	m_confInteger[RATE_EXPERIENCE_PVP] = getGlobalNumber(L, "rate_exp_pvp", 0);
 	m_confInteger[ADDONS_ONLY_FOR_PREMIUM] = getGlobalBoolean(L, "addons_only_for_premium", true);
-
+    m_confInteger[FIST_STRENGTH] = getGlobalNumber(L, "fist_strength", 7);
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
 	m_isLoaded = true;
 	return true;
