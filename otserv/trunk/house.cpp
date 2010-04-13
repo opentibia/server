@@ -155,7 +155,7 @@ bool House::kickPlayer(Player* player, const std::string& name)
 		HouseTile* houseTile = kickingPlayer->getTile()->getHouseTile();
 
 		if(houseTile && houseTile->getHouse() == this){
-			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && !kickingPlayer->hasFlag(PlayerFlag_CanEditHouses)){
+			if((getHouseAccessLevel(player) > getHouseAccessLevel(kickingPlayer) || kickingPlayer == player) && !kickingPlayer->hasFlag(PlayerFlag_CanEditHouses)){
 				if(g_game.internalTeleport(kickingPlayer, getEntryPosition()) == RET_NOERROR){
 					g_game.addMagicEffect(getEntryPosition(), NM_ME_TELEPORT);
 				}

@@ -429,9 +429,12 @@ void Spawn::cleanup()
 			spawnedMap.erase(it++);
 		}
 		else{
+			/*
+			 * This completely messes up luring, and also moves creatures into the view of online players without checks.
 			if(spawnId != 0 && !isInSpawnZone(monster->getPosition()) && monster->getIdleStatus()) {
 				g_game.internalTeleport(monster, monster->getMasterPos(), FLAG_NOLIMIT);
 			}
+			*/
 
 			++it;
 		}
