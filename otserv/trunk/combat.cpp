@@ -245,13 +245,8 @@ ConditionType_t Combat::DamageToConditionType(CombatType_t type)
 
 bool Combat::isPlayerCombat(const Creature* target)
 {
-	if(target->getPlayer()){
+	if(target->getPlayer() || target->isPlayerSummon())
 		return true;
-	}
-
-	if(target->isPlayerSummon()){
-		return true;
-	}
 
 	return false;
 }
@@ -579,24 +574,22 @@ bool Combat::setCallback(CallBackParam_t key)
 		{
 			delete params.tileCallback;
 			params.tileCallback = new TileCallback();
-			break;
+			return true;
 		}
 
 		case CALLBACKPARAM_TARGETCREATURECALLBACK:
 		{
 			delete params.targetCallback;
 			params.targetCallback = new TargetCallback();
-			break;
+			return true;
 		}
 
 		default:
 		{
 			std::cout << "Combat::setCallback - Unknown callback type: " << (uint32_t)key << std::endl;
-			break;
+			return false;
 		}
 	}
-
-	return false;
 }
 
 CallBack* Combat::getCallback(CallBackParam_t key)
@@ -799,7 +792,6 @@ void Combat::addDistanceEffect(Creature* caster, const Position& fromPos, const 
 			case WEAPON_AXE: distanceEffect = NM_SHOOT_WHIRLWINDAXE; break;
 			case WEAPON_SWORD: distanceEffect = NM_SHOOT_WHIRLWINDSWORD; break;
 			case WEAPON_CLUB: distanceEffect = NM_SHOOT_WHIRLWINDCLUB; break;
-
 			default: distanceEffect = NM_ME_NONE; break;
 		}
 	}

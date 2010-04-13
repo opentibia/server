@@ -1505,9 +1505,9 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 	return RET_NOERROR;
 }
 
-ReturnValue Game::internalPlayerAddItem(Player* player, Item* item, bool dropOnMap /*= true*/)
+ReturnValue Game::internalPlayerAddItem(Player* player, Item* item, bool dropOnMap /*= true*/, slots_t slot /*= SLOT_WHEREEVER*/)
 {
-	ReturnValue ret = internalAddItem(player, item);
+	ReturnValue ret = internalAddItem(player, item, (int32_t)slot);
 
 	if(ret != RET_NOERROR && dropOnMap){
 		ret = internalAddItem(player->getTile(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
@@ -1708,12 +1708,8 @@ uint32_t Game::getMoney(const Cylinder* cylinder)
 
 bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*/)
 {
-	if(cylinder == NULL){
+	if(cylinder == NULL || money <= 0)
 		return false;
-	}
-	if(money <= 0){
-		return true;
-	}
 
 	std::list<Container*> listContainer;
 	Container* tmpContainer = NULL;
@@ -4943,13 +4939,11 @@ void Game::loadGuildWars()
 			if(status == 1 && endDate <= std::time(NULL)){
 				guildWars[id] = war; //just add so endGuildWar can use it
 				endGuildWar(id);
+				status = -1;
 			}
 			else if(status == 0 && endDate > std::time(NULL)){
-				if(doGuildTransfer(war.guildId, war.opponentId, (war.guildFee + 1000), (war.opponentFee + 1000))){
-					//if this fails, in the next startup it will check again
-					guildWars[id] = war;
+				if(doGuildTransfer(war.guildId, war.opponentId, (war.guildFee + 1000), (war.opponentFee + 1000)))
 					status = 1;
-				}
 			}
 
 			//Add guilds to each other's enemy list if war was activated or if it didn't finish yet
@@ -4958,6 +4952,7 @@ void Game::loadGuildWars()
 				Guild* guild = getGuildById(war.guildId);
 				Guild* opponentGuild = getGuildById(war.opponentId);
 				if(guild && opponentGuild){
+					guildWars[id] = war;
 					guild->addEnemy(opponentGuild->getId(), id);
 					opponentGuild->addEnemy(guild->getId(), id);
 				}
@@ -4972,24 +4967,14 @@ void Game::loadGuildWars()
 	}
 }
 
-void Game::clearGuildWars()
-{
-	for(GuildsMap::iterator it = loadedGuilds.begin(); it != loadedGuilds.end(); ++it){
-		it->second->clearEnemies();
-	}
-
-	guildWars.clear();
-}
-
 bool Game::endGuildWar(uint32_t warId)
 {
 	GuildWarsMap::iterator it = guildWars.find(warId);
 	if(it != guildWars.end()){
 		Guild* guild = getGuildById(it->second.guildId);
 		Guild* opponentGuild = getGuildById(it->second.opponentId);
-		int32_t realGuildFee = 0, realOpponentFee = 0;
-
 		if(guild && opponentGuild){
+			int32_t realGuildFee = 0, realOpponentFee = 0;
 			if(it->second.guildFrags >= it->second.fragLimit){
 				realGuildFee = it->second.guildFee + it->second.opponentFee;
 			}
@@ -5015,7 +5000,7 @@ bool Game::endGuildWar(uint32_t warId)
 			//Do payment
 			doGuildTransfer(it->second.guildId, it->second.opponentId, -realGuildFee, -realOpponentFee);
 
-			//Do internal removal
+			//Do intern removal
 			guild->removeEnemy(opponentGuild->getId());
 			opponentGuild->removeEnemy(guild->getId());
 			guildWars.erase(it);
@@ -5069,6 +5054,8 @@ bool Game::doGuildTransfer(uint32_t guildId, uint32_t opponentId, int32_t guildF
 				}
 			}
 		} while(result->next());
+
+		db->freeResult(result);
 	}
 
 	//If both guilds have leaders that can afford the war, return true..
@@ -5103,9 +5090,8 @@ bool Game::setWarStatus(uint32_t warId, int32_t statusId)
 Guild* Game::getGuildById(uint32_t guildId)
 {
 	GuildsMap::iterator it = loadedGuilds.find(guildId);
-	if(it != loadedGuilds.end()){
+	if(it != loadedGuilds.end())
 		return it->second;
-	}
 	else{
 		Database* db = Database::instance();
 		DBResult* result;
@@ -5117,6 +5103,7 @@ Guild* Game::getGuildById(uint32_t guildId)
 			guild->setId(result->getDataInt("id"));
 			guild->setName(result->getDataString("name"));
 			loadedGuilds[guild->getId()] = guild;
+			db->freeResult(result);
 			return guild;
 		}
 	}
@@ -5139,18 +5126,34 @@ bool Game::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 void Game::reloadInfo(reloadTypes_t info)
 {
 	switch(info){
-		case RELOAD_TYPE_ACTIONS: g_actions->reload();
-		case RELOAD_TYPE_MONSTERS: g_monsters.reload();
-		case RELOAD_TYPE_NPCS: g_npcs.reload();
-		case RELOAD_TYPE_CONFIG: g_config.reload();
-		case RELOAD_TYPE_TALKACTIONS: g_talkactions->reload();
-		case RELOAD_TYPE_MOVEMENTS: g_moveEvents->reload();
+		case RELOAD_TYPE_ACTIONS: 
+			g_actions->reload();
+			break;
+		case RELOAD_TYPE_MONSTERS: 
+			g_monsters.reload();
+			break;
+		case RELOAD_TYPE_NPCS: 
+			g_npcs.reload();
+			break;
+		case RELOAD_TYPE_CONFIG: 
+			g_config.reload();
+			break;
+		case RELOAD_TYPE_TALKACTIONS: 
+			g_talkactions->reload();
+			break;
+		case RELOAD_TYPE_MOVEMENTS: 
+			g_moveEvents->reload();
+			break;
 		case RELOAD_TYPE_SPELLS: 
 			g_spells->reload();
 			g_monsters.reload();
+			break;
 		case RELOAD_TYPE_RAIDS:
 			Raids::getInstance()->reload();
 			Raids::getInstance()->startup();
-		case RELOAD_TYPE_CREATURESCRIPTS: g_creatureEvents->reload();
+			break;
+		case RELOAD_TYPE_CREATURESCRIPTS: 
+			g_creatureEvents->reload();
+			break;
 	}
 }

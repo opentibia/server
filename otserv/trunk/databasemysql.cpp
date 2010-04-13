@@ -92,12 +92,11 @@ DatabaseMySQL::~DatabaseMySQL()
 bool DatabaseMySQL::getParam(DBParam_t param)
 {
 	switch(param){
-	case DBPARAM_MULTIINSERT:
-		return true;
-		break;
-	default:
-		return false;
-		break;
+		case DBPARAM_MULTIINSERT: 
+			return true;
+			break;
+		default:
+			return false;
 	}
 }
 

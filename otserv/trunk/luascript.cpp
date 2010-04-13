@@ -1145,7 +1145,7 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerGuildNick(cid)
 	lua_register(m_luaState, "getPlayerGuildNick", LuaScriptInterface::luaGetPlayerGuildNick);
 
-	//getPlayerGuildNick(cid)
+	//getPlayerGuildLevel(cid)
 	lua_register(m_luaState, "getPlayerGuildLevel", LuaScriptInterface::luaGetPlayerGuildLevel);
 
 	//getPlayerSex(cid)
@@ -1335,7 +1335,7 @@ void LuaScriptInterface::registerFunctions()
 	//Returns uid of the created item
 	lua_register(m_luaState, "doPlayerAddItem", LuaScriptInterface::luaDoPlayerAddItem);
 
-	//doPlayerAddItemEx(cid, uid, <optional: default: 0> canDropOnMap)
+	//doPlayerAddItemEx(cid, uid, <optional: default: 0> canDropOnMap, <optional> slot)
 	lua_register(m_luaState, "doPlayerAddItemEx", LuaScriptInterface::luaDoPlayerAddItemEx);
 
 	//doPlayerSendTextMessage(cid, MessageClasses, message)
@@ -3028,13 +3028,22 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 {
-	//doPlayerAddItemEx(cid, uid, <optional: default: 0> canDropOnMap)
+	//doPlayerAddItemEx(cid, uid, <optional: default: 0> canDropOnMap, <optional> slot)
 	int32_t parameters = lua_gettop(L);
 
-	bool canDropOnMap = false;
-	if(parameters > 2){
-		canDropOnMap = popNumber(L) == LUA_TRUE;
+	uint32_t slot = SLOT_WHEREEVER;
+	if(parameters > 3){
+		slot = popNumber(L);
+		if(slot >= SLOT_LAST){ //depot is not a real slot, it IS >=
+			reportErrorFunc("Invalid slot.");
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
 	}
+			
+	bool canDropOnMap = false;
+	if(parameters > 2)
+		canDropOnMap = popNumber(L) == LUA_TRUE;
 
 	uint32_t uid = (uint32_t)popNumber(L);
 	uint32_t cid = popNumber(L);
@@ -3060,7 +3069,7 @@ int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 		return 1;
 	}
 
-	ReturnValue ret = g_game.internalPlayerAddItem(player, item, canDropOnMap);
+	ReturnValue ret = g_game.internalPlayerAddItem(player, item, canDropOnMap, (slots_t)slot);
 	lua_pushnumber(L, ret);
 	return 1;
 }

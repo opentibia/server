@@ -56,7 +56,6 @@ bool DatabasePgSQL::getParam(DBParam_t param)
 		case DBPARAM_MULTIINSERT:
 			return true;
 			break;
-
 		default:
 			return false;
 	}

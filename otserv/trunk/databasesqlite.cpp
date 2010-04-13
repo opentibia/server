@@ -74,7 +74,6 @@ bool DatabaseSQLite::getParam(DBParam_t param)
 		case DBPARAM_MULTIINSERT:
 			return false;
 			break;
-
 		default:
 			return false;
 	}

@@ -29,7 +29,6 @@
   <spawn centerx="227" centery="197" centerz="5" radius="5">
     <monster name="Orc Berserker" x="1" y="-2" z="5" spawntime="60"/>
     <monster name="Orc Shaman" x="0" y="-1" z="5" spawntime="60"/>
-    <monster name="Orc Leader" x="-5" y="0" z="5" spawntime="60"/>
     <monster name="Orc Leader" x="-1" y="0" z="5" spawntime="60"/>
     <monster name="Orc Shaman" x="1" y="1" z="5" spawntime="60"/>
   </spawn>
@@ -49,24 +48,11 @@
     <monster name="Scorpion" x="-1" y="-1" z="5" spawntime="60"/>
     <monster name="Cyclops" x="2" y="2" z="5" spawntime="60"/>
   </spawn>
-  <spawn centerx="396" centery="392" centerz="5" radius="1">
-    <monster name="Magicthrower" x="0" y="0" z="5" spawntime="60"/>
-  </spawn>
-  <spawn centerx="403" centery="392" centerz="5" radius="1">
-    <monster name="Magicthrower" x="0" y="0" z="5" spawntime="60"/>
-  </spawn>
-  <spawn centerx="396" centery="396" centerz="5" radius="1">
-    <monster name="Magicthrower" x="0" y="0" z="5" spawntime="60"/>
-  </spawn>
-  <spawn centerx="403" centery="396" centerz="5" radius="1">
-    <monster name="Magicthrower" x="0" y="0" z="5" spawntime="60"/>
-  </spawn>
   <spawn centerx="222" centery="83" centerz="6" radius="5">
     <monster name="Valkyrie" x="0" y="0" z="6" spawntime="60"/>
     <monster name="Valkyrie" x="1" y="0" z="6" spawntime="60"/>
   </spawn>
   <spawn centerx="183" centery="187" centerz="6" radius="5">
-    <monster name="Orc" x="0" y="-2" z="6" spawntime="60"/>
     <monster name="Orc" x="1" y="-1" z="6" spawntime="60"/>
   </spawn>
   <spawn centerx="230" centery="195" centerz="6" radius="5">
@@ -311,9 +297,6 @@
     <monster name="Orc Warrior" x="-3" y="0" z="7" spawntime="60"/>
     <monster name="Orc Warrior" x="1" y="1" z="7" spawntime="60"/>
   </spawn>
-  <spawn centerx="101" centery="181" centerz="7" radius="5">
-    <monster name="Deer" x="-2" y="-1" z="7" spawntime="60"/>
-  </spawn>
   <spawn centerx="111" centery="181" centerz="7" radius="5">
     <monster name="Deer" x="1" y="0" z="7" spawntime="60"/>
     <monster name="Deer" x="0" y="5" z="7" spawntime="60"/>
@@ -393,7 +376,6 @@
   </spawn>
   <spawn centerx="196" centery="208" centerz="7" radius="5">
     <monster name="Troll" x="-3" y="-4" z="7" spawntime="60"/>
-    <monster name="Troll" x="0" y="-4" z="7" spawntime="60"/>
     <monster name="Swamp Troll" x="3" y="-4" z="7" spawntime="60"/>
     <monster name="Troll" x="-4" y="0" z="7" spawntime="60"/>
     <monster name="Troll" x="1" y="0" z="7" spawntime="60"/>
@@ -510,7 +492,6 @@
   <spawn centerx="136" centery="273" centerz="7" radius="5">
     <monster name="Wolf" x="-2" y="-3" z="7" spawntime="60"/>
     <monster name="Wolf" x="3" y="-1" z="7" spawntime="60"/>
-    <monster name="Wolf" x="-2" y="3" z="7" spawntime="60"/>
     <monster name="Wolf" x="2" y="3" z="7" spawntime="60"/>
   </spawn>
   <spawn centerx="125" centery="276" centerz="7" radius="5">
@@ -536,7 +517,6 @@
   <spawn centerx="148" centery="282" centerz="7" radius="5">
     <monster name="Wolf" x="1" y="-4" z="7" spawntime="60"/>
     <monster name="Wolf" x="-2" y="-2" z="7" spawntime="60"/>
-    <monster name="Wolf" x="1" y="1" z="7" spawntime="60"/>
     <monster name="Wolf" x="3" y="2" z="7" spawntime="60"/>
     <monster name="Wolf" x="-2" y="3" z="7" spawntime="60"/>
   </spawn>

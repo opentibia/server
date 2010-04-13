@@ -315,7 +315,7 @@ public:
 		uint32_t flags = 0, bool test = false);
 	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false, uint32_t flags = 0);
 
-	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true);
+	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true, slots_t slot = SLOT_WHEREEVER);
 
 	/**
 	  * Find an item of a certain type
@@ -555,7 +555,6 @@ public:
 
 	//Guilds
 	void loadGuildWars();
-	void clearGuildWars();
 	bool endGuildWar(uint32_t warId);
 	bool doGuildTransfer(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee);
 	bool setWarStatus(uint32_t warId, int32_t statusId);

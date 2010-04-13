@@ -116,11 +116,10 @@ DatabaseODBC::~DatabaseODBC()
 bool DatabaseODBC::getParam(DBParam_t param)
 {
 	switch(param){
-		case DBPARAM_MULTIINSERT:
+		case DBPARAM_MULTIINSERT: 
 			return false;
 			break;
-
-		default:
+		default: 
 			return false;
 	}
 }
