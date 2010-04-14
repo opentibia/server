@@ -432,16 +432,14 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 			}
 
 			if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP){
-				if(const Player* targetPlayer = target->getPlayer()){
-					if(!targetPlayer->isGuildEnemy(attacker->getPlayer())){
-						if(!isInPvpZone(attacker, target)){
-							return RET_YOUMAYNOTATTACKTHISCREATURE;
-						}
-					}
-				}
+				const Player* targetPlayer = NULL;
+				if(target->getPlayer())
+					targetPlayer = target->getPlayer();
+				else if(target->isPlayerSummon())
+					targetPlayer = target->getPlayerMaster();
 
-				if(target->isPlayerSummon()){
-					if(!target->getPlayerMaster()->isGuildEnemy(attacker->getPlayer())){
+				if(targetPlayer){
+					if(!targetPlayer->isGuildEnemy(attacker->getPlayer())){
 						if(!isInPvpZone(attacker, target)){
 							return RET_YOUMAYNOTATTACKTHISCREATURE;
 						}

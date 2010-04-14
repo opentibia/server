@@ -757,11 +757,6 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 		}
 	}
 
-	int32_t oldIndex = tile->__getIndexOfThing(creature);
-	if(!map->removeCreature(creature)){
-		return false;
-	}
-
 	//send to client
 	uint32_t i = 0;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -776,6 +771,11 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	//event method
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onCreatureDisappear(creature, isLogout);
+	}
+
+	int32_t oldIndex = tile->__getIndexOfThing(creature);
+	if(!map->removeCreature(creature)){
+		return false;
 	}
 
 	creature->getParent()->postRemoveNotification(creature, NULL, oldIndex, true);
@@ -1994,9 +1994,8 @@ bool Game::playerMove(uint32_t playerId, Direction dir)
 		player->setNextWalkTask(task);
 		return false;
 	}
-
+	
 	player->resetIdle();
-	player->setFollowCreature(NULL);
 	player->onWalk(dir);
 	return (internalMoveCreature(player, dir) == RET_NOERROR);
 }
@@ -5113,11 +5112,27 @@ Guild* Game::getGuildById(uint32_t guildId)
 
 bool Game::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 {
+	// check cache
 	for(GuildsMap::iterator it = loadedGuilds.begin(); it != loadedGuilds.end(); ++it){
 		if(strcasecmp(it->second->getName().c_str(), guildName.c_str()) == 0){
 			guildId = it->first;
 			return true;
 		}
+	}
+
+	// not in cache, let's try database (also add in cache if found)
+	Database* db = Database::instance();
+	DBResult* result;
+	DBQuery query;
+
+	query << "SELECT `id`, `name` FROM `guilds` WHERE `name` = " << db->escapeString(guildName);
+	if((result = db->storeQuery(query.str()))){
+		Guild* guild = new Guild();
+		guild->setId(result->getDataInt("id"));
+		guild->setName(result->getDataString("name"));
+		loadedGuilds[guild->getId()] = guild;
+		db->freeResult(result);
+		return true;
 	}
 
 	return false;
