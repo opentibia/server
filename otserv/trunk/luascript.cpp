@@ -1873,6 +1873,36 @@ void LuaScriptInterface::registerFunctions()
 
 	//getNpcParameter(name, key)
 	lua_register(m_luaState, "getNpcParameter", LuaScriptInterface::luaGetNpcParameter);
+	
+	//getItemWeaponType(itemid)
+	lua_register(m_luaState, "getItemWeaponType", LuaScriptInterface::luaGetItemWeaponType);
+
+	//getItemAttack(itemid)
+	lua_register(m_luaState, "getItemAttack", LuaScriptInterface::luaGetItemAttack);
+
+	//getItemDefence(itemid)
+	lua_register(m_luaState, "getItemDefence", LuaScriptInterface::luaGetItemDefence);
+
+	//getItemExtraDef(itemid)
+	lua_register(m_luaState, "getItemExtraDef", LuaScriptInterface::luaGetItemExtraDef);
+
+	//getItemArmor(itemid)
+	lua_register(m_luaState, "getItemArmor", LuaScriptInterface::luaGetItemArmor);
+
+	//getItemWeaponTypeByUID(uid)
+	lua_register(m_luaState, "getItemWeaponTypeByUID", LuaScriptInterface::luaGetItemWeaponTypeByUID);
+
+	//getItemAttackByUID(uid)
+	lua_register(m_luaState, "getItemAttackByUID", LuaScriptInterface::luaGetItemAttackByUID);
+
+	//getItemDefenceByUID(uid)
+	lua_register(m_luaState, "getItemDefenceByUID", LuaScriptInterface::luaGetItemDefenceByUID);
+
+	//getItemExtraDefByUID(uid)
+	lua_register(m_luaState, "getItemExtraDefByUID", LuaScriptInterface::luaGetItemExtraDefByUID);
+
+	//getItemArmor(uid)
+	lua_register(m_luaState, "getItemArmorByUID", LuaScriptInterface::luaGetItemArmorByUID);
 
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
@@ -8442,3 +8472,138 @@ SHIFTOP(int32_t, LeftShift, <<)
 SHIFTOP(int32_t, RightShift, >>)
 SHIFTOP(uint32_t, ULeftShift, <<)
 SHIFTOP(uint32_t, URightShift, >>)
+
+int LuaScriptInterface::luaGetItemWeaponType(lua_State *L)
+{
+	//getItemWeaponType(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	lua_pushnumber(L, (int32_t) it.weaponType);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemAttack(lua_State *L)
+{
+	//getItemAttack(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	lua_pushnumber(L, it.attack);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemDefence(lua_State *L)
+{
+	//getItemDefence(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	lua_pushnumber(L, it.defence);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemExtraDef(lua_State *L)
+{
+	//getItemExtraDef(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	lua_pushnumber(L, it.extraDef);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemArmor(lua_State *L)
+{
+	//getItemArmor(itemid)
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	lua_pushnumber(L, it.armor);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemWeaponTypeByUID(lua_State *L)
+{
+	//getItemWeaponTypeByUID(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(!item){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnil(L);
+		return 1;
+	}
+	const ItemType& it = Item::items[item->getID()];
+	lua_pushnumber(L, (int32_t) it.weaponType);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemAttackByUID(lua_State *L)
+{
+	//getItemAttackByUID(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(!item){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnil(L);
+		return 1;
+	}
+	int ret = item->getAttack();
+	lua_pushnumber(L, ret);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemDefenceByUID(lua_State *L)
+{
+	//getItemDefenceByUID(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(!item){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnil(L);
+		return 1;
+	}
+	int ret = item->getDefense();
+	lua_pushnumber(L, ret);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemExtraDefByUID(lua_State *L)
+{
+	//getItemExtraDefByUID(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(!item){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnil(L);
+		return 1;
+	}
+	int ret = item->getExtraDef();
+	lua_pushnumber(L, ret);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetItemArmorByUID(lua_State *L)
+{
+	//getItemArmorByUID(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(!item){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnil(L);
+		return 1;
+	}
+	int ret = item->getArmor();
+	lua_pushnumber(L, ret);
+	return 1;
+}

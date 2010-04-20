@@ -73,6 +73,7 @@ protected:
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 
 	typedef std::map<unsigned short, Action*> ActionUseMap;
+	Action* elseAction;
 	ActionUseMap useItemMap;
 	ActionUseMap uniqueItemMap;
 	ActionUseMap actionItemMap;
