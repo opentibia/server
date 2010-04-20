@@ -8816,11 +8816,11 @@
 	</item>
 	<item id="3958" name="trashed wooden bars">
 		<attribute key="decayTo" value="3799"/>
-		<attribute key="duration" value="60"/>
+		<attribute key="duration" value="120"/>
 	</item>
 	<item id="3959" name="trashed wooden bars">
 		<attribute key="decayTo" value="3798"/>
-		<attribute key="duration" value="60"/>
+		<attribute key="duration" value="120"/>
 	</item>
 	<item id="3960" article="an" name="old and used backpack">
 		<attribute key="description" value="A label on the backpack reads: Property of Sam, Thais."/>
