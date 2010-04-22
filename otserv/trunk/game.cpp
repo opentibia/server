@@ -5095,7 +5095,7 @@ void Game::broadcastGuildKill(uint32_t guildId, Player* player, const DeathList&
 		}
 
 		//Get list of killers that belong to guild
-		std::stringstream kmsg;
+		std::string kmsg;
 		bool first = true;
 		for(DeathList::const_iterator itt = killers.begin(); itt != killers.end(); ++itt){
 			if(itt->isCreatureKill()){
@@ -5105,11 +5105,11 @@ void Game::broadcastGuildKill(uint32_t guildId, Player* player, const DeathList&
 
 				if(attackerPlayer && attackerPlayer->getGuildId() == guild->getId()){
 					if(!first)
-						kmsg << " and ";
+						kmsg += " and ";
 					else
 						first = false;
 					
-					kmsg << attackerPlayer->getName();
+					kmsg += attackerPlayer->getName();
 				}
 			}
 		}
@@ -5118,12 +5118,12 @@ void Game::broadcastGuildKill(uint32_t guildId, Player* player, const DeathList&
 		std::stringstream msg;
 		msg << "Opponent " << player->getName() << " of the " << enemy->getName() << " was killed by " << kmsg << 
 			". The new score is " << frags << ":" << enemyFrags << " frags (limit " << it->second.fragLimit << ").";
-		guild->broadcastMessage(SPEAK_CHANNEL_W, msg.str().c_str());
+		guild->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
 
 		msg.str("");
 		msg << "Guild member " << player->getName() << " was killed by " << kmsg << " of the " << guild->getName() <<	
 			". The new score is " << enemyFrags << ":" << frags << " frags (limit " << it->second.fragLimit << ").";
-		enemy->broadcastMessage(SPEAK_CHANNEL_W, msg.str().c_str());
+		enemy->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
 
 		if(it->second.finished){
 			msg.str("");

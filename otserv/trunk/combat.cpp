@@ -289,7 +289,7 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 #ifdef __SKULLSYSTEM__
 	if(const Player* targetPlayer = target->getPlayer()){
 		if(player->hasSafeMode()){
-			if(player->isPartner(targetPlayer) || player->isWarPartner(player) ||
+			if(player->isPartner(targetPlayer) || player->isWarPartner(targetPlayer) ||
 				player->isGuildEnemy(targetPlayer)){
 				return Combat::canDoCombat(player, targetPlayer);
 			}
