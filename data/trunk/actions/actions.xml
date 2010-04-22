@@ -929,5 +929,5 @@
 	<action itemid="8977" script="dolls.lua"/>
 	<action itemid="8981" script="dolls.lua"/>
 	<action itemid="8982" script="dolls.lua"/>
-	<action else="1" script="else.lua"/>
+	<action default="1" script="default.lua"/>
 </actions>

@@ -22,8 +22,11 @@
 #include "guild.h"
 #include "game.h"
 #include "database.h"
+#include "chat.h"
+#include "player.h"
 
 extern Game g_game;
+extern Chat g_chat;
 
 Guild::Guild()
 {
@@ -33,15 +36,15 @@ Guild::Guild()
 
 Guild::~Guild()
 {
-	clearEnemies();
+	enemyGuilds.clear();
 }
 
-void Guild::addFrag(uint32_t enemyId) const
+bool Guild::addFrag(uint32_t enemyId) const
 {
 	uint32_t warId = isEnemy(enemyId);
-	if(warId != 0){
-		GuildWarsMap::iterator it = g_game.getGuildWars().find(warId);
-		if(it != g_game.getGuildWars().end()){
+	GuildWarsMap::iterator it = g_game.getGuildWars().find(warId);
+	if(it != g_game.getGuildWars().end()){
+		if(!it->second.finished){
 			Database* db = Database::instance();
 			DBQuery query;
 			query << "UPDATE `guild_wars` SET ";
@@ -59,18 +62,9 @@ void Guild::addFrag(uint32_t enemyId) const
 			query << "= " << frags << " WHERE `id` = " << warId;
 			db->executeQuery(query.str());
 
-			if(frags >= it->second.fragLimit){
-				g_game.endGuildWar(warId);
-			}
-		}
-	}
-}
+			if(frags >= it->second.fragLimit && it->second.fragLimit > 0)
+				it->second.finished = true;
 
-bool Guild::hasDeclaredWar(uint32_t warId) const
-{
-	GuildWarsMap::iterator it = g_game.getGuildWars().find(warId);
-	if(it != g_game.getGuildWars().end()){
-		if(it->second.guildId == getId()){
 			return true;
 		}
 	}
@@ -78,10 +72,23 @@ bool Guild::hasDeclaredWar(uint32_t warId) const
 	return false;
 }
 
-void Guild::addEnemy(uint32_t guildId, uint32_t warId)
+bool Guild::hasDeclaredWar(uint32_t warId) const
 {
-	if(isEnemy(guildId) == 0){
-		enemyGuilds[guildId] = warId;
+	GuildWarsMap::iterator it = g_game.getGuildWars().find(warId);
+	if(it != g_game.getGuildWars().end()){
+		if(it->second.guildId == getId())
+			return true;
+	}
+
+	return false;
+}
+
+void Guild::broadcastMessage(SpeakClasses type, const std::string msg) const
+{
+	ChatChannel* channel = g_chat.getGuildChannel(getId());
+	if(channel){
+		//Channel doesn't necessarily exists
+		channel->sendInfo(type, msg);
 	}
 }
 
@@ -89,18 +96,15 @@ uint32_t Guild::isEnemy(uint32_t guildId) const
 {
 	EnemyGuildsMap::const_iterator it = enemyGuilds.find(guildId);
 	if(it != enemyGuilds.end()){
-		if(it->first == guildId){
+		if(it->first == guildId)
 			return it->second;
-		}
 	}
 
 	return 0;
 }
 
-void Guild::removeEnemy(uint32_t enemyId)
+void Guild::addEnemy(uint32_t guildId, uint32_t warId)
 {
-	EnemyGuildsMap::iterator it = enemyGuilds.find(enemyId);
-	if(it != enemyGuilds.end()){
-		enemyGuilds.erase(it);
-	}
+	if(isEnemy(guildId) == 0)
+		enemyGuilds[guildId] = warId;
 }

@@ -49,7 +49,7 @@ extern ConfigManager g_config;
 Actions::Actions() :
 m_scriptInterface("Action Interface")
 {
-	elseAction = NULL;
+	defaultAction = NULL;
 	m_scriptInterface.initState();
 }
 
@@ -73,9 +73,9 @@ void Actions::clear()
 	clearMap(useItemMap);
 	clearMap(uniqueItemMap);
 	clearMap(actionItemMap);
-	if (elseAction) {
-		delete elseAction;
-		elseAction = NULL;
+	if(defaultAction){
+		delete defaultAction;
+		defaultAction = NULL;
 	}
 
 	m_scriptInterface.reInitState();
@@ -130,11 +130,11 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 			actionItemMap[toId] = action->clone();
 		}
 	}
-	else if(readXMLInteger(p,"else", id) && id != 0) {
-		if (!elseAction)
-			elseAction = action->clone();
+	else if(readXMLInteger(p,"default",id) && id != 0) {
+		if(!defaultAction)
+			defaultAction = action->clone();
 		else
-			std::cout << "Warning: you can't define more than one \"else\" action." << std::endl;
+			std::cout << "Warning: you can't define more than one default action." << std::endl;
 	}
 	else{
 		return false;
@@ -213,8 +213,8 @@ ReturnValue Actions::canUse(const Player* player, const Position& pos, const Ite
 		return RET_NOERROR;
 	}
 
-	if(elseAction){
-		ReturnValue ret = elseAction->canExecuteAction(player, pos);
+	if(defaultAction){
+		ReturnValue ret = defaultAction->canExecuteAction(player, pos);
 		if(ret != RET_NOERROR){
 			return ret;
 		}
@@ -342,6 +342,11 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 		foundAction = true;
 	}
 
+	if(!foundAction && defaultAction){
+		executeUse(defaultAction, player, item, posEx, creatureId);
+		foundAction = true;
+	}
+
 	if(BedItem* bed = item->getBed()){
 		if(!bed->canUse(player)){
 			return RET_CANNOTUSETHISOBJECT;
@@ -393,16 +398,9 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 		return RET_NOERROR;
 	}
 
-	if(elseAction){
-		if(executeUse(elseAction, player, item, posEx, creatureId)){
-			return RET_NOERROR;
-		}
-		foundAction = true;
-	}
-
-	if(foundAction){
+	if(foundAction)
 		return RET_NOERROR;
-	}
+
 	return RET_CANNOTUSETHISOBJECT;
 }
 
@@ -510,15 +508,15 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 		}
 	}
 
-	if (elseAction) {
-		isSuccess = executeUseEx(elseAction, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
-		if(isSuccess || elseAction->hasOwnErrorHandler()){
+	if(defaultAction){
+		isSuccess = executeUseEx(defaultAction, player, item, fromPosEx, toPosEx, isHotkey, creatureId);
+		if(isSuccess || defaultAction->hasOwnErrorHandler()){
 			return RET_NOERROR;
 		foundAction = true;
 		}
 	}
 
-	if (foundAction)
+	if(foundAction)
 		return RET_NOERROR;
 
 	return RET_CANNOTUSETHISOBJECT;
@@ -533,16 +531,6 @@ bool Actions::useItemEx(Player* player, const Position& fromPos, const Position&
 
 	player->setNextActionTask(NULL);
 	player->stopWalk();
-
-	Action* action = getAction(item);
-	if(!action){
-		if(elseAction)
-			action = elseAction;
-		else {
-			player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-			return false;
-		}
-	}
 
 	int32_t fromStackPos = item->getParent()->__getIndexOfThing(item);
 	PositionEx fromPosEx(fromPos, fromStackPos);

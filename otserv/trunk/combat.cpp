@@ -289,7 +289,8 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 #ifdef __SKULLSYSTEM__
 	if(const Player* targetPlayer = target->getPlayer()){
 		if(player->hasSafeMode()){
-			if(player->isPartner(targetPlayer)){
+			if(player->isPartner(targetPlayer) || player->isWarPartner(player) ||
+				player->isGuildEnemy(targetPlayer)){
 				return Combat::canDoCombat(player, targetPlayer);
 			}
 			if(targetPlayer->getSkull() == SKULL_NONE){
@@ -372,12 +373,14 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 
 	if(	attackerPlayer == NULL ||
 		targetPlayer == NULL ||
+		targetPlayer == attackerPlayer ||
+		attackerPlayer->hasFlag(PlayerFlag_NotGainInFight) ||
 		attackerPlayer->isPartner(targetPlayer) ||
+		attackerPlayer->isWarPartner(targetPlayer) ||
 		attackerPlayer->isGuildEnemy(targetPlayer) ||
 		Combat::isInPvpZone(attackerPlayer, targetPlayer) ||
 		targetPlayer->hasAttacked(attackerPlayer) ||
-		targetPlayer->getSkull() != SKULL_NONE ||
-		targetPlayer == attackerPlayer){
+		targetPlayer->getSkull() != SKULL_NONE){
 		return false;
 	}
 
@@ -403,7 +406,9 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 
 				#ifdef __SKULLSYSTEM__
 				if(attackerPlayer->getSkull() == SKULL_BLACK &&
-					!attackerPlayer->isGuildEnemy(targetPlayer)){
+					!attackerPlayer->isGuildEnemy(targetPlayer) &&
+					!attackerPlayer->isPartner(targetPlayer) &&
+					!attackerPlayer->isWarPartner(targetPlayer)){
 					if(targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->hasAttacked(attackerPlayer)){
 						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
@@ -441,7 +446,10 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 				if(targetPlayer){
 					if(!targetPlayer->isGuildEnemy(attacker->getPlayer())){
 						if(!isInPvpZone(attacker, target)){
-							return RET_YOUMAYNOTATTACKTHISCREATURE;
+							if(target->getPlayer())
+								return RET_YOUMAYNOTATTACKTHISPERSON;
+							else
+								return RET_YOUMAYNOTATTACKTHISCREATURE;
 						}
 					}
 				}

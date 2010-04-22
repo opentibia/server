@@ -30,7 +30,6 @@
 #include "enums.h"
 #include "vocation.h"
 #include "protocolgame.h"
-#include "guild.h"
 
 #include <vector>
 #include <ctime>
@@ -42,6 +41,7 @@ class ProtocolGame;
 class Npc;
 class Party;
 class SchedulerTask;
+class Guild;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -145,6 +145,8 @@ public:
 	uint32_t getGuildId() const;
 
 	bool isGuildEnemy(const Player* player) const;
+	bool isGuildPartner(const Player* player) const;
+	bool isWarPartner(const Player* player) const;
 	GuildEmblems_t getGuildEmblem(const Player* player) const;
 
 	std::string guildRank, guildNick;
@@ -433,7 +435,7 @@ public:
 	bool removeOutfit(uint32_t outfitId, uint32_t addons);
 	bool canLogout();
 	void broadcastLoot(Creature* creature, Container* corpse);
-	bool checkPzBlockOnCombat(Player* targetPlayer);
+	bool checkPzBlock(Player* targetPlayer);
 
 	//creature events
 	void onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);

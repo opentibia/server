@@ -97,7 +97,6 @@ BREAKABLE_BY_WEAPONS = {
 	[3799] = { remainings = 3958, chance = 20 },
 }
 
-
 DOLLS = {
 	[5080] = {"Hug me."},
 	[5669] = {

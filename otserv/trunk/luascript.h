@@ -642,7 +642,7 @@ protected:
 
 	static int luaIsNpcName(lua_State *L);
 	static int luaGetMonsterParameter(lua_State *L);
-	static int luaGetNpcParameter(lua_State *L);
+	static int luaGetNpcParameterByName(lua_State *L);
 
 	static const luaL_Reg luaBitReg[13];
 	static int luaBitNot(lua_State *L);
@@ -660,12 +660,12 @@ protected:
 	
 	static int luaGetItemWeaponType(lua_State *L);
 	static int luaGetItemAttack(lua_State *L);
-	static int luaGetItemDefence(lua_State *L);
+	static int luaGetItemDefense(lua_State *L);
 	static int luaGetItemExtraDef(lua_State *L);
 	static int luaGetItemArmor(lua_State *L);
 	static int luaGetItemWeaponTypeByUID(lua_State *L);
 	static int luaGetItemAttackByUID(lua_State *L);
-	static int luaGetItemDefenceByUID(lua_State *L);
+	static int luaGetItemDefenseByUID(lua_State *L);
 	static int luaGetItemExtraDefByUID(lua_State *L);
 	static int luaGetItemArmorByUID(lua_State *L);
 

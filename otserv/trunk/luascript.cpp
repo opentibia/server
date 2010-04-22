@@ -44,6 +44,7 @@
 #include "ban.h"
 #include "movement.h"
 #include "tools.h"
+#include "guild.h"
 
 extern Game g_game;
 extern Monsters g_monsters;
@@ -1871,8 +1872,8 @@ void LuaScriptInterface::registerFunctions()
 	//getMonsterParameter(name, key)
 	lua_register(m_luaState, "getMonsterParameter", LuaScriptInterface::luaGetMonsterParameter);
 
-	//getNpcParameter(name, key)
-	lua_register(m_luaState, "getNpcParameter", LuaScriptInterface::luaGetNpcParameter);
+	//getNpcParameterByName(name, key)
+	lua_register(m_luaState, "getNpcParameterByName", LuaScriptInterface::luaGetNpcParameterByName);
 	
 	//getItemWeaponType(itemid)
 	lua_register(m_luaState, "getItemWeaponType", LuaScriptInterface::luaGetItemWeaponType);
@@ -1880,8 +1881,8 @@ void LuaScriptInterface::registerFunctions()
 	//getItemAttack(itemid)
 	lua_register(m_luaState, "getItemAttack", LuaScriptInterface::luaGetItemAttack);
 
-	//getItemDefence(itemid)
-	lua_register(m_luaState, "getItemDefence", LuaScriptInterface::luaGetItemDefence);
+	//getItemDefense(itemid)
+	lua_register(m_luaState, "getItemDefense", LuaScriptInterface::luaGetItemDefense);
 
 	//getItemExtraDef(itemid)
 	lua_register(m_luaState, "getItemExtraDef", LuaScriptInterface::luaGetItemExtraDef);
@@ -1895,8 +1896,8 @@ void LuaScriptInterface::registerFunctions()
 	//getItemAttackByUID(uid)
 	lua_register(m_luaState, "getItemAttackByUID", LuaScriptInterface::luaGetItemAttackByUID);
 
-	//getItemDefenceByUID(uid)
-	lua_register(m_luaState, "getItemDefenceByUID", LuaScriptInterface::luaGetItemDefenceByUID);
+	//getItemDefenseByUID(uid)
+	lua_register(m_luaState, "getItemDefenseByUID", LuaScriptInterface::luaGetItemDefenseByUID);
 
 	//getItemExtraDefByUID(uid)
 	lua_register(m_luaState, "getItemExtraDefByUID", LuaScriptInterface::luaGetItemExtraDefByUID);
@@ -4354,15 +4355,11 @@ int LuaScriptInterface::luaDoPlayerRemoveMoney(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 
 	Player* player = env->getPlayerByUID(cid);
-	if(money < 0)
-		lua_pushnumber(L, LUA_TRUE);
-	else if(player){
-		if(g_game.removeMoney(player, money)){
+	if(player){
+		if(g_game.removeMoney(player, money))
 			lua_pushnumber(L, LUA_TRUE);
-		}
-		else{
+		else
 			lua_pushnumber(L, LUA_FALSE);
-		}
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
@@ -6675,13 +6672,11 @@ int LuaScriptInterface::luaGetGuildId(lua_State *L)
 	std::string guildName = popString(L);
 
 	uint32_t guildId;
-	if(g_game.getGuildIdByName(guildId, guildName)){
+	if(g_game.getGuildIdByName(guildId, guildName))
 		lua_pushnumber(L, guildId);
-	}
-	else{
-		reportErrorFunc("Guild not found");
+	else
 		lua_pushnumber(L, LUA_ERROR);
-	}
+
 	return 1;
 }
 
@@ -8361,9 +8356,9 @@ int LuaScriptInterface::luaGetMonsterParameter(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaGetNpcParameter(lua_State *L)
+int LuaScriptInterface::luaGetNpcParameterByName(lua_State *L)
 {
-	//getNpcParameter(name, key)
+	//getNpcParameterByName(name, key)
 	Npc* npc = NULL;
 	std::string key = popString(L);
 	std::string name = popString(L);
@@ -8491,12 +8486,12 @@ int LuaScriptInterface::luaGetItemAttack(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaGetItemDefence(lua_State *L)
+int LuaScriptInterface::luaGetItemDefense(lua_State *L)
 {
-	//getItemDefence(itemid)
+	//getItemDefesce(itemid)
 	uint32_t itemid = popNumber(L);
 	const ItemType& it = Item::items[itemid];
-	lua_pushnumber(L, it.defence);
+	lua_pushnumber(L, it.defense);
 	return 1;
 }
 
@@ -8531,6 +8526,7 @@ int LuaScriptInterface::luaGetItemWeaponTypeByUID(lua_State *L)
 		lua_pushnil(L);
 		return 1;
 	}
+
 	const ItemType& it = Item::items[item->getID()];
 	lua_pushnumber(L, (int32_t) it.weaponType);
 	return 1;
@@ -8549,14 +8545,14 @@ int LuaScriptInterface::luaGetItemAttackByUID(lua_State *L)
 		lua_pushnil(L);
 		return 1;
 	}
-	int ret = item->getAttack();
-	lua_pushnumber(L, ret);
+
+	lua_pushnumber(L, item->getAttack());
 	return 1;
 }
 
-int LuaScriptInterface::luaGetItemDefenceByUID(lua_State *L)
+int LuaScriptInterface::luaGetItemDefenseByUID(lua_State *L)
 {
-	//getItemDefenceByUID(uid)
+	//getItemDefenseByUID(uid)
 	uint32_t uid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -8567,8 +8563,8 @@ int LuaScriptInterface::luaGetItemDefenceByUID(lua_State *L)
 		lua_pushnil(L);
 		return 1;
 	}
-	int ret = item->getDefense();
-	lua_pushnumber(L, ret);
+
+	lua_pushnumber(L, item->getDefense());
 	return 1;
 }
 
@@ -8585,8 +8581,8 @@ int LuaScriptInterface::luaGetItemExtraDefByUID(lua_State *L)
 		lua_pushnil(L);
 		return 1;
 	}
-	int ret = item->getExtraDef();
-	lua_pushnumber(L, ret);
+
+	lua_pushnumber(L, item->getExtraDef());
 	return 1;
 }
 
@@ -8603,7 +8599,7 @@ int LuaScriptInterface::luaGetItemArmorByUID(lua_State *L)
 		lua_pushnil(L);
 		return 1;
 	}
-	int ret = item->getArmor();
-	lua_pushnumber(L, ret);
+
+	lua_pushnumber(L, item->getArmor());
 	return 1;
 }

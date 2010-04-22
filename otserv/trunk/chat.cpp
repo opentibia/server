@@ -22,6 +22,7 @@
 #include "chat.h"
 #include "player.h"
 #include "tools.h"
+#include "guild.h"
 
 PrivateChatChannel::PrivateChatChannel(uint16_t channelId, std::string channelName) :
 ChatChannel(channelId, channelName)
@@ -434,14 +435,16 @@ bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& t
 		case CHANNEL_GAME_CHAT:
 		{
 			if(!player->hasFlag(PlayerFlag_CannotBeMuted)){
-				if(player->getLevel() < 2)
+				if(player->getLevel() < 2){
 					player->sendCancel("You may not speak into channels as long as you are on level 1.");
-				else if((channelId == CHANNEL_TRADE || channelId == CHANNEL_TRADE_ROOK) && player->hasCondition(CONDITION_TRADE_MUTED))
+					return true;
+				}
+				else if((channelId == CHANNEL_TRADE || channelId == CHANNEL_TRADE_ROOK) && player->hasCondition(CONDITION_TRADE_MUTED)){
 					player->sendCancel("You may only place one offer in two minutes.");
-				
-				return true;
-				break;
+					return true;
+				}
 			}
+			break;
 		}
 		default:
 		{
@@ -533,15 +536,6 @@ ChatChannel* Chat::getChannel(Party* party)
 	return NULL;
 }
 
-ChatChannel* Chat::getChannel(Guild* guild)
-{
-	GuildChannelMap::iterator git = m_guildChannels.find(guild->getId());
-	if(git != m_guildChannels.end()){
-		return git->second;
-	}
-	return NULL;
-}
-
 ChatChannel* Chat::getChannel(Player* player, uint16_t channelId)
 {
 	if(channelId == CHANNEL_GUILD){
@@ -590,6 +584,15 @@ ChatChannel* Chat::getChannelById(uint16_t channelId)
 		return it->second;
 	}
 
+	return NULL;
+}
+
+ChatChannel* Chat::getGuildChannel(uint32_t guildId)
+{
+	GuildChannelMap::iterator git = m_guildChannels.find(guildId);
+	if(git != m_guildChannels.end()){
+		return git->second;
+	}
 	return NULL;
 }
 

@@ -101,6 +101,7 @@ struct GuildWar {
 	uint32_t guildFee;
 	uint32_t opponentFee;
 	uint32_t fragLimit;
+	bool finished;
 };
 
 typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
@@ -555,9 +556,10 @@ public:
 
 	//Guilds
 	void loadGuildWars();
-	bool endGuildWar(uint32_t warId);
+	void endGuildWar(uint32_t warId);
 	bool doGuildTransfer(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee);
 	bool setWarStatus(uint32_t warId, int32_t statusId);
+	void broadcastGuildKill(uint32_t guildId, Player* player, const DeathList& killers);
 	GuildWarsMap& getGuildWars() {return guildWars;}
 
 	Guild* getGuildById(uint32_t guildId);

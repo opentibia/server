@@ -26,6 +26,7 @@
 
 #include <string>
 #include <map>
+class Player;
 
 class Guild
 {
@@ -34,20 +35,19 @@ public:
 	~Guild();
 
 	void setId(uint32_t _id){ id = _id; }
-	void setName(std::string _name){ name = _name; };
+	void setName(std::string _name){ name = _name; }
 
 	uint32_t getId() const { return id; }
 	std::string getName() const { return name; }
 
-	void addFrag(uint32_t enemyId) const;
+	bool addFrag(uint32_t enemyId) const;
 	bool isAtWar() const { return !enemyGuilds.empty(); }
 	bool hasDeclaredWar(uint32_t warId) const;
+	void broadcastMessage(SpeakClasses type, const std::string msg) const;
 
 	uint32_t isEnemy(uint32_t enemyId) const;
 	void addEnemy(uint32_t enemyId, uint32_t warId);
-	void removeEnemy(uint32_t enemyId);
-	void clearEnemies(){ enemyGuilds.clear(); }
-
+	
 protected:
 	uint32_t id;
 	std::string name;

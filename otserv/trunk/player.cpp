@@ -41,6 +41,7 @@
 #include "status.h"
 #include "beds.h"
 #include "party.h"
+#include "guild.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -2385,7 +2386,9 @@ void Player::onDie()
 				if(attackerPlayer){
 					if(getGuild() && attackerPlayer->getGuild()){
 						if(tmpList.find(attackerPlayer->getGuildId()) == tmpList.end()){
-							attackerPlayer->getGuild()->addFrag(getGuildId());
+							if(attackerPlayer->getGuild()->addFrag(getGuildId()))
+								g_game.broadcastGuildKill(attackerPlayer->getGuildId(), this, killers);
+
 							tmpList.insert(attackerPlayer->getGuildId());
 						}
 					}
@@ -2645,40 +2648,57 @@ void Player::kickPlayer()
 
 uint32_t Player::getGuildId() const
 {
-	if(getGuild()){
+	if(getGuild())
 		return getGuild()->getId();
-	}
-	else{
+	else
 		return 0;
-	}
 }
 
 bool Player::isGuildEnemy(const Player* player) const
 {
-	if(!player || !player->getGuild() || !getGuild()){
+	if(!player || !player->getGuild() || !getGuild())
 		return false;
-	}
 
-	if(getGuild()->isEnemy(player->getGuildId()) != 0){
+	if(getGuild()->isEnemy(player->getGuildId()) != 0)
 		return true;
-	}
+
+	return false;
+}
+
+bool Player::isGuildPartner(const Player* player) const
+{
+	if(!player || !player->getGuild() || !getGuild())
+		return false;
+
+	if(getGuildId() == player->getGuildId())
+		return true;
+
+	return false;
+}
+
+bool Player::isWarPartner(const Player* player) const
+{
+	if(!isGuildPartner(player))
+		return false;
+
+	//They belong to the same guild, so let's just check
+	//if such guild is in war
+	if(getGuild()->isAtWar())
+		return true;
 
 	return false;
 }
 
 GuildEmblems_t Player::getGuildEmblem(const Player* player) const
 {
-	if(!player || !player->getGuild() || !player->getGuild()->isAtWar()){
+	if(!player || !player->getGuild() || !player->getGuild()->isAtWar())
 		return EMBLEM_NONE;
-	}
 
 	if(getGuild()){
-		if(player->getGuildId() == getGuildId()){
+		if(isGuildPartner(player))
 			return EMBLEM_GREEN;
-		}
-		else if(isGuildEnemy(player)){
+		else if(isGuildEnemy(player))
 			return EMBLEM_RED;
-		}
 	}
 
 	return EMBLEM_BLUE;
@@ -3824,10 +3844,11 @@ void Player::onAttackedCreature(Creature* target)
 		bool doPzLock = false;
 		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
-				doPzLock = checkPzBlockOnCombat(targetPlayer);
+				doPzLock = checkPzBlock(targetPlayer);
 
 				#ifdef __SKULLSYSTEM__
 				if( !isPartner(targetPlayer) &&
+					!isWarPartner(targetPlayer) &&
 					!isGuildEnemy(targetPlayer) &&
 					!Combat::isInPvpZone(this, targetPlayer) &&
 					!targetPlayer->hasAttacked(this)){
@@ -3839,7 +3860,6 @@ void Player::onAttackedCreature(Creature* target)
 						setSkull(SKULL_WHITE);
 						g_game.updateCreatureSkull(this);
 					}
-
 
 					if(getSkull() == SKULL_NONE){
 						//yellow skull
@@ -3964,11 +3984,8 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 			targetPlayer->setLossSkill(false);
 		}
 		else if(!g_config.getNumber(ConfigManager::LAST_HIT_PZBLOCK_ONLY) || lastHit){
-			if(!hasFlag(PlayerFlag_NotGainInFight) && !Combat::isInPvpZone(this, targetPlayer) && hasCondition(CONDITION_INFIGHT)){
-				if(checkPzBlockOnCombat(targetPlayer)){
-					addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_SKULL_DURATION), true);
-				}
-			}
+			if(checkPzBlock(targetPlayer))
+				addInFightTicks(g_config.getNumber(ConfigManager::UNJUST_SKULL_DURATION), true);
 		}
 	}
 
@@ -4245,8 +4262,9 @@ Skulls_t Player::getSkullClient(const Player* player) const
 		}
 	}
 
-	if(player->getSkull() == SKULL_NONE && isPartner(player) && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP){
-		return SKULL_GREEN;
+	if(player->getSkull() == SKULL_NONE && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP){
+		if(isPartner(player) || isGuildEnemy(player) || isWarPartner(player))
+			return SKULL_GREEN;
 	}
 
 	return player->getSkull();
@@ -4630,21 +4648,21 @@ void Player::broadcastLoot(Creature* creature, Container* corpse)
 		sendTextMessage(MSG_INFO_DESCR, os.str());
 }
 
-bool Player::checkPzBlockOnCombat(Player* targetPlayer)
+bool Player::checkPzBlock(Player* targetPlayer)
 {
-	if(isGuildEnemy(targetPlayer)){
+	if(hasFlag(PlayerFlag_NotGainInFight) || Combat::isInPvpZone(this, targetPlayer))
+		return false;
+
+	if(isGuildEnemy(targetPlayer))
 		return true;
-	}
+
+	if(isPartner(targetPlayer) || isWarPartner(targetPlayer))
+		return false;
 
 	#ifdef __SKULLSYSTEM__
-	if(targetPlayer->hasAttacked(this) && !g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK)){
+	if(targetPlayer->hasAttacked(this) && !g_config.getNumber(ConfigManager::DEFENSIVE_PZ_LOCK))
 		return false;
-	}
 	#endif
-
-	if(isPartner(targetPlayer)){
-		return false;
-	}
 
 	return true;
 }

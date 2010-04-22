@@ -318,7 +318,7 @@ public:
 	virtual double getWeight() const;
 	int getAttack() const {return items[id].attack;}
 	int getArmor() const {return items[id].armor;}
-	int getDefense() const {return items[id].defence;}
+	int getDefense() const {return items[id].defense;}
 	int getExtraDef() const {return items[id].extraDef;}
 	int getSlotPosition() const {return items[id].slot_position;}
 	int getWieldPosition() const {return items[id].wield_position;}

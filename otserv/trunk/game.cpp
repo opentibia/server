@@ -1708,8 +1708,10 @@ uint32_t Game::getMoney(const Cylinder* cylinder)
 
 bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*/)
 {
-	if(cylinder == NULL || money <= 0)
+	if(cylinder == NULL)
 		return false;
+	else if(money <= 0)
+		return true;
 
 	std::list<Container*> listContainer;
 	Container* tmpContainer = NULL;
@@ -4934,9 +4936,11 @@ void Game::loadGuildWars()
 			war.guildFee = result->getDataInt("guild_fee");
 			war.opponentFee = result->getDataInt("opponent_fee");
 			war.fragLimit = result->getDataInt("frag_limit");
+			war.finished = false;
 
-			if(status == 1 && endDate <= std::time(NULL)){
-				guildWars[id] = war; //just add so endGuildWar can use it
+			if(status == 1 && (endDate <= std::time(NULL) ||
+				(war.fragLimit > 0 && (war.guildFrags >= war.fragLimit || war.opponentFrags >= war.fragLimit)))){
+				guildWars[id] = war;
 				endGuildWar(id);
 				status = -1;
 			}
@@ -4955,68 +4959,52 @@ void Game::loadGuildWars()
 					guild->addEnemy(opponentGuild->getId(), id);
 					opponentGuild->addEnemy(guild->getId(), id);
 				}
-
-				if(result->getDataInt("status") != 1){
-					setWarStatus(id, 1);
-				}
 			}
+
+			//Update status
+			setWarStatus(id, status);
 		} while(result->next());
 
 		db->freeResult(result);
 	}
 }
 
-bool Game::endGuildWar(uint32_t warId)
+void Game::endGuildWar(uint32_t warId)
 {
 	GuildWarsMap::iterator it = guildWars.find(warId);
 	if(it != guildWars.end()){
-		Guild* guild = getGuildById(it->second.guildId);
-		Guild* opponentGuild = getGuildById(it->second.opponentId);
-		if(guild && opponentGuild){
-			int32_t realGuildFee = 0, realOpponentFee = 0;
-			if(it->second.guildFrags >= it->second.fragLimit){
-				realGuildFee = it->second.guildFee + it->second.opponentFee;
-			}
-			else if(it->second.opponentFrags >= it->second.fragLimit){
-				realOpponentFee = it->second.guildFee + it->second.opponentFee;
-			}
-			else if(it->second.guildFrags == it->second.opponentFrags){ //We've got a tie - return the money
-				realGuildFee = it->second.guildFee;
-				realOpponentFee = it->second.opponentFee;
-			}
-			//Get proportional values positiveFrags/totalFrags in enemy's fee
-			else if(it->second.guildFrags > it->second.opponentFrags){
-				realGuildFee = (int32_t)std::ceil((double)((it->second.guildFrags - it->second.opponentFrags) / it->second.fragLimit) * it->second.opponentFee);
-				realOpponentFee = it->second.opponentFee - realGuildFee;
-				realGuildFee += it->second.guildFee;
-			}
-			else if(it->second.opponentFrags > it->second.guildFrags){
-				realOpponentFee = (int32_t)std::ceil((double)((it->second.opponentFrags - it->second.guildFrags) / it->second.fragLimit) * it->second.guildFee);
-				realGuildFee = it->second.guildFee - realOpponentFee;
-				realOpponentFee += it->second.opponentFee;
-			}
-
-			//Do payment
-			doGuildTransfer(it->second.guildId, it->second.opponentId, -realGuildFee, -realOpponentFee);
-
-			//Do intern removal
-			guild->removeEnemy(opponentGuild->getId());
-			opponentGuild->removeEnemy(guild->getId());
-			guildWars.erase(it);
+		int32_t realGuildFee = 0, realOpponentFee = 0;
+		if(it->second.guildFrags >= it->second.fragLimit)
+			realGuildFee = it->second.guildFee + it->second.opponentFee;
+		else if(it->second.opponentFrags >= it->second.fragLimit)
+			realOpponentFee = it->second.guildFee + it->second.opponentFee;
+		else if(it->second.guildFrags == it->second.opponentFrags){ //We've got a tie - return the money
+			realGuildFee = it->second.guildFee;
+			realOpponentFee = it->second.opponentFee;
+		}
+		//Get proportional values positiveFrags/totalFrags in enemy's fee
+		else if(it->second.guildFrags > it->second.opponentFrags){
+			realGuildFee = (int32_t)std::ceil((double)((it->second.guildFrags - it->second.opponentFrags) / it->second.fragLimit) * it->second.opponentFee);
+			realOpponentFee = it->second.opponentFee - realGuildFee;
+			realGuildFee += it->second.guildFee;
+		}
+		else if(it->second.opponentFrags > it->second.guildFrags){
+			realOpponentFee = (int32_t)std::ceil((double)((it->second.opponentFrags - it->second.guildFrags) / it->second.fragLimit) * it->second.guildFee);
+			realGuildFee = it->second.guildFee - realOpponentFee;
+			realOpponentFee += it->second.opponentFee;
 		}
 
-		return setWarStatus(warId, -1);
+		//Do payment and remove war
+		doGuildTransfer(it->second.guildId, it->second.opponentId, -realGuildFee, -realOpponentFee);
+		guildWars.erase(it);
 	}
-
-	return false;
 }
 
 bool Game::doGuildTransfer(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee)
 {
 	//Balance system should be enabled
-	if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE)){
+	if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE))
 		return false;
-	}
 
 	//Tries to get first leader that has enough money
 	Database* db = Database::instance();
@@ -5038,9 +5026,8 @@ bool Game::doGuildTransfer(uint32_t guildId, uint32_t opponentId, int32_t guildF
 			uint32_t gid = result->getDataInt("guild_id");
 			bool isOpponent = (gid == opponentId);
 
-			if((!isOpponent && guildPaid) || (isOpponent && opponentPaid)){
+			if((!isOpponent && guildPaid) || (isOpponent && opponentPaid))
 				continue;
-			}
 
 			if(Player* player = getPlayerByGuidEx(result->getDataInt("player_id"))){
 				if(!isOpponent && (int32_t)player->balance >= guildFee){
@@ -5086,6 +5073,72 @@ bool Game::setWarStatus(uint32_t warId, int32_t statusId)
 	return db->executeQuery(query.str());
 }
 
+void Game::broadcastGuildKill(uint32_t guildId, Player* player, const DeathList& killers)
+{
+	Guild* guild = getGuildById(guildId);
+	Guild* enemy = getGuildById(player->getGuildId());
+	if(!guild || !enemy)
+		return;
+
+	uint32_t warId = guild->isEnemy(enemy->getId());
+	GuildWarsMap::iterator it = guildWars.find(warId);
+	if(it != guildWars.end()){
+		//Get number of frags
+		uint32_t frags, enemyFrags;
+		if(guild->hasDeclaredWar(warId)){
+			frags = it->second.guildFrags;
+			enemyFrags = it->second.opponentFrags;
+		}
+		else{
+			frags = it->second.opponentFrags;
+			enemyFrags = it->second.guildFrags;
+		}
+
+		//Get list of killers that belong to guild
+		std::stringstream kmsg;
+		bool first = true;
+		for(DeathList::const_iterator itt = killers.begin(); itt != killers.end(); ++itt){
+			if(itt->isCreatureKill()){
+				Player* attackerPlayer = itt->getKillerCreature()->getPlayer();
+				if(itt->getKillerCreature()->isPlayerSummon())
+					attackerPlayer = itt->getKillerCreature()->getPlayerMaster();
+
+				if(attackerPlayer && attackerPlayer->getGuildId() == guild->getId()){
+					if(!first)
+						kmsg << " and ";
+					else
+						first = false;
+					
+					kmsg << attackerPlayer->getName();
+				}
+			}
+		}
+
+		//Send message to channels
+		std::stringstream msg;
+		msg << "Opponent " << player->getName() << " of the " << enemy->getName() << " was killed by " << kmsg << 
+			". The new score is " << frags << ":" << enemyFrags << " frags (limit " << it->second.fragLimit << ").";
+		guild->broadcastMessage(SPEAK_CHANNEL_W, msg.str().c_str());
+
+		msg.str("");
+		msg << "Guild member " << player->getName() << " was killed by " << kmsg << " of the " << guild->getName() <<	
+			". The new score is " << enemyFrags << ":" << frags << " frags (limit " << it->second.fragLimit << ").";
+		enemy->broadcastMessage(SPEAK_CHANNEL_W, msg.str().c_str());
+
+		if(it->second.finished){
+			msg.str("");
+			msg << "Congratulations! You have won the war against " << enemy->getName() <<
+				" with " << frags << " frags.";
+			guild->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
+
+			msg.str("");
+			msg << "You have lost the war against " << guild->getName() <<
+				". They have reached the limit of " << frags << " frags.";
+			enemy->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
+		}
+	}
+}
+
 Guild* Game::getGuildById(uint32_t guildId)
 {
 	GuildsMap::iterator it = loadedGuilds.find(guildId);
@@ -5112,7 +5165,7 @@ Guild* Game::getGuildById(uint32_t guildId)
 
 bool Game::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 {
-	// check cache
+	//Check cache
 	for(GuildsMap::iterator it = loadedGuilds.begin(); it != loadedGuilds.end(); ++it){
 		if(strcasecmp(it->second->getName().c_str(), guildName.c_str()) == 0){
 			guildId = it->first;
@@ -5120,7 +5173,7 @@ bool Game::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 		}
 	}
 
-	// not in cache, let's try database (also add in cache if found)
+	//Not in cache, let's try database (also add in cache if found)
 	Database* db = Database::instance();
 	DBResult* result;
 	DBQuery query;

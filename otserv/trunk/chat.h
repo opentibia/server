@@ -30,7 +30,6 @@
 
 class Player;
 class Party;
-class Guild;
 
 typedef std::map<uint32_t, Player*> UsersMap;
 
@@ -121,9 +120,9 @@ public:
 	ChannelList getChannelList(Player* player);
 
 	ChatChannel* getChannel(Party* party);
-	ChatChannel* getChannel(Guild* guild);
 	ChatChannel* getChannel(Player* player, uint16_t channelId);
 	ChatChannel* getChannelById(uint16_t channelId);
+	ChatChannel* getGuildChannel(uint32_t guildId);
 	PrivateChatChannel* getPrivateChannel(Player* player);
 
 private:

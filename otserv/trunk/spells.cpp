@@ -897,7 +897,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
-#ifdef __SKULLSYSTEM__
+			#ifdef __SKULLSYSTEM__
 			if(player->getSkull() == SKULL_BLACK && isAggressive){
 				if(!hasArea()){
 					Creature* targetCreature = tile->getTopVisibleCreature(player);
@@ -919,13 +919,15 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 
 			if(player->hasSafeMode() && isAggressive && needTarget && tile->getTopVisibleCreature(player)){
 				Player* targetPlayer = tile->getTopVisibleCreature(player)->getPlayer();
-				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && !targetPlayer->isPartner(player)){
+				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && 
+					!targetPlayer->isPartner(player) && !targetPlayer->isWarPartner(player) &&
+					!targetPlayer->isGuildEnemy(player)){
 					player->sendCancelMessage(RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS);
 					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 					return false;
 				}
 			}
-#endif
+			#endif
 		}
 	}
 
