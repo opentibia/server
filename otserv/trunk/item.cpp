@@ -770,7 +770,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			if(it.attack != 0){
 				s << ", Atk" << std::showpos << it.attack << std::noshowpos;
 			}
-			if(it.hitChance != 0){
+			if(it.hitChance > 0){ //excludes both cases it.hitchance 0 and -1
 				s << ", Hit%" << std::showpos << it.hitChance << std::noshowpos;
 			}
 			s << ")";

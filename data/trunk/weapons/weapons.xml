@@ -416,6 +416,9 @@
 		<vocation name="Paladin"/>
 		<vocation name="Royal Paladin" showInDescription="0"/>
 	</distance>
+	<distance id="2455" function="default"/> <!-- Crossbow -->
+	<distance id="2456" function="default"/> <!-- Bow -->
+	<distance id="7438" function="default"/> <!-- Elvish Bow -->
 
  	<!-- Ammunition -->
 	<distance id="2545" event="script" value="poison_arrow.lua"/>
@@ -434,5 +437,6 @@
 	<distance id="7363" level="30" function="default"/> <!-- Piercing Bolt -->
 	<distance id="2547" level="55" function="default"/> <!-- Power Bolt -->
 	<distance id="6529" level="70" function="default"/> <!-- Infernal Bolt -->
-	<distance id="7438" function="default"/> <!-- Elvish Bow -->
+	<distance id="2543" function="default"/> <!-- Bolt -->
+	<distance id="2544" function="default"/> <!-- Arrow -->
 </weapons>
