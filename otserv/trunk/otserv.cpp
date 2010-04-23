@@ -387,9 +387,10 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 void badAllocationHandler()
 {
 	// Use functions that only use stack allocation
-	puts("Allocation failed, server out of memory.\nDecrese the size of your map or compile in 64-bit mode.");
+	puts("Allocation failed, server out of memory.\nDecrease the size of your map or compile in 64-bit mode.");
 	char buf[1024];
-	fgets(buf, 1024, stdin);
+	if (fgets(buf, 1024, stdin)) //this weird "if" was added to prevent a compilation warning at g++
+		exit(-1);
 	exit(-1);
 }
 
