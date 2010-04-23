@@ -470,6 +470,7 @@ protected:
 #ifdef __DEBUG__
 	void validateMapCache();
 #endif
+	void updateTileCache(const Tile* tile);
 	void updateTileCache(const Tile* tile, int32_t dx, int32_t dy);
 	void updateTileCache(const Tile* tile, const Position& pos);
 	void internalCreatureDisappear(const Creature* creature, bool isLogout);

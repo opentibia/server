@@ -747,6 +747,18 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	SpectatorVec::iterator it;
 	getSpectators(list, tile->getPosition(), false, true);
 
+	//event method
+	for(it = list.begin(); it != list.end(); ++it){
+		(*it)->onCreatureDisappear(creature, isLogout);
+	}
+
+	//check tile and if needed get spectatos again, since npc scripts
+	//might have changed position and, consequently, spectators
+	if(tile != creature->getTile()){
+		tile = creature->getTile();
+		getSpectators(list, tile->getPosition(), false, true);
+	}
+
 	Player* player = NULL;
 	std::vector<uint32_t> oldStackPosVector;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -755,6 +767,11 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 				oldStackPosVector.push_back(tile->getClientIndexOfThing(player, creature));
 			}
 		}
+	}
+
+	//intern removal
+	if(!map->removeCreature(creature)){
+		return false;
 	}
 
 	//send to client
@@ -766,18 +783,13 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 				++i;
 			}
 		}
-	}
 
-	//event method
-	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onCreatureDisappear(creature, isLogout);
+		if(creature != (*it)){
+			(*it)->updateTileCache(tile);
+		}
 	}
 
 	int32_t oldIndex = tile->__getIndexOfThing(creature);
-	if(!map->removeCreature(creature)){
-		return false;
-	}
-
 	creature->getParent()->postRemoveNotification(creature, NULL, oldIndex, true);
 
 	listCreature.removeList(creature->getID());

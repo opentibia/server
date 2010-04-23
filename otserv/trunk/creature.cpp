@@ -388,6 +388,15 @@ void Creature::validateMapCache()
 }
 #endif
 
+void Creature::updateTileCache(const Tile* tile)
+{
+	if(isMapLoaded){
+		if(tile->getPosition().z == getPosition().z){
+			updateTileCache(tile, tile->getPosition());
+		}
+	}
+}
+
 void Creature::updateTileCache(const Tile* tile, int32_t dx, int32_t dy)
 {
 	if((std::abs(dx) <= (mapWalkWidth - 1) / 2) &&
@@ -524,15 +533,6 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 void Creature::onCreatureDisappear(const Creature* creature, bool isLogout)
 {
 	internalCreatureDisappear(creature, true);
-
-	if(creature == this){
-		//
-	}
-	else if(isMapLoaded){
-		if(creature->getPosition().z == getPosition().z){
-			updateTileCache(creature->getTile(), creature->getPosition());
-		}
-	}
 }
 
 void Creature::onRemoved()

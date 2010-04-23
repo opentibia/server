@@ -5,7 +5,7 @@ function onSay(cid, words, param)
 	end
 
 	local ntiles = tonumber(param)
-	if(ntiles == LUA_NULL or ntiles <= 0) then
+	if(ntiles == nil or ntiles <= 0) then
 		return FALSE
 	end
 
