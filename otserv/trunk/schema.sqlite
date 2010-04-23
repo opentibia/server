@@ -90,7 +90,7 @@ CREATE TABLE "guild_members" (
 	"guild_nick" VARCHAR(255) NOT NULL DEFAULT '',
 	UNIQUE ("player_id"),
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
+	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id")
 );
 
 CREATE TABLE "guild_wars" (
