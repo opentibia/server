@@ -50,6 +50,7 @@ extern Vocations g_vocations;
 extern MoveEvents* g_moveEvents;
 extern Weapons* g_weapons;
 extern CreatureEvents* g_creatureEvents;
+extern Guilds g_guilds;
 
 AutoList<Player> Player::listPlayer;
 MuteCountMap Player::muteCountMap;
@@ -262,7 +263,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		if(hasFlag(PlayerFlag_ShowGroupInsteadOfVocation))
 			s << " You are " << getGroupName() << ".";
 		else if(getVocationId() != VOCATION_NONE)
-			s << " You are " << vocation->getVocDescription() << ".";
+			s << " You are " << vocation->getDescription() << ".";
 		else
 			s << " You have no vocation.";
 	}
@@ -274,7 +275,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		if(hasFlag(PlayerFlag_ShowGroupInsteadOfVocation))
 			s << " is " << getGroupName() << ".";
 		else if(getVocationId() != VOCATION_NONE)
-			s << " is " << vocation->getVocDescription() << ".";
+			s << " is " << vocation->getDescription() << ".";
 		else
 			s << " has no vocation.";
 	}
@@ -2387,7 +2388,7 @@ void Player::onDie()
 					if(getGuild() && attackerPlayer->getGuild()){
 						if(tmpList.find(attackerPlayer->getGuildId()) == tmpList.end()){
 							if(attackerPlayer->getGuild()->addFrag(getGuildId()))
-								g_game.broadcastGuildKill(attackerPlayer->getGuildId(), this, killers);
+								g_guilds.broadcastKill(attackerPlayer->getGuildId(), this, killers);
 
 							tmpList.insert(attackerPlayer->getGuildId());
 						}

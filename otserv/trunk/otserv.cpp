@@ -55,6 +55,7 @@
 #include "vocation.h"
 #include "scriptmanager.h"
 #include "configmanager.h"
+#include "guild.h"
 
 #include "tools.h"
 #include "ban.h"
@@ -88,6 +89,7 @@ Npcs g_npcs;
 BanManager g_bans;
 Vocations g_vocations;
 IPList serverIPs;
+Guilds g_guilds;
 
 boost::mutex g_loaderLock;
 boost::condition_variable g_loaderSignal;
@@ -624,7 +626,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << "[done]" << std::endl;
 
 	std::cout << ":: Setting up guilds in war... " << std::flush;
-	g_game.loadGuildWars();
+	g_guilds.loadWars();
 	std::cout << "[done]" << std::endl;
 
 	#ifdef __SKULLSYSTEM__

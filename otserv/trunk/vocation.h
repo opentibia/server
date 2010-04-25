@@ -30,20 +30,19 @@ class Vocation
 {
 public:
 	~Vocation();
-	const std::string& getVocName() const {return name;}
-	const std::string& getVocDescription() const {return description;}
+
+	const std::string& getName() const {return name;}
+	const std::string& getDescription() const {return description;}
+
 	uint32_t getReqSkillTries(int32_t skill, int32_t level);
 	uint32_t getReqMana(int32_t magLevel);
-
 	uint32_t getHPGain() const {return gainHP;};
 	uint32_t getManaGain() const {return gainMana;};
 	uint32_t getCapGain() const {return gainCap;};
-
 	uint32_t getManaGainTicks() const {return gainManaTicks;};
 	uint32_t getManaGainAmount() const {return gainManaAmount;};
 	uint32_t getHealthGainTicks() const {return gainHealthTicks;};
 	uint32_t getHealthGainAmount() const {return gainHealthAmount;};
-
 	uint16_t getSoulMax() const {return maxSoul;};
 	uint16_t getSoulGainTicks() const {return gainSoulTicks;};
 
@@ -64,7 +63,6 @@ public:
 	float getMagicBaseDamage() const {return magicBaseDamage;};
 	float getWandBaseDamage() const {return wandBaseDamage;};
 	float getHealingBaseDamage() const {return healingBaseDamage;};
-
 	float getBaseDefense() const {return baseDefense;};
 	float getArmorDefense() const {return armorDefense;};
 
@@ -81,11 +79,9 @@ protected:
 	uint32_t gainHealthAmount;
 	uint32_t gainManaTicks;
 	uint32_t gainManaAmount;
-
 	uint32_t gainCap;
 	uint32_t gainMana;
 	uint32_t gainHP;
-
 	uint16_t maxSoul;
 	uint16_t gainSoulTicks;
 
@@ -98,11 +94,9 @@ protected:
 	float clubBaseDamage;
 	float distBaseDamage;
 	float fistBaseDamage;
-
 	float magicBaseDamage;
 	float wandBaseDamage;
 	float healingBaseDamage;
-
 	float baseDefense;
 	float armorDefense;
 

@@ -52,6 +52,7 @@ extern BanManager g_bans;
 extern ConfigManager g_config;
 extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
+extern Guilds g_guilds;
 
 enum{
 	EVENT_ID_LOADING = 1,
@@ -6672,7 +6673,7 @@ int LuaScriptInterface::luaGetGuildId(lua_State *L)
 	std::string guildName = popString(L);
 
 	uint32_t guildId;
-	if(g_game.getGuildIdByName(guildId, guildName))
+	if(g_guilds.getGuildIdByName(guildId, guildName))
 		lua_pushnumber(L, guildId);
 	else
 		lua_pushnumber(L, LUA_ERROR);

@@ -93,19 +93,7 @@ private:
 	RuleViolation(const RuleViolation&);
 };
 
-struct GuildWar {
-	uint32_t guildId;
-	uint32_t opponentId;
-	uint32_t guildFrags;
-	uint32_t opponentFrags;
-	uint32_t guildFee;
-	uint32_t opponentFee;
-	uint32_t fragLimit;
-	bool finished;
-};
-
 typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
-typedef std::map<uint32_t, GuildWar> GuildWarsMap;
 typedef std::vector<Player*> PlayerVector;
 
 #define EVENT_LIGHTINTERVAL  10000
@@ -554,17 +542,6 @@ public:
 
 	void reloadInfo(reloadTypes_t info);
 
-	//Guilds
-	void loadGuildWars();
-	void endGuildWar(uint32_t warId);
-	bool doGuildTransfer(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee);
-	bool setWarStatus(uint32_t warId, int32_t statusId);
-	void broadcastGuildKill(uint32_t guildId, Player* player, const DeathList& killers);
-	GuildWarsMap& getGuildWars() {return guildWars;}
-
-	Guild* getGuildById(uint32_t guildId);
-	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
-
 protected:
 
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
@@ -622,12 +599,6 @@ protected:
 
 	ServiceManager* service_manager;
 	Map* map;
-
-	//Guilds
-	typedef std::map<uint32_t, Guild*> GuildsMap; //guild id, guild class
-	GuildsMap loadedGuilds;
-	GuildWarsMap guildWars;
-
 };
 
 #endif

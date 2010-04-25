@@ -28,12 +28,14 @@
 #include "town.h"
 #include "configmanager.h"
 #include "tools.h"
+#include "guild.h"
 //[ added for beds system
 #include "beds.h"
 //]
 
 extern ConfigManager g_config;
 extern Game g_game;
+extern Guilds g_guilds;
 
 House::House(uint32_t _houseid) :
 transfer_container(ITEM_LOCKER1)
@@ -553,7 +555,7 @@ bool AccessList::addPlayer(std::string& name)
 bool AccessList::addGuild(const std::string& guildName, const std::string& rank)
 {
 	uint32_t guildId;
-	if(g_game.getGuildIdByName(guildId, guildName)){
+	if(g_guilds.getGuildIdByName(guildId, guildName)){
 		if(guildId != 0){
 			for(GuildList::iterator it = guildList.begin(); it != guildList.end(); ++it){
 				if(it->first == guildId && strcasecmp(rank.c_str(), it->second.c_str()) == 0){

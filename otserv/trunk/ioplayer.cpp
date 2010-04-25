@@ -33,6 +33,7 @@
 
 extern ConfigManager g_config;
 extern Game g_game;
+extern Guilds g_guilds;
 
 #ifndef __GNUC__
 #pragma warning( disable : 4005)
@@ -215,7 +216,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		WHERE `guild_members`.`player_id` = " << player->getGUID();
 
 	if((result = db->storeQuery(query.str()))){
-		Guild* guild = g_game.getGuildById(result->getDataInt("id"));
+		Guild* guild = g_guilds.getGuildById(result->getDataInt("id"));
 		if(guild){
 			player->setGuild(guild);
 

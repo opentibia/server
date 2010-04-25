@@ -87,7 +87,7 @@ CREATE TABLE "guild_ranks" (
 CREATE TABLE "guild_members" (
 	"player_id" INTEGER NOT NULL,
 	"rank_id" INTEGER NOT NULL,
-	"guild_nick" VARCHAR(255) NOT NULL DEFAULT '',
+	"nick" VARCHAR(255) NOT NULL DEFAULT '',
 	UNIQUE ("player_id"),
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
 	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id")
