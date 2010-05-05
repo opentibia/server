@@ -621,7 +621,7 @@ protected:
 	static int luaGetPlayerNameByGUID(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
-	static int luaIsInArray(lua_State *L);
+	static int luaIsIntegerInArray(lua_State *L);
 	static int luaGetFluidSourceType(lua_State *L);
 	static int luaAddEvent(lua_State *L);
 	static int luaStopEvent(lua_State *L);
@@ -657,7 +657,7 @@ protected:
 	static int luaBitUXor(lua_State *L);
 	static int luaBitULeftShift(lua_State *L);
 	static int luaBitURightShift(lua_State *L);
-	
+
 	static int luaGetItemWeaponType(lua_State *L);
 	static int luaGetItemAttack(lua_State *L);
 	static int luaGetItemDefense(lua_State *L);

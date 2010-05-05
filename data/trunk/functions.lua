@@ -795,6 +795,15 @@ function doCleanTileItemsByPos(pos, ignore)
 	return removed_items
 end
 
+function isInArray(array, value)
+	for k,v in pairs(array) do 
+		if v == value then 
+			return TRUE
+		end
+	end
+	return FALSE
+end
+
 function doBroadcastMessage(message, class)
 	local messageClass = class or MESSAGE_STATUS_WARNING
 	if messageClass < MESSAGE_CLASS_FIRST or messageClass > MESSAGE_CLASS_LAST then

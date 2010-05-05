@@ -1783,8 +1783,8 @@ void LuaScriptInterface::registerFunctions()
 	//getFluidSourceType(type)
 	lua_register(m_luaState, "getFluidSourceType", LuaScriptInterface::luaGetFluidSourceType);
 
-	//isInArray(array, value)
-	lua_register(m_luaState, "isInArray", LuaScriptInterface::luaIsInArray);
+	//isIntegerInArray(array, value)
+	lua_register(m_luaState, "isIntegerInArray", LuaScriptInterface::luaIsIntegerInArray);
 
 	//addEvent(callback, delay, ...)
 	lua_register(m_luaState, "addEvent", LuaScriptInterface::luaAddEvent);
@@ -1851,7 +1851,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//doSetGameState(gameState)
 	lua_register(m_luaState, "doSetGameState", LuaScriptInterface::luaDoSetGameState);
-	
+
 	//doReloadInfo(info)
 	lua_register(m_luaState, "doReloadInfo", LuaScriptInterface::luaDoReloadInfo);
 
@@ -1875,7 +1875,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//getNpcParameterByName(name, key)
 	lua_register(m_luaState, "getNpcParameterByName", LuaScriptInterface::luaGetNpcParameterByName);
-	
+
 	//getItemWeaponType(itemid)
 	lua_register(m_luaState, "getItemWeaponType", LuaScriptInterface::luaGetItemWeaponType);
 
@@ -3072,7 +3072,7 @@ int LuaScriptInterface::luaDoPlayerAddItemEx(lua_State *L)
 			return 1;
 		}
 	}
-			
+
 	bool canDropOnMap = false;
 	if(parameters > 2)
 		canDropOnMap = popNumber(L) == LUA_TRUE;
@@ -7145,9 +7145,9 @@ int LuaScriptInterface::luaGetFluidSourceType(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaIsInArray(lua_State *L)
+int LuaScriptInterface::luaIsIntegerInArray(lua_State *L)
 {
-	//isInArray(array, value)
+	//isIntegerInArray(array, value)
 	int32_t value = (int32_t)popNumber(L);
 	if(lua_istable(L, -1) == 0){
 		lua_pop(L, 1);
