@@ -796,15 +796,17 @@ function doCleanTileItemsByPos(pos, ignore)
 end
 
 function isInArray(array, value, isCaseSensitive)
-	local checkLowerCase = FALSE
-	if type(value) == "string" and isCaseSensitive == TRUE then
+	local compareLowerCase = FALSE
+	if type(value) == "string" and isCaseSensitive ~= TRUE then
 		value = string.lower(value)
-		checkLowerCase = TRUE
+		compareLowerCase = TRUE
 	end
 	for k,v in pairs(array) do
-		local newV = v
-		if checkLowerCase == TRUE then
+		local newV
+		if compareLowerCase == TRUE and type(v) == "string" then
 			newV = string.lower(v)
+		else
+			newV = v
 		end
 		if newV == value then 
 			return TRUE, k
