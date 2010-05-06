@@ -795,10 +795,19 @@ function doCleanTileItemsByPos(pos, ignore)
 	return removed_items
 end
 
-function isInArray(array, value)
-	for k,v in pairs(array) do 
-		if v == value then 
-			return TRUE
+function isInArray(array, value, isCaseSensitive)
+	local checkLowerCase = FALSE
+	if type(value) == "string" and isCaseSensitive == TRUE then
+		value = string.lower(value)
+		checkLowerCase = TRUE
+	end
+	for k,v in pairs(array) do
+		local newV = v
+		if checkLowerCase == TRUE then
+			newV = string.lower(v)
+		end
+		if newV == value then 
+			return TRUE, k
 		end
 	end
 	return FALSE
