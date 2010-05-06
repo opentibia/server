@@ -8474,7 +8474,13 @@ int LuaScriptInterface::luaGetItemWeaponType(lua_State *L)
 	//getItemWeaponType(itemid)
 	uint32_t itemid = popNumber(L);
 	const ItemType& it = Item::items[itemid];
-	lua_pushnumber(L, (int32_t) it.weaponType);
+	if(it.id != 0)
+		lua_pushnumber(L, (int32_t) it.weaponType);
+	else{
+		reportErrorFunc("Invalid itemid number.");
+		lua_pushnil(L);
+	}
+
 	return 1;
 }
 
@@ -8483,16 +8489,28 @@ int LuaScriptInterface::luaGetItemAttack(lua_State *L)
 	//getItemAttack(itemid)
 	uint32_t itemid = popNumber(L);
 	const ItemType& it = Item::items[itemid];
-	lua_pushnumber(L, it.attack);
+	if(it.id != 0)
+		lua_pushnumber(L, it.attack);
+	else{
+		reportErrorFunc("Invalid itemid number.");
+		lua_pushnil(L);
+	}
+
 	return 1;
 }
 
 int LuaScriptInterface::luaGetItemDefense(lua_State *L)
 {
-	//getItemDefesce(itemid)
+	//getItemDefense(itemid)
 	uint32_t itemid = popNumber(L);
 	const ItemType& it = Item::items[itemid];
-	lua_pushnumber(L, it.defense);
+	if(it.id != 0)
+		lua_pushnumber(L, it.defense);
+	else{
+		reportErrorFunc("Invalid itemid number.");
+		lua_pushnil(L);
+	}
+
 	return 1;
 }
 
@@ -8501,7 +8519,13 @@ int LuaScriptInterface::luaGetItemExtraDef(lua_State *L)
 	//getItemExtraDef(itemid)
 	uint32_t itemid = popNumber(L);
 	const ItemType& it = Item::items[itemid];
-	lua_pushnumber(L, it.extraDef);
+	if(it.id != 0)
+		lua_pushnumber(L, it.extraDef);
+	else{
+		reportErrorFunc("Invalid itemid number.");
+		lua_pushnil(L);
+	}
+
 	return 1;
 }
 
@@ -8510,7 +8534,13 @@ int LuaScriptInterface::luaGetItemArmor(lua_State *L)
 	//getItemArmor(itemid)
 	uint32_t itemid = popNumber(L);
 	const ItemType& it = Item::items[itemid];
-	lua_pushnumber(L, it.armor);
+	if(it.id != 0)
+		lua_pushnumber(L, it.armor);
+	else{
+		reportErrorFunc("Invalid itemid number.");
+		lua_pushnil(L);
+	}
+
 	return 1;
 }
 
@@ -8530,6 +8560,7 @@ int LuaScriptInterface::luaGetItemWeaponTypeByUID(lua_State *L)
 
 	const ItemType& it = Item::items[item->getID()];
 	lua_pushnumber(L, (int32_t) it.weaponType);
+
 	return 1;
 }
 
