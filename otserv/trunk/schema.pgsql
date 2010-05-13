@@ -199,7 +199,7 @@ CREATE TABLE "bans" (
 	"active" SMALLINT DEFAULT 0,
 	"expires" BIGINT NOT NULL,
 	"added" BIGINT NOT NULL,
-	"admin_id" INT DEFAULT 0,
+	"admin_id" INT,
 	"comment" VARCHAR(1024) NOT NULL DEFAULT '',
 	"reason" INT DEFAULT 0,
 	"action" INT DEFAULT 0,
