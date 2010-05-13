@@ -4085,7 +4085,7 @@ int LuaScriptInterface::luaSetPlayerStorageValue(lua_State *L)
 	uint32_t cid = popNumber(L);
 	if(IS_IN_KEYRANGE(key, RESERVED_RANGE)){
 		std::stringstream error_str;
-		error_str << "Accesing to reserverd range: "  << key;
+		error_str << "Accessing to reserved range: "  << key;
 		reportErrorFunc(error_str.str());
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
