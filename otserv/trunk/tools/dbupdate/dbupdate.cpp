@@ -63,58 +63,58 @@ SimpleUpdateQuery updateQueries[] = {
 	*/
 	{ 2,
 		{ // PgSql
-			"CREATE TABLE `map_store` ( "
-				"`house_id` INT NOT NULL,"
-				"`data` BYTEA NOT NULL,"
-				"KEY(`house_id`)"
-			");",
+			"CREATE TABLE `map_store` ( \n\
+				`house_id` INT NOT NULL,\n\
+				`data` BYTEA NOT NULL,\n\
+				KEY(`house_id`)\n\
+			);",
 			NULL
 		},
 		{ // MySql
-			"CREATE TABLE `map_store` ( "
-				"`house_id` INT UNSIGNED NOT NULL,"
-				"`data` BLOB NOT NULL,"
-				"KEY(`house_id`)"
-			");",
+			"CREATE TABLE `map_store` ( \n\
+				`house_id` INT UNSIGNED NOT NULL,\n\
+				`data` BLOB NOT NULL,\n\
+				KEY(`house_id`)\n\
+			);",
 			NULL
 		},
 		{ // Sqlite
-			"CREATE TABLE `map_store` ( "
-				"`house_id` INTEGER NOT NULL,"
-				"`data` BLOB NOT NULL,"
-				"UNIQUE(`house_id`)"
-			");",
+			"CREATE TABLE `map_store` ( \n\
+				`house_id` INTEGER NOT NULL,\n\
+				`data` BLOB NOT NULL,\n\
+				UNIQUE(`house_id`)\n\
+			);",
 			NULL
 		}
 	},
 	{ 3,
 		{ // PgSql
 			"DROP TABLE `schema_info`;",
-			"CREATE TABLE `schema_info` ("
-				"`name` VARCHAR(255) NOT NULL,"
-				"`value` VARCHAR(255) NOT NULL,"
-				"PRIMARY KEY (`name`)"
-			");",
+			"CREATE TABLE `schema_info` (\n\
+				`name` VARCHAR(255) NOT NULL,\n\
+				`value` VARCHAR(255) NOT NULL,\n\
+				PRIMARY KEY (`name`)\n\
+			);",
 			"INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
 			NULL
 		},
 		{ // MySql
 			"DROP TABLE `schema_info`;",
-			"CREATE TABLE `schema_info` ("
-				"`name` VARCHAR(255) NOT NULL,"
-				"`value` VARCHAR(255) NOT NULL,"
-				"PRIMARY KEY (`name`)"
-			");",
+			"CREATE TABLE `schema_info` (\n\
+				`name` VARCHAR(255) NOT NULL,\n\
+				`value` VARCHAR(255) NOT NULL,\n\
+				PRIMARY KEY (`name`)\n\
+			);",
 			"INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
 			NULL
 		},
 		{ // Sqlite
 			"DROP TABLE `schema_info`;",
-			"CREATE TABLE `schema_info` ("
-				"`name` VARCHAR(255) NOT NULL,"
-				"`value` VARCHAR(255) NOT NULL,"
-				"UNIQUE (`name`)"
-			");",
+			"CREATE TABLE `schema_info` (\n\
+				`name` VARCHAR(255) NOT NULL,\n\
+				`value` VARCHAR(255) NOT NULL,\n\
+				UNIQUE (`name`)\n\
+			);",
 			"INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 'ERROR');",
 			NULL
 		}
@@ -306,189 +306,189 @@ SimpleUpdateQuery updateQueries[] = {
 	},
 	{ 10,
 		{ // PgSql
-			"CREATE TABLE `player_deaths` ("
-			"	`id` SERIAL,"
-			"	`player_id` INT NOT NULL,"
-			"	`date` INT NOT NULL,"
-			"	`level` INT NOT NULL,"
-			"	PRIMARY KEY (`id`),"
-			"	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE"
-			");",
+			"CREATE TABLE `player_deaths` (\n\
+				`id` SERIAL,\n\
+				`player_id` INT NOT NULL,\n\
+				`date` INT NOT NULL,\n\
+				`level` INT NOT NULL,\n\
+				PRIMARY KEY (`id`),\n\
+				FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE\n\
+			);",
 
-			"CREATE TABLE `killers` ("
-			"	`id` SERIAL,"
-			"	`death_id` INT NOT NULL,"
-			"	`final_hit` SMALLINT NOT NULL DEFAULT 1,"
-			"	PRIMARY KEY(`id`),"
-			"	FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`) ON DELETE CASCADE"
-			");",
+			"CREATE TABLE `killers` (\n\
+				`id` SERIAL,\n\
+				`death_id` INT NOT NULL,\n\
+				`final_hit` SMALLINT NOT NULL DEFAULT 1,\n\
+				PRIMARY KEY(`id`),\n\
+				FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`) ON DELETE CASCADE\n\
+			);",
 
-			"CREATE TABLE `environment_killers` ("
-			"	`kill_id` INT NOT NULL,"
-			"	`name` VARCHAR(255) NOT NULL,"
-			"	FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE"
-			");",
+			"CREATE TABLE `environment_killers` (\n\
+				`kill_id` INT NOT NULL,\n\
+				`name` VARCHAR(255) NOT NULL,\n\
+				FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE\n\
+			);",
 
-			"CREATE TABLE `player_killers` ("
-			"	`kill_id` INT NOT NULL,"
-			"	`player_id` INT NOT NULL,"
-			"	FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE,"
-			"	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE"
-			");",
+			"CREATE TABLE `player_killers` (\n\
+				`kill_id` INT NOT NULL,\n\
+				`player_id` INT NOT NULL,\n\
+				FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE,\n\
+				FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE\n\
+			);",
 			NULL
 		},
 		{ // MySql
-			"CREATE TABLE `player_deaths` ("
-			"	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,"
-			"	`player_id` INT UNSIGNED NOT NULL,"
-			"	`date` INT UNSIGNED NOT NULL,"
-			"	`level` INT NOT NULL,"
-			"	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,"
-			"	PRIMARY KEY(`id`),"
-			"	INDEX(`date`)"
-			") ENGINE = InnoDB;",
+			"CREATE TABLE `player_deaths` (\n\
+				`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\n\
+				`player_id` INT UNSIGNED NOT NULL,\n\
+				`date` INT UNSIGNED NOT NULL,\n\
+				`level` INT NOT NULL,\n\
+				FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,\n\
+				PRIMARY KEY(`id`),\n\
+				INDEX(`date`)\n\
+			) ENGINE = InnoDB;",
 
-			"CREATE TABLE `killers` ("
-			"	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,"
-			"	`death_id` INT UNSIGNED NOT NULL,"
-			"	`final_hit` TINYINT(1) NOT NULL DEFAULT 1,"
-			"	PRIMARY KEY(`id`),"
-			"	FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`) ON DELETE CASCADE"
-			") ENGINE = InnoDB;",
+			"CREATE TABLE `killers` (\n\
+				`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\n\
+				`death_id` INT UNSIGNED NOT NULL,\n\
+				`final_hit` TINYINT(1) NOT NULL DEFAULT 1,\n\
+				PRIMARY KEY(`id`),\n\
+				FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`) ON DELETE CASCADE\n\
+			) ENGINE = InnoDB;",
 
-			"CREATE TABLE `environment_killers` ("
-			"	`kill_id` INT UNSIGNED NOT NULL,"
-			"	`name` VARCHAR(255) NOT NULL,"
-			"	FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE"
-			") ENGINE = InnoDB;",
+			"CREATE TABLE `environment_killers` (\n\
+				`kill_id` INT UNSIGNED NOT NULL,\n\
+				`name` VARCHAR(255) NOT NULL,\n\
+				FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE\n\
+			) ENGINE = InnoDB;",
 
-			"CREATE TABLE `player_killers` ("
-			"	`kill_id` INT UNSIGNED NOT NULL,"
-			"	`player_id` INT UNSIGNED NOT NULL,"
-			"	FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE,"
-			"	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE"
-			") ENGINE = InnoDB;",
+			"CREATE TABLE `player_killers` (\n\
+				`kill_id` INT UNSIGNED NOT NULL,\n\
+				`player_id` INT UNSIGNED NOT NULL,\n\
+				FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`) ON DELETE CASCADE,\n\
+				FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE\n\
+			) ENGINE = InnoDB;",
 			NULL
 		},
 		{ // Sqlite
 			// No support
-			"CREATE TABLE `player_deaths` ("
-			"	`id` INTEGER NOT NULL,"
-			"	`player_id` INTEGER NOT NULL,"
-			"	`date` INTEGER NOT NULL,"
-			"	`level` INTEGER NOT NULL,"
-			"	PRIMARY KEY (`id`),"
-			"	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`)"
-			");",
+			"CREATE TABLE `player_deaths` (\n\
+				`id` INTEGER NOT NULL,\n\
+				`player_id` INTEGER NOT NULL,\n\
+				`date` INTEGER NOT NULL,\n\
+				`level` INTEGER NOT NULL,\n\
+				PRIMARY KEY (`id`),\n\
+				FOREIGN KEY (`player_id`) REFERENCES `players` (`id`)\n\
+			);",
 
-			"CREATE TABLE `killers` ("
-			"	`id` INTEGER NOT NULL,"
-			"	`death_id` INTEGER NOT NULL,"
-			"	`final_hit` SMALLINT NOT NULL DEFAULT 1,"
-			"	PRIMARY KEY(`id`),"
-			"	FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`)"
-			");",
+			"CREATE TABLE `killers` (\n\
+				`id` INTEGER NOT NULL,\n\
+				`death_id` INTEGER NOT NULL,\n\
+				`final_hit` SMALLINT NOT NULL DEFAULT 1,\n\
+				PRIMARY KEY(`id`),\n\
+				FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`)\n\
+			);",
 
-			"CREATE TABLE `environment_killers` ("
-			"	`kill_id` INTEGER NOT NULL,"
-			"	`name` VARCHAR(255) NOT NULL,"
-			"	FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`)"
-			");",
+			"CREATE TABLE `environment_killers` (\n\
+				`kill_id` INTEGER NOT NULL,\n\
+				`name` VARCHAR(255) NOT NULL,\n\
+				FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`)\n\
+			);",
 
-			"CREATE TABLE `player_killers` ("
-			"	`kill_id` INTEGER NOT NULL,"
-			"	`player_id` INTEGER NOT NULL,"
-			"	FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`),"
-			"	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`)"
-			");",
+			"CREATE TABLE `player_killers` (\n\
+				`kill_id` INTEGER NOT NULL,\n\
+				`player_id` INTEGER NOT NULL,\n\
+				FOREIGN KEY (`kill_id`) REFERENCES `killers` (`id`),\n\
+				FOREIGN KEY (`player_id`) REFERENCES `players` (`id`)\n\
+			);",
 
-			"CREATE TRIGGER `oninsert_player_deaths`"
-			"BEFORE INSERT"
-			"ON `player_deaths`"
-			"FOR EACH ROW"
-			"BEGIN"
-			"	SELECT RAISE(ROLLBACK, 'INSERT on table `player_deaths` violates foreign: `player_id`')"
-			"	WHERE NEW.`player_id` IS NULL"
-			"		OR (SELECT `id` FROM `players` WHERE `id` = NEW.`player_id`) IS NULL;"
-			"END;",
+			"CREATE TRIGGER `oninsert_player_deaths`\n\
+			BEFORE INSERT\n\
+			ON `player_deaths`\n\
+			FOR EACH ROW\n\
+			BEGIN\n\
+				SELECT RAISE(ROLLBACK, 'INSERT on table `player_deaths` violates foreign: `player_id`')\n\
+				WHERE NEW.`player_id` IS NULL\n\
+					OR (SELECT `id` FROM `players` WHERE `id` = NEW.`player_id`) IS NULL;\n\
+			END;",
 
-			"CREATE TRIGGER `onupdate_player_deaths`"
-			"BEFORE UPDATE"
-			"ON `player_deaths`"
-			"FOR EACH ROW"
-			"BEGIN"
-			"	SELECT RAISE(ROLLBACK, 'UPDATE on table `player_deaths` violates foreign: `player_id`')"
-			"	WHERE NEW.`player_id` IS NULL"
-			"		OR (SELECT `id` FROM `players` WHERE `id` = NEW.`player_id`) IS NULL;"
-			"END;",
+			"CREATE TRIGGER `onupdate_player_deaths`\n\
+			BEFORE UPDATE\n\
+			ON `player_deaths`\n\
+			FOR EACH ROW\n\
+			BEGIN\n\
+				SELECT RAISE(ROLLBACK, 'UPDATE on table `player_deaths` violates foreign: `player_id`')\n\
+				WHERE NEW.`player_id` IS NULL\n\
+					OR (SELECT `id` FROM `players` WHERE `id` = NEW.`player_id`) IS NULL;\n\
+			END;",
 
-			"CREATE TRIGGER `oninsert_killers`"
-			"BEFORE INSERT"
-			"ON `killers`"
-			"FOR EACH ROW"
-			"BEGIN"
-			"	SELECT RAISE(ROLLBACK, 'INSERT on table `killers` violates foreign: `death_id`')"
-			"	WHERE NEW.`death_id` IS NULL"
-			"		OR (SELECT `id` FROM `player_deaths` WHERE `id` = NEW.`death_id`) IS NULL;"
-			"END;",
+			"CREATE TRIGGER `oninsert_killers`\n\
+			BEFORE INSERT\n\
+			ON `killers`\n\
+			FOR EACH ROW\n\
+			BEGIN\n\
+				SELECT RAISE(ROLLBACK, 'INSERT on table `killers` violates foreign: `death_id`')\n\
+				WHERE NEW.`death_id` IS NULL\n\
+					OR (SELECT `id` FROM `player_deaths` WHERE `id` = NEW.`death_id`) IS NULL;\n\
+			END;",
 
-			"CREATE TRIGGER `onupdate_killers`"
-			"BEFORE UPDATE"
-			"ON `killers`"
-			"FOR EACH ROW"
-			"BEGIN"
-			"	SELECT RAISE(ROLLBACK, 'UPDATE on table `killers` violates foreign: `death_id`')"
-			"	WHERE NEW.`death_id` IS NULL"
-			"		OR (SELECT `id` FROM `player_deaths` WHERE `id` = NEW.`death_id`) IS NULL;"
-			"END;",
+			"CREATE TRIGGER `onupdate_killers`\n\
+			BEFORE UPDATE\n\
+			ON `killers`\n\
+			FOR EACH ROW\n\
+			BEGIN\n\
+				SELECT RAISE(ROLLBACK, 'UPDATE on table `killers` violates foreign: `death_id`')\n\
+				WHERE NEW.`death_id` IS NULL\n\
+					OR (SELECT `id` FROM `player_deaths` WHERE `id` = NEW.`death_id`) IS NULL;\n\
+			END;",
 
-			"CREATE TRIGGER `oninsert_environment_killers`"
-			"BEFORE INSERT"
-			"ON `environment_killers`"
-			"FOR EACH ROW"
-			"BEGIN"
-			"	SELECT RAISE(ROLLBACK, 'INSERT on table `enviroment_killers` violates foreign: `kill_id`')"
-			"	WHERE NEW.`kill_id` IS NULL"
-			"		OR (SELECT `id` FROM `killers` WHERE `id` = NEW.`kill_id`) IS NULL;"
-			"END;",
+			"CREATE TRIGGER `oninsert_environment_killers`\n\
+			BEFORE INSERT\n\
+			ON `environment_killers`\n\
+			FOR EACH ROW\n\
+			BEGIN\n\
+				SELECT RAISE(ROLLBACK, 'INSERT on table `enviroment_killers` violates foreign: `kill_id`')\n\
+				WHERE NEW.`kill_id` IS NULL\n\
+					OR (SELECT `id` FROM `killers` WHERE `id` = NEW.`kill_id`) IS NULL;\n\
+			END;",
 
-			"CREATE TRIGGER `onupdate_environment_killers`"
-			"BEFORE UPDATE"
-			"ON `environment_killers`"
-			"FOR EACH ROW"
-			"BEGIN"
-			"	SELECT RAISE(ROLLBACK, 'INSERT on table `enviroment_killers` violates foreign: `kill_id`')"
-			"	WHERE NEW.`kill_id` IS NULL"
-			"		OR (SELECT `id` FROM `killers` WHERE `id` = NEW.`kill_id`) IS NULL;"
-			"END;",
+			"CREATE TRIGGER `onupdate_environment_killers`\n\
+			BEFORE UPDATE\n\
+			ON `environment_killers`\n\
+			FOR EACH ROW\n\
+			BEGIN\n\
+				SELECT RAISE(ROLLBACK, 'INSERT on table `enviroment_killers` violates foreign: `kill_id`')\n\
+				WHERE NEW.`kill_id` IS NULL\n\
+					OR (SELECT `id` FROM `killers` WHERE `id` = NEW.`kill_id`) IS NULL;\n\
+			END;",
 
-			"CREATE TRIGGER `oninsert_player_killers`"
-			"BEFORE INSERT"
-			"ON `player_killers`"
-			"FOR EACH ROW"
-			"BEGIN"
-			"	SELECT RAISE(ROLLBACK, 'INSERT on table `player_killers` violates foreign: `player_id`')"
-			"	WHERE NEW.`player_id` IS NULL"
-			"		OR (SELECT `id` FROM `players` WHERE `id` = NEW.`player_id`) IS NULL;"
-			"	"
-			"	SELECT RAISE(ROLLBACK, 'INSERT on table `player_killers` violates foreign: `kill_id`')"
-			"	WHERE NEW.`kill_id` IS NULL"
-			"		OR (SELECT `id` FROM `killers` WHERE `id` = NEW.`kill_id`) IS NULL;"
-			"END;",
+			"CREATE TRIGGER `oninsert_player_killers`\n\
+			BEFORE INSERT\n\
+			ON `player_killers`\n\
+			FOR EACH ROW\n\
+			BEGIN\n\
+				SELECT RAISE(ROLLBACK, 'INSERT on table `player_killers` violates foreign: `player_id`')\n\
+				WHERE NEW.`player_id` IS NULL\n\
+					OR (SELECT `id` FROM `players` WHERE `id` = NEW.`player_id`) IS NULL;\n\
+				\n\
+				SELECT RAISE(ROLLBACK, 'INSERT on table `player_killers` violates foreign: `kill_id`')\n\
+				WHERE NEW.`kill_id` IS NULL\n\
+					OR (SELECT `id` FROM `killers` WHERE `id` = NEW.`kill_id`) IS NULL;\n\
+			END;",
 
-			"CREATE TRIGGER `onupdate_player_killers`"
-			"BEFORE UPDATE"
-			"ON `player_killers`"
-			"FOR EACH ROW"
-			"BEGIN"
-			"	SELECT RAISE(ROLLBACK, 'UPDATE on table `player_killers` violates foreign: `player_id`')"
-			"	WHERE NEW.`player_id` IS NULL"
-			"		OR (SELECT `id` FROM `players` WHERE `id` = NEW.`player_id`) IS NULL;"
-			"		"
-			"	SELECT RAISE(ROLLBACK, 'UPDATE on table `killers` violates foreign: `kill_id`')"
-			"	WHERE NEW.`kill_id` IS NULL"
-			"		OR (SELECT `id` FROM `killers` WHERE `id` = NEW.`kill_id`) IS NULL;"
-			"END;",
+			"CREATE TRIGGER `onupdate_player_killers`\n\
+			BEFORE UPDATE\n\
+			ON `player_killers`\n\
+			FOR EACH ROW\n\
+			BEGIN\n\
+				SELECT RAISE(ROLLBACK, 'UPDATE on table `player_killers` violates foreign: `player_id`')\n\
+				WHERE NEW.`player_id` IS NULL\n\
+					OR (SELECT `id` FROM `players` WHERE `id` = NEW.`player_id`) IS NULL;\n\
+					\n\
+				SELECT RAISE(ROLLBACK, 'UPDATE on table `killers` violates foreign: `kill_id`')\n\
+				WHERE NEW.`kill_id` IS NULL\n\
+					OR (SELECT `id` FROM `killers` WHERE `id` = NEW.`kill_id`) IS NULL;\n\
+			END;",
 			NULL
 		}
 	},
@@ -626,14 +626,14 @@ SimpleUpdateQuery updateQueries[] = {
 			"ALTER TABLE `houses` ALTER COLUMN `tiles` SET NOT NULL;", 
 			"ALTER TABLE `houses` ALTER COLUMN `tiles` SET DEFAULT 0;",
 
-			"CREATE TABLE `house_auctions` ("
-				"`house_id` INT NOT NULL,"
-				"`player_id` INT NOT NULL,"
-				"`bid` INT NOT NULL DEFAULT 0,"
-				"`limit` INT NOT NULL DEFAULT 0,"
-				"`endtime` BIGINT NOT NULL DEFAULT 0,"
-				"FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE"
-			");",
+			"CREATE TABLE `house_auctions` (\n\
+				`house_id` INT NOT NULL,\n\
+				`player_id` INT NOT NULL,\n\
+				`bid` INT NOT NULL DEFAULT 0,\n\
+				`limit` INT NOT NULL DEFAULT 0,\n\
+				`endtime` BIGINT NOT NULL DEFAULT 0,\n\
+				FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE\n\
+			); ENGINE = InnoDB",
 			NULL
 		},
 		{ // MySql
@@ -641,14 +641,14 @@ SimpleUpdateQuery updateQueries[] = {
 
 			"ALTER TABLE `houses` ADD `tiles` INT NOT NULL DEFAULT 0;",
 
-			"CREATE TABLE `house_auctions` ("
-				"`house_id` INT UNSIGNED NOT NULL,"
-				"`player_id` INT UNSIGNED NOT NULL,"
-				"`bid` INT UNSIGNED NOT NULL DEFAULT 0,"
-				"`limit` INT UNSIGNED NOT NULL DEFAULT 0,"
-				"`endtime` INT UNSIGNED NOT NULL DEFAULT 0,"
-				"FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE"
-			") ENGINE = InnoDB;",
+			"CREATE TABLE `house_auctions` (\n\
+				`house_id` INT UNSIGNED NOT NULL,\n\
+				`player_id` INT UNSIGNED NOT NULL,\n\
+				`bid` INT UNSIGNED NOT NULL DEFAULT 0,\n\
+				`limit` INT UNSIGNED NOT NULL DEFAULT 0,\n\
+				`endtime` INT UNSIGNED NOT NULL DEFAULT 0,\n\
+				FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE\n\
+			) ENGINE = InnoDB;",
 			NULL
 		},
 		{ // Sqlite
@@ -696,6 +696,65 @@ SimpleUpdateQuery updateQueries[] = {
 		},
 		{ // MySql
 			"ALTER TABLE `bans` CHANGE `expires` `expires` INT NOT NULL;",
+			NULL
+		},
+		{ // Sqlite
+			NULL
+		}
+	},
+	{ 20,
+		{ // PgSql
+			"",
+			NULL
+		},
+		{ // MySql
+			"ALTER TABLE `tiles` ADD FOREIGN KEY (`house_id`) REFERENCES `houses`(`id`) ON DELETE NO ACTION;",
+			"ALTER TABLE `bans` CHANGE COLUMN `admin_id` `admin_id` INT UNSIGNED",
+			"UPDATE `bans` SET `admin_id` = NULL WHERE NOT EXISTS (SELECT 1 FROM `players` WHERE `id` = `bans`.`admin_id`);",
+			"ALTER TABLE `bans` ADD FOREIGN KEY (`admin_id`) REFERENCES `players`(`id`) ON DELETE SET NULL;",
+			
+			"ALTER TABLE `guilds` CHANGE COLUMN `ownerid` `owner_id` INT UNSIGNED NOT NULL;",
+			"DELETE FROM `guilds` WHERE NOT EXISTS (SELECT 1 FROM `players` WHERE `id` = `guilds`.`owner_id`);",
+			"ALTER TABLE `guilds` ADD FOREIGN KEY (`owner_id`) REFERENCES `players`(`id`) ON DELETE CASCADE;",
+
+			"DROP TRIGGER `ondelete_guilds`;",
+
+			"CREATE TABLE `guild_members` (\n\
+				`player_id` INT UNSIGNED NOT NULL,\n\
+				`rank_id` INT UNSIGNED NOT NULL COMMENT 'a rank which belongs to certain guild',\n\
+				`nick` VARCHAR(255) NOT NULL DEFAULT '',\n\
+				UNIQUE (`player_id`),\n\
+				FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,\n\
+				FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`) ON DELETE CASCADE\n\
+			) ENGINE = InnoDB;",
+
+			"INSERT INTO `guild_members`(`player_id`, `rank_id`, `nick`) SELECT `id`, `rank_id`, `guildnick` FROM `players` WHERE EXISTS "
+				"(SELECT 1 FROM `guild_ranks` WHERE `guild_ranks`.`id` = `players`.`rank_id`);",
+				
+			"ALTER TABLE `players` DROP COLUMN `rank_id`;",
+			"ALTER TABLE `players` DROP COLUMN `guildnick`;",
+
+			"CREATE TABLE `guild_wars` (\n\
+				`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\n\
+				`guild_id` INT UNSIGNED NOT NULL COMMENT 'the guild which declared the war',\n\
+				`opponent_id` INT UNSIGNED NOT NULL COMMENT 'the enemy guild at war',\n\
+				`frag_limit` INT UNSIGNED NOT NULL DEFAULT 10 COMMENT 'kills needed to win the war',\n\
+				`declaration_date` INT UNSIGNED NOT NULL,\n\
+				`end_date` INT UNSIGNED NOT NULL,\n\
+				`guild_fee` INT UNSIGNED NOT NULL DEFAULT 1000 COMMENT 'amount of money the guild has to pay if loses the war',\n\
+				`opponent_fee` INT UNSIGNED NOT NULL DEFAULT 1000 COMMENT 'amount of money the enemy guild has to pay if loses the war',\n\
+				`guild_frags` INT UNSIGNED NOT NULL DEFAULT 0,\n\
+				`opponent_frags` INT UNSIGNED NOT NULL DEFAULT 0,\n\
+				`comment` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'the guild leader can leave a message for the other guild',\n\
+				`status` INT NOT NULL DEFAULT 0 COMMENT '-1 -> will be ignored (finished or unaccepted) 0 -> to be started 1 -> started/not finished',\n\
+				PRIMARY KEY (`id`),\n\
+				FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE,\n\
+				FOREIGN KEY (`opponent_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE\n\
+			) ENGINE = InnoDB;",
+
+			"ALTER TABLE `houses` ADD COLUMN `id` INT UNSIGNED NOT NULL AUTO_INCREMENT;",
+			"ALTER TABLE `houses` ADD PRIMARY KEY(`id`);",
+
 			NULL
 		},
 		{ // Sqlite
