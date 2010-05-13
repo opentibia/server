@@ -122,6 +122,7 @@ struct CommandLineOptions{
 	std::string configfile;
 	bool truncate_log;
 	bool start_closed;
+	bool skip_scripts;
 	std::string logfile;
 	std::string errfile;
 #if !defined(__WINDOWS__)
@@ -285,6 +286,7 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 	std::vector<std::string>::iterator argi = args.begin();
 	opts.truncate_log = false;
 	opts.start_closed = false;
+	opts.skip_scripts = false;
 
 	if(argi != args.end()){
 		++argi;
@@ -354,6 +356,9 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		}
 		else if(arg == "--closed"){
 			opts.start_closed = true;
+		}
+		else if(arg == "--no-scripts"){
+			opts.skip_scripts = true;
 		}
 		else if(arg == "--help"){
 			std::cout <<
@@ -559,8 +564,15 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << "[done]" << std::endl;
 
 	//load scripts
-	if(ScriptingManager::getInstance()->loadScriptSystems() == false){
-		exit(-1);
+	if (command_opts.skip_scripts == false){
+		if(ScriptingManager::getInstance()->loadScriptSystems() == false){
+			exit(-1);
+		}
+	}
+	else{
+		// Dummy call to allocate the scripting system
+		ScriptingManager::getInstance();
+		std::cout << ":: Skipping loading script system." << std::endl;
 	}
 
 	// load monster data

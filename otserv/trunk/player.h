@@ -316,6 +316,7 @@ public:
 
 	//follow functions
 	virtual bool setFollowCreature(Creature* creature, bool fullPathSearch = false);
+	virtual void goToFollowCreature();
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature);

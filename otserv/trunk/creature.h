@@ -165,8 +165,6 @@ public:
 	virtual Monster* getMonster() {return NULL;};
 	virtual const Monster* getMonster() const {return NULL;};
 
-	void getPathToFollowCreature();
-
 	virtual const std::string& getName() const = 0;
 	virtual const std::string& getNameDescription() const = 0;
 	virtual std::string getDescription(int32_t lookDistance) const;
@@ -203,7 +201,7 @@ public:
 	int32_t getWalkDelay() const;
 	int64_t getTimeSinceLastMove() const;
 
-	int64_t getEventStepTicks() const;
+	int64_t getEventStepTicks(bool onlyDelay = false) const;
 	int32_t getStepDuration(Direction dir) const;
 	int32_t getStepDuration() const;
 	virtual int32_t getStepSpeed() const {return getSpeed();}
@@ -214,6 +212,7 @@ public:
 		varSpeed = varSpeedDelta;
 		if(getSpeed() <= 0){
 			stopEventWalk();
+			cancelNextWalk = true;
 		}
 		else if(oldSpeed <= 0 && !listWalkDir.empty()){
 			addEventWalk();
@@ -237,8 +236,9 @@ public:
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
-	void addEventWalk();
+	void addEventWalk(bool firstStep = false);
 	void stopEventWalk();
+	void goToFollowCreature();
 
 	//walk events
 	virtual void onWalk(Direction& dir);
@@ -431,6 +431,7 @@ protected:
 	//follow variables
 	Creature* followCreature;
 	uint32_t eventWalk;
+	bool cancelNextWalk;
 	std::list<Direction> listWalkDir;
 	uint32_t walkUpdateTicks;
 	bool hasFollowPath;

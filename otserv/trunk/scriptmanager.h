@@ -25,13 +25,13 @@
 class ScriptingManager
 {
 public:
+	ScriptingManager();
 	~ScriptingManager();
 	static ScriptingManager* getInstance();
 	
 	bool loadScriptSystems();
 
 private:
-	ScriptingManager();
 	static ScriptingManager* _instance;
 };
 

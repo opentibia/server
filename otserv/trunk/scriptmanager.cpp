@@ -47,7 +47,12 @@ ScriptingManager* ScriptingManager::_instance = NULL;
 
 ScriptingManager::ScriptingManager()
 {
-	//
+	g_weapons = new Weapons();
+	g_spells = new Spells();
+	g_actions = new Actions();
+	g_talkactions = new TalkActions();
+	g_moveEvents = new MoveEvents();
+	g_creatureEvents = new CreatureEvents();
 }
 
 ScriptingManager::~ScriptingManager()
@@ -62,8 +67,6 @@ ScriptingManager* ScriptingManager::getInstance()
 	}
 	return _instance;
 }
-
-
 bool ScriptingManager::loadScriptSystems()
 {
 	std::cout << ":: Loading Script Systems" << std::endl;
@@ -72,7 +75,6 @@ bool ScriptingManager::loadScriptSystems()
 
 	//load weapons data
 	std::cout << ":: Loading Weapons ...";
-	g_weapons = new Weapons();
 	if(!g_weapons->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Weapons!");
 		return false;
@@ -83,7 +85,6 @@ bool ScriptingManager::loadScriptSystems()
 
 	//load spells data
 	std::cout << ":: Loading Spells ...";
-	g_spells = new Spells();
 	if(!g_spells->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Spells!");
 		return false;
@@ -98,7 +99,6 @@ bool ScriptingManager::loadScriptSystems()
 
 	//load actions data
 	std::cout << ":: Loading Actions ...";
-	g_actions = new Actions();
 	if(!g_actions->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Actions!");
 		return false;
@@ -107,7 +107,6 @@ bool ScriptingManager::loadScriptSystems()
 
 	//load talkactions data
 	std::cout << ":: Loading Talkactions ...";
-	g_talkactions = new TalkActions();
 	if(!g_talkactions->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Talkactions!");
 		return false;
@@ -116,7 +115,6 @@ bool ScriptingManager::loadScriptSystems()
 
 	//load moveEvents
 	std::cout << ":: Loading MoveEvents ...";
-	g_moveEvents = new MoveEvents();
 	if(!g_moveEvents->loadFromXml(datadir)){
 		ErrorMessage("Unable to load MoveEvents!");
 		return false;
@@ -125,7 +123,6 @@ bool ScriptingManager::loadScriptSystems()
 
 	//load creature events
 	std::cout << ":: Loading CreatureEvents ...";
-	g_creatureEvents = new CreatureEvents();
 	if(!g_creatureEvents->loadFromXml(datadir)){
 		ErrorMessage("Unable to load CreatureEvents!");
 		return false;

@@ -77,6 +77,7 @@ Creature::Creature() :
 	followCreature = NULL;
 	hasFollowPath = false;
 	eventWalk = 0;
+	cancelNextWalk = false;
 	forceUpdateFollowPath = false;
 	isMapLoaded = false;
 	isUpdatingPath = false;
@@ -239,7 +240,7 @@ void Creature::onThink(uint32_t interval)
 
 	if(isUpdatingPath){
 		isUpdatingPath = false;
-		getPathToFollowCreature();
+		goToFollowCreature();
 	}
 
 	onAttacking(interval);
@@ -268,11 +269,19 @@ void Creature::onWalk()
 				forceUpdateFollowPath = true;
 			}
 		}
+		else{
+			if(listWalkDir.empty()){
+				onWalkComplete();
+			}
+			stopEventWalk();
+		}
 	}
 
-	if(listWalkDir.empty()){
-		onWalkComplete();
-	}
+	if (cancelNextWalk){
+		listWalkDir.clear();
+		onWalkAborted();
+		cancelNextWalk = false;
+ 	}
 
 	if(eventWalk != 0){
 		eventWalk = 0;
@@ -317,19 +326,28 @@ bool Creature::getNextStep(Direction& dir, uint32_t& flags)
 bool Creature::startAutoWalk(std::list<Direction>& listDir)
 {
 	listWalkDir = listDir;
-	addEventWalk();
+	addEventWalk(listDir.size() > 1);
 	return true;
 }
 
-void Creature::addEventWalk()
+void Creature::addEventWalk(bool firstStep)
 {
+	//static int64_t last_time = OTSYS_TIME();
+	cancelNextWalk = false;
+
 	if(eventWalk == 0){
 		//std::cout << "addEventWalk() - " << getName() << std::endl;
+		int64_t ticks = getEventStepTicks(firstStep);
+		//std::cout << "addEventWalk() - " << getName() << " - " << (OTSYS_TIME() - last_time) << "\t- " << ticks << std::endl;
+		//last_time = OTSYS_TIME();
 
-		int64_t ticks = getEventStepTicks();
 		if(ticks > 0){
+			// Take first step right away, but still queue the next
+			if (ticks == 1)
+				g_game.checkCreatureWalk(getID());
+
 			eventWalk = g_scheduler.addEvent(createSchedulerTask(
-				ticks, boost::bind(&Game::checkCreatureWalk, &g_game, getID())));
+				std::max((int64_t)SCHEDULER_MINTICKS, ticks), boost::bind(&Game::checkCreatureWalk, &g_game, getID())));
 		}
 	}
 }
@@ -339,11 +357,6 @@ void Creature::stopEventWalk()
 	if(eventWalk != 0){
 		g_scheduler.stopEvent(eventWalk);
 		eventWalk = 0;
-
-		if(!listWalkDir.empty()){
-			listWalkDir.clear();
-			onWalkAborted();
-		}
 	}
 }
 
@@ -574,11 +587,11 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 		else{
 			if(oldPos.z != newPos.z){
 				//floor change extra cost
-				lastStepCost = 2;
+				lastStepCost = 1;
 			}
 			else if(std::abs(newPos.x - oldPos.x) >=1 && std::abs(newPos.y - oldPos.y) >= 1){
 				//diagonal extra cost
-				lastStepCost = 2;
+				lastStepCost = 3;
 			}
 		}
 
@@ -1088,7 +1101,7 @@ void Creature::getPathSearchParams(const Creature* creature, FindPathParams& fpp
 	fpp.maxTargetDist = 1;
 }
 
-void Creature::getPathToFollowCreature()
+void Creature::goToFollowCreature()
 {
 	if(followCreature){
 		FindPathParams fpp;
@@ -1566,12 +1579,15 @@ int32_t Creature::getStepDuration() const
 	return duration * lastStepCost;
 }
 
-int64_t Creature::getEventStepTicks() const
+int64_t Creature::getEventStepTicks(bool onlyDelay) const
 {
 	int64_t ret = getWalkDelay();
 
 	if(ret <= 0){
-		ret = getStepDuration();
+		if (onlyDelay)
+			ret = 1;
+		else
+			ret = getStepDuration();
 	}
 
 	return ret;

@@ -1997,21 +1997,11 @@ bool Game::playerMove(uint32_t playerId, Direction dir)
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
 		return false;
-
-	player->stopWalk();
-	int32_t delay = player->getWalkDelay(dir);
-
-	if(delay > 0){
-		player->setNextAction(OTSYS_TIME() + player->getStepDuration(dir) - 1);
-		SchedulerTask* task = createSchedulerTask( ((uint32_t)delay), boost::bind(&Game::playerMove, this,
-			playerId, dir));
-		player->setNextWalkTask(task);
-		return false;
-	}
 	
-	player->resetIdle();
-	player->onWalk(dir);
-	return (internalMoveCreature(player, dir) == RET_NOERROR);
+	std::list<Direction> dirs;
+	dirs.push_back(dir);
+	
+	return player->startAutoWalk(dirs);;
 }
 
 bool Game::internalBroadcastMessage(Player* player, const std::string& text)
@@ -3258,6 +3248,7 @@ bool Game::playerSetAttackedCreature(uint32_t playerId, uint32_t creatureId)
 	}
 
 	player->setAttackedCreature(attackCreature);
+	g_dispatcher.addTask(createTask(boost::bind(&Game::updateCreatureWalk, this, player->getID())));
 	return true;
 }
 
@@ -3273,7 +3264,8 @@ bool Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 	if(creatureId != 0){
 		followCreature = getCreatureByID(creatureId);
 	}
-
+	
+	g_dispatcher.addTask(createTask(boost::bind(&Game::updateCreatureWalk, this, player->getID())));
 	return player->setFollowCreature(followCreature);
 }
 
@@ -3868,7 +3860,7 @@ void Game::updateCreatureWalk(uint32_t creatureId)
 {
 	Creature* creature = getCreatureByID(creatureId);
 	if(creature && creature->getHealth() > 0){
-		creature->getPathToFollowCreature();
+		creature->goToFollowCreature();
 	}
 }
 
