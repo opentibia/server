@@ -19,6 +19,14 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+#include "outputmessage.h"
+#include "connection.h"
+#include "admin.h"
+#include "status.h"
+#include "protocollogin.h"
+#endif
+
 #include "creature.h"
 #include "player.h"
 #include "tools.h"
@@ -29,20 +37,10 @@
 #include "town.h"
 #include "raids.h"
 #include "tools.h"
-#include <sstream>
-
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-#include "outputmessage.h"
-#include "connection.h"
-#include "admin.h"
-#include "status.h"
-#include "protocollogin.h"
-#endif
-
+#include "talkaction.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-
-#include "talkaction.h"
+#include <sstream>
 
 extern Game g_game;
 extern ConfigManager g_config;

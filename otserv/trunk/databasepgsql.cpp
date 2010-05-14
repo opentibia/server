@@ -22,12 +22,11 @@
 
 #ifdef __USE_PGSQL__
 
-#include <iostream>
-
 #include "database.h"
 #include "databasepgsql.h"
-
 #include "configmanager.h"
+#include <iostream>
+
 extern ConfigManager g_config;
 
 /** DatabasePgSQL definitions */

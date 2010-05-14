@@ -19,10 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <string>
-#include <iostream>
-#include <sstream>
-
 #include "luascript.h"
 #include "player.h"
 #include "ioaccount.h"
@@ -45,6 +41,9 @@
 #include "movement.h"
 #include "tools.h"
 #include "guild.h"
+#include <string>
+#include <iostream>
+#include <sstream>
 
 extern Game g_game;
 extern Monsters g_monsters;

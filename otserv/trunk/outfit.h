@@ -21,11 +21,12 @@
 #ifndef __OTSERV_OUTFIT_H__
 #define __OTSERV_OUTFIT_H__
 
+#include "definitions.h"
+#include "enums.h"
 #include <vector>
 #include <string>
 #include <map>
 #include <list>
-#include "enums.h"
 
 struct Outfit{
 	Outfit() : outfitId(0), lookType(0), addons(0), isPremium(false), isDefault(false), name("") {}

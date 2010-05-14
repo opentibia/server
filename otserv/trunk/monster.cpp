@@ -19,11 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <vector>
-#include <string>
-#include <sstream>
-#include <algorithm>
-
 #include "monster.h"
 #include "monsters.h"
 #include "game.h"
@@ -32,6 +27,10 @@
 #include "spawn.h"
 #include "configmanager.h"
 #include "party.h"
+#include <vector>
+#include <string>
+#include <sstream>
+#include <algorithm>
 
 extern Game g_game;
 extern ConfigManager g_config;

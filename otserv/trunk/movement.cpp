@@ -19,19 +19,16 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "movement.h"
 #include "game.h"
-#include "creature.h"
 #include "player.h"
 #include "tile.h"
 #include <sstream>
 #include "tools.h"
 #include "combat.h"
 #include "vocation.h"
-
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-
-#include "movement.h"
 
 extern Game g_game;
 extern Vocations g_vocations;

@@ -19,18 +19,15 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <string>
-#include <iostream>
-#include <sstream>
-
 #include "networkmessage.h"
-
 #include "container.h"
 #include "creature.h"
 #include "player.h"
-
 #include "position.h"
 #include "rsa.h"
+#include <string>
+#include <iostream>
+#include <sstream>
 
 int32_t NetworkMessage::decodeHeader()
 {

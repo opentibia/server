@@ -19,8 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
 #if defined __WINDOWS__
 #include <winerror.h>
 #endif

@@ -21,6 +21,7 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
+#include "definitions.h"
 #include <cstdio>
 #include <cstring>
 #include <boost/utility.hpp>

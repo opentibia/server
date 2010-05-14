@@ -30,7 +30,6 @@
 #include "configmanager.h"
 #include "party.h"
 #include "monsters.h"
-
 #include <string>
 #include <sstream>
 #include <vector>

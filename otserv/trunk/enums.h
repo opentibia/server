@@ -21,6 +21,8 @@
 #ifndef __OTSERV_ENUMS_H__
 #define __OTSERV_ENUMS_H__
 
+#include "definitions.h"
+
 enum RaceType_t {
 	RACE_NONE	= 0,
 	RACE_VENOM  = 1,

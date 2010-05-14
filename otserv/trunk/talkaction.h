@@ -22,11 +22,12 @@
 #ifndef __TALKACTION_H__
 #define __TALKACTION_H__
 
-#include <list>
-#include <string>
+#include "definitions.h"
 #include "luascript.h"
 #include "baseevents.h"
 #include "const.h"
+#include <list>
+#include <string>
 
 enum TalkActionResult_t{
 	//TALKACTION_NOTFOUND,

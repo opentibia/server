@@ -19,23 +19,13 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
-#include <string>
-#include <sstream>
-#include <map>
-#include <fstream>
-
-#include <boost/config.hpp>
-#include <boost/bind.hpp>
-
+#include "game.h"
 #include "otsystem.h"
 #include "tasks.h"
 #include "items.h"
 #include "creature.h"
 #include "player.h"
 #include "monster.h"
-#include "game.h"
 #include "tile.h"
 #include "house.h"
 #include "actions.h"
@@ -54,6 +44,12 @@
 #include "quests.h"
 #include "movement.h"
 #include "guild.h"
+#include <boost/config.hpp>
+#include <boost/bind.hpp>
+#include <string>
+#include <sstream>
+#include <map>
+#include <fstream>
 
 extern ConfigManager g_config;
 extern Actions* g_actions;

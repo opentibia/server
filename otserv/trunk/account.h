@@ -22,23 +22,34 @@
 #ifndef __OTSERV_ACCOUNT_H__
 #define __OTSERV_ACCOUNT_H__
 
+#include "definitions.h"
 #include <list>
 #include <string>
 #include <ctime>
-
-#include "definitions.h"
+#include <cmath>
 
 class Account
 {
 public:
-	Account();
-	~Account();
+	Account(){
+		number = 0;
+		warnings = 0;
+		premEnd = 0;
+	}
+	~Account(){}
 
-	static uint16_t getPremiumDaysLeft(int32_t _premEnd);
+	static uint16_t getPremiumDaysLeft(int32_t _premEnd)
+	{
+		if(_premEnd < time(NULL)){
+			return 0;
+		}
+		return (uint16_t)std::ceil((double)((_premEnd - time(NULL)) / 86400));
+	}
 
 	uint32_t number;
 	uint32_t warnings;
-	std::string name, password;
+	std::string name;
+	std::string	password;
 
 	time_t premEnd; // < current time is none, (time_t)(-1) is infinite.
 	std::list<std::string> charList;

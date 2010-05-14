@@ -47,10 +47,9 @@
 
 #include "otpch.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "md5.h"
+#include <cstdio>
+#include <cstdlib>
 
 /* Padding */
 static unsigned char MD5_PADDING[64] = {

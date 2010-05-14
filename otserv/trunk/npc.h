@@ -21,6 +21,7 @@
 #ifndef __OTSERV_NPC_H__
 #define __OTSERV_NPC_H__
 
+#include "definitions.h"
 #include "creature.h"
 #include "luascript.h"
 #include "templates.h"

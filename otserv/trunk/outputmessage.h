@@ -21,12 +21,13 @@
 #ifndef __OTSERV_OUTPUT_MESSAGE_H__
 #define __OTSERV_OUTPUT_MESSAGE_H__
 
+#include "definitions.h"
 #include "networkmessage.h"
 #include "connection.h"
+#include "tools.h"
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
-#include "tools.h"
 #include <iostream>
 #include <list>
 

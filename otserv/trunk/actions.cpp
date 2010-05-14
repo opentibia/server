@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "actions.h"
 #include "const.h"
 #include "player.h"
 #include "monster.h"
@@ -33,13 +34,9 @@
 #include "spells.h"
 #include "configmanager.h"
 #include "beds.h"
-
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-
 #include <sstream>
-
-#include "actions.h"
 
 extern Game g_game;
 extern Spells* g_spells;

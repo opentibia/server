@@ -22,11 +22,11 @@
 #define __OTSERV_SERVER_H__
 
 #include "definitions.h"
-#include <iostream>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/utility.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <iostream>
 
 class Connection;
 typedef boost::shared_ptr<Connection> Connection_ptr;

@@ -25,7 +25,6 @@
 #include "ioplayer.h"
 #include "depot.h"
 #include "town.h"
-
 #include <sstream>
 
 extern Game g_game;

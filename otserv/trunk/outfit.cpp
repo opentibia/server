@@ -19,7 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "outfit.h"
 #include "tools.h"
 #include <libxml/xmlmemory.h>

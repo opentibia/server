@@ -19,12 +19,11 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <iostream>
-#include <sstream>
-
 #include "waitlist.h"
 #include "status.h"
 #include "configmanager.h"
+#include <iostream>
+#include <sstream>
 
 extern ConfigManager g_config;
 

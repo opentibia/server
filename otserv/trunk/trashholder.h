@@ -21,6 +21,7 @@
 #ifndef __TRASHHOLDER_H__
 #define __TRASHHOLDER_H__
 
+#include "definitions.h"
 #include "item.h"
 #include "cylinder.h"
 #include "const.h"

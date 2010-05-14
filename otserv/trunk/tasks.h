@@ -22,6 +22,7 @@
 #ifndef __OTSERV_TASKS_H__
 #define __OTSERV_TASKS_H__
 
+#include "definitions.h"
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 

@@ -21,12 +21,11 @@
 #ifndef __TEMPLATES_H__
 #define __TEMPLATES_H__
 
-#include <set>
-#include <map>
-
-
+#include "definitions.h"
 #include "creature.h"
 #include <boost/thread.hpp>
+#include <set>
+#include <map>
 
 template<class T> class AutoList
 {

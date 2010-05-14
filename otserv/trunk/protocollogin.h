@@ -21,6 +21,7 @@
 #ifndef __OTSERV_PROTOCOL_LOGIN_H__
 #define __OTSERV_PROTOCOL_LOGIN_H__
 
+#include "definitions.h"
 #include "protocol.h"
 
 class NetworkMessage;

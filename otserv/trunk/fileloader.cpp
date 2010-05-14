@@ -21,7 +21,6 @@
 #include "otpch.h"
 
 #include "fileloader.h"
-
 #include <cmath>
 
 FileLoader::FileLoader()

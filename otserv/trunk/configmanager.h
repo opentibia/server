@@ -21,6 +21,7 @@
 #ifndef _CONFIG_MANAGER_H
 #define _CONFIG_MANAGER_H
 
+#include "definitions.h"
 #include <string>
 
 extern "C"

@@ -22,16 +22,14 @@
 #include "scriptmanager.h"
 #include "luascript.h"
 #include "configmanager.h"
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
 #include "actions.h"
 #include "talkaction.h"
 #include "spells.h"
 #include "movement.h"
 #include "weapons.h"
 #include "creatureevent.h"
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 Actions* g_actions = NULL;
 TalkActions* g_talkactions = NULL;

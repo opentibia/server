@@ -23,9 +23,7 @@
 #define __OTSERV_CREATURE_H__
 
 #include "definitions.h"
-
 #include <boost/any.hpp>
-
 #include "templates.h"
 #include "map.h"
 #include "position.h"
@@ -34,7 +32,6 @@
 #include "tile.h"
 #include "enums.h"
 #include "creatureevent.h"
-
 #include <list>
 
 typedef std::list<Condition*> ConditionList;

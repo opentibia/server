@@ -22,6 +22,7 @@
 #ifndef __BASEEVENTS_H__
 #define __BASEEVENTS_H__
 
+#include "definitions.h"
 #include "luascript.h"
 #include <libxml/parser.h>
 

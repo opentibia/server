@@ -37,16 +37,13 @@
 #include "connection.h"
 #include "creatureevent.h"
 #include "quests.h"
-#include "definitions.h"
-
+#include <boost/function.hpp>
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <time.h>
+#include <ctime>
 #include <list>
 #include <fstream>
-
-#include <boost/function.hpp>
 
 extern Game g_game;
 extern ConfigManager g_config;

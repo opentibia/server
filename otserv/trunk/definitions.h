@@ -18,71 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_DEFINITIONS_H__
 #define __OTSERV_DEFINITIONS_H__
-
 
 #define OTSERV_VERSION "0.6.3_SVN"
 #define OTSERV_NAME "OTServ"
 #define OTSERV_CLIENT_VERSION "8.57"
 #define CURRENT_SCHEMA_VERSION 20
-
-#if defined __MINGW32__
-	#ifndef XML_GCC_FREE
-		#define XML_GCC_FREE
-	#endif
-	//Cross-compiling
-	#ifndef __WINDOWS__
-		#define __WINDOWS__
-	#endif
-#endif
-
-#if defined _WIN32 || defined WIN32 || defined __WINDOWS__
-	#ifndef _WIN64
-		#ifndef _WIN32
-			#define _WIN32
-		#endif
-		#ifndef WIN32
-			#define WIN32
-		#endif
-	#endif
-	#ifndef __WINDOWS__
-		#define __WINDOWS__
-	#endif
-#endif
-
-//Cross-compiling
-#ifdef __CYGWIN__
-	#undef WIN32
-	#undef _WIN32
-	#undef WINDOWS
-	#undef __WINDOWS__
-	#define HAVE_ERRNO_AS_DEFINE
-#endif
-
-#ifdef XML_GCC_FREE
-	#define xmlFreeOTSERV(s)	free(s)
-#else
-	#define xmlFreeOTSERV(s)	xmlFree(s)
-#endif
-
-#ifdef __USE_MINIDUMP__
-	#ifndef __EXCEPTION_TRACER__
-		#define __EXCEPTION_TRACER__
-	#endif
-#endif
-
-#ifdef __DEBUG_EXCEPTION_REPORT__
-	#define DEBUG_REPORT int *a = NULL; *a = 1;
-#else
-	#ifdef __EXCEPTION_TRACER__
-		#include "exception.h"
-		#define DEBUG_REPORT ExceptionHandler::dumpStack();
-	#else
-		#define DEBUG_REPORT
-	#endif
-#endif
 
 #ifdef __USE_SQLITE__
 	#define SINGLE_SQL_DRIVER
@@ -127,79 +69,149 @@ enum passwordType_t{
 // Boost won't complain about non-working function
 #define BOOST_ASIO_ENABLE_CANCELIO 1
 
-#if defined __WINDOWS__
-
-#if defined _MSC_VER && defined NDEBUG
-	#define _SECURE_SCL 0
-	#define HAS_ITERATOR_DEBUGGING 0
-#endif
-
 #ifndef __FUNCTION__
 	#define	__FUNCTION__ __func__
 #endif
 
-#ifndef EWOULDBLOCK
-#	ifdef _MSC_VER
-#		include <errno.h>
-#		ifndef EWOULDBLOCK
-#			define EWOULDBLOCK WSAEWOULDBLOCK
-#		endif
-#	else
-#		define EWOULDBLOCK WSAEWOULDBLOCK
-#	endif
+// Debug help only safety works with Visual C++
+#ifdef __USE_MINIDUMP__
+	#ifndef __EXCEPTION_TRACER__
+		#define __EXCEPTION_TRACER__
+	#endif
 #endif
 
-#ifdef _WIN32_WINNT
-	#undef _WIN32_WINNT
+#ifdef __DEBUG_EXCEPTION_REPORT__
+	#define DEBUG_REPORT int *a = NULL; *a = 1;
+#else
+	#ifdef __EXCEPTION_TRACER__
+		#include "exception.h"
+		#define DEBUG_REPORT ExceptionHandler::dumpStack();
+	#else
+		#define DEBUG_REPORT
+	#endif
 #endif
-//Windows 2000	0x0500
-//Windows Xp	0x0501
-//Windows 2003	0x0502
-//Windows Vista	0x0600
-//Windows Seven 0x0601
-#define _WIN32_WINNT 0x0501
 
-#ifdef __GNUC__
-	#if __GNUC__ < 4
+#define xmake_str(str) #str
+#define make_str(str) xmake_str(str)
+
+#if defined __GNUC__
+	//GNU Compiler version example, GCC 3.0.2: 300002
+	#ifdef __GNUC_PATCHLEVEL__
+		#define __GNUC_VERSION__ (__GNUC__ * 10000 \
+								+ __GNUC_MINOR__ * 100 \
+								+ __GNUC_PATCHLEVEL__)
+	#else
+		#define __GNUC_VERSION__ (__GNUC__ * 10000 \
+								+ __GNUC_MINOR__ * 100)
+		#define __GNUC_PATCHLEVEL__ 0
+	#endif
+	#define COMPILER_STRING ("GCC " make_str(__GNUC__) "." \
+								    make_str(__GNUC_MINOR__) "." \
+									make_str(__GNUC_PATCHLEVEL__))
+
+	//GNU Ports
+	#ifdef __MINGW32__
+		//MinGW port version example, MinGW 2.7: 2070
+		#define __MINGW32_VERSION__ (__MINGW32_MAJOR_VERSION * 1000 \
+								+ __MINGW32_MINOR_VERSION * 10)
+		#define COMPILER_PORT_STRING ("MinGW32 " make_str(__MINGW32_MAJOR_VERSION) "." \
+											     make_str(__MINGW32_MINOR_VERSION))
+		#define __WINDOWS__
+		#define XML_GCC_FREE
+	#elif __MINGW64__
+		#define COMPILER_PORT_STRING ("MinGW64 " make_str(__VERSION__))
+		#define __WINDOWS__
+	#elif __CYGWIN__
+		#define COMPILER_PORT_STRING ("Cygwin " make_str(__VERSION__))
+		#undef WIN32
+		#undef _WIN32
+		#undef __WIN32__
+		#undef __WINDOWS__
+		#define HAVE_ERRNO_AS_DEFINE
+	#endif
+
+	#if __GNUC_VERSION__ > 40400 // GCC 4.4.0
+		#include <unordered_map>
+		#include <unordered_set>
+		#define UNORDERED_MAP std::unordered_map
+		#define UNORDERED_SET std::unordered_set
+	#elif __GNUC_VERSION__ > 40300 // GCC 4.3.0
+		#ifndef __GXX_EXPERIMENTAL_CXX0X__
+			#include <tr1/unordered_map>
+			#include <tr1/unordered_set>
+			#define UNORDERED_MAP std::tr1::unordered_map
+			#define UNORDERED_SET std::tr1::unordered_set
+		#else
+			#include <unordered_map>
+			#include <unordered_set>
+			#define UNORDERED_MAP std::unordered_map
+			#define UNORDERED_SET std::unordered_set
+		#endif
+	#elif __GNUC_VERSION__ > 20900 // GCC 2.9.0
+		#include <ext/hash_map>
+		#include <ext/hash_set>
+		#define UNORDERED_MAP __gnu_cxx::hash_map
+		#define UNORDERED_SET __gnu_cxx::hash_set
+	#else
 		#include <boost/version.hpp>
-		#if BOOST_VERSION >= 103600
+		#if BOOST_VERSION >= 103600 // Boost 1.36
 			#include <boost/unordered_map.hpp>
 			#include <boost/unordered_set.hpp>
 			#define UNORDERED_MAP boost::unordered_map
 			#define UNORDERED_SET boost::unordered_set
-		#else
-			#include <ext/hash_map>
-			#include <ext/hash_set>
-			#define UNORDERED_MAP __gnu_cxx::hash_map
-			#define UNORDERED_SET __gnu_cxx::hash_set
 		#endif
-	#else
-		#ifndef __GXX_EXPERIMENTAL_CXX0X__
-			#include <tr1/unordered_map>
-			#include <tr1/unordered_set>
-		#else
-			// these only work, for some reason, with c++0x standard enabled
-			#include <unordered_map>
-			#include <unordered_set>
-		#endif
-
-		#define UNORDERED_MAP std::tr1::unordered_map
-		#define UNORDERED_SET std::tr1::unordered_set
 	#endif
-	#include <assert.h>
-	#include <stdint.h>
+	
+	#ifdef __GXX_EXPERIMENTAL_CXX0X__
+		#include <cstdint>
+	#else
+		#include <stdint.h>
+	#endif
+	
+	#include <cassert>
+	#include <cstring>
+	#define strcasecmp strcmp
+	#define strncasecmp strncmp
+
 	#define ATOI64 atoll
 
-#else
-	typedef unsigned long long uint64_t;
+	#ifdef __USE_MINIDUMP__
+		#undef __USE_MINIDUMP__
+	#endif
+
+#elif defined(_MSC_VER)
+	//Visual C++ Compiler version
+	#if _MSC_VER >= 1600 // VC++ 10.0
+		#define VISUALC_VERSION 10
+	#elif _MSC_VER >= 1500 // VC++ 9.0
+		#define VISUALC_VERSION 9
+	#elif _MSC_VER >= 1400 // VC++ 8.0
+		#define VISUALC_VERSION 8
+	#elif _MSC_VER >= 1310 // VC++ 7.1
+		#define VISUALC_VERSION 7.1
+	#elif _MSC_VER >= 1300 // VC++ 7.0
+		#define VISUALC_VERSION 7
+	#endif
+	#define COMPILER_STRING ("Microsoft Visual C++ " make_str(VISUALC_VERSION))
+
+	#define __WINDOWS__
+
+	#ifdef NDEBUG
+		#define _SECURE_SCL 0
+		#define HAS_ITERATOR_DEBUGGING 0
+	#endif
+
+	#ifdef _DEBUG
+		#define __DEBUG__
+	#endif
 
 	#ifndef NOMINMAX
 		#define NOMINMAX
 	#endif
 
 	#include <limits>
-	#include <assert.h>
-	#include <time.h>
+	#include <cassert>
+	#include <ctime>
 
 	#include <hash_map>
 	#include <hash_set>
@@ -217,13 +229,18 @@ enum passwordType_t{
 		return ::_strnicmp(s1, s2, n);
 	}
 
-	typedef signed long long int64_t;
-	typedef unsigned long uint32_t;
-	typedef signed long int32_t;
-	typedef unsigned short uint16_t;
-	typedef signed short int16_t;
-	typedef unsigned char uint8_t;
-	typedef signed char int8_t;
+	#if VISUALC_VERSION >= 10
+		#include <cstdint>
+	#else
+		typedef unsigned long long uint64_t;
+		typedef signed long long int64_t;
+		typedef unsigned long uint32_t;
+		typedef signed long int32_t;
+		typedef unsigned short uint16_t;
+		typedef signed short int16_t;
+		typedef unsigned char uint8_t;
+		typedef signed char int8_t;
+	#endif
 
 	#define ATOI64 _atoi64
 
@@ -231,44 +248,25 @@ enum passwordType_t{
 	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
 	#pragma warning(disable:4244) //'argument' : conversion from 'type1' to 'type2', possible loss of data
 	#pragma warning(disable:4267) //'var' : conversion from 'size_t' to 'type', possible loss of data
+	#pragma warning(disable:4996) //"_ftime64" : this function or variable may be unsafe
 
 #endif
 
-//*nix systems
+#ifdef XML_GCC_FREE
+	#define xmlFreeOTSERV(s)	free(s)
 #else
-	#include <stdint.h>
-	#include <string.h>
-	#include <assert.h>
-
-	#if __GNUC__ < 4
-		#include <boost/version.hpp>
-		#if BOOST_VERSION >= 103600
-			#include <boost/unordered_map.hpp>
-			#include <boost/unordered_set.hpp>
-			#define UNORDERED_MAP boost::unordered_map
-			#define UNORDERED_SET boost::unordered_set
-		#else
-			#include <ext/hash_map>
-			#include <ext/hash_set>
-			#define UNORDERED_MAP __gnu_cxx::hash_map
-			#define UNORDERED_SET __gnu_cxx::hash_set
-		#endif
-	#else
-		#ifndef __GXX_EXPERIMENTAL_CXX0X__
-			#include <tr1/unordered_map>
-			#include <tr1/unordered_set>
-		#else
-			// these only work, for some reason, with c++0x standard enabled
-			#include <unordered_map>
-			#include <unordered_set>
-		#endif
-
-		#define UNORDERED_MAP std::tr1::unordered_map
-		#define UNORDERED_SET std::tr1::unordered_set
-	#endif
-	#define ATOI64 atoll
-
+	#define xmlFreeOTSERV(s)	xmlFree(s)
 #endif
+
+#ifdef _WIN32_WINNT
+	#undef _WIN32_WINNT
+#endif
+//Windows 2000	0x0500
+//Windows Xp	0x0501
+//Windows 2003	0x0502
+//Windows Vista	0x0600
+//Windows Seven 0x0601
+#define _WIN32_WINNT 0x0501
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)

@@ -21,11 +21,10 @@
 #ifndef __OTSERV_NETWORK_MESSAGE_H__
 #define __OTSERV_NETWORK_MESSAGE_H__
 
-#include <boost/shared_ptr.hpp>
-
 #include "definitions.h"
 #include "otsystem.h"
 #include "const.h"
+#include <boost/shared_ptr.hpp>
 
 class Item;
 class Creature;

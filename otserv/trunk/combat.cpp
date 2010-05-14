@@ -20,7 +20,6 @@
 #include "otpch.h"
 
 #include "combat.h"
-
 #include "configmanager.h"
 #include "game.h"
 #include "creature.h"
@@ -29,7 +28,6 @@
 #include "tools.h"
 #include "weapons.h"
 #include "party.h"
-
 #include <sstream>
 
 extern Game g_game;

@@ -27,12 +27,13 @@
 #error "database.h should be included first."
 #endif
 
+#include "definitions.h"
 #include "otsystem.h"
 
 #ifdef __MYSQL_ALT_INCLUDE__
-#include <mysql.h>
+	#include <mysql.h>
 #else
-#include <mysql/mysql.h>
+	#include <mysql/mysql.h>
 #endif
 #include <sstream>
 #include <map>

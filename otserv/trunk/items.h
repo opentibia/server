@@ -22,14 +22,11 @@
 #ifndef __OTSERV_ITEMS_H__
 #define __OTSERV_ITEMS_H__
 
-
 #include "definitions.h"
 #include "const.h"
 #include "enums.h"
 #include "itemloader.h"
-//[ added for beds system
 #include "position.h"
-//]
 #include <map>
 
 #define SLOTP_WHEREEVER 0xFFFFFFFF

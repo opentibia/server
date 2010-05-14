@@ -22,8 +22,6 @@
 
 #ifdef __USE_MYSQL__
 
-#include <iostream>
-
 #include "database.h"
 #include "databasemysql.h"
 #ifdef __MYSQL_ALT_INCLUDE__
@@ -31,8 +29,9 @@
 #else
 #include <mysql/errmsg.h>
 #endif
-
 #include "configmanager.h"
+#include <iostream>
+
 extern ConfigManager g_config;
 
 /** DatabaseMySQL definitions */

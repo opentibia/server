@@ -21,6 +21,7 @@
 #ifndef __OTSERV_TELEPORT_H__
 #define __OTSERV_TELEPORT_H__
 
+#include "definitions.h"
 #include "tile.h"
 
 class Teleport : public Item, public Cylinder

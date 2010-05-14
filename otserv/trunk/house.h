@@ -21,16 +21,15 @@
 #ifndef __OTSERV_HOUSE_H__
 #define __OTSERV_HOUSE_H__
 
-#include <string>
-#include <list>
-#include <map>
-
-#include <boost/regex.hpp>
-
 #include "definitions.h"
 #include "position.h"
 #include "housetile.h"
 #include "player.h"
+#include <boost/regex.hpp>
+#include <string>
+#include <list>
+#include <map>
+
 
 class House;
 class BedItem;

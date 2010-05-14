@@ -23,6 +23,8 @@
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
 
+#include "definitions.h"
+
 class ExceptionHandler
 {
 public:

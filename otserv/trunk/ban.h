@@ -20,8 +20,9 @@
 
 #ifndef __OTSERV_BAN_H__
 #define __OTSERV_BAN_H__
-#include "enums.h"
 
+#include "definitions.h"
+#include "enums.h"
 #include <boost/thread.hpp>
 #include <list>
 #include <vector>

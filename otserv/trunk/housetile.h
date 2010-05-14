@@ -21,6 +21,7 @@
 #ifndef __HOUSETILE_H__
 #define __HOUSETILE_H__
 
+#include "definitions.h"
 #include "tile.h"
 
 class House;

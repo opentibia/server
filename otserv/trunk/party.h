@@ -23,11 +23,11 @@
 
 #include "definitions.h"
 #include "const.h"
-
 #include <list>
 #include <vector>
 #include <map>
 #include <string>
+
 class Player;
 class Creature;
 class Container;

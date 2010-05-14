@@ -20,11 +20,9 @@
 #include "otpch.h"
 
 #include "raids.h"
-
 #include "game.h"
 #include "player.h"
 #include "configmanager.h"
-
 #include <sstream>
 #include <algorithm>
 
@@ -168,7 +166,7 @@ void Raids::checkRaids()
 				if(MAX_RAND_RANGE*CHECK_RAIDS_INTERVAL/(*it)->getInterval() >= (uint32_t)random_range(0, MAX_RAND_RANGE)){
 #ifdef __DEBUG_RAID__
 					char buffer[32];
-					time_t tmp = time(NULL);
+					time_t tmp = std::time(NULL);
 					formatDate(tmp, buffer);
 					std::cout << buffer << " [Notice] Raids: Starting raid " << (*it)->getName() << std::endl;
 #endif

@@ -21,7 +21,6 @@
 
 #include "ban.h"
 #include "tools.h"
-
 #include "configmanager.h"
 #include "ioplayer.h"
 #include "database.h"

@@ -19,11 +19,10 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "baseevents.h"
+#include "tools.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-#include "tools.h"
-
-#include "baseevents.h"
 
 BaseEvents::BaseEvents()
 {

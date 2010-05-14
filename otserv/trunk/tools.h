@@ -20,19 +20,18 @@
 
 #ifndef __OTSERV_TOOLS_H__
 #define __OTSERV_TOOLS_H__
+
 #include "definitions.h"
+#include "enums.h"
+#include "const.h"
 #include <libxml/parser.h>
+#include <boost/tokenizer.hpp>
 #include <vector>
 #include <iostream>
 #include <ctime>
 #include <cstring>
 
-#include <boost/tokenizer.hpp>
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-#include "enums.h"
-#include "const.h"
-
 
 enum DistributionType_t {
 	DISTRO_UNIFORM,

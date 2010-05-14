@@ -25,7 +25,6 @@
 #include "npc.h"
 #include "tools.h"
 #include "configmanager.h"
-
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 

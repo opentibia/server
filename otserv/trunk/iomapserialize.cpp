@@ -19,10 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "iomapserialize.h"
 #include "ioplayer.h"
-
 #include "house.h"
 #include "configmanager.h"
 #include "game.h"

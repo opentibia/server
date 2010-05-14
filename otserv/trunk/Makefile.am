@@ -56,7 +56,7 @@ EXTRA_DIST=autogen.sh \
 
 
 otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
-	account.cpp	   map.cpp		   rsa.cpp \
+	map.cpp		   rsa.cpp \
 	actions.cpp	   md5.cpp		   scheduler.cpp \
 	admin.cpp	   monster.cpp	           scriptmanager.cpp \
 	allocator.cpp	   depot.cpp	       monsters.cpp	   server.cpp \

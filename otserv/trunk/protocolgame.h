@@ -22,10 +22,11 @@
 #ifndef __OTSERV_PROTOCOLGAME_H__
 #define __OTSERV_PROTOCOLGAME_H__
 
-#include <string>
+#include "definitions.h"
 #include "protocol.h"
 #include "enums.h"
 #include "creature.h"
+#include <string>
 
 enum connectResult_t{
 	CONNECT_SUCCESS = 1,

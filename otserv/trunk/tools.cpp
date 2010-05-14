@@ -24,8 +24,7 @@
 #include "configmanager.h"
 #include "md5.h"
 #include "sha1.h"
-
-#include "math.h"
+#include <cmath>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
@@ -85,7 +84,8 @@ std::string asUpperCaseString(const std::string& source)
 	return s;
 }
 
-bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
+#if defined __WINDOWS__ && !defined __GNUC__
+bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
@@ -96,9 +96,8 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 
 	return false;
 }
-
-#if defined __WINDOWS__ && !defined __GNUC__
-bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
+#else
+bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){

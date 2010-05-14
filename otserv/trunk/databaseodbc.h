@@ -34,15 +34,16 @@
 #define __DATABASE_ODBC_H__
 
 #ifndef __OTSERV_DATABASE_H__
-#error "database.h should be included first."
+	#error "database.h should be included first."
 #endif
 
 #ifdef __WINDOWS__
-#include <windows.h>
+	#include <windows.h>
 #else
-#include <sqltypes.h>
+	#include <sqltypes.h>
 #endif
 
+#include "definitions.h"
 #include <sql.h>
 #include <sqlext.h>
 

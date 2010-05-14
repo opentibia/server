@@ -23,10 +23,8 @@
 #include "spells.h"
 #include "condition.h"
 #include "weapons.h"
-
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-
 #include <iostream>
 #include <string>
 

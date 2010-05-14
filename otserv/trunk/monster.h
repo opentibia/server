@@ -22,6 +22,7 @@
 #ifndef __OTSERV_MONSTER_H__
 #define __OTSERV_MONSTER_H__
 
+#include "definitions.h"
 #include "tile.h"
 #include "monsters.h"
 

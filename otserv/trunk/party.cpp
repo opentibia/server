@@ -25,7 +25,6 @@
 #include "chat.h"
 #include "tools.h"
 #include "configmanager.h"
-
 #include <sstream>
 
 extern Game g_game;

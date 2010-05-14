@@ -76,6 +76,7 @@
 //		message(string)
 //
 
+#include "definitions.h"
 #include "player.h"
 #include "logger.h"
 #include <string>

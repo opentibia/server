@@ -22,10 +22,9 @@
 #ifndef __OTSERV_IOACCOUNT_H__
 #define __OTSERV_IOACCOUNT_H__
 
-#include <string>
-
-#include "account.h"
 #include "definitions.h"
+#include "account.h"
+#include <string>
 
 /** Baseclass for all Player-Loaders */
 class IOAccount {

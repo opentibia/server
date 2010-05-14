@@ -19,17 +19,13 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "ioaccount.h"
-
+#include "database.h"
+#include "configmanager.h"
+#include <iostream>
 #include <algorithm>
 #include <functional>
 #include <sstream>
-
-#include "database.h"
-#include <iostream>
-
-#include "configmanager.h"
 
 extern ConfigManager g_config;
 

@@ -4,8 +4,6 @@
 
 #define __OTSERV_OTCP_H__
 
-//#undef __USE_OTPCH__
-
 // Definitions should be global.
 #include "definitions.h"
 

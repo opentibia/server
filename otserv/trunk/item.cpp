@@ -19,7 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "item.h"
 #include "container.h"
 #include "depot.h"
@@ -29,14 +28,10 @@
 #include "house.h"
 #include "game.h"
 #include "luascript.h"
-
 #include "actions.h"
 #include "combat.h"
 #include "weapons.h"
-//[ added for beds system
 #include "beds.h"
-//]
-
 #include <iostream>
 #include <sstream>
 #include <iomanip>

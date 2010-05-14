@@ -19,9 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <sstream>
-#include <algorithm>
-
 #include "house.h"
 #include "ioplayer.h"
 #include "game.h"
@@ -29,9 +26,9 @@
 #include "configmanager.h"
 #include "tools.h"
 #include "guild.h"
-//[ added for beds system
 #include "beds.h"
-//]
+#include <sstream>
+#include <algorithm>
 
 extern ConfigManager g_config;
 extern Game g_game;

@@ -31,7 +31,6 @@
 #include "tools.h"
 #include "rsa.h"
 #include "mailbox.h"
-
 #include "logger.h"
 
 static void addLogLine(ProtocolAdmin* conn, eLogType type, int level, std::string message);
@@ -52,7 +51,7 @@ Protocol(connection)
 	m_state = NO_CONNECTED;
 	m_loginTries = 0;
 	m_lastCommand = 0;
-	m_startTime = time(NULL);
+	m_startTime = std::time(NULL);
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	protocolAdminCount++;
@@ -102,7 +101,7 @@ void ProtocolAdmin::onRecvFirstMessage(NetworkMessage& msg)
 		OutputMessagePool::getInstance()->send(output);
 	}
 
-	m_lastCommand = time(NULL);
+	m_lastCommand = std::time(NULL);
 	m_state = ENCRYPTION_NO_SET;
 }
 
@@ -195,7 +194,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			return;
 		}
 
-		m_lastCommand = time(NULL);
+		m_lastCommand = std::time(NULL);
 
 		switch(recvbyte){
 		case AP_MSG_LOGIN:

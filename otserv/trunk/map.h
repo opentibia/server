@@ -21,21 +21,20 @@
 #ifndef __OTSERV_MAP_H__
 #define __OTSERV_MAP_H__
 
-#include <queue>
-#include <bitset>
-#include <map>
-
-#include <boost/shared_ptr.hpp>
-using boost::shared_ptr;
-
+#include "definitions.h"
 #include "position.h"
 #include "item.h"
 #include "iomapserialize.h"
 #include "fileloader.h"
-
 #include "tools.h"
 #include "tile.h"
 #include "waypoints.h"
+#include <boost/shared_ptr.hpp>
+#include <queue>
+#include <bitset>
+#include <map>
+
+using boost::shared_ptr;
 
 class Creature;
 class Player;

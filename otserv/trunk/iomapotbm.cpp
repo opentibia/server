@@ -22,7 +22,6 @@
 #include "iomapotbm.h"
 #include "game.h"
 #include "map.h"
-
 #include "tile.h"
 #include "item.h"
 #include "container.h"
@@ -31,10 +30,7 @@
 #include "fileloader.h"
 #include "town.h"
 #include "house.h"
-
-//[ added for beds system
 #include "beds.h"
-//]
 
 typedef uint8_t attribute_t;
 typedef uint32_t flags_t;

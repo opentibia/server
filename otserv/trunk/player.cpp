@@ -19,15 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <algorithm>
-
-#include <stdlib.h>
-
 #include "player.h"
 #include "ioplayer.h"
 #include "game.h"
@@ -42,6 +33,11 @@
 #include "beds.h"
 #include "party.h"
 #include "guild.h"
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <cstdlib>
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -1711,7 +1707,7 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 
 		g_chat.removeUserFromAllChannels(this);
 
-		lastLogout = time(NULL);
+		lastLogout = std::time(NULL);
 		IOPlayer::instance()->updateLogoutInfo(this);
 
 		bool saved = false;

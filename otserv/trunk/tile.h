@@ -23,6 +23,7 @@
 #ifndef __OTSERV_TILE_H__
 #define __OTSERV_TILE_H__
 
+#include "definitions.h"
 #include "cylinder.h"
 #include "item.h"
 #include <boost/shared_ptr.hpp>

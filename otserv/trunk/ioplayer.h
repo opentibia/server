@@ -21,10 +21,10 @@
 #ifndef __IOPLAYER_H
 #define __IOPLAYER_H
 
-#include <string>
-
+#include "definitions.h"
 #include "player.h"
 #include "database.h"
+#include <string>
 
 enum UnjustKillPeriod_t{
 	UNJUST_KILL_PERIOD_DAY,
@@ -85,7 +85,6 @@ protected:
 		bool operator()(const std::string& l, const std::string& r) const
 		{
 			return strcasecmp(l.c_str(), r.c_str()) < 0;
-				return true;
 		}
 	};
 

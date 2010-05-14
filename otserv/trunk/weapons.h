@@ -22,6 +22,7 @@
 #ifndef __OTSERV_WEAPONS_H__
 #define __OTSERV_WEAPONS_H__
 
+#include "definitions.h"
 #include "game.h"
 #include "luascript.h"
 #include "player.h"

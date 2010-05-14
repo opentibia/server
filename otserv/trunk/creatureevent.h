@@ -21,6 +21,7 @@
 #ifndef __OTSERV_CREATUREEVENT_H__
 #define __OTSERV_CREATUREEVENT_H__
 
+#include "definitions.h"
 #include "enums.h"
 #include "luascript.h"
 #include "baseevents.h"

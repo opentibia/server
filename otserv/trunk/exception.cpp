@@ -22,16 +22,15 @@
 
 #if defined __EXCEPTION_TRACER__
 
+#include "exception.h"
+#include "configmanager.h"
+#include <boost/thread.hpp>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <ctime>
-#include <stdlib.h>
+#include <cstdlib>
 #include <map>
-
-#include <boost/thread.hpp>
-#include "exception.h"
-#include "configmanager.h"
 
 extern ConfigManager g_config;
 
@@ -83,11 +82,7 @@ extern ConfigManager g_config;
 #endif
 
 #ifndef COMPILER_STRING
-#ifdef __GNUC__
-#define COMPILER_STRING  "gcc " __VERSION__
-#else
-#define COMPILER_STRING  ""
-#endif
+	#define COMPILER_STRING ""
 #endif
 
 #define COMPILATION_DATE  __DATE__ " " __TIME__
@@ -304,6 +299,9 @@ bool ExceptionHandler::RemoveHandler()
 			*outdriver << "*****************************************************" << std::endl;
 			*outdriver << "Error report - " << std::ctime(&rawtime) << std::endl;
 			*outdriver << "Compiler info - " << COMPILER_STRING << std::endl;
+			#ifdef COMPILER_PORT_STRING
+			*outdriver << "Compiler port info - " << COMPILER_PORT_STRING << std::endl;
+			#endif
 			*outdriver << "Compilation Date - " << COMPILATION_DATE << std::endl << std::endl;
 
 			//system and process info
@@ -550,6 +548,9 @@ bool ExceptionHandler::RemoveHandler()
 			output << "*****************************************************" << std::endl;
 			output << "Stack dump - " << std::ctime(&rawtime) << std::endl;
 			output << "Compiler info - " << COMPILER_STRING << std::endl;
+			#ifdef COMPILER_PORT_STRING
+			output << "Compiler port info - " << COMPILER_PORT_STRING << std::endl;
+			#endif
 			output << "Compilation Date - " << COMPILATION_DATE << std::endl << std::endl;
 
 			__asm__ ("movl %%esp, %0;":"=r"(esp)::);

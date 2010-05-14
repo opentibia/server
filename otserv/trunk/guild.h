@@ -24,9 +24,9 @@
 #include "definitions.h"
 #include "const.h"
 #include "creature.h"
-
 #include <string>
 #include <map>
+
 class Player;
 
 struct GuildWar {

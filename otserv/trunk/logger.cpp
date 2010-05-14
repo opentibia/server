@@ -17,50 +17,24 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
 
 #include "logger.h"
-#include <iostream>
-#include <ctime>
 #include "tools.h"
-/*
-void Logger::logMessage(std::string channel, eLogType type, int level,
-			std::string message, std::string func,
-			int line, std::string file)
-{
-	std::string sType;
-	switch(type){
-	case LOGTYPE_ERROR:
-			sType = "error";
-			break;
-	case LOGTYPE_EVENT:
-			sType = "event";
-			break;
-	case LOGTYPE_WARNING:
-			sType = "warning";
-}
-	std::cout << "Channel: " << channel << std::endl;
-	std::cout << "Type: " << sType << std::endl;
-	std::cout << "Level: " << level << std::endl;
-	std::cout << "Message: " << message << std::endl;
-	std::cout << "Func: " << func << std::endl;
-	std::cout << "Line: " << line << std::endl;
-	std::cout << "File: " << file << std::endl;
-}
-*/
+#include <ctime>
 
 Logger::Logger()
 {
-	m_file = fopen("otlog.txt", "a");
-	if(!m_file)
-		m_file = stderr;
+	m_file.open("otlog.txt", std::ios::app);
+	if(m_file.good()){
+		m_registering = true;
+	}
 }
 
 Logger::~Logger()
 {
-	if(m_file){
-		fclose(m_file);
+	if(m_registering){
+		m_file.close();
 	}
 }
 
@@ -69,18 +43,24 @@ void Logger::logMessage(const char* channel, eLogType type, int level, std::stri
 	//TODO: decide if should be saved or not depending on channel type and level
 	// if should be save decide where and how
 
+	//check if the file is open, if not, avoid writting to file
+	if(!m_registering){
+		return;
+	}
+
 	//write timestamp of the event
 	char buffer[32];
-	time_t tmp = time(NULL);
-	formatDate(tmp, buffer);
-	fprintf(m_file, "%s", buffer);
+	time_t now = std::time(NULL);
+	formatDate(now, buffer);
+	m_file << buffer << std::endl;
+
 	//write channel generating the message
 	if(channel){
-		fprintf(m_file, " [%s] ", channel);
+		m_file << " [" << channel << "] ";
 	}
 
 	//write message type
-	const char* type_str;
+	std::string type_str;
 	switch(type){
 	case LOGTYPE_EVENT:
 		type_str = "event";
@@ -95,9 +75,10 @@ void Logger::logMessage(const char* channel, eLogType type, int level, std::stri
 		type_str = "???";
 		break;
 	}
-	fprintf(m_file, " %s:", type_str);
-	//write the message
-	fprintf(m_file, " %s\n", message.c_str());
+	m_file << " " << type_str << ":";
 
-	fflush(m_file);
+	//write the message
+	m_file << " " << message << std::endl;
+
+	m_file.flush();
 }

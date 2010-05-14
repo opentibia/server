@@ -19,7 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
 #include "npc.h"
 #include "game.h"
 #include "tools.h"
@@ -27,17 +26,14 @@
 #include "position.h"
 #include "spells.h"
 #include "player.h"
-
+#include "luascript.h"
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 #include <algorithm>
 #include <functional>
 #include <string>
 #include <sstream>
 #include <fstream>
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
-#include "luascript.h"
 
 extern ConfigManager g_config;
 extern Game g_game;

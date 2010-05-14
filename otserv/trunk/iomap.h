@@ -22,12 +22,12 @@
 #ifndef __IOMAP_H
 #define __IOMAP_H
 
-#include <string>
-
+#include "definitions.h"
 #include "map.h"
 #include "iomapserialize.h"
 #include "spawn.h"
 #include "house.h"
+#include <string>
 
 class IOMap{
 public:

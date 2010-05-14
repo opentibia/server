@@ -22,9 +22,9 @@
 #ifndef __OTSERV_RSA_H__
 #define __OTSERV_RSA_H__
 
-#include <boost/thread.hpp>
-
+#include "definitions.h"
 #include "gmp.h"
+#include <boost/thread.hpp>
 
 class RSA{
 public:

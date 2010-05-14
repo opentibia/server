@@ -21,8 +21,9 @@
 #ifndef __OTSERV_MONSTERS_H__
 #define __OTSERV_MONSTERS_H__
 
-#include <string>
+#include "definitions.h"
 #include "creature.h"
+#include <string>
 
 #define MAX_LOOTCHANCE 100000
 #define MAX_STATICWALK 100

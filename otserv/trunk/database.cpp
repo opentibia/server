@@ -21,8 +21,8 @@
 
 #include "otpch.h"
 
-#include <string>
 #include "database.h"
+#include <string>
 
 #ifdef __USE_MYSQL__
 #include "databasemysql.h"

@@ -21,6 +21,7 @@
 #ifndef __OTSERV_IOMAPOTBM_H__
 #define __OTSERV_IOMAPOTBM_H__
 
+#include "definitions.h"
 #include "iomap.h"
 #include "item.h"
 

@@ -32,14 +32,13 @@
 
 #ifdef __USE_ODBC__
 
-#include <iostream>
-
 #include "database.h"
 #include "databaseodbc.h"
+#include "configmanager.h"
+#include <iostream>
 
 #define RETURN_SUCCESS(ret) (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 
-#include "configmanager.h"
 extern ConfigManager g_config;
 
 /** DatabaseODBC definitions */

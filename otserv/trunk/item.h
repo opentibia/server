@@ -22,12 +22,11 @@
 #ifndef __OTSERV_ITEM_H__
 #define __OTSERV_ITEM_H__
 
+#include "definitions.h"
 #include "thing.h"
 #include "items.h"
-
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-
 #include <iostream>
 #include <list>
 #include <vector>

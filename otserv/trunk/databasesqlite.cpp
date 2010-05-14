@@ -22,13 +22,12 @@
 
 #ifdef __USE_SQLITE__
 
+#include "database.h"
+#include "databasesqlite.h"
+#include "configmanager.h"
 #include <iostream>
 #include <fstream>
 
-#include "database.h"
-#include "databasesqlite.h"
-
-#include "configmanager.h"
 extern ConfigManager g_config;
 
 #if SQLITE_VERSION_NUMBER < 3003009

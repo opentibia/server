@@ -27,7 +27,6 @@
 #include "tools.h"
 #include "guild.h"
 #include "game.h"
-
 #include <iostream>
 #include <iomanip>
 

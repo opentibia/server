@@ -21,10 +21,11 @@
 #ifndef _QUESTS_H_
 #define _QUESTS_H_
 
-#include <list>
-#include <string>
+#include "definitions.h"
 #include "player.h"
 #include "networkmessage.h"
+#include <list>
+#include <string>
 
 class MissionState;
 class Mission;

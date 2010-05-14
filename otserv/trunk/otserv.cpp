@@ -19,24 +19,19 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
-
+#include "otsystem.h"
+#include "server.h"
+#include "ioplayer.h"
+#include "game.h"
+#include <boost/thread.hpp>
+#include <boost/asio.hpp>
 #include <string>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <fstream>
-
-#include "otsystem.h"
-#include "server.h"
-#include "ioplayer.h"
-#include <boost/thread.hpp>
-#include <boost/asio.hpp>
-
-#include <stdlib.h>
-#include <time.h>
-#include "game.h"
-
+#include <cstdlib>
+#include <ctime>
 
 #if !defined(__WINDOWS__)
 	#include <unistd.h> // for access()

@@ -21,11 +21,10 @@
 #ifndef __OTSERV_CONTAINER_H__
 #define __OTSERV_CONTAINER_H__
 
-#include <queue>
-
 #include "definitions.h"
 #include "cylinder.h"
 #include "item.h"
+#include <queue>
 
 class Container;
 class Depot;

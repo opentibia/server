@@ -22,14 +22,13 @@
 #include "protocollogin.h"
 #include "outputmessage.h"
 #include "connection.h"
-
 #include "rsa.h"
 #include "configmanager.h"
 #include "tools.h"
 #include "ioaccount.h"
 #include "ban.h"
-#include <iomanip>
 #include "game.h"
+#include <iomanip>
 
 extern ConfigManager g_config;
 extern IPList serverIPs;

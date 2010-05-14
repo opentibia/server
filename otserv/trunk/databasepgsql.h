@@ -24,9 +24,10 @@
 #define __DATABASE_PGSQL_H__
 
 #ifndef __OTSERV_DATABASE_H__
-#error "database.h should be included first."
+	#error "database.h should be included first."
 #endif
 
+#include "definitions.h"
 #include <libpq-fe.h>
 
 class DatabasePgSQL : public _Database

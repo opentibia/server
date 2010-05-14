@@ -21,11 +21,11 @@
 #ifndef __OTSERV_STATUS_H
 #define __OTSERV_STATUS_H
 
-#include <string>
 #include "definitions.h"
 #include "networkmessage.h"
-
 #include "protocol.h"
+#include <string>
+#include <map>
 
 class ProtocolStatus : public Protocol
 {

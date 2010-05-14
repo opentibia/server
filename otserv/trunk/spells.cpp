@@ -19,20 +19,17 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "definitions.h"
+#include "spells.h"
 #include "game.h"
 #include "tools.h"
 #include "house.h"
 #include "housetile.h"
-#include "spells.h"
 #include "combat.h"
 #include "monsters.h"
 #include "configmanager.h"
 #include "const.h"
-
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-
 #include <sstream>
 
 extern Game g_game;
