@@ -28,6 +28,17 @@
 
 #include "definitions.h"
 
+struct AccountCharacter {
+	std::string name;
+	std::string world;
+	uint16_t port;
+	uint32_t ip;
+
+	bool operator < (const AccountCharacter& rhs) const{
+		return name < rhs.name;
+	}
+};
+
 class Account
 {
 public:
@@ -40,7 +51,7 @@ public:
 	std::string name, password;
 
 	time_t premEnd; // < current time is none, (time_t)(-1) is infinite.
-	std::list<std::string> charList;
+	std::list<AccountCharacter> charList;
 };
 
 #endif  // #ifndef __ACCOUNT_H__

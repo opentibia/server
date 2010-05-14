@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "game.h"
+#include "http_request.h"
 
 
 #if !defined(__WINDOWS__)
@@ -87,7 +88,6 @@ Monsters g_monsters;
 Npcs g_npcs;
 BanManager g_bans;
 Vocations g_vocations;
-IPList serverIPs;
 
 boost::mutex g_loaderLock;
 boost::condition_variable g_loaderSignal;
@@ -301,8 +301,6 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 				return false;
 			}
 
-			if(type == "g" || type == "game")
-				g_config.setNumber(ConfigManager::GAME_PORT, atoi(argi->c_str()));
 			if(type == "l" || type == "login")
 				g_config.setNumber(ConfigManager::LOGIN_PORT, atoi(argi->c_str()));
 			if(type == "a" || type == "admin")
@@ -354,7 +352,8 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			"\n"
 			"\t-i, --ip $1\t\tIP of gameworld server. Should be equal to the \n"
 			"\t\t\t\tglobal IP.\n"
-			"\t-p, --port $1\t\tPort for server to listen on.\n"
+			"\t-p, --port $1 $2\t\tPort ($2) for server to listen on $1 is type\n"
+			"\t\t\t\t(status, login, admin).\n"
 			"\t-c, --config $1\t\tAlternate config file path.\n"
 			"\t-l, --log-file $1 $2\tAll standard output will be logged to the $1\n"
 			"\t\t\t\tfile, all errors will be logged to $2.\n"
@@ -452,7 +451,8 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	mutexName << "otserv_" << g_config.getNumber(ConfigManager::LOGIN_PORT);
 	CreateMutex(NULL, FALSE, mutexName.str().c_str());
 	if(GetLastError() == ERROR_ALREADY_EXISTS)
-		ErrorMessage("There's an another instance of the OTServ running with the same login port, please shut it down first or change ports for this one.");
+		ErrorMessage("There's an another instance of the OTServ running with the same login port, please shut it down first or change ports for this one."
+			"\nIf you want to run multiple servers, disable login ports for all but one of them.");
 #endif
 
 #if defined(PKGDATADIR) && !defined(__WINDOWS__) // I dont care enough to port this to win32, prolly not needed
@@ -654,48 +654,116 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	g_game.setGameState(GAME_STATE_INIT);
 
-	// Tie ports and register services
+	// Load world
+	std::cout << ":: World ";
+	DBResult* world_result;
+	std::string world_id;
+	{
+		std::ostringstream id;
+		id << g_config.getNumber(ConfigManager::WORLD_ID);
+		world_id = id.str();
+	}
+	if(!(world_result = db->storeQuery("SELECT `name`, `port` FROM `worlds` WHERE `id` = '" + world_id + "'"))){
+		ErrorMessage("Cannot load world with world id " + world_id + ".");
+		exit(-1);
+	}
+	std::string world_name = world_result->getDataString("name");
+	int game_port = world_result->getDataInt("port");
 
-	// Tibia protocols
-	service_manager->add<ProtocolGame>(g_config.getNumber(ConfigManager::GAME_PORT));
-	service_manager->add<ProtocolLogin>(g_config.getNumber(ConfigManager::LOGIN_PORT));
+	db->freeResult(world_result);
+	if(world_name == "" || game_port == 0){
+		ErrorMessage("The specified world was not found in the database.");
+		exit(-1);
+	}
+	std::cout << world_name << std::endl;
+	
 
-	// OT protocols
-	service_manager->add<ProtocolAdmin>(g_config.getNumber(ConfigManager::ADMIN_PORT));
-	service_manager->add<ProtocolStatus>(g_config.getNumber(ConfigManager::STATUS_PORT));
+	// Load IP Address(es)
+	// Primary IP is the "best" IP we can find (first global, then net adapter, then localhost)
+	IPAddressList ipList;
+	std::string globalIPstr;
 
-	// Legacy protocols (they need to listen on login port as all old server only used one port
-	// which was the login port.)
-	service_manager->add<ProtocolOldLogin>(g_config.getNumber(ConfigManager::LOGIN_PORT));
-	service_manager->add<ProtocolOldGame>(g_config.getNumber(ConfigManager::LOGIN_PORT));
+	if (g_config.getString(ConfigManager::IP) == "auto"){
+		std::vector<std::pair<std::string, std::string> > servers;
+		servers.push_back(std::make_pair("http://remeresmapeditor.com/echo_ip.php", "remeresmapeditor.com"));
+		servers.push_back(std::make_pair("http://classictibia.com/echo_ip.php", "classictibia.com"));
+		std::random_shuffle(servers.begin(), servers.end());
 
+		std::vector<std::pair<std::string, std::string> >::const_iterator server;
+		for (server = servers.begin(); server != servers.end(); ++server)
+		{
+			std::cout << ":: Fetching global IP (server " << server->second << ")";
+			HTTP::Request request;
 
-	// Print ports/ip addresses that we listen too
+			if( 200 ==
+				request.
+				url(server->first, server->second).
+				method(HTTP::GET).
+				fetch().
+				responseCode())
+			{
+				std::cout << " [done]" << std::endl;
+				globalIPstr = request.responseData();
+				break;
+			}
+			std::cout << " [failed, " << request.responseCode() << "]" << std::endl;
+		}
+	
+		if (server == servers.end())
+			std::cout << ":: No server replied, using local IP" << std::endl;
+	}
+	else{
+		globalIPstr = g_config.getString(ConfigManager::IP);
+	}
 
-	std::pair<uint32_t, uint32_t> IpNetMask;
-	IpNetMask.first  = inet_addr("127.0.0.1");
-	IpNetMask.second = 0xFFFFFFFF;
-	serverIPs.push_back(IpNetMask);
+	IPAddress globalIP;
+	if (globalIPstr != ""){
+		std::cout << ":: Global IP address:     ";
+
+		uint32_t resolvedIp = inet_addr(globalIPstr.c_str());
+		if(resolvedIp == INADDR_NONE){
+			struct hostent* he = gethostbyname(globalIPstr.c_str());
+			if(he != 0){
+				resolvedIp = *(uint32_t*)he->h_addr;
+			}
+			else{
+				std::string error_msg = "Can't resolve: " + globalIPstr;
+				ErrorMessage(error_msg.c_str());
+				exit(-1);
+			}
+		}
+
+		globalIP = boost::asio::ip::address_v4(swap_uint32(resolvedIp));
+		ipList.push_back(globalIP);
+		std::cout << globalIP.to_string() << std::endl << "::" << std::endl;
+	}
+
+	// Print ports/ip addresses that we listen to
+	bool useLocal = g_config.getNumber(ConfigManager::USE_LOCAL_IP) != 0;
+	bool ownsGlobal = false;
+
+	ipList.push_back(boost::asio::ip::address_v4(INADDR_LOOPBACK));
 
 	char szHostName[128];
 	if(gethostname(szHostName, 128) == 0){
-		std::cout << "::" << std::endl << ":: Running on host " << szHostName << std::endl;
-
 		hostent *he = gethostbyname(szHostName);
 
 		if(he){
-			std::cout << ":: Local IP address(es):  ";
+			if (useLocal)
+				std::cout << ":: Local IP address(es):  ";
 			unsigned char** addr = (unsigned char**)he->h_addr_list;
 
 			while (addr[0] != NULL){
-				std::cout << (unsigned int)(addr[0][0]) << "."
-				<< (unsigned int)(addr[0][1]) << "."
-				<< (unsigned int)(addr[0][2]) << "."
-				<< (unsigned int)(addr[0][3]) << "  ";
+				if (useLocal)
+					std::cout
+						<< (unsigned int)(addr[0][0]) << "."
+						<< (unsigned int)(addr[0][1]) << "."
+						<< (unsigned int)(addr[0][2]) << "."
+						<< (unsigned int)(addr[0][3]) << "  ";
 
-				IpNetMask.first  = *(uint32_t*)(*addr);
-				IpNetMask.second = 0x0000FFFF;
-				serverIPs.push_back(IpNetMask);
+				ipList.push_back(boost::asio::ip::address_v4(*(uint32_t*)(*addr)));
+				if (ipList.back() == globalIP)
+					ownsGlobal = true;
 
 				addr++;
 			}
@@ -704,7 +772,41 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		}
 	}
 
-	std::cout << ":: Local ports:           ";
+	// Update database with our new primary IP
+	std::ostringstream ipQuery;
+	ipQuery << "UPDATE `worlds` SET `ip` = " << swap_uint32(globalIP.to_v4().to_ulong()) << " WHERE `id` = " << world_id;
+	db->executeQuery(ipQuery.str());
+
+	// We can't bind to this address if we don't own it, just bind to any then
+	if (globalIPstr != ""){
+		if (ownsGlobal){
+			// No problem! Bind to what everything we can
+		}
+		else{
+			// We don't own our global address, listen to anything
+			ipList.clear();
+			ipList.push_back(boost::asio::ip::address_v4(INADDR_ANY));
+		}
+	}
+
+	// Tie ports and register services
+
+	// Tibia protocols
+	service_manager->add<ProtocolGame>(game_port, ipList);
+	service_manager->add<ProtocolLogin>(g_config.getNumber(ConfigManager::LOGIN_PORT), ipList);
+
+	// OT protocols
+	service_manager->add<ProtocolAdmin>(g_config.getNumber(ConfigManager::ADMIN_PORT), ipList);
+	service_manager->add<ProtocolStatus>(g_config.getNumber(ConfigManager::STATUS_PORT), ipList);
+
+	// Legacy protocols (they need to listen on login port as all old server only used one port
+	// which was the login port.)
+	service_manager->add<ProtocolOldLogin>(g_config.getNumber(ConfigManager::LOGIN_PORT), ipList);
+	service_manager->add<ProtocolOldGame>(g_config.getNumber(ConfigManager::LOGIN_PORT), ipList);
+
+
+	// Print some more info
+	std::cout << ":: Bound ports:           ";
 	std::list<uint16_t> ports = service_manager->get_ports();
 	while(ports.size()){
 		std::cout << ports.front() << "\t";
@@ -712,28 +814,8 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::cout << std::endl;
 
-	std::cout << ":: Global IP address:     ";
-	std::string ip = g_config.getString(ConfigManager::IP);
-
-	uint32_t resolvedIp = inet_addr(ip.c_str());
-	if(resolvedIp == INADDR_NONE){
-		struct hostent* he = gethostbyname(ip.c_str());
-		if(he != 0){
-			resolvedIp = *(uint32_t*)he->h_addr;
-		}
-		else{
-			std::string error_msg = "Can't resolve: " + ip;
-			ErrorMessage(error_msg.c_str());
-			exit(-1);
-		}
-	}
-
-	std::cout << convertIPToString(resolvedIp) << std::endl << "::" << std::endl;
-
-	IpNetMask.first  = resolvedIp;
-	IpNetMask.second = 0;
-	serverIPs.push_back(IpNetMask);
-	std::cout << ":: Starting Server... ";
+	//
+	std::cout << ":: Starting Server " << world_name << "... ";
 
 	Status* status = Status::instance();
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));

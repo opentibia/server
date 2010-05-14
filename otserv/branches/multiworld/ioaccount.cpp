@@ -57,13 +57,23 @@ Account IOAccount::loadAccount(const std::string& name, bool preLoad/* = false*/
 		return acc;
 
 	query.str("");
-	query << "SELECT `name` FROM `players` WHERE `account_id` = " << acc.number;
+	query << "SELECT " <<
+			"`players`.`name` AS `name`, `worlds`.`name` AS `world`, " <<
+			"`worlds`.`port` AS `port`, `worlds`.`ip` AS `ip` " <<
+		"FROM `players` " <<
+		"LEFT JOIN `worlds` ON `worlds`.`id` = `players`.`world_id` " <<
+		"WHERE `account_id` = " << acc.number;
 	if(!(result = db->storeQuery(query.str()))){
 		return acc;
 	}
 
 	do {
-		acc.charList.push_back(result->getDataString("name"));
+		AccountCharacter c;
+		c.name = result->getDataString("name");
+		c.world = result->getDataString("world");
+		c.port = (uint16_t)result->getDataInt("port");
+		c.ip = (uint32_t)result->getDataLong("ip");
+		acc.charList.push_back(c);
 	} while(result->next());
 
 	acc.charList.sort();
@@ -86,7 +96,9 @@ bool IOAccount::getPassword(const std::string& accountname, const std::string &n
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`name` = " << db->escapeString(accountname) << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` " <<
+		"WHERE `accounts`.`name` = " << db->escapeString(accountname) << 
+		" AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
 	if((result = db->storeQuery(query.str()))){
 		password = result->getDataString("password");
 		db->freeResult(result);

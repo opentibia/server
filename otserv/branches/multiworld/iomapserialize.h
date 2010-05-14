@@ -80,7 +80,7 @@ protected:
 	bool loadMapRelational(Map* map);
 	bool saveMapRelational(Map* map);
 	
-	bool saveItems(Database* db, uint32_t tileId, uint32_t houseId, const Tile* tile);
+	bool saveItems(Database* db, uint32_t houseId, const Tile* tile);
 	bool loadItems(Database* db, DBResult* result, Cylinder* parent, bool depotTransfer = false);
 
 	// Binary storage uses a giant BLOB field for storing everything

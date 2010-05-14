@@ -26,7 +26,7 @@
 #define OTSERV_VERSION "0.6.3_SVN"
 #define OTSERV_NAME "OTServ"
 #define OTSERV_CLIENT_VERSION "8.50"
-#define CURRENT_SCHEMA_VERSION 19
+#define CURRENT_SCHEMA_VERSION 20
 
 #if defined __MINGW32__
 	#define XML_GCC_FREE
@@ -137,7 +137,14 @@ enum passwordType_t{
 #endif
 
 #ifndef EWOULDBLOCK
-	#define EWOULDBLOCK WSAEWOULDBLOCK
+#	ifdef _MSC_VER
+#		include <errno.h>
+#		ifndef EWOULDBLOCK
+#			define EWOULDBLOCK WSAEWOULDBLOCK
+#		endif
+#	else
+#		define EWOULDBLOCK WSAEWOULDBLOCK
+#	endif
 #endif
 
 #ifdef _WIN32_WINNT

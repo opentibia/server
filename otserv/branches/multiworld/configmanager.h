@@ -47,12 +47,12 @@ public:
 		MAP_KIND,
 		LOGIN_MSG,
 		SERVER_NAME,
-		WORLD_NAME,
 		OWNER_NAME,
 		OWNER_EMAIL,
 		URL,
 		LOCATION,
 		IP,
+		USE_LOCAL_IP,
 		MOTD,
 		PASSWORD_TYPE_STR,
 		PASSWORD_SALT,
@@ -68,7 +68,7 @@ public:
 
 	enum integer_config_t {
 		LOGIN_TRIES = 0,
-		GAME_PORT,
+		WORLD_ID,
 		ADMIN_PORT,
 		LOGIN_PORT,
 		STATUS_PORT,

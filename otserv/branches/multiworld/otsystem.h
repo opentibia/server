@@ -28,8 +28,6 @@
 #include <vector>
 #include <algorithm>
 
-typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
-
 #ifdef __WINDOWS__
 #ifdef __WIN_LOW_FRAG_HEAP__
 #define _WIN32_WINNT 0x0501

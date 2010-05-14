@@ -51,12 +51,12 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
 		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
-		`skull_type`, `guildnick`, `loss_experience`, `loss_mana`, `loss_skills`, \
-		`loss_items`, `loss_containers`, `rank_id`, `town_id`, `balance`, `stamina` \
+		`skull_type`, `loss_experience`, `loss_mana`, `loss_skills`, \
+		`loss_items`, `loss_containers`, `town_id`, `balance`, `stamina` \
 		FROM `players` \
 		LEFT JOIN `accounts` ON `account_id` = `accounts`.`id`\
 		LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` \
-		WHERE `players`.`name` = " + db->escapeString(name);
+		WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `players`.`name` = " + db->escapeString(name);
 
 	if(!(result = db->storeQuery(query.str()))){
 		return false;
@@ -205,7 +205,10 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	db->freeResult(result);
 
 	if(rankid){
-		query << "SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, `guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` FROM `guild_ranks`, `guilds` WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds`.`id`";
+		query << 
+			"SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, " <<
+			"`guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` FROM `guild_ranks`, " <<
+			"`guilds` WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds`.`id`";
 		if((result = db->storeQuery(query.str()))){
 			player->guildName = result->getDataString("guildname");
 			player->guildLevel = result->getDataInt("level");
@@ -876,7 +879,7 @@ bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `name` FROM `players` WHERE `id` = " << guid;
+	query << "SELECT `name` FROM `players` WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `id` = " << guid;
 
 	if(!(result = db->storeQuery(query.str())))
 		return false;
@@ -900,7 +903,11 @@ bool IOPlayer::getGuidByName(uint32_t &guid, std::string& name)
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery("SELECT `name`, `id` FROM `players` WHERE `name` = " + db->escapeString(name))))
+	query << 
+		"SELECT `name`, `id` "
+		"FROM `players` "
+		"WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `name` = " << db->escapeString(name);
+	if(!(result = db->storeQuery(query.str())))
 		return false;
 
 	name = result->getDataString("name");
@@ -917,7 +924,11 @@ bool IOPlayer::getAccountByName(uint32_t& account, std::string& name)
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery("SELECT `account_id` FROM `players` WHERE `name` = " + db->escapeString(name))))
+	query << 
+		"SELECT `account_id` "
+		"FROM `players` "
+		"WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `name` = " << db->escapeString(name);
+	if(!(result = db->storeQuery(query.str())))
 		return false;
 
 	account = result->getDataInt("account_id");
@@ -930,7 +941,8 @@ bool IOPlayer::getAccountByName(std::string& account, std::string& name)
 {
 	Database* db = Database::instance();
 	DBQuery query;
-	query << "SELECT `a`.`name` FROM `players` p LEFT JOIN `accounts` a ON `p`.`account_id` = `a`.`id` WHERE `p`.`name` = " << db->escapeString(name);
+	query << "SELECT `a`.`name` FROM `players` p LEFT JOIN `accounts` a ON `p`.`account_id` = `a`.`id` "
+		"WHERE `p`.`world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `p`.`name` = " << db->escapeString(name);
 
 	DBResult* result;
 	if(!(result = db->storeQuery(query.str())))
@@ -948,10 +960,11 @@ bool IOPlayer::getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& na
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery(
-		"SELECT `players`.`name`, `players`.`id`, `groups`.`flags` AS `flags` \
-		FROM `players` LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` \
-		WHERE `players`.`name`= " + db->escapeString(name))))
+	query <<
+		"SELECT `players`.`name`, `players`.`id`, `groups`.`flags` AS `flags` "
+		"FROM `players` LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` "
+		"WHERE `players`.`world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `players`.`name`= " << db->escapeString(name);
+	if(!(result = db->storeQuery(query.str())))
 		return false;
 
 	name = result->getDataString("name");
@@ -968,7 +981,11 @@ bool IOPlayer::getDefaultTown(std::string& name, uint32_t& depotId)
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery("SELECT `town_id` FROM `players` WHERE `name`= " + db->escapeString(name))))
+	query << 
+		"SELECT `town_id` "
+		"FROM `players` "
+		"WHERE `players`.`world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `name`= " << db->escapeString(name);
+	if(!(result = db->storeQuery(query.str())))
 		return false;
 
 	depotId = result->getDataInt("town_id");
@@ -982,7 +999,12 @@ bool IOPlayer::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery("SELECT `id` FROM `guilds` WHERE `name` = " + db->escapeString(guildName))))
+	query <<
+		"SELECT `guilds`.`id` "
+		"FROM `guilds` "
+		"LEFT JOIN `players` ON `players`.`id` = `guilds`.`ownerid` "
+		"WHERE `players`.`world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `guilds`.`name` = " << db->escapeString(guildName);
+	if(!(result = db->storeQuery(query.str())))
 		return false;
 
 	guildId = result->getDataInt("id");
@@ -996,11 +1018,36 @@ bool IOPlayer::playerExists(std::string name)
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery("SELECT `id` FROM `players` WHERE `name`= " + db->escapeString(name))))
+	query <<
+		"SELECT `id` "
+		"FROM `players` "
+		"WHERE `players`.`world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `name`= " << db->escapeString(name);
+	if(!(result = db->storeQuery(query.str())))
 		return false;
 
 	db->freeResult(result);
 	return true;
+}
+
+bool IOPlayer::isPlayerOnlineByAccount(uint32_t acc)
+{
+	Database* db = Database::instance();
+	DBResult* result;
+	DBQuery query;
+
+	query <<
+		"SELECT COUNT(*) AS `co` "
+		"FROM `players` "
+		"WHERE `players`.`online` = 1 AND `players`.`account_id` = " << acc;
+	if(!(result = db->storeQuery(query.str())))
+		return false;
+
+	db->freeResult(result);
+
+	if(result->getDataInt("co") > 0)
+		return true;
+
+	return false;
 }
 
 void IOPlayer::loadItems(ItemMap& itemMap, DBResult* result)
@@ -1035,7 +1082,11 @@ bool IOPlayer::hasFlag(PlayerFlags flag, uint32_t guid)
 	DBResult* result;
 
 	DBQuery query;
-	query << "SELECT `groups`.`flags` AS `flags` FROM `players` LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` WHERE `players`.`id` = " << guid;
+	query << 
+		"SELECT `groups`.`flags` AS `flags` "
+		"FROM `players` "
+		"LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` "
+		"WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `players`.`id` = " << guid;
 	if(!(result = db->storeQuery(query.str())))
 		return false;
 
@@ -1050,7 +1101,10 @@ bool IOPlayer::getLastIP(uint32_t& ip, uint32_t guid)
 	DBResult* result;
 
 	DBQuery query;
-	query << "SELECT `lastip` FROM `players` WHERE `id` = " << guid << ";";
+	query << 
+		"SELECT `lastip` "
+		"FROM `players` "
+		"WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `id` = " << guid << ";";
 	if(!(result = db->storeQuery(query.str())))
 		return false;
 
@@ -1087,6 +1141,8 @@ void IOPlayer::updateLogoutInfo(Player* player)
 bool IOPlayer::cleanOnlineInfo()
 {
 	Database* db = Database::instance();
-	DBQuery query;
-	return db->executeQuery("UPDATE `players` SET `online` = 0");
+	DBQuery lock;
+	std::ostringstream query;
+	query << "UPDATE `players` SET `online` = 0 WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
+	return db->executeQuery(query.str());
 }

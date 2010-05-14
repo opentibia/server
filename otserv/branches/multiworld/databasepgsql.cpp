@@ -217,6 +217,14 @@ int32_t PgSQLResult::getDataInt(const std::string &s)
 	return atoi( PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) ) );
 }
 
+int32_t PgSQLResult::getDataInt(const std::string &s)
+{
+	std::istringstream os(PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) ) );
+	uint32_t res;
+	os >> res;
+	return res;
+}
+
 int64_t PgSQLResult::getDataLong(const std::string &s)
 {
 	return ATOI64( PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) ) );

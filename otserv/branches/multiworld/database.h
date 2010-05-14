@@ -196,6 +196,11 @@ public:
 	*\param s The name of the field
 	*/
 	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s) { return 0; }
+	/** Get the Unsigned Integer value of a field in database
+	*\return The Integer value of the selected field and row
+	*\param s The name of the field
+	*/
+	DATABASE_VIRTUAL uint32_t getDataUInt(const std::string &s) { return 0; }
 	/** Get the Long value of a field in database
 	*\return The Long value of the selected field and row
 	*\param s The name of the field

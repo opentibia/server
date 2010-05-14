@@ -63,6 +63,7 @@ class PgSQLResult : public _DBResult
 
 public:
 	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);
+	DATABASE_VIRTUAL uint32_t getDataUInt(const std::string &s);
 	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s);
 	DATABASE_VIRTUAL std::string getDataString(const std::string &s);
 	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size);

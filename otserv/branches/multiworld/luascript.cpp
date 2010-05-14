@@ -117,15 +117,21 @@ bool ScriptEnviroment::saveGameState()
 	Database* db = Database::instance();
 	DBQuery query;
 
-	if(!db->executeQuery("DELETE FROM `global_storage`")){
+	std::string world_id;
+	{
+		std::ostringstream os;
+		os << g_config.getNumber(ConfigManager::WORLD_ID);
+		world_id = os.str();
+	}
+	if(!db->executeQuery("DELETE FROM `global_storage` WHERE `world_id` = " + world_id)){
 		return false;
 	}
 
 	DBInsert stmt(db);
-	stmt.setQuery("INSERT INTO `global_storage` (`key`, `value`) VALUES ");
+	stmt.setQuery("INSERT INTO `global_storage` (`world_id`, `key`, `value`) VALUES ");
 
 	for(StorageMap::const_iterator it = m_globalStorageMap.begin(); it != m_globalStorageMap.end(); ++it){
-		query << it->first << ", " << it->second;
+		query << world_id << ", " << it->first << ", " << it->second;
 
 		if(!stmt.addRow(query)){
 			return false;
@@ -145,7 +151,13 @@ bool ScriptEnviroment::loadGameState()
 	DBResult* result;
 	DBQuery query;
 
-	if(!(result = db->storeQuery("SELECT COUNT(*) AS `count` FROM `global_storage`"))){
+	std::string world_id;
+	{
+		std::ostringstream os;
+		os << g_config.getNumber(ConfigManager::WORLD_ID);
+		world_id = os.str();
+	}
+	if(!(result = db->storeQuery("SELECT COUNT(*) AS `count` FROM `global_storage` WHERE `world_id` = " + world_id))){
 		return false;
 	}
 
@@ -155,7 +167,7 @@ bool ScriptEnviroment::loadGameState()
 		return true;
 	}
 
-	if(!(result = db->storeQuery("SELECT * FROM `global_storage`"))){
+	if(!(result = db->storeQuery("SELECT * FROM `global_storage` WHERE `world_id` = " + world_id))){
 		return false;
 	}
 

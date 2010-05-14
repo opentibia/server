@@ -294,6 +294,23 @@ int32_t ODBCResult::getDataInt(const std::string &s)
 	return 0; // Failed
 }
 
+uint32_t ODBCResult::getDataUInt(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() ){
+		uint32_t value;
+		SQLRETURN ret = SQLGetData(m_handle, it->second, SQL_C_ULONG, &value, 0, NULL);
+
+		if( RETURN_SUCCESS(ret) )
+			return value;
+		else
+			std::cout << "Error during getDataInt(" << s << ")." << std::endl;
+	}
+
+	std::cout << "Error during getDataInt(" << s << ")." << std::endl;
+	return 0; // Failed
+}
+
 int64_t ODBCResult::getDataLong(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);

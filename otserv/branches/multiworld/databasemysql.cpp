@@ -264,6 +264,25 @@ int32_t MySQLResult::getDataInt(const std::string &s)
 	return 0; // Failed
 }
 
+uint32_t MySQLResult::getDataUInt(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() ){
+		if(m_row[it->second] == NULL){
+			return 0;
+		}
+		else{
+			std::istringstream os(m_row[it->second]);
+			uint32_t res;
+			os >> res;
+			return res;
+		}
+	}
+
+	std::cout << "Error during getDataInt(" << s << ")." << std::endl;
+	return 0; // Failed
+}
+
 int64_t MySQLResult::getDataLong(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);

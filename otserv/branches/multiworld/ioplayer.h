@@ -66,6 +66,7 @@ public:
 
 	bool getGuidByName(uint32_t& guid, std::string& name);
 	bool getAccountByName(uint32_t& acc, std::string& name);
+	bool getWorldByName(uint32_t& world_id, std::string& name);
 	bool getAccountByName(std::string& acc, std::string& name);
 	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
 	bool getDefaultTown(std::string& name, uint32_t& townId);
@@ -76,6 +77,7 @@ public:
 	bool hasFlag(PlayerFlags flag, uint32_t guid);
 	void updateLoginInfo(Player* player);
 	void updateLogoutInfo(Player* player);
+	bool isPlayerOnlineByAccount(uint32_t acc);
 	bool cleanOnlineInfo();
 
 protected:

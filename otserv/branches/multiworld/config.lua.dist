@@ -25,8 +25,12 @@ servername = "OTServ"
 -- server location
 location = "Germany"
 
--- server ip (the ip that server listens on)
-ip = "127.0.0.1"
+-- Bind to all available local IP addresses
+-- If you are behind a router, this setting has no effect
+use_local_ip = false
+-- server ip (the ip that this server on)
+-- Can be "auto" to fetch the global ip automatically
+ip = "auto"
 
 -- login server port
 -- This should be the port used for connecting with IP changers etc.
@@ -34,7 +38,8 @@ login_port = "7171"
 
 -- game server port
 -- game server must be on it's own port (due to limits of the protocol)
-game_port = "7172"
+-- Configured in database, turn on this option to override database setting
+game_port = 7172
 
 -- status port
 -- Used by status protocol connections, should be same as login
@@ -53,9 +58,6 @@ ownername = "Tliff"
 
 -- server owner email
 owneremail = "otserv@tibia.de"
-
--- world name
-worldname = "OpenTibia"
 
 -- world type
 -- options: pvp, no-pvp, pvp-enforced

@@ -170,7 +170,7 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 		}
 
 		if(g_config.getNumber(ConfigManager::CHECK_ACCOUNTS) && !player->hasFlag(PlayerFlag_CanAlwaysLogin)
-			&& g_game.getPlayerByAccount(player->getAccountId())){
+			&& (g_game.getPlayerByAccount(player->getAccountId()) != NULL || IOPlayer::instance()->isPlayerOnlineByAccount(player->getAccountId()))){
 			disconnectClient(0x14, "You may only login with one character per account.");
 			return false;
 		}
@@ -199,7 +199,7 @@ bool ProtocolGame::login(const std::string& name, bool isSetGM)
 #ifdef __DEBUG__
 			std::cout << "ProtocolGame::login - loadPlayer failed - " << name << std::endl;
 #endif
-			disconnectClient(0x14, "Your character could not be loaded.");
+			disconnectClient(0x14, "Your character does not belong to this world.");
 			return false;
 		}
 
@@ -343,7 +343,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 		return false;
 	}
 
-	if(g_bans.isIpDisabled(getIP())){
+	if(g_bans.isIpDisabled(getIP()) && false){
 		disconnectClient(0x14, "Too many connections attempts from this IP. Try again later.");
 		return false;
 	}
