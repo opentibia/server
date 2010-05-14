@@ -684,20 +684,18 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::string globalIPstr;
 
 	if (g_config.getString(ConfigManager::IP) == "auto"){
-		std::vector<std::pair<std::string, std::string> > servers;
-		servers.push_back(std::make_pair("http://remeresmapeditor.com/echo_ip.php", "remeresmapeditor.com"));
-		servers.push_back(std::make_pair("http://classictibia.com/echo_ip.php", "classictibia.com"));
+		std::vector<std::string> servers = g_config.getIPServerList();
 		std::random_shuffle(servers.begin(), servers.end());
 
-		std::vector<std::pair<std::string, std::string> >::const_iterator server;
+		std::vector<std::string >::const_iterator server;
 		for (server = servers.begin(); server != servers.end(); ++server)
 		{
-			std::cout << ":: Fetching global IP (server " << server->second << ")";
+			std::cout << ":: Fetching global IP (server " << *server << ")";
 			HTTP::Request request;
 
 			if( 200 ==
 				request.
-				url(server->first, server->second).
+				url(*server).
 				method(HTTP::GET).
 				fetch().
 				responseCode())

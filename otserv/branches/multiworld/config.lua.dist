@@ -278,6 +278,13 @@ house_level = 1
 -- PS: This info is going to be shown just if house has no owner
 show_house_prices = false
 
+-- Server will pick one of these at random to fetch the global IP address
+ip_server_list = {
+	"http://remeresmapeditor.com/echo_ip.php",
+	"http://otfans.net/otserv/ip.php",
+	"http://classictibia.com/echo_ip.php",
+}
+
 -- SQL type
 -- options: mysql, sqlite, odbc or pgsql
 sql_type = "sqlite"

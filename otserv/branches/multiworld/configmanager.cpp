@@ -189,6 +189,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
+	
 	m_isLoaded = true;
 	return true;
 }
@@ -246,6 +247,26 @@ bool ConfigManager::setNumber(uint32_t _what, int64_t _value)
 		std::cout << "Warning: [ConfigManager::setNumber] " << _what << std::endl;
 		return false;
 	}
+}
+
+std::vector<std::string> ConfigManager::getIPServerList()
+{
+	lua_getglobal(L, "ip_server_list");
+
+	if(!lua_istable(L, -1))
+		return std::vector<std::string>();
+
+	std::vector<std::string> servers;
+
+	lua_pushnil(L);
+	while (lua_next(L, -2)){
+		std::string s(lua_tostring(L, -1), lua_strlen(L, -1));
+		servers.push_back(s);
+		lua_pop(L, 1);
+	}
+	lua_pop(L, 1);
+
+	return servers;
 }
 
 bool ConfigManager::setString(uint32_t _what, const std::string& _value)

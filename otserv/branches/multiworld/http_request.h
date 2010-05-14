@@ -42,7 +42,7 @@ namespace HTTP
 	public:
 		Request();
 		
-		Request& url(const std::string& url, const std::string& hostname);
+		Request& url(const std::string& url);
 		Request& method(Method method);
 		Request& header(const std::string& name, const std::string& value);
 		Request& header(const Headers& headers);
@@ -61,7 +61,6 @@ namespace HTTP
 	protected:
 		// Request data
 		std::string requestUrl;
-		std::string requestHostname;
 		std::string requestData;
 		Method requestMethod;
 		Headers requestHeaders;

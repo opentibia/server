@@ -32,10 +32,9 @@ Request::Request() : requestMethod(GET), respCode(0)
 {
 }
 
-Request& Request::url(const std::string& url, const std::string& hostname)
+Request& Request::url(const std::string& url)
 {
 	requestUrl = url;
-	requestHostname = hostname;
 	return *this;
 }
 
@@ -153,7 +152,7 @@ Request& Request::fetch()
 		std::ostringstream request;
 		request <<
 			(requestMethod == GET ? "GET" : "POST") << " " << locator << " HTTP/1.0\r\n" <<
-			"Host: " << requestHostname << ":" << port << "\r\n" <<
+			"Host: " << domain << ":" << port << "\r\n" <<
 			"\r\n"
 		;
 

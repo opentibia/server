@@ -164,6 +164,8 @@ public:
 	bool setNumber(uint32_t _what, int64_t _value);
 	bool setString(uint32_t _what, const std::string& _value);
 
+	std::vector<std::string> getIPServerList();
+
 private:
 	static void moveValue(lua_State* fromL, lua_State* toL);
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
