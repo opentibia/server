@@ -119,12 +119,7 @@ enum passwordType_t{
 		#define HAVE_ERRNO_AS_DEFINE
 	#endif
 
-	#if __GNUC_VERSION__ > 40400 // GCC 4.4.0
-		#include <unordered_map>
-		#include <unordered_set>
-		#define UNORDERED_MAP std::unordered_map
-		#define UNORDERED_SET std::unordered_set
-	#elif __GNUC_VERSION__ > 40300 // GCC 4.3.0
+	#if __GNUC_VERSION__ > 40300 // GCC 4.3.0
 		#ifndef __GXX_EXPERIMENTAL_CXX0X__
 			#include <tr1/unordered_map>
 			#include <tr1/unordered_set>
@@ -135,7 +130,7 @@ enum passwordType_t{
 			#include <unordered_set>
 			#define UNORDERED_MAP std::unordered_map
 			#define UNORDERED_SET std::unordered_set
-		#endif
+		#endif		
 	#elif __GNUC_VERSION__ > 20900 // GCC 2.9.0
 		#include <ext/hash_map>
 		#include <ext/hash_set>
