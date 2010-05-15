@@ -80,17 +80,6 @@ enum passwordType_t{
 	#endif
 #endif
 
-#ifdef __DEBUG_EXCEPTION_REPORT__
-	#define DEBUG_REPORT int *a = NULL; *a = 1;
-#else
-	#ifdef __EXCEPTION_TRACER__
-		#include "exception.h"
-		#define DEBUG_REPORT ExceptionHandler::dumpStack();
-	#else
-		#define DEBUG_REPORT
-	#endif
-#endif
-
 #define xmake_str(str) #str
 #define make_str(str) xmake_str(str)
 
@@ -161,13 +150,13 @@ enum passwordType_t{
 			#define UNORDERED_SET boost::unordered_set
 		#endif
 	#endif
-	
+
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
 		#include <cstdint>
 	#else
 		#include <stdint.h>
 	#endif
-	
+
 	#include <cassert>
 	#include <cstring>
 	#define strcasecmp strcmp
@@ -267,6 +256,17 @@ enum passwordType_t{
 //Windows Vista	0x0600
 //Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
+
+#ifdef __DEBUG_EXCEPTION_REPORT__
+	#define DEBUG_REPORT int *a = NULL; *a = 1;
+#else
+	#ifdef __EXCEPTION_TRACER__
+		#include "exception.h"
+		#define DEBUG_REPORT ExceptionHandler::dumpStack();
+	#else
+		#define DEBUG_REPORT
+	#endif
+#endif
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)
