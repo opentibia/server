@@ -4534,10 +4534,6 @@ bool Player::hasLearnedInstantSpell(const std::string& name) const
 
 bool Player::withdrawMoney(uint32_t amount)
 {
-	if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE)){
-		return false;
-	}
-
 	if(balance < amount){
 		return false;
 	}
@@ -4551,10 +4547,6 @@ bool Player::withdrawMoney(uint32_t amount)
 
 bool Player::depositMoney(uint32_t amount)
 {
-	if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE)){
-		return false;
-	}
-
 	bool ret = g_game.removeMoney(this, amount);
 	if(ret){
 		balance += amount;
@@ -4565,10 +4557,6 @@ bool Player::depositMoney(uint32_t amount)
 
 bool Player::transferMoneyTo(const std::string& name, uint32_t amount)
 {
-	if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE)){
-		return false;
-	}
-
 	Player* target = g_game.getPlayerByNameEx(name);
 	if(!target){
 		return false;

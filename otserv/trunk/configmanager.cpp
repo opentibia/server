@@ -149,7 +149,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[MAX_MESSAGEBUFFER] = getGlobalNumber(L, "maxmessagebuffer", 4);
 	m_confInteger[SAVE_CLIENT_DEBUG_ASSERTIONS] = getGlobalBoolean(L, "saveclientdebug", true);
 	m_confInteger[CHECK_ACCOUNTS] = getGlobalBoolean(L, "checkaccounts", true);
-	m_confInteger[USE_ACCBALANCE] = getGlobalBoolean(L, "useaccbalance", true);
+	m_confInteger[USE_BALANCE_HOUSE_PAYING] = getGlobalBoolean(L, "use_balance_house_paying", true);
 	m_confInteger[PREMIUM_ONLY_BEDS] = getGlobalBoolean(L, "premonlybeds", true);
 	m_confInteger[UNJUST_SKULL_DURATION] = getGlobalNumber(L, "unjust_skull_duration", 15*60*1000);
 	m_confInteger[KILLS_PER_DAY_RED_SKULL] = getGlobalNumber(L, "kills_per_day_red_skull", 3);

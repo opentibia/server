@@ -31,11 +31,7 @@
 class Account
 {
 public:
-	Account(){
-		number = 0;
-		warnings = 0;
-		premEnd = 0;
-	}
+	Account() : number(0), warnings(0), premEnd(0){}
 	~Account(){}
 
 	static uint16_t getPremiumDaysLeft(int32_t _premEnd)

@@ -111,7 +111,7 @@ houserentperiod = "monthly"
 premonlybeds = true
 
 -- Should the server use account balance system or depot system for paying houses?
-useaccbalance = true
+use_balance_house_paying = true
 
 -- How long time the red skull will last in seconds (default 30 days)
 red_skull_duration = 30*24*60*60

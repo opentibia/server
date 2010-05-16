@@ -121,10 +121,6 @@ void Guilds::endWar(uint32_t warId)
 
 bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee)
 {
-	//Balance system should be enabled
-	if(!g_config.getNumber(ConfigManager::USE_ACCBALANCE))
-		return false;
-
 	//Tries to get first leader that has enough money
 	Database* db = Database::instance();
 	DBResult* result;
