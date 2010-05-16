@@ -96,7 +96,8 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 
 	return false;
 }
-#else
+#endif
+
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
@@ -108,7 +109,6 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 
 	return false;
 }
-#endif
 
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 {
