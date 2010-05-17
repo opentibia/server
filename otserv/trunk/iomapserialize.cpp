@@ -801,7 +801,7 @@ bool IOMapSerialize::processHouseAuctions()
 		Houses::getInstance().payHouse(house, currentTime);
 		
 		query.str("");
-		query << "DELETE * FROM `house_auctions` WHERE `house_id` =" << houseid;
+		query << "DELETE FROM `house_auctions` WHERE `house_id` =" << houseid;
 		db->executeQuery(query.str());
 		
 	}while(result_set->next());
