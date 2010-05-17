@@ -154,8 +154,6 @@ enum passwordType_t{
 
 	#include <cassert>
 	#include <cstring>
-	#define strcasecmp strcmp
-	#define strncasecmp strncmp
 
 	#define ATOI64 atoll
 
