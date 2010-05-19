@@ -1450,6 +1450,9 @@ void Npc::onThink(uint32_t interval)
 		m_npcEventHandler->onThink();
 	}
 
+	if (getTimeSinceLastMove() >= walkTicks)
+		addEventWalk();
+
 	isIdle = true;
 	hasUsedIdleReply = false;
 
