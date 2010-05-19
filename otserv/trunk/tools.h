@@ -79,10 +79,7 @@ void toUpperCaseString(std::string& source);
 std::string asLowerCaseString(const std::string& source);
 std::string asUpperCaseString(const std::string& source);
 bool utf8ToLatin1(char* intext, std::string& outtext);
-bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
-#if defined __WINDOWS__ && !defined __GNUC__
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value);
-#endif
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);

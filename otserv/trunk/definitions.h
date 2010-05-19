@@ -181,10 +181,8 @@ enum passwordType_t{
 	#ifdef NDEBUG
 		#define _SECURE_SCL 0
 		#define HAS_ITERATOR_DEBUGGING 0
-	#endif
-
-	#ifdef _DEBUG
-		#define __DEBUG__
+	#elif  _DEBUG
+		//#define __DEBUG__
 	#endif
 
 	#ifndef NOMINMAX
@@ -212,12 +210,13 @@ enum passwordType_t{
 	}
 
 	#if VISUALC_VERSION >= 10
-		#include <cstdint>
+		#include <stdint.h>
 	#else
 		typedef unsigned long long uint64_t;
 		typedef signed long long int64_t;
-		typedef unsigned long uint32_t;
-		typedef signed long int32_t;
+		// Int is 4 bytes on all x86 and x86-64 platforms
+		typedef unsigned int uint32_t;
+		typedef signed int int32_t;
 		typedef unsigned short uint16_t;
 		typedef signed short int16_t;
 		typedef unsigned char uint8_t;
@@ -231,7 +230,6 @@ enum passwordType_t{
 	#pragma warning(disable:4244) //'argument' : conversion from 'type1' to 'type2', possible loss of data
 	#pragma warning(disable:4267) //'var' : conversion from 'size_t' to 'type', possible loss of data
 	#pragma warning(disable:4996) //"_ftime64" : this function or variable may be unsafe
-
 #endif
 
 #ifdef XML_GCC_FREE

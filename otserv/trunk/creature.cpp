@@ -334,6 +334,9 @@ void Creature::addEventWalk(bool firstStep)
 	//static int64_t last_time = OTSYS_TIME();
 	cancelNextWalk = false;
 
+	if (getSpeed() <= 0)
+		return;
+
 	if(eventWalk == 0){
 		//std::cout << "addEventWalk() - " << getName() << std::endl;
 		int64_t ticks = getEventStepTicks(firstStep);
