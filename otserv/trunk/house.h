@@ -142,7 +142,7 @@ public:
 		HOUSE_SYNC_GUILDHALL	= 1 << 3
 	};
 
-	House(uint32_t _houseid);
+	House(uint32_t _id);
 	~House();
 
 	void addTile(HouseTile* tile);
@@ -162,11 +162,11 @@ public:
 	void setEntryPos(const Position& pos) {posEntry = pos;}
 	const Position& getEntryPosition() const {return posEntry;}
 
-	void setName(const std::string& _houseName) {houseName = _houseName;}
-	const std::string& getName() const {return houseName;}
+	void setName(const std::string& _name) {name = _name;}
+	const std::string& getName() const {return name;}
 
-	void setHouseOwner(uint32_t guid);
-	uint32_t getHouseOwner() const {return houseOwner;}
+	void setOwner(uint32_t guid);
+	uint32_t getOwner() const {return owner;}
 
 	void setPaidUntil(time_t paid){paidUntil = paid;}
 	time_t getPaidUntil() const {return paidUntil;}
@@ -192,7 +192,7 @@ public:
 	void setPendingDepotTransfer(bool _pendingDepotTransfer) {pendingDepotTransfer = _pendingDepotTransfer;}
 	bool getPendingDepotTransfer() const {return pendingDepotTransfer;}
 
-	uint32_t getHouseId() const {return houseid;}
+	uint32_t getId() const {return id;}
 
 	void addDoor(Door* door);
 	void removeDoor(Door* door);
@@ -220,22 +220,22 @@ public:
 	uint32_t getBedCount() {return (uint32_t)std::ceil((double)getBedTiles() / 2);} //each bed takes 2 sqms of space, ceil is just for bad maps
 
 	// Transfers all items to depot and clicks all players (useful for map updates, for example)
-	void cleanHouse();
+	void clean();
 
 private:
 	void updateDoorDescription();
 	bool transferToDepot();
 
 	bool isLoaded;
-	uint32_t houseid;
-	uint32_t houseOwner;
-	std::string houseOwnerName;
+	uint32_t id;
+	uint32_t owner;
+	std::string ownerName;
 	HouseTileList houseTiles;
 	HouseDoorList doorList;
 	HouseBedItemList bedsList;
 	AccessList guestList;
 	AccessList subOwnerList;
-	std::string houseName;
+	std::string name;
 	Position posEntry;
 	time_t paidUntil;
 	uint32_t rentWarnings;

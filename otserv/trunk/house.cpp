@@ -34,17 +34,17 @@ extern ConfigManager g_config;
 extern Game g_game;
 extern Guilds g_guilds;
 
-House::House(uint32_t _houseid) :
+House::House(uint32_t _id) :
 transfer_container(ITEM_LOCKER1)
 {
 	isLoaded = false;
-	houseName = "OTServ headquarter (Flat 1, Area 42)";
-	houseOwner = 0;
+	name = "OTServ headquarter (Flat 1, Area 42)";
+	owner = 0;
 	posEntry.x = 0;
 	posEntry.y = 0;
 	posEntry.z = 0;
 	paidUntil = 0;
-	houseid = _houseid;
+	id = _id;
 	rentWarnings = 0;
 	lastWarning = 0;
 	rent = 0;
@@ -66,18 +66,18 @@ void House::addTile(HouseTile* tile)
 	houseTiles.push_back(tile);
 }
 
-void House::setHouseOwner(uint32_t guid)
+void House::setOwner(uint32_t guid)
 {
-	if(isLoaded && houseOwner == guid)
+	if(isLoaded && owner == guid)
 		return;
 
 	isLoaded = true;
 
-	if(houseOwner){
-		cleanHouse();
+	if(owner){
+		clean();
 
 		//clean access lists
-		houseOwner = 0;
+		owner = 0;
 		setAccessList(SUBOWNER_LIST, "");
 		setAccessList(GUEST_LIST, "");
 
@@ -92,8 +92,8 @@ void House::setHouseOwner(uint32_t guid)
 
 	std::string name;
 	if(guid != 0 && IOPlayer::instance()->getNameByGuid(guid, name)){
-		houseOwner = guid;
-		houseOwnerName = name;
+		owner = guid;
+		ownerName = name;
 	}
 
 	updateDoorDescription();
@@ -103,10 +103,10 @@ void House::setHouseOwner(uint32_t guid)
 void House::updateDoorDescription()
 {
 	std::stringstream houseDescription;
-	houseDescription << "It belongs to house '" << houseName << "'." << std::endl;
+	houseDescription << "It belongs to house '" << name << "'." << std::endl;
 
-	if(houseOwner != 0){
-		houseDescription << houseOwnerName << " owns this house.";
+	if(owner != 0){
+		houseDescription << ownerName << " owns this house.";
 	}
 	else{
 		houseDescription << "Nobody owns this house.";
@@ -135,7 +135,7 @@ AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
 	if(player->hasFlag(PlayerFlag_CanEditHouses))
 		return HOUSE_OWNER;
 
-	if(player->getGUID() == houseOwner)
+	if(player->getGUID() == owner)
 		return HOUSE_OWNER;
 
 	if(subOwnerList.isInList(player))
@@ -218,7 +218,7 @@ bool House::transferToDepot()
 		return false;
 	}
 
-	Player* player = g_game.getPlayerByGuidEx(houseOwner);
+	Player* player = g_game.getPlayerByGuidEx(owner);
 	if(!player){
 		return false;
 	}
@@ -262,7 +262,7 @@ bool House::transferToDepot()
 	return true;
 }
 
-void House::cleanHouse()
+void House::clean()
 {
 	transferToDepot();
 
@@ -477,7 +477,7 @@ bool House::executeTransfer(HouseTransferItem* item, Player* newOwner)
 		return false;
 	}
 
-	setHouseOwner(newOwner->getGUID());
+	setOwner(newOwner->getGUID());
 	transferItem = NULL;
 	return true;
 }
@@ -794,7 +794,7 @@ House* Houses::getHouseByPlayerId(uint32_t playerId)
 {
 	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
 		House* house = it->second;
-		if(house->getHouseOwner() == playerId){
+		if(house->getOwner() == playerId){
 			return house;
 		}
 	}
@@ -882,7 +882,7 @@ bool Houses::loadHousesXML(std::string filename)
 					house->resetSyncFlag(House::HOUSE_SYNC_GUILDHALL);
 				}
 
-				house->setHouseOwner(0);
+				house->setOwner(0);
 			}
 
 			houseNode = houseNode->next;
@@ -913,7 +913,7 @@ bool Houses::payRent(Player* player, House* house, time_t time /*= 0*/)
 	if(!town){
 		#ifdef __DEBUG_HOUSES__
 		std::cout << "Warning: [Houses::payHouses] town = NULL, townid = " <<
-			house->getTownId() << ", houseid = " << house->getHouseId() << std::endl;
+			house->getTownId() << ", houseid = " << house->getId() << std::endl;
 		#endif
 		return false;
 	}
@@ -964,16 +964,16 @@ bool Houses::payHouse(House* house, time_t time)
 		return true;
 	}
 
-	if(house->getRent() == 0 || house->getPaidUntil() > time || house->getHouseOwner() == 0){
+	if(house->getRent() == 0 || house->getPaidUntil() > time || house->getOwner() == 0){
 		return true;
 	}
 
-	uint32_t ownerid = house->getHouseOwner();
+	uint32_t ownerid = house->getOwner();
 	Town* town = Towns::getInstance().getTown(house->getTownId());
 	if(!town){
 		#ifdef __DEBUG_HOUSES__
 		std::cout << "Warning: [Houses::payHouses] town = NULL, townid = " <<
-			house->getTownId() << ", houseid = " << house->getHouseId() << std::endl;
+			house->getTownId() << ", houseid = " << house->getId() << std::endl;
 		#endif
 		return false;
 	}
@@ -981,7 +981,7 @@ bool Houses::payHouse(House* house, time_t time)
 	std::string name;
 	if(!IOPlayer::instance()->getNameByGuid(ownerid, name)){
 		//player doesnt exist, remove it as house owner?
-		//house->setHouseOwner(0);
+		//house->setOwner(0);
 		return false;
 	}
 
@@ -998,8 +998,8 @@ bool Houses::payHouse(House* house, time_t time)
 
 	if(!hasPaidRent && time >= house->getLastWarning() + 24 * 60 * 60){
 		if(house->getPayRentWarnings() >= 7){
-			house->setHouseOwner(0);
-			// setHouseOwner will load the player,
+			house->setOwner(0);
+			// setOwner will load the player,
 			// transfer house items to his depot and then
 			// will save it, so here should not be saved
 			// again

@@ -461,8 +461,6 @@ protected:
 	CreatureEventList getCreatureEvents(CreatureEventType_t type);
 	void onDieEvent(Item* corpse);
 	void onKillEvent(Creature* target, bool lastHit);
-	virtual void onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel){}
-	virtual bool onLookEvent(Thing* target, uint32_t itemId){ return false; }
 
 	void updateMapCache();
 #ifdef __DEBUG__

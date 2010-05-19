@@ -116,7 +116,7 @@ Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item
 #endif
 					std::cout << "Error: [HouseTile::__queryDestination] House entry not correct"
 						<< " - Name: " << house->getName()
-						<< " - House id: " << house->getHouseId()
+						<< " - House id: " << house->getId()
 						<< " - Tile not found: " << entryPos << std::endl;
 					
 					const Position& templePos = player->getTemplePosition();

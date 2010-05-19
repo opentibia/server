@@ -4207,7 +4207,7 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 		if(houseTile){
 			House* house = houseTile->getHouse();
 			if(house){
-				lua_pushnumber(L, house->getHouseId());
+				lua_pushnumber(L, house->getId());
 			}
 			else{
 				lua_pushnumber(L, LUA_NULL);
@@ -4581,7 +4581,7 @@ int LuaScriptInterface::luaGetHouseOwner(lua_State *L)
 
 	House* house = Houses::getInstance().getHouse(houseid);
 	if(house){
-		uint32_t owner = house->getHouseOwner();
+		uint32_t owner = house->getOwner();
 		lua_pushnumber(L, owner);
 	}
 	else{
@@ -4686,7 +4686,7 @@ int LuaScriptInterface::luaGetHouseByPlayerGUID(lua_State *L)
 
 	House* house = Houses::getInstance().getHouseByPlayerId(guid);
 	if(house){
-		lua_pushnumber(L, house->getHouseId());
+		lua_pushnumber(L, house->getId());
 	}
 	else{
 		lua_pushnil(L);
@@ -4785,7 +4785,7 @@ int LuaScriptInterface::luaSetHouseOwner(lua_State *L)
 
 	House* house = Houses::getInstance().getHouse(houseid);
 	if(house){
-		house->setHouseOwner(owner);
+		house->setOwner(owner);
 		lua_pushnumber(L, LUA_TRUE);
 	}
 	else{
@@ -4811,7 +4811,7 @@ int LuaScriptInterface::luaGetHouseList(lua_State *L)
 		if(townid != 0 && house->getTownId() != townid)
 			continue;
 		lua_pushnumber(L, n);
-		lua_pushnumber(L, house->getHouseId());
+		lua_pushnumber(L, house->getId());
 		lua_settable(L, -3);
 	}
 
@@ -4825,7 +4825,7 @@ int LuaScriptInterface::luaCleanHouse(lua_State *L)
 
 	House* house = Houses::getInstance().getHouse(houseid);
 	if(house){
-		house->cleanHouse();
+		house->clean();
 		lua_pushnumber(L, LUA_TRUE);
 	}
 	else{
