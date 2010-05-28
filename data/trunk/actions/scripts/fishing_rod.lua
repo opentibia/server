@@ -119,6 +119,7 @@ function onUse(cid, item, frompos, item2, topos)
 
 	local formula = (getPlayerSkill(cid, CONST_SKILL_FISHING) / 200) + (0.85 * math.random())
 	local useNail = (item.itemid == ITEM_MECHANICAL_FISHING_ROD)
+	local hasFished = false;
 
 	local canGainSkill = not(getTilePzInfo(getThingPos(cid)) == TRUE or
 		(getPlayerItemCount(cid, ITEM_WORM) < 1 and item.itemid == ITEM_FISHING_ROD) or
@@ -137,6 +138,7 @@ function onUse(cid, item, frompos, item2, topos)
 				doPlayerAddSkillTry(cid, CONST_SKILL_FISHING, 1)
 				doTransformItem(item2.uid, item2.itemid + 9)
 				doDecayItem(item2.uid)
+				hasFished = true;
 			end
 			doPlayerAddSkillTry(cid, CONST_SKILL_FISHING, 1)
 		end
@@ -154,8 +156,11 @@ function onUse(cid, item, frompos, item2, topos)
 					doPlayerAddItem(cid, ITEM_NORTHERN_PIKE)
 				elseif(formula > 0.5) then
 					doPlayerAddItem(cid, ITEM_GREEN_PERCH)
-				else
+				elseif(formula > 0.47) then
 					doPlayerAddItem(cid, ITEM_FISH)
+				end
+				if formula > 0.47 then
+					hasFished = true
 				end
 			end
 			doTransformItem(item2.uid, item2.itemid + 1)
@@ -165,9 +170,9 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	if useNail then
+	if useNail and hasFished then
 		doPlayerRemoveItem(cid, ITEM_NAIL, 1)
-	else
+	elseif hasFished then
 		doPlayerRemoveItem(cid, ITEM_WORM, 1)
 	end
 	doDecayItem(item2.uid)

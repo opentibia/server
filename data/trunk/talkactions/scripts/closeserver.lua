@@ -3,7 +3,7 @@ function onSay(cid, words, param)
 
 	local casterRemoved = false
 	for i, uid in ipairs(getPlayersOnlineList()) do
-		if getPlayerFlagValue(uid, PLAYERFLAG_CANALWAYSLOGIN) == FALSE and getPlayerName(uid) ~= "Leandro" then
+		if getPlayerFlagValue(uid, PLAYERFLAG_CANALWAYSLOGIN) == FALSE then
 			if uid == cid then
 				casterRemoved = true
 			end
