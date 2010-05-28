@@ -181,8 +181,6 @@ enum passwordType_t{
 	#ifdef NDEBUG
 		#define _SECURE_SCL 0
 		#define HAS_ITERATOR_DEBUGGING 0
-	#elif  _DEBUG
-		//#define __DEBUG__
 	#endif
 
 	#ifndef NOMINMAX
