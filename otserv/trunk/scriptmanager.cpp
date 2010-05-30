@@ -41,8 +41,6 @@ CreatureEvents* g_creatureEvents = NULL;
 extern ConfigManager g_config;
 extern void ErrorMessage(const char* message) ;
 
-ScriptingManager* ScriptingManager::_instance = NULL;
-
 ScriptingManager::ScriptingManager()
 {
 	g_weapons = new Weapons();
@@ -58,13 +56,6 @@ ScriptingManager::~ScriptingManager()
 	//
 }
 
-ScriptingManager* ScriptingManager::getInstance()
-{
-	if(_instance == NULL){
-		_instance = new ScriptingManager();
-	}
-	return _instance;
-}
 bool ScriptingManager::loadScriptSystems()
 {
 	std::cout << ":: Loading Script Systems" << std::endl;
@@ -88,12 +79,6 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
-
-	/*
-	std::cout << ":: Loading Fields ...";
-	Items::loadFieldsFromXml(datadir);
-	std::cout << "[done]" << std::endl;
-	*/
 
 	//load actions data
 	std::cout << ":: Loading Actions ...";

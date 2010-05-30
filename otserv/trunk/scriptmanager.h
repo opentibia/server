@@ -25,14 +25,16 @@
 class ScriptingManager
 {
 public:
-	ScriptingManager();
 	~ScriptingManager();
-	static ScriptingManager* getInstance();
-	
+	static ScriptingManager* getInstance(){
+		static ScriptingManager instance;
+		return &instance;
+	}
+
 	bool loadScriptSystems();
 
-private:
-	static ScriptingManager* _instance;
+protected:
+	ScriptingManager();
 };
 
 

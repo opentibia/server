@@ -102,9 +102,9 @@
 	<action itemid="8473" script="liquids/ultimate_health.lua"/>
 	
 	<!-- Make Bread -->
-	<action itemid="2692" script="flour.lua"/>
-	<action itemid="2693" script="dough.lua"/>
-	<action itemid="2694" script="wheat.lua"/>
+	<action itemid="2692" script="make_bread.lua"/>
+	<action itemid="2693" script="make_bread.lua"/>
+	<action itemid="2694" script="make_bread.lua"/>
 
 	<!-- Make Rum -->
 	<action itemid="5467" script="bunch.lua"/>

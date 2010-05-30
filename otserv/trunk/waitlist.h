@@ -39,7 +39,6 @@ typedef WaitList::iterator WaitListIterator;
 class WaitingList
 {
 public:
-	WaitingList();
 	~WaitingList();
 
 	static WaitingList* getInstance()
@@ -53,6 +52,7 @@ public:
 	static int32_t getTime(int32_t slot);
 
 protected:
+	WaitingList();
 	WaitList priorityWaitList;
 	WaitList waitList;
 

@@ -23146,6 +23146,12 @@
 	<item id="10116" article="a" name="stone pile"/>
 	<item id="10117" article="a" name="stone pile"/>
 	<item id="10118" article="a" name="stone pile"/>
+	<item id="10119" article="a" name="heated worm punisher">
+		<attribute key="weight" value="6450"/>
+		<attribute key="duration" value="10" />
+		<attribute key="decayTo" value="10152" />
+		<attribute key="description" value="This hammer is a worm's worst nightmare."/>
+	</item>
 	<item id="10124" article="a" name="champion's cup">
 		<attribute key="weight" value="1800"/>
 	</item>
@@ -23819,6 +23825,8 @@
 	</item>
 	<item id="10512" article="a" name="jammed sneaky stabber of eliteness">
 		<attribute key="weight" value="300"/>
+		<attribute key="decayTo" value="10511"/>
+		<attribute key="duration" value="60"/>
 		<attribute key="description" value="This nifty gadget can be used for many vital and less vital purposes. If it's not jammed, that is."/>
 	</item>
 	<item id="10513" article="a" name="squeezing gear of girlpower">
@@ -23827,6 +23835,8 @@
 	</item>
 	<item id="10514" article="a" name="jammed squeezing gear of girlpower">
 		<attribute key="weight" value="300"/>
+		<attribute key="decayTo" value="10513"/>
+		<attribute key="duration" value="60"/>
 		<attribute key="description" value="This nifty gadget can be used for many vital and less vital purposes. If it's not jammed, that is."/>
 	</item>
 	<item id="10515" article="a" name="whacking driller of fate">
@@ -23835,6 +23845,8 @@
 	</item>
 	<item id="10516" article="a" name="jammed whacking driller of fate">
 		<attribute key="weight" value="300"/>
+		<attribute key="decayTo" value="10515"/>
+		<attribute key="duration" value="60"/>
 		<attribute key="description" value="This nifty gadget can be used for many vital and less vital purposes. If it's not jammed, that is."/>
 	</item> 
 	<item id="10518" article="a" name="demon backpack">
@@ -24081,6 +24093,19 @@
 		<attribute key="weight" value="3500"/>
 	</item>
 	<!-- 10718 & 10719 - Tibia Friends amulet -->
+	<item id="10728" article="a" name="dragonbone tree" />
+	<item id="10732" article="a" name="jade spike plant" />
+	<item id="10734" article="a" name="thornpeak grass" />
+	<item id="10735" name="pepper roots grass" />
+	<item id="10736" name="pepper roots grass" />
+	<item id="10741" name="trollhair plants" />
+	<item id="10742" name="trollhair plants" />
+	<item id="10743" name="trollhair plants" />	
+	<item id="10757" article="a" name="diabolic hedge" />
+	<item id="10761" name="wild vine" />
+	<item id="10762" name="wild vine" />
+	<item id="10763" name="pepper roots grass" />
+	<item id="10764" name="trollhair plants" />	
 	<item id="10775" article="a" name="closed door">
 		<attribute key="type" value="door"/>
 		<attribute key="blockprojectile" value="1"/>
@@ -24133,6 +24158,44 @@
 	<item id="10792" article="a" name="open door">
 		<attribute key="type" value="door"/>
 	</item>
+	<item id="10793" article="a" name="tainted plant" />
+	<item id="10803" article="a" name="witches cauldron plant (rotten)" />
+	<item id="10806" article="a" name="pestilent fern" />
+	<item id="10807" article="a" name="necrotic grass" />
+	<item id="10808" article="a" name="necrotic grass" />
+	<item id="10809" article="a" name="necrotic grass" />
+	<item id="10811" article="an" name="apocalypse mushroom" />
+	<item id="10813" article="a" name="mourning mushroom" />
+	<item id="10816" article="an" name="infected throne" />
+	<item id="10817" article="a" name="pestbringer" />
+	<item id="10913" article="a" name="dry solstice tree" />
+	<item id="10914" article="a" name="high grass" />
+	<item id="10915" article="a" name="high grass" />
+	<item id="10916" article="a" name="high grass" />
+	<item id="10942" article="an" name="almanac of magic">
+		<attribute key="description" value="Invaluable for all magic research."/>
+		<attribute key="weight" value="5555"/>
+	</item>
+	<item id="10943" article="a" name="baby rotworm">
+		<attribute key="description" value="It looks hungry."/>
+		<attribute key="weight" value="45"/>
+	</item>
+	<item id="10944" article="an" name="universal tool">
+		<attribute key="description" value="The tool of choice for any gadgeteer."/>
+		<attribute key="weight" value="300"/>
+	</item>
+	<item id="10945" article="a" name="soul contract">
+		<attribute key="description" value="A contract in which some desperate person has sold his soul."/>
+		<attribute key="weight" value="150"/>
+	</item>
+	<item id="10946" article="a" name="dragon statue" />
+	<item id="10947" article="a" name="dragon statue" />
+	<item id="10948" article="a" name="dragon statue" />
+	<item id="10949" article="a" name="dragon statue" />
+	<item id="10950" article="a" name="dragon banner" />
+	<item id="10951" article="a" name="dragon banner" />
+	<item id="10952" article="a" name="dragon banner" />
+	<item id="10953" article="a" name="dragon banner" />
 	<item id="10971" name="wall lamp">
 	</item>
 	<item id="10972" name="wall lamp">
@@ -24149,6 +24212,14 @@
 	</item>
 	<item id="11002" name="street lamp">
 	</item>
+	<item id="11043" name="rice"/>
+	<item id="11044" name="rice"/>
+	<item id="11045" name="rice"/>
+	<item id="11046" name="rice"/>
+	<item id="11047" name="rice"/>
+	<item id="11048" name="rice"/>
+	<item id="11049" name="rice"/>
+	<item id="11050" name="rice"/>
 	<item id="11062" name="glowing switch"/>
 	<item id="11063" name="glowing switch"/>
 	<item id="11098" article="a" name="magic wall">
@@ -24160,6 +24231,10 @@
 		<attribute key="type" value="magicfield"/>
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="45"/>
+	</item>
+	<item id="11100" article="a" name="flash with beaver bait">
+		<attribute key="description" value="It smells like a mixture of wood and fish. Phew."/>
+		<attribute key="weight" value="180"/>
 	</item>
 	<item id="11107" article="a" name="dead draken warmaster" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
@@ -24216,12 +24291,16 @@
 		<attribute key="floorchange" value="north"/>
 	</item>
 	<item id="11129" name="dragon statue">
+		<attribute key="rotateTo" value="11131"/>
 	</item>
 	<item id="11130" name="dragon statue">
+		<attribute key="rotateTo" value="11129"/>
 	</item>
 	<item id="11131" name="dragon statue">
+		<attribute key="rotateTo" value="11132"/>
 	</item>
 	<item id="11132" name="dragon statue">
+		<attribute key="rotateTo" value="11130"/>
 	</item>
 	<item id="11134" name="tome of knowledge">
 		<attribute key="description" value="Bring this encrypted book to a sage in Farmine to gain wisdom or unlock more of Zao's culture."/>
@@ -24295,8 +24374,10 @@
 		<attribute key="weight" value="124"/>
 	</item>
 	<item id="11203" name="dragon throne">
+		<attribute key="rotateTo" value="11204"/>
 	</item>
 	<item id="11204" name="dragon throne">
+		<attribute key="rotateTo" value="11204"/>
 	</item>
 	<item id="11206" name="red lantern">
 		<attribute key="weight" value="116"/>
@@ -24313,7 +24394,7 @@
 	<item id="11210" name="striped fur">
 		<attribute key="weight" value="120"/>
 	</item>
-	<item id="11211" name="toad doll">
+	<item id="11211" name="stuffed toad">
 		<attribute key="weight" value="116"/>
 	</item>
 	<item id="11212" name="winter wolf fur">
@@ -24610,6 +24691,16 @@
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
+	<item id="11289" article="a" name="banner" />
+	<item id="11290" article="a" name="banner" />
+	<item id="11291" article="a" name="banner" />
+	<item id="11292" article="a" name="banner" />
+	<item id="11293" article="a" name="banner" />
+	<item id="11294" article="a" name="banner" />
+	<item id="11295" article="a" name="banner" />
+	<item id="11296" article="a" name="banner" />
+	<item id="11297" article="a" name="banner" />
+	<item id="11298" article="a" name="banner" />
 	<item id="11301" name="zaoan armor">
 		<attribute key="armor" value="13"/>
 		<attribute key="slotType" value="body"/>
@@ -24693,7 +24784,7 @@
 		<attribute key="duration" value="60"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
-		<item id="11314" name="weaver wandtip">
+	<item id="11314" name="weaver wandtip">
 		<attribute key="weight" value="170"/>
 	</item>
 	<item id="11316" article="a" name="dead draken spellweaver" editorsuffix=" (Unmoveable)">
@@ -24719,6 +24810,12 @@
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="60"/>
 		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="11321" article="a" name="bone shoulderplate">
+		<attribute key="weight" value="220"/>
+	</item>
+	<item id="11322" article="a" name="warmaster's wristguards">
+		<attribute key="weight" value="120"/>
 	</item>
 	<item id="11323" name="zaoan halberd">
 		<attribute key="defense" value="15"/>
@@ -24769,6 +24866,19 @@
 	</item>
 	<item id="11337" article="a" name="petrified scream" plural="petrified scream">
 		<attribute key="weight" value="150"/>
+	</item>
+	<item id="11338" article="a" name="disgusting trophy">
+		<attribute key="weight" value="700"/>
+	</item>
+	<item id="11339" article="a" name="clay lump">
+	</item>
+	<item id="11343" article="a" name="piece of marble rock">
+	</item>
+	<item id="11344" article="a" name="marble statue">
+	</item>
+	<item id="11345" article="a" name="marble statue">
+	</item>
+	<item id="11346" article="a" name="marble statue">
 	</item>
 	<item id="11347" article="a" name="dead terramite" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
@@ -24919,7 +25029,15 @@
 		<attribute key="duration" value="60"/>
 		<attribute key="corpseType" value="blood"/>
 	</item>
-	<item id="11394" name="lucky clover amulet">
+	<item id="11385" article="a" name="part of a giant stone dragon" />
+	<item id="11386" article="a" name="part of a giant stone dragon" />
+	<item id="11387" article="a" name="part of a giant stone dragon" />
+	<item id="11388" article="a" name="part of a giant stone dragon" />
+	<item id="11389" article="a" name="part of a giant stone dragon" />
+	<item id="11390" article="a" name="part of a giant stone dragon" />
+	<item id="11391" article="a" name="part of a giant stone dragon" />
+	<item id="11392" article="a" name="part of a giant stone dragon" />
+	<item id="11393" name="lucky clover amulet">
 		<attribute key="description" value="It is rumoured to bring you good luck! Luck sponsored by TibiaLottery."/>
 		<attribute key="weight" value="150"/>
 		<attribute key="slotType" value="necklace"/>
