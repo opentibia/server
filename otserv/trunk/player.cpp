@@ -625,9 +625,9 @@ int32_t Player::getPlayerInfo(playerinfo_t playerinfo) const
 		case PLAYERINFO_LEVELPERCENT: return levelPercent; break;
 		case PLAYERINFO_MAGICLEVEL: return std::max((int32_t)0, ((int32_t)magLevel + varStats[STAT_MAGICPOINTS])); break;
 		case PLAYERINFO_MAGICLEVELPERCENT: return magLevelPercent; break;
-		case PLAYERINFO_HEALTH: return health; break;
+		case PLAYERINFO_HEALTH: return std::max(0, health); break;
 		case PLAYERINFO_MAXHEALTH: return std::max((int32_t)1, ((int32_t)healthMax + varStats[STAT_MAXHITPOINTS])); break;
-		case PLAYERINFO_MANA: return mana; break;
+		case PLAYERINFO_MANA: return std::max(0, mana); break;
 		case PLAYERINFO_MAXMANA: return std::max((int32_t)0, ((int32_t)manaMax + varStats[STAT_MAXMANAPOINTS])); break;
 		case PLAYERINFO_SOUL: return std::max((int32_t)0, ((int32_t)soul + varStats[STAT_SOULPOINTS])); break;
 		default:
@@ -2167,9 +2167,9 @@ void Player::removeExperience(uint64_t exp, bool updateStats /*= true*/)
 
 	while(newLevel > 1 && experience < Player::getExpForLevel(newLevel)){
 		newLevel--;
-		healthMax = std::max((int32_t)0, (healthMax - (int32_t)vocation->getHPGain()));
-		manaMax = std::max((int32_t)0, (manaMax - (int32_t)vocation->getManaGain()));
-		capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
+		healthMax -= vocation->getHPGain();
+		manaMax -= vocation->getManaGain();
+		capacity -= vocation->getCapGain();
 	}
 
 	if(prevLevel != newLevel){

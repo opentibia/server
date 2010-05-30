@@ -223,9 +223,10 @@ public:
 		else if(hasFlag(PlayerFlag_HasInfiniteCapacity)){
 			return 10000.00;
 		}
-		else{
-			return capacity;
+		else if(capacity < 0){
+			return 0.00;
 		}
+		return capacity;
 	}
 
 	double getFreeCapacity() const {

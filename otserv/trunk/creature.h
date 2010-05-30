@@ -219,11 +219,33 @@ public:
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
 	int getBaseSpeed() {return baseSpeed;}
 
-	virtual int32_t getHealth() const {return health;}
-	virtual int32_t getMaxHealth() const {return healthMax;}
+	virtual int32_t getHealth() const {
+		if(health < 0){
+			return 0;
+		}
+		return health;
+	}
+	virtual int32_t getMaxHealth() const {
+		if(healthMax){
+			return 0;
+		}
+		return healthMax;
+	}
+	virtual int32_t getMana() const
+	{
+		if(mana < 0){
+			return 0;
+		}
+		return mana;
+	}
+	virtual int32_t getMaxMana() const
+	{
+		if(manaMax < 0){
+			return 0;
+		}
+		return manaMax;
+	}
 	virtual bool hasHiddenHealth() const { return false; }
-	virtual int32_t getMana() const {return mana;}
-	virtual int32_t getMaxMana() const {return manaMax;}
 
 	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
