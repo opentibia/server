@@ -761,6 +761,23 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		}
 	},
+	{21,
+		{// PgSQL
+			"",
+			NULL
+		},
+		{// MySQL
+			"ALTER TABLE `players` MODIFY COLUMN `health` INT(10) NOT NULL DEFAULT 100;",
+			"ALTER TABLE `players` MODIFY COLUMN `healthmax` INT(10) NOT NULL DEFAULT 100;",
+			"ALTER TABLE `players` MODIFY COLUMN `mana` INT(10) NOT NULL DEFAULT 100;",
+			"ALTER TABLE `players` MODIFY COLUMN `manamax` INT(10) NOT NULL DEFAULT 100;",
+			
+			NULL
+		},
+		}// SQLite
+			NULL
+		}
+	},
 };
 
 bool applyUpdateQuery(const SimpleUpdateQuery& updateQuery)
