@@ -226,7 +226,7 @@ public:
 		return health;
 	}
 	virtual int32_t getMaxHealth() const {
-		if(healthMax){
+		if(healthMax < 0){
 			return 0;
 		}
 		return healthMax;
