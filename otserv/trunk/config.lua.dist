@@ -215,6 +215,11 @@ distance_weapon_interrupt_swing = true
 -- How strong should be the attack using bare hands (fist fighting)?
 fist_strength = 7
 
+-- Guild War Fee
+-- The addition 'war charge' to start a guild war (default: 1000)
+-- To disable set to 0
+guild_war_fee = 1000
+
 -- Allow gamemaster multiclient login to everybody?
 allow_gamemaster_multiclient = false
 

@@ -64,7 +64,7 @@ void Guilds::loadWars()
 				status = -1;
 			}
 			else if(status == 0 && endDate > std::time(NULL)){
-				if(transferMoney(war.guildId, war.opponentId, (war.guildFee + 1000), (war.opponentFee + 1000)))
+				if(transferMoney(war.guildId, war.opponentId, (war.guildFee + g_config.getNumber(ConfigManager::GUILD_WAR_FEE)), (war.opponentFee + g_config.getNumber(ConfigManager::GUILD_WAR_FEE))))
 					status = 1;
 			}
 
@@ -223,7 +223,7 @@ void Guilds::broadcastKill(uint32_t guildId, Player* player, const DeathList& ki
 						kmsg += " and ";
 					else
 						first = false;
-					
+
 					kmsg += attackerPlayer->getName();
 				}
 			}
@@ -231,12 +231,12 @@ void Guilds::broadcastKill(uint32_t guildId, Player* player, const DeathList& ki
 
 		//Send message to channels
 		std::stringstream msg;
-		msg << "Opponent " << player->getName() << " of the " << enemy->getName() << " was killed by " << kmsg << 
+		msg << "Opponent " << player->getName() << " of the " << enemy->getName() << " was killed by " << kmsg <<
 			". The new score is " << frags << ":" << enemyFrags << " frags (limit " << it->second.fragLimit << ").";
 		guild->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
 
 		msg.str("");
-		msg << "Guild member " << player->getName() << " was killed by " << kmsg << " of the " << guild->getName() <<	
+		msg << "Guild member " << player->getName() << " was killed by " << kmsg << " of the " << guild->getName() <<
 			". The new score is " << enemyFrags << ":" << frags << " frags (limit " << it->second.fragLimit << ").";
 		enemy->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
 

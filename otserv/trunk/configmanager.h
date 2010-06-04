@@ -147,6 +147,7 @@ public:
 		RATE_EXPERIENCE_PVP,
 		ADDONS_ONLY_FOR_PREMIUM,
 		FIST_STRENGTH,
+		GUILD_WAR_FEE,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
