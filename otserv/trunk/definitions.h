@@ -24,7 +24,7 @@
 #define OTSERV_VERSION "0.6.3_SVN"
 #define OTSERV_NAME "OTServ"
 #define OTSERV_CLIENT_VERSION "8.57"
-#define CURRENT_SCHEMA_VERSION 21
+#define CURRENT_SCHEMA_VERSION 22
 
 #ifdef __USE_SQLITE__
 	#define SINGLE_SQL_DRIVER
@@ -130,7 +130,7 @@ enum passwordType_t{
 			#include <unordered_set>
 			#define UNORDERED_MAP std::unordered_map
 			#define UNORDERED_SET std::unordered_set
-		#endif		
+		#endif
 	#elif __GNUC_VERSION__ > 20900 // GCC 2.9.0
 		#include <ext/hash_map>
 		#include <ext/hash_set>

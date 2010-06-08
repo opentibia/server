@@ -332,7 +332,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 21);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 22);
 
 DELIMITER |
 
@@ -379,8 +379,8 @@ END|
 
 DELIMITER ;
 
-# uncomment to add a single player
-#INSERT INTO `groups` VALUES (1, 'Group 1', 0, 3, 10, 10);
-#INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0, 0);
-#INSERT INTO `players` VALUES (2, 'OTSCMS', 1, 1, 0, 1, 2252770, 53, 8, 11970, 11970, 11820, 11820, 1847, 100, 2, 10, 10, 10, 10, 128, 0, 116, 106, 7, 9980, 1221452439, 102017216, 1, '', 0, 0, '', 10, 10, 10, 10, 0, 1, 10000000);
+# uncomment to add 5 groups, an account, and an administrator character
+#INSERT INTO `groups` VALUES (5,'Administrator',57172440358904,5,0,100, 100),(4,'Senior Gamemaster',56622701191160,4,0,100, 100),(3,'Gamemaster',56622701191162,3,0,75, 100),(2,'Tutor',16875520,1,0,50, 75),(1,'Player',0,0,1,50, 50);
+#INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0);
+#INSERT INTO `players` VALUES (2, 'Administrator', 1, 5, 7, 0, 2252770, 53, 8, 11970, 11970, 11820, 11820, 1847, 100, 2, 10, 10, 10, 10, 75, 0, 116, 106, 7, 9980, 1221452439, 102017216, 1, 1, '', 0, 0, '', 10, 10, 10, 10, 0, 1,10000000 , 1);
 
