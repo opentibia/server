@@ -721,9 +721,10 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 	 	skills[skill][SKILL_TRIES] = 0;
 		skills[skill][SKILL_PERCENT] = 0;
 		std::stringstream advMsg;
-		advMsg << "You advanced in " << getSkillName(skill) << ".";
-		if(g_config.getString(ConfigManager::SHOW_NEW_SKILL_LEVEL) == "yes")
-			advMsg << " [" << skills[skill][SKILL_LEVEL] << "]";
+		if(!g_config.getNumber(ConfigManager::SHOW_NEW_SKILL_LEVEL))
+			advMsg << "You advanced in " << getSkillName(skill) << ".";
+		else
+			advMsg << "You advanced to " << getSkillName(skill) << " " << skills[skill][SKILL_LEVEL] << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
 
 		//scripting event - onAdvance
@@ -2091,8 +2092,6 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 
 			std::stringstream MaglvMsg;
 			MaglvMsg << "You advanced to magic level " << magLevel << ".";
-			if(g_config.getString(ConfigManager::SHOW_NEW_SKILL_LEVEL) == "yes")
-				MaglvMsg << " [" << magLevel << "]";
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
 
 			//scripting event - onAdvance

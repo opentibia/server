@@ -191,9 +191,9 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[FIST_STRENGTH] = getGlobalNumber(L, "fist_strength", 7);
 	m_confInteger[GUILD_WAR_FEE] = getGlobalNumber(L, "guild_war_fee", 1000);
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
-	m_confString[SHOW_NEW_SKILL_LEVEL] = getGlobalString(L, "show_new_skill_level", "yes");
-	m_confString[SHOW_HEALING] = getGlobalString(L, "show_healing", "yes");
-	m_confString[ORANGE_SPELL_TEXT] = getGlobalString(L, "orange_spell_text", "yes");
+	m_confInteger[SHOW_NEW_SKILL_LEVEL] = getGlobalBoolean(L, "show_new_skill_level", false);
+	m_confInteger[SHOW_HEALING] = getGlobalBoolean(L, "show_healing", false);
+	m_confInteger[ORANGE_SPELL_TEXT] = getGlobalBoolean(L, "orange_spell_text", false);
 	m_isLoaded = true;
 	return true;
 }

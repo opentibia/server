@@ -3573,7 +3573,7 @@ bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& 
 {
 	TalkActionResult_t result = g_spells->playerSaySpell(player, type, text);
 	if(result == TALKACTION_BREAK){
-		if(g_config.getString(ConfigManager::ORANGE_SPELL_TEXT) == "yes")
+		if(g_config.getNumber(ConfigManager::ORANGE_SPELL_TEXT))
 			return internalCreatureSay(player, SPEAK_MONSTER_SAY, text);
 		else
 			return internalCreatureSay(player, SPEAK_SAY, text);
@@ -4107,7 +4107,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 		if(target->getHealth() <= 0){
 			return false;
 		}
-		if(g_config.getString(ConfigManager::SHOW_HEALING) == "yes"){
+		if(g_config.getNumber(ConfigManager::SHOW_HEALING)){
 			std::stringstream ss;
 			ss << "+" << healthChange;
 			addAnimatedText(list, targetPos, TEXTCOLOR_GREEN, ss.str());

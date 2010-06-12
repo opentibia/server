@@ -176,17 +176,17 @@ rate_mag = 1
 rate_loot = 1
 rate_spawn = 1
 
---Displays the skill advanced to when advancing in skills (both melee and magic level) [default: "yes"]
---Example: "You advanced in sword fighting. [17]"
-show_new_skill_level = "yes"
+--Displays the skill advanced to when advancing in skills (melee) [default: "no"]
+--Example: "You advanced to sword fighting 17. "
+show_new_skill_level = false
 
 --Displays amount of health healed. 
---Similar to the way damage is shown, except in green numbers (Example: +17) [default: "yes"]
-show_healing = "yes"
+--Similar to the way damage is shown, except in green numbers (Example: +17) [default: "no"]
+show_healing = false
 
---Use orange text for spells rather than traditional text [default: "yes"]
+--Use orange text for spells rather than traditional text [default: "no"]
 --NOTE: The orange text will not be displayed on the default channel 
-orange_spell_text = "yes"
+orange_spell_text = false
 
 -- Stamina Configuration
 -- Gain stamina rate - 1 second offline = X milliseconds of stamina
