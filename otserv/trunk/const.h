@@ -265,6 +265,7 @@ enum SquareColor_t {
 
 enum TextColor_t {
 	TEXTCOLOR_BLUE        = 5,
+	TEXTCOLOR_GREEN       = 18,
 	TEXTCOLOR_LIGHTBLUE   = 35,
 	TEXTCOLOR_LIGHTGREEN  = 30,
 	TEXTCOLOR_PURPLE      = 83,

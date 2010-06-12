@@ -63,6 +63,9 @@ public:
 		SQL_DB,
 		SQL_TYPE,
 		MAP_STORAGE_TYPE,
+		SHOW_NEW_SKILL_LEVEL,
+		SHOW_HEALING,
+		ORANGE_SPELL_TEXT,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 
