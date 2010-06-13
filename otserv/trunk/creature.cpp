@@ -325,7 +325,7 @@ bool Creature::getNextStep(Direction& dir, uint32_t& flags)
 bool Creature::startAutoWalk(std::list<Direction>& listDir)
 {
 	listWalkDir = listDir;
-	addEventWalk(listDir.size() > 1);
+	addEventWalk(listDir.size() == 1);
 	return true;
 }
 
@@ -334,7 +334,7 @@ void Creature::addEventWalk(bool firstStep)
 	//static int64_t last_time = OTSYS_TIME();
 	cancelNextWalk = false;
 
-	if (getSpeed() <= 0)
+	if (getStepSpeed() <= 0)
 		return;
 
 	if(eventWalk == 0){
