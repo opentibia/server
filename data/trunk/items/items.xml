@@ -8853,6 +8853,7 @@
 		<attribute key="defense" value="7"/>
 		<attribute key="attack" value="28"/>
 		<attribute key="weaponType" value="axe"/>
+		<attribute key="slotType" value="two-handed"/>
 	</item>
 	<item id="3965" article="a" name="hunting spear" plural="hunting spears">
 		<attribute key="weight" value="2200"/>

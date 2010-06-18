@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Troll" nameDescription="a troll" race="blood" experience="20" speed="126" manacost="290">
 	<health now="50" max="50"/>
-	<look type="15" corpse="5960"/>
+	<look type="15" corpse="2806"/>
 	<targetchange interval="2000" chance="0"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
