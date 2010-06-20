@@ -16,8 +16,12 @@
 				<Compiler>
 					<Add option="-pg" />
 					<Add option="-g" />
-					<Add option="-D__DEBUG__" />
 					<Add option="-D__EXCEPTION_TRACER__" />
+					<Add directory="%BOOST_INCLUDE_PATH%" />
+					<Add directory="%LIBXML_INCLUDE_PATH%" />
+					<Add directory="%MYSQL_INCLUDE_PATH%" />
+					<Add directory="%LUA_INCLUDE_PATH%" />
+					<Add directory="%GMP_INCLUDE_PATH%" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -32,6 +36,11 @@
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
+					<Add directory="%BOOST_LIB_PATH%" />
+					<Add directory="%LIBXML_LIB_PATH%" />
+					<Add directory="%MYSQL_LIB_PATH%" />
+					<Add directory="%LUA_LIB_PATH%" />
+					<Add directory="%GMP_LIB_PATH%" />
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
@@ -43,6 +52,11 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="%BOOST_INCLUDE_PATH%" />
+					<Add directory="%LIBXML_INCLUDE_PATH%" />
+					<Add directory="%MYSQL_INCLUDE_PATH%" />
+					<Add directory="%LUA_INCLUDE_PATH%" />
+					<Add directory="%GMP_INCLUDE_PATH%" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -56,6 +70,11 @@
 					<Add option="-lboost_regex-mgw44-mt-1_43" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
+					<Add directory="%BOOST_LIB_PATH%" />
+					<Add directory="%LIBXML_LIB_PATH%" />
+					<Add directory="%MYSQL_LIB_PATH%" />
+					<Add directory="%LUA_LIB_PATH%" />
+					<Add directory="%GMP_LIB_PATH%" />
 				</Linker>
 			</Target>
 			<Target title="Debug Unix">
@@ -122,23 +141,10 @@
 			<Add alias="All Release" targets="Release Windows;Release Unix;" />
 		</VirtualTargets>
 		<Compiler>
-			<Add option="-std=c++0x" />
 			<Add option="-Wno-unused-parameter" />
 			<Add option="-D__USE_SQLITE__" />
 			<Add option="-D__USE_MYSQL__" />
-			<Add directory="%BOOST_INCLUDE_PATH%" />
-			<Add directory="%LIBXML_INCLUDE_PATH%" />
-			<Add directory="%MYSQL_INCLUDE_PATH%" />
-			<Add directory="%LUA_INCLUDE_PATH%" />
-			<Add directory="%GMP_INCLUDE_PATH%" />
 		</Compiler>
-		<Linker>
-			<Add directory="%BOOST_LIB_PATH%" />
-			<Add directory="%LIBXML_LIB_PATH%" />
-			<Add directory="%MYSQL_LIB_PATH%" />
-			<Add directory="%LUA_LIB_PATH%" />
-			<Add directory="%GMP_LIB_PATH%" />
-		</Linker>
 		<Unit filename="..\AUTHORS" />
 		<Unit filename="..\Doxyfile" />
 		<Unit filename="..\LICENSE" />
