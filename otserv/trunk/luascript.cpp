@@ -1660,7 +1660,7 @@ void LuaScriptInterface::registerFunctions()
 	//doAddCondition(cid, condition)
 	lua_register(m_luaState, "doAddCondition", LuaScriptInterface::luaDoAddCondition);
 
-	//doRemoveCondition(cid, type)
+	//doRemoveCondition(cid, type, <optional> subId)
 	lua_register(m_luaState, "doRemoveCondition", LuaScriptInterface::luaDoRemoveCondition);
 
 	//numberToVariant(number)
@@ -6315,8 +6315,13 @@ int LuaScriptInterface::luaDoAddCondition(lua_State *L)
 
 int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
 {
-	//doRemoveCondition(cid, type)
-
+	//doRemoveCondition(cid, type, <optional> subId)
+	uint32_t subId = 0;
+	int32_t parameters = lua_gettop(L);
+	if(parameters > 2){
+		subId = popNumber(L);
+	}
+	
 	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -6328,16 +6333,15 @@ int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
-
-	Condition* condition = creature->getCondition(conditionType, CONDITIONID_COMBAT, 0);
-	if(!condition){
-		condition = creature->getCondition(conditionType, CONDITIONID_DEFAULT, 0);
-	}
-
-	if(condition){
-		creature->removeCondition(condition);
-	}
-
+	
+	Condition* condition;
+	while((condition = creature->getCondition(conditionType, CONDITIONID_COMBAT, subId))) {
+	      creature->removeCondition(condition);
+	      }
+	while((condition = creature->getCondition(conditionType, CONDITIONID_DEFAULT, subId))) {
+	      creature->removeCondition(condition);
+	      }
+	
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
