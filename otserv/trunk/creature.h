@@ -202,7 +202,7 @@ public:
 	int32_t getStepDuration(Direction dir) const;
 	int32_t getStepDuration() const;
 	virtual int32_t getStepSpeed() const {return getSpeed();}
-	int32_t getSpeed() const {return baseSpeed + varSpeed;}
+	int32_t getSpeed() const {return getBaseSpeed() + varSpeed;}
 	void setSpeed(int32_t varSpeedDelta)
 	{
 		int32_t oldSpeed = getSpeed();
@@ -217,7 +217,7 @@ public:
 	}
 
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
-	int getBaseSpeed() {return baseSpeed;}
+	uint32_t getBaseSpeed() const {return baseSpeed;}
 
 	virtual int32_t getHealth() const {
 		if(health < 0){
