@@ -1073,6 +1073,8 @@ void LuaScriptInterface::registerFunctions()
 {
 	//lua_register(L, "name", C_function);
 
+	//getOTSYSTime()
+	lua_register(m_luaState, "getOTSYSTime", LuaScriptInterface::luaGetOTSYSTime);
 
 	//getConfigValue(key)
 	lua_register(m_luaState, "getConfigValue", LuaScriptInterface::luaGetConfigValue);
@@ -8631,5 +8633,13 @@ int LuaScriptInterface::luaGetItemArmorByUID(lua_State *L)
 	}
 
 	lua_pushnumber(L, item->getArmor());
+	return 1;
+}
+
+int LuaScriptInterface::luaGetOTSYSTime(lua_State *L)
+{
+	//getOTSYSTime()
+	int64_t ret = OTSYS_TIME();
+	lua_pushnumber(L, ret);
 	return 1;
 }
