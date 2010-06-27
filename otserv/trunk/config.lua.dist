@@ -189,9 +189,9 @@ show_healing = false
 orange_spell_text = false
 
 -- Configuration for death messages
--- Should the client show the popup window after a death?
+-- Should the client show the popup window after a death? [default: "yes"]
 show_death_window = true
--- What message should be sent for the player, after its own death?
+-- What message should be sent for the player, after its own death? Use "" to disable.
 death_msg = "You are dead."
 
 -- Stamina Configuration
