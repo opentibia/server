@@ -188,6 +188,12 @@ show_healing = false
 --NOTE: The orange text will not be displayed on the default channel 
 orange_spell_text = false
 
+-- Configuration for death messages
+-- Should the client show the popup window after a death?
+show_death_window = true
+-- What message should be sent for the player, after its own death?
+death_msg = "You are dead."
+
 -- Stamina Configuration
 -- Gain stamina rate - 1 second offline = X milliseconds of stamina
 rate_stamina_gain = 334

@@ -194,6 +194,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[SHOW_NEW_SKILL_LEVEL] = getGlobalBoolean(L, "show_new_skill_level", false);
 	m_confInteger[SHOW_HEALING] = getGlobalBoolean(L, "show_healing", false);
 	m_confInteger[ORANGE_SPELL_TEXT] = getGlobalBoolean(L, "orange_spell_text", false);
+	m_confInteger[SHOW_DEATH_WINDOW] = getGlobalBoolean(L, "show_death_window", true);
+	m_confString[DEATH_MSG] = getGlobalString(L, "death_msg", "You are dead.");
 	m_isLoaded = true;
 	return true;
 }

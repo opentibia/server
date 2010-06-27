@@ -2495,7 +2495,11 @@ void Player::die()
   		}
 
 		Creature::die();
-		sendReLoginWindow();
+		std::string death_msg = g_config.getString(ConfigManager::DEATH_MSG);
+		if (death_msg.length() > 0)
+			sendTextMessage(MSG_EVENT_DEFAULT, death_msg);
+		if(g_config.getNumber(ConfigManager::SHOW_DEATH_WINDOW))
+			sendReLoginWindow();
 	}
 	else{
 		preSave();

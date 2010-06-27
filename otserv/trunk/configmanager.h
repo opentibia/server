@@ -63,6 +63,7 @@ public:
 		SQL_DB,
 		SQL_TYPE,
 		MAP_STORAGE_TYPE,
+		DEATH_MSG,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 
@@ -151,6 +152,7 @@ public:
 		SHOW_NEW_SKILL_LEVEL,
 		SHOW_HEALING,
 		ORANGE_SPELL_TEXT,
+		SHOW_DEATH_WINDOW,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
