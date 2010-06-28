@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Zombie" nameDescription="a zombie" race="undead" experience="280" speed="180" manacost="0">
 	<health now="500" max="500"/>
 	<look type="311" corpse="9875"/>
@@ -18,12 +18,18 @@
 		<flag runonhealth="0"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" min="-0" max="-120"/>
-		<attack name="manadrain" interval="1000" chance="13" range="1" min="-0" max="-45"/>
+		<attack name="melee" interval="2000" min="-0" max="-130"/>
+    	<attack name="lifedrain" interval="500" chance="7" range="1" min="-15" max="-24">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="manadrain" interval="500" chance="8" range="1" min="-14" max="-23"/>
+  		<attack name="death" interval="1000" chance="7" range="1" radius="1" target="1" min="-30" max="-49">
+			<attribute key="shootEffect" value="death"/>
+		</attack>
 	</attacks>
 	<defenses armor="15" defense="10"/>
 	<elements>
-		<element firePercent="-40"/>
+		<element firePercent="50"/>
 	</elements>
 	<immunities>
 		<immunity death="1"/>
@@ -40,17 +46,19 @@
 		<voice sentence="Httt.... hmnnsss..."/>
 	</voices>
 	<loot>
-		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
-		<item id="2148" countmax="52" chance="100000"/><!-- gold coin -->
-		<item id="1987" chance="100000"><!-- bag -->
+		<item id="2148" countmax="64" chance1="79794" chancemax="0"/>  -- gold coin
+		<item id="2417" chance="7140"/>  -- battle hammer
+		<item id="10576" chance="11000"/>  -- half-eaten brain
+		<item id="2460" chance="10290"/>  -- brass helmet
+		<item id="1987" chance="99000"> -- bag
 			<inside>
-				<item id="2381" chance="2857"/><!-- battle hammer -->
-				<item id="2398" chance="10000"/><!-- mace -->
-				<item id="2457" chance="5000"/><!-- steel helmet -->
-				<item id="2056" chance="20000"/><!-- torch -->
-				<item id="7620" chance="4000"/><!-- mana potion -->
-				<item id="9808" chance="3000"/><!-- rusty armor -->
-				<item id="2205" chance="2000"/><!-- life ring -->
+				<item id="2381" chance="4140"/>  -- halberd :: Def 14 :: Atk 35
+				<item id="2398" chance="8570"/>  -- mace :: Def 11 :: Atk 16
+				<item id="2457" chance="4290"/>  -- steel helmet :: Arm 6
+				<item id="2657" chance="430"/>  -- simple dress
+				<item id="7620" chance="860"/>  -- mana potion
+				<item id="9808" chance="4570"/>  -- rusty armor :: Arm 1
+				<item id="2205" chance="1570"/>  -- life ring (faster regeneration)
 			</inside>
 		</item>
 	</loot>

@@ -2311,9 +2311,9 @@
 	<item id="1975" article="a" name="book">
 		<attribute key="weight" value="1300"/>
 	</item>
-	<item id="1976" article="a" name="book">
+	<item id="1976" article="a" name="gemmed book">
 		<attribute key="writeable" value="1"/>
-		<attribute key="maxTextLen" value="512"/>
+		<attribute key="maxTextLen" value="1100"/>
 		<attribute key="weight" value="1300"/>
 	</item>
 	<item id="1977" article="a" name="book">
