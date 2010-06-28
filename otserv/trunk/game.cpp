@@ -1993,11 +1993,11 @@ bool Game::playerMove(uint32_t playerId, Direction dir)
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
 		return false;
-	
+
 	std::list<Direction> dirs;
 	dirs.push_back(dir);
-	
-	return player->startAutoWalk(dirs);;
+
+	return player->startAutoWalk(dirs);
 }
 
 bool Game::internalBroadcastMessage(Player* player, const std::string& text)
@@ -3260,7 +3260,7 @@ bool Game::playerFollowCreature(uint32_t playerId, uint32_t creatureId)
 	if(creatureId != 0){
 		followCreature = getCreatureByID(creatureId);
 	}
-	
+
 	g_dispatcher.addTask(createTask(boost::bind(&Game::updateCreatureWalk, this, player->getID())));
 	return player->setFollowCreature(followCreature);
 }
@@ -4924,25 +4924,25 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 void Game::reloadInfo(reloadTypes_t info)
 {
 	switch(info){
-		case RELOAD_TYPE_ACTIONS: 
+		case RELOAD_TYPE_ACTIONS:
 			g_actions->reload();
 			break;
-		case RELOAD_TYPE_MONSTERS: 
+		case RELOAD_TYPE_MONSTERS:
 			g_monsters.reload();
 			break;
-		case RELOAD_TYPE_NPCS: 
+		case RELOAD_TYPE_NPCS:
 			g_npcs.reload();
 			break;
-		case RELOAD_TYPE_CONFIG: 
+		case RELOAD_TYPE_CONFIG:
 			g_config.reload();
 			break;
-		case RELOAD_TYPE_TALKACTIONS: 
+		case RELOAD_TYPE_TALKACTIONS:
 			g_talkactions->reload();
 			break;
-		case RELOAD_TYPE_MOVEMENTS: 
+		case RELOAD_TYPE_MOVEMENTS:
 			g_moveEvents->reload();
 			break;
-		case RELOAD_TYPE_SPELLS: 
+		case RELOAD_TYPE_SPELLS:
 			g_spells->reload();
 			g_monsters.reload();
 			break;
@@ -4950,7 +4950,7 @@ void Game::reloadInfo(reloadTypes_t info)
 			Raids::getInstance()->reload();
 			Raids::getInstance()->startup();
 			break;
-		case RELOAD_TYPE_CREATURESCRIPTS: 
+		case RELOAD_TYPE_CREATURESCRIPTS:
 			g_creatureEvents->reload();
 			break;
 	}

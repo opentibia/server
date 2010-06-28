@@ -3015,15 +3015,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 	}
 
 	while(itemCount > 0){
-		int32_t stackCount;
-		//Runes should not be stackable beyond 100, so check if it's a rune
-		if(it.isRune()){
-			stackCount = std::min((int32_t)100, (int32_t)subType);
-		}
-	    //This is for amulets that can have charges up to 250 (example: protection amulet)
-		else{
-			stackCount = std::min((int32_t)250, (int32_t)subType);
-		}
+		int32_t stackCount = std::min((int32_t)100, (int32_t)subType);
 		Item* newItem = Item::CreateItem(itemId, stackCount);
 
 		if(!newItem){
@@ -6331,7 +6323,7 @@ int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
 	if(parameters > 2){
 		subId = popNumber(L);
 	}
-	
+
 	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -6343,7 +6335,7 @@ int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
-	
+
 	Condition* condition;
 	while((condition = creature->getCondition(conditionType, CONDITIONID_COMBAT, subId))) {
 	      creature->removeCondition(condition);
@@ -6351,7 +6343,7 @@ int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
 	while((condition = creature->getCondition(conditionType, CONDITIONID_DEFAULT, subId))) {
 	      creature->removeCondition(condition);
 	      }
-	
+
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }

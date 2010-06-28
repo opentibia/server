@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="OTServ DBUpdate" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release Windows">
+				<Option platforms="Windows;" />
+				<Option output="bin/dbupdate" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="../" />
+				<Option object_output="obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="%BOOST_INCLUDE_PATH%" />
+					<Add directory="%MYSQL_INCLUDE_PATH%" />
+					<Add directory="%LUA_INCLUDE_PATH%" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-llibmysql" />
+					<Add option="-llua" />
+					<Add option="-lboost_thread-mgw44-mt-1_43" />
+					<Add directory="%BOOST_LIB_PATH%" />
+					<Add directory="%MYSQL_LIB_PATH%" />
+					<Add directory="%LUA_LIB_PATH%" />
+				</Linker>
+			</Target>
+			<Target title="Release Unix">
+				<Option platforms="Unix;" />
+				<Option output="bin/dbupdate" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="../" />
+				<Option object_output="obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="/usr/include/lua5.1/" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="boost_thread" />
+					<Add library="lua5.1" />
+					<Add library="mysqlclient" />
+				</Linker>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Release Windows;Release Unix;" />
+			<Add alias="All Release" targets="Release Windows;Release Unix;" />
+		</VirtualTargets>
+		<Compiler>
+			<Add option="-D__USE_MYSQL__" />
+		</Compiler>
+		<Unit filename="../../../configmanager.cpp" />
+		<Unit filename="../../../configmanager.h" />
+		<Unit filename="../../../database.cpp" />
+		<Unit filename="../../../database.h" />
+		<Unit filename="../../../databasemysql.cpp" />
+		<Unit filename="../../../databasemysql.h" />
+		<Unit filename="../../../databaseodbc.cpp" />
+		<Unit filename="../../../databaseodbc.h" />
+		<Unit filename="../../../databasepgsql.cpp" />
+		<Unit filename="../../../databasepgsql.h" />
+		<Unit filename="../../../databasesqlite.cpp" />
+		<Unit filename="../../../databasesqlite.h" />
+		<Unit filename="../../../definitions.h" />
+		<Unit filename="../dbupdate.cpp" />
+		<Unit filename="../dbupdate.lua.dist" />
+		<Unit filename="../queries.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
