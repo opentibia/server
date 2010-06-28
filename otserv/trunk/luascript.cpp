@@ -3015,7 +3015,15 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 	}
 
 	while(itemCount > 0){
-		int32_t stackCount = std::min((int32_t)100, (int32_t)subType);
+		int32_t stackCount;
+		//Runes should not be stackable beyond 100, so check if it's a rune
+		if(it.isRune()){
+			stackCount = std::min((int32_t)100, (int32_t)subType);
+		}
+	    //This is for amulets that can have charges up to 250 (example: protection amulet)
+		else{
+			stackCount = std::min((int32_t)250, (int32_t)subType);
+		}
 		Item* newItem = Item::CreateItem(itemId, stackCount);
 
 		if(!newItem){
