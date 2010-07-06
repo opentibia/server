@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<monster name="Dworc Voodoomaster" namedescription="a dworc voodoomaster" race="blood" experience="50" speed="240" manacost="0">
+	<health now="80" max="80"/>
+	<look type="214" corpse="6055"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="15"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="22" attack="13"/>
+		<attack name="lifedrain" interval="1000" chance="6" range="1" min="-1" max="-39"/>
+		<attack name="speed" interval="1000" chance="8" range="7" speedchange="-800" duration="5000">
+			<attribute key="areaeffect" value="redshimmer"/>
+		</attack>
+		<attack name="drunk" interval="1000" chance="10" range="7">
+			<attribute key="shooteffect" value="energy"/>
+			<attribute key="areaeffect" value="energyarea"/>
+		</attack>
+		<attack name="outfit" interval="1000" chance="9" range="7" monster="chicken" duration="5000">
+			<attribute key="areaeffect" value="blueshimmer"/>
+		</attack>
+		<attack name="poison" interval="1000" chance="20" radius="6" target="0" min="-6" max="-18">
+			<attribute key="areaeffect" value="poison"/>
+		</attack>
+		<attack name="poisonfield" interval="1000" chance="13" range="7" radius="1" target="1">
+			<attribute key="shooteffect" value="poison"/>
+		</attack>
+	</attacks>
+	<defenses armor="3" defense="8">
+		<defense name="healing" interval="1000" chance="10" min="3" max="9">
+			<attribute key="areaeffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="1000" chance="8" speedchange="200" duration="4000">
+			<attribute key="areaeffect" value="redshimmer"/>
+		</defense>
+		<defense name="invisible" interval="1000" chance="5" duration="3000">
+			<attribute key="areaeffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="100"/>
+		<element holyPercent="20"/>
+		<element firePercent="-15"/>
+		<element deathPercent="-10"/>
+		<element icePercent="-8"/>
+	</elements>
+	<voices interval="5000" chance="10">
+		<voice sentence="grak brrretz!"/>
+		<voice sentence="grow truk grrrrr."/>
+		<voice sentence="prek tars, dekklep zurk."/>
+	</voices>
+	<loot>
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="12" chance="100000"/><!-- gold coin -->
+		<item id="2666" countmax="2" chance="40000"/><!-- meat -->
+		<item id="2512" chance="10000"/><!-- wooden shield -->
+		<item id="2530" chance="4000"/><!-- copper shield -->
+		<item id="3973" chance="100"/><!-- tusk shield -->
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="3967" chance="50"/><!-- tribal mask -->
+				<item id="3955" chance="80"/><!-- voodoo doll -->
+				<item id="2385" chance="6666"/><!-- sabre -->
+				<item id="2464" chance="5000"/><!-- chain armor -->
+				<item id="2420" chance="5000"/><!-- machete -->
+				<item id="2448" chance="5000"/><!-- studded club -->
+				<item id="2007" chance="20000"/><!-- blue bottle -->
+			</inside>
+		</item>
+	</loot>
+</monster>

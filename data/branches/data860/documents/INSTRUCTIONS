@@ -1,0 +1,81 @@
+Instructions when mapping with this Data Folder
+====================================
+1. Sand
+
+Sand with ActionID 100 will have a 20% chance of turning into
+a cave entrace when a shovel is used in it.
+
+Sand with ActionID 101 will have a 5% chance of summoning a
+Scarab when a shovel is used in it.
+
+Sand with ActionID 102 will have a 5% chance of giving a scarab coin
+when a shovel is used in it.
+
+====================================
+2. Swimmable Water
+
+To make water that you can swim through, you must use water IDs 4820-4825.
+
+To use borders that makes you with swimmable outfit, use borders 4828-4831(general)
+or borders 7943-7954(sand).
+
+Be aware when using those IDs, because you can walk over them.
+
+Remember to make the water as a PZ and Non-Logout zone.
+
+====================================
+3. Doors and Keys
+
+Locked doors can only be placed if one of the locked door id is placed
+on the map with an actionid.
+
+Doors with actionid's can be opened and locked by a key with the same
+actionid.
+
+A key with actionid 10000 is able to open and close any lockable door of the server.
+
+The 'locked door' ids are:
+1209, 1212, 1231, 1234, 1249, 1252, 3535, 3544, 4913, 4916, 5098, 5107, 5116,
+5125, 5134, 5137, 5140, 5143, 5278, 5281, 5732, 5735, 6192, 6195, 6249, 6252, 
+6891, 6900, 7033 and 7042
+
+You can identify a locked door when the next 2 IDs of it are a Closed door and
+an Open door.
+
+====================================
+4. Gate of Expertises(aka. "Level Doors")
+
+Gate of Expertises are normal doors when no reserved actionId is set
+on them.
+
+The reserved actionIds are:
+- 1001 to 1999: Level required to pass the door. Level is the actionId-1000.
+- 2001 to 2008: Vocation required to pass the door.
+-- 2001: Sorcerer
+-- 2002: Druid
+-- 2003: Paladin
+-- 2004: Knight
+-- 2005: Master Sorcerer
+-- 2006: Elder Druid
+-- 2007: Royal Paladin
+-- 2008: Elite Knight
+
+====================================
+5. Sealed Doors(aka. "Quest Doors")
+
+Sealed Doors are normal doors if no actionId is set on them.
+
+Players can only pass these doors if their storage value equal to the actionId
+of that door is 1.
+
+====================================
+6. Hidden holes(aka. pick holes)
+
+To make hidden holes on mud, simply add actionID 100 to a mud tile, then you can use a
+pick on it.
+
+====================================
+7. Fishable water
+
+To make water you can fish through, use water with ID 4608 to ID 4616. Waters with ID 4617 to 4625
+will take a bit longer to be "fishable" after the server begins(nothing special).

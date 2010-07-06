@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Juggernaut" nameDescription="a juggernaut" race="blood" experience="6500" speed="280" manacost="0">
+	<health now="20000" max="20000"/>
+	<look type="244" corpse="6336"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="3000" min="-200" max="-1423"/>
+		<attack name="physical" interval="4000" chance="15" range="7" min="-280" max="-620">
+		<attribute key="shootEffect" value="largerock"/>
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="15">
+		<defense name="speed" interval="1000" chance="12" speedchange="480" duration="4000">
+		<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element physicalPercent="40"/>
+		<element firePercent="30"/>
+		<element icePercent="30"/>
+		<element earthPercent="30"/>
+		<element energyPercent="-20"/>
+		<element holyPercent="-15"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="10">
+		<voice sentence="WAHHHH!"/>
+		<voice sentence="RAAARRR!"/>
+		<voice sentence="GRRRRRR!"/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="1" chance="100000"/><!-- gold coin -->
+		<item id="2152" countmax="1" chance="100000"/><!-- platinum coin -->
+		<item id="2666" countmax="8" chance="20000"/><!-- meat -->
+		<item id="2672" countmax="3" chance="10000"/><!-- dragon ham -->
+		<item id="2220" chance="10000"/><!-- dirty fur -->
+		<item id="2228" chance="5000"/><!-- broken pottery -->
+		<item id="2452" chance="444"/><!-- heavy mace -->
+		<item id="6558" chance="2500"/><!-- concentrated demonic blood -->
+		<item id="6558" chance="2500"/><!-- concentrated demonic blood -->
+		<item id="6500" countmax="1" chance="1429"/><!-- demonic essence -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="5944" countmax="1" chance="1333"/><!-- soul orb -->
+				<item id="2434" chance="1667"/><!-- dragon hammer -->
+				<item id="2466" chance="333"/><!-- golden armor -->
+				<item id="2470" chance="400"/><!-- golden legs -->
+				<item id="7452" chance="600"/><!-- spiked squelcher -->
+			</inside>
+		</item>
+	</loot>
+</monster>

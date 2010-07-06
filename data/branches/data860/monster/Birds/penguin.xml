@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<monster name="Penguin" nameDescription="penguin" race="blood" experience="1" speed="156" manacost="300">
+	<health now="33" max="33"/>
+	<look type="250" corpse="7334"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="15"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-0" max="-15"/>
+	</attacks>
+	<elements>
+		<element icePercent="10"/>
+		<element energyPercent="-5"/>
+	</elements>
+	<loot>
+		<item id="2148" countmax="10" chance="12000"/><!-- gold coin -->
+		<item id="2669" countmax="1" chance="32000"/><!-- northern pike -->
+		<item id="2669" countmax="1" chance="320"/><!-- northern pike -->
+		<item id="2667" countmax="2" chance="320"/><!-- fish -->
+	</loot>
+</monster>

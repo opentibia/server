@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Enlightened of the Cult" nameDescription="a enlightened of the cult" race="blood" experience="500" speed="220" manacost="0">
+	<health now="700" max="700"/>
+	<look type="193" corpse="6080"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag staticattack="50"/>
+		<flag targetdistance="5"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-30" max="-120"/>
+		<attack name="lifedrain" interval="2000" chance="17" range="7" radius="1" target="1" min="-30" max="-140">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="drunk" interval="1000" chance="15" range="7" radius="1" target="1">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="physical" interval="3000" chance="17" range="7" radius="1" target="1" min="-70" max="-185">
+			<attribute key="shootEffect" value="energy"/>
+			<attribute key="areaEffect" value="energyarea"/>
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="20">
+		<defense name="invisible" interval="2000" chance="15" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element holyPercent="20"/>
+		<element icePercent="10"/>
+		<element physicalPercent="-10"/>
+		<element energyPercent="-7"/>
+		<element deathPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="Crypt Shambler" interval="2000" chance="10000"/>
+		<summon name="Ghost" interval="2000" chance="10000"/>
+	</summons>
+	<loot>
+		<item id="2148" countmax="82" chance="47831"/><!-- gold coin -->
+		<item id="2654" chance="5000"/><!-- cape -->
+		<item id="2187" chance="1111"/><!-- wand of inferno -->
+		<item id="5801" chance="909"/><!-- key ring -->
+		<item id="2167" chance="1000"/><!-- energy ring -->
+		<item id="2171" chance="909"/><!-- platinum amulet -->
+		<item id="7426" chance="1009"/><!-- amber staff -->
+		<item id="2656" chance="400"/><!-- blue robe -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2114" chance="1333"/><!-- piggy bank -->
+				<item id="6087" chance="1428"/><!-- music sheet -->
+				<item id="5810" chance="555"/><!-- pirate voodoo doll -->
+				<item id="2146" countmax="2" chance="1538"/><!-- small sapphire -->
+				<item id="2436" chance="500"/><!-- skull staff -->
+				<item id="2200" chance="1000"/><!-- protection amulet -->
+				<item id="5669" chance="400"/><!-- voodoo skull -->
+			</inside>
+		</item>
+	</loot>
+</monster>

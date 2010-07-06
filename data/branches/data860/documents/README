@@ -1,0 +1,14 @@
+======================
+About Data folder
+======================
+This is NOT a data-project.
+
+The Data folder under the Open Tibia SVN is a folder
+to be released together with OTServ.
+
+Thus, since it is under the otserv project, it is under
+the GPLv2 license. For further information, read the README
+and the LICENSE on OTServ project, under this same subversion
+
+This file shall be deleted from this folder when releasing
+otserv.
