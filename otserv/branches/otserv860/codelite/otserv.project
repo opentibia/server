@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Project Name="otserv" InternalType="Console">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
+    </Plugin>
+  </Plugins>
+  <Description/>
+  <Dependencies/>
+  <VirtualDirectory Name="Sources">
+    <File Name="../actions.cpp"/>
+    <File Name="../admin.cpp"/>
+    <File Name="../allocator.cpp"/>
+    <File Name="../ban.cpp"/>
+    <File Name="../baseevents.cpp"/>
+    <File Name="../beds.cpp"/>
+    <File Name="../chat.cpp"/>
+    <File Name="../combat.cpp"/>
+    <File Name="../condition.cpp"/>
+    <File Name="../configmanager.cpp"/>
+    <File Name="../connection.cpp"/>
+    <File Name="../container.cpp"/>
+    <File Name="../creature.cpp"/>
+    <File Name="../creatureevent.cpp"/>
+    <File Name="../cylinder.cpp"/>
+    <File Name="../database.cpp"/>
+    <File Name="../databasemysql.cpp"/>
+    <File Name="../databaseodbc.cpp"/>
+    <File Name="../databasepgsql.cpp"/>
+    <File Name="../databasesqlite.cpp"/>
+    <File Name="../depot.cpp"/>
+    <File Name="../exception.cpp"/>
+    <File Name="../fileloader.cpp"/>
+    <File Name="../game.cpp"/>
+    <File Name="../guild.cpp"/>
+    <File Name="../house.cpp"/>
+    <File Name="../housetile.cpp"/>
+    <File Name="../ioaccount.cpp"/>
+    <File Name="../iomapotbm.cpp"/>
+    <File Name="../iomapserialize.cpp"/>
+    <File Name="../ioplayer.cpp"/>
+    <File Name="../item.cpp"/>
+    <File Name="../items.cpp"/>
+    <File Name="../logger.cpp"/>
+    <File Name="../luascript.cpp"/>
+    <File Name="../mailbox.cpp"/>
+    <File Name="../map.cpp"/>
+    <File Name="../md5.cpp"/>
+    <File Name="../monster.cpp"/>
+    <File Name="../monsters.cpp"/>
+    <File Name="../movement.cpp"/>
+    <File Name="../networkmessage.cpp"/>
+    <File Name="../npc.cpp"/>
+    <File Name="../otserv.cpp"/>
+    <File Name="../outfit.cpp"/>
+    <File Name="../outputmessage.cpp"/>
+    <File Name="../party.cpp"/>
+    <File Name="../player.cpp"/>
+    <File Name="../position.cpp"/>
+    <File Name="../protocol.cpp"/>
+    <File Name="../protocolgame.cpp"/>
+    <File Name="../protocollogin.cpp"/>
+    <File Name="../protocolold.cpp"/>
+    <File Name="../quests.cpp"/>
+    <File Name="../raids.cpp"/>
+    <File Name="../rsa.cpp"/>
+    <File Name="../scheduler.cpp"/>
+    <File Name="../scriptmanager.cpp"/>
+    <File Name="../server.cpp"/>
+    <File Name="../sha1.cpp"/>
+    <File Name="../spawn.cpp"/>
+    <File Name="../spells.cpp"/>
+    <File Name="../status.cpp"/>
+    <File Name="../talkaction.cpp"/>
+    <File Name="../tasks.cpp"/>
+    <File Name="../teleport.cpp"/>
+    <File Name="../thing.cpp"/>
+    <File Name="../tile.cpp"/>
+    <File Name="../tools.cpp"/>
+    <File Name="../trashholder.cpp"/>
+    <File Name="../vocation.cpp"/>
+    <File Name="../waitlist.cpp"/>
+    <File Name="../weapons.cpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Headers">
+    <File Name="../account.h"/>
+    <File Name="../actions.h"/>
+    <File Name="../admin.h"/>
+    <File Name="../allocator.h"/>
+    <File Name="../ban.h"/>
+    <File Name="../baseevents.h"/>
+    <File Name="../beds.h"/>
+    <File Name="../chat.h"/>
+    <File Name="../combat.h"/>
+    <File Name="../condition.h"/>
+    <File Name="../configmanager.h"/>
+    <File Name="../connection.h"/>
+    <File Name="../const.h"/>
+    <File Name="../container.h"/>
+    <File Name="../creature.h"/>
+    <File Name="../creatureevent.h"/>
+    <File Name="../cylinder.h"/>
+    <File Name="../database.h"/>
+    <File Name="../databasemysql.h"/>
+    <File Name="../databaseodbc.h"/>
+    <File Name="../databasepgsql.h"/>
+    <File Name="../databasesqlite.h"/>
+    <File Name="../definitions.h"/>
+    <File Name="../depot.h"/>
+    <File Name="../enums.h"/>
+    <File Name="../exception.h"/>
+    <File Name="../fileloader.h"/>
+    <File Name="../game.h"/>
+    <File Name="../guild.h"/>
+    <File Name="../house.h"/>
+    <File Name="../housetile.h"/>
+    <File Name="../ioaccount.h"/>
+    <File Name="../iomap.h"/>
+    <File Name="../iomapotbm.h"/>
+    <File Name="../iomapserialize.h"/>
+    <File Name="../ioplayer.h"/>
+    <File Name="../item.h"/>
+    <File Name="../itemloader.h"/>
+    <File Name="../items.h"/>
+    <File Name="../logger.h"/>
+    <File Name="../luascript.h"/>
+    <File Name="../mailbox.h"/>
+    <File Name="../map.h"/>
+    <File Name="../md5.h"/>
+    <File Name="../monster.h"/>
+    <File Name="../monsters.h"/>
+    <File Name="../movement.h"/>
+    <File Name="../networkmessage.h"/>
+    <File Name="../npc.h"/>
+    <File Name="../otpch.h"/>
+    <File Name="../otsystem.h"/>
+    <File Name="../outfit.h"/>
+    <File Name="../outputmessage.h"/>
+    <File Name="../party.h"/>
+    <File Name="../player.h"/>
+    <File Name="../position.h"/>
+    <File Name="../protocol.h"/>
+    <File Name="../protocolgame.h"/>
+    <File Name="../protocollogin.h"/>
+    <File Name="../protocolold.h"/>
+    <File Name="../quests.h"/>
+    <File Name="../raids.h"/>
+    <File Name="../rsa.h"/>
+    <File Name="../scheduler.h"/>
+    <File Name="../scriptmanager.h"/>
+    <File Name="../server.h"/>
+    <File Name="../sha1.h"/>
+    <File Name="../spawn.h"/>
+    <File Name="../spells.h"/>
+    <File Name="../status.h"/>
+    <File Name="../talkaction.h"/>
+    <File Name="../tasks.h"/>
+    <File Name="../teleport.h"/>
+    <File Name="../templates.h"/>
+    <File Name="../thing.h"/>
+    <File Name="../tile.h"/>
+    <File Name="../tools.h"/>
+    <File Name="../town.h"/>
+    <File Name="../trashholder.h"/>
+    <File Name="../vocation.h"/>
+    <File Name="../waitlist.h"/>
+    <File Name="../waypoints.h"/>
+    <File Name="../weapons.h"/>
+  </VirtualDirectory>
+  <Settings Type="Executable">
+    <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="" Required="yes" PreCompiledHeader=""/>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="" IntermediateDirectory="" Command="" CommandArguments="" WorkingDirectory="" PauseExecWhenProcTerminates="yes"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-mthreads;-fomit-frame-pointer;-finline-functions" Required="yes" PreCompiledHeader=""/>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
+    <GlobalSettings>
+      <Compiler Options="">
+        <Preprocessor Value="__USE_MYSQL__"/>
+      </Compiler>
+      <Linker Options="">
+        <Library Value="lua5.1"/>
+        <Library Value="liblibxml2"/>
+        <Library Value="liblibmysql"/>
+        <Library Value="gmp"/>
+        <Library Value="libboost_system-mgw44-mt-1_43"/>
+        <Library Value="libboost_thread-mgw44-mt-1_43"/>
+        <Library Value="libboost_regex-mgw44-mt-1_43"/>
+        <Library Value="libwsock32"/>
+        <Library Value="libws2_32"/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+  </Settings>
+</CodeLite_Project>
