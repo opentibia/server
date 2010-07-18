@@ -127,7 +127,7 @@ public:
 	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
 	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
-	bool isRune() const {return clientCharges;}
+	bool isRune() const {return charges != 0;}
 
 	//[ added for beds system
 	bool isBed() const {return type == ITEM_TYPE_BED;}
@@ -162,7 +162,6 @@ public:
 	bool           isHorizontal;
 	bool           isHangable;
 	bool           allowDistRead;
-	bool           clientCharges;
 	bool           lookThrough;
 	uint16_t       speed;
 	int32_t        decayTo;
