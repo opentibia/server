@@ -169,19 +169,26 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 
 	const ItemType& it = items[id];
 
-	count = 1;
-	if(it.charges != 0){
-		setCharges(it.charges);
-	}
+	setItemCount(1);
 
 	if(it.isFluidContainer() || it.isSplash()){
 		setFluidType(_count);
 	}
-	else if(it.stackable && _count != 0){
-		count = _count;
+	else if(it.stackable){
+		if(_count != 0){
+			setItemCount(_count);
+		}
+		else if(it.charges != 0){
+			setItemCount(it.charges);
+		}
 	}
-	else if(it.charges != 0 && _count != 0){
-		setCharges(_count);
+	else if(it.charges != 0){
+		if(_count != 0){
+			setCharges(_count);
+		}
+		else{
+			setCharges(it.charges);
+		}
 	}
 
 	setDefaultDuration();
@@ -230,10 +237,15 @@ Item::~Item()
 void Item::setDefaultSubtype()
 {
 	const ItemType& it = items[id];
-
+	
 	count = 1;
 	if(it.charges != 0){
-		setCharges(it.charges);
+		if(it.stackable){
+			setItemCount(it.charges);
+		}
+		else{
+			setCharges(it.charges);
+		}
 	}
 }
 
@@ -282,11 +294,14 @@ uint16_t Item::getSubType() const
 	if(it.isFluidContainer() || it.isSplash()){
 		return getFluidType();
 	}
+	else if(it.stackable){
+		return getItemCount();
+	}
 	else if(it.charges != 0){
 		return getCharges();
 	}
 
-	return count;
+	return getItemCount();
 }
 
 Player* Item::getHoldingPlayer()
@@ -313,11 +328,14 @@ void Item::setSubType(uint16_t n)
 	if(it.isFluidContainer() || it.isSplash()){
 		setFluidType(n);
 	}
+	else if(it.stackable){
+		setItemCount(n);
+	}
 	else if(it.charges != 0){
 		setCharges(n);
 	}
 	else{
-		count = n;
+		setItemCount(n);
 	}
 }
 
@@ -689,7 +707,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 double Item::getWeight() const
 {
 	if(isStackable()){
-		return items[id].weight * std::max((int32_t)1, (int32_t)count);
+		return items[id].weight * std::max((int32_t)1, (int32_t)getItemCount());
 	}
 
 	return items[id].weight;
@@ -744,7 +762,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 	s << getLongName(it, lookDistance, item, subType, addArticle);
 
 	if(it.isRune()){
-		s << "(\"" << it.runeSpellName << "\", Charges:" << subType <<").";
+		s << " (\"" << it.runeSpellName << "\").";
 		if(it.runeLevel > 0 || it.runeMagLevel > 0){
 			s << std::endl << "It can only be used with";
 			if(it.runeLevel > 0){
@@ -1029,7 +1047,7 @@ std::string Item::getWeightDescription() const
 std::string Item::getWeightDescription(double weight) const
 {
 	const ItemType& it = Item::items[id];
-	return getWeightDescription(it, weight, count);
+	return getWeightDescription(it, weight, getItemCount());
 }
 
 std::string Item::getWeightDescription(const ItemType& it, double weight, uint32_t count /*= 1*/)

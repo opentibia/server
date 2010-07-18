@@ -2288,8 +2288,8 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 		Spell::postCastSpell(player);
 
 		if(hasCharges && item && g_config.getNumber(ConfigManager::REMOVE_RUNE_CHARGES)){
-			int32_t newCharge = std::max((int32_t)0, ((int32_t)item->getCharges()) - 1);
-			g_game.transformItem(item, item->getID(), newCharge);
+			int32_t newCount = std::max((int32_t)0, ((int32_t)item->getItemCount()) - 1);
+			g_game.transformItem(item, item->getID(), newCount);
 		}
 	}
 

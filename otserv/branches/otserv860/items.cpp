@@ -458,11 +458,12 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(asLowerCaseString(strValue) == "door"){
 										it.type = ITEM_TYPE_DOOR;
 									}
-									//[ added for beds system
 									else if(asLowerCaseString(strValue) == "bed"){
 										it.type = ITEM_TYPE_BED;
 									}
-									//]
+									else if(asLowerCaseString(strValue) == "rune"){
+										it.type = ITEM_TYPE_RUNE;
+									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown type " << strValue  << std::endl;
 									}

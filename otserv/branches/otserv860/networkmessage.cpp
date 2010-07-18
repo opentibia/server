@@ -113,7 +113,7 @@ void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 
 	AddU16(it.clientId);
 
-	if(it.stackable || it.isRune()){
+	if(it.stackable){
 		AddByte(count);
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
@@ -128,7 +128,7 @@ void NetworkMessage::AddItem(const Item* item)
 
 	AddU16(it.clientId);
 
-	if(it.stackable || it.isRune()){
+	if(it.stackable){
 		AddByte(item->getSubType());
 	}
 	else if(it.isSplash() || it.isFluidContainer()){

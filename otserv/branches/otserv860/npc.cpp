@@ -502,10 +502,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 								li.subType = intValue;
 							}
 							else{
-								if(it.isRune()){
-									li.subType = it.charges;
-								}
-								else if(it.stackable){
+								if(it.stackable){
 									li.subType = 1;
 								}
 								else if(it.isFluidContainer() || it.isSplash()){

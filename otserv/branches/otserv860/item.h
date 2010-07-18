@@ -348,7 +348,7 @@ public:
 	bool isRoteable() const {const ItemType& it = items[id]; return it.rotable && it.rotateTo;}
 	bool isDoor() const {return items[id].isDoor();}
 	bool isBed() const {return items[id].isBed();}
-	bool hasCharges() const {return items[id].charges != 0;}
+	bool hasCharges() const {return getCharges() > 0;}
 
 	bool floorChangeDown() const {return items[id].floorChangeDown;}
 	bool floorChangeNorth() const {return items[id].floorChangeNorth;}
@@ -404,15 +404,9 @@ typedef std::list<Item *> ItemList;
 
 inline uint32_t Item::countByType(const Item* i, int32_t checkType, bool multiCount){
 	if(checkType == -1 || checkType == i->getSubType()){
-
-		if(multiCount)
-			return i->getItemCount();
-
-		if(i->isRune())
-			return i->getCharges();
-
 		return i->getItemCount();
 	}
+
 	return 0;
 }
 
