@@ -405,39 +405,59 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 		Container* parentContainer = dynamic_cast<Container*>(getParent());
 		if(parentContainer)
 			return parentContainer;
-		else
-			return this;
-	}
-	else if(index == 255 /*add wherever*/){
-		index = INDEX_WHEREEVER;
-		*destItem = NULL;
+
 		return this;
 	}
-	else{
-		if(index >= (int32_t)capacity()){
-			/*
-			if you have a container, maximize it to show all 20 slots
-			then you open a bag that is inside the container you will have a bag with 8 slots
-			and a "grey" area where the other 12 slots where from the container
-			if you drop the item on that grey area
-			the client calculates the slot position as if the bag has 20 slots
-			*/
+	
+	if(index == 255 /*add wherever*/){
+		index = INDEX_WHEREEVER;
+		*destItem = NULL;
+	}
+	else if(index >= (int32_t)capacity()){
+		/*
+		if you have a container, maximize it to show all 20 slots
+		then you open a bag that is inside the container you will have a bag with 8 slots
+		and a "grey" area where the other 12 slots where from the container
+		if you drop the item on that grey area
+		the client calculates the slot position as if the bag has 20 slots
+		*/
 
-			index = INDEX_WHEREEVER;
-		}
+		index = INDEX_WHEREEVER;
+		*destItem = NULL;
+	}
 
-		if(index != INDEX_WHEREEVER){
-			Thing* destThing = __getThing(index);
-			if(destThing)
-				*destItem = destThing->getItem();
+	const Item* item = thing->getItem();
+	if(item == NULL){
+		return this;
+	}
 
-			Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destItem);
+	if(item->isStackable()){
+		if(item->getParent() != this){
+			//try find a suitable item to stack with
+			uint32_t n = 0;
+			for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
+				if((*cit) != item && (*cit)->getID() == item->getID() && (*cit)->getItemCount() < 100){
+					*destItem = (*cit);
+					index = n;
+					return this;
+				}
 
-			if(subCylinder){
-				index = INDEX_WHEREEVER;
-				*destItem = NULL;
-				return subCylinder;
+				++n;
 			}
+		}
+	}
+
+	if(index != INDEX_WHEREEVER){
+		Thing* destThing = __getThing(index);
+		if(destThing)
+			*destItem = destThing->getItem();
+
+		Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destItem);
+
+		if(subCylinder){
+			index = INDEX_WHEREEVER;
+			*destItem = NULL;
+			return subCylinder;
 		}
 	}
 	

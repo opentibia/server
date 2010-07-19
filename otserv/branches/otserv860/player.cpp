@@ -3081,11 +3081,20 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 
 		//find a appropiate slot
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
-			if(inventory[i] == NULL){
-				if(__queryAdd(i, item, item->getItemCount(), 0) == RET_NOERROR){
-					index = i;
-					return this;
+			Item* inventoryItem = inventory[i];
+			if(inventoryItem){
+				if(item->isStackable()){
+					//try find a suitable item to stack with
+					if(inventoryItem != item && inventoryItem->getID() == item->getID() && inventoryItem->getItemCount() < 100){
+						*destItem = inventoryItem;
+						index = i;
+						return this;
+					}
 				}
+			}
+			else if(__queryAdd(i, item, item->getItemCount(), 0) == RET_NOERROR){
+				index = i;
+				return this;
 			}
 		}
 

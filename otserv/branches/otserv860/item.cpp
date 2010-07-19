@@ -238,7 +238,7 @@ void Item::setDefaultSubtype()
 {
 	const ItemType& it = items[id];
 	
-	count = 1;
+	setItemCount(1);
 	if(it.charges != 0){
 		if(it.stackable){
 			setItemCount(it.charges);
