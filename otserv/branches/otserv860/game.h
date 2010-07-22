@@ -302,6 +302,8 @@ public:
 
 	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
 		uint32_t flags = 0, bool test = false);
+	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, int32_t index,
+		uint32_t flags, bool test, uint32_t& remainderCount);
 	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false, uint32_t flags = 0);
 
 	ReturnValue internalPlayerAddItem(Player* player, Item* item, bool dropOnMap = true, slots_t slot = SLOT_WHEREEVER);
