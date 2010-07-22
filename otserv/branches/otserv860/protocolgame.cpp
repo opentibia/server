@@ -1914,7 +1914,8 @@ void ProtocolGame::sendCancelTarget()
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
 		TRACK_MESSAGE(msg);
-		//msg->AddByte(0xA3);
+		msg->AddByte(0xA3);
+		msg->AddU32(0);
 	}
 }
 
