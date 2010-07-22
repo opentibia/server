@@ -343,14 +343,30 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 	if(item->isStackable()){
 		uint32_t n = 0;
 		
-		if(index != INDEX_WHEREEVER){
+		if(index == INDEX_WHEREEVER){
+			//Iterate through every item and check how much free stackable slots there is.
+			uint32_t slotIndex = 0;
+			for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit, ++slotIndex){
+
+				if((*cit) != item && (*cit)->getID() == item->getID() && (*cit)->getItemCount() < 100){
+					uint32_t remainder = (100 - (*cit)->getItemCount());
+					if(__queryAdd(slotIndex, item, remainder, flags) == RET_NOERROR){
+						n += remainder;
+					}
+				}
+			}
+		}
+		else{
 			const Thing* destThing = __getThing(index);
 			const Item* destItem = NULL;
 			if(destThing)
 				destItem = destThing->getItem();
 
-			if(destItem && destItem->getID() == item->getID()){
-				n = 100 - destItem->getItemCount();
+			if(destItem && destItem->getID() == item->getID() && destItem->getItemCount() < 100){
+				uint32_t remainder = 100 - destItem->getItemCount();
+				if(__queryAdd(index, item, remainder, flags) == RET_NOERROR){
+					n = remainder;
+				}
 			}
 		}
 
