@@ -719,6 +719,10 @@ if(Modules == nil) then
 			[TAG_ITEMNAME] = self.npcHandler.shopItems[itemid].realName
 		}
 
+		if amount <= 0 then
+			return false
+		end
+
 		local cost = amount*self.npcHandler.shopItems[itemid].buyPrice
 		local backpackId = 1988
 
