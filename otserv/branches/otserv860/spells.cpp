@@ -49,7 +49,7 @@ Spells::~Spells()
 	clear();
 }
 
-TalkActionResult_t Spells::playerSaySpell(Player* player, SpeakClasses type, const std::string& words)
+TalkActionResult_t Spells::playerSaySpell(Player* player, SpeakClasses type, std::string& words)
 {
 	std::string str_words = words;
 
@@ -88,6 +88,7 @@ TalkActionResult_t Spells::playerSaySpell(Player* player, SpeakClasses type, con
 	}
 
 	if(instantSpell->playerCastInstant(player, param)){
+		words = instantSpell->getWords();
 		return TALKACTION_BREAK;
 	}
 	else{

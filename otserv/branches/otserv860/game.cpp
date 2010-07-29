@@ -3581,12 +3581,13 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 
 bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
 {
-	TalkActionResult_t result = g_spells->playerSaySpell(player, type, text);
+	std::string words = text;
+	TalkActionResult_t result = g_spells->playerSaySpell(player, type, words);
 	if(result == TALKACTION_BREAK){
 		if(g_config.getNumber(ConfigManager::ORANGE_SPELL_TEXT))
-			return internalCreatureSay(player, SPEAK_MONSTER_SAY, text);
+			return internalCreatureSay(player, SPEAK_MONSTER_SAY, words);
 		else
-			return internalCreatureSay(player, SPEAK_SAY, text);
+			return internalCreatureSay(player, SPEAK_SAY, words);
 	}
 	else if(result == TALKACTION_FAILED){
 		return true;
@@ -4645,12 +4646,8 @@ void Game::FreeThing(Thing* thing)
 
 void Game::showUseHotkeyMessage(Player* player, Item* item)
 {
-	int32_t subType = -1;
-	if(item->hasSubType() && !item->hasCharges()){
-		subType = item->getSubType();
-	}
 	const ItemType& it = Item::items[item->getID()];
-	uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+	uint32_t itemCount = item->getItemCount();
 
 	std::stringstream ss;
 	if(itemCount == 1){

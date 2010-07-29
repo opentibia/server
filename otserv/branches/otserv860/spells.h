@@ -53,7 +53,7 @@ public:
 	uint32_t getInstantSpellCount(const Player* player);
 	InstantSpell* getInstantSpellByIndex(const Player* player, uint32_t index);
 
-	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
+	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, std::string& words);
 
 	static Position getCasterPosition(Creature* creature, Direction dir);
 	virtual std::string getScriptBaseName();
