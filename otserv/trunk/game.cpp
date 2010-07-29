@@ -2688,6 +2688,11 @@ bool Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 		return false;
 	}
 
+	if(!canThrowObjectTo(tradePartner->getPosition(), player->getPosition())){
+		player->sendCancelMessage(RET_CREATUREISNOTREACHABLE);
+		return false;
+	}
+
 	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, stackPos, spriteId, STACKPOS_USE));
 	if(!tradeItem || tradeItem->getClientID() != spriteId || !tradeItem->isPickupable() || tradeItem->getUniqueId() != 0) {
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -2785,9 +2790,18 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 		return false;
 	}
 
-	player->setTradeState(TRADE_ACCEPT);
 	Player* tradePartner = player->tradePartner;
-	if(tradePartner && tradePartner->getTradeState() == TRADE_ACCEPT){
+	if(!tradePartner){
+		return false;
+	}
+
+	if(!canThrowObjectTo(tradePartner->getPosition(), player->getPosition())){
+		player->sendCancelMessage(RET_CREATUREISNOTREACHABLE);
+		return false;
+	}
+
+	player->setTradeState(TRADE_ACCEPT);
+	if(tradePartner->getTradeState() == TRADE_ACCEPT){
 
 		Item* tradeItem1 = player->tradeItem;
 		Item* tradeItem2 = tradePartner->tradeItem;
