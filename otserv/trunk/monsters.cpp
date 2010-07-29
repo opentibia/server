@@ -632,13 +632,13 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* 
 			combat->setCondition(condition);
 		}
 		else if(asLowerCaseString(name) == "firefield"){
-			combat->setParam(COMBATPARAM_CREATEITEM, 1492);
+			combat->setParam(COMBATPARAM_CREATEITEM, ITEM_FIREFIELD);
 		}
 		else if(asLowerCaseString(name) == "poisonfield"){
-			combat->setParam(COMBATPARAM_CREATEITEM, 1496);
+			combat->setParam(COMBATPARAM_CREATEITEM, ITEM_POISONFIELD);
 		}
 		else if(asLowerCaseString(name) == "energyfield"){
-			combat->setParam(COMBATPARAM_CREATEITEM, 1495);
+			combat->setParam(COMBATPARAM_CREATEITEM, ITEM_ENERGYFIELD);
 		}
 		else if(asLowerCaseString(name) == "firecondition" ||
 				asLowerCaseString(name) == "poisoncondition" ||
