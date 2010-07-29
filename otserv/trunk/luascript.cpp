@@ -1475,6 +1475,9 @@ void LuaScriptInterface::registerFunctions()
 	//isValidUID(uid)
 	lua_register(m_luaState, "isValidUID", LuaScriptInterface::luaIsValidUID);
 
+	//isCreatureImmuneToCondition(cid, conditionType)
+	lua_register(m_luaState, "isCreatureImmuneToCondition", LuaScriptInterface::luaIsCreatureImmuneToCondition);
+
 	//isCreature(cid)
 	lua_register(m_luaState, "isCreature", LuaScriptInterface::luaIsCreature);
 
@@ -2750,7 +2753,7 @@ int LuaScriptInterface::luaDoCreatureSay(lua_State *L)
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 	}
 	return 1;
@@ -6768,6 +6771,29 @@ int LuaScriptInterface::luaIsValidUID(lua_State *L)
 	}
 	return 1;
 }
+
+int LuaScriptInterface::luaIsCreatureImmuneToCondition(lua_State *L)
+{
+	//isCreatureImmuneToCondition(cid, conditionType)
+	ConditionType_t conditionType = (ConditionType_t) popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		if (creature->isImmune(conditionType))
+			lua_pushnumber(L, LUA_TRUE);
+		else
+			lua_pushnumber(L, LUA_FALSE);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
 
 int LuaScriptInterface::luaIsCreature(lua_State *L)
 {

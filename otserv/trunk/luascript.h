@@ -606,6 +606,7 @@ protected:
 	static int luaGetPartyMembers(lua_State *L);
 	static int luaHasCondition(lua_State *L);
 
+	static int luaIsCreatureImmuneToCondition(lua_State *L);
 	static int luaHasProperty(lua_State *L);
 	static int luaIsItemStackable(lua_State *L);
 	static int luaIsItemRune(lua_State *L);
