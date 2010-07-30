@@ -2343,7 +2343,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 
 	player->setNextActionTask(NULL);
 
-	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item, isHotkey);
+	return g_actions->useItemEx(player, fromPos, toPos, toStackPos, item, isHotkey, playerId);
 }
 
 bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPos,
