@@ -1006,7 +1006,7 @@ int32_t LuaScriptInterface::popCallback(lua_State *L)
 	return luaL_ref(L, LUA_REGISTRYINDEX);
 }
 
-void LuaScriptInterface::setField(lua_State *L, const char* index, int32_t val)
+void LuaScriptInterface::setField(lua_State *L, const char* index, int64_t val)
 {
 	lua_pushstring(L, index);
 	lua_pushnumber(L, (double)val);
