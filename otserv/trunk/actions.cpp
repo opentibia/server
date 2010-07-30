@@ -340,8 +340,7 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos,
 	}
 
 	if(!foundAction && defaultAction){
-		executeUse(defaultAction, player, item, posEx, creatureId);
-		foundAction = true;
+		foundAction = executeUse(defaultAction, player, item, posEx, creatureId);
 	}
 
 	if(BedItem* bed = item->getBed()){
