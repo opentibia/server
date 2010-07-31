@@ -518,7 +518,6 @@ ReturnValue Actions::internalUseItemEx(Player* player, const PositionEx& fromPos
 	return RET_CANNOTUSETHISOBJECT;
 }
 
-//creatureId must be the id of the target creature. If there isn't none, it must be the playerid
 bool Actions::useItemEx(Player* player, const Position& fromPos, const Position& toPos,
 	uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId/* = 0*/)
 {
