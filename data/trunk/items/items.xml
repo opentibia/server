@@ -23799,7 +23799,7 @@
 	<item id="10498" name="pavement"/>
 	<item id="10499" name="remains of a water elemental">
 		<attribute key="description" value="Something is wobbling inside. Maybe with a fishing rod you could reach it."/>
-		<attribute key="decayTo" value="500"/>
+		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="300"/>
 		<attribute key="corpseType" value="water"/>
 	</item>
