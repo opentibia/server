@@ -8,5 +8,7 @@ setConditionFormula(condition, -0.9, 0, -0.9, 0)
 setCombatCondition(combat, condition)
 
 function onCastSpell(cid, var)
+	local pos = getCreaturePosition(cid)
+	doSendMagicEffect(pos, CONST_ME_MAGIC_GREEN)
 	return doCombat(cid, combat, var)
 end
