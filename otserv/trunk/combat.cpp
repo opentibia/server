@@ -706,11 +706,9 @@ bool Combat::CombatNullFunc(Creature* caster, Creature* target, const CombatPara
 {
 	CombatConditionFunc(caster, target, params, NULL);
 	CombatDispelFunc(caster, target, params, NULL);
-
-	if(params.isAggressive){
-		onCreatureDoCombat(caster, target);
-	}
-
+	
+	onCreatureDoCombat(caster, target, params.isAggressive);
+	
 	return true;
 }
 
@@ -872,9 +870,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 						}
 
 						if(func == CombatDispelFunc || func == CombatConditionFunc){
-							if(params.isAggressive){
-								onCreatureDoCombat(caster, *cit);
-							}
+							onCreatureDoCombat(caster, *cit, params.isAggressive);
 						}
 					}
 				}
@@ -1014,9 +1010,7 @@ void Combat::doCombatCondition(Creature* caster, Creature* target, const CombatP
 			addDistanceEffect(caster, caster->getPosition(), target->getPosition(), params.distanceEffect);
 		}
 
-		if(params.isAggressive){
-			onCreatureDoCombat(caster, target);
-		}
+		onCreatureDoCombat(caster, target, params.isAggressive);
 	}
 }
 
@@ -1043,9 +1037,7 @@ void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatPara
 			addDistanceEffect(caster, caster->getPosition(), target->getPosition(), params.distanceEffect);
 		}
 
-		if(params.isAggressive){
-			onCreatureDoCombat(caster, target);
-		}
+		onCreatureDoCombat(caster, target, params.isAggressive);
 	}
 }
 
@@ -1070,13 +1062,11 @@ void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatPar
 	}
 }
 
-void Combat::onCreatureDoCombat(Creature* caster, Creature* target)
+void Combat::onCreatureDoCombat(Creature* caster, Creature* target, bool isAggressive)
 {
-	if(caster && target){
-		if(caster != target){
+	if(isAggressive && caster && target && caster != target){
 			caster->onAttackedCreature(target);
 			target->onAttacked();
-		}
 	}
 }
 
