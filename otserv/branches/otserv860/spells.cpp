@@ -89,6 +89,11 @@ TalkActionResult_t Spells::playerSaySpell(Player* player, SpeakClasses type, std
 
 	if(instantSpell->playerCastInstant(player, param)){
 		words = instantSpell->getWords();
+
+		if(instantSpell->getHasParam()){
+			words += " \"" + param + "\""; 
+		}
+
 		return TALKACTION_BREAK;
 	}
 	else{
