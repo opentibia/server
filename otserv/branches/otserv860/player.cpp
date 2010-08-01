@@ -3163,21 +3163,22 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		//check deeper in the containers
 		for(std::list<Container*>::iterator it = containerList.begin(); it != containerList.end(); ++it){
 			for(ContainerIterator iit = (*it)->begin(); iit != (*it)->end(); ++iit){
-				Container* subContainer = (*iit)->getContainer();
+				if(Container* subContainer = (*iit)->getContainer()){
 
-				if(subContainer == tradeItem){
-					continue;
-				}
+					if(subContainer == tradeItem){
+						continue;
+					}
 
-				Cylinder* tmpCylinder = NULL;
-				int32_t tmpIndex = INDEX_WHEREEVER;
-				Item* tmpDestItem = NULL;
+					Cylinder* tmpCylinder = NULL;
+					int32_t tmpIndex = INDEX_WHEREEVER;
+					Item* tmpDestItem = NULL;
 
-				tmpCylinder = subContainer->__queryDestination(tmpIndex, item, &tmpDestItem, flags);
-				if(tmpCylinder && tmpCylinder->__queryAdd(tmpIndex, item, item->getItemCount(), flags) == RET_NOERROR){
-					index = tmpIndex;
-					*destItem = tmpDestItem;
-					return tmpCylinder;
+					tmpCylinder = subContainer->__queryDestination(tmpIndex, item, &tmpDestItem, flags);
+					if(tmpCylinder && tmpCylinder->__queryAdd(tmpIndex, item, item->getItemCount(), flags) == RET_NOERROR){
+						index = tmpIndex;
+						*destItem = tmpDestItem;
+						return tmpCylinder;
+					}
 				}
 			}
 		}
