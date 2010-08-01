@@ -3392,7 +3392,7 @@ int32_t Player::__getLastIndex() const
 	return SLOT_LAST;
 }
 
-uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
+uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) const
 {
 	uint32_t count = 0;
 
@@ -3400,34 +3400,35 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 		Item* item = inventory[i];
 
 		if(item){
-			if(item->getID() == itemId)
-				count += Item::countByType(item, subType, itemCount);
-
-			Container* container = item->getContainer();
-			if(container)
-				for(ContainerIterator iter = container->begin(), end = container->end(); iter != end; ++iter)
-					if((*iter)->getID() == itemId)
-						count += Item::countByType(*iter, subType, itemCount);
+			if(item->getID() == itemId){
+				count += Item::countByType(item, subType);
+			}
+			else if(Container* container = item->getContainer()){
+				for(ContainerIterator it = container->begin(), end = container->end(); it != end; ++it){
+					if((*it)->getID() == itemId){
+						count += Item::countByType(*it, subType);
+					}
+				}
+			}
 		}
 	}
 
 	return count;
 }
 
-std::map<uint32_t, uint32_t>& Player::__getAllItemTypeCount(
-	std::map<uint32_t, uint32_t>& countMap, bool itemCount /*= true*/) const
+std::map<uint32_t, uint32_t>& Player::__getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const
 {
 	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
 		Item* item = inventory[i];
 
 		if(item){
-			countMap[item->getID()] += Item::countByType(item, -1, itemCount);
+			countMap[item->getID()] += Item::countByType(item, -1);
 
-			Container* container = item->getContainer();
-
-			if(container)
-				for(ContainerIterator iter = container->begin(), end = container->end(); iter != end; ++iter)
-					countMap[(*iter)->getID()] += Item::countByType(*iter, -1, itemCount);
+			if(Container* container = item->getContainer()){
+				for(ContainerIterator it = container->begin(), end = container->end(); it != end; ++it){
+					countMap[(*it)->getID()] += Item::countByType(*it, -1);
+				}
+			}
 		}
 	}
 

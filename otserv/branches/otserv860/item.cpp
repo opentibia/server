@@ -41,7 +41,7 @@ extern Weapons* g_weapons;
 
 Items Item::items;
 
-Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 1*/)
+Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 {
 	Item* newItem = NULL;
 

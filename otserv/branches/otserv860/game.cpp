@@ -4647,7 +4647,7 @@ void Game::FreeThing(Thing* thing)
 void Game::showUseHotkeyMessage(Player* player, Item* item)
 {
 	const ItemType& it = Item::items[item->getID()];
-	uint32_t itemCount = item->getItemCount();
+	uint32_t itemCount = player->__getItemTypeCount(item->getID(), -1);
 
 	std::stringstream ss;
 	if(itemCount == 1){
