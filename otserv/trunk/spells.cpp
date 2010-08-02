@@ -888,7 +888,8 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
-			if(needTarget && tile->getTopVisibleCreature(player) == NULL){
+			bool canAttackInvisible = g_config.getNumber(ConfigManager::CAN_ATTACK_INVISIBLE);
+			if(needTarget && tile->getTopVisibleCreature(player, !canAttackInvisible) == NULL){
 				player->sendCancelMessage(RET_CANONLYUSETHISRUNEONCREATURES);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
@@ -916,7 +917,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 
 			if(player->hasSafeMode() && isAggressive && needTarget && tile->getTopVisibleCreature(player)){
 				Player* targetPlayer = tile->getTopVisibleCreature(player)->getPlayer();
-				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE && 
+				if(targetPlayer && targetPlayer != player && targetPlayer->getSkull() == SKULL_NONE &&
 					!targetPlayer->isPartner(player) && !targetPlayer->isWarPartner(player) &&
 					!targetPlayer->isGuildEnemy(player)){
 					player->sendCancelMessage(RET_TURNSECUREMODETOATTACKUNMARKEDPLAYERS);

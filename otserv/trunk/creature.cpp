@@ -149,6 +149,19 @@ bool Creature::canSee(const Position& pos) const
 	return canSee(getPosition(), pos, Map::maxViewportX, Map::maxViewportY);
 }
 
+bool Creature::canBeSeen(const Creature* viewer, bool checkVisibility/*=true*/) const
+{
+	if (viewer && checkVisibility)
+		return viewer->canSeeCreature(this);
+	if (viewer && viewer->canSeeInvisibility())
+		return true;
+	if (getPlayer() && getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+		return false;
+	if (checkVisibility)
+		return !isInvisible();
+	return true;
+}
+
 bool Creature::canSeeCreature(const Creature* creature) const
 {
 	if(creature == this){

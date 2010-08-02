@@ -153,6 +153,7 @@ public:
 		SHOW_HEALING,
 		ORANGE_SPELL_TEXT,
 		SHOW_DEATH_WINDOW,
+		CAN_ATTACK_INVISIBLE,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

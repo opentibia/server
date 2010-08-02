@@ -196,6 +196,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[ORANGE_SPELL_TEXT] = getGlobalBoolean(L, "orange_spell_text", false);
 	m_confInteger[SHOW_DEATH_WINDOW] = getGlobalBoolean(L, "show_death_window", true);
 	m_confString[DEATH_MSG] = getGlobalString(L, "death_msg", "You are dead.");
+	m_confInteger[CAN_ATTACK_INVISIBLE] = getGlobalBoolean(L, "can_attack_invisible", false);
 	m_isLoaded = true;
 	return true;
 }

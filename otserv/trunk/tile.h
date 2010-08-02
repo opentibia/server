@@ -167,8 +167,8 @@ public:
 	Item* getTopDownItem();
 	bool isMoveableBlocking() const;
 	Thing* getTopVisibleThing(const Creature* creature);
-	Creature* getTopVisibleCreature(const Creature* creature);
-	const Creature* getTopVisibleCreature(const Creature* creature) const;
+	Creature* getTopVisibleCreature(const Creature* creature, bool checkVisibility=true);
+	const Creature* getTopVisibleCreature(const Creature* creature, bool checkVisibility=true) const;
 	Item* getItemByTopOrder(uint32_t topOrder);
 
 	uint32_t getThingCount() const {return thingCount;}

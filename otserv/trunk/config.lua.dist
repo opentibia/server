@@ -180,12 +180,12 @@ rate_spawn = 1
 --Example: "You advanced to sword fighting 17. "
 show_new_skill_level = false
 
---Displays amount of health healed. 
+--Displays amount of health healed.
 --Similar to the way damage is shown, except in green numbers (Example: +17) [default: "no"]
 show_healing = false
 
 --Use orange text for spells rather than traditional text [default: "no"]
---NOTE: The orange text will not be displayed on the default channel 
+--NOTE: The orange text will not be displayed on the default channel
 orange_spell_text = false
 
 -- Configuration for death messages
@@ -246,6 +246,9 @@ allow_gamemaster_multiclient = false
 despawnrange = 2
 -- how many square metters can a monster be far from his spawn before despawning
 despawnradius = 50
+
+--should players be able to hit invisible creatures using not AOE runes? (default: false)
+can_attack_invisible = false
 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
 maxmessagebuffer = 4
