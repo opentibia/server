@@ -1018,8 +1018,28 @@ bool Player::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+bool Player::getWalkBit(Player *viewer) const
+{
+	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	return Creature::getWalkBit(viewer);
+	#else
+	if (!Creature::getWalkBit(viewer))
+		return false;
+	if (!g_config.getNumber(ConfigManager::CAN_PASS_THROUGH))
+		return true;
+	if (g_config.getNumber(ConfigManager::LEVEL_PROTECTION) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP)
+		return true;
+	return false;
+	#endif
+}
+
+
 bool Player::canWalkthrough(const Creature* creature) const
 {
+	if (hasFlag(PlayerFlag_CanPassThroughAllCreatures)){
+		return true;
+	}
+
 	if(!creature->getPlayer()){
 		return false;
 	}
@@ -1028,15 +1048,22 @@ bool Player::canWalkthrough(const Creature* creature) const
 		return true;
 	}
 
-	if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP){
-		if(isGuildEnemy(creature->getPlayer())){
+	return (Combat::checkExtraRestrictions(this, creature, true) != RET_NOERROR);
+}
+
+
+bool Player::canBePushedBy(const Player *player) const
+{
+	if (player->hasFlag(PlayerFlag_CanPushAllCreatures))
+		return true;
+	if (g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)){
+		uint32_t victim_level = getLevel();
+		uint32_t player_level = player->getLevel();
+		uint32_t p_level = g_config.getNumber(ConfigManager::LEVEL_PROTECTION);
+		if (player_level < p_level && victim_level >= p_level)
 			return false;
 		}
-
-		return (getTile() && getTile()->ground->getID() != ITEM_GLOWING_SWITCH);
-	}
-
-	return false;
+	return isPushable();
 }
 
 void Player::onReceiveMail(uint32_t depotId)

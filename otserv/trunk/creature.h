@@ -168,6 +168,7 @@ public:
 
 	void setID(){this->id = auto_id | this->idRange();}
 	void setRemoved() {isInternalRemoved = true;}
+	virtual bool getWalkBit(Player *viewer) const;
 
 	virtual uint32_t idRange() = 0;
 	uint32_t getID() const { return id; }
@@ -192,6 +193,7 @@ public:
 
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return (getWalkDelay() <= 0);};
+	virtual bool canBePushedBy(const Player *player) const;
 	virtual bool isRemoved() const {return isInternalRemoved;};
 	virtual bool canSeeInvisibility() const { return false;}
 
@@ -284,6 +286,8 @@ public:
 	bool isSummon() const {return master != NULL;}
 	bool isPlayerSummon() const {return master != NULL && master->getPlayer() != NULL;}
 	Player* getPlayerMaster() const {return (isPlayerSummon() ? master->getPlayer() : NULL);}
+	Player* getPlayerInCharge() { return (getPlayer() ? getPlayer() : getPlayerMaster());}
+	const Player* getPlayerInCharge() const { return (getPlayer() ? getPlayer() : getPlayerMaster());}
 	const Creature* getMaster() const {return master;}
 
 	virtual void addSummon(Creature* creature);

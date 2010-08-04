@@ -243,10 +243,7 @@ ConditionType_t Combat::DamageToConditionType(CombatType_t type)
 
 bool Combat::isPlayerCombat(const Creature* target)
 {
-	if(target->getPlayer() || target->isPlayerSummon())
-		return true;
-
-	return false;
+	return(target && target->getPlayerInCharge());
 }
 
 ReturnValue Combat::canTargetCreature(const Player* player, const Creature* target)
@@ -388,6 +385,56 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 	#endif
 }
 
+
+ReturnValue Combat::checkExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalkCheck)
+{
+	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	const Player* targetPlayer;
+	if (g_config.getNumber(ConfigManager::PROTECTION_EXTENDED_TO_SUMMONS))
+		targetPlayer = target->getPlayerInCharge();
+	else
+		targetPlayer = target->getPlayer();
+	#else
+	const Player* targetPlayer = target->getPlayer();
+	#endif
+	const Player* attackerPlayer= attacker->getPlayerInCharge();
+
+	if(targetPlayer && attackerPlayer){
+		bool cancel = false;
+		bool pass_through = g_config.getNumber(ConfigManager::CAN_PASS_THROUGH);
+		if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP) {
+			if (!targetPlayer->isGuildEnemy(attackerPlayer) ||
+				(!isWalkCheck && !isInPvpZone(attacker, target))){
+				cancel = true;
+			}
+			if (isWalkCheck && !pass_through){
+				cancel = true;
+			}
+		}
+		else {
+			if (!isWalkCheck || pass_through){
+				uint32_t p_level = g_config.getNumber(ConfigManager::LEVEL_PROTECTION);
+				uint32_t attackerLevel = attackerPlayer->getLevel();
+				uint32_t targetLevel = targetPlayer->getLevel();
+				if ((attackerLevel >= p_level && targetLevel < p_level && isWalkCheck) ||
+					(!isWalkCheck && (attackerLevel < p_level || targetLevel < p_level)))
+					cancel = true;
+			}
+		}
+		if (isWalkCheck && target->getTile() && target->getTile()->ground->getID() == ITEM_GLOWING_SWITCH)
+			cancel = true;
+		if (cancel) {
+			if(target->getPlayer())
+				return RET_YOUMAYNOTATTACKTHISPERSON;
+			else
+				return RET_YOUMAYNOTATTACKTHISCREATURE;
+		}
+	}
+	return RET_NOERROR;
+}
+
+
+
 ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target)
 {
 	if(attacker){
@@ -427,31 +474,13 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 				}
 			}
 		}
-
 		if(attacker->getPlayer() || attacker->isPlayerSummon()){
 			//nopvp-zone
 			if(target->getPlayer() && target->getTile()->hasFlag(TILESTATE_NOPVPZONE)){
 				return RET_ACTIONNOTPERMITTEDINANONPVPZONE;
 			}
 
-			if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP){
-				const Player* targetPlayer = NULL;
-				if(target->getPlayer())
-					targetPlayer = target->getPlayer();
-				else if(target->isPlayerSummon())
-					targetPlayer = target->getPlayerMaster();
-
-				if(targetPlayer){
-					if(!targetPlayer->isGuildEnemy(attacker->getPlayer())){
-						if(!isInPvpZone(attacker, target)){
-							if(target->getPlayer())
-								return RET_YOUMAYNOTATTACKTHISPERSON;
-							else
-								return RET_YOUMAYNOTATTACKTHISCREATURE;
-						}
-					}
-				}
-			}
+			return Combat::checkExtraRestrictions(attacker, target, false);
 		}
 	}
 
@@ -706,9 +735,9 @@ bool Combat::CombatNullFunc(Creature* caster, Creature* target, const CombatPara
 {
 	CombatConditionFunc(caster, target, params, NULL);
 	CombatDispelFunc(caster, target, params, NULL);
-	
+
 	onCreatureDoCombat(caster, target, params.isAggressive);
-	
+
 	return true;
 }
 

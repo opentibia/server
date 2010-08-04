@@ -210,6 +210,7 @@ public:
 	bool isLoginAttackLocked(uint32_t attackerId) const;
 
 	virtual bool isPushable() const;
+	virtual bool canBePushedBy(const Player *player) const;
 	virtual int getThrowRange() const {return 1;};
 	virtual bool canSeeInvisibility() const;
 	uint32_t getMuteTime();
@@ -406,6 +407,7 @@ public:
 	virtual void onIdleStatus();
 	virtual void onPlacedCreature();
 	virtual void sendReLoginWindow();
+	virtual bool getWalkBit(Player *viewer) const;
 	virtual void getCreatureLight(LightInfo& light) const;
 
 	void setParty(Party* _party) {party = _party;}

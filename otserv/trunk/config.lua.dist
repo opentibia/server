@@ -250,6 +250,15 @@ despawnradius = 50
 --should players be able to hit invisible creatures using not AOE runes? (default: false)
 can_attack_invisible = false
 
+--should players be able to pass through each other if they can't attack each other (at non-pvp server or protected levels)?
+can_pass_through = true
+
+--players with a level smaller than this number can't be attacked by other players. Set it to to 0 to disable
+level_protection = 0
+
+--should all the protection code apply to creatures summoned by protected chars too? (experimental code, DO NOT UNCOMMENT!)
+--protection_extended_to_summon = true
+
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
 maxmessagebuffer = 4
 

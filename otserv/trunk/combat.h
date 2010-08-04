@@ -296,6 +296,7 @@ public:
 	static CombatType_t ConditionToDamageType(ConditionType_t type);
 	static ConditionType_t DamageToConditionType(CombatType_t type);
 	static ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
+	static ReturnValue checkExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalking);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
 	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);

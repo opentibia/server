@@ -2583,7 +2583,7 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 		msg->AddByte(player->getGuildEmblem(creature->getPlayer())); // guild war emblem
 	}
 
-	msg->AddByte(!player->canWalkthrough(creature));
+	msg->AddByte(creature->getWalkBit(player));
 }
 
 void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)

@@ -897,10 +897,12 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 		return false;
 	}
 
-	if(!movingCreature->isPushable() && !player->hasFlag(PlayerFlag_CanPushAllCreatures)){
+
+	if (!movingCreature->canBePushedBy(player)){
 		player->sendCancelMessage(RET_NOTMOVEABLE);
 		return false;
 	}
+
 
 	//check throw distance
 	if((std::abs(movingCreaturePos.x - toPos.x) > movingCreature->getThrowRange()) ||
