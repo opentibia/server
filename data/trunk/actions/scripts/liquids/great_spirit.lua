@@ -29,8 +29,8 @@ function onUse(cid, item, frompos, item2, topos)
 		return TRUE
 	end
 
-	if (not(isPaladin(item2.uid)) or (getPlayerLevel(item2.uid) < 80)) and not(getPlayerAccess(cid) > 0) then
-		doCreatureSay(item2.uid, "Only paladins of level 80 or above may drink this fluid.", TALKTYPE_ORANGE_1)
+	if (not(isPaladin(cid)) or (getPlayerLevel(cid) < 80)) and not(getPlayerAccess(cid) > 0) then
+		doCreatureSay(cid, "Only paladins of level 80 or above may drink this fluid.", TALKTYPE_ORANGE_1)
 		return TRUE
 	end
 

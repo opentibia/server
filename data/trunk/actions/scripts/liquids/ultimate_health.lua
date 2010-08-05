@@ -18,8 +18,8 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 
-	if (not(isKnight(item2.uid)) or (getPlayerLevel(item2.uid) < 130)) and not(getPlayerAccess(cid) > 0) then
-		doCreatureSay(item2.uid, "Only knights of level 130 or above may drink this fluid.", TALKTYPE_ORANGE_1)
+	if (not(isKnight(cid)) or (getPlayerLevel(cid) < 130)) and not(getPlayerAccess(cid) > 0) then
+		doCreatureSay(cid, "Only knights of level 130 or above may drink this fluid.", TALKTYPE_ORANGE_1)
 		return TRUE
 	end
 
