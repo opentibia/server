@@ -6400,9 +6400,26 @@ int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 	//variantToNumber(var)
 	LuaVariant var = popVariant(L);
 
+	ScriptEnviroment* env = getScriptEnv();
+
 	uint32_t number = 0;
-	if(var.type == VARIANT_NUMBER){
-		number = var.number;
+	switch (var.type) {
+		case VARIANT_NUMBER:
+			number = var.number;
+			break;
+		case VARIANT_TARGETPOSITION:
+		case VARIANT_POSITION:
+			if (Tile* tile = g_game.getMap()->getTile(var.pos)) {
+				if (Thing* thing = tile->getTopVisibleThing(NULL)) {
+					number = env->addThing(thing);
+				}
+			}
+			break;
+		case VARIANT_STRING:
+			Player *player;
+			if (g_game.getPlayerByNameWildcard(var.text, player) == RET_NOERROR){
+				number = env->addThing(player);
+			}
 	}
 
 	lua_pushnumber(L, number);
@@ -6414,9 +6431,27 @@ int LuaScriptInterface::luaVariantToString(lua_State *L)
 	//variantToString(var)
 	LuaVariant var = popVariant(L);
 
+	ScriptEnviroment* env = getScriptEnv();
+
 	std::string text = "";
-	if(var.type == VARIANT_STRING){
-		text = var.text;
+
+	switch (var.type) {
+		case VARIANT_STRING:
+			text = var.text;
+			break;
+		case VARIANT_NUMBER:
+			if (Player* player = env->getPlayerByUID(var.number))
+				text = player->getName();
+			break;
+		case VARIANT_TARGETPOSITION:
+		case VARIANT_POSITION:
+			if (Tile* tile = g_game.getMap()->getTile(var.pos)){
+				if (Thing* thing = tile->getTopVisibleThing(NULL)){
+					if (thing->getCreature() && thing->getCreature()->getPlayer()){
+						text = thing->getCreature()->getPlayer()->getName();
+					}
+				}
+			}
 	}
 
 	lua_pushstring(L, text.c_str());
@@ -6428,9 +6463,25 @@ int LuaScriptInterface::luaVariantToPosition(lua_State *L)
 	//luaVariantToPosition(var)
 	LuaVariant var = popVariant(L);
 
+	ScriptEnviroment* env = getScriptEnv();
+
 	PositionEx pos(0, 0, 0, 0);
-	if(var.type == VARIANT_POSITION || var.type == VARIANT_TARGETPOSITION){
-		pos = var.pos;
+
+	switch (var.type) {
+		case VARIANT_TARGETPOSITION:
+		case VARIANT_POSITION:
+			pos = var.pos;
+			break;
+		case VARIANT_STRING:
+			Player *player;
+			if (g_game.getPlayerByNameWildcard(var.text, player) == RET_NOERROR){
+				pos = player->getPosition();
+			}
+			break;
+		case VARIANT_NUMBER:
+			if (Player* player = env->getPlayerByUID(var.number))
+				pos = player->getPosition();
+			break;
 	}
 
 	pushPosition(L, pos, pos.stackpos);

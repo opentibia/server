@@ -310,11 +310,11 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	return NULL;
 }
 
-Thing* Tile::getTopVisibleThing(const Creature* creature)
+Thing* Tile::getTopVisibleThing(const Creature* creature, bool checkVisibility/*=true*/)
 {
 	if(const CreatureVector* creatures = getCreatures()){
 		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-			if(creature->canSeeCreature(*cit)){
+			if((*cit)->canBeSeen(creature, checkVisibility)){
 				return (*cit);
 			}
 		}
