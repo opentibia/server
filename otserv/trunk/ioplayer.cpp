@@ -818,7 +818,7 @@ int32_t IOPlayer::getPlayerUnjustKillCount(const Player* player, UnjustKillPerio
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT date";
+	query << "SELECT 'date' ";
 	query << "FROM ";
 	query << "`player_killers` ";
 	query << "LEFT JOIN ";
