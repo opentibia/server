@@ -929,6 +929,10 @@ void Player::dropLoot(Container* corpse)
 				}
 			}
 		}
+		if (!inventory[SLOTP_BACKPACK]) {
+			Item* bag = Item::CreateItem(ITEM_BAG, 1);
+			ReturnValue ret = g_game.internalPlayerAddItem(this, bag, false);
+		}
 	}
 }
 

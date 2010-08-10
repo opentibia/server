@@ -410,6 +410,8 @@ enum item_t {
 	ITEM_LETTER_STAMPED   = 2598,
 	ITEM_LABEL            = 2599,
 
+	ITEM_BAG			  = 1987,
+
 	ITEM_DOCUMENT_RO      = 1968 //read-only
 };
 
