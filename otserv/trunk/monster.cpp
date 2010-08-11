@@ -1519,6 +1519,9 @@ void Monster::onCreatureConvinced(const Creature* convincer, const Creature* cre
 		updateTargetList();
 		updateIdleStatus();
 	}
+	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	g_game.forceClientsToReloadCreature(creature);
+	#endif
 }
 
 void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp) const

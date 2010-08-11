@@ -4020,6 +4020,22 @@ void Game::internalCreatureChangeVisible(Creature* creature, bool visible)
 	}
 }
 
+#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+void Game::forceClientsToReloadCreature(const Creature* creature)
+{
+	const SpectatorVec& list = getSpectators(creature->getPosition());
+	SpectatorVec::const_iterator it;
+
+	//send to client
+	Player* tmpPlayer = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->forceClientToReloadCreature(creature);
+		}
+	}
+}
+#endif
+
 
 void Game::changeLight(const Creature* creature)
 {

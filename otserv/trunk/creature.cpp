@@ -187,7 +187,7 @@ bool Creature::getWalkBit(Player *viewer) const
 	if (!g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)
 		|| (g_config.getNumber(ConfigManager::LEVEL_PROTECTION) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP))
 		return true;
-	return false;
+	return !isSummon();
 	#else
 	return !viewer->hasFlag(PlayerFlag_CanPassThroughAllCreatures);
 	#endif

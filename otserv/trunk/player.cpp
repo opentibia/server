@@ -1025,7 +1025,12 @@ bool Player::canSeeCreature(const Creature* creature) const
 bool Player::getWalkBit(Player *viewer) const
 {
 	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
-	return Creature::getWalkBit(viewer);
+	if (viewer->hasFlag(PlayerFlag_CanPassThroughAllCreatures))
+		return false;
+	if (!g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)
+		|| (g_config.getNumber(ConfigManager::LEVEL_PROTECTION) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP))
+		return true;
+	return false;
 	#else
 	if (!Creature::getWalkBit(viewer))
 		return false;
@@ -1041,14 +1046,6 @@ bool Player::getWalkBit(Player *viewer) const
 bool Player::canWalkthrough(const Creature* creature) const
 {
 	if (hasFlag(PlayerFlag_CanPassThroughAllCreatures)){
-		return true;
-	}
-
-	if(!creature->getPlayer()){
-		return false;
-	}
-
-	if(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
 		return true;
 	}
 

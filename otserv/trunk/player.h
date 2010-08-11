@@ -503,6 +503,14 @@ public:
 				}
 			}
 		}
+	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	void forceClientToReloadCreature(const Creature* creature) {
+		if (client && creature) {
+			client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature), false);
+			client->sendAddCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature));
+			}
+		}
+	#endif
 	void sendCreatureLight(const Creature* creature)
 		{if(client) client->sendCreatureLight(creature);}
 	void sendCreatureShield(const Creature* creature)
