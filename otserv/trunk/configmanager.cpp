@@ -202,6 +202,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
 	m_confInteger[PROTECTION_EXTENDED_TO_SUMMONS] = getGlobalBoolean(L, "protection_extended_to_summon", true);
 	#endif
+	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 2);
 	m_isLoaded = true;
 	return true;
 }

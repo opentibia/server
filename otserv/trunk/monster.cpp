@@ -593,6 +593,9 @@ void Monster::setIdle(bool _idle)
 
 void Monster::updateIdleStatus()
 {
+	//heightMinimum is declared static to avoid
+	//several calls for getNumber (updateIdleStatus is called often)
+	static int heightMinimum = g_config.getNumber(ConfigManager::HEIGHT_MINIMUM_FOR_IDLE);
 	bool idle = false;
 
 	if(conditions.empty()){
@@ -605,8 +608,12 @@ void Monster::updateIdleStatus()
 			}
 		}
 		else{
-			if(targetList.empty()){
-				idle = true;
+			idle = true;
+			for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
+				if (std::abs((*it)->getPosition().z - getPosition().z) < heightMinimum) {
+					idle = false;
+					break;
+				}
 			}
 		}
 	}

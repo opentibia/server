@@ -159,6 +159,7 @@ public:
 		#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
 		PROTECTION_EXTENDED_TO_SUMMONS,
 		#endif
+		HEIGHT_MINIMUM_FOR_IDLE,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

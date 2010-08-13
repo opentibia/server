@@ -194,6 +194,12 @@ show_death_window = true
 -- What message should be sent for the player, after its own death? Use "" to disable.
 death_msg = "You are dead."
 
+
+--how many floors away of a player should a monster be to become idle?
+--WARNING: setting this as any number bigger than two may increase CPU usage while
+--setting this to any value smaller than two will make nearly impossible to rope monsters from a hole
+height_minimum_for_idle = 2
+
 -- Stamina Configuration
 -- Gain stamina rate - 1 second offline = X milliseconds of stamina
 rate_stamina_gain = 334
