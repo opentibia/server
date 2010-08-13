@@ -595,9 +595,11 @@ void Monster::updateIdleStatus()
 {
 	//heightMinimum is declared static to avoid
 	//several calls for getNumber (updateIdleStatus is called often)
-	static int heightMinimum = g_config.getNumber(ConfigManager::HEIGHT_MINIMUM_FOR_IDLE);
-	bool idle = false;
+	static int heightMinimum = 0;
+	if (heightMinimum <= 0)
+		heightMinimum = std::max(g_config.getNumber(ConfigManager::HEIGHT_MINIMUM_FOR_IDLE),(int64_t)1);
 
+	bool idle = false;
 	if(conditions.empty()){
 		if(isSummon()){
 			if(!isMasterInRange){
