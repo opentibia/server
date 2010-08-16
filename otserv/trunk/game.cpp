@@ -3491,7 +3491,10 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 	Player* player = getPlayerByID(playerId);
 	if(!player || player->isRemoved())
 		return false;
-
+	int64_t lastRequest = player->getLastTimeRequestOutfit();
+	if (lastRequest >= OTSYS_TIME() - 2000) {
+		return false;
+	}
 	uint32_t outfitId = Outfits::getInstance()->getOutfitId(outfit.lookType);
 	if(player->canWearOutfit(outfitId, outfit.lookAddons)){
 		player->defaultOutfit = outfit;
@@ -3501,6 +3504,7 @@ bool Game::playerChangeOutfit(uint32_t playerId, Outfit_t outfit)
 		}
 
 		internalCreatureChangeOutfit(player, outfit);
+		player->setLastTimeRequestOutfitAsNow();
 	}
 
 	return true;

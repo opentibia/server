@@ -120,6 +120,8 @@ Creature()
 	idleTime = 0;
 	idleWarned = false;
 
+	lastTimeRequestOutfit = 0;
+
 	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;
 		inventoryAbilities[i] = false;
