@@ -25,9 +25,9 @@
 					<Add option="-llibsqlite3" />
 					<Add option="-lgmp" />
 					<Add option="-llua" />
-					<Add option="-lboost_system-mgw44-mt-1_43" />
-					<Add option="-lboost_thread-mgw44-mt-1_43" />
-					<Add option="-lboost_regex-mgw44-mt-1_43" />
+					<Add option="-llibboost_system-mgw44-mt-1_41" />
+					<Add option="-llibboost_thread-mgw44-mt-1_41" />
+					<Add option="-llibboost_regex-mgw44-mt-1_41" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
@@ -50,9 +50,9 @@
 					<Add option="-llibsqlite3" />
 					<Add option="-lgmp" />
 					<Add option="-llua" />
-					<Add option="-lboost_system-mgw44-mt-1_43" />
-					<Add option="-lboost_thread-mgw44-mt-1_43" />
-					<Add option="-lboost_regex-mgw44-mt-1_43" />
+					<Add option="-llibboost_system-mgw44-mt-1_41" />
+					<Add option="-llibboost_thread-mgw44-mt-1_41" />
+					<Add option="-llibboost_regex-mgw44-mt-1_41" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 				</Linker>
