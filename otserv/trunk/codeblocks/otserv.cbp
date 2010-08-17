@@ -8,20 +8,15 @@
 		<Build>
 			<Target title="Debug Windows">
 				<Option platforms="Windows;" />
-				<Option output="C:/otserv/otserv-debug" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="C:/otserv/" />
-				<Option object_output="obj/Debug/" />
+				<Option output="C:\otserv\otserv-debug" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="C:\otserv\" />
+				<Option object_output="obj\Debug\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-D__EXCEPTION_TRACER__" />
-					<Add directory="%BOOST_INCLUDE_PATH%" />
-					<Add directory="%LIBXML_INCLUDE_PATH%" />
-					<Add directory="%MYSQL_INCLUDE_PATH%" />
-					<Add directory="%LUA_INCLUDE_PATH%" />
-					<Add directory="%GMP_INCLUDE_PATH%" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -36,27 +31,17 @@
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
 					<Add option="-Wl,-Map=C:\otserv\otserv.map" />
-					<Add directory="%BOOST_LIB_PATH%" />
-					<Add directory="%LIBXML_LIB_PATH%" />
-					<Add directory="%MYSQL_LIB_PATH%" />
-					<Add directory="%LUA_LIB_PATH%" />
-					<Add directory="%GMP_LIB_PATH%" />
 				</Linker>
 			</Target>
 			<Target title="Release Windows">
 				<Option platforms="Windows;" />
-				<Option output="C:/otserv/otserv" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="C:/otserv/" />
-				<Option object_output="obj/Release/" />
+				<Option output="C:\otserv\otserv" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="C:\otserv\" />
+				<Option object_output="obj\Release\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="%BOOST_INCLUDE_PATH%" />
-					<Add directory="%LIBXML_INCLUDE_PATH%" />
-					<Add directory="%MYSQL_INCLUDE_PATH%" />
-					<Add directory="%LUA_INCLUDE_PATH%" />
-					<Add directory="%GMP_INCLUDE_PATH%" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -70,17 +55,12 @@
 					<Add option="-lboost_regex-mgw44-mt-1_43" />
 					<Add option="-lwsock32" />
 					<Add option="-lws2_32" />
-					<Add directory="%BOOST_LIB_PATH%" />
-					<Add directory="%LIBXML_LIB_PATH%" />
-					<Add directory="%MYSQL_LIB_PATH%" />
-					<Add directory="%LUA_LIB_PATH%" />
-					<Add directory="%GMP_LIB_PATH%" />
 				</Linker>
 			</Target>
 			<Target title="Debug Unix">
 				<Option platforms="Unix;" />
-				<Option output="../otserv" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="../" />
+				<Option output="..\otserv" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="..\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
@@ -91,8 +71,8 @@
 					<Add option="-D__EXCEPTION_TRACER__" />
 					<Add option="-D__DEBUG_SCHEDULER__" />
 					<Add option="-D__DEBUG_NET__" />
-					<Add directory="/usr/include/libxml2/" />
-					<Add directory="/usr/include/lua5.1/" />
+					<Add directory="\usr\include\libxml2\" />
+					<Add directory="\usr\include\lua5.1\" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
@@ -137,9 +117,10 @@
 			<Add alias="All Release" targets="Release Windows;Release Unix;" />
 		</VirtualTargets>
 		<Compiler>
-			<Add option="-Wno-unused-parameter" />
+			<Add option="-Wall" />
+			<Add option="-D__USE_MYSQL__" />
 			<Add option="-D__USE_SQLITE__" />
-			<Add option="-D__SKULLSYSTEM__" />
+			<Add option="-Wno-unused-parameter" />
 		</Compiler>
 		<Unit filename="../AUTHORS" />
 		<Unit filename="../Doxyfile" />
