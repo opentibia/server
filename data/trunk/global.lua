@@ -16,6 +16,9 @@ STORAGE_BLESSES = 500000
 -- Storage will be set to know we will remove blesses in onLogin
 STORAGE_REMOVE_BLESSES = 1000000
 
+-- Storage for death (for the code which gives a bag after the death of a player)
+STORAGE_DEATH_BAG = 2000000
+
 -- Booleans consts
 TRUE = 1
 FALSE = 0
@@ -500,6 +503,8 @@ SKULL_GREEN = 2
 SKULL_WHITE = 3
 SKULL_RED = 4
 SKULL_BLACK = 5
+
+ITEM_BAG = 1987
 
 ITEM_GOLD_COIN = 2148
 ITEM_PLATINUM_COIN = 2152

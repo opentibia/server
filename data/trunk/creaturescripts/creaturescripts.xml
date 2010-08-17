@@ -3,5 +3,6 @@
 	<event name="PlayerLogin" type="login" script="login.lua"/>
 	<event name="SendLoginInfo" type="login" script="sendlogininfo.lua"/>
 	<event name="RemoveBlesses" type="die" script="removeblesses.lua"/>
+	<event name="Give_Bag_After_Death" type="die" script="give_bag_after_death.lua"/>
 	<!--event name="PlayerLook" type="look" script="look.lua"/-->
 </creaturescripts>

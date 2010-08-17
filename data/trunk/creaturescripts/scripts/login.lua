@@ -4,6 +4,16 @@ function onLogin(cid)
 	--Register the kill/die event
 	registerCreatureEvent(cid, "RemoveBlesses")
 
+	--Register the Give_Bag_After_Death event
+	registerCreatureEvent(cid, "Give_Bag_After_Death")
+
+	--add a backpack if it is a relogin after a death
+	if getPlayerStorageValue(cid, STORAGE_DEATH_BAG) == 1 then
+		local item_bag = doCreateItemEx(ITEM_BAG, 1)
+		doPlayerAddItemEx(cid, item_bag, FALSE, CONST_SLOT_BACKPACK)
+		setPlayerStorageValue(cid, STORAGE_DEATH_BAG, -1)
+	end
+
 	--Remove blesses if necessary
 	if getPlayerStorageValue(cid, STORAGE_REMOVE_BLESSES) == 1 then
 		local i = 0
