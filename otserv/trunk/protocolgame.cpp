@@ -1816,7 +1816,7 @@ void ProtocolGame::sendTradeItemRequest(const Player* player, const Item* item, 
 			std::list<const Item*> listItem;
 			listItem.push_back(tradeContainer);
 
-			while(listContainer.size() > 0) {
+			while(!listContainer.empty()) {
 				const Container* container = listContainer.front();
 				listContainer.pop_front();
 
@@ -1830,7 +1830,7 @@ void ProtocolGame::sendTradeItemRequest(const Player* player, const Item* item, 
 			}
 
 			msg->AddByte(listItem.size());
-			while(listItem.size() > 0) {
+			while(!listItem.empty()) {
 				const Item* item = listItem.front();
 				listItem.pop_front();
 				msg->AddItem(item);
@@ -2405,7 +2405,7 @@ void ProtocolGame::sendOutfitWindow()
 			}
 		}
 
-		if(outfitList.size() > 0){
+		if(!outfitList.empty()){
 			if(outfitList.size() > MAX_NUMBER_OF_OUTFITS){
 				msg->AddByte(MAX_NUMBER_OF_OUTFITS);
 			}

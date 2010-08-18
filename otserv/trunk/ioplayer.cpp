@@ -411,7 +411,7 @@ bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert
 		}
 	}
 
-	while(stack.size() > 0){
+	while(!stack.empty()){
 		const containerBlock& cb = stack.front();
 		Container* container = cb.first;
 		parentId = cb.second;
@@ -748,7 +748,7 @@ bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 			name = de.getKillerName();
 		}
 
-		if(name.size() > 0){
+		if(!name.empty()){
 			DBInsert env_killers_stmt(db);
 			env_killers_stmt.setQuery("INSERT INTO `environment_killers` (`kill_id`, `name`) VALUES ");
 

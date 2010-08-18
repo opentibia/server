@@ -1557,7 +1557,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
 		}
 	}
 
-	while(listContainer.size() > 0){
+	while(!listContainer.empty()){
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 
@@ -1628,7 +1628,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 		}
 	}
 
-	while(listContainer.size() > 0 && count > 0){
+	while(!listContainer.empty() && count > 0){
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 
@@ -1697,7 +1697,7 @@ uint32_t Game::getMoney(const Cylinder* cylinder)
 		}
 	}
 
-	while(listContainer.size() > 0){
+	while(!listContainer.empty()){
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 
@@ -1752,7 +1752,7 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 		}
 	}
 
-	while(listContainer.size() > 0 && money > 0){
+	while(!listContainer.empty() && money > 0){
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 
@@ -2955,7 +2955,7 @@ bool Game::playerLookInTrade(uint32_t playerId, bool lookAtCounterOffer, int ind
 
 	listContainer.push_back(tradeContainer);
 
-	while(!foundItem && listContainer.size() > 0){
+	while(!foundItem && !listContainer.empty()){
 		const Container* container = listContainer.front();
 		listContainer.pop_front();
 
