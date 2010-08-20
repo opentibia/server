@@ -663,7 +663,7 @@ public:
 	uint32_t getNextActionTime() const;
 	virtual uint32_t getAttackSpeed() const;
 	int64_t getLastTimeRequestOutfit() const { return lastTimeRequestOutfit; }
-	int64_t setLastTimeRequestOutfitAsNow() { lastTimeRequestOutfit = OTSYS_TIME(); }
+	void setLastTimeRequestOutfitAsNow() { lastTimeRequestOutfit = OTSYS_TIME(); }
 
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
