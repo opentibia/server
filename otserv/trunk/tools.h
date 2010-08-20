@@ -90,7 +90,7 @@ bool hasBitSet(uint32_t flag, uint32_t flags);
 uint32_t rand24b();
 float box_muller(float m, float s);
 
-int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM);
+int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM, float deviation = 0.25);
 
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);

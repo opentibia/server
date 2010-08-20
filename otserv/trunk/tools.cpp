@@ -237,7 +237,7 @@ float box_muller(float m, float s)
 	return( m + y1 * s );
 }
 
-int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_UNIFORM*/)
+int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_UNIFORM*/, float deviation /*= 0.25*/)
 {
 	if(highest_number == lowest_number){
 		return lowest_number;
@@ -256,7 +256,7 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 		return lowest_number + r;
 	}
 	else if(type == DISTRO_NORMAL){
-		float value = box_muller(0.5, 0.25);
+		float value = box_muller(0.5, deviation);
 
 		if(value < 0){
 			value = 0;
