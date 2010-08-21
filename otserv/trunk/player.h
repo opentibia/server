@@ -357,6 +357,8 @@ public:
 	int32_t getShootRange() const {return shootRange;}
 
 	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;
+	std::string getSkillName(int skillid);
+
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}
 
@@ -695,7 +697,6 @@ protected:
 	void checkTradeState(const Item* item);
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
-	std::string getSkillName(int skillid);
 	void gainExperience(uint64_t& gainExp, bool fromMonster);
 	void addExperience(uint64_t exp);
 	void removeExperience(uint64_t exp, bool updateStats = true);

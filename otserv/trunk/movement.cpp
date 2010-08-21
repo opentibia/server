@@ -851,9 +851,9 @@ uint32_t MoveEvent::EquipItem(MoveEvent* moveEvent, Player* player, Item* item, 
 	//skill modifiers
 	bool needUpdateSkills = false;
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		if(it.abilities.skills[i]){
+		if(it.abilities.skill.upgrades[i]){
 			needUpdateSkills = true;
-			player->setVarSkill((skills_t)i, it.abilities.skills[i]);
+			player->setVarSkill((skills_t)i, it.abilities.skill.upgrades[i]);
 		}
 	}
 	if(needUpdateSkills){
@@ -917,9 +917,9 @@ uint32_t MoveEvent::DeEquipItem(MoveEvent* moveEvent, Player* player, Item* item
 	//skill modifiers
 	bool needUpdateSkills = false;
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		if(it.abilities.skills[i] != 0){
+		if(it.abilities.skill.upgrades[i] != 0){
 			needUpdateSkills = true;
-			player->setVarSkill((skills_t)i, -it.abilities.skills[i]);
+			player->setVarSkill((skills_t)i, -it.abilities.skill.upgrades[i]);
 		}
 	}
 	if(needUpdateSkills){

@@ -909,37 +909,37 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(asLowerCaseString(strValue) == "skillsword"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_SWORD] = intValue;
+									it.abilities.skill.upgrades[SKILL_SWORD] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillaxe"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_AXE] = intValue;
+									it.abilities.skill.upgrades[SKILL_AXE] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillclub"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_CLUB] = intValue;
+									it.abilities.skill.upgrades[SKILL_CLUB] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skilldist"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_DIST] = intValue;
+									it.abilities.skill.upgrades[SKILL_DIST] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillfish"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_FISH] = intValue;
+									it.abilities.skill.upgrades[SKILL_FISH] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillshield"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_SHIELD] = intValue;
+									it.abilities.skill.upgrades[SKILL_SHIELD] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "skillfist"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.skills[SKILL_FIST] = intValue;
+									it.abilities.skill.upgrades[SKILL_FIST] = intValue;
 								}
 							}
 							else if(asLowerCaseString(strValue) == "maxhitpoints"){
@@ -1419,10 +1419,10 @@ const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
 Abilities::Abilities()
 {
 	memset(&absorb, 0, sizeof(absorb));
+    memset(&skill, 0, sizeof(skill));
 
 	elementType = COMBAT_NONE;
 	elementDamage = 0;
-	memset(skills, 0, sizeof(skills));
 
 	memset(stats, 0 , sizeof(stats));
 	memset(statsPercent, 0, sizeof(statsPercent));
@@ -1442,6 +1442,34 @@ Abilities::Abilities()
 
 	preventItemLoss = false;
 	preventSkillLoss = false;
+}
+bool Abilities::Skill::any() const
+{
+    for(int32_t c = 0; c != SKILL_LAST + 1; ++c)
+    {
+        if(upgrades[c] != 0)
+            return true;
+    }
+    return false;
+}
+
+std::ostream& Abilities::Skill::getDescription(std::ostream& os, bool& first, int32_t type) const
+{
+    if(upgrades[type] == 0)
+        return os;
+    Player *player;
+    os << (first? " " : ", ") << player->getSkillName(type) << " +" << std::noshowpos << upgrades[type] << "";
+    first = false;
+    return os;
+}
+
+std::ostream& Abilities::Skill::getDescription(std::ostream& os) const
+{
+	bool first = true;
+	for(int32_t c = 0; c != SKILL_LAST + 1; ++c){
+		getDescription(os, first, c);
+	}
+	return os;
 }
 
 bool Abilities::Absorb::any() const
