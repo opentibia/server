@@ -3125,11 +3125,12 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* inventoryItem = inventory[i];
 
-			if(inventoryItem == tradeItem){
-				continue;
-			}
-
 			if(inventoryItem){
+				
+				if(inventoryItem == tradeItem){
+					continue;
+				}
+
 				//try find an already existing item to stack with
 				if(inventoryItem != item && item->isStackable() && inventoryItem->getID() == item->getID() && inventoryItem->getItemCount() < 100){
 					*destItem = inventoryItem;
