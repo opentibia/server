@@ -357,7 +357,7 @@ public:
 	int32_t getShootRange() const {return shootRange;}
 
 	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;
-	std::string getSkillName(int skillid);
+	static std::string getSkillName(int skillid);
 
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
 	BlockType_t getLastAttackBlockType() const {return lastAttackBlockType;}

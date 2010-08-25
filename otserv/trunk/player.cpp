@@ -713,7 +713,7 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 	skills[skill][SKILL_TRIES] += count * g_config.getNumber(ConfigManager::RATE_SKILL);
 
 #ifdef __DEBUG__
-	std::cout << getName() << ", has the vocation: " << (int)getVocationId() << " and is training his " << getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1) << ")" << std::endl;
+	std::cout << getName() << ", has the vocation: " << (int)getVocationId() << " and is training his " << Player::getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1) << ")" << std::endl;
 	std::cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
 #endif
 
@@ -724,9 +724,9 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 		skills[skill][SKILL_PERCENT] = 0;
 		std::stringstream advMsg;
 		if(!g_config.getNumber(ConfigManager::SHOW_NEW_SKILL_LEVEL))
-			advMsg << "You advanced in " << getSkillName(skill) << ".";
+			advMsg << "You advanced in " << Player::getSkillName(skill) << ".";
 		else
-			advMsg << "You advanced to " << getSkillName(skill) << " " << skills[skill][SKILL_LEVEL] << ".";
+			advMsg << "You advanced to " << Player::getSkillName(skill) << " " << skills[skill][SKILL_LEVEL] << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
 
 		//scripting event - onAdvance

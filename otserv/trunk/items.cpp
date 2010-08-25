@@ -219,7 +219,7 @@ int Items::loadFromOtb(std::string file)
 		std::cout << "New version of items.otb detected, a newer version of the server is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
-	else if(Items::dwMinorVersion != CLIENT_VERSION_860){
+	else if(Items::dwMinorVersion != CLIENT_VERSION_861){
 		std::cout << "Another (client) version of items.otb is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -1461,8 +1461,7 @@ std::ostream& Abilities::Skill::getDescription(std::ostream& os, bool& first, in
 {
     if(upgrades[type] == 0)
         return os;
-    Player *player;
-    os << (first? " " : ", ") << player->getSkillName(type) << " +" << std::noshowpos << upgrades[type] << "";
+    os << (first? " " : ", ") << Player::getSkillName(type) << " +" << std::noshowpos << upgrades[type] << "";
     first = false;
     return os;
 }
