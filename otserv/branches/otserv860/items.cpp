@@ -534,6 +534,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.moveable = (intValue == 1);
 								}
 							}
+							else if(asLowerCaseString(strValue) == "pickupable"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.pickupable = (intValue == 1);
+								}
+							}
 							else if(asLowerCaseString(strValue) == "blockprojectile"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.blockProjectile = (intValue == 1);
