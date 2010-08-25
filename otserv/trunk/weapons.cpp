@@ -938,24 +938,24 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 		// We failed attack, miss!
 		Tile* destTile = target->getTile();
 		if(!Position::areInRange<1,1,0>(player->getPosition(), target->getPosition())){
-			typedef std::pair<int32_t, int32_t> dPair;
-			std::vector<dPair> destList;
-			destList.push_back(dPair(-1, -1));
-			destList.push_back(dPair(-1, 0));
-			destList.push_back(dPair(-1, 1));
-			destList.push_back(dPair(0, -1));
-			destList.push_back(dPair(0, 0));
-			destList.push_back(dPair(0, 1));
-			destList.push_back(dPair(1, -1));
-			destList.push_back(dPair(1, 0));
-			destList.push_back(dPair(1, 1));
+			typedef std::vector<std::pair<int32_t, int32_t> > RelPosList;
+			RelPosList destList;
+			destList.push_back(std::make_pair(-1, -1));
+			destList.push_back(std::make_pair(-1, 0));
+			destList.push_back(std::make_pair(-1, 1));
+			destList.push_back(std::make_pair(0, -1));
+			destList.push_back(std::make_pair(0, 0));
+			destList.push_back(std::make_pair(0, 1));
+			destList.push_back(std::make_pair(1, -1));
+			destList.push_back(std::make_pair(1, 0));
+			destList.push_back(std::make_pair(1, 1));
 
 			std::random_shuffle(destList.begin(), destList.end());
 
 			Position destPos = target->getPosition();
 			Tile* tmpTile = NULL;
 
-			for(std::vector<dPair>::iterator it = destList.begin(); it != destList.end(); ++it){
+			for(RelPosList::iterator it = destList.begin(); it != destList.end(); ++it){
 				tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
 				// Blocking tiles or tiles without ground ain't valid targets for spears
 				if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID) && tmpTile->ground != NULL){
