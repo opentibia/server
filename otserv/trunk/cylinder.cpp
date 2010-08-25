@@ -38,13 +38,12 @@ int32_t Cylinder::__getLastIndex() const
 	return -1;
 }
 
-uint32_t Cylinder::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
+uint32_t Cylinder::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) const
 {
 	return 0;
 }
 
-std::map<uint32_t, uint32_t>& Cylinder::__getAllItemTypeCount(
-	std::map<uint32_t, uint32_t>& countMap, bool itemCount/*= true*/) const
+std::map<uint32_t, uint32_t>& Cylinder::__getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const
 {
 	return countMap;
 }

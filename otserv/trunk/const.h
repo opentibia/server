@@ -95,6 +95,8 @@ enum MagicEffectClasses {
 	NM_ME_BATS             = 0x42, //66
 	NM_ME_SMOKE            = 0x43, //67
 	NM_ME_INSECTS          = 0x44, //68
+	NM_ME_DRAGONHEAD       = 0x45, //69
+
 	//for internal use, dont send to client
 	NM_ME_NONE             = 0xFF,
 	NM_ME_UNK              = 0xFFFF

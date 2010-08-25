@@ -761,10 +761,11 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	serverIPs.push_back(IpNetMask);
 	std::cout << ":: Starting Server... ";
 
+	g_game.start(service_manager);
+
 	if(command_opts.start_closed)
 		g_game.setGameState(GAME_STATE_CLOSED);
 	else
 		g_game.setGameState(GAME_STATE_NORMAL);
-	g_game.start(service_manager);
 	g_loaderSignal.notify_all();
 }

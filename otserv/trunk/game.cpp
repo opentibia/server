@@ -1401,9 +1401,19 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t index /*= INDEX_WHEREEVER*/,
 	uint32_t flags /*= 0*/, bool test /*= false*/)
 {
+	uint32_t remainderCount = 0;
+	return internalAddItem(toCylinder, item, index, flags, test, remainderCount);
+}
+
+ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t index,
+	uint32_t flags, bool test, uint32_t& remainderCount)
+{
+	remainderCount = 0;
 	if(toCylinder == NULL || item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
+
+	Cylinder* origToCylinder = toCylinder;
 
 	Item* toItem = NULL;
 	toCylinder = toCylinder->__queryDestination(index, item, &toItem, flags);
@@ -1414,57 +1424,49 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 		return ret;
 	}
 
-	//check how much we can move
+	/*
+	Check if we can move add the whole amount, we do this by checking against the original cylinder,
+	since the queryDestination can return a cylinder that might only hold a part of the full amount.
+	*/
 	uint32_t maxQueryCount = 0;
-	ret = toCylinder->__queryMaxCount(index, item, item->getItemCount(), maxQueryCount, flags);
+	ret = origToCylinder->__queryMaxCount(INDEX_WHEREEVER, item, item->getItemCount(), maxQueryCount, flags);
 
 	if(ret != RET_NOERROR){
 		return ret;
 	}
 
-	uint32_t m = 0;
-	uint32_t n = 0;
-
-	if(item->isStackable()){
-		m = std::min((uint32_t)item->getItemCount(), maxQueryCount);
-	}
-	else
-		m = maxQueryCount;
-
 	if(!test){
-		Item* moveItem = item;
+		if(item->isStackable() && toItem){
+			uint32_t m = 0;
+			uint32_t n = 0;
 
-		//update item(s)
-		if(item->isStackable()) {
-			if(toItem && toItem->getID() == item->getID()){
+			m = std::min((uint32_t)item->getItemCount(), maxQueryCount);
+
+			if(toItem->getID() == item->getID()){
 				n = std::min((uint32_t)100 - toItem->getItemCount(), m);
 				toCylinder->__updateThing(toItem, toItem->getID(), toItem->getItemCount() + n);
 			}
 
 			if(m - n > 0){
 				if(m - n != item->getItemCount()){
-					moveItem = Item::CreateItem(item->getID(), m - n);
+					Item* remainderItem = Item::CreateItem(item->getID(), m - n);
+					if(internalAddItem(origToCylinder, remainderItem, INDEX_WHEREEVER, flags, false) != RET_NOERROR){
+						FreeThing(remainderItem);
+						remainderCount = m - n;
+					}
+					
 				}
 			}
 			else{
-				//merged with toItem, item will be destroyed
-				moveItem = NULL;
+				//fully merged with toItem, item will be destroyed
 				item->onRemoved();
 				FreeThing(item);
 			}
 		}
-
-		if(moveItem){
-			toCylinder->__addThing(index, moveItem);
-
-			int32_t moveItemIndex = toCylinder->__getIndexOfThing(moveItem);
-			if(moveItemIndex != -1){
-				toCylinder->postAddNotification(moveItem, NULL, moveItemIndex);
-			}
-		}
 		else{
-			int32_t itemIndex = toCylinder->__getIndexOfThing(item);
+			toCylinder->__addThing(index, item);
 
+			int32_t itemIndex = toCylinder->__getIndexOfThing(item);
 			if(itemIndex != -1){
 				toCylinder->postAddNotification(item, NULL, itemIndex);
 			}
@@ -1517,7 +1519,16 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 
 ReturnValue Game::internalPlayerAddItem(Player* player, Item* item, bool dropOnMap /*= true*/, slots_t slot /*= SLOT_WHEREEVER*/)
 {
-	ReturnValue ret = internalAddItem(player, item, (int32_t)slot);
+	uint32_t remainderCount = 0;
+	ReturnValue ret = internalAddItem(player, item, (int32_t)slot, 0, false, remainderCount);
+
+	if(remainderCount > 0){
+		Item* remainderItem = Item::CreateItem(item->getID(), remainderCount);
+		ReturnValue remaindRet = internalAddItem(player->getTile(), remainderItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		if(remaindRet != RET_NOERROR){
+			FreeThing(remainderItem);
+		}
+	}
 
 	if(ret != RET_NOERROR && dropOnMap){
 		ret = internalAddItem(player->getTile(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
@@ -3590,12 +3601,13 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 
 bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
 {
-	TalkActionResult_t result = g_spells->playerSaySpell(player, type, text);
+	std::string words = text;
+	TalkActionResult_t result = g_spells->playerSaySpell(player, type, words);
 	if(result == TALKACTION_BREAK){
 		if(g_config.getNumber(ConfigManager::ORANGE_SPELL_TEXT))
-			return internalCreatureSay(player, SPEAK_MONSTER_SAY, text);
+			return internalCreatureSay(player, SPEAK_MONSTER_SAY, words);
 		else
-			return internalCreatureSay(player, SPEAK_SAY, text);
+			return internalCreatureSay(player, SPEAK_SAY, words);
 	}
 	else if(result == TALKACTION_FAILED){
 		return true;
@@ -4670,12 +4682,8 @@ void Game::FreeThing(Thing* thing)
 
 void Game::showUseHotkeyMessage(Player* player, Item* item)
 {
-	int32_t subType = -1;
-	if(item->hasSubType() && !item->hasCharges()){
-		subType = item->getSubType();
-	}
 	const ItemType& it = Item::items[item->getID()];
-	uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+	uint32_t itemCount = player->__getItemTypeCount(item->getID(), -1);
 
 	std::stringstream ss;
 	if(itemCount == 1){

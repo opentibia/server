@@ -502,10 +502,7 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 								li.subType = intValue;
 							}
 							else{
-								if(it.isRune()){
-									li.subType = it.charges;
-								}
-								else if(it.stackable){
+								if(it.stackable){
 									li.subType = 1;
 								}
 								else if(it.isFluidContainer() || it.isSplash()){
@@ -3484,9 +3481,12 @@ int NpcScriptInterface::luaDoSellItem(lua_State *L)
 		actionId = popNumber(L);
 	}
 
-	uint32_t subType = 1;
+	uint16_t subType = 0;
 	if(parameters > 3){
-		subType = popNumber(L);
+		int32_t n = popNumber(L);
+		if(n != -1){
+			subType = n;
+		}
 	}
 
 	uint32_t amount = (uint32_t)popNumber(L);
