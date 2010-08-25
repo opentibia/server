@@ -894,7 +894,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
-			bool canAttackInvisible = g_config.getNumber(ConfigManager::CAN_ATTACK_INVISIBLE);
+			bool canAttackInvisible = g_config.getBoolean(ConfigManager::CAN_ATTACK_INVISIBLE);
 			if(needTarget && tile->getTopVisibleCreature(player, !canAttackInvisible) == NULL){
 				player->sendCancelMessage(RET_CANONLYUSETHISRUNEONCREATURES);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);

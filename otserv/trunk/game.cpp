@@ -4887,7 +4887,7 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	if(removeNotations > 1)
 		g_bans.removeNotations(account.number);
 
-	bool announceViolation = g_config.getNumber(ConfigManager::BROADCAST_BANISHMENTS) != 0;
+	bool announceViolation = g_config.getBoolean(ConfigManager::BROADCAST_BANISHMENTS);
 	std::ostringstream ss;
 	if(actionType == ACTION_STATEMENT){
 		if(announceViolation){

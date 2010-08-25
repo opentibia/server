@@ -176,6 +176,7 @@ public:
 	const std::string& getString(uint32_t _what) const;
 	double getFloat(uint32_t _what) const;
 	int64_t getNumber(uint32_t _what) const;
+	bool getBoolean(uint32_t _what) const { return getNumber(_what) != 0; }
 	bool setNumber(uint32_t _what, int64_t _value);
 	bool setString(uint32_t _what, const std::string& _value);
 
