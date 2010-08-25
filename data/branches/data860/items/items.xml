@@ -2441,7 +2441,8 @@
 	</item>
 	<item id="2005" article="a" name="bucket">
 		<attribute key="weight" value="2000"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2006" article="a" name="vial">
 		<attribute key="weight" value="180"/>
 	</item>
@@ -2450,28 +2451,34 @@
 	</item>
 	<item id="2008" article="a" name="vase">
 		<attribute key="weight" value="940"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2009" article="a" name="green flask">
 		<attribute key="weight" value="300"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2010" article="a" name="broken bottle">
 		<attribute key="weight" value="100"/>
 	</item>
 	<item id="2011" article="a" name="blue amphora">
 		<attribute key="weight" value="850"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2012" article="a" name="mug">
 		<attribute key="weight" value="250"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2013" article="a" name="cup">
 		<attribute key="weight" value="200"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2014" article="a" name="jug">
 		<attribute key="weight" value="750"/>
 	</item>
 	<item id="2015" article="a" name="beer bottle">
 		<attribute key="weight" value="250"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2016" article="a" name="water splash">
 		<attribute key="decayTo" value="2017"/>
 		<attribute key="duration" value="45"/>
@@ -2501,7 +2508,8 @@
 	</item>
 	<item id="2023" article="an" name="amphora">
 		<attribute key="weight" value="9700"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2024" article="a" name="broken brown glass">
 		<attribute key="weight" value="100"/>
 	</item>
@@ -2516,10 +2524,12 @@
 	</item>
 	<item id="2032" article="a" name="bowl">
 		<attribute key="weight" value="380"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2033" article="a" name="golden mug">
 		<attribute key="weight" value="470"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2034" article="a" name="large amphora"/>
 	<item id="2035" article="a" name="plate">
 		<attribute key="weight" value="150"/>
@@ -5066,7 +5076,8 @@
 	</item>
 	<item id="2562" article="a" name="pot">
 		<attribute key="weight" value="5250"/>
-	</item>
+		<attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2563" article="a" name="pan">
 		<attribute key="weight" value="1800"/>
 	</item>
@@ -5102,16 +5113,20 @@
 	</item>
 	<item id="2574" article="a" name="white vase">
 		<attribute key="weight" value="1500"/>
-	</item>
+    <attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2575" article="a" name="yellow vase">
 		<attribute key="weight" value="1500"/>
-	</item>
+    <attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2576" article="a" name="blue vase">
 		<attribute key="weight" value="1500"/>
-	</item>
+    <attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2577" article="a" name="green vase">
 		<attribute key="weight" value="1500"/>
-	</item>
+    <attribute key="pickupable" value="1"/>
+  </item>
 	<item id="2578" article="a" name="closed trap">
 		<attribute key="weight" value="2100"/>
 	</item>
@@ -6057,7 +6072,7 @@
 	<item id="2869" article="a" name="dead minotaur" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
 		<attribute key="corpseType" value="blood"/>
-	</item>
+  </item>
 	<item id="2870" article="a" name="dead minotaur" editorsuffix=" (Not decaying)">
 		<attribute key="weight" value="60000"/>
 		<attribute key="corpseType" value="blood"/>
@@ -8838,10 +8853,12 @@
 	</item>
 	<item id="3941" article="a" name="cup">
 		<attribute key="weight" value="200"/>
-	</item>
+    <attribute key="pickupable" value="1"/>
+  </item>
 	<item id="3942" article="a" name="cup">
 		<attribute key="weight" value="200"/>
-	</item>
+    <attribute key="pickupable" value="1"/>
+  </item>
 	<item id="3943" article="a" name="torch bearer"/>
 	<item id="3944" article="a" name="lit torch bearer"/>
 	<item id="3945" article="a" name="torch bearer"/>
@@ -11826,7 +11843,8 @@
 	<item id="5552" article="a" name="pile of sugar cane"/>
 	<item id="5553" article="a" name="rum flask">
 		<attribute key="weight" value="280"/>
-	</item>
+    <attribute key="pickupable" value="1"/>
+  </item>
 	<item id="5554" article="a" name="small fish"/>
 	<item id="5555" name="straw"/>
 	<item id="5556" name="straw"/>
@@ -23240,7 +23258,8 @@
 	<item id="10143" article="a" name="cherry blossom tree"/>
 	<item id="10150" article="a" name="cocktail glass">
 		<attribute key="weight" value="200"/>
-	</item>
+    <attribute key="pickupable" value="1"/>
+  </item>
 	<item id="10151" article="a" name="golem part">
 		<attribute key="weight" value="35"/>
 	</item>
