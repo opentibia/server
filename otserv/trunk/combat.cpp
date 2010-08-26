@@ -1603,7 +1603,11 @@ bool MagicField::isBlocking(const Creature* creature) const
 void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 {
 	//remove magic walls/wild growth
-	if(id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE || isBlocking(creature)){
+	if(id == ITEM_MAGICWALL ||
+		id == ITEM_WILDGROWTH ||
+		id == ITEM_MAGICWALL_SAFE ||
+		id == ITEM_WILDGROWTH_SAFE || isBlocking(creature) )
+	{
 		g_game.internalRemoveItem(this, 1);
 	}
 	else{
