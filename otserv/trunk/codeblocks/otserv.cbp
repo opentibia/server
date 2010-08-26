@@ -170,10 +170,7 @@
 		<Unit filename="../cylinder.h" />
 		<Unit filename="../database.cpp" />
 		<Unit filename="../database.h" />
-		<Unit filename="../databasemysql.cpp">
-			<Option target="Debug Windows" />
-			<Option target="Release Windows" />
-		</Unit>
+		<Unit filename="../databasemysql.cpp" />
 		<Unit filename="../databasemysql.h" />
 		<Unit filename="../databaseodbc.cpp" />
 		<Unit filename="../databaseodbc.h" />
