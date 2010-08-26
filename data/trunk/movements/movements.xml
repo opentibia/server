@@ -76,7 +76,10 @@
 	<moveevent event="StepIn" itemid="1496" function="onStepInField" />
 	<moveevent event="AddItem" itemid="1496" function="onAddField" />
 
-	<moveevent event="StepIn" itemid="1498" function="onStepInField" />
+  <moveevent event="StepIn" itemid="1497" function="onStepInField" />
+  <moveevent event="AddItem" itemid="1497" function="onAddField" />
+  
+  <moveevent event="StepIn" itemid="1498" function="onStepInField" />
 	<moveevent event="AddItem" itemid="1498" function="onAddField" />
 
 	<moveevent event="StepIn" itemid="1499" function="onStepInField" />
