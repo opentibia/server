@@ -6420,6 +6420,9 @@ int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 			if (g_game.getPlayerByNameWildcard(var.text, player) == RET_NOERROR){
 				number = env->addThing(player);
 			}
+			break;
+		default:
+			break;
 	}
 
 	lua_pushnumber(L, number);
@@ -6452,6 +6455,9 @@ int LuaScriptInterface::luaVariantToString(lua_State *L)
 					}
 				}
 			}
+			break;
+		default:
+			break;
 	}
 
 	lua_pushstring(L, text.c_str());
@@ -6479,8 +6485,11 @@ int LuaScriptInterface::luaVariantToPosition(lua_State *L)
 			}
 			break;
 		case VARIANT_NUMBER:
-			if (Player* player = env->getPlayerByUID(var.number))
+			if (Player* player = env->getPlayerByUID(var.number)){
 				pos = player->getPosition();
+			}
+			break;
+		default:
 			break;
 	}
 
