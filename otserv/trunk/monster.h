@@ -142,6 +142,7 @@ private:
 	bool resetTicks;
 	bool isIdle;
 	bool extraMeleeAttack;
+	bool semiIdle;
 
 	Spawn* spawn;
 	bool isMasterInRange;

@@ -61,6 +61,7 @@ Monster::Monster(MonsterType* _mtype) :
 Creature()
 {
 	isIdle = true;
+	semiIdle = false;
 	isMasterInRange = false;
 	mType = _mtype;
 	spawn = NULL;
@@ -584,6 +585,7 @@ void Monster::setIdle(bool _idle)
 		g_game.addCreatureCheck(this);
 	}
 	else{
+		semiIdle = false;
 		onIdleStatus();
 		clearTargetList();
 		clearFriendList();
@@ -600,6 +602,7 @@ void Monster::updateIdleStatus()
 		heightMinimum = std::max(g_config.getNumber(ConfigManager::HEIGHT_MINIMUM_FOR_IDLE),(int64_t)1);
 
 	bool idle = false;
+	semiIdle = false;
 	if(conditions.empty()){
 		if(isSummon()){
 			if(!isMasterInRange){
@@ -610,10 +613,11 @@ void Monster::updateIdleStatus()
 			}
 		}
 		else{
-			idle = true;
+			idle = targetList.empty();
+			semiIdle = !idle;
 			for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
 				if (std::abs((*it)->getPosition().z - getPosition().z) < heightMinimum) {
-					idle = false;
+					semiIdle = false;
 					break;
 				}
 			}
@@ -657,7 +661,7 @@ void Monster::onThink(uint32_t interval)
 	}
 	else{
 		updateIdleStatus();
-		if(!isIdle){
+		if(!isIdle && !semiIdle){
 			addEventWalk();
 
 			if(isSummon()){
@@ -1426,6 +1430,7 @@ void Monster::changeHealth(int32_t healthChange)
 {
 	//In case a player with ignore flag set attacks the monster
 	setIdle(false);
+	semiIdle = false;
 	Creature::changeHealth(healthChange);
 }
 
