@@ -17,7 +17,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return FALSE
 	end
 	
-	doPlayerAddQuestReward( parameters)
+	doPlayerAddQuestReward(cid, parameters)
 	
 	return TRUE
 end
