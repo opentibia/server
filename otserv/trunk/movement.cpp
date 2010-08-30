@@ -1099,7 +1099,7 @@ ReturnValue MoveEvent::canPlayerWearEquip(Player* player, slots_t slot)
 
 	//check all required values
 	const VocEquipMap vocMap = getVocEquipMap();
-	if(vocMap.find(player->getVocationId()) == vocMap.end()){
+	if(!vocMap.empty() && vocMap.find(player->getVocationId()) == vocMap.end()){
 		return RET_NOTREQUIREDPROFESSION;
 	}
 	if(player->getLevel() < getReqLevel()){
