@@ -37,6 +37,7 @@ extern ConfigManager g_config;
 #if defined __WINDOWS__
 
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
+		#include <windows.h>
 		#include "dbghelp.h"
 
 		// based on dbghelp.h
