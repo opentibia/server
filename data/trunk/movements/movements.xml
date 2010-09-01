@@ -141,6 +141,9 @@
 
 	<moveevent event="StepIn" itemid="7473" function="onStepInField" />
 	<moveevent event="AddItem" itemid="7473" function="onAddField" />
+	
+	<moveevent event="StepIn" itemid="11098" function="onStepInField" />
+	<moveevent event="AddItem" itemid="11098" function="onAddField" />
 
 	<!-- Walkable waters -->
 	<moveevent event="StepIn" itemid="4820" script="swimmingpool_swim.lua" />
