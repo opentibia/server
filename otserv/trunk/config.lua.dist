@@ -333,12 +333,12 @@ show_house_prices = false
 -- options: mysql, sqlite, odbc or pgsql
 sql_type = "sqlite"
 
---- SQL connection part
+-- SQL connection part
 sql_db   = "db.s3db"
---- sql_db = "otserv" -- use this for MySQL/PgSQL
---- sql_db = "Your Source" -- ODBC
+-- sql_db = "otserv" -- use this for MySQL/PgSQL
+-- sql_db = "Your Source" -- ODBC
 
--- there settings are not used by SQLite
+-- Additional connection settings for mysql, pgsql and odbc
 sql_host = "localhost"
 sql_port = 3306
 --- sql_port = 5432 -- use this for PgSQL
