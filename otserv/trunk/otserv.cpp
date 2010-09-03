@@ -261,8 +261,11 @@ int main(int argc, char *argv[])
 	// Wait for loading to finish
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
+	boost::this_thread::sleep(boost::posix_time::milliseconds(10000));
+
 	if(servicer.is_running()){
-		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
+		std::cout << "[done]" << std::endl;
+		std::cout << ":: Server Running..." << std::endl;
 		servicer.run();
 	}
 	else{
