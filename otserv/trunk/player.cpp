@@ -3095,7 +3095,7 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 				maxQueryCount = 0;
 		}
 		//empty slot
-		else if(__queryAdd(index, item, item->getItemCount(), flags) == RET_NOERROR){
+		else if(__queryAdd(index, item, count, flags) == RET_NOERROR){
 			if(item->isStackable())
 				maxQueryCount = 100;
 			else
