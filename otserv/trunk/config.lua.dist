@@ -256,14 +256,19 @@ despawnradius = 50
 --should players be able to hit invisible creatures using not AOE runes? (default: false)
 can_attack_invisible = false
 
---should players be able to pass through each other if they can't attack each other (at non-pvp server or protected levels)?
+--should players be able to pass through each other if they can't attack each other (non-pvp servers/tiles or levels too low for PvP)?
+--this option also controls if they can pass through magic wall/wild growth casted by players with those restrictions
 can_pass_through = true
 
---players with a level smaller than this number can't be attacked by other players. Set it to to 0 to disable
-level_protection = 0
+--should magic walls (and wild growth) disappear when a player walks upon it? (non-pvp servers/tiles or casted by chars who are too low)?
+magic_wall_disappear_on_walk = true
 
---should all the protection code apply to creatures summoned by protected chars too? (experimental code, DO NOT UNCOMMENT!)
---protection_extended_to_summon = true
+--players with a level smaller than this number can't be attacked by other players. Set it to to 0 to disable
+min_pvp_level = 0
+
+--should pvp restrictions apply to summons too?
+-- (experimental code - requires otserv to be compiled with flag __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__)
+--min_pvp_level_applies_to_summons = true
 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
 maxmessagebuffer = 4

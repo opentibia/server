@@ -1533,7 +1533,7 @@ void Monster::onCreatureConvinced(const Creature* convincer, const Creature* cre
 		updateTargetList();
 		updateIdleStatus();
 	}
-	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	g_game.forceClientsToReloadCreature(creature);
 	#endif
 }

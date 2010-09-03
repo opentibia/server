@@ -198,9 +198,10 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confString[DEATH_MSG] = getGlobalString(L, "death_msg", "You are dead.");
 	m_confInteger[CAN_ATTACK_INVISIBLE] = getGlobalBoolean(L, "can_attack_invisible", false);
 	m_confInteger[CAN_PASS_THROUGH] = getGlobalBoolean(L, "can_pass_through", true);
-	m_confInteger[LEVEL_PROTECTION] = getGlobalNumber(L, "level_protection", 0);
-	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
-	m_confInteger[PROTECTION_EXTENDED_TO_SUMMONS] = getGlobalBoolean(L, "protection_extended_to_summon", true);
+	m_confInteger[MIN_PVP_LEVEL] = getGlobalNumber(L, "min_pvp_level", 0);
+	m_confInteger[MW_DISAPPEAR_ON_WALK] = getGlobalBoolean(L, "magic_wall_disappear_on_walk", true);
+	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+	m_confInteger[MIN_PVP_LEVEL_APPLIES_TO_SUMMONS] = getGlobalBoolean(L, "min_pvp_level_applies_to_summons", true);
 	#endif
 	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 2);
 	m_isLoaded = true;

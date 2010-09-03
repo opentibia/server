@@ -1454,7 +1454,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 						FreeThing(remainderItem);
 						remainderCount = m - n;
 					}
-					
+
 				}
 			}
 			else{
@@ -4036,7 +4036,7 @@ void Game::internalCreatureChangeVisible(Creature* creature, bool visible)
 	}
 }
 
-#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 void Game::forceClientsToReloadCreature(const Creature* creature)
 {
 	const SpectatorVec& list = getSpectators(creature->getPosition());

@@ -385,11 +385,11 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 	#endif
 }
 
-ReturnValue Combat::checkExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalkCheck)
+ReturnValue Combat::checkPVPExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalkCheck)
 {
-	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	const Player* targetPlayer;
-	if (g_config.getNumber(ConfigManager::PROTECTION_EXTENDED_TO_SUMMONS))
+	if (g_config.getNumber(ConfigManager::MIN_PVP_LEVEL_APPLIES_TO_SUMMONS))
 		targetPlayer = target->getPlayerInCharge();
 	else
 		targetPlayer = target->getPlayer();
@@ -414,7 +414,7 @@ ReturnValue Combat::checkExtraRestrictions(const Creature* attacker, const Creat
 		}
 		else{
 			if(!isWalkCheck || canPassThrough){
-				uint32_t p_level = g_config.getNumber(ConfigManager::LEVEL_PROTECTION);
+				uint32_t p_level = g_config.getNumber(ConfigManager::MIN_PVP_LEVEL);
 				uint32_t attackerLevel = attackerPlayer->getLevel();
 				uint32_t targetLevel = targetPlayer->getLevel();
 
@@ -424,7 +424,7 @@ ReturnValue Combat::checkExtraRestrictions(const Creature* attacker, const Creat
 				}
 			}
 		}
-		
+
 		if(isWalkCheck && target->getTile() && target->getTile()->ground->getID() == ITEM_GLOWING_SWITCH){
 			stopAttack = true;
 		}
@@ -487,7 +487,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 				return RET_ACTIONNOTPERMITTEDINANONPVPZONE;
 			}
 
-			return Combat::checkExtraRestrictions(attacker, target, false);
+			return Combat::checkPVPExtraRestrictions(attacker, target, false);
 		}
 	}
 
@@ -761,6 +761,20 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 			}
 		}
 		if(p_caster){
+			if(itemId == ITEM_WILDGROWTH){
+					if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
+							g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
+					{
+						itemId = ITEM_WILDGROWTH_SAFE;
+					}
+			}
+			if(itemId == ITEM_MAGICWALL){
+					if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
+							g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
+					{
+						itemId = ITEM_MAGICWALL_SAFE;
+					}
+				}
 			if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD){
 					itemId = ITEM_FIREFIELD_SAFE;
@@ -1593,47 +1607,60 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 
 bool MagicField::isBlocking(const Creature* creature) const
 {
-	if(id != ITEM_MAGICWALL_SAFE && id != ITEM_WILDGROWTH_SAFE){
-		return Item::isBlocking(creature);
+	if (id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE){
+		uint32_t ownerId = getOwner();
+		if (ownerId !=0){
+			Creature *owner = g_game.getCreatureByID(ownerId);
+			if (owner){
+				return !creature->canWalkthrough(owner);
+			}
+		}
+		return true;
 	}
 
-	return (!creature || !creature->getPlayer());
+	return Item::isBlocking(creature);
+}
+
+bool MagicField::canOwnerHarm(const Creature* target) const
+{
+	uint32_t ownerId = getOwner();
+	if (ownerId !=0){
+		Creature* owner = g_game.getCreatureByID(ownerId);
+		if (owner && owner != target){
+			return (Combat::canDoCombat(owner, target) == RET_NOERROR);
+		}
+	}
+	return true;
 }
 
 void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 {
 	//remove magic walls/wild growth
-	if(id == ITEM_MAGICWALL ||
-		id == ITEM_WILDGROWTH ||
-		id == ITEM_MAGICWALL_SAFE ||
-		id == ITEM_WILDGROWTH_SAFE || isBlocking(creature) )
+	if ( id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE ||
+			id == ITEM_MAGICWALL || id == ITEM_WILDGROWTH )
 	{
-		g_game.internalRemoveItem(this, 1);
+		bool isBlockingVar = isBlocking(creature);
+		bool config = g_config.getBoolean(ConfigManager::MW_DISAPPEAR_ON_WALK);
+		if(isBlockingVar || (!isBlockingVar && config)){
+			g_game.internalRemoveItem(this, 1);
+		}
 	}
 	else{
 		const ItemType& it = items[getID()];
 		if(it.condition){
-			Condition* conditionCopy = it.condition->clone();
-			uint32_t owner = getOwner();
-			if(owner != 0 && purposeful){
-				bool harmfulField = true;
-				if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP || getTile()->hasFlag(TILESTATE_NOPVPZONE) ){
-					Creature* creature = g_game.getCreatureByID(owner);
-					if(creature){
-						if(creature->getPlayer() || creature->isPlayerSummon()){
-							harmfulField = false;
-						}
+			if (canOwnerHarm(creature)){
+				Condition* conditionCopy = it.condition->clone();
+				uint32_t ownerId = getOwner();
+				if(ownerId != 0 && purposeful){
+					Creature* owner = g_game.getCreatureByID(ownerId);
+					if(	(OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
+							owner->hasBeenAttacked(ownerId)	)
+					{
+						conditionCopy->setParam(CONDITIONPARAM_OWNER, ownerId);
 					}
 				}
-				if(   !harmfulField ||
-					  (OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
-						creature->hasBeenAttacked(owner))
-				{
-					conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);
-				}
+				creature->addCondition(conditionCopy);
 			}
-
-			creature->addCondition(conditionCopy);
 		}
 	}
 }

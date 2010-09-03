@@ -257,7 +257,7 @@ enum passwordType_t{
 	#endif
 #endif
 
-//#define __PROTECTION_EXTENDED_TO_SUMMONS__ //experimental
+//#define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__ //experimental
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)

@@ -486,7 +486,7 @@ public:
 	void changeSpeed(Creature* creature, int32_t varSpeedDelta);
 	void internalCreatureChangeOutfit(Creature* creature, const Outfit_t& oufit);
 	void internalCreatureChangeVisible(Creature* creature, bool visible);
-	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	void forceClientsToReloadCreature(const Creature* creature);
 	#endif
 	void changeLight(const Creature* creature);

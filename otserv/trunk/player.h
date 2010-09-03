@@ -505,7 +505,7 @@ public:
 				}
 			}
 		}
-	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	void forceClientToReloadCreature(const Creature* creature) {
 		if (client && creature) {
 			client->sendRemoveCreature(creature, creature->getPosition(), creature->getTile()->getClientIndexOfThing(this, creature), false);

@@ -1022,11 +1022,11 @@ bool Player::canSeeCreature(const Creature* creature) const
 
 bool Player::getWalkBit(Player *viewer) const
 {
-	#ifdef __PROTECTION_EXTENDED_TO_SUMMONS__
+	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	if (viewer->hasFlag(PlayerFlag_CanPassThroughAllCreatures))
 		return false;
 	if (!g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)
-		|| (g_config.getNumber(ConfigManager::LEVEL_PROTECTION) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP))
+		|| (g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP))
 		return true;
 	return false;
 	#else
@@ -1034,7 +1034,7 @@ bool Player::getWalkBit(Player *viewer) const
 		return false;
 	if (!g_config.getNumber(ConfigManager::CAN_PASS_THROUGH))
 		return true;
-	if (g_config.getNumber(ConfigManager::LEVEL_PROTECTION) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP)
+	if (g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP)
 		return true;
 	return false;
 	#endif
@@ -1047,7 +1047,7 @@ bool Player::canWalkthrough(const Creature* creature) const
 		return true;
 	}
 
-	return (Combat::checkExtraRestrictions(this, creature, true) != RET_NOERROR);
+	return (Combat::checkPVPExtraRestrictions(this, creature, true) != RET_NOERROR);
 }
 
 
@@ -1058,7 +1058,7 @@ bool Player::canBePushedBy(const Player *player) const
 	if (g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)){
 		uint32_t victim_level = getLevel();
 		uint32_t player_level = player->getLevel();
-		uint32_t p_level = g_config.getNumber(ConfigManager::LEVEL_PROTECTION);
+		uint32_t p_level = g_config.getNumber(ConfigManager::MIN_PVP_LEVEL);
 		if (player_level < p_level && victim_level >= p_level)
 			return false;
 		}
@@ -3152,7 +3152,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 			Item* inventoryItem = inventory[i];
 
 			if(inventoryItem){
-				
+
 				if(inventoryItem == tradeItem){
 					continue;
 				}

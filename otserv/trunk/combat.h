@@ -296,7 +296,7 @@ public:
 	static CombatType_t ConditionToDamageType(ConditionType_t type);
 	static ConditionType_t DamageToConditionType(CombatType_t type);
 	static ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
-	static ReturnValue checkExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalking);
+	static ReturnValue checkPVPExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalking);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
 	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
@@ -370,6 +370,7 @@ public:
 		return it.combatType;
 	}
 	void onStepInField(Creature* creature, bool purposeful = true);
+	bool canOwnerHarm(const Creature* target) const;
 
 private:
 	int64_t createTime;
