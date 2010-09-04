@@ -3146,7 +3146,8 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 			return this;
 		}
 
-		
+		bool autoStack = !((flags & FLAG_IGNOREAUTOSTACK) == FLAG_IGNOREAUTOSTACK);
+
 		std::list<Container*> containerList;
 		for(uint32_t slotIndex = SLOT_FIRST; slotIndex < SLOT_LAST; ++slotIndex){
 			Item* inventoryItem = inventory[slotIndex];
@@ -3161,12 +3162,14 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 					continue;
 				}
 
-				if(item->isStackable()){
+				if(autoStack && item->isStackable()){
 					//try find an already existing item to stack with
-					if(inventoryItem->getID() == item->getID() && inventoryItem->getItemCount() < 100){
-						index = slotIndex;
-						*destItem = inventoryItem;
-						return this;
+					if(__queryAdd(slotIndex, item, item->getItemCount(), 0) == RET_NOERROR){
+						if(inventoryItem->getID() == item->getID() && inventoryItem->getItemCount() < 100){
+							index = slotIndex;
+							*destItem = inventoryItem;
+							return this;
+						}
 					}
 
 					if(Container* subContainer = inventoryItem->getContainer()){
@@ -3207,7 +3210,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 						continue;
 					}
 
-					if(item->isStackable()){
+					if(autoStack && item->isStackable()){
 						//try find an already existing item to stack with
 						if(tmpItem != item && tmpItem->getID() == item->getID() && tmpItem->getItemCount() < 100){
 							index = n;

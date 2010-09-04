@@ -447,18 +447,21 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 		return this;
 	}
 
-	if(item->isStackable()){
-		if(item->getParent() != this){
-			//try find a suitable item to stack with
-			uint32_t n = 0;
-			for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
-				if((*cit) != item && (*cit)->getID() == item->getID() && (*cit)->getItemCount() < 100){
-					*destItem = (*cit);
-					index = n;
-					return this;
-				}
+	bool autoStack = !((flags & FLAG_IGNOREAUTOSTACK) == FLAG_IGNOREAUTOSTACK);
+	if(autoStack){
+		if(item->isStackable()){
+			if(item->getParent() != this){
+				//try find a suitable item to stack with
+				uint32_t n = 0;
+				for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
+					if((*cit) != item && (*cit)->getID() == item->getID() && (*cit)->getItemCount() < 100){
+						*destItem = (*cit);
+						index = n;
+						return this;
+					}
 
-				++n;
+					++n;
+				}
 			}
 		}
 	}
