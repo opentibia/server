@@ -3146,10 +3146,10 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 			return this;
 		}
 
-		//find an appropiate slot
+		
 		std::list<Container*> containerList;
-		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
-			Item* inventoryItem = inventory[i];
+		for(uint32_t slotIndex = SLOT_FIRST; slotIndex < SLOT_LAST; ++slotIndex){
+			Item* inventoryItem = inventory[slotIndex];
 
 			if(inventoryItem){
 
@@ -3157,58 +3157,87 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 					continue;
 				}
 
-				//try find an already existing item to stack with
-				if(inventoryItem != item && item->isStackable() && inventoryItem->getID() == item->getID() && inventoryItem->getItemCount() < 100){
-					*destItem = inventoryItem;
-					index = i;
-					return this;
+				if(inventoryItem == item){
+					continue;
 				}
-				//check sub-containers
-				else if(Container* subContainer = inventoryItem->getContainer()){
-					Cylinder* tmpCylinder = NULL;
-					int32_t tmpIndex = INDEX_WHEREEVER;
-					Item* tmpDestItem = NULL;
 
-					tmpCylinder = subContainer->__queryDestination(tmpIndex, item, &tmpDestItem, flags);
-					if(tmpCylinder && tmpCylinder->__queryAdd(tmpIndex, item, item->getItemCount(), flags) == RET_NOERROR){
-						index = tmpIndex;
-						*destItem = tmpDestItem;
-						return tmpCylinder;
+				if(item->isStackable()){
+					//try find an already existing item to stack with
+					if(inventoryItem->getID() == item->getID() && inventoryItem->getItemCount() < 100){
+						index = slotIndex;
+						*destItem = inventoryItem;
+						return this;
+					}
+
+					if(Container* subContainer = inventoryItem->getContainer()){
+						containerList.push_back(subContainer);
+					}
+				}
+				else if(Container* subContainer = inventoryItem->getContainer()){
+					if(subContainer->__queryAdd(INDEX_WHEREEVER, item, item->getItemCount(), flags) == RET_NOERROR){
+						index = INDEX_WHEREEVER;
+						*destItem = NULL;
+						return subContainer;
 					}
 
 					containerList.push_back(subContainer);
 				}
 			}
 			//empty slot
-			else if(__queryAdd(i, item, item->getItemCount(), flags) == RET_NOERROR){
-				index = i;
+			else if(__queryAdd(slotIndex, item, item->getItemCount(), flags) == RET_NOERROR){
+				index = slotIndex;
 				*destItem = NULL;
 				return this;
 			}
 		}
 
-		//check deeper in the containers
-		for(std::list<Container*>::iterator it = containerList.begin(); it != containerList.end(); ++it){
-			for(ContainerIterator iit = (*it)->begin(); iit != (*it)->end(); ++iit){
-				if(Container* subContainer = (*iit)->getContainer()){
+		while(!containerList.empty()){
+			Container* tmpContainer = containerList.front();
+			containerList.pop_front();
 
-					if(subContainer == tradeItem){
+			for(uint32_t n = 0; n < tmpContainer->capacity(); ++n){
+				Item* tmpItem = tmpContainer->getItem(n);
+
+				if(tmpItem){
+					if(tmpItem == tradeItem){
 						continue;
 					}
 
-					Cylinder* tmpCylinder = NULL;
-					int32_t tmpIndex = INDEX_WHEREEVER;
-					Item* tmpDestItem = NULL;
-
-					tmpCylinder = subContainer->__queryDestination(tmpIndex, item, &tmpDestItem, flags);
-					if(tmpCylinder && tmpCylinder->__queryAdd(tmpIndex, item, item->getItemCount(), flags) == RET_NOERROR){
-						index = tmpIndex;
-						*destItem = tmpDestItem;
-						return tmpCylinder;
+					if(tmpItem == item){
+						continue;
 					}
+
+					if(item->isStackable()){
+						//try find an already existing item to stack with
+						if(tmpItem != item && tmpItem->getID() == item->getID() && tmpItem->getItemCount() < 100){
+							index = n;
+							*destItem = tmpItem;
+							return tmpContainer;
+						}
+					
+						if(Container* subContainer = tmpItem->getContainer()){
+							containerList.push_back(subContainer);
+						}
+					}
+					else if(Container* subContainer = tmpItem->getContainer()){
+						if(subContainer->__queryAdd(INDEX_WHEREEVER, item, item->getItemCount(), flags) == RET_NOERROR){
+							index = INDEX_WHEREEVER;
+							*destItem = NULL;
+							return subContainer;
+						}
+
+						containerList.push_back(subContainer);
+					}
+				}
+				//empty slot
+				else if(tmpContainer->__queryAdd(n, item, item->getItemCount(), flags) == RET_NOERROR){
+					index = n;
+					*destItem = NULL;
+					return tmpContainer;
 				}
 			}
 		}
+
 		return this;
 	}
 
