@@ -1585,6 +1585,15 @@ std::string Creature::getDescription(int32_t lookDistance) const
 	return str;
 }
 
+std::string Creature::getXRayDescription() const
+{
+	std::stringstream ret;
+	ret << "Health: [" << getHealth() << "/" << getMaxHealth() << "]" << std::endl;
+	ret << "Mana: [" << getMana() << "/" << getMaxMana() << "]" << std::endl;
+	ret << Thing::getXRayDescription();
+	return ret.str();
+}
+
 int32_t Creature::getStepDuration(Direction dir) const
 {
 	int32_t stepDuration = getStepDuration();

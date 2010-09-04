@@ -1237,6 +1237,9 @@ void LuaScriptInterface::registerFunctions()
 	//getItemRWInfo(uid)
 	lua_register(m_luaState, "getItemRWInfo", LuaScriptInterface::luaGetItemRWInfo);
 
+	//getThingDefaultDescription(uid, lookDistance, <optional> canSeeXRay)
+	lua_register(m_luaState, "getThingDefaultDescription", LuaScriptInterface::luaGetThingDefaultDescription);
+
 	//getItemSpecialDescription(uid)
 	lua_register(m_luaState, "getItemSpecialDescription", LuaScriptInterface::luaGetItemSpecialDescription);
 
@@ -3561,6 +3564,36 @@ int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+//getThingDefaultDescription(uid, lookDistance, <optional> canSeeXRay>)
+int	LuaScriptInterface::luaGetThingDefaultDescription(lua_State *L)
+{
+	int32_t parameters = lua_gettop(L);
+
+	bool canSeeXRay = false;
+	if(parameters > 2){
+		canSeeXRay = (popNumber(L) == LUA_TRUE);
+	}
+
+	uint32_t lookDistance = popNumber(L);
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Thing* thing = env->getThingByUID(uid);
+	if(thing){
+		std::stringstream ret;
+		ret << thing->getDescription(lookDistance);
+		if (canSeeXRay)
+			ret << thing->getXRayDescription();
+		lua_pushstring(L, ret.str().c_str());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
+		lua_pushnil(L);
 	}
 	return 1;
 }

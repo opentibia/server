@@ -300,6 +300,7 @@ public:
 	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
 
 	virtual std::string getDescription(int32_t lookDistance) const;
+	virtual std::string getXRayDescription() const;
 	std::string getWeightDescription() const;
 
 	uint16_t getID() const {return id;}

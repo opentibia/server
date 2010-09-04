@@ -3210,20 +3210,7 @@ bool Game::playerLookAt(uint32_t playerId, const Position& pos, uint16_t spriteI
 	//x-ray (special description)
 	if(player->hasFlag(PlayerFlag_CanSeeSpecialDescription)){
 		ss << std::endl;
-		if(Item* item = thing->getItem()){
-			ss << "ID: " << item->getID() << std::endl;
-			uint16_t actionId = item->getActionId();
-			uint16_t uniqueId = item->getUniqueId();
-			if(actionId > 0)
-				ss << "Action ID: " << actionId << std::endl;
-			if(uniqueId > 0)
-				ss << "Unique ID: " << uniqueId << std::endl;
-		}
-		else if(Creature* creature = thing->getCreature()){
-			ss << "Health: [" << creature->getHealth() << "/" << creature->getMaxHealth() << "]" << std::endl;
-			ss << "Mana: [" << creature->getMana() << "/" << creature->getMaxMana() << "]" << std::endl;
-		}
-		ss << "Position: [" << thing->getPosition().x << ", " << thing->getPosition().y << ", " << thing->getPosition().z << "]";
+		ss << thing->getXRayDescription();
 	}
 
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());

@@ -23,6 +23,8 @@
 
 #include "definitions.h"
 #include "position.h"
+#include <string>
+#include <sstream>
 
 /*Notice: remember to add new error codes to global.lua*/
 enum ReturnValue{
@@ -113,6 +115,12 @@ public:
 	}
 
 	virtual std::string getDescription(int32_t lookDistance) const = 0;
+	virtual std::string getXRayDescription() const {
+		std::stringstream ret;
+		ret << "Position: [";
+		ret << getPosition().x << ", " << getPosition().y << ", " << getPosition().z << "]";
+		return ret.str();
+	}
 
 	Cylinder* getParent() {return parent;};
 	const Cylinder* getParent() const {return parent;};
