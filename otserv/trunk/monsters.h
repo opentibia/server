@@ -29,8 +29,8 @@
 #define MAX_STATICWALK 100
 
 struct LootBlock{
-	unsigned short id;
-	unsigned short countmax;
+	uint16_t id;
+	uint32_t countmax;
 	uint32_t chance;
 
 	//optional
@@ -147,7 +147,7 @@ public:
 
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
-	Item* createLootItem(const LootBlock& lootblock);
+	std::list<Item*> createLootItem(const LootBlock& lootblock);
 
 	bool getParameter(const std::string key, std::string& value);
 };

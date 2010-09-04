@@ -147,20 +147,24 @@ void Monsters::pushSpellParameters(const std::string name, LuaScriptInterface* e
 void MonsterType::createLoot(Container* corpse)
 {
 	for(LootItems::const_iterator it = lootItems.begin(); it != lootItems.end() && (corpse->capacity() - corpse->size() > 0); it++){
-		Item* tmpItem = createLootItem(*it);
-		if(tmpItem){
-			//check containers
-			if(Container* container = tmpItem->getContainer()){
-				createLootContainer(container, *it);
-				if(container->size() == 0){
-					delete container;
+		std::list<Item*> itemList = createLootItem(*it);
+		if(!itemList.empty()){
+			for(std::list<Item*>::iterator iit = itemList.begin(); iit != itemList.end(); ++iit){
+				Item* tmpItem = *iit;
+
+				//check containers
+				if(Container* container = tmpItem->getContainer()){
+					createLootContainer(container, *it);
+					if(container->size() == 0){
+						delete container;
+					}
+					else{
+						corpse->__internalAddThing(tmpItem);
+					}
 				}
 				else{
 					corpse->__internalAddThing(tmpItem);
 				}
-			}
-			else{
-				corpse->__internalAddThing(tmpItem);
 			}
 		}
 	}
@@ -168,23 +172,30 @@ void MonsterType::createLoot(Container* corpse)
 	corpse->__startDecaying();
 }
 
-Item* MonsterType::createLootItem(const LootBlock& lootBlock)
+std::list<Item*> MonsterType::createLootItem(const LootBlock& lootBlock)
 {
 	Item* tmpItem = NULL;
-	if(Item::items[lootBlock.id].stackable){
-		uint32_t randvalue = Monsters::getLootRandom();
-		if(randvalue < lootBlock.chance){
-			uint16_t n = randvalue % lootBlock.countmax + 1;
-			tmpItem = Item::CreateItem(lootBlock.id, n);
+	int32_t itemCount = 0;
+
+	uint32_t randvalue = Monsters::getLootRandom();
+	if(randvalue < lootBlock.chance){
+		if(Item::items[lootBlock.id].stackable){
+			if(randvalue < lootBlock.chance){
+				itemCount = randvalue % lootBlock.countmax + 1;
+			}
 		}
-	}
-	else{
-		if(Monsters::getLootRandom() < lootBlock.chance){
-			tmpItem = Item::CreateItem(lootBlock.id, 0);
+		else{
+			itemCount = 1;
 		}
 	}
 
-	if(tmpItem){
+	std::list<Item*> itemList;
+
+	while(itemCount > 0){
+		uint16_t n = (uint16_t)std::min(itemCount, (int32_t)100);
+		tmpItem = Item::CreateItem(lootBlock.id, n);
+		itemCount -= n;
+
 		if(lootBlock.subType != -1){
 			tmpItem->setSubType(lootBlock.subType);
 		}
@@ -197,10 +208,10 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 			tmpItem->setText(lootBlock.text);
 		}
 
-		return tmpItem;
+		itemList.push_back(tmpItem);
 	}
 
-	return NULL;
+	return itemList;
 }
 
 void MonsterType::createLootContainer(Container* parent, const LootBlock& lootblock)
@@ -208,19 +219,22 @@ void MonsterType::createLootContainer(Container* parent, const LootBlock& lootbl
 	if(parent->size() < parent->capacity()){
 		LootItems::const_iterator it;
 		for(it = lootblock.childLoot.begin(); it != lootblock.childLoot.end(); it++){
-			Item* tmpItem = createLootItem(*it);
-			if(tmpItem){
-				if(Container* container = tmpItem->getContainer()){
-					createLootContainer(container, *it);
-					if(container->size() == 0 && it->dropEmpty == false){
-						delete container;
+			std::list<Item*> itemList = createLootItem(*it);
+			if(!itemList.empty()){
+				for(std::list<Item*>::iterator iit = itemList.begin(); iit != itemList.end(); ++iit){
+					Item* tmpItem = *iit;
+					if(Container* container = tmpItem->getContainer()){
+						createLootContainer(container, *it);
+						if(container->size() == 0 && it->dropEmpty == false){
+							delete container;
+						}
+						else{
+							parent->__internalAddThing(container);
+						}
 					}
 					else{
-						parent->__internalAddThing(container);
+						parent->__internalAddThing(tmpItem);
 					}
-				}
-				else{
-					parent->__internalAddThing(tmpItem);
 				}
 			}
 		}
@@ -1397,13 +1411,8 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 
 	if(readXMLInteger(node, "countmax", intValue) && intValue > 0){
 		lootBlock.countmax = intValue;
-
-		if(lootBlock.countmax > 100){
-			lootBlock.countmax = 100;
-		}
 	}
 	else{
-		//std::cout << "missing countmax for loot id = "<< lootBlock.id << std::endl;
 		lootBlock.countmax = 1;
 	}
 
