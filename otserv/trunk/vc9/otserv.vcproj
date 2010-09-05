@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="vc9"
+	Name="otserv"
 	ProjectGUID="{134E4CDD-1487-47D6-BE35-71A2D0A26209}"
 	RootNamespace="vc9"
 	TargetFrameworkVersion="196613"
@@ -60,8 +60,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="lua5.1.lib libmysql.lib mpir.lib libxml2_debug.lib"
-				OutputFile="$(OutDir)\otserv.exe"
-				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(GMP_LIB_PATH)&quot;"
+				OutputFile="$(OutDir)\otservd.exe"
+				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(LIBICONV_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(MPIR_LIB_PATH)&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 				CLRThreadAttribute="1"
@@ -135,7 +135,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="lua5.1.lib libmysql.lib mpir.lib libxml2.lib"
 				OutputFile="$(OutDir)\otserv.exe"
-				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(GMP_LIB_PATH)&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(LIBICONV_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(MPIR_LIB_PATH)&quot;"
 				GenerateDebugInformation="false"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -720,6 +720,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\resource1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\resource2.h"
+				>
+			</File>
+			<File
 				RelativePath="..\rsa.h"
 				>
 			</File>
@@ -810,15 +818,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\otserv.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vc9.rc"
+				RelativePath=".\otserv.rc"
 				>
 			</File>
 		</Filter>
