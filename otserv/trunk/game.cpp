@@ -3149,23 +3149,11 @@ bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 		return false;
 	}
 
-	int32_t subType = 0;
-	if(it.isFluidContainer()){
-		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
-		if(count < maxFluidType){
-			subType = reverseFluidMap[count];
-		}
-	}
-	else{
-		subType = count;
-	}
-
-	if(player->onLookEvent(NULL, it.id)){
+	if (player->onLookEvent(NULL, it.id)){
 		std::stringstream ss;
-		ss << "You see " << Item::getDescription(it, 1, NULL, subType);
+		ss << "You see " << it.getDescription(count);
 		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 	}
-
 	return true;
 }
 

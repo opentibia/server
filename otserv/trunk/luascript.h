@@ -420,6 +420,7 @@ protected:
 	static int luaGetTileThingByTopOrder(lua_State *L);
 	static int luaGetTopCreature(lua_State *L);
 	static int luaGetThingDefaultDescription(lua_State *L);
+	static int luaGetItemTypeDefaultDescription(lua_State *L);
 	static int luaGetItemSpecialDescription(lua_State *L);
 
 	//set item

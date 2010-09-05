@@ -132,6 +132,22 @@ ItemType::~ItemType()
 	delete condition;
 }
 
+std::string ItemType::getDescription(uint8_t count) const
+{
+	int32_t subType = 0;
+	if(isFluidContainer()){
+		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
+		if(count < maxFluidType){
+			subType = reverseFluidMap[count];
+		}
+	}
+	else{
+		subType = count;
+	}
+	return Item::getDescription(*this, 1, NULL, subType);
+}
+
+
 Items::Items() :
 items(8000)
 {

@@ -121,6 +121,8 @@ public:
 	itemgroup_t group;
 	ItemTypes_t type;
 
+	std::string getDescription(uint8_t count) const;
+
 	bool isGroundTile() const {return (group == ITEM_GROUP_GROUND);}
 	bool isContainer() const {return (group == ITEM_GROUP_CONTAINER);}
 	bool isSplash() const {return (group == ITEM_GROUP_SPLASH);}

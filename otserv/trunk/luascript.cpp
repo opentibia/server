@@ -1240,6 +1240,9 @@ void LuaScriptInterface::registerFunctions()
 	//getThingDefaultDescription(uid, lookDistance, <optional> canSeeXRay)
 	lua_register(m_luaState, "getThingDefaultDescription", LuaScriptInterface::luaGetThingDefaultDescription);
 
+	//getItemTypeDefaultDescription(itemid, <optional> count)
+	lua_register(m_luaState, "getItemTypeDefaultDescription", LuaScriptInterface::luaGetItemTypeDefaultDescription);
+
 	//getItemSpecialDescription(uid)
 	lua_register(m_luaState, "getItemSpecialDescription", LuaScriptInterface::luaGetItemSpecialDescription);
 
@@ -3568,9 +3571,10 @@ int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)
 	return 1;
 }
 
-//getThingDefaultDescription(uid, lookDistance, <optional> canSeeXRay>)
+
 int	LuaScriptInterface::luaGetThingDefaultDescription(lua_State *L)
 {
+	//getThingDefaultDescription(uid, lookDistance, <optional> canSeeXRay>)
 	int32_t parameters = lua_gettop(L);
 
 	bool canSeeXRay = false;
@@ -3595,6 +3599,25 @@ int	LuaScriptInterface::luaGetThingDefaultDescription(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
 		lua_pushnil(L);
 	}
+	return 1;
+}
+
+
+int LuaScriptInterface::luaGetItemTypeDefaultDescription(lua_State *L)
+{
+	//getThingDefaultDescription(itemid, <optional> count)
+	std::stringstream ret;
+
+	int32_t parameters = lua_gettop(L);
+	uint32_t count = 1;
+	if(parameters > 1){
+		count = std::max(popNumber(L), uint32_t(1));
+	}
+
+	uint32_t itemid = popNumber(L);
+	const ItemType& it = Item::items[itemid];
+	ret << it.getDescription((uint8_t) count);
+	lua_pushstring(L, ret.str().c_str());
 	return 1;
 }
 
