@@ -27,6 +27,7 @@
 #include <boost/utility.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <iostream>
+#include <list>
 
 class Connection;
 typedef boost::shared_ptr<Connection> Connection_ptr;
