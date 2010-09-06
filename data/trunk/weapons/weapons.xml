@@ -424,9 +424,9 @@
 	<distance id="7438" function="default"/> <!-- Elvish Bow -->
 
  	<!-- Ammunition -->
-	<distance id="2545" event="script" value="poison_arrow.lua"/>
-	<distance id="2546" event="script" value="explosive_arrow.lua"/>
-	<distance id="7366" event="script" value="viper_star.lua"/>
+	<distance id="2545" function="script" script="poison_arrow.lua"/>
+	<distance id="2546" function="script" script="explosive_arrow.lua"/>
+	<distance id="7366" function="script" script="viper_star.lua"/>
 	<distance id="7838" type="energy" function="default"/>
 	<distance id="7839" type="ice" function="default"/>
 	<distance id="7840" type="fire" function="default"/>

@@ -168,7 +168,7 @@ int32_t Weapons::getMaxWeaponDamage(int32_t level, int32_t attackSkill, int32_t 
 Weapon::Weapon(LuaScriptInterface* _interface) :
 	Event(_interface)
 {
-	m_scripted = true;
+	m_scripted = false;
 	id = 0;
 	level = 0;
 	magLevel = 0;
@@ -190,7 +190,6 @@ Weapon::~Weapon()
 
 void Weapon::setCombatParam(const CombatParams& _params)
 {
-	m_scripted = false;
 	params = _params;
 }
 
@@ -328,6 +327,9 @@ bool Weapon::loadFunction(const std::string& functionName)
 		if(configureWeapon(Item::items[getID()])){
 			return true;
 		}
+	}
+	else if(asLowerCaseString(functionName) == "script"){
+		m_scripted = true;
 	}
 	return false;
 }
@@ -627,7 +629,6 @@ bool WeaponMelee::configureEvent(xmlNodePtr p)
 
 bool WeaponMelee::configureWeapon(const ItemType& it)
 {
-	m_scripted = false;
 	elementType = it.abilities.elementType;
 	elementDamage = it.abilities.elementDamage;
 	return Weapon::configureWeapon(it);
@@ -646,6 +647,12 @@ bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
 		eParams.isAggressive = true;
 		eParams.useCharges = true;
 		Combat::doCombatHealth(player, target, damage, damage, eParams);
+
+		if(g_config.getNumber(ConfigManager::REMOVE_WEAPON_CHARGES))
+		{
+			int32_t newCount = std::max(0, item->getItemCount() - 1);
+			g_game.transformItem(item, item->getID(), newCount);
+		}
 	}
 
 	return true;
@@ -807,8 +814,6 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 
 bool WeaponDistance::configureWeapon(const ItemType& it)
 {
-	m_scripted = false;
-
 	//default values
 	if(it.amuType != AMMO_NONE){
 		//hit chance on two-handed weapons is limited to 90%
@@ -1109,7 +1114,6 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 
 bool WeaponWand::configureWeapon(const ItemType& it)
 {
-	m_scripted = false;
 	range = it.shootRange;
 	params.distanceEffect = it.shootType;
 
