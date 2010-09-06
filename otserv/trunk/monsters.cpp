@@ -180,9 +180,7 @@ std::list<Item*> MonsterType::createLootItem(const LootBlock& lootBlock)
 	uint32_t randvalue = Monsters::getLootRandom();
 	if(randvalue < lootBlock.chance){
 		if(Item::items[lootBlock.id].stackable){
-			if(randvalue < lootBlock.chance){
-				itemCount = randvalue % lootBlock.countmax + 1;
-			}
+			itemCount = randvalue % lootBlock.countmax + 1;
 		}
 		else{
 			itemCount = 1;
