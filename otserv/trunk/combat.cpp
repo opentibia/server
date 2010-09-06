@@ -1653,10 +1653,12 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 				uint32_t ownerId = getOwner();
 				if(ownerId != 0 && purposeful){
 					Creature* owner = g_game.getCreatureByID(ownerId);
-					if(	(OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
-							owner->hasBeenAttacked(ownerId)	)
-					{
-						conditionCopy->setParam(CONDITIONPARAM_OWNER, ownerId);
+					if(owner){
+						if(	(OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
+								owner->hasBeenAttacked(ownerId)	)
+						{
+							conditionCopy->setParam(CONDITIONPARAM_OWNER, ownerId);
+						}
 					}
 				}
 				creature->addCondition(conditionCopy);
