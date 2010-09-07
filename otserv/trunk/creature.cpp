@@ -179,29 +179,18 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
-bool Creature::getWalkBit(Player *viewer) const
-{
-	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
-	if (viewer->hasFlag(PlayerFlag_CanPassThroughAllCreatures))
-		return false;
-	if (!g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)
-		|| (g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP))
-		return true;
-	return !isSummon();
-	#else
-	return !viewer->hasFlag(PlayerFlag_CanPassThroughAllCreatures);
-	#endif
-}
-
 bool Creature::canWalkthrough(const Creature* creature) const
 {
-	if(creature->getPlayer() && creature->getPlayer()->isGmInvisible())
+	if(creature->getPlayer() &&
+		(creature->getPlayer()->isGmInvisible()
+		|| creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)))
 		return true;
 
-	if(creature->getPlayer()){
-		return creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen);
+	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+	if (isSummon() && getMaster()->getPlayer()){
+		return getMaster()->getPlayer()->canWalkthrough(creature);
 	}
-
+	#endif
 	return false;
 }
 

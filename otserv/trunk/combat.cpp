@@ -425,10 +425,6 @@ ReturnValue Combat::checkPVPExtraRestrictions(const Creature* attacker, const Cr
 			}
 		}
 
-		if(isWalkCheck && target->getTile() && target->getTile()->ground->getID() == ITEM_GLOWING_SWITCH){
-			stopAttack = true;
-		}
-
 		if(stopAttack){
 			if(target->getPlayer()){
 				return RET_YOUMAYNOTATTACKTHISPERSON;

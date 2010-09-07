@@ -1026,36 +1026,20 @@ bool Player::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
-bool Player::getWalkBit(Player *viewer) const
-{
-	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
-	if (viewer->hasFlag(PlayerFlag_CanPassThroughAllCreatures))
-		return false;
-	if (!g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)
-		|| (g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP))
-		return true;
-	return false;
-	#else
-	if (!Creature::getWalkBit(viewer))
-		return false;
-	if (!g_config.getNumber(ConfigManager::CAN_PASS_THROUGH))
-		return true;
-	if (g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) <= 0 && g_game.getWorldType() != WORLD_TYPE_OPTIONAL_PVP)
-		return true;
-	return false;
-	#endif
-}
-
-
 bool Player::canWalkthrough(const Creature* creature) const
 {
-	if(creature->getPlayer() && creature->getPlayer()->isGmInvisible() &&
+	/*if(creature->getPlayer() && creature->getPlayer()->isGmInvisible() &&
 		!canSeeGmInvisible((Player*)creature->getPlayer()))
-		return true;
+		return true;*/
 
-	if (hasFlag(PlayerFlag_CanPassThroughAllCreatures)){
-		return true;
-	}
+	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures) ||
+		(creature->getTile() && creature->getTile()->ground->getID() == ITEM_GLOWING_SWITCH)||
+		(creature->getPlayer() &&
+				(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen) ||
+				creature->getPlayer()->isGmInvisible())) )
+		{
+			return true;
+		}
 
 	return (Combat::checkPVPExtraRestrictions(this, creature, true) != RET_NOERROR);
 }
@@ -3227,7 +3211,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 							*destItem = tmpItem;
 							return tmpContainer;
 						}
-					
+
 						if(Container* subContainer = tmpItem->getContainer()){
 							containerList.push_back(subContainer);
 						}
@@ -4797,6 +4781,18 @@ bool Player::checkPzBlock(Player* targetPlayer)
 
 void Player::onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
 {
+	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+	if (g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)){
+		uint32_t prot_level = g_config.getNumber(ConfigManager::MIN_PVP_LEVEL);
+		if (oldLevel < prot_level && newLevel >= prot_level){
+			g_game.forceClientsToReloadCreature(this);
+			std::list<Creature*>::iterator cit;
+			for(cit = summons.begin(); cit != summons.end(); ++cit){
+				g_game.forceClientsToReloadCreature(*cit);
+			}
+		}
+	}
+	#endif
 	CreatureEventList advanceEvents = getCreatureEvents(CREATURE_EVENT_ADVANCE);
 	for(CreatureEventList::iterator it = advanceEvents.begin(); it != advanceEvents.end(); ++it){
 		(*it)->executeOnAdvance(this, type, oldLevel, newLevel);
@@ -4828,7 +4824,7 @@ void Player::toogleGmInvisible()
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it)
 	{
-		if(tmpPlayer = (*it)->getPlayer())
+		if((tmpPlayer = (*it)->getPlayer()))
 		{
 			if(tmpPlayer != this && !tmpPlayer->canSeeGmInvisible(this))
 			{

@@ -2564,7 +2564,7 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 
 	msg->AddByte((uint8_t)creature->getDirection());
 	if(creature->isInvisible() ||
-		creature->getPlayer() && creature->getPlayer()->isGmInvisible())
+		(creature->getPlayer() && creature->getPlayer()->isGmInvisible()))
 	{
 		static Outfit_t outfit;
 		AddCreatureOutfit(msg, creature, outfit);
@@ -2589,7 +2589,7 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 		msg->AddByte(player->getGuildEmblem(creature->getPlayer())); // guild war emblem
 	}
 
-	msg->AddByte(creature->getWalkBit(player));
+	msg->AddByte(!player->canWalkthrough(creature));
 }
 
 void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)

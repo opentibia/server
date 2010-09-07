@@ -4020,7 +4020,7 @@ void Game::forceClientsToReloadCreature(const Creature* creature)
 	//send to client
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if((tmpPlayer = (*it)->getPlayer())){
+		if((creature != *it) && (tmpPlayer = (*it)->getPlayer())){
 			tmpPlayer->forceClientToReloadCreature(creature);
 		}
 	}

@@ -169,7 +169,6 @@ public:
 
 	void setID(){this->id = auto_id | this->idRange();}
 	void setRemoved() {isInternalRemoved = true;}
-	virtual bool getWalkBit(Player *viewer) const;
 
 	virtual uint32_t idRange() = 0;
 	uint32_t getID() const { return id; }
