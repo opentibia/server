@@ -28,6 +28,7 @@
 	<talkaction words="/m" access="2" filter="first word" script="placemonster.lua"/>
 	<talkaction words="/c" access="2" filter="first word" script="teleporthere.lua"/>
 	<talkaction words="/refreshmap" access="2" filter="first word" script="refreshmap.lua"/>
+	<talkaction words="/invisible" access="2" filter="first word" script="gminvisible.lua"/>
 
 	<!-- Tutors -->
 	<talkaction words="/bc" access="1" filter="first word" script="broadcastclass.lua"/>

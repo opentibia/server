@@ -2150,7 +2150,8 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 					bool online;
 					std::string vip_name;
 					if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
-						online = (g_game.getPlayerByName(vip_name) != NULL);
+						Player *p = g_game.getPlayerByName(vip_name);
+						online = (p && (!p->isGmInvisible() || player->canSeeGmInvisible(p)));
 						sendVIP((*it), vip_name, online);
 					}
 				}
@@ -2562,7 +2563,9 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 	msg->AddByte(healthToSend);
 
 	msg->AddByte((uint8_t)creature->getDirection());
-	if(creature->isInvisible()){
+	if(creature->isInvisible() ||
+		creature->getPlayer() && creature->getPlayer()->isGmInvisible())
+	{
 		static Outfit_t outfit;
 		AddCreatureOutfit(msg, creature, outfit);
 	}

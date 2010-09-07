@@ -1919,6 +1919,12 @@ void LuaScriptInterface::registerFunctions()
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
 	luaL_register(m_luaState, "bit", LuaScriptInterface::luaBitReg);
+
+	//isGmInvisible(cid)
+	lua_register(m_luaState, "isGmInvisible", LuaScriptInterface::luaIsGmInvisible);
+
+	//doPlayerToogleGmInvisible(cid)
+	lua_register(m_luaState, "doPlayerToogleGmInvisible", LuaScriptInterface::luaDoPlayerToogleGmInvisible);
 }
 
 int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
@@ -2066,6 +2072,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			break;
 		case PlayerInfoIp:
 			value = player->getIP();
+			break;
+		case PlayerInfoGmInvisible:
+			value = player->isGmInvisible();
 			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
@@ -2215,6 +2224,11 @@ int LuaScriptInterface::luaGetPlayerLastLogin(lua_State *L)
 int LuaScriptInterface::luaGetPlayerIp(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoIp);
+}
+
+int LuaScriptInterface::luaIsGmInvisible(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoGmInvisible);
 }
 //
 
@@ -8783,5 +8797,25 @@ int LuaScriptInterface::luaGetOTSYSTime(lua_State *L)
 	//getOTSYSTime()
 	int64_t ret = OTSYS_TIME();
 	lua_pushnumber(L, ret);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerToogleGmInvisible(lua_State *L)
+{
+	//doPlayerToogleGmInvisible(cid)
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->toogleGmInvisible();
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
 	return 1;
 }

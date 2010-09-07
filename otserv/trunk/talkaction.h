@@ -91,6 +91,7 @@ protected:
 	static TalkActionFunction placeNpc;
 	static TalkActionFunction sellHouse;
 	static TalkActionFunction forceRaid;
+	static TalkActionFunction gmInvisible;
 	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static TalkActionFunction serverDiag;
 	#endif

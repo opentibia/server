@@ -108,6 +108,8 @@ Creature()
 	fightMode = FIGHTMODE_ATTACK;
 	safeMode = true;
 
+	gmInvisible = false;
+
 	tradePartner = NULL;
 	tradeState = TRADE_NONE;
 	tradeItem = NULL;
@@ -1002,6 +1004,10 @@ bool Player::canSeeInvisibility() const
 
 bool Player::canSeeCreature(const Creature* creature) const
 {
+	if(creature->getPlayer() && creature->getPlayer()->isGmInvisible() &&
+		!canSeeGmInvisible((Player*)creature->getPlayer()))
+		return false;
+
 	if(canSeeInvisibility() || creature == this){
 		return true;
 	}
@@ -1043,6 +1049,10 @@ bool Player::getWalkBit(Player *viewer) const
 
 bool Player::canWalkthrough(const Creature* creature) const
 {
+	if(creature->getPlayer() && creature->getPlayer()->isGmInvisible() &&
+		!canSeeGmInvisible((Player*)creature->getPlayer()))
+		return true;
+
 	if (hasFlag(PlayerFlag_CanPassThroughAllCreatures)){
 		return true;
 	}
@@ -4803,4 +4813,52 @@ bool Player::onLookEvent(Thing* target, uint32_t itemId)
 	}
 
 	return true;
+}
+
+void Player::toogleGmInvisible()
+{
+	//
+	gmInvisible = !gmInvisible;
+
+	//
+	const SpectatorVec& list = g_game.getSpectators(getPosition());
+	SpectatorVec::const_iterator it;
+
+	//
+	Player* tmpPlayer = NULL;
+	for(it = list.begin(); it != list.end(); ++it)
+	{
+		if(tmpPlayer = (*it)->getPlayer())
+		{
+			if(tmpPlayer != this && !tmpPlayer->canSeeGmInvisible(this))
+			{
+				if(gmInvisible)
+					tmpPlayer->sendCreatureDisappear(this, getTile()->getClientIndexOfThing(tmpPlayer, this), true);
+				else
+					tmpPlayer->sendCreatureAppear(this, getPosition());
+			}
+			else
+			{
+				if(gmInvisible)
+				{
+					static Outfit_t Outfit;
+					tmpPlayer->sendCreatureChangeOutfit(this, Outfit);
+				}
+				else
+					tmpPlayer->sendCreatureChangeOutfit(this, getCurrentOutfit());
+			}
+		}
+	}
+
+	// VIPs
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it)
+	{
+		if(it->second != this && !it->second->canSeeGmInvisible(this))
+		{
+			if(gmInvisible)
+				it->second->notifyLogOut(this);
+			else
+				it->second->notifyLogIn(this);
+		}
+	}
 }

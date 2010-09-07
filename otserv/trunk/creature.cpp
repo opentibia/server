@@ -195,6 +195,9 @@ bool Creature::getWalkBit(Player *viewer) const
 
 bool Creature::canWalkthrough(const Creature* creature) const
 {
+	if(creature->getPlayer() && creature->getPlayer()->isGmInvisible())
+		return true;
+
 	if(creature->getPlayer()){
 		return creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen);
 	}

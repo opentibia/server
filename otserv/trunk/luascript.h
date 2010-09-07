@@ -228,7 +228,8 @@ enum PlayerInfo_t{
 	PlayerInfoPzLock,
 	PlayerInfoPremium,
 	PlayerInfoLastLogin,
-	PlayerInfoIp
+	PlayerInfoIp,
+	PlayerInfoGmInvisible
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -503,6 +504,9 @@ protected:
 	static int luaDoPlayerAddOutfitEx(lua_State *L);
 	static int luaDoPlayerRemoveOutfitEx(lua_State *L);
 	static int luaCanPlayerWearOutfit(lua_State *L);
+
+	static int luaIsGmInvisible(lua_State *L);
+	static int luaDoPlayerToogleGmInvisible(lua_State *L);
 
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);

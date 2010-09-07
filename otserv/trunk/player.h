@@ -153,6 +153,12 @@ public:
 	uint32_t guildLevel;
 	//]
 
+	//[ gm invisible
+	void toogleGmInvisible();
+	bool isGmInvisible() const {return gmInvisible;}
+	bool canSeeGmInvisible(Player* player) const { return (player->getAccessLevel() <= getAccessLevel()); }
+	//]
+
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
@@ -792,6 +798,9 @@ protected:
 	chaseMode_t chaseMode;
 	fightMode_t fightMode;
 	bool safeMode;
+
+	//
+	bool gmInvisible;
 
 	//account variables
 	uint32_t accountId;
