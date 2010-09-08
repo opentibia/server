@@ -4782,7 +4782,7 @@ bool Player::checkPzBlock(Player* targetPlayer)
 void Player::onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
 {
 	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
-	if (g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)){
+	if (type == LEVEL_EXPERIENCE && g_config.getNumber(ConfigManager::CAN_PASS_THROUGH)){
 		uint32_t prot_level = g_config.getNumber(ConfigManager::MIN_PVP_LEVEL);
 		if (oldLevel < prot_level && newLevel >= prot_level){
 			g_game.forceClientsToReloadCreature(this);
