@@ -6543,6 +6543,7 @@
     <attribute key="weight" value="50000"/>
   </item>
   <item id="2949" name="remains of a mummy">
+    <attribute key="type" value="container"/>
     <attribute key="weight" value="1000"/>
     <attribute key="containerSize" value="10"/>
     <attribute key="decayTo" value="2950"/>
@@ -13063,6 +13064,7 @@
     <attribute key="fluidSource" value="blood"/>
   </item>
   <item id="6004" name="remains of a mummy" editorsuffix=" (Unmoveable)">
+    <attribute key="type" value = "container"/>
     <attribute key="containerSize" value="10"/>
     <attribute key="decayTo" value="2949"/>
     <attribute key="duration" value="10"/>
