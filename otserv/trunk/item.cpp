@@ -824,7 +824,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		s << ".";
 	}
-	else if(it.armor != 0 || it.abilities.skill.any() || it.abilities.absorb.any() || it.abilities.stats[STAT_MAGICPOINTS] != 0 || it.abilities.speed != 0){
+	else if(it.armor != 0 || it.abilities.skill.any() || it.abilities.absorb.any() || it.abilities.stats[STAT_MAGICPOINTS] != 0 || it.abilities.speed != 0 || it.defense != 0 ){
 		if(it.showCharges){
 			if(subType > 1){
 				s << " that has " << (int32_t)subType << " charges left";
@@ -870,6 +870,10 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
 			s << ", magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+		}
+
+        if(it.defense != 0){
+			s << ", defense " << std::showpos << (int32_t)it.defense << std::noshowpos;
 		}
 
 		if(it.abilities.speed != 0){
