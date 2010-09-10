@@ -324,6 +324,9 @@ int Items::loadFromOtb(std::string file)
 					return ERROR_INVALID_FORMAT;
 
 				iType->id = serverid;
+				if (serverid == 1775){ //emergency fix for "trough" (id = 1775)
+					iType->blockSolid = true; //please remove those lines after the proper fix at the otb
+				}
 				break;
 			}
 			case ITEM_ATTR_CLIENTID:
