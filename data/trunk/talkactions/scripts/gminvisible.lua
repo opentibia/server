@@ -1,5 +1,5 @@
 function onSay(cid, words, param)
-	doPlayerToogleGminvisible(cid)
+	doPlayerToogleGmInvisible(cid)
 	if isGmInvisible(cid) == TRUE then
 		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You are now invisible.")
 	else
