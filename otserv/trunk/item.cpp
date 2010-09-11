@@ -854,30 +854,57 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 
 		s << " (";
+		bool prevDesc = false;
 		if(it.armor != 0){
+			// as it is the first desc it isn't
+			// really necessary to add it here
+			//if(prevDesc)
+			//	s << ", ";
 			s << "Arm:" << it.armor;
+			prevDesc = true;
 		}
 
 		if(it.abilities.skill.any()){
-            s << ", ";
-            it.abilities.skill.getDescription(s);
+			if(prevDesc)
+				s << ", ";
+
+			it.abilities.skill.getDescription(s);
+			prevDesc = true;
 		}
 
 		if(it.abilities.absorb.any()){
-			s << ", protection";
+			if(prevDesc)
+				s << ", ";
+
+			s << "protection";
 			it.abilities.absorb.getDescription(s);
+			prevDesc = true;
 		}
 
 		if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
-			s << ", magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+			if(prevDesc)
+				s << ", ";
+
+			s << "magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+			prevDesc = true;
 		}
 
         if(it.defense != 0){
-			s << ", defense " << std::showpos << (int32_t)it.defense << std::noshowpos;
+			if(prevDesc)
+				s << ", ";
+
+			s << "defense " << std::showpos << (int32_t)it.defense << std::noshowpos;
+			prevDesc = true;
 		}
 
 		if(it.abilities.speed != 0){
-			s << ", speed " << std::showpos << (int32_t)(it.abilities.speed / 2) << std::noshowpos;
+			if(prevDesc)
+				s << ", ";
+
+			s << "speed " << std::showpos << (int32_t)(it.abilities.speed / 2) << std::noshowpos;
+
+			// last desc... same thing as the first
+			//prevDesc = true;
 		}
 
 		s << ").";

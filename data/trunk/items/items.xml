@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <items>
   <item id="100" name="void"/>
   <item id="101" name="earth"/>
@@ -3122,7 +3122,7 @@
   <item id="2194" article="a" name="mysterious fetish">
     <attribute key="weight" value="490"/>
   </item>
-  <item id="2195" name="boots of haste (speed +20)">
+  <item id="2195" name="boots of haste">
     <attribute key="weight" value="750"/>
     <attribute key="slotType" value="feet"/>
     <attribute key="speed" value="20"/>
@@ -3212,7 +3212,7 @@
     <attribute key="manaTicks" value="6000"/>
     <attribute key="showduration" value="1"/>
   </item>
-  <item id="2206" article="a" name="time ring (speed +30)">
+  <item id="2206" article="a" name="time ring">
     <attribute key="weight" value="90"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -25079,7 +25079,7 @@
   <item id="11373" article="a" name="sandcrawler shell">
     <attribute key="weight" value="75"/>
   </item>
-  <item id="11374" name="beetle necklace (speed +2)">
+  <item id="11374" name="beetle necklace">
     <attribute key="speed" value="4"/>
     <attribute key="weight" value="820"/>
     <attribute key="slotType" value="necklace"/>
