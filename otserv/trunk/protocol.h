@@ -34,8 +34,8 @@ typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;
 class RSA;
 
-#define CLIENT_VERSION_MIN 860
-#define CLIENT_VERSION_MAX 860
+#define CLIENT_VERSION_MIN 861
+#define CLIENT_VERSION_MAX 861
 
 #define STRING_CLIENT_VERSION "This server requires client version " OTSERV_CLIENT_VERSION "."
 

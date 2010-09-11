@@ -235,7 +235,7 @@ int Items::loadFromOtb(std::string file)
 		std::cout << "New version of items.otb detected, a newer version of the server is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
-	else if(Items::dwMinorVersion != CLIENT_VERSION_860){
+	else if(Items::dwMinorVersion != CLIENT_VERSION_861){
 		std::cout << "Another (client) version of items.otb is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -322,11 +322,6 @@ int Items::loadFromOtb(std::string file)
 
 				if(serverid > 20000)
 					return ERROR_INVALID_FORMAT;
-
-				iType->id = serverid;
-				if (serverid == 1775){ //emergency fix for "trough" (id = 1775)
-					iType->blockSolid = true; //please remove those lines after the proper fix at the otb
-				}
 				break;
 			}
 			case ITEM_ATTR_CLIENTID:
