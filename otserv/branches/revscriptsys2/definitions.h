@@ -144,10 +144,6 @@ enum passwordType_t{
 	#define	__FUNCTION__ __func__
 #endif
 
-#ifndef EWOULDBLOCK
-	#define EWOULDBLOCK WSAEWOULDBLOCK
-#endif
-
 #ifdef _WIN32_WINNT
 	#undef _WIN32_WINNT
 #endif
