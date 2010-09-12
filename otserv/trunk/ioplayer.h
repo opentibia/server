@@ -90,6 +90,13 @@ protected:
 
 	typedef std::map<int,std::pair<Item*,int> > ItemMap;
 
+	void loadVip(Player* player, DBResult* result);
+	void loadOutfit(Player* player, DBResult* result);
+	void loadSkills(Player* player, DBResult* result);
+	void loadDepot(Player* player, DBResult* result);
+	void loadInventory(Player* player, DBResult* result);
+	void loadConditions(Player* player, DBResult* result);
+
 	void loadItems(ItemMap& itemMap, DBResult* result);
 	bool saveItems(Player* player, const ItemBlockList& itemList, DBInsert& query_insert);
 

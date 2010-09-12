@@ -39,6 +39,7 @@ extern Guilds g_guilds;
 #pragma warning( disable : 4996)
 #endif
 
+#ifndef __OLD_GUILD_SYSTEM__
 bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload /*= false*/)
 {
 	Database* db = Database::instance();
@@ -73,7 +74,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	int32_t violationLevel = result->getDataInt("violation");
 	if(violationLevel > maxViolationLevel){
 		violationLevel = maxViolationLevel;
-		std::cout << "Warning: When loading player, maximum violation level is" << maxViolationLevel std::endl;
+		std::cout << "Warning: When loading player, maximum violation level is" << maxViolationLevel << std::endl;
 	}
 	player->violationLevel = violationLevel;
 
@@ -112,36 +113,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	player->health = result->getDataInt("health");
 	player->healthMax = result->getDataInt("healthmax");
-	player->defaultOutfit.lookType = result->getDataInt("looktype");
-	player->defaultOutfit.lookHead = result->getDataInt("lookhead");
-	player->defaultOutfit.lookBody = result->getDataInt("lookbody");
-	player->defaultOutfit.lookLegs = result->getDataInt("looklegs");
-	player->defaultOutfit.lookFeet = result->getDataInt("lookfeet");
-	player->defaultOutfit.lookAddons = result->getDataInt("lookaddons");
 
-	uint32_t outfitId = Outfits::getInstance()->getOutfitId(player->defaultOutfit.lookType);
-	bool canWearOutfit = true;
-	if(outfitId > 0){
-		//Check if the current outfit is right
-		Outfit outfit;
-		canWearOutfit = Outfits::getInstance()->getOutfit(outfitId, player->getSex(), outfit);
-		if(canWearOutfit){
-			if(player->defaultOutfit.lookType != outfit.lookType){
-				player->defaultOutfit.lookType = outfit.lookType;
-			}
-		}
-	}
-
-	if(!canWearOutfit){
-		//Just pick the first default outfit we can find
-		const OutfitMap& default_outfits = Outfits::getInstance()->getOutfits(player->getSex());
-		if(!default_outfits.empty()){
-			Outfit newOutfit = (*default_outfits.begin()).second;
-			player->defaultOutfit.lookType = newOutfit.lookType;
-		}
-	}
-
-	player->currentOutfit = player->defaultOutfit;
+	loadOutfit(player, result);
 
 #ifdef __SKULLSYSTEM__
 	int32_t skullType = result->getDataInt("skull_type");
@@ -154,20 +127,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 #endif
 
-	unsigned long conditionsSize = 0;
-	const char* conditions = result->getDataStream("conditions", conditionsSize);
-	PropStream propStream;
-	propStream.init(conditions, conditionsSize);
+	loadConditions(player, result);
 
-	Condition* condition;
-	while((condition = Condition::createCondition(propStream))){
-		if(condition->unserialize(propStream)){
-			player->storedConditionList.push_back(condition);
-		}
-		else{
-			delete condition;
-		}
-	}
 	// you need to set the vocation after conditions in order to ensure the proper regeneration rates for the vocation
 	player->setVocation(result->getDataInt("vocation"));
 	// this stuff has to go after the vocation is set
@@ -249,24 +210,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	query.str("");
 	query << "SELECT `skillid`, `value`, `count` FROM `player_skills` WHERE `player_id` = " << player->getGUID();
 	if((result = db->storeQuery(query.str()))){
-		//now iterate over the skills
-		do{
-			int skillid = result->getDataInt("skillid");
-			if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST){
-				uint32_t skillLevel = result->getDataInt("value");
-				uint32_t skillCount = result->getDataInt("count");
-
-				uint32_t nextSkillCount = player->vocation->getReqSkillTries(skillid, skillLevel + 1);
-				if(skillCount > nextSkillCount){
-					//make sure its not out of bound
-					skillCount = 0;
-				}
-
-				player->skills[skillid][SKILL_LEVEL] = skillLevel;
-				player->skills[skillid][SKILL_TRIES] = skillCount;
-				player->skills[skillid][SKILL_PERCENT] = Player::getPercentLevel(skillCount, nextSkillCount);
-			}
-		}while(result->next());
+		loadSkills(player, result);
 		db->freeResult(result);
 	}
 
@@ -281,70 +225,18 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 
 	//load inventory items
-	ItemMap itemMap;
-
 	query.str("");
 	query << "SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_items` WHERE `player_id` = " << player->getGUID() << " ORDER BY `sid` DESC";
 	if((result = db->storeQuery(query.str()))){
-		loadItems(itemMap, result);
-
-		ItemMap::reverse_iterator it;
-		ItemMap::iterator it2;
-
-		for(it = itemMap.rbegin(); it != itemMap.rend(); ++it){
-			Item* item = it->second.first;
-			int pid = it->second.second;
-			if(pid >= 1 && pid <= 10){
-				player->__internalAddThing(pid, item);
-			}
-			else{
-				it2 = itemMap.find(pid);
-				if(it2 != itemMap.end())
-					if(Container* container = it2->second.first->getContainer()){
-						container->__internalAddThing(item);
-					}
-			}
-		}
-
+		loadInventory(player, result);
 		db->freeResult(result);
 	}
 
-
 	//load depot items
-	itemMap.clear();
-
 	query.str("");
 	query << "SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_depotitems` WHERE `player_id` = " << player->getGUID() << " ORDER BY `sid` DESC";
 	if((result = db->storeQuery(query.str()))){
-		loadItems(itemMap, result);
-
-		ItemMap::reverse_iterator it;
-		ItemMap::iterator it2;
-
-		for(it = itemMap.rbegin(); it != itemMap.rend(); ++it){
-			Item* item = it->second.first;
-			int pid = it->second.second;
-			if(pid >= 0 && pid < 100){
-				if(Container* c = item->getContainer()){
-					if(Depot* depot = c->getDepot())
-						player->addDepot(depot, pid);
-					else
-						std::cout << "Error loading depot "<< pid << " for player " << player->getGUID() << std::endl;
-				}
-				else{
-					std::cout << "Error loading depot "<< pid << " for player " <<
-						player->getGUID() << std::endl;
-				}
-			}
-			else{
-				it2 = itemMap.find(pid);
-				if(it2 != itemMap.end())
-					if(Container* container = it2->second.first->getContainer()){
-						container->__internalAddThing(item);
-					}
-			}
-		}
-
+		loadDepot(player, result);
 		db->freeResult(result);
 	}
 
@@ -378,6 +270,370 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->updateItemsLight(true);
 
 	return true;
+}
+#else
+bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload /*= false*/)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "SELECT `players`.`id` AS `id`, `players`.`name` AS `name`, `accounts`.`name` AS `accname`, \
+		`account_id`, `sex`, `vocation`, `experience`, `level`, `maglevel`, `health`, \
+		`groups`.`name` AS `groupname`, `groups`.`flags` AS `groupflags`, `groups`.`access` AS `access`, \
+		`groups`.`maxviplist` AS `maxviplist`, `groups`.`maxdepotitems` AS `maxdepotitems`, `groups`.`violation` AS `violationaccess`, \
+		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
+		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
+		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
+		`skull_type`, `loss_experience`, `loss_mana`, `loss_skills`, \
+		`loss_items`, `loss_containers`, `rank_id`, `guildnick`, `town_id`, `balance`, `stamina` \
+		FROM `players` \
+		LEFT JOIN `accounts` ON `account_id` = `accounts`.`id`\
+		LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` \
+		WHERE `players`.`name` = " + db->escapeString(name);
+
+	if(!(result = db->storeQuery(query.str()))){
+		return false;
+	}
+	query.str("");
+
+	player->setGUID(result->getDataInt("id"));
+	player->accountId = result->getDataInt("account_id");
+	player->accountName = result->getDataString("accname");
+
+	player->groupName = result->getDataString("groupname");
+	player->accessLevel = result->getDataInt("access");
+	int32_t violationLevel = result->getDataInt("violation");
+	if(violationLevel > maxViolationLevel){
+		violationLevel = maxViolationLevel;
+		std::cout << "Warning: When loading player, maximum violation level is" << maxViolationLevel << std::endl;
+	}
+	player->violationLevel = violationLevel;
+
+	player->maxDepotLimit = result->getDataInt("maxdepotitems");
+	int32_t vipLimit = result->getDataInt("maxviplist");
+	if(vipLimit > 100){
+		vipLimit = 100;
+		std::cout << "Warning: When loading player, maximum size of VIP list is 100." << std::endl;
+	}
+	player->maxVipLimit = vipLimit;
+	player->setFlags(result->getDataLong("groupflags"));
+
+	if(preload){
+		//only loading basic info
+		db->freeResult(result);
+		return true;
+	}
+
+	// Getting all player properties
+	player->setSex((playersex_t)result->getDataInt("sex"));
+	player->setDirection((Direction)result->getDataInt("direction"));
+	player->level = std::max((uint32_t)1, (uint32_t)result->getDataInt("level"));
+
+	uint64_t currExpCount = Player::getExpForLevel(player->level);
+	uint64_t nextExpCount = Player::getExpForLevel(player->level + 1);
+	uint64_t experience = (uint64_t)result->getDataLong("experience");
+	if(experience < currExpCount || experience  > nextExpCount){
+		experience = currExpCount;
+	}
+	player->experience = experience;
+	player->levelPercent = Player::getPercentLevel(player->experience - currExpCount, nextExpCount - currExpCount);
+	player->soul = result->getDataInt("soul");
+	player->capacity = result->getDataInt("cap");
+	player->lastLoginSaved = result->getDataInt("lastlogin");
+	player->lastLogout = result->getDataInt("lastlogout");
+
+	player->health = result->getDataInt("health");
+	player->healthMax = result->getDataInt("healthmax");
+
+	loadOutfit(player, result);
+
+#ifdef __SKULLSYSTEM__
+	int32_t skullType = result->getDataInt("skull_type");
+	int64_t lastSkullTime = result->getDataLong("skull_time");
+
+	if((skullType == SKULL_RED && std::time(NULL) < lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION)) ||
+		(skullType == SKULL_BLACK && std::time(NULL) < lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION))){
+		player->lastSkullTime = lastSkullTime;
+		player->skullType = (Skulls_t)skullType;
+	}
+#endif
+
+	loadConditions(player, result);
+
+	// you need to set the vocation after conditions in order to ensure the proper regeneration rates for the vocation
+	player->setVocation(result->getDataInt("vocation"));
+	// this stuff has to go after the vocation is set
+	player->mana = result->getDataInt("mana");
+	player->manaMax = result->getDataInt("manamax");
+	player->magLevel = result->getDataInt("maglevel");
+
+	uint32_t nextManaCount = (uint32_t)player->vocation->getReqMana(player->magLevel + 1);
+	uint32_t manaSpent = (uint32_t)result->getDataInt("manaspent");
+	if(manaSpent > nextManaCount){
+		//make sure its not out of bound
+		manaSpent = 0;
+	}
+	player->manaSpent = manaSpent;
+	player->magLevelPercent = Player::getPercentLevel(player->manaSpent, nextManaCount);
+
+	player->setLossPercent(LOSS_EXPERIENCE, result->getDataInt("loss_experience"));
+	player->setLossPercent(LOSS_MANASPENT, result->getDataInt("loss_mana"));
+	player->setLossPercent(LOSS_SKILLTRIES, result->getDataInt("loss_skills"));
+	player->setLossPercent(LOSS_ITEMS, result->getDataInt("loss_items"));
+	player->setLossPercent(LOSS_CONTAINERS, result->getDataInt("loss_containers"));
+
+	player->loginPosition.x = result->getDataInt("posx");
+	player->loginPosition.y = result->getDataInt("posy");
+	player->loginPosition.z = result->getDataInt("posz");
+
+	player->town = result->getDataInt("town_id");
+	Town* town = Towns::getInstance().getTown(player->town);
+	if(town){
+		player->masterPos = town->getTemplePosition();
+	}
+
+	//if posx == 0 AND posy == 0 AND posz == 0
+	// login position is temple position
+	Position loginPos = player->loginPosition;
+	if(loginPos.x == 0 && loginPos.y == 0 && loginPos.z == 0){
+		player->loginPosition = player->masterPos;
+	}
+
+	// place it here and now we can drop all additional query instances as all data were loaded
+	uint32_t rankid = result->getDataInt("rank_id");
+	player->guildNick = result->getDataString("guildnick");
+
+	player->balance = result->getDataInt("balance");
+	player->stamina = result->getDataInt("stamina");
+	db->freeResult(result);
+
+	//guild system
+	query.str("");
+	query << "SELECT `guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, `guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` \
+		FROM `guild_ranks`, `guilds` \
+		WHERE `guild_ranks`.`id` = " << rankid << " AND `guild_ranks`.`guild_id` = `guilds`.`id`";
+
+	if((result = db->storeQuery(query.str()))){
+		Guild* guild = g_guilds.getGuildById(result->getDataInt("guildid"));
+		if(guild){
+			player->setGuild(guild);
+
+			player->guildRank = result->getDataString("rank");
+			player->guildLevel = result->getDataInt("level");
+
+			db->freeResult(result);
+		}
+	}
+
+	//get password
+	query.str("");
+	query << "SELECT `password`, `premend` FROM `accounts` WHERE `id` = " << player->accountId;
+	if(!(result = db->storeQuery(query.str()))){
+		return false;
+	}
+
+	player->password = result->getDataString("password");
+	player->premiumDays = Account::getPremiumDaysLeft(result->getDataInt("premend"));
+	db->freeResult(result);
+
+	// we need to find out our skills
+	// so we query the skill table
+	query.str("");
+	query << "SELECT `skillid`, `value`, `count` FROM `player_skills` WHERE `player_id` = " << player->getGUID();
+	if((result = db->storeQuery(query.str()))){
+		loadSkills(player, result);
+		db->freeResult(result);
+	}
+
+	query.str("");
+	query << "SELECT `name` FROM `player_spells` WHERE `player_id` = " << player->getGUID();
+	if((result = db->storeQuery(query.str()))){
+		do{
+			std::string spellName = result->getDataString("name");
+			player->learnedInstantSpellList.push_back(spellName);
+		}while(result->next());
+		db->freeResult(result);
+	}
+
+	//load inventory items
+	query.str("");
+	query << "SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_items` WHERE `player_id` = " << player->getGUID() << " ORDER BY `sid` DESC";
+	if((result = db->storeQuery(query.str()))){
+		loadInventory(player, result);
+		db->freeResult(result);
+	}
+
+	//load depot items
+	query.str("");
+	query << "SELECT `pid`, `sid`, `itemtype`, `count`, `attributes` FROM `player_depotitems` WHERE `player_id` = " << player->getGUID() << " ORDER BY `sid` DESC";
+	if((result = db->storeQuery(query.str()))){
+		loadDepot(player, result);
+		db->freeResult(result);
+	}
+
+	//load storage map
+	query.str("");
+	query << "SELECT `key`, `value` FROM `player_storage` WHERE `player_id` = " << player->getGUID();
+	if((result = db->storeQuery(query.str()))){
+		do{
+			uint32_t key = result->getDataInt("key");
+			int32_t value = result->getDataInt("value");
+			player->addStorageValue(key,value);
+		}while(result->next());
+		db->freeResult(result);
+	}
+
+	//load vip
+	query.str("");
+	query << "SELECT `vip_id` FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
+	if((result = db->storeQuery(query.str()))){
+		do{
+			uint32_t vip_id = result->getDataInt("vip_id");
+			std::string dummy_str;
+			if(storeNameByGuid(*db, vip_id))
+				player->addVIP(vip_id, dummy_str, false, true);
+		}while(result->next());
+		db->freeResult(result);
+	}
+
+	player->updateBaseSpeed();
+	player->updateInventoryWeight();
+	player->updateItemsLight(true);
+
+	return true;
+}
+#endif
+
+void IOPlayer::loadOutfit(Player* player, DBResult* result)
+{
+	player->defaultOutfit.lookType = result->getDataInt("looktype");
+	player->defaultOutfit.lookHead = result->getDataInt("lookhead");
+	player->defaultOutfit.lookBody = result->getDataInt("lookbody");
+	player->defaultOutfit.lookLegs = result->getDataInt("looklegs");
+	player->defaultOutfit.lookFeet = result->getDataInt("lookfeet");
+	player->defaultOutfit.lookAddons = result->getDataInt("lookaddons");
+
+	uint32_t outfitId = Outfits::getInstance()->getOutfitId(player->defaultOutfit.lookType);
+	bool canWearOutfit = true;
+	if(outfitId > 0){
+		//Check if the current outfit is right
+		Outfit outfit;
+		canWearOutfit = Outfits::getInstance()->getOutfit(outfitId, player->getSex(), outfit);
+		if(canWearOutfit){
+			if(player->defaultOutfit.lookType != outfit.lookType){
+				player->defaultOutfit.lookType = outfit.lookType;
+			}
+		}
+	}
+
+	if(!canWearOutfit){
+		//Just pick the first default outfit we can find
+		const OutfitMap& default_outfits = Outfits::getInstance()->getOutfits(player->getSex());
+		if(!default_outfits.empty()){
+			Outfit newOutfit = (*default_outfits.begin()).second;
+			player->defaultOutfit.lookType = newOutfit.lookType;
+		}
+	}
+
+	player->currentOutfit = player->defaultOutfit;
+}
+
+void IOPlayer::loadSkills(Player* player, DBResult* result)
+{
+	//now iterate over the skills
+	do{
+		int skillid = result->getDataInt("skillid");
+		if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST){
+			uint32_t skillLevel = result->getDataInt("value");
+			uint32_t skillCount = result->getDataInt("count");
+
+			uint32_t nextSkillCount = player->vocation->getReqSkillTries(skillid, skillLevel + 1);
+			if(skillCount > nextSkillCount){
+				//make sure its not out of bound
+				skillCount = 0;
+			}
+
+			player->skills[skillid][SKILL_LEVEL] = skillLevel;
+			player->skills[skillid][SKILL_TRIES] = skillCount;
+			player->skills[skillid][SKILL_PERCENT] = Player::getPercentLevel(skillCount, nextSkillCount);
+		}
+	}while(result->next());
+}
+
+void IOPlayer::loadDepot(Player* player, DBResult* result)
+{
+	ItemMap itemMap;
+	loadItems(itemMap, result);
+
+	ItemMap::reverse_iterator it;
+	ItemMap::iterator it2;
+
+	for(it = itemMap.rbegin(); it != itemMap.rend(); ++it){
+		Item* item = it->second.first;
+		int pid = it->second.second;
+		if(pid >= 0 && pid < 100){
+			if(Container* c = item->getContainer()){
+				if(Depot* depot = c->getDepot())
+					player->addDepot(depot, pid);
+				else
+					std::cout << "Error loading depot "<< pid << " for player " << player->getGUID() << std::endl;
+			}
+			else{
+				std::cout << "Error loading depot "<< pid << " for player " <<
+					player->getGUID() << std::endl;
+			}
+		}
+		else{
+			it2 = itemMap.find(pid);
+			if(it2 != itemMap.end())
+				if(Container* container = it2->second.first->getContainer()){
+					container->__internalAddThing(item);
+				}
+		}
+	}
+}
+
+void IOPlayer::loadInventory(Player* player, DBResult* result)
+{
+	ItemMap itemMap;
+	loadItems(itemMap, result);
+
+	ItemMap::reverse_iterator it;
+	ItemMap::iterator it2;
+
+	for(it = itemMap.rbegin(); it != itemMap.rend(); ++it){
+		Item* item = it->second.first;
+		int pid = it->second.second;
+		if(pid >= 1 && pid <= 10){
+			player->__internalAddThing(pid, item);
+		}
+		else{
+			it2 = itemMap.find(pid);
+			if(it2 != itemMap.end())
+				if(Container* container = it2->second.first->getContainer()){
+					container->__internalAddThing(item);
+				}
+		}
+	}
+}
+
+void IOPlayer::loadConditions(Player* player, DBResult* result)
+{
+	unsigned long conditionsSize = 0;
+	const char* conditions = result->getDataStream("conditions", conditionsSize);
+	PropStream propStream;
+	propStream.init(conditions, conditionsSize);
+
+	Condition* condition;
+	while((condition = Condition::createCondition(propStream))){
+		if(condition->unserialize(propStream)){
+			player->storedConditionList.push_back(condition);
+		}
+		else{
+			delete condition;
+		}
+	}
 }
 
 bool IOPlayer::saveItems(Player* player, const ItemBlockList& itemList, DBInsert& query_insert)
