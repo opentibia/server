@@ -1,5 +1,5 @@
 function onSay(cid, words, param)
-	if (isPlayer(cid) == TRUE and getPlayerFlagValue(cid, PlayerFlag_CannotBeSeen) == TRUE) then
+	if (isPlayer(cid) == TRUE and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == TRUE) then
 		doPlayerToogleGmInvisible(cid)
 	end
 	if (isGmInvisible(cid) == TRUE) then
