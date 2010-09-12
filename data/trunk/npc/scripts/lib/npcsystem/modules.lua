@@ -45,7 +45,7 @@ if(Modules == nil) then
 	function StdModule.say(cid, message, keywords, parameters, node)
 		local npcHandler = parameters.npcHandler
 		if(npcHandler == nil) then
-			error('StdModule.say called without any npcHandler instance.')
+			print('StdModule.say called without any npcHandler instance.')
 		end
 		local onlyFocus = (parameters.onlyFocus == nil or parameters.onlyFocus == true)
 		if(not npcHandler:isFocused(cid) and onlyFocus) then
@@ -65,46 +65,94 @@ if(Modules == nil) then
 	end
 
 
+
+    --Usage:
+        -- local node1 = keywordHandler:addKeyword({'promot'}, StdModule.say, {npcHandler = npcHandler, text = 'I can promote you for 20000 gold coins. Do you want me to promote you?'})
+        --         node1:addChildKeyword({'yes'}, StdModule.promotePlayer, {npcHandler = npcHandler, cost = 20000, level = 20}, text = 'Congratulations! You are now promoted.')
+        --         node1:addChildKeyword({'no'}, StdModule.say, {npcHandler = npcHandler, text = 'Allright then. Come back when you are ready.'}, reset = true)
+		
+local function getPromotedVocation(voc)
+        if(voc >= 1 and voc <= 4) then
+                return voc + 4
+        else
+                return voc
+        end
+end
+		
+    function StdModule.promotePlayer(cid, message, keywords, parameters, node)
+        local npcHandler = parameters.npcHandler
+        if(npcHandler == nil) then
+            print('StdModule.promotePlayer called without any npcHandler instance.')
+        end
+        if(not npcHandler:isFocused(cid)) then
+            return false
+        end
+
+        if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == true or parameters.premium == false) then
+            local currentVoc = getPlayerVocation(cid)
+            local promotedVoc = getPromotedVocation(currentVoc)
+            
+            if(currentVoc == promotedVoc) then
+                npcHandler:say('You are already promoted!', cid)
+            elseif(getPlayerLevel(cid) < parameters.level) then
+                npcHandler:say('I am sorry, but I can only promote you once you have reached level ' .. parameters.level .. '.', cid)
+            elseif(doPlayerRemoveMoney(cid, parameters.cost) ~= TRUE) then
+                npcHandler:say('You do not have enough money!', cid)
+            else
+                doPlayerSetVocation(cid, promotedVoc)
+                doPlayerRemoveSkillLossPercent(cid, 30)
+				setPlayerStorageValue(cid, STORAGE_PROMOTION, -1)
+                npcHandler:say(parameters.text, cid)
+            end
+        else
+            npcHandler:say("You need a premium account in order to get promoted", cid)
+        end
+        npcHandler:resetNpc()
+        return true
+    end
+	
 	--Usage:
-		-- local node1 = keywordHandler:addKeyword({'promot'}, StdModule.say, {npcHandler = npcHandler, text = 'I can promote you for 20000 gold coins. Do you want me to promote you?'})
-		-- 		node1:addChildKeyword({'yes'}, StdModule.promotePlayer, {npcHandler = npcHandler, promotions = {[1] = 5, [2] = 6, [3] = 7, [4] = 8}, cost = 20000, level = 20}, text = 'Congratulations! You are now promoted.')
-		-- 		node1:addChildKeyword({'no'}, StdModule.say, {npcHandler = npcHandler, text = 'Allright then. Come back when you are ready.'}, reset = true)
-	function StdModule.promotePlayer(cid, message, keywords, parameters, node)
+		--local node1 = keywordHandler:addKeyword({'wisdom of solitude'}, StdModule.say, {npcHandler = npcHandler, onlyFocus = true, text = 'Do you want to buy wisdom of solitude for 2000 (plus level depending amount) gold?'})
+		--node1:addChildKeyword({'yes'}, StdModule.bless, {npcHandler = npcHandler, number = 0, premium = false, baseCost = 2000, levelCost = 200, startLevel = 30, endLevel = 120})
+		--node1:addChildKeyword({'no'}, StdModule.say, {npcHandler = npcHandler, onlyFocus = true, reset = true, text = 'Too expensive, eh?'})
+	
+	function StdModule.bless(cid, message, keywords, parameters, node)
 		local npcHandler = parameters.npcHandler
 		if(npcHandler == nil) then
-			error('StdModule.promotePlayer called without any npcHandler instance.')
+			print('StdModule.bless called without any npcHandler instance.')
 		end
+
 		if(not npcHandler:isFocused(cid)) then
 			return false
 		end
 
-		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium == false) then
-			local oldVoc = getPlayerVocation(cid)
-			if(parameters.promotions[oldVoc] == oldVoc or parameters.promotions[oldVoc] == nil) then
-				npcHandler:say('You are already promoted!', cid)
-			elseif(getPlayerLevel(cid) < parameters.level) then
-				npcHandler:say('I am sorry, but I can only promote you once you have reached level ' .. parameters.level .. '.', cid)
-			elseif(doPlayerRemoveMoney(cid, parameters.cost) ~= TRUE) then
-				npcHandler:say('You do not have enough money!', cid)
+		if(isPlayerPremiumCallback(cid) or not(parameters.premium)) then
+			local price = parameters.baseCost
+			if(getPlayerLevel(cid) > parameters.startLevel) then
+				price = (price + ((math.min(parameters.endLevel, getPlayerLevel(cid)) - parameters.startLevel) * parameters.levelCost))
+			end
+
+			if(getPlayerBless(cid, parameters.number)) == TRUE then
+				npcHandler:say("Gods have already blessed you with this blessing!", cid)
+			elseif doPlayerRemoveMoney(cid, price) == FALSE then
+				npcHandler:say("You don't have enough money for blessing.", cid)
 			else
-				doPlayerSetVocation(cid, parameters.promotions[oldVoc])
-				npcHandler:say(parameters.text, cid)
+				npcHandler:say("You have been blessed by one of the five gods!", cid)
+				doPlayerAddBless(cid, parameters.number)
 			end
 		else
-			npcHandler:say('Sorry, only premium characters are allowed to be promoted.', cid)
+			npcHandler:say('You need a premium account in order to be blessed.', cid)
 		end
 
 		npcHandler:resetNpc()
 		return true
-
 	end
-
-
+	
 
 	function StdModule.travel(cid, message, keywords, parameters, node)
 		local npcHandler = parameters.npcHandler
 		if(npcHandler == nil) then
-			error('StdModule.travel called without any npcHandler instance.')
+			print('StdModule.travel called without any npcHandler instance.')
 		end
 		if(not npcHandler:isFocused(cid)) then
 			return false
@@ -115,6 +163,8 @@ if(Modules == nil) then
 				npcHandler:say('You must reach level ' .. parameters.level .. ' before I can let you go there.', cid)
 			elseif(doPlayerRemoveMoney(cid, parameters.cost) ~= TRUE) then
 				npcHandler:say('You do not have enough money!', cid)
+			elseif(isPzLocked(cid) == TRUE) then
+				npcHandler:say('Get out of there with this blood!', cid)
 			else
 				doTeleportThing(cid, parameters.destination)
 				doSendMagicEffect(parameters.destination, 10)
@@ -227,7 +277,7 @@ if(Modules == nil) then
 
 			for temp in string.gmatch(keys, '[^,]+') do
 				table.insert(keywords, temp)
-				i = i+1
+				i = i + 1
 			end
 
 			if(i ~= 1) then
@@ -240,7 +290,7 @@ if(Modules == nil) then
 			else
 				print('[Warning] NpcSystem:', 'No keywords found for keyword set #' .. n .. '. Skipping...')
 			end
-			n = n+1
+			n = n + 1
 		end
 	end
 
@@ -709,7 +759,7 @@ if(Modules == nil) then
 	-- Callback onBuy() function. If you wish, you can change certain Npc to use your onBuy().
 	function ShopModule:callbackOnBuy(cid, itemid, subType, amount, ignoreCapacity, buyWithBackpacks)
 		if(self.npcHandler.shopItems[itemid] == nil) then
-			error("[ShopModule.onBuy]", "items[itemid] == nil")
+			print("[ShopModule.onBuy]", "items[itemid] == nil")
 		end
 
 		local parseInfo = {
@@ -779,7 +829,7 @@ if(Modules == nil) then
 	-- Callback onSell() function. If you wish, you can change certain Npc to use your onSell().
 	function ShopModule:callbackOnSell(cid, itemid, subType, amount)
 		if(self.npcHandler.shopItems[itemid] == nil) then
-			error("[ShopModule.onSell]", "items[itemid] == nil")
+			print("[ShopModule.onSell]", "items[itemid] == nil")
 		end
 
 		if(not isItemStackable(itemid) and amount > MAX_NONESTACKABLE_SELL_AMOUNT) then

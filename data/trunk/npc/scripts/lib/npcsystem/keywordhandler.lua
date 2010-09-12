@@ -10,7 +10,7 @@ if(KeywordHandler == nil) then
 	BEHAVIOR_SIMPLE = 1 -- Does not support nested keywords. If you choose this setting you must use a variable such as 'talkState' to keep track of how to handle keywords.
 	BEHAVIOR_NORMAL = 2 -- Default behvaior. If a sub-keyword is not found, then the root is searched, not the parent hierarchy,
 	BEHAVIOR_NORMAL_EXTENDED = 3 -- Same as BEHAVIOR_NORMAL but it also searches through the last node's parent.
-	BEHAVIOR_COMPLEX = 4 -- Extended behavior. It a sub-keyword is not found, then the entire keyword hierarchy is searched upwards intil root is reached.
+	BEHAVIOR_COMPLEX = 4 -- Extended behavior. It a sub-keyword is not found, then the entire keyword hierarchy is searched upwards until root is reached.
 	
 	
 	-- BEHAVIOR_NORMAL_EXTENDED is recommended as it (probably) mimics the behavior of real Tibia's NPCs the most. 
@@ -121,7 +121,7 @@ if(KeywordHandler == nil) then
 	function KeywordHandler:processMessage(cid, message)
 		local node = self:getLastNode()
 		if(node == nil) then
-			error('No root node found.')
+			print('No root node found.')
 			return false
 		end
 		if(KEYWORD_BEHAVIOR == BEHAVIOR_SIMPLE) then
@@ -163,7 +163,7 @@ if(KeywordHandler == nil) then
 				end
 			end
 		else
-			error('Unknown keyword behavior.')
+			print('Unknown keyword behavior.')
 		end
 		return false
 	end
@@ -213,7 +213,7 @@ if(KeywordHandler == nil) then
 		if(steps == nil) then
 			steps = 1
 		end
-		for i=1,steps,1 do
+		for i = 1,steps,1 do
 			if(self.lastNode == nil) then
 				break
 			else

@@ -16,12 +16,12 @@ if(NpcHandler == nil) then
 	NPCHANDLER_TALKDELAY = TALKDELAY_ONTHINK
 
 	-- Constant conversation behaviors.
-	CONVERSATION_DEFAULT = 0 -- Conversation through default window, like it was before 8.2 update. (Default)
-	CONVERSATION_PRIVATE = 1 -- Conversation through NPCs chat window, as of 8.2 update.
+	CONVERSATION_DEFAULT = 0 -- Conversation through default window, like it was before 8.2 update.
+	CONVERSATION_PRIVATE = 1 -- Conversation through NPCs chat window, as of 8.2 update.(Default)
 	--Small Note: Private conversations also means the NPC will use multi-focus system.
 
-	-- Currently applied conversation behavior. CONVERSATION_DEFAULT is default.
-	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_DEFAULT
+	-- Currently applied conversation behavior. CONVERSATION_PRIVATE is default.
+	NPCHANDLER_CONVBEHAVIOR = CONVERSATION_PRIVATE
 
 	-- max amount of none stackable items that a NPC will sell to a player at the same time
 	MAX_NONESTACKABLE_SELL_AMOUNT = 100
@@ -77,7 +77,7 @@ if(NpcHandler == nil) then
 		focuses = nil,
 		talkStart = nil,
 		idleTime = 30,
-		talkRadius = 5,
+		talkRadius = 3,
 		talkDelayTime = 1, -- Seconds to delay outgoing messages.
 		queue = nil,
 		talkDelay = nil,
@@ -208,6 +208,7 @@ if(NpcHandler == nil) then
 			closeShopWindow(focus) --Even if it can not exist, we need to prevent it.
 			self:updateFocus()
 		else
+			closeShopWindow(focus) --Even if it can not exist, we need to prevent it.
 			self:changeFocus(0)
 		end
 	end
@@ -597,7 +598,7 @@ if(NpcHandler == nil) then
 	--	shallDelay is a boolean value. If it is false, the message is not delayed. Default value is false.
 	function NpcHandler:say(message, focus, publicize, shallDelay)
 		if(shallDelay == nil) then
-			shallDelay = true
+			shallDelay = false
 		end
 		if(NPCHANDLER_TALKDELAY == TALKDELAY_NONE or shallDelay == false) then
 			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then

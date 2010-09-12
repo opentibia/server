@@ -302,7 +302,8 @@ checkaccounts = true
 -- max number of players allowed
 maxplayers = "900"
 
--- save client debug assertion reports
+-- save client debug assertion reports 
+-- to use this option you have to create file called client_assertions.txt and make sure after client crash to change IP to otserv one then click "send".
 saveclientdebug = true
 
 -- Set the max query interval for retrieving status information

@@ -73,7 +73,7 @@ if(Queue == nil) then
 		if(self.handler ~= nil) then
 			self.handler:greet(cid)
 		else
-			error('No handler assigned to queue!')
+			print('No handler assigned to queue!')
 		end
 	end
 	

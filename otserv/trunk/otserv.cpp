@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
 	// Wait for loading to finish
 	g_loaderSignal.wait(g_loaderUniqueLock);
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(10000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	if(servicer.is_running()){
 		std::cout << "[done]" << std::endl;

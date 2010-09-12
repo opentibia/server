@@ -1,7 +1,7 @@
 
 CC = g++
-CFLAGS = -Wall -D__USE_MYSQL__ -D__USE_SQLITE__ -I/usr/include/lua5.1
-LIBS = -lsqlite3 -lmysqlclient -llua5.1 -lboost_thread-mt
+CFLAGS = -Wall -D__USE_MYSQL__ -I/usr/include/lua5.1
+LIBS = -lmysqlclient -llua5.1 -lboost_thread-mt
 OBJS = dbupdate.o configmanager.o database.o databasemysql.o \
 	databasesqlite.o
 

@@ -27,3 +27,11 @@ function selfGotoIdle()
 	debugPrint('selfGotoIdle(): deprecated function. Do not use it anymore!')
 	return nil
 end
+
+function msgcontains(message, keyword)
+	local a, b = string.find(message, keyword)
+	if a == nil or b == nil then
+		return false
+	end
+	return true
+end
