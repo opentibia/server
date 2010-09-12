@@ -10,108 +10,103 @@ What is this?
 	based on the CIPSoft's Tibia.
 
 How does it work?
-	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 7.8, 7.81, ,7.82, 7.9, 7.92, 8.0, 8.1, 8.11, 8.2 ,8.21, 8.22, 8.3, 8.4, 8.41, 8.42, 8.5, 8.51, 8.52.
-	OTServ is now played using Tibia 8.55.
+	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 
+	7.8, 7.81, ,7.82, 7.9, 7.92, 8.0, 8.1, 8.11, 8.2 ,8.21, 8.22, 8.3, 8.4, 8.41, 8.42, 8.5, 
+	8.51, 8.52, 8.53, 8.54, 8.55, 8.56, 8.57.
+	
+	OTServ is now played using Tibia 8.60 and 8.61.
 
 	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here
 	http://www.otchanger.net/
 
 	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
-	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier
-	.
-	Then login with the following:
-		Account Number: 111111
-		Password: tibia
-	To do so you have to execute some sql queries from schema.mysql, schema.pgsql or even schema.sqlite.
+	double clicking it. 
+	
+	You have to execute some sql queries from schema.mysql, schema.pgsql or even schema.sqlite.
 	And check it out. Once you are done, have a look around in the folders
-	and take a look at the config.lua :)
+	and take a look at the config.lua
 
 	NEVER ever enter your real acc# and/or password when not connecting to the CIP servers.
 	Then you are logged in.
 
-Features?
-    many ...(almost all are here):
-	http://otfans.net/wiki/index.php/Talk:OTServ_Roadmap
-
-How do I use this new stuff?
-	I'm just going over what might not be familiar to you here.
-
-	The word "actions" might be unfamiliar to you. What it is an action?
-	For instance when you click on a door it will open, or drinking mana-fluids.
-	"movement" is any thing you do when moving: stepping in or out a tile, adding
-	or removing an item from/to somewhere, equipping or de-equipping an item, etc..
-	"talkactions" are like actions, but they mean for talking. So, everytime you
-	say something, it's a talkaction.
-
-	There is other cool stuff such as SQL-support. It includes MySQL, SQLite, PostgreSQL and ODBC support.
-	Google it if you don't know it, we won't explain other softwares here ;p
-
-	Binary map, well this seems quite new doesn't it. For a long time maps have been in xml format
-	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
-	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
-	(Xml maps was in 7.4-7.1 ?)
-    	Binary house storage it is also new feature in otserv before it was relational storage (u can change storage in config.lua)
-	which takes long to save tiles in houses so otserv team make it in db but in binary storage.
 
 Credits?
 
 	-Project Admins
 
-	Tliff			 	(Inactive)
-	Sim0ne
-	Spin				(Inactive)
 	Remere
 	SimOne
+	Khaos				(Inactive)
+	Tliff			 	(Inactive)
+	Spin				(Inactive)
 	Shi'Voc				(Inactive)
 
 	-Forum Administrators
 
+	GriZzm0
+	Stormer
+	Mackan
+	Tythor Zeth
 	Tliff				(Inactive)
 	Yorick				(Inactive)
 	Pekay				(Inactive)
 	Nuker				(Inactive)
 	verkon				(Inactive)
-	GriZzm0
-	Evo
-	Stormer
+	Evo					(Inactive)
 
 	-Active Developers
 
-	Khaos				YATC
-	nfries88			YATC/OpenTibia
-	Nostradamus			POT/OpenTibia
-	rafaelhamdan			OpenTibia
-	hackerpotato			OpenTibia
-	Kilouco				YATC
 	Assassina			OpenTibia
+	hackerpotato		OpenTibia
+	Nostradamus			POT/OpenTibia
+	rafaelhamdan		OpenTibia
+	Sim0ne				OpenTibia
 
 	-Inactive Developers
 
 	Acrimon				Initial project developer
-	Snack				OpenTibia
-	Reebow				Special protocol support
-	Aire				OpenTibia
 	Haktivex			Initial project developer
 	Fandoras			Initial project developer
-	TiMMit				OpenTibia
-	Decar				Fansite
-	Matkus				Developer
+	Reebow				Special protocol support
 	Privateer			Documentation on the protocol
-	Torvik				Item list
-	j4K3xBl4sT3r			OpenTibia/OTClient
-	Smygflik			OpenTibia
-	Heliton				OpenTibia (scripting)
-	the fike			Advisory, optimization
-	Vitor				Advisory, optimization
-	Primer				OpenTibia/OTClient
-	GriZzm0				OpenTibia (scripting)
-	Jiddo				Scripting
+	Aire				OpenTibia
+	Anstice				OpenTibia
 	Arkold Thos			OpenTibia (Linux porter)
 	bruno				OpenTibia (ODBC driver)
-	Anstice				OpenTibia
+	Heliton				OpenTibia (scripting)
+	Jiddo				OpenTibia (scripting)
+	Winghawk			OpenTibia (scripting)
+	Blackdemon			OpenTibia
+	FightingElf			OpenTibia
+	Gecko				OpenTibia
 	Pedro B.			OpenTibia
-	Wrzasq				POT/OpenTibia (database structure)
+	Matkus				OpenTibia
+	OsoSangre			OpenTibia
+	Smygflik			OpenTibia
+	Snack				OpenTibia
+	TiMMit				OpenTibia
+	Primer				OpenTibia/OTClient (MAC porter)
+	j4K3xBl4sT3r		OpenTibia/OTClient
+	Wrzasq				POT/OpenTibia (database)
+	Kilouco				YATC
+	nfries88			YATC/OpenTibia
+	the fike			Advisory, optimization
+	Vitor				Advisory, optimization
+	Decar				Fansite
+	Torvik				Item list
 
+	-Contribuitors
+	Those are some users that helped the project with patches or bug reports.
+	
+	adakraz, Bennet, Dored, Pietia10, Quintinon, Fusion666, Joffily, Ispiro, slawkens, Umby, Rogier1337, pajlada,
+	Fernando Coutinho, Sapphire, Lithium, Proglin, LooS!k, Jason, nicaw, Xidaozu, Talaturen, The Chaos, Junkfood,
+	Beet Da Brat, honux, Ruly, Steeled Blade, Xera, BurnMc, Cayan, BlackKnight, Thomac, mike2k1, SuperGillis,
+	wik, Tijn, _X_Dead_X_, Skulldiggers, NeWsOfTzzz, kijano, Rex, DimiGhost, dark-bart, DeathClaw, Steelberg, Jero,
+	TechnoPirate, Mozila, Thax, Ashganek, RicarDog, ZeroCoolz, K-Zodron, gerax, Urmel, Cip, wasabi, Jovial, Yurez,
+	Rebell, Ilidian, blaxskull, dabobath, Mindrage, Eventide, MedionAktiver, Czepek, krt, mmb, Iyashii, Mazen, Figgi, 
+	Rith, Rizz, Vinny, YobaK, Nexoz, Ferrus
+	
+	
 	And special thanks to all otfans.net moderators.
 
 Help?

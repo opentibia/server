@@ -1436,6 +1436,9 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerSetVocation(cid, voc)
 	lua_register(m_luaState, "doPlayerSetVocation", LuaScriptInterface::luaDoPlayerSetVocation);
 
+	//doPlayerSetSex(cid, sex)
+	lua_register(m_luaState, "doPlayerSetSex", LuaScriptInterface::luaDoPlayerSetSex);
+
 	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype)
 	lua_register(m_luaState, "doPlayerRemoveItem", LuaScriptInterface::luaDoPlayerRemoveItem);
 
@@ -4593,6 +4596,26 @@ int LuaScriptInterface::luaDoPlayerSetVocation(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 	}
 	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSetSex(lua_State *L)
+{
+    //doPlayerSetSex(cid, sex)
+    uint32_t sex = popNumber(L);
+    uint32_t cid = popNumber(L);
+
+    ScriptEnviroment* env = getScriptEnv();
+
+    Player* player = env->getPlayerByUID(cid);
+    if(player){
+        player->setSex(sex);
+        lua_pushnumber(L, LUA_NO_ERROR);
+    }
+    else{
+        reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+        lua_pushnumber(L, LUA_ERROR);
+    }
+    return 1;
 }
 
 int LuaScriptInterface::luaDebugPrint(lua_State *L)

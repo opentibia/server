@@ -382,6 +382,7 @@ protected:
 	static int luaDoPlayerSetMasterPos(lua_State *L);
 	static int luaDoPlayerSetTown(lua_State *L);
 	static int luaDoPlayerSetVocation(lua_State *L);
+	static int luaDoPlayerSetSex(lua_State *L);
 	static int luaDoPlayerRemoveItem(lua_State *L);
 	static int luaDoPlayerAddSoul(lua_State *L);
 	static int luaDoPlayerAddExp(lua_State *L);
