@@ -322,6 +322,8 @@ int Items::loadFromOtb(std::string file)
 
 				if(serverid > 20000)
 					return ERROR_INVALID_FORMAT;
+
+				iType->id = serverid;
 				break;
 			}
 			case ITEM_ATTR_CLIENTID:
