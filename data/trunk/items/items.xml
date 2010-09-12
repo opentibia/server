@@ -3173,7 +3173,7 @@
     <attribute key="showcharges" value="1"/>
     <attribute key="absorbPercentFire" value="8"/>
   </item>
-  <item id="2202" article="a" name="stealth ring (invisibility)">
+  <item id="2202" article="a" name="stealth ring">
     <attribute key="weight" value="100"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -3182,7 +3182,7 @@
     <attribute key="showduration" value="1"/>
     <attribute key="invisible" value="1"/>
   </item>
-  <item id="2203" article="a" name="power ring (fist fighting +6)">
+  <item id="2203" article="a" name="power ring">
     <attribute key="weight" value="80"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -3191,7 +3191,7 @@
     <attribute key="duration" value="1800"/>
     <attribute key="showduration" value="1"/>
   </item>
-  <item id="2204" article="an" name="energy ring (magic shield)">
+  <item id="2204" article="an" name="energy ring">
     <attribute key="weight" value="80"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -3200,7 +3200,7 @@
     <attribute key="showduration" value="1"/>
     <attribute key="manashield" value="1"/>
   </item>
-  <item id="2205" article="a" name="life ring (faster regeneration)">
+  <item id="2205" article="a" name="life ring">
     <attribute key="weight" value="80"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -3242,7 +3242,7 @@
     <attribute key="stopduration" value="1"/>
     <attribute key="showduration" value="1"/>
   </item>
-  <item id="2210" article="a" name="sword ring (sword fighting +4)">
+  <item id="2210" article="a" name="sword ring">
     <attribute key="weight" value="90"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -3251,7 +3251,7 @@
     <attribute key="duration" value="1800"/>
     <attribute key="showduration" value="1"/>
   </item>
-  <item id="2211" article="an" name="axe ring (axe fighting +4)">
+  <item id="2211" article="an" name="axe ring">
     <attribute key="weight" value="90"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -3260,7 +3260,7 @@
     <attribute key="duration" value="1800"/>
     <attribute key="showduration" value="1"/>
   </item>
-  <item id="2212" article="a" name="club ring (club fighting +4)">
+  <item id="2212" article="a" name="club ring">
     <attribute key="weight" value="90"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -3283,7 +3283,7 @@
     <attribute key="stopduration" value="1"/>
     <attribute key="showduration" value="1"/>
   </item>
-  <item id="2215" article="a" name="dwarven ring (hard drinking)">
+  <item id="2215" article="a" name="dwarven ring">
     <attribute key="weight" value="110"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -3292,7 +3292,7 @@
     <attribute key="duration" value="3600"/>
     <attribute key="showduration" value="1"/>
   </item>
-  <item id="2216" article="a" name="ring of healing (faster regeneration)">
+  <item id="2216" article="a" name="ring of healing">
     <attribute key="weight" value="80"/>
     <attribute key="slotType" value="ring"/>
     <attribute key="decayTo" value="0"/>
@@ -5279,7 +5279,7 @@
   <item id="2639" article="a" name="tic-tac-toe token" plural="o tic-tac-toe tokens">
     <attribute key="weight" value="500"/>
   </item>
-  <item id="2640" article="a" name="pair of soft boots (faster regeneration)">
+  <item id="2640" article="a" name="pair of soft boots">
     <attribute key="weight" value="800"/>
     <attribute key="slotType" value="feet"/>
     <attribute key="decayTo" value="10021"/>
@@ -6543,7 +6543,6 @@
     <attribute key="weight" value="50000"/>
   </item>
   <item id="2949" name="remains of a mummy">
-    <attribute key="type" value="container"/>
     <attribute key="weight" value="1000"/>
     <attribute key="containerSize" value="10"/>
     <attribute key="decayTo" value="2950"/>
@@ -13065,7 +13064,6 @@
     <attribute key="fluidSource" value="blood"/>
   </item>
   <item id="6004" name="remains of a mummy" editorsuffix=" (Unmoveable)">
-    <attribute key="type" value = "container"/>
     <attribute key="containerSize" value="10"/>
     <attribute key="decayTo" value="2949"/>
     <attribute key="duration" value="10"/>
@@ -19277,7 +19275,7 @@
     <attribute key="description" value="They have an aromatic smell."/>
     <attribute key="weight" value="80"/>
   </item>
-  <item id="8110" article="a" name="present (Vol:5)" editorsuffix=" (Explosive)">
+  <item id="8110" article="a" name="present" editorsuffix=" (Explosive)">
     <attribute key="weight" value="600"/>
   </item>
   <item id="8111" article="an" name="exploding cookie" plural="exploding cookies">
