@@ -3125,7 +3125,7 @@
   <item id="2195" name="boots of haste">
     <attribute key="weight" value="750"/>
     <attribute key="slotType" value="feet"/>
-    <attribute key="speed" value="20"/>
+    <attribute key="speed" value="40"/>
   </item>
   <item id="2196" article="a" name="broken amulet">
     <attribute key="weight" value="420"/>
@@ -4121,7 +4121,7 @@
   <item id="2396" article="an" name="ice rapier">
     <attribute key="description" value="A deadly but fragile weapon."/>
     <attribute key="weight" value="1500"/>
-    <attribute key="attack" value="60"/>
+    <attribute key="attack" value="42"/>
     <attribute key="defense" value="1"/>
     <attribute key="weaponType" value="sword"/>
     <attribute key="elementIce" value="18"/>
@@ -11575,7 +11575,7 @@
     <attribute key="weight" value="21000"/>
     <attribute key="armor" value="2"/>
     <attribute key="slotType" value="head"/>
-    <attribute key="suppressDrown" value="1"/>
+    <attribute key="absorbPercentDrown" value="100"/>
   </item>
   <item id="5462" name="pirate boots">
     <attribute key="weight" value="800"/>
@@ -12296,9 +12296,10 @@
     <attribute key="weight" value="1500"/>
   </item>
   <item id="5800" article="a" name="grappling hook"/>
-  <item id="5801" article="a" name="key ring">
-    <attribute key="weight" value="50"/>
-    <attribute key="containerSize" value="20"/>
+  <item id="5801" article="a" name="jewelled backpack">
+    <attribute key="weight" value="1700"/>
+    <attribute key="containerSize" value="22"/>
+	<attribute key="slotType" value="backpack"/>
   </item>
   <item id="5802" article="a" name="message in a bottle"	editorsuffix=" (Unknown weight)"/>
   <item id="5803" article="an" name="arbalest">
@@ -16713,7 +16714,7 @@
     <attribute key="weight" value="4600"/>
     <attribute key="defense" value="23"/>
     <attribute key="attack" value="46"/>
-    <attribute key="weaponType" value="axe"/>
+    <attribute key="weaponType" value="sword"/>
     <attribute key="extradef" value="-3"/>
   </item>
   <item id="7419" article="a" name="dreaded cleaver">
@@ -18767,6 +18768,7 @@
     <attribute key="slotType" value="necklace"/>
     <attribute key="absorbPercentEarth" value="20"/>
     <attribute key="absorbPercentFire" value="-10"/>
+	<attribute key="charges" value="200"/>
   </item>
   <item id="7888" article="a" name="glacier amulet">
     <attribute key="weight" value="500"/>
@@ -19489,7 +19491,6 @@
     <attribute key="floorchange" value="down"/>
   </item>
   <item id="8253" name="something crawling">
-    <attribute key="floorchange" value="down"/>
   </item>
   <item id="8254" article="a" name="hole">
     <attribute key="description" value="It seems too narrow to crawl trough."/>
@@ -23877,7 +23878,7 @@
   <item id="10498" name="pavement"/>
   <item id="10499" name="remains of a water elemental">
     <attribute key="description" value="Something is wobbling inside. Maybe with a fishing rod you could reach it."/>
-    <attribute key="decayTo" value="0"/>
+    <attribute key="decayTo" value="10500"/>
     <attribute key="duration" value="300"/>
     <attribute key="corpseType" value="water"/>
   </item>
