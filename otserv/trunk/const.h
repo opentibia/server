@@ -487,31 +487,30 @@ enum ViolationActions_t
 	Action_IpBan                    = 1 << 7
 };
 
-const int32_t violationReasons[5] =
+const int maxViolationLevel = 4;
+
+const int32_t violationReasons[maxViolationLevel] =
 {
 	0,	//ignore this
 	3,	//all name reasons
 	9,	//all name & statement reasons
 	18,	//all name, statement & cheating reasons
-	19	//all name, statement & cheating reasons & ip-banishment
 };
 
-const int32_t violationNames[5] =
+const int32_t violationNames[maxViolationLevel] =
 {
 	Action_None,
 	Action_Namelock,
 	Action_Namelock,
 	Action_Namelock | Action_NamelockBan,
-	Action_Namelock | Action_NamelockBan | Action_NamelockBanFinalWarning | Action_IpBan
 };
 
-const int32_t violationStatements[5] =
+const int32_t violationStatements[maxViolationLevel] =
 {
 	Action_None,
 	Action_None,
 	Action_StatementReport,
 	Action_StatementReport | Action_Notation | Action_Banishment,
-	Action_StatementReport | Action_Notation | Action_Banishment | Action_BanFinalWarning | Action_IpBan
 };
 
 //Reserved player storage key ranges
