@@ -3612,7 +3612,7 @@ int LuaState::lua_internalCastSpell()
 		blockedByShield = popBoolean();
 	}
 	int32_t amount = popInteger();
-	Creature* target = popCreature(ERROR_PASS);
+	Creature* target = popCreature();
 	Creature* caster = popCreature(ERROR_PASS);
 	CombatType combatType = popEnum<CombatType>();
 	
