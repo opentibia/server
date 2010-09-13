@@ -80,21 +80,21 @@ enum passwordType_t{
     Compiler setup
 */
 #if defined __GNUC__
-	#include "compiler\gcc.h"
+	#include "compiler/gcc.h"
 	#ifdef __MINGW32__
-		#include "compiler\mingw32.h"
+		#include "compiler/mingw32.h"
 	#elif defined __CYGWIN__
-		#include "compiler\cygwin.h"
+		#include "compiler/cygwin.h"
 	#endif
 #elif defined(_MSC_VER)
-	#include "compiler\msvc.h"
+	#include "compiler/msvc.h"
 #endif
 
 /*
     After setting up the compiler we need to
     solve the differences to make the code portable.
 */
-#include "compiler\workarounds.h"
+#include "compiler/workarounds.h"
 
 /*
     If the compiler supports the upcoming standard,
