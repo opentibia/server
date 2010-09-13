@@ -489,7 +489,7 @@ enum ViolationActions_t
 
 const int maxViolationLevel = 3;
 
-const int32_t violationReasons[maxViolationLevel] =
+const int32_t violationReasons[maxViolationLevel + 1] =
 {
 	0,	//ignore this
 	3,	//all name reasons
@@ -497,7 +497,7 @@ const int32_t violationReasons[maxViolationLevel] =
 	18,	//all name, statement & cheating reasons
 };
 
-const int32_t violationNames[maxViolationLevel] =
+const int32_t violationNames[maxViolationLevel + 1] =
 {
 	Action_None,
 	Action_Namelock,
@@ -505,7 +505,7 @@ const int32_t violationNames[maxViolationLevel] =
 	Action_Namelock | Action_NamelockBan,
 };
 
-const int32_t violationStatements[maxViolationLevel] =
+const int32_t violationStatements[maxViolationLevel + 1] =
 {
 	Action_None,
 	Action_None,
