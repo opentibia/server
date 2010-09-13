@@ -11,7 +11,7 @@ clean:
 	rm dbupdate *.o
 
 dbupdate : ${OBJS}
-	${CC} ${LIBS} ${OBJS} -o dbupdate
+	${CC} ${OBJS} ${LIBS} -o dbupdate
 
 dbupdate.o: dbupdate.cpp
 	${CC} -c ${CFLAGS} -o $*.o $*.cpp
