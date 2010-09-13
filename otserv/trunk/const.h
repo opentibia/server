@@ -487,7 +487,7 @@ enum ViolationActions_t
 	Action_IpBan                    = 1 << 7
 };
 
-const int maxViolationLevel = 4;
+const int maxViolationLevel = 3;
 
 const int32_t violationReasons[maxViolationLevel] =
 {
