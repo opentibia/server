@@ -919,6 +919,7 @@
 	<action itemid="2096" script="pumpkinhead.lua" />
 	<action itemid="2114" script="piggy_bank.lua" />
 	<action itemid="5080" script="dolls.lua"/>
+	<action fromitemid="5792" toitemid="5797" script="dice.lua"/>
 	<action itemid="5669" script="dolls.lua"/>
 	<action itemid="5670" script="dolls.lua"/>
 	<action itemid="5791" script="dolls.lua"/>
