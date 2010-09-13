@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\compiler">
+      <UniqueIdentifier>{67677c08-13dd-40e0-9453-6f790453b3d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\account.h">
@@ -263,6 +266,21 @@
     </ClInclude>
     <ClInclude Include="..\weapons.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\compiler\cygwin.h">
+      <Filter>Header Files\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\compiler\gcc.h">
+      <Filter>Header Files\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\compiler\mingw32.h">
+      <Filter>Header Files\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\compiler\workarounds.h">
+      <Filter>Header Files\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\compiler\msvc.h">
+      <Filter>Header Files\compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
