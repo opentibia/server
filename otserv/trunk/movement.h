@@ -65,7 +65,7 @@ public:
 	void onAddTileItem(const Tile* tile, Item* item);
 
 protected:
-	typedef UNORDERED_MAP<int32_t, MoveEventList> MoveListMap;
+	typedef std::unordered_map<int32_t, MoveEventList> MoveListMap;
 	typedef std::map<Position, MoveEventList> MovePosListMap;
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();

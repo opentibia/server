@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="8,00"
 	Name="otserv"
-	ProjectGUID="{134E4CDD-1487-47D6-BE35-71A2D0A26209}"
-	RootNamespace="vc9"
-	TargetFrameworkVersion="196613"
+	ProjectGUID="{CC7A11A7-3E8E-46DA-AF48-09EA4E115258}"
+	RootNamespace="otserv"
 	>
 	<Platforms>
 		<Platform
@@ -40,12 +39,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(BOOST_INCLUDE_PATH)&quot;;&quot;$(LIBXML_INCLUDE_PATH)&quot;;&quot;$(LIBICONV_INCLUDE_PATH)&quot;;&quot;$(MYSQL_INCLUDE_PATH)&quot;;&quot;$(LUA_INCLUDE_PATH)&quot;;&quot;$(MPIR_INCLUDE_PATH)&quot;"
-				PreprocessorDefinitions="_SCL_SECURE_NO_WARNINGS;__USE_MYSQL__"
+				AdditionalIncludeDirectories="&quot;$(LIBICONV_INCLUDE_PATH)&quot;;&quot;$(MPIR_INCLUDE_PATH)&quot;;&quot;$(LUA_INCLUDE_PATH)&quot;;&quot;$(MYSQL_INCLUDE_PATH)&quot;;&quot;$(LIBXML_INCLUDE_PATH)&quot;;&quot;$(BOOST_INCLUDE_PATH)&quot;"
+				PreprocessorDefinitions="__USE_MYSQL__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -59,12 +59,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lua5.1.lib libmysql.lib mpir.lib libxml2_debug.lib"
-				OutputFile="$(OutDir)\otservd.exe"
-				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(LIBICONV_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(MPIR_LIB_PATH)&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(MPIR_LIB_PATH)&quot;;&quot;$(LIBICONV_LIB_PATH)&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
-				CLRThreadAttribute="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -83,6 +80,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -113,13 +113,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(BOOST_INCLUDE_PATH)&quot;;&quot;$(LIBXML_INCLUDE_PATH)&quot;;&quot;$(LIBICONV_INCLUDE_PATH)&quot;;&quot;$(MYSQL_INCLUDE_PATH)&quot;;&quot;$(LUA_INCLUDE_PATH)&quot;;&quot;$(MPIR_INCLUDE_PATH)&quot;"
-				PreprocessorDefinitions="_SCL_SECURE_NO_WARNINGS;__USE_MYSQL__"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
+				AdditionalIncludeDirectories="&quot;$(LIBICONV_INCLUDE_PATH)&quot;;&quot;$(MPIR_INCLUDE_PATH)&quot;;&quot;$(LUA_INCLUDE_PATH)&quot;;&quot;$(MYSQL_INCLUDE_PATH)&quot;;&quot;$(LIBXML_INCLUDE_PATH)&quot;;&quot;$(BOOST_INCLUDE_PATH)&quot;"
+				PreprocessorDefinitions="__USE_MYSQL__"
+				RuntimeLibrary="2"
 				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -133,14 +131,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lua5.1.lib libmysql.lib mpir.lib libxml2.lib"
-				OutputFile="$(OutDir)\otserv.exe"
-				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(LIBICONV_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(MPIR_LIB_PATH)&quot;"
-				GenerateDebugInformation="false"
+				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(MPIR_LIB_PATH)&quot;;&quot;$(LIBICONV_LIB_PATH)&quot;"
+				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
-				CLRThreadAttribute="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -159,6 +154,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -720,11 +718,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\resource1.h"
-				>
-			</File>
-			<File
-				RelativePath=".\resource2.h"
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
@@ -841,6 +835,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath="..\otserv.ico"
+				>
+			</File>
 			<File
 				RelativePath=".\otserv.rc"
 				>

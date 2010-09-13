@@ -26,6 +26,7 @@
 #include "player.h"
 #include "configmanager.h"
 #include "ioplayer.h"
+#include <boost/algorithm/string/predicate.hpp>
 
 extern Game g_game;
 extern Chat g_chat;
@@ -343,7 +344,7 @@ bool Guilds::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 {
 	//Check cache
 	for(GuildsMap::iterator it = loadedGuilds.begin(); it != loadedGuilds.end(); ++it){
-		if(strcasecmp(it->second->getName().c_str(), guildName.c_str()) == 0){
+		if(boost::algorithm::iequals(it->second->getName(), guildName)){
 			guildId = it->first;
 			return true;
 		}

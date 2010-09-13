@@ -4608,7 +4608,7 @@ int LuaScriptInterface::luaDoPlayerSetSex(lua_State *L)
 
     Player* player = env->getPlayerByUID(cid);
     if(player){
-        player->setSex((playersex_t)sex);
+        player->setSex((PlayerSex_t)sex);
         lua_pushnumber(L, LUA_NO_ERROR);
     }
     else{

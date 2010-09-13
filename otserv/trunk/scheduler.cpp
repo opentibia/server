@@ -45,7 +45,6 @@ void Scheduler::schedulerThread(void* p)
 	ExceptionHandler schedulerExceptionHandler;
 	schedulerExceptionHandler.InstallHandler();
 	#endif
-	srand((unsigned int)OTSYS_TIME());
 	#ifdef __DEBUG_SCHEDULER__
 	std::cout << "Starting Scheduler" << std::endl;
 	#endif

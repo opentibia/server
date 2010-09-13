@@ -28,6 +28,7 @@
 #include <map>
 #include <list>
 #include <vector>
+#include <cassert>
 
 extern "C"
 {

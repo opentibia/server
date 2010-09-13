@@ -29,6 +29,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <boost/algorithm/string/predicate.hpp>
 
 extern ConfigManager g_config;
 
@@ -587,7 +588,7 @@ AmmoActionNames ammoActionNames[] = {
 MagicEffectClasses getMagicEffect(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(magicEffectNames)/sizeof(MagicEffectNames); ++i){
-		if(strcasecmp(strValue.c_str(), magicEffectNames[i].name) == 0){
+		if(boost::algorithm::iequals(strValue.c_str(), magicEffectNames[i].name)){
 			return magicEffectNames[i].effect;
 		}
 	}
@@ -597,7 +598,7 @@ MagicEffectClasses getMagicEffect(const std::string& strValue)
 ShootType_t getShootType(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(shootTypeNames)/sizeof(ShootTypeNames); ++i){
-		if(strcasecmp(strValue.c_str(), shootTypeNames[i].name) == 0){
+		if(boost::algorithm::iequals(strValue.c_str(), shootTypeNames[i].name)){
 			return shootTypeNames[i].shoot;
 		}
 	}
@@ -607,7 +608,7 @@ ShootType_t getShootType(const std::string& strValue)
 Ammo_t getAmmoType(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(ammoTypeNames)/sizeof(AmmoTypeNames); ++i){
-		if(strcasecmp(strValue.c_str(), ammoTypeNames[i].name) == 0){
+		if(boost::algorithm::iequals(strValue.c_str(), ammoTypeNames[i].name)){
 			return ammoTypeNames[i].ammoType;
 		}
 	}
@@ -617,7 +618,7 @@ Ammo_t getAmmoType(const std::string& strValue)
 AmmoAction_t getAmmoAction(const std::string& strValue)
 {
 	for(uint32_t i = 0; i < sizeof(ammoActionNames)/sizeof(AmmoActionNames); ++i){
-		if(strcasecmp(strValue.c_str(), ammoActionNames[i].name) == 0){
+		if(boost::algorithm::iequals(strValue.c_str(), ammoActionNames[i].name)){
 			return ammoActionNames[i].ammoAction;
 		}
 	}
@@ -711,7 +712,7 @@ std::string getViolationActionString(violationAction_t actionId, bool ipBanishme
 	return action;
 }
 
-std::string playerSexAdjectiveString(playersex_t sex)
+std::string playerSexAdjectiveString(PlayerSex_t sex)
 {
 	if(sex % 2 == 0){
 		return "her";
@@ -721,7 +722,7 @@ std::string playerSexAdjectiveString(playersex_t sex)
 	}
 }
 
-std::string playerSexSubjectString(playersex_t sex)
+std::string playerSexSubjectString(PlayerSex_t sex)
 {
 	if(sex % 2 == 0){
 		return "She";

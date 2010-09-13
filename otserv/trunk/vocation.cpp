@@ -25,6 +25,7 @@
 #include <libxml/parser.h>
 #include <iostream>
 #include <cmath>
+#include <boost/algorithm/string/predicate.hpp>
 
 Vocations::Vocations()
 {
@@ -194,7 +195,7 @@ Vocation* Vocations::getVocation(uint32_t vocId)
 int32_t Vocations::getVocationId(const std::string& name)
 {
 	for(VocationsMap::iterator it = vocationsMap.begin(); it != vocationsMap.end(); ++it){
-		if(strcasecmp(it->second->name.c_str(), name.c_str()) == 0){
+		if(boost::algorithm::iequals(it->second->name, name)){
 			return it->first;
 		}
 	}

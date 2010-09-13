@@ -27,6 +27,7 @@
 #include "tools.h"
 #include "guild.h"
 #include "beds.h"
+#include <boost/algorithm/string/predicate.hpp>
 #include <sstream>
 #include <algorithm>
 
@@ -555,7 +556,7 @@ bool AccessList::addGuild(const std::string& guildName, const std::string& rank)
 	if(g_guilds.getGuildIdByName(guildId, guildName)){
 		if(guildId != 0){
 			for(GuildList::iterator it = guildList.begin(); it != guildList.end(); ++it){
-				if(it->first == guildId && strcasecmp(rank.c_str(), it->second.c_str()) == 0){
+				if(it->first == guildId && boost::algorithm::iequals(rank, it->second)){
 					return false;
 				}
 			}
@@ -640,7 +641,7 @@ bool AccessList::isInList(const Player* player)
 		return true;
 
 	for(GuildList::iterator it = guildList.begin(); it != guildList.end(); ++it){
-		if((player->getGuild() && it->first == player->getGuildId()) && strcasecmp(player->guildRank.c_str(), it->second.c_str()) == 0){
+		if((player->getGuild() && it->first == player->getGuildId()) && boost::algorithm::iequals(player->guildRank, it->second)){
 			return true;
 		}
 	}

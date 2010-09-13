@@ -145,8 +145,11 @@ void closeRunfile(void)
 
 int main(int argc, char *argv[])
 {
+	// Set seed for rand()
+	std::srand((unsigned int)OTSYS_TIME());
+
 	// Parse any command line (and display help text)
-	if(parseCommandLine(g_command_opts, std::vector<std::string>(argv, argv + argc)) == false){
+	if(!parseCommandLine(g_command_opts, std::vector<std::string>(argv, argv + argc))){
 		return 0;
 	}
 
@@ -277,7 +280,9 @@ int main(int argc, char *argv[])
 	mainExceptionHandler.RemoveHandler();
 #endif
 	// Don't run destructors, may hang!
-	exit(0);
+	std::exit(0);
+
+	return 0;
 }
 
 bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)

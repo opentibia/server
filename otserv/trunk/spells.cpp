@@ -30,6 +30,7 @@
 #include "const.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
+#include <boost/algorithm/string/predicate.hpp>
 #include <sstream>
 
 extern Game g_game;
@@ -91,7 +92,7 @@ TalkActionResult_t Spells::playerSaySpell(Player* player, SpeakClasses type, std
 		words = instantSpell->getWords();
 
 		if(instantSpell->getHasParam()){
-			words += " \"" + param + "\""; 
+			words += " \"" + param + "\"";
 		}
 
 		return TALKACTION_BREAK;
@@ -228,7 +229,7 @@ RuneSpell* Spells::getRuneSpell(uint32_t id)
 RuneSpell* Spells::getRuneSpellByName(const std::string& name)
 {
 	for(RunesMap::iterator it = runes.begin(); it != runes.end(); ++it){
-		if(strcasecmp(it->second->getName().c_str(), name.c_str()) == 0){
+		if(boost::algorithm::iequals(it->second->getName(), name)){
 			return it->second;
 		}
 	}
@@ -243,7 +244,7 @@ InstantSpell* Spells::getInstantSpell(const std::string words)
 		InstantSpell* instantSpell = it->second;
 		size_t spellLen = instantSpell->getWords().length();
 
-		if(strncasecmp(instantSpell->getWords().c_str(), words.c_str(), spellLen) == 0){
+		if(asLowerCaseString(words).compare(0, spellLen, asLowerCaseString(instantSpell->getWords())) == 0){
 			if(!result || spellLen > result->getWords().length()){
 				result = instantSpell;
 			}
@@ -521,7 +522,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 		};
 
 		for(unsigned int i = 0; i < sizeof(reservedList)/sizeof(const char*); ++i){
-			if(strcasecmp(reservedList[i], name.c_str()) == 0){
+			if(boost::algorithm::iequals(reservedList[i], name.c_str())){
 				std::cout << "Error: [Spell::configureSpell] Spell is using a reserved name: " << reservedList[i] << std::endl;
 				return false;
 			}

@@ -58,13 +58,13 @@ public:
 
 	uint32_t getOutfitId(uint32_t lookType);
 	bool getOutfit(uint32_t lookType, Outfit& outfit);
-	bool getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit);
-	const OutfitMap& getOutfits(playersex_t playersex);
+	bool getOutfit(uint32_t outfitId, PlayerSex_t sex, Outfit& outfit);
+	const OutfitMap& getOutfits(PlayerSex_t playersex);
 
 private:
 	Outfits();
 	OutfitList allOutfits;
-	std::map<playersex_t, OutfitMap > outfitMaps;
+	std::map<PlayerSex_t, OutfitMap > outfitMaps;
 };
 
 #endif

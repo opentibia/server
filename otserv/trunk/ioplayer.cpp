@@ -94,7 +94,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	}
 
 	// Getting all player properties
-	player->setSex((playersex_t)result->getDataInt("sex"));
+	player->setSex((PlayerSex_t)result->getDataInt("sex"));
 	player->setDirection((Direction)result->getDataInt("direction"));
 	player->level = std::max((uint32_t)1, (uint32_t)result->getDataInt("level"));
 

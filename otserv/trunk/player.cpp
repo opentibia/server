@@ -33,6 +33,7 @@
 #include "beds.h"
 #include "party.h"
 #include "guild.h"
+#include <boost/algorithm/string/predicate.hpp>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -4561,7 +4562,7 @@ bool Player::removeOutfit(uint32_t outfitId, uint32_t addons)
 	return false;
 }
 
-void Player::setSex(playersex_t player_sex)
+void Player::setSex(PlayerSex_t player_sex)
 {
 	if(sex != player_sex){
 		sex = player_sex;
@@ -4646,7 +4647,7 @@ bool Player::hasLearnedInstantSpell(const std::string& name) const
 
 	for(LearnedInstantSpellList::const_iterator it = learnedInstantSpellList.begin();
 			it != learnedInstantSpellList.end(); ++it){
-		if(strcasecmp((*it).c_str(), name.c_str()) == 0){
+		if(boost::algorithm::iequals((*it), name)){
 			return true;
 		}
 	}

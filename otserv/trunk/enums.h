@@ -221,7 +221,7 @@ enum ConditionId_t{
 	CONDITIONID_AMMO = 10
 };
 
-enum playersex_t {
+enum PlayerSex_t {
 	PLAYERSEX_FIRST = 0,
 	PLAYERSEX_FEMALE = PLAYERSEX_FIRST,
 	PLAYERSEX_MALE = 1,

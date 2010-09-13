@@ -50,7 +50,7 @@ public:
 	void getList(std::string& _list) const;
 
 private:
-	typedef UNORDERED_SET<uint32_t> PlayerList;
+	typedef std::unordered_set<uint32_t> PlayerList;
 	typedef std::list< std::pair<uint32_t, std::string> > GuildList;
 
 	typedef std::list<std::string> ExpressionList;

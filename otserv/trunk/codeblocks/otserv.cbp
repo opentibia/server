@@ -151,6 +151,10 @@
 		</Unit>
 		<Unit filename="../combat.cpp" />
 		<Unit filename="../combat.h" />
+		<Unit filename="../compiler/gcc.h" />
+		<Unit filename="../compiler/mingw32.h" />
+		<Unit filename="../compiler/msvc.h" />
+		<Unit filename="../compiler/workarounds.h" />
 		<Unit filename="../condition.cpp" />
 		<Unit filename="../condition.h" />
 		<Unit filename="../config.lua.dist" />

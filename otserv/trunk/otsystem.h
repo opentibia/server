@@ -37,6 +37,7 @@ typedef std::vector< std::pair<uint32_t, uint32_t> > IPList;
 #include <cstddef>
 #include <cstdlib>
 #include <winsock2.h>
+#include <sys/types.h>
 #include <sys/timeb.h>
 
 #ifndef EWOULDBLOCK
@@ -52,7 +53,7 @@ inline int64_t OTSYS_TIME()
 
 typedef int socklen_t;
 
-#else  // #if defined __WINDOWS__
+#else  // __WINDOWS__
 
 #include <sys/types.h>
 #include <sys/timeb.h>

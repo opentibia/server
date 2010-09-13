@@ -84,7 +84,7 @@ protected:
 	{
 		bool operator()(const std::string& l, const std::string& r) const
 		{
-			return strcasecmp(l.c_str(), r.c_str()) < 0;
+			return asLowerCaseString(l).compare(asLowerCaseString(r)) < 0;
 		}
 	};
 

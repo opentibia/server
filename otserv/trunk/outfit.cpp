@@ -91,7 +91,7 @@ bool Outfits::loadFromXml(const std::string& datadir)
 							}
 
 							if(readXMLString(pchild, "type", strValue)){
-								playersex_t playersex = PLAYERSEX_LAST;
+								PlayerSex_t playersex = PLAYERSEX_LAST;
 
 								if(asLowerCaseString(strValue) == "female"){
 									playersex = PLAYERSEX_FEMALE;
@@ -170,7 +170,7 @@ bool Outfits::getOutfit(uint32_t lookType, Outfit& outfit)
 	return false;
 }
 
-bool Outfits::getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit)
+bool Outfits::getOutfit(uint32_t outfitId, PlayerSex_t sex, Outfit& outfit)
 {
 	OutfitMap map = getOutfits(sex);
 	OutfitMap::iterator it = map.find(outfitId);
@@ -182,7 +182,7 @@ bool Outfits::getOutfit(uint32_t outfitId, playersex_t sex, Outfit& outfit)
 	return false;
 }
 
-const OutfitMap& Outfits::getOutfits(playersex_t playersex)
+const OutfitMap& Outfits::getOutfits(PlayerSex_t playersex)
 {
 	return outfitMaps[playersex];
 }

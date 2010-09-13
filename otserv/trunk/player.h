@@ -199,11 +199,11 @@ public:
 	uint32_t getVocationId() const;
 	Vocation* getVocation() const {return vocation;};
 
-	playersex_t getSex() const {return sex;}
+	PlayerSex_t getSex() const {return sex;}
 	bool isMale() const {return getSex() % 2 != 0;}
 	bool isFemale() const {return getSex() % 2 == 0;}
 
-	void setSex(playersex_t);
+	void setSex(PlayerSex_t player_sex);
 	int32_t getPlayerInfo(playerinfo_t playerinfo) const;
 	int64_t getExperience() const {return experience;}
 
@@ -763,7 +763,7 @@ protected:
 	uint32_t manaSpent;
 	Vocation_t vocation_id;
 	Vocation* vocation;
-	playersex_t sex;
+	PlayerSex_t sex;
 	int32_t soul, soulMax;
 	uint64_t groupFlags;
 	uint16_t premiumDays;

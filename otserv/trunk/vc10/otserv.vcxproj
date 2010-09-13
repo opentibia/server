@@ -58,6 +58,7 @@
       <PreprocessorDefinitions>__USE_MYSQL__;__USE_MINIDUMP__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -73,6 +74,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__USE_MYSQL__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -92,6 +94,11 @@
     <ClInclude Include="..\beds.h" />
     <ClInclude Include="..\chat.h" />
     <ClInclude Include="..\combat.h" />
+    <ClInclude Include="..\compiler\cygwin.h" />
+    <ClInclude Include="..\compiler\gcc.h" />
+    <ClInclude Include="..\compiler\mingw32.h" />
+    <ClInclude Include="..\compiler\msvc.h" />
+    <ClInclude Include="..\compiler\workarounds.h" />
     <ClInclude Include="..\condition.h" />
     <ClInclude Include="..\configmanager.h" />
     <ClInclude Include="..\connection.h" />
