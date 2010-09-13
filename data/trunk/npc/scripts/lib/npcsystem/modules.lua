@@ -45,7 +45,8 @@ if(Modules == nil) then
 	function StdModule.say(cid, message, keywords, parameters, node)
 		local npcHandler = parameters.npcHandler
 		if(npcHandler == nil) then
-			print('StdModule.say called without any npcHandler instance.')
+			print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] StdModule.say called without any npcHandler instance.')
+			return false
 		end
 		local onlyFocus = (parameters.onlyFocus == nil or parameters.onlyFocus == true)
 		if(not npcHandler:isFocused(cid) and onlyFocus) then
@@ -82,7 +83,8 @@ end
     function StdModule.promotePlayer(cid, message, keywords, parameters, node)
         local npcHandler = parameters.npcHandler
         if(npcHandler == nil) then
-            print('StdModule.promotePlayer called without any npcHandler instance.')
+            print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] StdModule.promotePlayer called without any npcHandler instance.')
+			return false
         end
         if(not npcHandler:isFocused(cid)) then
             return false
@@ -119,7 +121,8 @@ end
 	function StdModule.bless(cid, message, keywords, parameters, node)
 		local npcHandler = parameters.npcHandler
 		if(npcHandler == nil) then
-			print('StdModule.bless called without any npcHandler instance.')
+			print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] StdModule.bless called without any npcHandler instance.')
+			return false
 		end
 
 		if(not npcHandler:isFocused(cid)) then
@@ -152,7 +155,8 @@ end
 	function StdModule.travel(cid, message, keywords, parameters, node)
 		local npcHandler = parameters.npcHandler
 		if(npcHandler == nil) then
-			print('StdModule.travel called without any npcHandler instance.')
+			print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] StdModule.travel called without any npcHandler instance.')
+			return false
 		end
 		if(not npcHandler:isFocused(cid)) then
 			return false
@@ -285,10 +289,10 @@ end
 				if(reply ~= nil) then
 					self:addKeyword(keywords, reply)
 				else
-					print('[Warning] NpcSystem:', 'Parameter \'' .. 'keyword_reply' .. n .. '\' missing. Skipping...')
+					print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Parameter \'' .. 'keyword_reply' .. n .. '\' missing. Skipping...')
 				end
 			else
-				print('[Warning] NpcSystem:', 'No keywords found for keyword set #' .. n .. '. Skipping...')
+				print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'No keywords found for keyword set #' .. n .. '. Skipping...')
 			end
 			n = n + 1
 		end
@@ -365,7 +369,7 @@ end
 				elseif(i == 7) then
 					checkPzBlock = temp == 'true'
 				else
-					print('[Warning] NpcSystem:', 'Unknown parameter found in travel destination parameter.', temp, destination)
+					print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Unknown parameter found in travel destination parameter.', temp, destination)
 				end
 				i = i+1
 			end
@@ -373,7 +377,7 @@ end
 			if(name ~= nil and x ~= nil and y ~= nil and z ~= nil and cost ~= nil) then
 				self:addDestination(name, {x=x, y=y, z=z}, cost, premium, checkPzBlock)
 			else
-				print('[Warning] NpcSystem:', 'Parameter(s) missing for travel destination:', name, x, y, z, cost, premium)
+				print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Parameter(s) missing for travel destination:', name, x, y, z, cost, premium)
 			end
 		end
 	end
@@ -565,19 +569,19 @@ end
 				elseif(i == 4) then
 					charges = tonumber(temp)
 				else
-					print('[Warning] NpcSystem:', 'Unknown parameter found in buyable items parameter.', temp, item)
+					print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Unknown parameter found in buyable items parameter.', temp, item)
 				end
 				i = i+1
 			end
 
 			if(itemid ~= nil and cost ~= nil) then
 				if((isItemRune(itemid) == TRUE or isItemFluidContainer(itemid) == TRUE) and charges == nil) then
-					print('[Warning] NpcSystem:', 'Charges missing for parameter item:' , item)
+					print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Charges missing for parameter item:' , item)
 				else
 					self:addBuyableItem(nil, itemid, cost, charges)
 				end
 			else
-				print('[Warning] NpcSystem:', 'Parameter(s) missing for item:', name, itemid, cost)
+				print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Parameter(s) missing for item:', name, itemid, cost)
 			end
 		end
 	end
@@ -598,7 +602,7 @@ end
 				elseif(i == 3) then
 					cost = tonumber(temp)
 				else
-					print('[Warning] NpcSystem:', 'Unknown parameter found in sellable items parameter.', temp, item)
+					print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Unknown parameter found in sellable items parameter.', temp, item)
 				end
 				i = i+1
 			end
@@ -606,7 +610,7 @@ end
 			if(itemid ~= nil and cost ~= nil) then
 				self:addSellableItem(nil, itemid, cost)
 			else
-				print('[Warning] NpcSystem:', 'Parameter(s) missing for item:', itemid, cost)
+				print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Parameter(s) missing for item:', itemid, cost)
 			end
 		end
 	end
@@ -759,7 +763,8 @@ end
 	-- Callback onBuy() function. If you wish, you can change certain Npc to use your onBuy().
 	function ShopModule:callbackOnBuy(cid, itemid, subType, amount, ignoreCapacity, buyWithBackpacks)
 		if(self.npcHandler.shopItems[itemid] == nil) then
-			print("[ShopModule.onBuy]", "items[itemid] == nil")
+			print("[Warning - ' .. getCreatureName(getNpcCid()) .. '] [ShopModule.onBuy]", "items[itemid] == nil")
+			return false
 		end
 
 		local parseInfo = {
@@ -829,7 +834,8 @@ end
 	-- Callback onSell() function. If you wish, you can change certain Npc to use your onSell().
 	function ShopModule:callbackOnSell(cid, itemid, subType, amount)
 		if(self.npcHandler.shopItems[itemid] == nil) then
-			print("[ShopModule.onSell]", "items[itemid] == nil")
+			print("[Warning - ' .. getCreatureName(getNpcCid()) .. '] [ShopModule.onSell]", "items[itemid] == nil")
+			return false
 		end
 
 		if(not isItemStackable(itemid) and amount > MAX_NONESTACKABLE_SELL_AMOUNT) then

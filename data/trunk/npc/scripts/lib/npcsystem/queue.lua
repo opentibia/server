@@ -73,7 +73,8 @@ if(Queue == nil) then
 		if(self.handler ~= nil) then
 			self.handler:greet(cid)
 		else
-			print('No handler assigned to queue!')
+			print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] No handler assigned to queue!')
+			return false
 		end
 	end
 	

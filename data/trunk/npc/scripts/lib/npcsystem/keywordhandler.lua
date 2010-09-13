@@ -121,7 +121,7 @@ if(KeywordHandler == nil) then
 	function KeywordHandler:processMessage(cid, message)
 		local node = self:getLastNode()
 		if(node == nil) then
-			print('No root node found.')
+			print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] No root node found.')
 			return false
 		end
 		if(KEYWORD_BEHAVIOR == BEHAVIOR_SIMPLE) then
@@ -163,7 +163,7 @@ if(KeywordHandler == nil) then
 				end
 			end
 		else
-			print('Unknown keyword behavior.')
+			print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] Unknown keyword behavior.')
 		end
 		return false
 	end
