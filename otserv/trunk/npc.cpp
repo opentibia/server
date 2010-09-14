@@ -123,6 +123,7 @@ void Npc::reset()
 	loaded = false;
 	walkTicks = 1500;
 	floorChange = false;
+	initialLookDir = SOUTH;
 	attackable = false;
 	hasBusyReply = false;
 	hasScriptedFocus = false;
@@ -215,6 +216,10 @@ bool Npc::loadFromXml(const std::string& filename)
 			masterRadius = intValue;
 		}
 
+		if(readXMLInteger(root, "lookdir", intValue)){
+			initialLookDir = (Direction) intValue;
+		}
+		
 		if(readXMLInteger(root, "autowalk", intValue)){
 			//Deprecated attribute.
 			if(intValue == 0){
@@ -1226,6 +1231,16 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->lastResponseTime = OTSYS_TIME();
 	stateList.push_back(state);
 	return state;
+}
+
+void Npc::onPlacedCreature()
+{
+	turnToInitialLookDirection();
+}
+
+void Npc::turnToInitialLookDirection()
+{
+	doTurn(initialLookDir);
 }
 
 bool Npc::canSee(const Position& pos) const
@@ -3171,6 +3186,7 @@ int NpcScriptInterface::luaSetNpcFocus(lua_State *L)
 		}
 		else{
 			npc->hasScriptedFocus = false;
+			npc->turnToInitialLookDirection();
 		}
 
 		npc->setCreatureFocus(creature);

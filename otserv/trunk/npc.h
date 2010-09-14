@@ -506,6 +506,7 @@ public:
 
 	void turnToCreature(Creature* creature);
 	void setCreatureFocus(Creature* creature);
+	void turnToInitialLookDirection();
 	bool getParameter(const std::string key, std::string& value);
 	NpcScriptInterface* getScriptInterface();
 
@@ -523,13 +524,13 @@ protected:
 	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
 		const Tile* oldTile, const Position& oldPos, bool teleport);
-
+	virtual void onPlacedCreature();
 	virtual void onCreatureTurn(const Creature* creature);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 	virtual void onThink(uint32_t interval);
 	virtual std::string getDescription(int32_t lookDistance) const;
-
+	
 	bool isImmune(CombatType_t type) const {return true;}
 	bool isImmune(ConditionType_t type) const {return true;}
 	virtual bool isAttackable() const { return attackable; }
@@ -578,6 +579,7 @@ protected:
 	std::string m_filename;
 	uint32_t walkTicks;
 	bool floorChange;
+	Direction initialLookDir;
 	bool attackable;
 	bool isIdle;
 	bool hasUsedIdleReply;
