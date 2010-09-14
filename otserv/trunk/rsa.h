@@ -24,6 +24,7 @@
 
 #include "definitions.h"
 #include "gmp.h"
+#include <string.h>
 #include <boost/thread.hpp>
 
 class RSA{
