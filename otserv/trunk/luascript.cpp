@@ -1489,6 +1489,12 @@ void LuaScriptInterface::registerFunctions()
 
 	//isCreature(cid)
 	lua_register(m_luaState, "isCreature", LuaScriptInterface::luaIsCreature);
+	
+	//isItemTwoHandedByUID(uid)
+	lua_register(m_luaState, "isItemTwoHandedByUID", LuaScriptInterface::luaIsItemTwoHandedByUID);
+
+	//isItemTwoHanded(uid)
+	lua_register(m_luaState, "isItemTwoHanded", LuaScriptInterface::luaIsItemTwoHanded);
 
 	//isContainer(uid)
 	lua_register(m_luaState, "isContainer", LuaScriptInterface::luaIsContainer);
@@ -8812,6 +8818,50 @@ int LuaScriptInterface::luaGetItemArmorByUID(lua_State *L)
 	}
 
 	lua_pushnumber(L, item->getArmor());
+	return 1;
+}
+
+int LuaScriptInterface::luaIsItemTwoHandedByUID(lua_State *L)
+{
+	//isItemTwoHandedByUID(uid)
+	uint32_t uid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Item* item = env->getItemByUID(uid);
+	if(!item){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+		lua_pushnil(L);
+		return 1;
+	}
+
+	if (item->getSlotPosition() & SLOTP_TWO_HAND){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaIsItemTwoHanded(lua_State *L)
+{
+	//isItemTwoHanded(itemid)
+	uint32_t itemid = popNumber(L);
+	if(itemid > 0){
+		const ItemType& it = Item::items[itemid];
+		if (it.slot_position & SLOTP_TWO_HAND){
+			lua_pushnumber(L, LUA_TRUE);
+		}
+		else{
+			lua_pushnumber(L, LUA_FALSE);
+		}
+	}
+	else{
+		reportErrorFunc("Invalid itemid number.");
+		lua_pushnil(L);
+	}
+
 	return 1;
 }
 

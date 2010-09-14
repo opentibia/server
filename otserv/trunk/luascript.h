@@ -616,6 +616,8 @@ protected:
 
 	static int luaIsCreatureImmuneToCondition(lua_State *L);
 	static int luaHasProperty(lua_State *L);
+	static int luaIsItemTwoHandedByUID(lua_State *L);
+	static int luaIsItemTwoHanded(lua_State *L);
 	static int luaIsItemStackable(lua_State *L);
 	static int luaIsItemRune(lua_State *L);
 	static int luaIsItemDoor(lua_State *L);
