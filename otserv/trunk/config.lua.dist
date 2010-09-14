@@ -268,7 +268,7 @@ min_pvp_level = 0
 
 --should pvp restrictions apply to summons too?
 -- (experimental code - requires otserv to be compiled with flag __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__)
---min_pvp_level_applies_to_summons = true
+min_pvp_level_applies_to_summons = true
 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
 maxmessagebuffer = 4
@@ -302,7 +302,7 @@ checkaccounts = true
 -- max number of players allowed
 maxplayers = "900"
 
--- save client debug assertion reports 
+-- save client debug assertion reports
 -- to use this option you have to create file called client_assertions.txt and make sure after client crash to change IP to otserv one then click "send".
 saveclientdebug = true
 
