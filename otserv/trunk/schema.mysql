@@ -69,6 +69,8 @@ CREATE TABLE `players` (
 	`balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
 	`stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds',
 	`online` TINYINT(1) NOT NULL DEFAULT 0,
+	`rank_id` INT NOT NULL,
+	`guildnick` VARCHAR(255) NOT NULL,
 
 	PRIMARY KEY (`id`),
 	UNIQUE (`name`),

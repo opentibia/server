@@ -64,6 +64,8 @@ CREATE TABLE "players" (
 	"balance" INT NOT NULL DEFAULT 0,
 	"stamina" INT NOT NULL DEFAULT 151200000,
 	"online" SMALLINT NOT NULL DEFAULT 0,
+	"rank_id" INT NOT NULL,
+	"guildnick" VARCHAR(255) NOT NULL,
 	PRIMARY KEY ("id"),
 	UNIQUE ("name"),
 	KEY ("online"),

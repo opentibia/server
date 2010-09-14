@@ -15,18 +15,12 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="%BOOST_INCLUDE_PATH%" />
-					<Add directory="%MYSQL_INCLUDE_PATH%" />
-					<Add directory="%LUA_INCLUDE_PATH%" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-llibmysql" />
 					<Add option="-llua" />
-					<Add option="-lboost_thread-mgw44-mt-1_43" />
-					<Add directory="%BOOST_LIB_PATH%" />
-					<Add directory="%MYSQL_LIB_PATH%" />
-					<Add directory="%LUA_LIB_PATH%" />
+					<Add option="-llibboost_thread-mgw44-mt-1_41" />
 				</Linker>
 			</Target>
 			<Target title="Release Unix">

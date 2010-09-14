@@ -783,6 +783,19 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		}
 	},
+	{23,
+		{// PgSQL
+			NULL
+		},
+		{// MySQL
+			"ALTER TABLE `players` ADD `guildnick` varchar(255) NOT NULL;", // for compatibility with __OLD_GUILD_SYSTEM__
+			"ALTER TABLE `players` ADD `rank_id` INT(11) NOT NULL;",	// for compatibility with __OLD_GUILD_SYSTEM__
+			NULL
+		},
+		{// SQLite
+			NULL
+		}
+	},
 };
 
 #endif
