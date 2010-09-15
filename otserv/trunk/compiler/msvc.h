@@ -47,7 +47,6 @@
 	Disable deprecated CRT functions limitation.
 	For further information visit:
 	http://msdn.microsoft.com/en-us/library/ms235384.aspx
-
 */
 #define _CRT_SECURE_NO_DEPRECATE
 #define _CRT_NON_CONFORMING_SWPRINTFS

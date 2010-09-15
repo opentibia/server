@@ -91,12 +91,6 @@ enum passwordType_t{
 #endif
 
 /*
-    After setting up the compiler we need to
-    solve the differences to make the code portable.
-*/
-#include "compiler/workarounds.h"
-
-/*
     If the compiler supports the upcoming standard,
     call some of the useful headers.
 */
@@ -104,6 +98,8 @@ enum passwordType_t{
 	#include <cstdint>
 	#include <unordered_map>
 	#include <unordered_set>
+#else
+	#include "compiler/workarounds.h"
 #endif
 
 #ifdef _WIN32_WINNT

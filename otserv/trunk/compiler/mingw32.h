@@ -36,4 +36,8 @@
 #define COMPILER_PORT_STRING ("MinGW32 " make_str(__MINGW32_MAJOR_VERSION) "." \
 										 make_str(__MINGW32_MINOR_VERSION))
 
+#ifndef XML_GCC_FREE										 
+	#define XML_GCC_FREE
+#endif
+
 #endif // __OTSERV_MINGW32_H__
