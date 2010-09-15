@@ -25,7 +25,11 @@ AC_SUBST(DEBUG_FLAGS)
 AC_ARG_ENABLE(server-diag, [  --enable-server-diag      enable server diagnostics], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__ENABLE_SERVER_DIAGNOSTIC__"])
 
 # check if we want reloading guild wars in lua without restarting server just to reload guild wars.
-AC_ARG_ENABLE(server-diag, [  --enable-guild-wars-reload     enable reload guild wars], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__GUILDWARSLUARELOAD__"])
+AC_ARG_ENABLE(guild-wars, [  --enable-guild-wars-reload     enable reload guild wars], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__GUILDWARSLUARELOAD__"])
+
+# check if we want old guild system enabled (rank_id and nickname instead of guild_members)
+AC_ARG_ENABLE(oldguild-system, [  --enable-old-guild-system     enable old guild system], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__OLD_GUILD_SYSTEM__"])
+
 
 # check if we want to use otserv.lua instead config.lua
 AC_ARG_ENABLE(otconfig, [  --enable-otconfig      use otserv.lua configuration], [ OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__LUA_NAME_ALTER__"])
