@@ -1934,6 +1934,11 @@ void LuaScriptInterface::registerFunctions()
 
 	//doPlayerToogleGmInvisible(cid)
 	lua_register(m_luaState, "doPlayerToogleGmInvisible", LuaScriptInterface::luaDoPlayerToogleGmInvisible);
+	
+	#ifdef __GUILDWARSLUARELOAD__
+	//doUpdateGuildWar
+	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
+	#endif
 }
 
 int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
@@ -8892,3 +8897,35 @@ int LuaScriptInterface::luaDoPlayerToogleGmInvisible(lua_State *L)
 
 	return 1;
 }
+#ifdef __GUILDWARSLUARELOAD__
+int32_t LuaScriptInterface::luaDoUpdateGuildWar(lua_State* L)
+{
+	//doUpdateGuildWar(warId)
+	uint32_t warId = popNumber(L);
+	bool isSuccess = g_guilds.loadWar(warId);
+
+	GuildWarsMap& guildWarMap = g_guilds.getWars();
+	GuildWarsMap::iterator wit = guildWarMap.find(warId);
+
+	if(wit == guildWarMap.end()){
+		//warId doesnt exist so we didnt succeed.
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	uint32_t guild1 = wit->second.guildId;
+	uint32_t guild2 = wit->second.opponentId;
+
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		if(it->second->isRemoved())
+			continue;
+
+		if(it->second->getGuildId() == guild1 || it->second->getGuildId() == guild2){
+			g_game.updateCreatureEmblem(it->second);
+		}
+	}
+
+	lua_pushboolean(L, isSuccess);
+	return 1;
+}
+#endif

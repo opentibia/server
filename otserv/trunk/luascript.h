@@ -509,7 +509,10 @@ protected:
 
 	static int luaIsGmInvisible(lua_State *L);
 	static int luaDoPlayerToogleGmInvisible(lua_State *L);
-
+	#ifdef __GUILDWARSLUARELOAD__
+	static int luaDoUpdateGuildWar(lua_State* L);
+	#endif
+	
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);
 	static int luaGetWorldLight(lua_State *L);

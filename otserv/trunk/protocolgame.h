@@ -223,6 +223,9 @@ private:
 
 	void sendCreatureSkull(const Creature* creature);
 	void sendCreatureShield(const Creature* creature);
+	#ifdef __GUILDWARSLUARELOAD__
+	void sendCreatureEmblem(const Creature* creature);
+	#endif
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 
 	//tiles

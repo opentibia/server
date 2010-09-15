@@ -62,7 +62,7 @@ void Guilds::loadWars()
 				(war.fragLimit > 0 && (war.guildFrags >= war.fragLimit || war.opponentFrags >= war.fragLimit)))){
 				guildWars[id] = war;
 				endWar(id);
-				status = -1;
+				status = 4;
 			}
 			else if(status == 0 && endDate > std::time(NULL)){
 				if(transferMoney(war.guildId, war.opponentId, (war.guildFee + g_config.getNumber(ConfigManager::GUILD_WAR_FEE)), (war.opponentFee + g_config.getNumber(ConfigManager::GUILD_WAR_FEE))))
@@ -88,7 +88,63 @@ void Guilds::loadWars()
 		db->freeResult(result);
 	}
 }
+#ifdef __GUILDWARSLUARELOAD__
+bool Guilds::loadWar(uint32_t warId)
+{
+	Database* db = Database::instance();
+	DBResult* result;
+	DBQuery query;
 
+	query << "SELECT `id`, `guild_id`, `opponent_id`, `frag_limit`, `end_date`, `status`, \
+		`guild_fee`, `opponent_fee`, `guild_frags`, `opponent_frags` FROM `guild_wars` WHERE `id` = " << warId;
+
+	if((result = db->storeQuery(query.str()))){
+		uint32_t id = result->getDataInt("id");
+		int32_t endDate = result->getDataInt("end_date");
+		int32_t status = result->getDataInt("status");
+
+		GuildWar war;
+		war.guildId = result->getDataInt("guild_id");
+		war.opponentId = result->getDataInt("opponent_id");
+		war.guildFrags = result->getDataInt("guild_frags");
+		war.opponentFrags = result->getDataInt("opponent_frags");
+		war.guildFee = result->getDataInt("guild_fee");
+		war.opponentFee = result->getDataInt("opponent_fee");
+		war.fragLimit = result->getDataInt("frag_limit");
+		war.finished = false;
+
+		if(status == 1 && (endDate <= std::time(NULL) ||
+			(war.fragLimit > 0 && (war.guildFrags >= war.fragLimit || war.opponentFrags >= war.fragLimit)))){
+			guildWars[id] = war;
+			endWar(id);
+			status = 4;
+		}
+		else if(status == 0 && endDate > std::time(NULL)){
+			if(transferMoney(war.guildId, war.opponentId, (war.guildFee + g_config.getNumber(ConfigManager::GUILD_WAR_FEE)), (war.opponentFee + g_config.getNumber(ConfigManager::GUILD_WAR_FEE))))
+				status = 1;
+		}
+
+		//Add guilds to each other's enemy list if war was activated or if it didn't finish yet
+		//Also change war status in database if it has changed
+		if(status == 1){
+			Guild* guild = getGuildById(war.guildId);
+			Guild* opponentGuild = getGuildById(war.opponentId);
+			if(guild && opponentGuild){
+				guildWars[id] = war;
+				guild->addEnemy(opponentGuild->getId(), id);
+				opponentGuild->addEnemy(guild->getId(), id);
+			}
+		}
+
+		//Update status
+		setWarStatus(id, status);		
+		db->freeResult(result);
+		return (status == 1);
+	}
+
+	return false;
+}
+#endif
 void Guilds::endWar(uint32_t warId)
 {
 	GuildWarsMap::iterator it = guildWars.find(warId);

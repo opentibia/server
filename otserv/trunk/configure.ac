@@ -24,6 +24,9 @@ AC_SUBST(DEBUG_FLAGS)
 # check if we want server diagnostics enabled
 AC_ARG_ENABLE(server-diag, [  --enable-server-diag      enable server diagnostics], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__ENABLE_SERVER_DIAGNOSTIC__"])
 
+# check if we want reloading guild wars in lua without restarting server just to reload guild wars.
+AC_ARG_ENABLE(server-diag, [  --enable-guild-wars-reload     enable reload guild wars], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__GUILDWARSLUARELOAD__"])
+
 # check if we want to use otserv.lua instead config.lua
 AC_ARG_ENABLE(otconfig, [  --enable-otconfig      use otserv.lua configuration], [ OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__LUA_NAME_ALTER__"])
 

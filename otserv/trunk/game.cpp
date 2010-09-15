@@ -4408,6 +4408,20 @@ void Game::updateCreatureSkull(Player* player)
 	}
 }
 #endif
+#ifdef __GUILDWARSLUARELOAD__
+void Game::updateCreatureEmblem(Creature* creature)
+{
+	const SpectatorVec& list = getSpectators(creature->getPosition());
+
+	//send to client
+	Player* tmpPlayer = NULL;
+	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it)
+	{
+		if((tmpPlayer = (*it)->getPlayer()))
+			tmpPlayer->sendCreatureEmblem(creature);
+	}
+}
+#endif
 
 void Game::startDecay(Item* item)
 {

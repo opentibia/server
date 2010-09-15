@@ -448,10 +448,11 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 		return false;
 	}
 
-	Tile* tile = g_game.getTile(_pos);
+	/*Tile* tile = g_game.getTile(_pos);
 	if(!tile || tile->isMoveableBlocking()){
 		std::cout << "Warning: [Spawn::addMonster] Position " << _pos << " is not valid. Could not place " << _name << "." << std::endl;
-	}
+	}*/ //we will wait for rme to support deleting incorrect spawns instead of having at start x number of bad monsters on map.(It would be fine if it would be 5 errors
+		//but what if there is about 1000 ?)
 
 	if(_interval < interval){
 		interval = _interval;
