@@ -6,6 +6,11 @@ local MUD_HOLE		=	489
 local SCARAB_COIN_TILE		= 	102
 local duration = 5 * 60000 -- 5 minutes
 
+local function __doTransformHole__(parameters)
+	local thing = getTileItemById(parameters.pos, MUD_HOLE)
+	local newItem = doTransformItem(thing.uid, parameters.oldType)
+end
+
 function onUse(cid, item, frompos, item2, topos)
 	if (isInArray(CLOSED_HOLE, item2.itemid) == TRUE) then
 		if item2.itemid == 8579 then
@@ -17,6 +22,7 @@ function onUse(cid, item, frompos, item2, topos)
 		if (item2.actionid == TUMB_ENTRANCE) then
 			if (math.random(1, 5) == 1) then
 				doTransformItem(item2.uid, MUD_HOLE)
+				addEvent(__doTransformHole__, duration, {oldType = item2.itemid, pos = topos})
 			end
 		elseif (item2.actionid == SCARAB_TILE) then
 			if (math.random(1, 20) == 1) then

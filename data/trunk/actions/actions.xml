@@ -21,7 +21,7 @@
 	<action itemid="10223" script="fishing_rod.lua" allowfaruse="1"/>
 	<action itemid="5865" script="juice_squeezer.lua"/>
 	<action itemid="9930" script="rusty_remover.lua" />
-
+	<action fromitemid="10511" toitemid="10516" script="squeezings.lua"/>
 	<!-- Enchanting -->
 	<action itemid="7759" script="enchant.lua" />
 	<action itemid="7760" script="enchant.lua" />
