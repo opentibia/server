@@ -1333,7 +1333,7 @@ void LuaScriptInterface::registerFunctions()
 	//doCreatureAddHealth(cid, health, <optional: default: 1> filter))
 	lua_register(m_luaState, "doCreatureAddHealth", LuaScriptInterface::luaDoCreatureAddHealth);
 
-	//doPlayerAddMana(cid, mana, <optional: default: 1> filter)
+	//doPlayerAddMana(cid, mana, <optional: default: 1> withoutAnimation)
 	lua_register(m_luaState, "doPlayerAddMana", LuaScriptInterface::luaDoPlayerAddMana);
 
 	//doPlayerAddSoul(cid, soul)
@@ -2970,26 +2970,21 @@ int LuaScriptInterface::luaDoCreatureAddHealth(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 {
-	//doPlayerAddMana(cid, mana, <optional: default: 1> filter)
-	bool filter = true;
+	//doPlayerAddMana(cid, mana, <optional: default: 1> withoutAnimation)
+	//if you choose UtamoEffect and mana < 0 then it will show the animation 
+	bool withoutAnimation = true;
 	if(lua_gettop(L) >= 3)
-		filter = popNumber(L) == LUA_TRUE;
+		withoutAnimation = popNumber(L) == LUA_TRUE;
 
 	int32_t manaChange = (int32_t)popNumber(L);
 	ScriptEnviroment* env = getScriptEnv();
 	if(Player* player = env->getPlayerByUID(popNumber(L))){
-		if(manaChange >= 0){
+		if(manaChange >= 0 || withoutAnimation){
 			player->changeMana(manaChange);
 		}
 		else{
-			if(filter){
-				player->drainMana(NULL, -manaChange);
-			}
-			else{
-				g_game.combatChangeMana(NULL, player, manaChange);
-			}
+			g_game.combatChangeMana(NULL, player, manaChange);
 		}
-
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
