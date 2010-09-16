@@ -114,11 +114,9 @@ function onUse(cid, item, frompos, item2, topos)
 		addEvent(__doTransformHole2__, duration, {oldType = item2.itemid, pos = topos})
 		return TRUE
 	end
-	local newPosition = {x=32566, y=31338, z=10}
-	if(item2.uid == 53118) and (item2.itemid == 6299) then
-		doTeleportThing(cid, newPosition)
-		doSendMagicEffect(newPosition, CONST_ME_TELEPORT)
-		doSendMagicEffect(frompos, CONST_ME_POFF)
+	if(itemEx.itemid == FRAGILE_ICE) then
+		doTransformItem(itemEx.uid, ICE_FISHHOLE)
+		doSendMagicEffect(toPosition, CONST_ME_BLOCKHIT)
 		return TRUE
 	end
 	
