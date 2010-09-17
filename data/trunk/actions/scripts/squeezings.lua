@@ -114,9 +114,9 @@ function onUse(cid, item, frompos, item2, topos)
 		addEvent(__doTransformHole2__, duration, {oldType = item2.itemid, pos = topos})
 		return TRUE
 	end
-	if(itemEx.itemid == FRAGILE_ICE) then
-		doTransformItem(itemEx.uid, ICE_FISHHOLE)
-		doSendMagicEffect(toPosition, CONST_ME_BLOCKHIT)
+	if(item2.itemid == FRAGILE_ICE) then
+		doTransformItem(item2.uid, ICE_FISHHOLE)
+		doSendMagicEffect(topos, CONST_ME_BLOCKHIT)
 		return TRUE
 	end
 	
