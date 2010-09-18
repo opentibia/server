@@ -4,6 +4,7 @@ How do I compile OTServ?
 	selected as database engine. It doesn't require any configuration from you, OTServ is configured for it by default and all what you need is to provide SQLite library for it.
 	
 		Instructions to compile OTServ: http://otfans.net/wiki/index.php/Compiling_OTServ
+		Updated easy instructions to compile OTServ using msvc 2010 http://otfans.net/showthread.php?170169-Compiling-Simple-OTServ-MSVC-2010-Compiling-the-Source
 		
 MySQL Server
 	By default OTServ uses SQLite database which doesn't require any configuration from you. However it is
@@ -21,50 +22,20 @@ MySQL Server
 			6. Find the name "phpmyadmin" and go to it
 			7. You will find some controls, make a database called "otserv"
 			8. Now you will be taken to the database, click the tab "SQL"
-			9. Goto the file named sample.sql, its in the folder this README is in.
+			9. Goto the file named schema.mysql, its in the folder this README is in.
 			10. Copy the text in that file and paste it in that text box on your browser then press ok ;)
-			11. SQL instructions have been executed and a sample account (Account number: 111111, Password: tibia) and player should be made.
+			11.After that please copy this to sql and click execute to create character.
+			
+INSERT INTO `groups` VALUES (5,'Administrator',57172440358904,5,0,100, 100),(4,'Senior Gamemaster',56622701191160,4,0,100, 100),(3,'Gamemaster',56622701191162,3,0,75, 100),(2,'Tutor',16875520,1,0,50, 100),(1,'Player',0,0,1,50, 100);
+INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0);
+INSERT INTO `players` VALUES (2, 'Administrator', 1, 5, 7, 0, 2252770, 53, 8, 11970, 11970, 11820, 11820, 1847, 100, 2, 10, 10, 10, 10, 75, 0, 116, 106, 7, 9980, 1221452439, 102017216, 1, 1, '', 0, 0, 10, 10, 10, 10, 10, 0, 1,10000000 , 1);
+INSERT INTO `players` VALUES (3, 'Player', 1, 1, 1, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 1221452439, 102017216, 1, 1, '', 0, 0, 10, 10, 10, 10, 100, 1, 1,151200000, 1);
+			
 			12. Now go to your folder and open config.lua and make sure the SQL Stuff there is correct such as the mysql user and password ;).
 				Should be all correct for you anyway ;).
 			13. Start the server and login.
 
-		Instructions to compile OTServ with MySQL:
-            1. Download MySQL client libraries libraries from http://dev.mysql.com/ (or just install them from packages in your Linux distro)(libmysqlclient15-dev).
-			2. Compile your OTServ against MySQL:
-				a) On Windows use -D__USE_MYSQL__ -lmysqlclient
-				b) On POSIX(linux like) systems use ./configure --enable-mysql
-
-PostgreSQL Server
-	PostgreSQL is, after MySQL, probably most popular open-source database system. It provides huge possibilities and
-	better performance.
-
-		Instructions to compile OTServ with PostgreSQL driver:
-				a) On Windows use -D__USE_PGSQL__ -lpg
-				b) On POSIX(linux like) systems use ./configure --enable-pgsql
-
-ODBC data sources
-	OTServ contains also ODBC database driver. It allows to connect throught unified ODBC connection mechanism
-	to any ODBC data source. It was first developed under Windows, but there are currently ODBC implementations
-	on various platforms (search for UnixODBC).
-
-	Note: under non-Windows OSes you will need to download UnixODBC. You most likely have it in your Linux
-	ditro repositories as unixodbc and unixodbc-dev packages.
-
-		Instructions to compile OTServ with ODBC driver:
-				a) On Windows use -D__USE_ODBC__ -lodbc
-				b) On POSIX(linux like) systems use ./configure --enable-odbc
-
-SQLite with other drivers
-	By default any alternative driver like MySQL disables SQLite support. However sometimes you might want
-	to compile more then one driver into your server (then you choose which one you want to use in your
-	config.lua file).
-
-		Instructions to compile OTServ with SQLite and other drivers:
-			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
-			2. Compile your OTServ against SQLite:
-				a) On Windows use -D__USE_SQLITE__ -lsqlite3 -D__USE_MYSQL__ -lmysqlclient
-				b) On POSIX systems use ./configure --enable-sqlite
-
+			
 What about old XML files?
 	If you have your old database in XML format and want to switch to SQL database, there is XML2SQL project in our SVN tree.
 
@@ -75,27 +46,14 @@ Different name on configuration file
 		Instructions to compile OTServ to use otserv.lua config file:
 			a) On Windows use -D__LUA_NAME_ALTER__
 			b) On POSIX systems use ./configure --with-otconfig
+			
+		Instructions to compile OTServ with SQLite and other drivers:
+			1. Download SQLite libraries from http://sqlite.org/download.html (or just install them from packages in your Linux distro).
+			2. Compile your OTServ against SQLite:
+				a) On Windows use -D__USE_SQLITE__ -lsqlite3 -D__USE_MYSQL__ -lmysqlclient
+				b) On POSIX systems use ./configure --enable-sqlite or ./configure --enable-mysql
 
-KDE KDevelop compilation
-	A graphical environment to program and compile otserv without any knowledge about the linux shell, it by 
-	default will run the configuration without any flag, with that I mean that will be compiled with XML and 
-	this can be easily changed opening the project and going to:
-		1. Project -> Project Options
-		2. Configure Options -> Configure arguents:
-			By default debuging enabled, and it will say:
-				--enable-debug=full
-				If you don't like or want it, you can delete it.
-		3. After (or replacing) --enable-debug=full you will write:
-			a) for MySQL:
-				--enable-mysql
-			b) for ODBC:
-				--enable-odbc
-		4. Extra
-			4.1 Different Lua configuration file
-				--with-otconfig
-
-If you find any problem using kdevelop file, please go to http://otserv.org/index.php?title=Compiling_with_KDevelop
-
+			
 Problems?
 	The server is stable now-a-days, but if you do find bugs, you can report them at the 
 	OpenTibia Project Tools forum at OTFans (http://otfans.net/project.php?projectid=1). When the

@@ -340,7 +340,7 @@ sql_db   = "db.s3db"
 -- sql_db = "Your Source" -- ODBC
 
 -- Additional connection settings for mysql, pgsql and odbc
-sql_host = "localhost"
+sql_host = "127.0.0.1"
 sql_port = 3306
 --- sql_port = 5432 -- use this for PgSQL
 sql_user = "root"
