@@ -151,14 +151,20 @@ bool Creature::canSee(const Position& pos) const
 
 bool Creature::canBeSeen(const Creature* viewer, bool checkVisibility/*=true*/) const
 {
+	/*NOTE: if viewer is NULL, we consider the default behavior of a general viewer without
+	  any kind of special flag to see invisible creatures or GMs*/
 	if (viewer && checkVisibility)
 		return viewer->canSeeCreature(this);
-	if (viewer && viewer->canSeeInvisibility())
-		return true;
-	if (getPlayer() && getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+	
+	if (getPlayer() &&
+		(getPlayer()->hasFlag(PlayerFlag_CannotBeSeen) ||
+		(getPlayer()->isGmInvisible() &&
+		(!viewer || !viewer->getPlayer() || !viewer->getPlayer()->canSeeGmInvisible(getPlayer()))))){
 		return false;
+	}
+	
 	if (checkVisibility)
-		return !isInvisible();
+		return (viewer && viewer->canSeeInvisibility()) || !isInvisible();
 	return true;
 }
 

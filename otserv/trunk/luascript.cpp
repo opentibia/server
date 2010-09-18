@@ -6496,10 +6496,29 @@ int LuaScriptInterface::luaTargetPositionToVariant(lua_State *L)
 
 int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 {
-	//variantToNumber(var)
-	LuaVariant var = popVariant(L);
-
+	//variantToNumber(var, <optional> vieweruid, <optional> checkVisibility)
+	/*vieweruid is an optional parameter that is used to determine if invisible GMs or players should be considered when trying to convert 
+	from a position to a uid. If viewerUid is ommited, it uses the point of view of a generic player (no special flags). 
+	The checkVisibility parameter is about the ConditionInvisible. */
+	
 	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* viewer = NULL;
+	bool checkVisibility = true;
+	uint16_t parameters = lua_gettop(L);
+	if(parameters >= 3){
+		checkVisibility = (popNumber(L) == LUA_TRUE);
+	}
+	if (parameters >= 2){
+		uint32_t viewerUid = popNumber(L);
+		viewer = env->getCreatureByUID(viewerUid);
+		if(!viewer){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			lua_pushnil(L);
+			return 1;
+		}
+	}
+	LuaVariant var = popVariant(L);
 
 	uint32_t number = 0;
 	switch (var.type) {
@@ -6509,7 +6528,7 @@ int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 		case VARIANT_TARGETPOSITION:
 		case VARIANT_POSITION:
 			if (Tile* tile = g_game.getMap()->getTile(var.pos)) {
-				if (Thing* thing = tile->getTopVisibleThing(NULL)) {
+				if (Thing* thing = tile->getTopVisibleThing(viewer, checkVisibility)) {
 					number = env->addThing(thing);
 				}
 			}
@@ -6530,10 +6549,29 @@ int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 
 int LuaScriptInterface::luaVariantToString(lua_State *L)
 {
-	//variantToString(var)
+	//variantToString(var, <optional> vieweruid, <optional> checkVisibility)
+	/*vieweruid is an optional parameter that is used to determine if invisible GMs or players should be considered when trying to convert 
+	from a position to a uid. If viewerUid is ommited, it uses the point of view of a generic player (no special flags). 
+	The checkVisibility parameter is about the ConditionInvisible. */
 	LuaVariant var = popVariant(L);
 
 	ScriptEnviroment* env = getScriptEnv();
+	
+	Creature* viewer = NULL;
+	bool checkVisibility = true;
+	uint16_t parameters = lua_gettop(L);
+	if(parameters >= 3){
+		checkVisibility = (popNumber(L) == LUA_TRUE);
+	}
+	if (parameters >= 2){
+		uint32_t viewerUid = popNumber(L);
+		viewer = env->getCreatureByUID(viewerUid);
+		if(!viewer){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			lua_pushnil(L);
+			return 1;
+		}
+	}
 
 	std::string text = "";
 
@@ -6548,7 +6586,7 @@ int LuaScriptInterface::luaVariantToString(lua_State *L)
 		case VARIANT_TARGETPOSITION:
 		case VARIANT_POSITION:
 			if (Tile* tile = g_game.getMap()->getTile(var.pos)){
-				if (Thing* thing = tile->getTopVisibleThing(NULL)){
+				if (Thing* thing = tile->getTopVisibleThing(viewer, checkVisibility)){
 					if (thing->getCreature() && thing->getCreature()->getPlayer()){
 						text = thing->getCreature()->getPlayer()->getName();
 					}
@@ -6565,7 +6603,7 @@ int LuaScriptInterface::luaVariantToString(lua_State *L)
 
 int LuaScriptInterface::luaVariantToPosition(lua_State *L)
 {
-	//luaVariantToPosition(var)
+	//variantToPosition(var)
 	LuaVariant var = popVariant(L);
 
 	ScriptEnviroment* env = getScriptEnv();

@@ -156,7 +156,7 @@ public:
 	//[ gm invisible
 	void toogleGmInvisible();
 	bool isGmInvisible() const {return gmInvisible;}
-	bool canSeeGmInvisible(Player* player) const { return (player->getAccessLevel() <= getAccessLevel()); }
+	bool canSeeGmInvisible(const Player* player) const { return (player->getAccessLevel() <= getAccessLevel()); }
 	//]
 
 	void setFlags(uint64_t flags){ groupFlags = flags;}
