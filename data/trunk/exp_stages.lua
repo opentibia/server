@@ -10,6 +10,7 @@ function checkStageChange(cid)
 	
 	if (playerLevel > stages[#stages].maxLevel) then
 		setExperienceRate(cid, stages[#stages].multiplier)
+		return true
 	end
 	
 	for i = 1, #stages do
