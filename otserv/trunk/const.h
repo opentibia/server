@@ -161,9 +161,9 @@ enum SpeakClasses {
 	SPEAK_CHANNEL_Y         = 0x07,	//Yellow message in chat
 	SPEAK_CHANNEL_W         = 0x08, //White message in chat
 	SPEAK_BROADCAST         = 0x09,	//Broadcast a message - #b
-	//SPEAK_                = 0x0A, //?
-	//SPEAK_                = 0x0B, //Red text with name
-	//SPEAK_                = 0x0C, //?
+	SPEAK_CHANNEL_R1        = 0x0A, //Talk red on chat - #c
+	SPEAK_PRIVATE_RED       = 0x0B,	//Red private - @name@ text
+	SPEAK_CHANNEL_O         = 0x0C,	//Talk orange on text
 	SPEAK_MONSTER_SAY       = 0x0D,	//Talk orange
 	SPEAK_MONSTER_YELL      = 0x0E,	//Yell orange
 
@@ -171,10 +171,7 @@ enum SpeakClasses {
 	SPEAK_RVR_CHANNEL       = 0xFF + 1, //Reporting rule violation - Ctrl+R
 	SPEAK_RVR_ANSWER        = 0xFF + 2, //Answering report
 	SPEAK_RVR_CONTINUE	    = 0xFF + 3, //Answering the answer of the report
-	SPEAK_CHANNEL_O         = 0xFF + 4,	//Talk orange on text
-	SPEAK_CHANNEL_R2        = 0xFF + 5,	//Talk red anonymously on chat - #d
-	SPEAK_CHANNEL_R1        = 0xFF + 6,	//Talk red on chat - #c
-	SPEAK_PRIVATE_RED       = 0xFF + 7,	//Red private - @name@ text
+	SPEAK_CHANNEL_R2        = 0xFF + 4,	//Talk red anonymously on chat - #d
 };
 
 enum MessageClasses {
