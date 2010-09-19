@@ -6,6 +6,11 @@ function onLogin(cid)
 
 	--Register the Give_Bag_After_Death event
 	registerCreatureEvent(cid, "Give_Bag_After_Death")
+	
+	--Register the Stage event
+	registerCreatureEvent(cid, "ExpStage")
+	
+	checkStageChange(cid)
 
 	--add a backpack if it is a relogin after a death
 	if getPlayerStorageValue(cid, STORAGE_DEATH_BAG) == 1 then
