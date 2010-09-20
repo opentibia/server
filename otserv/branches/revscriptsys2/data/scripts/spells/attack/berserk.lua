@@ -6,7 +6,7 @@ berserk.damageType 	= COMBAT_PHYSICALDAMAGE
 berserk.level		= 35
 berserk.mana		= 115
 berserk.aggressive 	= true
-berserk.premium		= false--true
+berserk.premium		= true
 berserk.areaEffect 	= MAGIC_EFFECT_BLACK_SPARK
 
 berserk.area 		=
