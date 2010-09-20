@@ -161,6 +161,7 @@ public:
 		MIN_PVP_LEVEL_APPLIES_TO_SUMMONS,
 		#endif
 		HEIGHT_MINIMUM_FOR_IDLE,
+		EXPERIENCE_STAGES,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

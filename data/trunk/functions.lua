@@ -830,18 +830,33 @@ function doBroadcastMessage(message, class)
 	return LUA_NO_ERROR
 end
 
-function getBooleanFromString(input)
+--default is the returned value if the value of input is missing or invalid
+function getBooleanFromString(input, default)
+	if input == nil then
+		return default
+	end
+
 	local tmp = type(input)
-	if(tmp == 'boolean') then
+	if tmp == 'boolean' then
 		return input
 	end
 
-	if(tmp == 'number') then
-		return input > 0
+	if tmp == 'number' then
+		return (input > 0)
 	end
 
-	local str = string.lower(tostring(input))
-	return (str == "yes" or str == "true" or (tonumber(str) ~= nil and tonumber(str) > 0))
+	if tmp == 'string' then
+		local str = string.lower(input)
+		local number = tonumber(str)
+		if (str == "yes" or str == "true" or (number ~= nil and number > 0)) then
+			return true
+		end
+		if (str == "no" or str == "false" or (number ~= nil and number == 0)) then
+			return false
+		end
+	end
+
+	return default
 end
 
 function isNumber(str)

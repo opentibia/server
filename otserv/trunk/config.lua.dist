@@ -169,7 +169,7 @@ max_idle_time_warning = 15*60*1000
 addons_only_for_premium = true
 
 -- Exp Stages configuration is in /data/exp_stages.lua
-experienceStages = false
+experience_stages = false
 
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
