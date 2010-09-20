@@ -3915,9 +3915,9 @@ int LuaScriptInterface::luaGetTileThingByTopOrder(lua_State *L)
 int LuaScriptInterface::luaGetAllCreatures(lua_State *L)
 {
 	//getAllCreatures(pos, <optional> flag)
-	//bits for flags 8 = SHOW INVISIBLE MONSTERS AND GMs, 4 = SHOW NPCs, 2 = SHOW MONSTERS, 1 = SHOW PLAYERS
+	//bits for flags: 8 = SHOW INVISIBLE MONSTERS AND GMs, 4 = SHOW NPCs, 2 = SHOW MONSTERS, 1 = SHOW PLAYERS
 	
-	uint32_t flag = 3; //by default shows visible monsters and players with any kind of invisibility flag
+	uint32_t flag = 3; //by default shows visible monsters and players without any kind of invisibility flag
 	
 	uint32_t parameters = lua_gettop(L);
 	if (parameters >= 2)
