@@ -4,6 +4,9 @@ doPlayerRemOutfit = doPlayerRemoveOutfit
 doPlayerRemOutfitEx = doPlayerRemoveOutfitEx
 getThingfromPos = getThingFromPos
 getPlayerBalance = getPlayerAccountBalance
+broadcastMessage = doBroadcastMessage
+broadcastMessageEx = broadcastMessage
+
 
 function setExperienceRate(cid, value)
 	return doPlayerSetRate(cid, LEVEL_EXPERIENCE, value)
@@ -827,5 +830,20 @@ function doBroadcastMessage(message, class)
 	return LUA_NO_ERROR
 end
 
-broadcastMessage = doBroadcastMessage
-broadcastMessageEx = broadcastMessage
+function getBooleanFromString(input)
+	local tmp = type(input)
+	if(tmp == 'boolean') then
+		return input
+	end
+
+	if(tmp == 'number') then
+		return input > 0
+	end
+
+	local str = string.lower(tostring(input))
+	return (str == "yes" or str == "true" or (tonumber(str) ~= nil and tonumber(str) > 0))
+end
+
+function isNumber(str)
+	return tonumber(str) ~= nil
+end

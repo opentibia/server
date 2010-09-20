@@ -168,6 +168,9 @@ max_idle_time_warning = 15*60*1000
 -- Should just premium players be able to use addons?
 addons_only_for_premium = true
 
+-- Exp Stages configuration is in /data/exp_stages.lua
+experienceStages = false
+
 -- rates (experience, skill, magic level, loot and spawn)
 rate_exp = 1
 rate_exp_pvp = 0
