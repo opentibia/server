@@ -122,7 +122,6 @@ public:
 	float          weight;
 	bool           showCount;
 	WeaponType     weaponType;
-	Weapon*        weaponInstance;
 	AmmunitionType ammoType;
 	ShootEffect    shootType;
 	MagicEffect    magicEffect;
@@ -254,8 +253,6 @@ public:
 	std::map<uint32_t, ItemType*> currencyMap;
 
 protected:
-	void loadWeaponDefaults();
-
 	typedef std::map<int32_t, int32_t> ReverseItemMap;
 	ReverseItemMap reverseItemMap;
 

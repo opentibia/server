@@ -245,6 +245,45 @@ namespace Script {
 		};
 	}
 
+	///////////////////////////////////////////////////////////////////////////////
+	// OnUseWeapon event
+	// Triggered when a player is using weapons
+	namespace OnUseWeapon {
+		enum FilterType {
+			FILTER_ALL, //
+			FILTER_FIST, // no weapon
+			FILTER_WEAPONID // specific weapon
+		};
+
+		struct ScriptInformation {
+			FilterType method;
+			uint16_t weaponid;
+		};
+
+		class Event : public Script::Event {
+		public:
+			Event(Player* player, Creature* attacked, Item* weapon);
+			~Event();
+
+			std::string getName() const {return "OnUseWeapon";}
+
+			// Runs the event
+			bool dispatch(Manager& state, Environment& environment);
+
+			// This checks if the script information matches this events prerequisite
+			bool check_match(const ScriptInformation& info);
+
+			// Lua stack manipulation
+			void push_instance(LuaState& state, Environment& environment);
+			void update_instance(Manager& state, Script::Environment& environment, LuaThread_ptr thread);
+
+		protected:
+			Player *player;
+			Creature *attacked;
+			Item *weapon;
+		};
+	}
+
 	////////////////////////////////////////////////////////////////
 	// OnEquipItem event
 	// Triggered when a player equip an item

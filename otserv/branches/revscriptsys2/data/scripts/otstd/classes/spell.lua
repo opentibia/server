@@ -16,11 +16,11 @@ function Spell:new(name)
 		maybeTarget     = false,
 		needTarget      = false,
 		condition       = nil,
-		
+
 		-- Area spells use this
 		area            = nil,
 		field           = 0,
-		
+
 		-- Damaging spells
 		damageType      = COMBAT_NONE,
 		aggressive      = false,
@@ -30,7 +30,7 @@ function Spell:new(name)
 		failEffect      = MAGIC_EFFECT_POFF,
 		areaEffect      = MAGIC_EFFECT_NONE,
 		shootEffect     = SHOOT_EFFECT_NONE,
-		
+
 		-- Overrideable functions
 		onBeginCast     = nil,
 		onCast          = nil,
@@ -39,17 +39,17 @@ function Spell:new(name)
 		onFinishCast    = nil,
 		-- Very low-level, probably won't override these
 		onSay           = nil,
-		
+
 		-- Instant spells
 		words           = nil,
-		
+
 		-- Weapon spells
 		weapon          = 0,
-		
+
 		-- Rune spells
 		rune            = 0,
 		range           = nil,
-		
+
 		-- Conjure spells
 		reagent         = 0,
 		product         = {id = 0, count = 0, charges = 0}
@@ -79,7 +79,7 @@ function otstd.canCastSpellOnTile(spell, caster, tile)
 
 		if caster:ignoreProtectionZone() then
 			return true, RET_NOERROR
-		end	
+		end
 	end
 
 	if spell.aggressive and tile:isPz() then
@@ -94,7 +94,7 @@ function otstd.canCastSpellOnCreature(spell, caster, target)
 		if target:getID() == caster:getID() then
 			return false, RET_YOUMAYNOTATTACKTHISPERSON
 		end
-		
+
 		caster = (typeof(caster, "Player") and caster) or caster:getMaster()
 		if typeof(caster, "Player") then
 			if typeof(target, "Player") then
@@ -108,7 +108,7 @@ function otstd.canCastSpellOnCreature(spell, caster, target)
 				elseif not caster:ignoreProtectionZone() and target:getParentTile():isPz() then
 					return false, RET_ACTIONNOTPERMITTEDINANONPVPZONE
 				end
-				
+
 				if caster:getSkull() == SKULL_BLACK then
 					if target:getSkull() == SKULL_NONE and not target:hasAttacked(caster) then
 						return false, RET_YOUMAYNOTATTACKTHISPERSON
@@ -117,7 +117,7 @@ function otstd.canCastSpellOnCreature(spell, caster, target)
 
 				if getWorldType() == WORLD_TYPE_NOPVP and not otstd.isInPvpZone(caster, target) then
 					return false, RET_YOUMAYNOTATTACKTHISPERSON
-				end				
+				end
 			elseif typeof(target, "Actor") then
 				if target:isPlayerSummon() then
 					if getWorldType() == WORLD_TYPE_NOPVP and not otstd.isInPvpZone(caster, target) then
@@ -131,7 +131,7 @@ function otstd.canCastSpellOnCreature(spell, caster, target)
 			end
 		end
 	end
-	
+
 	return true, RET_NOERROR
 end
 
@@ -143,7 +143,7 @@ function otstd.isInPvpZone(caster, creature)
 	if creature:getZone() ~= ZONE_PVP then
 		return false
 	end
-	
+
 	return true
 end
 
@@ -170,11 +170,11 @@ end
 function otstd.onSpell(event)
 	local caster = event.caster
 	local spell = event.spell
-	
+
 	if otstd.onSpellCheck(event) then
 		-- Check extra conditions
 		if (not spell.internalBeginCast or spell.internalBeginCast(event)) and (not spell.onBeginCast or spell.onBeginCast(event)) then
-		
+
 			-- Cast the spell!
 			if spell.onCast then
 				-- Normal (low-level) cast function has been overridden
@@ -185,8 +185,7 @@ function otstd.onSpell(event)
 			return true
 		end
 	end
-	
-	event:skip()
+
 	if caster and spell.failEffect ~= MAGIC_EFFECT_NONE then
 		sendMagicEffect(caster:getPosition(), spell.failEffect)
 	end
@@ -197,7 +196,7 @@ function otstd.onSpellCheck(event)
 	local caster = event.caster
 	local spell = event.spell
 	local tile = map:getTile(caster:getPosition())
-	
+
 	if typeof(caster, "Player") then
 		if caster:canUseSpells() == false then
 			caster:sendCancel("You cannot cast spells.")
@@ -219,10 +218,12 @@ function otstd.onSpellCheck(event)
 			caster:sendCancel(RET_NOTENOUGHSOUL)
 		elseif caster:hasLearnedSpell(spell.name) == false then
 			caster:sendCancel(RET_YOUNEEDTOLEARNTHISSPELL)
-		elseif spell.weapon ~= 0 and caster:isEquipped(spell.weapon) then
+		elseif spell.weapon ~= 0 and not caster:isEquipped(spell.weapon) then
 			caster:sendCancel(RET_YOUNEEDAWEAPONTOUSETHISSPELL)
-		elseif spell.premium and caster:isPremium() then
+		elseif spell.premium and not caster:isPremium() then
 			caster:sendCancel(RET_YOUNEEDPREMIUMACCOUNT)
+		elseif not checkVocation(caster:getVocationName(), spell.vocation) then
+			caster:sendCancel(RET_YOURVOCATIONCANNOTUSETHISSPELL)
 		else
 			return true
 		end
@@ -240,21 +241,21 @@ function otstd.onCastSpell(event)
 	local target = event.targetCreature
 	local targetPos = event.targetPosition or (target and target:getPosition())
 	local spell = event.spell
-	
+
 	if typeof(caster, "Player") then
 		-- All spell checks have been done, remove mana etc.
 		if not caster:hasInfiniteMana() then
 			caster:spendMana(spell.mana)
 		end
-		
+
 		if not caster:hasInfiniteSoul() then
 			caster:removeSoul(spell.soul)
 		end
-		
+
 		if not caster:isInvulnerable() then
 			caster:removeHealth(spell.health)
 		end
-		
+
 		if not caster:canGetExhausted() then
 			if spell.aggressive then
 				caster:addCombatExhaustion(config["fight_exhausted"])
@@ -262,28 +263,28 @@ function otstd.onCastSpell(event)
 				caster:addHealExhaustion(config["heal_exhausted"])
 			end
 		end
-		
+
 		if spell.aggressive and not caster:cannotGainInFight() then
 			caster:addInFight(config["in_fight_duration"])
 		end
 	end
-	
+
 	-- default spell handling
 	local centerPos = (target and target:getPosition()) or targetPos or casterPos
 	local hitTiles = {}
-	
+
 	if target and (spell.maybeTarget or spell.needTarget) then
 		local targetTile = map:getTile(targetPos)
 		hitTiles[targetPos] = {[1] = target}
 	else
 		hitTiles = spell:getAffectedArea(centerPos, caster)
 	end
-	
+
 	-- We got a list of all tiles, loop through and apply spell effect
 	for pos, creatures in pairs(hitTiles) do
 		local targetTile = map:getTile(pos)
 		local canCast = not targetTile or otstd.canCastSpellOnTile(spell, caster, targetTile)
-		
+
 		if targetTile and canCast then
 			for _, target in ipairs(creatures) do
 				if otstd.canCastSpellOnCreature(spell, caster, target) then
@@ -295,20 +296,22 @@ function otstd.onCastSpell(event)
 								amount = -amount
 							end
 						end
-						if amount == 0 or internalCastSpell(spell.damageType, caster, target, amount, spell.blockedByShield, spell.blockedByArmor) then
-							if spell.condition then
-								target:addCondition(spell.condition)
-							end
+						if caster ~= target then
+							if amount == 0 or internalCastSpell(spell.damageType, caster, target, amount, spell.blockedByShield, spell.blockedByArmor) then
+								if spell.condition then
+									target:addCondition(spell.condition)
+								end
 
-							if spell.onHitCreature then
-								spell.onHitCreature(target, event)
+								if spell.onHitCreature then
+									spell.onHitCreature(target, event)
+								end
 							end
 						end
 					else
 						if spell.condition then
 							target:addCondition(spell.condition)
 						end
-						
+
 						if spell.onHitCreature then
 							spell.onHitCreature(target, event)
 						end
@@ -317,9 +320,31 @@ function otstd.onCastSpell(event)
 					if spell.aggressive and typeof(target, "Player") then
 						target:addInFight(config["in_fight_duration"])
 					end
+				else
+					-- If we can't attack the creature, just send the magic effect and finish cast
+					local magicEffect = MAGIC_EFFECT_NONE
+					if spell.damageType == COMBAT_ENERGYDAMAGE then
+						magicEffect = MAGIC_EFFECT_ENERGY_HIT
+					elseif spell.damageType == COMBAT_EARTHDAMAGE then
+						magicEffect = MAGIC_EFFECT_GREEN_RING
+					elseif spell.damageType == COMBAT_DROWNDAMAGE then
+						magicEffect = MAGIC_EFFECT_BLUE_RING
+					elseif spell.damageType == COMBAT_FIREDAMAGE then
+						magicEffect = MAGIC_EFFECT_FIRE_HIT
+					elseif spell.damageType == COMBAT_ICEDAMAGE then
+						magicEffect = MAGIC_EFFECT_ICE_HIT
+					elseif spell.damageType == COMBAT_HOLYDAMAGE then
+						magicEffect = MAGIC_EFFECT_HOLY_HIT
+					elseif spell.damageType == COMBAT_DEATHDAMAGE then
+						magicEffect = MAGIC_EFFECT_SMALLCLOUDS
+					elseif spell.damageType == COMBAT_LIFEDRAIN then
+						magicEffect = MAGIC_EFFECT_RED_SHIMMER
+					end
+
+					sendMagicEffect(caster:getPosition(), magicEffect)
 				end
 			end
-				
+
 			-- Spawn a simple field for field spells
 			if spell.field and spell.field ~= 0 then
 				if not targetTile:isBlocking() then
@@ -329,19 +354,19 @@ function otstd.onCastSpell(event)
 					event.field = field
 				end
 			end
-			
+
 			-- Call the tile hit callback
 			if spell.onHitTile then
 				spell.onHitTile(targetTile, event)
 			end
 		end
-		
+
 		-- Area effects should be displayed even if the tile did not exist, but not if it's PZ (and the spell is aggressive)
 		if canCast and spell.areaEffect ~= MAGIC_EFFECT_NONE then
 			sendMagicEffect(pos, spell.areaEffect)
 		end
 	end
-	
+
 	if caster and spell.effect ~= MAGIC_EFFECT_NONE then
 		sendMagicEffect(caster:getPosition(), spell.effect)
 	end
@@ -349,14 +374,30 @@ function otstd.onCastSpell(event)
 		--caster:sendNote("Shoot from " .. table.serialize(caster:getPosition()) .. " to " .. table.serialize(centerPos) .. ".")
 		sendDistanceEffect(caster:getPosition(), centerPos, spell.shootEffect)
 	end
-	
+
 	-- finish cast
 	if spell.onFinishCast then
 		return spell.onFinishCast(event)
 	end
-	
+
 	if spell.internalFinishCast then
 		return spell.internalFinishCast(event)
+	end
+end
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Instant spells default handler begin/finish handlers
+
+function otstd.onFinishCastInstantSpell(event)
+	local caster = event.caster
+	local text = event.text
+
+	if typeof(caster, "Player") then
+		if config["orange_spell_text"] then
+			caster:say(text, SPEAK_MONSTER_SAY)
+		else
+			caster:say(text, SPEAK_SAY)
+		end
 	end
 end
 
@@ -370,7 +411,7 @@ function otstd.onBeginCastRuneSpell(event)
 	local toPos = event.targetPosition
 	local tile = map:getTile(toPos)
 	local spell = event.spell
-	
+
 	if typeof(caster, "Player") then
 		if tile then
 			local playerPos = caster:getPosition()
@@ -385,7 +426,7 @@ function otstd.onBeginCastRuneSpell(event)
 					caster:sendCancel(RET_CANNOTTHROW)
 					return false
 				end
-				
+
 				if spell.needTarget and not event.targetCreature then
 					caster:sendCancel(RET_CANONLYUSETHISRUNEONCREATURES)
 					return false
@@ -397,7 +438,7 @@ function otstd.onBeginCastRuneSpell(event)
 						return false
 					end
 				end
-				
+
 				local result, retval = otstd.canCastSpellOnTile(spell, caster, tile)
 				if not result then
 					caster:sendCancel(retval)
@@ -436,8 +477,26 @@ function otstd.onBeginCastRuneSpell(event)
 			end
 		end
 	end
-	
+
 	return true
+end
+
+function otstd.onFinishCastRuneSpell(event)
+	local caster = event.caster
+	local rune = event.item
+
+	if typeof(caster, "Player") and
+		typeof(rune, "Item") then
+
+		if config["remove_rune_charges"] then
+			local newcount = rune:getCount() - 1
+			if newcount <= 0 then
+				rune:destroy()
+			else
+				rune:setCount(newcount)
+			end
+		end
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -447,7 +506,7 @@ end
 function otstd.onBeginCastConjureSpell(event)
 	local caster = event.caster
 	local spell = event.spell
-	
+
 	if spell.reagent and spell.reagent ~= 0 then -- Reagents! => Rune spell
 		local reagents = {}
 		for _, item in ipairs(caster:getHandContents()) do
@@ -479,7 +538,7 @@ end
 function otstd.onCastConjureSpell(event)
 	local caster = event.caster
 	local spell = event.spell
-	
+
 	if event.reagents then -- Reagents! => Rune spell
 		for _, item in ipairs(event.reagents) do
 			item:setItemID(spell.product.id, spell.product.count)
@@ -517,7 +576,7 @@ function formulaLevelMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelt
 	else
 		-- Both 5th and 6th are set
 	end
-	
+
 	return function(player)
 		return math.random(
 				math.max(minFloor, minAbsolute + (player:getLevel() / 5 + player:getMagicLevel() * minDelta)),
@@ -539,7 +598,7 @@ function formulaOldLevelMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxD
 	else
 		-- Both 5th and 6th are set
 	end
-	
+
 	return function(player)
 		return math.random(
 				math.max(minFloor, minAbsolute + (player:getLevel() / 3 + player:getMagicLevel() * 2) * minDelta),
@@ -561,7 +620,7 @@ function formulaLevel(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelta, ma
 	else
 		-- Both 5th and 6th are set
 	end
-	
+
 	return function(player)
 		return math.random(
 				math.max(minFloor, minAbsolute + player:getLevel() * minDelta),
@@ -583,7 +642,7 @@ function formulaMagic(minAbsolute, minDelta, minFloor, maxAbsolute, maxDelta, ma
 	else
 		-- Both 5th and 6th are set
 	end
-	
+
 	return function(player)
 		return math.random(
 				math.max(minFloor, minAbsolute + player:getMagicLevel() * minDelta),
@@ -597,8 +656,8 @@ function formulaStatic(minFloor, maxFloor)
 		maxFloor = minFloor
 		minFloor = v
 	end
-	
-	return function(player) return math.random(minFloor, maxFloor) end	
+
+	return function(player) return math.random(minFloor, maxFloor) end
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -609,13 +668,13 @@ end
 -- If there is no caster, the target tile can be any tile
 function Spell:cast(caster, target)
 	local spellThread = nil
-	
+
 	-- Construct a virtual event
 	local event = {}
-	
+
 	if self.words then
 		-- Instant spell
-		
+
 		event.class = SPEAK_SAY
 		if type(target) == "string" then
 			event.text = target
@@ -634,11 +693,11 @@ function Spell:cast(caster, target)
 				event.targetPosition = target
 			end
 		end
-		
+
 		event.spell = self
 		event.caster = caster
 		event.creature = caster
-		
+
 		if self.onSay then
 			spellThread = coroutine.create(self.onSay)
 		else
@@ -648,7 +707,7 @@ function Spell:cast(caster, target)
 		-- Rune spell
 		return false
 	end
-	
+
 	-- Invoke the coroutine
 	while true do
 		state, ret = coroutine.resume(spellThread, event)
@@ -656,7 +715,7 @@ function Spell:cast(caster, target)
 			error(ret)
 			break
 		end
-		
+
 		if ret == "WAIT" then
 			-- Pass waits on
 			wait(param)
@@ -674,14 +733,14 @@ function Spell:getAffectedArea(centerPos, caster)
 		-- Collect the positions that the spell hit on
 		local areaWidth = #self.area[1]
 		local areaHeight = table.getn(self.area)
-		
+
 		local centerX = (areaWidth - 1) / 2
 		local centerY = (areaHeight - 1) / 2
 
 		local dir = nil
 		if typeof(caster, "Creature") then
 			local casterPos = caster:getPosition()
-			
+
 			local dx = centerPos.x - casterPos.x
 			local dy = centerPos.y - casterPos.y
 			-- Decide the direction (should be moved to another function?)
@@ -708,8 +767,8 @@ function Spell:getAffectedArea(centerPos, caster)
 			end
 		else
 			dir = caster
-		end		
-		
+		end
+
 		-- Go through the area array, and assemble all tiles that match the direction
 		for rowIndex, rows in pairs(self.area) do
 			for colIndex, value in ipairs(rows) do
@@ -725,9 +784,9 @@ function Spell:getAffectedArea(centerPos, caster)
 						then
 					local posx = centerPos.x + (centerX - (areaWidth - 1)) + colIndex - 1
 					local posy = centerPos.y + (centerY - (areaHeight - 1)) + rowIndex - 1
-					
+
 					local pos = {x = posx, y = posy, z = centerPos.z}
-					
+
 					if map:rayCast(centerPos, pos, true) then
 						local tile = map:getTile(pos)
 						hitTiles[pos] = tile and tile:getCreatures()
@@ -739,25 +798,27 @@ function Spell:getAffectedArea(centerPos, caster)
 		local tile = map(centerPos)
 		hitTiles[centerPos] = tile and tile:getCreatures()
 	end
-	
+
 	return hitTiles
 end
 
 -- Register / Unregister the spell
 function Spell:register()
 	self:unregister()
-	
+
 	if otstd.spells[self.name] then
-		error("Duplicate spell \"" .. name .. "\"")
+		error("Duplicate spell \"" .. self.name .. "\"")
 	end
-	
+
 	if self.words then
 		assert(self.words:len() > 0, "Words for spells must be atleast one letter.")
 		-- Instant spell
 		if table.findf(otstd.spells, function(s) return s.words == self.words end) ~= nil then
 			error("Duplicate spell \"" .. self.words .. "\": two instant spells can't have the same words.")
 		end
-		
+
+		self.internalFinishCast = otstd.onFinishCastInstantSpell
+
 		--  Figure out spell type
 		if self.product.id ~= 0 then
 			-- Conjuration spell
@@ -769,44 +830,52 @@ function Spell:register()
 			else
 				self.product.count = 1
 			end
-			
+
 			self.internalBeginCast  = otstd.onBeginCastConjureSpell
 			self.internalFinishCast = otstd.onCastConjureSpell
 		else
 			-- Other instant spell (attack)
 		end
-		
+
 		-- Lamba callback to include what spell is being cast
 		local function spellSayHandler(event)
 			event:propagate()
-			
-			local param = string.strip_whitespace(string.sub(event.text, self.words:len()+1) or "")
-			event.spell = self
-			event.caster = event.creature
-			if self.needTarget then
-				event.targetCreature = getPlayerByName(param)
-			elseif self.maybeTarget then
-				event.targetCreature = event.creature:getTarget()
-			end
-			
-			if self.onSay then
-				self:onSay(event)
-			else
-				otstd.onSpell(event)
+
+			local text = string.explode(event.text, "\"")
+			local words = string.strip_whitespace(text[1] or "")
+			local param = string.strip_whitespace(text[2] or "")
+			if self.words:lower() == words:lower() then
+				-- this is the right one
+				event:skip()
+
+				event.spell = self
+				event.caster = event.creature
+				if self.needTarget then
+					event.targetCreature = getPlayerByName(param)
+				elseif self.maybeTarget then
+					event.targetCreature = event.creature:getTarget()
+				end
+
+				if self.onSay then
+					self:onSay(event)
+				else
+					otstd.onSpell(event)
+				end
 			end
 		end
-		
+
 		-- Register the onSay event
 		self.onSayHandler = registerOnSay("beginning", false, self.words, spellSayHandler)
-		
+
 	elseif self.rune ~= 0 and self.rune then
-	
+
 		if table.findf(otstd.spells, function(s) return s.rune == self.rune end) ~= nil then
 			error("Duplicate spell \"" .. self.words .. "\": two rune spells can't use the same ID.")
 		end
 
 		self.internalBeginCast  = otstd.onBeginCastRuneSpell
-		
+		self.internalFinishCast = otstd.onFinishCastRuneSpell
+
 		-- Lamba callback to include what spell is being used
 		local function spellUseRuneHandler(event)
 			event:skip()
@@ -817,8 +886,8 @@ function Spell:register()
 				local tile = map:getTile(event.targetPosition)
 				event.targetCreature = tile and tile:getTopCreature(event.player)
 			end
-			
-			event.caster:sendNote("Casting rune spell " .. self.name)			
+
+			event.caster:sendNote("Casting rune spell " .. self.name)
 			otstd.onSpell(event)
 		end
 
@@ -826,7 +895,7 @@ function Spell:register()
 	else
 		error("Unknown spell type, spell must be either instant (words) or rune type")
 	end
-	
+
 	otstd.spells[self.name] = self
 end
 
@@ -840,7 +909,7 @@ function Spell:unregister()
 		stopListener(self.onUseRuneHandler)
 		self.onUseRuneHandler = nil
 	end
-	
+
 	otstd.spells[self.name] = nil
 end
 

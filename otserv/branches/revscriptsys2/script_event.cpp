@@ -408,6 +408,64 @@ void OnUseItem::Event::update_instance(Manager& state, Environment& environment,
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// OnUseWeapon Event
+///////////////////////////////////////////////////////////////////////////////
+// Triggered when a player is using weapons
+
+OnUseWeapon::Event::Event(Player *player, Creature *attacked, Item *weapon) :
+	player(player),
+	attacked(attacked),
+	weapon(weapon)
+{
+	//propagate_by_default = false;
+}
+
+OnUseWeapon::Event::~Event()
+{
+}
+
+bool OnUseWeapon::Event::check_match(const ScriptInformation& info)
+{
+	switch(info.method)
+	{
+		case FILTER_ALL:
+			return true;
+		case FILTER_FIST:
+			return !weapon;
+		case FILTER_WEAPONID:
+			return weapon && weapon->getID() == info.weaponid;
+		default: break;
+	}
+	return false;
+}
+
+bool OnUseWeapon::Event::dispatch(Manager& state, Environment& environment)
+{
+	return dispatchEvent<OnUseWeapon::Event>
+			(this, state, environment, environment.Generic.OnUseWeapon);
+}
+
+void OnUseWeapon::Event::push_instance(LuaState& state, Environment& environment)
+{
+	state.pushClassTableInstance("OnUseWeaponEvent");
+	state.pushThing(player);
+	state.setField(-2, "player");
+	state.pushThing(attacked);
+	state.setField(-2, "attacked");
+	if(weapon){
+		state.pushThing(weapon);
+	}
+	else{
+		state.pushNil();
+	}
+	state.setField(-2, "weapon");
+}
+
+void OnUseWeapon::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
+{
+	//
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnEquipItem Event
@@ -1767,7 +1825,6 @@ void OnTradeEnd::Event::update_instance(Manager& state, Environment& environment
 {
 	;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnConditionEffect Event

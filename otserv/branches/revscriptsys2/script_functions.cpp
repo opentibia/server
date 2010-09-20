@@ -124,6 +124,7 @@ void Manager::registerClasses() {
 	registerClass("Event");
 	registerClass("OnSayEvent", "Event");
 	registerClass("OnUseItemEvent", "Event");
+	registerClass("OnUseWeaponEvent", "Event");
 	registerClass("OnJoinChannelEvent", "Event");
 	registerClass("OnLeaveChannelEvent", "Event");
 	registerClass("OnLoginEvent", "Event");
@@ -245,6 +246,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getBaseSpeed()", &Manager::lua_Creature_getBaseSpeed);
 	registerMemberFunction("Creature", "isPushable()", &Manager::lua_Creature_isPushable);
 	registerMemberFunction("Creature", "getTarget()", &Manager::lua_Creature_getTarget);
+	registerMemberFunction("Creature", "getMasterPos()", &Manager::lua_Creature_getMasterPos);
 	registerMemberFunction("Creature", "isImmuneToCombat(CombatType combattype)", &Manager::lua_Creature_isImmuneToCombat);
 	registerMemberFunction("Creature", "isImmuneToMechanic(MechanicType conditiontype)", &Manager::lua_Creature_isImmuneToMechanic);
 	registerMemberFunction("Creature", "getMechanicImmunities()", &Manager::lua_Creature_getMechanicImmunities);
@@ -258,10 +260,14 @@ void Manager::registerClasses() {
 	registerGlobalFunction("getCreaturesByName(string name)", &Manager::lua_getCreaturesByName);
 
 	// Actor
-	registerMemberFunction("Actor", "setShouldReload(boolean shouldreload)", &Manager::lua_Actor_setShouldReload);
+	registerMemberFunction("Actor", "setShouldReload(boolean shouldReload)", &Manager::lua_Actor_setShouldReload);
 	registerMemberFunction("Actor", "getShouldReload()", &Manager::lua_Actor_getShouldReload);
-	registerMemberFunction("Actor", "setAlwaysThink(boolean shouldreload)", &Manager::lua_Actor_setAlwaysThink);
+	registerMemberFunction("Actor", "setAlwaysThink(boolean alwaysThink)", &Manager::lua_Actor_setAlwaysThink);
 	registerMemberFunction("Actor", "getAlwaysThink()", &Manager::lua_Actor_getAlwaysThink);
+	registerMemberFunction("Actor", "setOnlyThink(boolean onlyThink)", &Manager::lua_Actor_setOnlyThink);
+	registerMemberFunction("Actor", "getOnlyThink()", &Manager::lua_Actor_getOnlyThink);
+	registerMemberFunction("Actor", "setCanTarget(boolean canTarget)", &Manager::lua_Actor_setCanTarget);
+	registerMemberFunction("Actor", "getCanTarget()", &Manager::lua_Actor_getCanTarget);
 
 	registerMemberFunction("Actor", "setArmor(int newarmor)", &Manager::lua_Actor_setArmor);
 	registerMemberFunction("Actor", "setDefense(int newdefense)", &Manager::lua_Actor_setDefense);
@@ -316,6 +322,9 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getMagicLevel()", &Manager::lua_Player_getMagicLevel);
 	registerMemberFunction("Player", "getSkill(SkillType skill)", &Manager::lua_Player_getSkill);
 	registerMemberFunction("Player", "advanceSkill(SkillType skill, int count)", &Manager::lua_Player_advanceSkill);
+	registerMemberFunction("Player", "getAttackFactor()", &Manager::lua_Player_getAttackFactor);
+	registerMemberFunction("Player", "getAddAttackSkill()", &Manager::lua_Player_getAddAttackSkill);
+	registerMemberFunction("Player", "getLastAttackBlockType()", &Manager::lua_Player_getLastAttackBlockType);
 	registerMemberFunction("Player", "isPremium()", &Manager::lua_Player_isPremium);
 	registerMemberFunction("Player", "isAutoWalking()", &Manager::lua_Player_isAutoWalking);
 	registerMemberFunction("Player", "getManaMax()", &Manager::lua_Player_getManaMax);
@@ -329,6 +338,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getAccess()", &Manager::lua_Player_getAccess);
 	registerMemberFunction("Player", "getVocationID()", &Manager::lua_Player_getVocationID);
 	registerMemberFunction("Player", "getVocationName()", &Manager::lua_Player_getVocationName);
+	registerMemberFunction("Player", "getVocationDescription()", &Manager::lua_Player_getVocationDescription);
 	registerMemberFunction("Player", "getTownID()", &Manager::lua_Player_getTownID);
 	registerMemberFunction("Player", "getGUID()", &Manager::lua_Player_getGUID);
 	registerMemberFunction("Player", "getAccessGroup()", &Manager::lua_Player_getGroup);
@@ -374,6 +384,8 @@ void Manager::registerClasses() {
 	registerMemberFunction("Item", "getWeight()", &Manager::lua_Item_getWeight);
 	registerMemberFunction("Item", "isPickupable()", &Manager::lua_Item_isPickupable);
 	registerMemberFunction("Item", "getSubtype()", &Manager::lua_Item_getSubtype);
+	registerMemberFunction("Item", "getWeaponType()", &Manager::lua_Item_getWeaponType);
+	registerMemberFunction("Item", "getAmmoType()", &Manager::lua_Item_getAmmoType);
 
 	registerMemberFunction("Item", "setItemID(int newid [, int newtype])", &Manager::lua_Item_setItemID);
 	registerMemberFunction("Item", "setCount(int newcount)", &Manager::lua_Item_setCount);
@@ -481,6 +493,9 @@ void Manager::registerFunctions() {
 	// OnUse
 	registerGlobalFunction("registerOnUseItem(string method, int filter, function callback)", &Manager::lua_registerGenericEvent_OnUseItem);
 
+	// OnUseWeapon
+	registerGlobalFunction("registerOnUseWeapon([int weaponid = nil], string method, function callback)", &Manager::lua_registerGenericEvent_OnUseWeapon);
+
 	// OnMove
 	registerGlobalFunction("registerOnCreatureMove(Creature who, function callback)", &Manager::lua_registerSpecificEvent_CreatureMove);
 	registerGlobalFunction("registerOnCreatureMoveIn(Creature who, string method, int itemid, function callback)", &Manager::lua_registerSpecificEvent_CreatureMoveIn);
@@ -573,8 +588,8 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("registerOnCreatureDeath(Creature creature [, string what = nil], string method, function callback)", &Manager::lua_registerSpecificEvent_OnDeath);
 
 	// OnActorLoadSpell/OnActorCastSpell
-	registerGlobalFunction("registerOnActorLoadSpell(function callback)", &Manager::lua_registerGenericEvent_onActorLoadSpell);
-	registerGlobalFunction("registerOnActorCastSpell(function callback)", &Manager::lua_registerGenericEvent_onActorCastSpell);
+	registerGlobalFunction("registerOnActorLoadSpell(function callback)", &Manager::lua_registerGenericEvent_OnActorLoadSpell);
+	registerGlobalFunction("registerOnActorCastSpell(function callback)", &Manager::lua_registerGenericEvent_OnActorCastSpell);
 	registerGlobalFunction("configureActorSpells()", &Manager::lua_configureActorSpells);
 
 	registerGlobalFunction("stopListener(string listener_id)", &Manager::lua_stopListener);
@@ -879,6 +894,48 @@ int LuaState::lua_registerGenericEvent_OnUseItem() {
 		default: break; // impossible, crash
 	}
 	list->push_back(listener);
+
+	// Register event
+	setRegistryItem(listener->getLuaTag());
+
+	// Return listener
+	pushString(listener->getLuaTag());
+	return 1;
+}
+
+int LuaState::lua_registerGenericEvent_OnUseWeapon()
+{
+	// Store callback
+	insert(-3);
+
+	std::string method = popString();
+	uint16_t weaponid = 0;
+	if(isNil(-1)){
+		pop();
+	}
+	else{
+		weaponid = (uint16_t)popInteger();
+	}
+
+	OnUseWeapon::ScriptInformation si_onuseweapon;
+	if(method == "all"){
+		si_onuseweapon.method = OnUseWeapon::FILTER_ALL;
+	}
+	else if(method == "fist"){
+		si_onuseweapon.method = OnUseWeapon::FILTER_FIST;
+	}
+	else if(method =="weaponid"){
+		si_onuseweapon.method = OnUseWeapon::FILTER_WEAPONID;
+		si_onuseweapon.weaponid = weaponid;
+	}
+	else{
+		throw Error("Invalid argument (2) 'method'");
+	}
+
+	boost::any p(si_onuseweapon);
+	Listener_ptr listener(new Listener(ON_USE_WEAPON_LISTENER, p, *manager));
+
+	environment->Generic.OnUseWeapon.push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -2656,7 +2713,7 @@ int LuaState::lua_registerSpecificEvent_OnDeath() {
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_onActorLoadSpell() {
+int LuaState::lua_registerGenericEvent_OnActorLoadSpell() {
 	Listener_ptr listener(new Listener(ON_ACTOR_LOAD_SPELL_LISTENER, boost::any(), *manager));
 
 	environment->Generic.OnActorLoadSpell.push_back(listener);
@@ -2669,7 +2726,7 @@ int LuaState::lua_registerGenericEvent_onActorLoadSpell() {
 	return 1;
 }
 
-int LuaState::lua_registerGenericEvent_onActorCastSpell() {
+int LuaState::lua_registerGenericEvent_OnActorCastSpell() {
 	Listener_ptr listener(new Listener(ON_ACTOR_CAST_SPELL_LISTENER, boost::any(), *manager));
 
 	environment->Generic.OnActorCastSpell.push_back(listener);
@@ -3500,6 +3557,13 @@ int LuaState::lua_Creature_getTarget()
 	return 1;
 }
 
+int LuaState::lua_Creature_getMasterPos()
+{
+	Creature* creature = popCreature();
+	pushPosition(creature->getMasterPos());
+	return 1;
+}
+
 int LuaState::lua_Creature_isImmuneToMechanic()
 {
 	Creature* creature = popCreature();
@@ -3752,6 +3816,34 @@ int LuaState::lua_Actor_setAlwaysThink()
 int LuaState::lua_Actor_getAlwaysThink()
 {
 	pushBoolean(popActor()->alwaysThink());
+	return 1;
+}
+
+int LuaState::lua_Actor_setOnlyThink()
+{
+	bool b = popBoolean();
+	popActor()->onlyThink(b);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_getOnlyThink()
+{
+	pushBoolean(popActor()->onlyThink());
+	return 1;
+}
+
+int LuaState::lua_Actor_setCanTarget()
+{
+	bool b = popBoolean();
+	popActor()->canTarget(b);
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_Actor_getCanTarget()
+{
+	pushBoolean(popActor()->canTarget());
 	return 1;
 }
 
@@ -4156,6 +4248,27 @@ int LuaState::lua_Player_advanceSkill()
 	return 1;
 }
 
+int LuaState::lua_Player_getAttackFactor()
+{
+	Player *p = popPlayer();
+	push(p->getAttackFactor());
+	return 1;
+}
+
+int LuaState::lua_Player_getAddAttackSkill()
+{
+	Player *p = popPlayer();
+	push(p->getAddAttackSkill());
+	return 1;
+}
+
+int LuaState::lua_Player_getLastAttackBlockType()
+{
+	Player *p = popPlayer();
+	push(p->getLastAttackBlockType());
+	return 1;
+}
+
 int LuaState::lua_Player_isAutoWalking()
 {
 	Player* player = popPlayer();
@@ -4220,9 +4333,18 @@ int LuaState::lua_Player_getVocationName()
 {
 	Player* p = popPlayer();
 	Vocation* vocation = p->getVocation();
+	push(vocation->getVocName());
+	return 1;
+}
+
+int LuaState::lua_Player_getVocationDescription()
+{
+	Player* p = popPlayer();
+	Vocation* vocation = p->getVocation();
 	push(vocation->getVocDescription());
 	return 1;
 }
+
 
 int LuaState::lua_Player_getSoulPoints()
 {
@@ -4677,6 +4799,20 @@ int LuaState::lua_Item_getSubtype()
 		pushInteger(item->getSubType());
 	else
 		pushNil();
+	return 1;
+}
+
+int LuaState::lua_Item_getWeaponType()
+{
+	Item *item = popItem();
+	push(item->getWeaponType());
+	return 1;
+}
+
+int LuaState::lua_Item_getAmmoType()
+{
+	Item *item = popItem();
+	push(item->getAmmoType());
 	return 1;
 }
 

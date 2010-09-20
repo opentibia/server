@@ -16,7 +16,7 @@ end
 function Tile:getPlayers()
 	local creatures = self:getCreatures()
 	local players = {}
-	for __,creature in ipairs(creatures) do
+	for _, creature in ipairs(creatures) do
 		if creature:type() == "Player" then
 			players:append(creature)
 		end
@@ -25,23 +25,23 @@ function Tile:getPlayers()
 end
 
 function Tile:getTopThing()
-	return self:getThing(-1)
+	return self:getThing(1)
 end
 
 function Tile:getTopItem()
-	return self:getItem(-1)
+	return self:getItem(1)
 end
 
-function Tile:getTopCreature(who)
-	local creatures = self:getCreatures(who)
-	
-	for __,creature in ipairs(creatures) do
+function Tile:getTopCreature()
+	local creatures = self:getCreatures()
+
+	for _, creature in ipairs(creatures) do
 		return creature
 	end
 end
 
 function Tile:getTopMoveableThing()
-	local t = self:getThing(-1)
+	local t = self:getThing(1)
 	if t and not t:isMoveable() then
 		return nil
 	end

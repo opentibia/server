@@ -24,7 +24,6 @@
 #include "condition.h"
 #include "configmanager.h"
 #include "game.h"
-#include "weapons.h"
 
 extern Game g_game;
 extern ConfigManager g_config;

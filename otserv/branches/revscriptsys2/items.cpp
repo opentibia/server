@@ -21,7 +21,6 @@
 
 #include "items.h"
 #include "condition.h"
-#include "weapons.h"
 
 uint32_t Items::dwMajorVersion = 0;
 uint32_t Items::dwMinorVersion = 0;
@@ -67,7 +66,6 @@ ItemType::ItemType()
 	weight        = 0;  // weight of the item, e.g. throwing distance depends on it
 	showCount     = true;
 	weaponType    = WEAPON_NONE;
-	weaponInstance= NULL;
 	slotPosition  = SLOTPOSITION_RIGHT | SLOTPOSITION_LEFT | SLOTPOSITION_AMMO;
 	wieldPosition = SLOT_HAND;
 	ammoType      = AMMO_NONE;
@@ -1163,7 +1161,7 @@ bool Items::loadFromXml(const std::string& datadir)
 			std::cout << "Warning: [Items::loadFromXml] Item " << it->id <<  " is not set as a bed-type." << std::endl;
 		}
 
-		/*
+#ifdef __DEBUG__
 		//check looping decaying items
 		if(it->decayTo <= 0 || !it->moveable){
 			continue;
@@ -1192,55 +1190,10 @@ bool Items::loadFromXml(const std::string& datadir)
 				break;
 			}
 		}
-		*/
+#endif
 	}
-
-	loadWeaponDefaults();
 
 	return true;
-}
-
-void Items::loadWeaponDefaults() {
-	for(uint32_t i = 0; i < Item::items.size(); ++i){
-		ItemType* it = Item::items.getElement(i);
-
-		if(!it || it->weaponInstance != NULL){
-			continue;
-		}
-
-		if(it->weaponType != WEAPON_NONE){
-			Weapon* weapon = NULL;
-			switch(it->weaponType.value()){
-				case enums::WEAPON_AXE:
-				case enums::WEAPON_SWORD:
-				case enums::WEAPON_CLUB:
-				{
-					weapon = new WeaponMelee();
-					break;
-				}
-
-				case enums::WEAPON_AMMO:
-				case enums::WEAPON_DIST:
-				{
-					if(it->weaponType == WEAPON_DIST && it->ammoType != AMMO_NONE){
-						//distance weapons with ammunitions are configured seperatly
-						continue;
-					}
-
-					weapon = new WeaponDistance();
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}
-			if(weapon) {
-				weapon->configureWeapon(*it);
-				it->weaponInstance = weapon;
-			}
-		}
-	}
 }
 
 ItemType& Items::getItemType(int32_t id)

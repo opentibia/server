@@ -25,18 +25,18 @@ end
 
 function Player:inRangeOfItem(item)
 	assert(typeof(item, "Item"))
-	
+
 	local parent = item:getParent()
 	if not parent then
 		return false
 	end
-	
+
 	if typeof(parent, "Container") then
 		while parent and typeof(parent, "Container") do
 			parent = parent:getParent()
 		end
 	end
-	
+
 	if parent and typeof(parent, "Player") then
 		if self:getGUID() == parent:getGUID() then
 			return true
@@ -48,7 +48,7 @@ function Player:inRangeOfItem(item)
 		playerPos = self:getPosition()
 		return math.abs(pos.x - playerPos.x) <= 1 and math.abs(pos.y - playerPos.y) <= 1 and pos.z == playerPos.z
 	end
-	
+
 	return false
 end
 
@@ -76,22 +76,22 @@ function Player:walkTo(to)
 				pos.y == self:getPosition().y and
 				pos.z == self:getPosition().z)
 	end
-	
+
 	if isAt(to) then
 		return true
 	end
-	
+
 	if not self:internalWalkTo(to) then
 		return false
 	end
-	
+
 	local start = self:getPosition()
-	
+
 	while not isAt(to) do
 		if not #self then
 			return false
 		end
-		
+
 		if not isAt(start) and not self:isAutoWalking() then
 			return isAt(to)
 		end
@@ -161,18 +161,18 @@ function Player:addItemOfType(itemid, subtype, count, itemModFunc)
 	if not item_type then
 		error "Attempting to add item of invalid type!"
 	end
-	
+
 	if (not item_type.hasSpecialType) and subtype and not count then
 		count = subtype
 	end
-	
+
 	if not count then
 		count = 1
 	end
 	if not subtype then
 		subtype = 0
 	end
-	
+
 	if item_type.stackable then
 		while count > 0 do
 			local item = createItem(itemid, count)
@@ -207,6 +207,65 @@ function Player:getHandContents()
 	return hands
 end
 
+-- weapon functions
+function Player:getWeapon(ignoreAmmo)
+	local hands = self:getHandContents()
+	for _, item in ipairs(hands) do
+		local weaponType = item:getWeaponType()
+		if weaponType == WEAPON_SWORD or
+			weaponType == WEAPON_CLUB or
+			weaponType == WEAPON_AXE then
+			return item
+		elseif weaponType == WEAPON_DIST then
+			if not ignoreAmmo and item:getAmmoType() ~= AMMO_NONE then
+				local ammo = self:getInventoryItem(SLOT_AMMO)
+				if ammo and ammo:getAmmoType() == item:getAmmoType() then
+					return item
+				end
+			else
+				return item
+			end
+		end
+	end
+
+	return nil
+end
+
+function Player:getWeaponSkill(weapon)
+	weaponType = WEAPON_NONE
+	skillType = SKILL_FIST
+
+	-- check weapon
+	if weapon then
+		weaponType = weapon:getWeaponType()
+	end
+
+	-- check weapon type
+	if weaponType == WEAPON_SWORD then
+		skillType = SKILL_SWORD
+
+	elseif weaponType == WEAPON_CLUB then
+		skillType = SKILL_CLUB
+
+	elseif weaponType == WEAPON_AXE then
+		skillType = SKILL_AXE
+
+	elseif weaponType == WEAPON_SHIELD then
+		skillType = SKILL_SHIELD
+
+	elseif weaponType == WEAPON_DIST or
+			weaponType == WEAPON_AMMO then
+		skillType = SKILL_DIST
+
+	--elseif weaponType == WEAPON_WAND then
+	--	skillType = nil
+
+	end
+
+	-- return player skill
+	return self:getSkill(skillType)
+end
+
 -- Bank functions
 
 function Player:getBalance()
@@ -217,7 +276,7 @@ function Player:hasBalance(amount)
 	return getBalance() >= amount
 end
 
--- Modify contents, does not take 
+-- Modify contents, does not take
 function Player:setBalance(amount)
 	return self:setStorageValue("__balance", amount)
 end
@@ -300,11 +359,15 @@ function Player:cannotAttackMonster()
 end
 
 function Player:canGetExhausted()
-	return self:hasGroupFlag(PlayerFlag_HasNoExhaustion)	
+	return self:hasGroupFlag(PlayerFlag_HasNoExhaustion)
 end
 
 function Player:cannotGainInFight()
 	return self:hasGroupFlag(PlayerFlag_NotGainInFight)
+end
+
+function Player:notGainSkill()
+	return self:hasGroupFlag(PlayerFlag_NotGainSkill)
 end
 
 function Player:addCombatExhaustion(time)
@@ -324,14 +387,14 @@ function Player:addInFight(time)
 				icon = ICON_SWORDS
 			}
 		}
-		
+
 	return self:addCondition(condition)
 end
 
 -- Login / Logout
 function otstd.Player.LoginHandler(event)
 	local player = event.player
-	
+
 	-- Load outfits
 	if player.loadOutfits then
 		-- Defined in outfits.lua
@@ -343,10 +406,10 @@ function otstd.Player.LogoutHandler(event)
 	local player = event.player
 	-- This will fook up if a listener aborts the logout! :(
 	player:setStorageValue("__lastlogout", os.time())
-	
+
 	-- Save playtime
 	player:setStorageValue("__playtime", player:getPlayTime())
-	
+
 	-- Save outfits
 	if player.saveOutfits then
 		-- Defined in outfits.lua
@@ -362,7 +425,7 @@ otstd.Player.onLogoutListener = registerOnLogout(otstd.Player.LogoutHandler)
 function otstd.Player.AdvanceHandler(event)
 	local player = event.player
 	local message = ""
-	
+
 	if event.skill == LEVEL_FIST then
 		message = "You advanced in fist fighting."
 	elseif event.skill == LEVEL_CLUB then
@@ -384,7 +447,7 @@ function otstd.Player.AdvanceHandler(event)
 	else
 		message = "You advanced, but not in any skill?"
 	end
-	
+
 	player:sendAdvance(message)
 end
 

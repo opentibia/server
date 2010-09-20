@@ -70,6 +70,8 @@ Actor::Actor(CreatureType _cType) : Creature(), cType(_cType)
 	spawn = NULL;
 	shouldReload_ = false;
 	alwaysThink_ = false;
+	onlyThink_ = false;
+	canTarget_ = true;
 
 	defaultOutfit = cType.outfit();
 	currentOutfit = cType.outfit();
@@ -527,6 +529,7 @@ BlockType Actor::blockHit(CombatType combatType, const CombatSource& combatSourc
 bool Actor::isTarget(Creature* creature)
 {
 	if( creature->isRemoved() ||
+		!canTarget() ||
 		!creature->isAttackable() ||
 		creature->getZone() == ZONE_PROTECTION ||
 		!canSeeCreature(creature)){
@@ -578,6 +581,15 @@ void Actor::alwaysThink(bool b)
 		updateIdleStatus();
 }
 
+void Actor::canTarget(bool b)
+{
+	canTarget_ = b;
+	if(!canTarget()){
+		setAttackedCreature(0);
+		setFollowCreature(0);
+	}
+}
+
 void Actor::setIdle(bool _idle)
 {
 	if(getHealth() <= 0 || isRemoved()){
@@ -585,6 +597,11 @@ void Actor::setIdle(bool _idle)
 	}
 
 	isIdle = _idle;
+
+	// don't go any further if we are set
+	// with always think
+	if(alwaysThink())
+		return;
 
 	if(!isIdle){
 		g_game.addCreatureCheck(this);
@@ -653,6 +670,11 @@ void Actor::onEndCondition(const Condition* condition, bool preEnd /*= true*/)
 void Actor::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
+
+	// if onlythink is set we may return here as the user
+	// demands full control of the actor
+	if(onlyThink())
+		return;
 
 	if(despawn()){
 		g_game.removeCreature(this, true);

@@ -378,6 +378,7 @@ template<> void Script::ListenerType__Base::initialize()
 {
 	initAddValue(Script::enums::ON_SAY_LISTENER, "ON_SAY_LISTENER", true);
 	initAddValue(Script::enums::ON_USE_ITEM_LISTENER, "ON_USE_ITEM_LISTENER", true);
+	initAddValue(Script::enums::ON_USE_WEAPON_LISTENER, "ON_USE_WEAPON_LISTENER", true);
 	initAddValue(Script::enums::ON_EQUIP_ITEM_LISTENER, "ON_EQUIP_ITEM_LISTENER", true);
 	initAddValue(Script::enums::ON_MOVE_CREATURE_LISTENER, "ON_MOVE_CREATURE_LISTENER", true);
 	initAddValue(Script::enums::ON_MOVE_ITEM_LISTENER, "ON_MOVE_ITEM_LISTENER", true);

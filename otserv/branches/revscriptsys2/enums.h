@@ -520,6 +520,7 @@ namespace enums {
 	enum ListenerType {
 		ON_SAY_LISTENER,
 		ON_USE_ITEM_LISTENER,
+		ON_USE_WEAPON_LISTENER,
 		ON_EQUIP_ITEM_LISTENER,
 		ON_MOVE_CREATURE_LISTENER,
 		ON_MOVE_ITEM_LISTENER,
@@ -564,6 +565,7 @@ typedef Enum<Script::enums::ListenerType, Script::enums::ON_LOSE_CREATURE_LISTEN
 //begin enum definitions
 	const ListenerType ON_SAY_LISTENER(enums::ON_SAY_LISTENER);
 	const ListenerType ON_USE_ITEM_LISTENER(enums::ON_USE_ITEM_LISTENER);
+	const ListenerType ON_USE_WEAPON_LISTENER(enums::ON_USE_WEAPON_LISTENER);
 	const ListenerType ON_EQUIP_ITEM_LISTENER(enums::ON_EQUIP_ITEM_LISTENER);
 	const ListenerType ON_MOVE_CREATURE_LISTENER(enums::ON_MOVE_CREATURE_LISTENER);
 	const ListenerType ON_MOVE_ITEM_LISTENER(enums::ON_MOVE_ITEM_LISTENER);

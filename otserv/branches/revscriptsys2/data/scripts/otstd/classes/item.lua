@@ -4,7 +4,7 @@ function Item:removeCount(count)
 	if count <= 0 then
 		return
 	end
-	
+
 	if self:getCount() > count then
 		self:setCount(self:getCount() - count)
 	else
@@ -93,22 +93,23 @@ function Item:setSpecialDescription(v) return self:setStringAttribute("desc", v)
 function Item:getText() return self:getStringAttribute("text") or "" end
 function Item:setText(v) return self:setStringAttribute("text", v) end
 
-function Item:getAttack(extra) 
+function Item:getAttack(extra)
 	local a = self:getIntegerAttribute("attack") or self:getDefaultAttack()
 	if extra then
 		a = a + self:getExtraAttack()
 	end
 	return a
 end
+function Item:getAttack() return self:getIntegerAttribute("attack") or self:getDefaultAttack() end
 function Item:getDefaultAttack() return Items[self:getItemID()].attack end
 function Item:setAttack(v) return self:setIntegerAttribute("attack", v) end
 
+function Item:getDefense() return self:getIntegerAttribute("defense") or self:getDefaultAttack() end
+function Item:getDefaultDefense() return Items[self:getItemID()].defense end
+function Item:setDefense(v) return self:setIntegerAttribute("defense", v) end
+
 function Item:getArmor() return self:getIntegerAttribute("armor") or self:getDefaultArmor() end
 function Item:getDefaultArmor() return Items[self:getItemID()].armor end
-function Item:setArmor(v) return self:setIntegerAttribute("attack", v) end
-
-function Item:getAttack() return self:getIntegerAttribute("attack") or self:getDefaultAttack() end
-function Item:getDefaultAttack() return Items[self:getItemID()].itemid end
-function Item:setAttack(v) return self:setIntegerAttribute("attack", v) end
+function Item:setArmor(v) return self:setIntegerAttribute("armor", v) end
 
 function Item:isCorpse() return Items[self:getItemID()].corpseType ~= RACE_NONE end

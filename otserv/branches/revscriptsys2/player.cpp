@@ -34,7 +34,6 @@
 #include "beds.h"
 #include "depot.h"
 #include "party.h"
-#include "weapons.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -327,14 +326,7 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 			case enums::WEAPON_AXE:
 			case enums::WEAPON_CLUB:
 			case enums::WEAPON_WAND:
-			{
-				const Weapon* weapon = item->getWeapon();
-				if(weapon){
-					return item;
-				}
-
-				break;
-			}
+				return item;
 
 			case enums::WEAPON_DIST:
 			{
@@ -342,19 +334,13 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
 
 					if(ammuItem && ammuItem->getAmmoType() == item->getAmmoType()){
-						const Weapon* weapon = ammuItem->getWeapon();
-						if(weapon){
-							shootRange = item->getShootRange();
-							return ammuItem;
-						}
+						shootRange = item->getShootRange();
+						return ammuItem;
 					}
 				}
 				else{
-					const Weapon* weapon = item->getWeapon();
-					if(weapon){
-						shootRange = item->getShootRange();
-						return item;
-					}
+					shootRange = item->getShootRange();
+					return item;
 				}
 			}
 
@@ -383,37 +369,17 @@ int32_t Player::getWeaponSkill(const Item* item) const
 	}
 
 	WeaponType weaponType = item->getWeaponType();
-	int32_t attackSkill;
+	SkillType skillType = SKILL_SWORD;
 
 	switch(weaponType.value()){
-		case enums::WEAPON_SWORD:
-			attackSkill = getSkill(SKILL_SWORD, SKILL_LEVEL);
-			break;
-
-		case enums::WEAPON_CLUB:
-		{
-			attackSkill = getSkill(SKILL_CLUB, SKILL_LEVEL);
-			break;
-		}
-
-		case enums::WEAPON_AXE:
-		{
-			attackSkill = getSkill(SKILL_AXE, SKILL_LEVEL);
-			break;
-		}
-
+		case enums::WEAPON_SWORD: skillType = SKILL_SWORD; break;
+		case enums::WEAPON_CLUB: skillType = SKILL_CLUB; break;
+		case enums::WEAPON_AXE: skillType = SKILL_AXE; break;
 		case enums::WEAPON_DIST:
-		{
-			attackSkill = getSkill(SKILL_DIST, SKILL_LEVEL);
-			break;
-		}
-		default:
-		{
-			attackSkill = 0;
-			break;
-		}
+		case enums::WEAPON_AMMO: skillType = SKILL_DIST; break;
+		default: return 0;
 	}
-	return attackSkill;
+	return getSkill(skillType, SKILL_LEVEL);
 }
 
 int32_t Player::getArmor() const
@@ -730,7 +696,7 @@ void Player::addSkillAdvance(SkillType skill, uint32_t count, bool useMultiplier
 	}
 	skills[skill.value()][SKILL_TRIES] += count * g_config.getNumber(ConfigManager::RATE_SKILL);
 
-#if __DEBUG__
+#ifdef __DEBUG__
 	std::cout << getName() << ", has the vocation: " << (int)getVocationId() << " and is training his " << skill << ". Tries: " << skills[skill.value()][SKILL_TRIES] << "(" << vocation->getReqSkillTries(skill, skills[skill.value()][SKILL_LEVEL] + 1) << ")" << std::endl;
 	std::cout << "Current skill: " << skills[skill.value()][SKILL_LEVEL] << std::endl;
 #endif
@@ -3351,18 +3317,17 @@ void Player::doAttacking(uint32_t interval)
 	}
 
 	// Can't attack while pacified
-	if(hasCondition(CONDITION_DISARMED))
-	{
+	if(hasCondition(CONDITION_DISARMED)){
 		return;
 	}
 
-	if((OTSYS_TIME() - lastAttack) >= getAttackSpeed() ){
-		Item* tool = getWeapon();
-		const Weapon* weapon = NULL;
+	if((OTSYS_TIME() - lastAttack) >= getAttackSpeed()){
+		Item* weapon = getWeapon();
 		bool result = false;
-		if(tool && (weapon = tool->getWeapon())){
-			if(!weapon->interruptSwing()){
-				result = weapon->useWeapon(this, tool, attackedCreature);
+		if(weapon){
+			if(!(weapon->getWeaponType() == WEAPON_DIST || weapon->getWeaponType() == WEAPON_AMMO) &&
+					g_config.getNumber(ConfigManager::DISTANCE_WEAPON_INTERRUPT_SWING)){
+				result = g_game.onPlayerUseWeapon(this, attackedCreature, weapon);
 			}
 			else if(!canDoAction()){
 				uint32_t delay = getNextActionTime();
@@ -3373,14 +3338,13 @@ void Player::doAttacking(uint32_t interval)
 			else {
 				// If the player is not exhausted OR if the player's weapon
 				// does not have hasExhaust, use the weapon.
-				if(!hasCondition(CONDITION_EXHAUST_DAMAGE))
-				{
-					result = weapon->useWeapon(this, tool, attackedCreature);
+				if(!hasCondition(CONDITION_EXHAUST_DAMAGE)){
+					result = g_game.onPlayerUseWeapon(this, attackedCreature, weapon);
 				}
 			}
 		}
 		else{
-			result = Weapon::useFist(this, attackedCreature);
+			result = g_game.onPlayerUseWeapon(this, attackedCreature, NULL);
 		}
 
 		if(result){

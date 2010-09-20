@@ -630,7 +630,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << ":: Loading Scripts ..." << std::endl;
 	try {
 		g_game.loadScripts();
-		std::cout << std::endl << "::" << std::endl;
+		std::cout << "::" << std::endl;
 	} catch(Script::Error& err){
 		std::cout << std::endl << err.what() << std::endl;
 		exit(-1);

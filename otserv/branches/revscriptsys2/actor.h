@@ -60,6 +60,10 @@ public:
 	void shouldReload(bool b) {shouldReload_ = b;}
 	bool alwaysThink() const {return alwaysThink_;}
 	void alwaysThink(bool b);
+	bool onlyThink() const {return onlyThink_;}
+	void onlyThink(bool b) {onlyThink_ = b;}
+	bool canTarget() const {return canTarget_;}
+	void canTarget(bool b);
 
 	virtual uint32_t idRange(){ return 0x40000000;}
 	static AutoList<Actor> listMonster;
@@ -151,6 +155,8 @@ private:
 	bool shouldReload_;
 
 	bool alwaysThink_;
+	bool onlyThink_;
+	bool canTarget_;
 
 	std::string strDescription;
 

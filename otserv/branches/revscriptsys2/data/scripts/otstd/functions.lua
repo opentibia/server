@@ -78,7 +78,7 @@ function convertIntToIP(int, mask)
 			end
 		end
 	end
-	
+
 	return b1 .. "." .. b2 .. "." .. b3 .. "." .. b4
 end
 
@@ -91,10 +91,10 @@ function convertIPToInt(str)
 		else
 			ipstring = str:sub(1, maskindex - 1)
 			maskstring = str:sub(maskindex)
-			
+
 			local ipint = 0
 			local maskint = 0
-			
+
 			local index = 0
 			for b in ipstring:gmatch("(%d+).?") do
 				if tonumber(b) > 255 or tonumber(b) < 0 then
@@ -109,7 +109,7 @@ function convertIPToInt(str)
 			if index ~= 32 then -- Invalid
 				return 0, 0
 			end
-			
+
 			index = 0
 			for b in maskstring:gmatch("(%d+)%.?") do
 				if tonumber(b) > 255 or tonumber(b) < 0 then
@@ -124,14 +124,14 @@ function convertIPToInt(str)
 			if index ~= 32 then
 				return 0, 0
 			end
-			
+
 			return ipint, maskint
 		end
 	else
 		local ipint = 0
 		local maskint = 0
 		local index = 24
-		
+
 		for b in str:gmatch("([x%d]+)%.?") do
 			if b ~= "x" then
 				if b:find("x") ~= nil then
@@ -162,7 +162,7 @@ function getDestination(param)
 	local N = 1
 	local name = ""
 	local kind = nil
-	
+
 	kind, name, N = param:match "(%w+):(.-)#(%d+)"
 	if kind and name and N then
 		-- Match
@@ -186,11 +186,11 @@ function getDestination(param)
 			end
 		end
 	end
-	
+
 	N = tonumber(N)
-	
+
 	local pos = nil
-	
+
 	if kind == "creature" or kind == "c" then
 		local creatures = getCreaturesByName(name)
 		if N > #creatures or N < 1 then
@@ -245,11 +245,11 @@ function getDestination(param)
 			end
 		end
 	end
-	
+
 	if not pos then
 		return "Can not find player/waypoint, enter on the form 'kind:name#N'"
 	end
-	
+
 	return pos
 end
 
@@ -260,11 +260,36 @@ function areInRange(p1, p2, dx, dy, dz)
 	if dz == nil then
 		dz = dy
 	end
-	
+
 	if math.abs(p1.x - p2.x) > dx or
 	   math.abs(p1.y - p2.y) > dy or
 	   math.abs(p1.z - p2.z) > dz then
 		return false
 	end
 	return true
+end
+
+function checkVocation(vocation, vocationList)
+	if typeof(vocationList, "string") then
+		local i, j = string.find(vocationList:lower(), "any")
+		if i and j then
+			return true
+		end
+
+		i, j = string.find(vocation:lower(), vocationList:lower())
+		if i and j then
+			return true
+		end
+
+	elseif typeof(vocationList, "table") then
+		for _, voc in ipairs(vocationList) do
+			local i, j = string.find(vocation:lower(), voc:lower())
+			if i and j then
+				--print(string.sub(vocation, i, j))
+				return true
+			end
+		end
+	end
+
+	return false
 end

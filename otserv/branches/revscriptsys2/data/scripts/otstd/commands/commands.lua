@@ -15,7 +15,7 @@ function Command:register()
 	if self.Listeners ~= nil then
 		stopListener(self.Listeners)
 	end
-	
+
 	if self.words == nil then
 		error("Can not register command without words!")
 	end
@@ -25,7 +25,7 @@ function Command:register()
 	if self.handler == nil then
 		error("Can not register command '" .. self.words .. " without handler!")
 	end
-	
+
 	function registerHandler(words)
 		function internalHandler(event)
 			local speaker = event.creature
@@ -40,10 +40,10 @@ function Command:register()
 				error("A non-player creature attempted to use a command.")
 			end
 		end
-		
+
 		table.insert(self.Listeners, registerOnSay("beginning", true, words, internalHandler))
 	end
-	
+
 	self.Listeners = {}
 	if type(self.words) == "table" then
 		for k, words in ipairs(self.words) do
@@ -52,7 +52,7 @@ function Command:register()
 	else
 		registerHandler(self.words)
 	end
-	
+
 	otstd.Commands[self.name] = self
 end
 
@@ -62,8 +62,9 @@ require("otstd/commands/makeitem")
 require("otstd/commands/age")
 require("otstd/commands/statset")
 require("otstd/commands/goto")
+require("otstd/commands/gotomasterpos")
 require("otstd/commands/send")
 require("otstd/commands/bring")
-require("otstd/commands/remove_items")
+require("otstd/commands/removething")
 require("otstd/commands/createmonster")
 require("otstd/commands/createnpc")

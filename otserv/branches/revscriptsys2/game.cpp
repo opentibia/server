@@ -1347,6 +1347,14 @@ bool Game::onPlayerTradeEnd(Player* player, Item* tradeItem, Player* tradePlayer
 	return script_system->dispatchEvent(evt);
 }
 
+bool Game::onPlayerUseWeapon(Player *player, Creature *attacked, Item *weapon)
+{
+	if(!script_system)
+		return false; // Not handled
+	Script::OnUseWeapon::Event evt(player, attacked, weapon);
+	return script_system->dispatchEvent(evt);
+}
+
 bool Game::onPlayerShopPurchase(Player* player, uint16_t itemId, int32_t type, uint32_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
 	if(!script_system)

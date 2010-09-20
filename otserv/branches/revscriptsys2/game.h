@@ -531,6 +531,7 @@ public:
 	bool onPlayerShopClose(Player* player);
 	bool onPlayerTradeBegin(Player* player, Item* tradeItem, Player* tradePlayer, Item* tradePlayerItem);
 	bool onPlayerTradeEnd(Player* player, Item* tradeItem, Player* tradePlayer, Item* tradePlayerItem, bool isCompleted = false);
+	bool onPlayerUseWeapon(Player *player, Creature *attacked, Item *weapon);
 	bool onMoveCreature(Creature* actor, Creature* moving_creature, Tile* fromTile, Tile* toTile);
 	bool onMoveItem(Creature* actor, Item* item, Tile* tile, bool addItem);
 	bool onSpawn(Actor* actor);

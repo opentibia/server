@@ -22,7 +22,6 @@
 #include "item.h"
 #include "tile.h"
 #include "creature.h"
-#include "weapons.h"
 #include "house.h"
 #include "beds.h"
 #include "container.h"

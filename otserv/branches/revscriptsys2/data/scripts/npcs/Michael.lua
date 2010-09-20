@@ -1,5 +1,5 @@
 local Michael = NPC:new("Michael")
---[[
+
 Michael.outfit = {
 	type = 130,
 	head = 20,
@@ -9,16 +9,17 @@ Michael.outfit = {
 }
 
 Michael.greeting = {"Hello $name.", "Greetings $name."}
-Michael.farewell = "Goodbye $sir $name."
+Michael.farewell = {"Goodbye $sir $name."}
 
---Michael.listen_radius = 4
---Michael.walk_radius = 3
+Michael.idleTimeout = 30
+Michael.listenRadius = 4
+Michael.walkRadius = 3
 
 Michael.dialog = {
 	{"job|occupation", "My job is to be awesome."};
 	{"queue", function(self) return "There is " .. #self.queue .. " people in queue." end};
 	{"count my gold", function(self) return "You have " .. self.focus:countMoney() .. " gold." end};
-	{"ab'dendriel", travel{122, 322, 7}};
+	--{"ab'dendriel", travel{122, 322, 7}};
 	{"dialog", function(self)
 		self:say("Do you want to continue this conversation?")
 		local reply = self:listen()
@@ -51,4 +52,3 @@ Michael.trade = {
 function Michael:onHear(message, class)
 	self:say("Awesome, you said '" .. message .. "'.")
 end
---]]

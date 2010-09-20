@@ -12,7 +12,9 @@ function otstd.burnTarget(target, interval, rounds, min, max)
 			}
 	}
 
-	target:addInFight()
+	if typeof(target, "Player") then
+		target:addInFight(config["fight_exhausted"])
+	end
 	target:addCondition(condition)
 end
 
@@ -29,7 +31,9 @@ function otstd.poisonTarget(target, interval, start, min, max)
 			}
 	}
 
-	target:addInFight()
+	if typeof(target, "Player") then
+		target:addInFight(config["fight_exhausted"])
+	end
 	target:addCondition(condition)
 end
 
@@ -45,8 +49,9 @@ function otstd.electrifyTarget(target, interval, rounds, min, max)
 			}
 	}
 
-	-- TODO: Player:addInFight
-	--target:addInFight()
+	if typeof(target, "Player") then
+		target:addInFight(config["fight_exhausted"])
+	end
 	target:addCondition(condition)
 end
 

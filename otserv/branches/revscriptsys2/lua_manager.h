@@ -251,6 +251,7 @@ public:
 	int lua_registerSpecificEvent_OnSay();
 	int lua_registerSpecificEvent_OnHear();
 	int lua_registerGenericEvent_OnUseItem();
+	int lua_registerGenericEvent_OnUseWeapon();
 	int lua_registerGenericEvent_OnJoinChannel();
 	int lua_registerSpecificEvent_OnJoinChannel();
 	int lua_registerGenericEvent_OnLeaveChannel();
@@ -300,8 +301,8 @@ public:
 	int lua_registerSpecificEvent_OnTradeBegin();
 	int lua_registerGenericEvent_OnTradeEnd();
 	int lua_registerSpecificEvent_OnTradeEnd();
-	int lua_registerGenericEvent_onActorLoadSpell();
-	int lua_registerGenericEvent_onActorCastSpell();
+	int lua_registerGenericEvent_OnActorLoadSpell();
+	int lua_registerGenericEvent_OnActorCastSpell();
 	int lua_configureActorSpells();
 
 	int lua_stopListener();
@@ -381,6 +382,7 @@ public:
 	int lua_Creature_isSummon();
 	int lua_Creature_isPushable();
 	int lua_Creature_getTarget();
+	int lua_Creature_getMasterPos();
 	int lua_Creature_isImmuneToCombat();
 	int lua_Creature_getDamageImmunities();
 	int lua_Creature_isImmuneToMechanic();
@@ -400,9 +402,13 @@ public:
 	int lua_createActor();
 
 	int lua_Actor_setShouldReload();
-	int lua_Actor_setAlwaysThink();
 	int lua_Actor_getShouldReload();
+	int lua_Actor_setAlwaysThink();
 	int lua_Actor_getAlwaysThink();
+	int lua_Actor_setOnlyThink();
+	int lua_Actor_getOnlyThink();
+	int lua_Actor_setCanTarget();
+	int lua_Actor_getCanTarget();
 
 	// Actor type changes
 	int lua_Actor_setArmor();
@@ -462,6 +468,9 @@ public:
 	int lua_Player_getMagicLevel();
 	int lua_Player_getSkill();
 	int lua_Player_advanceSkill();
+	int lua_Player_getAttackFactor();
+	int lua_Player_getAddAttackSkill();
+	int lua_Player_getLastAttackBlockType();
 	int lua_Player_isPremium();
 	int lua_Player_isAutoWalking();
 	int lua_Player_getCorpseId();
@@ -471,6 +480,7 @@ public:
 	int lua_Player_getGroup();
 	int lua_Player_getVocationID();
 	int lua_Player_getVocationName();
+	int lua_Player_getVocationDescription();
 	int lua_Player_getTownID();
 	int lua_Player_getGUID();
 	int lua_Player_getPremiumDays();
@@ -523,6 +533,8 @@ public:
 	int lua_Item_getWeight();
 	int lua_Item_isPickupable();
 	int lua_Item_getSubtype();
+	int lua_Item_getWeaponType();
+	int lua_Item_getAmmoType();
 
 	int lua_Item_setItemID();
 	int lua_Item_setCount();

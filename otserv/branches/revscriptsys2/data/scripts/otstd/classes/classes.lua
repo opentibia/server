@@ -4,14 +4,14 @@ function typeof(val, t)
 	if type(t) == "table" then
 		t = t:type()
 	end
-	
+
 	if val == nil then
 		if t == nil or t == "nil" then
 			return true
 		end
 		return false
 	end
-	
+
 	if val["type"] ~= nil then
 		repeat
 			if val["type"] ~= nil and val:type() == t then
@@ -52,3 +52,4 @@ require("otstd/classes/waypoint")
 require("otstd/classes/chat")
 require("otstd/classes/condition")
 require("otstd/classes/spell")
+require("otstd/classes/weapon")

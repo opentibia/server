@@ -284,7 +284,6 @@ public:
 	uint32_t getDefaultDuration() const {return items[id].decayTime * 1000;}
 
 	WeaponType getWeaponType() const {return items[id].weaponType;}
-	Weapon* getWeapon() const {return items[id].weaponInstance;}
 	AmmunitionType	getAmmoType() const {return items[id].ammoType;}
 	int32_t	getShootRange() const {return items[id].shootRange;}
 	bool isReplaceable() const {return Item::items[id].replaceable;}
