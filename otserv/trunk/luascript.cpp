@@ -1272,6 +1272,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//getTopCreature(pos)
 	lua_register(m_luaState, "getTopCreature", LuaScriptInterface::luaGetTopCreature);
+	
+	//getAllCreatures(pos, <optional> flag)
+	lua_register(m_luaState, "getAllCreatures", LuaScriptInterface::luaGetAllCreatures);
 
 	//getWaypointPositionByName(name)
 	lua_register(m_luaState, "getWaypointPositionByName", LuaScriptInterface::luaGetWaypointPositionByName);
@@ -3909,6 +3912,51 @@ int LuaScriptInterface::luaGetTileThingByTopOrder(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetAllCreatures(lua_State *L)
+{
+	//getAllCreatures(pos, <optional> flag)
+	//bits for flags 8 = SHOW INVISIBLE MONSTERS AND GMs, 4 = SHOW NPCs, 2 = SHOW MONSTERS, 1 = SHOW PLAYERS
+	
+	uint32_t flag = 3; //by default shows visible monsters and players with any kind of invisibility flag
+	
+	uint32_t parameters = lua_gettop(L);
+	if (parameters >= 2)
+		flag = popNumber(L);
+
+	PositionEx pos;
+	popPosition(L, pos);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(!tile){
+		lua_pushnil(L);
+		return 1;
+	}
+
+	lua_newtable(L);
+	uint32_t index = 1;
+	bool showInvisib = ((flag & 8) == 8);
+	CreatureVector* creatures = tile->getCreatures();
+
+	for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+		Player *p = (*cit)->getPlayer();
+		Monster *m = (*cit)->getMonster();
+		Npc *n = (*cit)->getNpc();
+
+		if ((p && ((flag & 1) == 1) && (showInvisib || !p->hasSomeInvisibilityFlag() )) ||
+			(m && ((flag & 2) == 2) && (showInvisib || !m->hasCondition(CONDITION_INVISIBLE) )) ||
+			(n && ((flag & 4) == 4)))
+		{
+			lua_pushnumber(L, index);
+			env->addThing(*cit);
+			lua_pushnumber(L, (*cit)->getID());
+			lua_settable(L, -3);
+			index++;
+		}
+	}
+	return 1;
+}
 
 int LuaScriptInterface::luaGetTopCreature(lua_State *L)
 {
