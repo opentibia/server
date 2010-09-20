@@ -224,7 +224,7 @@ function otstd.internalUseWeapon(event)
 		damage = otstd.damageFormula(player, target, weapon)
 	end
 
-	damage = (damage * event.damageModifier) / event.damageModifier
+	damage = (damage * event.damageModifier) / 100
 
 	-- do the damage
 	internalCastSpell(internalWeapon.damageType, player, target, damage,
