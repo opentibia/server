@@ -381,8 +381,9 @@ END|
 
 DELIMITER ;
 
-# uncomment to add 5 groups, an account, a player character, and an administrator character
-#INSERT INTO `groups` VALUES (5,'Administrator',57172440358904,5,0,100, 100),(4,'Senior Gamemaster',56622701191160,4,0,100, 100),(3,'Gamemaster',56622701191162,3,0,75, 100),(2,'Tutor',16875520,1,0,50, 100),(1,'Player',0,0,1,50, 100);
+# uncomment to add 6 groups, an account, a player character, and an administrator character
+#INSERT INTO `groups` VALUES (1, 'Player', 0, 0, 0, 2000, 100),(2, 'Tutor', 16777216, 0, 0, 2000, 100),(3, 'Sennior Tutor', 274894684160, 0, 0, 2000, 100),(4, 'Community Manager', 69681547968463, 2, 0, 1000, 100),(5, 'Game Master', 69681547968463, 2, 0, 1000, 100),(6, 'GOD/OWNER', 57171953819640, 3, 0, 2000, 100);
 #INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0);
-#INSERT INTO `players` VALUES (2, 'Administrator', 1, 5, 7, 0, 2252770, 53, 8, 11970, 11970, 11820, 11820, 1847, 100, 2, 10, 10, 10, 10, 75, 0, 116, 106, 7, 9980, 1221452439, 102017216, 1, 1, '', 0, 0, 10, 10, 10, 10, 10, 0, 1,10000000 , 1);
+#INSERT INTO `players` VALUES (2, 'Administrator', 1, 6, 7, 0, 2252770, 53, 8, 11970, 11970, 11820, 11820, 1847, 100, 2, 10, 10, 10, 10, 75, 0, 116, 106, 7, 9980, 1221452439, 102017216, 1, 1, '', 0, 0, 10, 10, 10, 10, 10, 0, 1,10000000 , 1);
 #INSERT INTO `players` VALUES (3, 'Player', 1, 1, 1, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 1221452439, 102017216, 1, 1, '', 0, 0, 10, 10, 10, 10, 100, 1, 1,151200000, 1);
+# to add your own privileges for players/gms please use this flag generator http://hem.bredband.net/johannesrosen/playerflags.html
