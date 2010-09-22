@@ -1,0 +1,928 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		55896D7B118DFA2E00B3D215 /* beds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D66118DFA0800B3D215 /* beds.cpp */; };
+		55896D7C118DFA3000B3D215 /* databaseodbc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D6A118DFA0800B3D215 /* databaseodbc.cpp */; };
+		55896D7D118DFA3100B3D215 /* databasepgsql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D6B118DFA0800B3D215 /* databasepgsql.cpp */; };
+		55896D7E118DFA3100B3D215 /* databasesqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A411A0C1E943500798B45 /* databasesqlite.cpp */; };
+		55896D7F118DFA3300B3D215 /* exception.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41150C1E943500798B45 /* exception.cpp */; };
+		55896D80118DFA3400B3D215 /* guild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D6D118DFA0800B3D215 /* guild.cpp */; };
+		55896D81118DFA3900B3D215 /* party.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D6F118DFA0800B3D215 /* party.cpp */; };
+		55896D82118DFA3D00B3D215 /* protocolgame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D71118DFA0800B3D215 /* protocolgame.cpp */; };
+		55896D83118DFA3E00B3D215 /* protocolold.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D73118DFA0800B3D215 /* protocolold.cpp */; };
+		55896D84118DFA3F00B3D215 /* quests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D75118DFA0800B3D215 /* quests.cpp */; };
+		55896D85118DFA4200B3D215 /* sha1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D77118DFA0800B3D215 /* sha1.cpp */; };
+		55EBB2CD118DFE7500CCFC83 /* beds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D66118DFA0800B3D215 /* beds.cpp */; };
+		55EBB2CF118DFE8300CCFC83 /* party.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D6F118DFA0800B3D215 /* party.cpp */; };
+		55EBB2D0118DFE8700CCFC83 /* sha1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D77118DFA0800B3D215 /* sha1.cpp */; };
+		55EBB2D1118DFE8B00CCFC83 /* guild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55896D6D118DFA0800B3D215 /* guild.cpp */; };
+		55EBB2D2118DFE8F00CCFC83 /* exception.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41150C1E943500798B45 /* exception.cpp */; };
+		F62774090CB841CC00FC37DB /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774010CB841CC00FC37DB /* connection.cpp */; };
+		F627740A0CB841CC00FC37DB /* creatureevent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774020CB841CC00FC37DB /* creatureevent.cpp */; };
+		F627740B0CB841CC00FC37DB /* outputmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774030CB841CC00FC37DB /* outputmessage.cpp */; };
+		F627740C0CB841CC00FC37DB /* protocollogin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774040CB841CC00FC37DB /* protocollogin.cpp */; };
+		F627740D0CB841CC00FC37DB /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774010CB841CC00FC37DB /* connection.cpp */; };
+		F627740E0CB841CC00FC37DB /* creatureevent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774020CB841CC00FC37DB /* creatureevent.cpp */; };
+		F627740F0CB841CC00FC37DB /* outputmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774030CB841CC00FC37DB /* outputmessage.cpp */; };
+		F62774100CB841CC00FC37DB /* protocollogin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774040CB841CC00FC37DB /* protocollogin.cpp */; };
+		F627741E0CB8424400FC37DB /* protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774130CB8424400FC37DB /* protocol.cpp */; };
+		F627741F0CB8424400FC37DB /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774160CB8424400FC37DB /* scheduler.cpp */; };
+		F62774200CB8424400FC37DB /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774170CB8424400FC37DB /* server.cpp */; };
+		F62774210CB8424400FC37DB /* tasks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774190CB8424400FC37DB /* tasks.cpp */; };
+		F62774220CB8424400FC37DB /* protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774130CB8424400FC37DB /* protocol.cpp */; };
+		F62774230CB8424400FC37DB /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774160CB8424400FC37DB /* scheduler.cpp */; };
+		F62774240CB8424400FC37DB /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774170CB8424400FC37DB /* server.cpp */; };
+		F62774250CB8424400FC37DB /* tasks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F62774190CB8424400FC37DB /* tasks.cpp */; };
+		F69A42E50C1EAC8300798B45 /* actions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413E0C1E943500798B45 /* actions.cpp */; };
+		F69A42E70C1EAC8300798B45 /* admin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413A0C1E943500798B45 /* admin.cpp */; };
+		F69A42E90C1EAC8300798B45 /* allocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41380C1E943500798B45 /* allocator.cpp */; };
+		F69A42EB0C1EAC8300798B45 /* ban.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41340C1E943500798B45 /* ban.cpp */; };
+		F69A42ED0C1EAC8300798B45 /* baseevents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41320C1E943500798B45 /* baseevents.cpp */; };
+		F69A42EF0C1EAC8300798B45 /* chat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41300C1E943500798B45 /* chat.cpp */; };
+		F69A42F10C1EAC8300798B45 /* combat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A412D0C1E943500798B45 /* combat.cpp */; };
+		F69A42F50C1EAC8300798B45 /* condition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41290C1E943500798B45 /* condition.cpp */; };
+		F69A42F70C1EAC8300798B45 /* configmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41270C1E943500798B45 /* configmanager.cpp */; };
+		F69A42FA0C1EAC8300798B45 /* container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41240C1E943500798B45 /* container.cpp */; };
+		F69A42FC0C1EAC8300798B45 /* creature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41210C1E943500798B45 /* creature.cpp */; };
+		F69A42FE0C1EAC8300798B45 /* cylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41200C1E943500798B45 /* cylinder.cpp */; };
+		F69A43000C1EAC8300798B45 /* database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A411E0C1E943500798B45 /* database.cpp */; };
+		F69A43020C1EAC8300798B45 /* databasemysql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A411C0C1E943500798B45 /* databasemysql.cpp */; };
+		F69A43070C1EAC8300798B45 /* depot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41170C1E943500798B45 /* depot.cpp */; };
+		F69A430C0C1EAC8300798B45 /* fileloader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41130C1E943500798B45 /* fileloader.cpp */; };
+		F69A430E0C1EAC8300798B45 /* game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41110C1E943500798B45 /* game.cpp */; };
+		F69A43100C1EAC8300798B45 /* house.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A410B0C1E943500798B45 /* house.cpp */; };
+		F69A43120C1EAC8300798B45 /* housetile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41090C1E943500798B45 /* housetile.cpp */; };
+		F69A43140C1EAC8300798B45 /* ioaccount.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41490C1E943500798B45 /* ioaccount.cpp */; };
+		F69A431B0C1EAC8300798B45 /* iomapotbm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41060C1E943500798B45 /* iomapotbm.cpp */; };
+		F69A431D0C1EAC8300798B45 /* iomapserialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41040C1E943500798B45 /* iomapserialize.cpp */; };
+		F69A43250C1EAC8300798B45 /* ioplayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FC0C1E943500798B45 /* ioplayer.cpp */; };
+		F69A432B0C1EAC8300798B45 /* item.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F70C1E943500798B45 /* item.cpp */; };
+		F69A432E0C1EAC8300798B45 /* items.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F60C1E943500798B45 /* items.cpp */; };
+		F69A43300C1EAC8300798B45 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F50C1E943500798B45 /* logger.cpp */; };
+		F69A43320C1EAC8300798B45 /* luascript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41460C1E943500798B45 /* luascript.cpp */; };
+		F69A43340C1EAC8300798B45 /* mailbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F10C1E943500798B45 /* mailbox.cpp */; };
+		F69A43360C1EAC8300798B45 /* map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41420C1E943500798B45 /* map.cpp */; };
+		F69A43380C1EAC8300798B45 /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EF0C1E943500798B45 /* md5.cpp */; };
+		F69A433A0C1EAC8300798B45 /* monster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41360C1E943500798B45 /* monster.cpp */; };
+		F69A433C0C1EAC8300798B45 /* monsters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EC0C1E943500798B45 /* monsters.cpp */; };
+		F69A433E0C1EAC8300798B45 /* movement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EB0C1E943500798B45 /* movement.cpp */; };
+		F69A43400C1EAC8300798B45 /* networkmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413F0C1E943500798B45 /* networkmessage.cpp */; };
+		F69A43420C1EAC8300798B45 /* npc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EA0C1E943500798B45 /* npc.cpp */; };
+		F69A43450C1EAC8300798B45 /* otserv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E80C1E943500798B45 /* otserv.cpp */; };
+		F69A43470C1EAC8300798B45 /* outfit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E70C1E943500798B45 /* outfit.cpp */; };
+		F69A43490C1EAC8300798B45 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E50C1E943500798B45 /* player.cpp */; };
+		F69A434B0C1EAC8300798B45 /* position.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E30C1E943500798B45 /* position.cpp */; };
+		F69A434F0C1EAC8300798B45 /* raids.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DF0C1E943500798B45 /* raids.cpp */; };
+		F69A43510C1EAC8300798B45 /* rsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DD0C1E943500798B45 /* rsa.cpp */; };
+		F69A43540C1EAC8300798B45 /* scriptmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DA0C1E943500798B45 /* scriptmanager.cpp */; };
+		F69A43560C1EAC8300798B45 /* spawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D80C1E943500798B45 /* spawn.cpp */; };
+		F69A43580C1EAC8300798B45 /* spells.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D60C1E943500798B45 /* spells.cpp */; };
+		F69A435A0C1EAC8300798B45 /* status.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D40C1E943500798B45 /* status.cpp */; };
+		F69A435C0C1EAC8300798B45 /* talkaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D20C1E943500798B45 /* talkaction.cpp */; };
+		F69A435F0C1EAC8300798B45 /* teleport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CF0C1E943500798B45 /* teleport.cpp */; };
+		F69A43620C1EAC8300798B45 /* thing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CC0C1E943500798B45 /* thing.cpp */; };
+		F69A43640C1EAC8300798B45 /* tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CA0C1E943500798B45 /* tile.cpp */; };
+		F69A43660C1EAC8300798B45 /* tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C80C1E943500798B45 /* tools.cpp */; };
+		F69A43690C1EAC8300798B45 /* trashholder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C50C1E943500798B45 /* trashholder.cpp */; };
+		F69A436B0C1EAC8300798B45 /* vocation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C30C1E943500798B45 /* vocation.cpp */; };
+		F69A436D0C1EAC8300798B45 /* waitlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C10C1E943500798B45 /* waitlist.cpp */; };
+		F69A436F0C1EAC8300798B45 /* weapons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40BF0C1E943500798B45 /* weapons.cpp */; };
+		F69A43970C1EAED100798B45 /* actions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413E0C1E943500798B45 /* actions.cpp */; };
+		F69A43990C1EAED100798B45 /* admin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413A0C1E943500798B45 /* admin.cpp */; };
+		F69A439B0C1EAED100798B45 /* allocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41380C1E943500798B45 /* allocator.cpp */; };
+		F69A439D0C1EAED100798B45 /* ban.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41340C1E943500798B45 /* ban.cpp */; };
+		F69A439F0C1EAED100798B45 /* baseevents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41320C1E943500798B45 /* baseevents.cpp */; };
+		F69A43A10C1EAED100798B45 /* chat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41300C1E943500798B45 /* chat.cpp */; };
+		F69A43A30C1EAED100798B45 /* combat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A412D0C1E943500798B45 /* combat.cpp */; };
+		F69A43A70C1EAED100798B45 /* condition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41290C1E943500798B45 /* condition.cpp */; };
+		F69A43A90C1EAED100798B45 /* configmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41270C1E943500798B45 /* configmanager.cpp */; };
+		F69A43AC0C1EAED100798B45 /* container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41240C1E943500798B45 /* container.cpp */; };
+		F69A43AE0C1EAED100798B45 /* creature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41210C1E943500798B45 /* creature.cpp */; };
+		F69A43B00C1EAED100798B45 /* cylinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41200C1E943500798B45 /* cylinder.cpp */; };
+		F69A43B20C1EAED100798B45 /* database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A411E0C1E943500798B45 /* database.cpp */; };
+		F69A43B60C1EAED100798B45 /* databasesqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A411A0C1E943500798B45 /* databasesqlite.cpp */; };
+		F69A43B90C1EAED100798B45 /* depot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41170C1E943500798B45 /* depot.cpp */; };
+		F69A43BE0C1EAED100798B45 /* fileloader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41130C1E943500798B45 /* fileloader.cpp */; };
+		F69A43C00C1EAED100798B45 /* game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41110C1E943500798B45 /* game.cpp */; };
+		F69A43C20C1EAED100798B45 /* house.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A410B0C1E943500798B45 /* house.cpp */; };
+		F69A43C40C1EAED100798B45 /* housetile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41090C1E943500798B45 /* housetile.cpp */; };
+		F69A43C60C1EAED100798B45 /* ioaccount.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41490C1E943500798B45 /* ioaccount.cpp */; };
+		F69A43CD0C1EAED100798B45 /* iomapotbm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41060C1E943500798B45 /* iomapotbm.cpp */; };
+		F69A43CF0C1EAED100798B45 /* iomapserialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41040C1E943500798B45 /* iomapserialize.cpp */; };
+		F69A43D70C1EAED100798B45 /* ioplayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40FC0C1E943500798B45 /* ioplayer.cpp */; };
+		F69A43DD0C1EAED100798B45 /* item.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F70C1E943500798B45 /* item.cpp */; };
+		F69A43E00C1EAED100798B45 /* items.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F60C1E943500798B45 /* items.cpp */; };
+		F69A43E20C1EAED100798B45 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F50C1E943500798B45 /* logger.cpp */; };
+		F69A43E40C1EAED100798B45 /* luascript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41460C1E943500798B45 /* luascript.cpp */; };
+		F69A43E60C1EAED100798B45 /* mailbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40F10C1E943500798B45 /* mailbox.cpp */; };
+		F69A43E80C1EAED100798B45 /* map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41420C1E943500798B45 /* map.cpp */; };
+		F69A43EA0C1EAED100798B45 /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EF0C1E943500798B45 /* md5.cpp */; };
+		F69A43EC0C1EAED100798B45 /* monster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A41360C1E943500798B45 /* monster.cpp */; };
+		F69A43EE0C1EAED100798B45 /* monsters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EC0C1E943500798B45 /* monsters.cpp */; };
+		F69A43F00C1EAED100798B45 /* movement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EB0C1E943500798B45 /* movement.cpp */; };
+		F69A43F20C1EAED100798B45 /* networkmessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A413F0C1E943500798B45 /* networkmessage.cpp */; };
+		F69A43F40C1EAED100798B45 /* npc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40EA0C1E943500798B45 /* npc.cpp */; };
+		F69A43F70C1EAED100798B45 /* otserv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E80C1E943500798B45 /* otserv.cpp */; };
+		F69A43F90C1EAED100798B45 /* outfit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E70C1E943500798B45 /* outfit.cpp */; };
+		F69A43FB0C1EAED100798B45 /* player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E50C1E943500798B45 /* player.cpp */; };
+		F69A43FD0C1EAED100798B45 /* position.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40E30C1E943500798B45 /* position.cpp */; };
+		F69A44010C1EAED100798B45 /* raids.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DF0C1E943500798B45 /* raids.cpp */; };
+		F69A44030C1EAED100798B45 /* rsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DD0C1E943500798B45 /* rsa.cpp */; };
+		F69A44060C1EAED100798B45 /* scriptmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40DA0C1E943500798B45 /* scriptmanager.cpp */; };
+		F69A44080C1EAED100798B45 /* spawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D80C1E943500798B45 /* spawn.cpp */; };
+		F69A440A0C1EAED100798B45 /* spells.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D60C1E943500798B45 /* spells.cpp */; };
+		F69A440C0C1EAED100798B45 /* status.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D40C1E943500798B45 /* status.cpp */; };
+		F69A440E0C1EAED100798B45 /* talkaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40D20C1E943500798B45 /* talkaction.cpp */; };
+		F69A44110C1EAED100798B45 /* teleport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CF0C1E943500798B45 /* teleport.cpp */; };
+		F69A44140C1EAED100798B45 /* thing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CC0C1E943500798B45 /* thing.cpp */; };
+		F69A44160C1EAED100798B45 /* tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40CA0C1E943500798B45 /* tile.cpp */; };
+		F69A44180C1EAED100798B45 /* tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C80C1E943500798B45 /* tools.cpp */; };
+		F69A441B0C1EAED100798B45 /* trashholder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C50C1E943500798B45 /* trashholder.cpp */; };
+		F69A441D0C1EAED100798B45 /* vocation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C30C1E943500798B45 /* vocation.cpp */; };
+		F69A441F0C1EAED100798B45 /* waitlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40C10C1E943500798B45 /* waitlist.cpp */; };
+		F69A44210C1EAED100798B45 /* weapons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F69A40BF0C1E943500798B45 /* weapons.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		55896D66118DFA0800B3D215 /* beds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beds.cpp; path = ../beds.cpp; sourceTree = SOURCE_ROOT; };
+		55896D67118DFA0800B3D215 /* beds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = beds.h; path = ../beds.h; sourceTree = SOURCE_ROOT; };
+		55896D68118DFA0800B3D215 /* connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = connection.h; path = ../connection.h; sourceTree = SOURCE_ROOT; };
+		55896D69118DFA0800B3D215 /* const.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = const.h; path = ../const.h; sourceTree = SOURCE_ROOT; };
+		55896D6A118DFA0800B3D215 /* databaseodbc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = databaseodbc.cpp; path = ../databaseodbc.cpp; sourceTree = SOURCE_ROOT; };
+		55896D6B118DFA0800B3D215 /* databasepgsql.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = databasepgsql.cpp; path = ../databasepgsql.cpp; sourceTree = SOURCE_ROOT; };
+		55896D6C118DFA0800B3D215 /* databasepgsql.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = databasepgsql.h; path = ../databasepgsql.h; sourceTree = SOURCE_ROOT; };
+		55896D6D118DFA0800B3D215 /* guild.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = guild.cpp; path = ../guild.cpp; sourceTree = SOURCE_ROOT; };
+		55896D6E118DFA0800B3D215 /* guild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = guild.h; path = ../guild.h; sourceTree = SOURCE_ROOT; };
+		55896D6F118DFA0800B3D215 /* party.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = party.cpp; path = ../party.cpp; sourceTree = SOURCE_ROOT; };
+		55896D70118DFA0800B3D215 /* party.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = party.h; path = ../party.h; sourceTree = SOURCE_ROOT; };
+		55896D71118DFA0800B3D215 /* protocolgame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = protocolgame.cpp; path = ../protocolgame.cpp; sourceTree = SOURCE_ROOT; };
+		55896D72118DFA0800B3D215 /* protocolgame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = protocolgame.h; path = ../protocolgame.h; sourceTree = SOURCE_ROOT; };
+		55896D73118DFA0800B3D215 /* protocolold.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = protocolold.cpp; path = ../protocolold.cpp; sourceTree = SOURCE_ROOT; };
+		55896D74118DFA0800B3D215 /* protocolold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = protocolold.h; path = ../protocolold.h; sourceTree = SOURCE_ROOT; };
+		55896D75118DFA0800B3D215 /* quests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quests.cpp; path = ../quests.cpp; sourceTree = SOURCE_ROOT; };
+		55896D76118DFA0800B3D215 /* quests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quests.h; path = ../quests.h; sourceTree = SOURCE_ROOT; };
+		55896D77118DFA0800B3D215 /* sha1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sha1.cpp; path = ../sha1.cpp; sourceTree = SOURCE_ROOT; };
+		55896D78118DFA0800B3D215 /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sha1.h; path = ../sha1.h; sourceTree = SOURCE_ROOT; };
+		F62774010CB841CC00FC37DB /* connection.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = connection.cpp; path = ../connection.cpp; sourceTree = SOURCE_ROOT; };
+		F62774020CB841CC00FC37DB /* creatureevent.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = creatureevent.cpp; path = ../creatureevent.cpp; sourceTree = SOURCE_ROOT; };
+		F62774030CB841CC00FC37DB /* outputmessage.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = outputmessage.cpp; path = ../outputmessage.cpp; sourceTree = SOURCE_ROOT; };
+		F62774040CB841CC00FC37DB /* protocollogin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = protocollogin.cpp; path = ../protocollogin.cpp; sourceTree = SOURCE_ROOT; };
+		F62774110CB8424400FC37DB /* creatureevent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = creatureevent.h; path = ../creatureevent.h; sourceTree = SOURCE_ROOT; };
+		F62774120CB8424400FC37DB /* outputmessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = outputmessage.h; path = ../outputmessage.h; sourceTree = SOURCE_ROOT; };
+		F62774130CB8424400FC37DB /* protocol.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = protocol.cpp; path = ../protocol.cpp; sourceTree = SOURCE_ROOT; };
+		F62774140CB8424400FC37DB /* protocol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = protocol.h; path = ../protocol.h; sourceTree = SOURCE_ROOT; };
+		F62774150CB8424400FC37DB /* protocollogin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = protocollogin.h; path = ../protocollogin.h; sourceTree = SOURCE_ROOT; };
+		F62774160CB8424400FC37DB /* scheduler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = scheduler.cpp; path = ../scheduler.cpp; sourceTree = SOURCE_ROOT; };
+		F62774170CB8424400FC37DB /* server.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = server.cpp; path = ../server.cpp; sourceTree = SOURCE_ROOT; };
+		F62774180CB8424400FC37DB /* server.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = server.h; path = ../server.h; sourceTree = SOURCE_ROOT; };
+		F62774190CB8424400FC37DB /* tasks.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = tasks.cpp; path = ../tasks.cpp; sourceTree = SOURCE_ROOT; };
+		F62DEBA80C233B4C004E3974 /* config.lua */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = config.lua; path = ../../../../.otserv/config.lua; sourceTree = SOURCE_ROOT; };
+		F69A40BE0C1E943500798B45 /* weapons.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = weapons.h; path = ../weapons.h; sourceTree = SOURCE_ROOT; };
+		F69A40BF0C1E943500798B45 /* weapons.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = weapons.cpp; path = ../weapons.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40C00C1E943500798B45 /* waitlist.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = waitlist.h; path = ../waitlist.h; sourceTree = SOURCE_ROOT; };
+		F69A40C10C1E943500798B45 /* waitlist.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = waitlist.cpp; path = ../waitlist.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40C20C1E943500798B45 /* vocation.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = vocation.h; path = ../vocation.h; sourceTree = SOURCE_ROOT; };
+		F69A40C30C1E943500798B45 /* vocation.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = vocation.cpp; path = ../vocation.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40C40C1E943500798B45 /* trashholder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trashholder.h; path = ../trashholder.h; sourceTree = SOURCE_ROOT; };
+		F69A40C50C1E943500798B45 /* trashholder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = trashholder.cpp; path = ../trashholder.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40C60C1E943500798B45 /* town.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = town.h; path = ../town.h; sourceTree = SOURCE_ROOT; };
+		F69A40C70C1E943500798B45 /* tools.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tools.h; path = ../tools.h; sourceTree = SOURCE_ROOT; };
+		F69A40C80C1E943500798B45 /* tools.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = tools.cpp; path = ../tools.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40C90C1E943500798B45 /* tile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tile.h; path = ../tile.h; sourceTree = SOURCE_ROOT; };
+		F69A40CA0C1E943500798B45 /* tile.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = tile.cpp; path = ../tile.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40CB0C1E943500798B45 /* thing.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = thing.h; path = ../thing.h; sourceTree = SOURCE_ROOT; };
+		F69A40CC0C1E943500798B45 /* thing.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = thing.cpp; path = ../thing.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40CD0C1E943500798B45 /* templates.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = templates.h; path = ../templates.h; sourceTree = SOURCE_ROOT; };
+		F69A40CE0C1E943500798B45 /* teleport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = teleport.h; path = ../teleport.h; sourceTree = SOURCE_ROOT; };
+		F69A40CF0C1E943500798B45 /* teleport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = teleport.cpp; path = ../teleport.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40D00C1E943500798B45 /* tasks.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tasks.h; path = ../tasks.h; sourceTree = SOURCE_ROOT; };
+		F69A40D10C1E943500798B45 /* talkaction.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = talkaction.h; path = ../talkaction.h; sourceTree = SOURCE_ROOT; };
+		F69A40D20C1E943500798B45 /* talkaction.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = talkaction.cpp; path = ../talkaction.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40D30C1E943500798B45 /* status.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = status.h; path = ../status.h; sourceTree = SOURCE_ROOT; };
+		F69A40D40C1E943500798B45 /* status.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = status.cpp; path = ../status.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40D50C1E943500798B45 /* spells.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = spells.h; path = ../spells.h; sourceTree = SOURCE_ROOT; };
+		F69A40D60C1E943500798B45 /* spells.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = spells.cpp; path = ../spells.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40D70C1E943500798B45 /* spawn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = spawn.h; path = ../spawn.h; sourceTree = SOURCE_ROOT; };
+		F69A40D80C1E943500798B45 /* spawn.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = spawn.cpp; path = ../spawn.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40D90C1E943500798B45 /* scriptmanager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = scriptmanager.h; path = ../scriptmanager.h; sourceTree = SOURCE_ROOT; };
+		F69A40DA0C1E943500798B45 /* scriptmanager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = scriptmanager.cpp; path = ../scriptmanager.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40DB0C1E943500798B45 /* scheduler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = scheduler.h; path = ../scheduler.h; sourceTree = SOURCE_ROOT; };
+		F69A40DC0C1E943500798B45 /* rsa.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = rsa.h; path = ../rsa.h; sourceTree = SOURCE_ROOT; };
+		F69A40DD0C1E943500798B45 /* rsa.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = rsa.cpp; path = ../rsa.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40DE0C1E943500798B45 /* raids.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = raids.h; path = ../raids.h; sourceTree = SOURCE_ROOT; };
+		F69A40DF0C1E943500798B45 /* raids.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = raids.cpp; path = ../raids.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40E20C1E943500798B45 /* position.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = position.h; path = ../position.h; sourceTree = SOURCE_ROOT; };
+		F69A40E30C1E943500798B45 /* position.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = position.cpp; path = ../position.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40E40C1E943500798B45 /* player.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = player.h; path = ../player.h; sourceTree = SOURCE_ROOT; };
+		F69A40E50C1E943500798B45 /* player.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = player.cpp; path = ../player.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40E60C1E943500798B45 /* outfit.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = outfit.h; path = ../outfit.h; sourceTree = SOURCE_ROOT; };
+		F69A40E70C1E943500798B45 /* outfit.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = outfit.cpp; path = ../outfit.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40E80C1E943500798B45 /* otserv.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = otserv.cpp; path = ../otserv.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40E90C1E943500798B45 /* otsystem.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = otsystem.h; path = ../otsystem.h; sourceTree = SOURCE_ROOT; };
+		F69A40EA0C1E943500798B45 /* npc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = npc.cpp; path = ../npc.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40EB0C1E943500798B45 /* movement.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = movement.cpp; path = ../movement.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40EC0C1E943500798B45 /* monsters.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = monsters.cpp; path = ../monsters.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40ED0C1E943500798B45 /* monster.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = monster.h; path = ../monster.h; sourceTree = SOURCE_ROOT; };
+		F69A40EE0C1E943500798B45 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = md5.h; path = ../md5.h; sourceTree = SOURCE_ROOT; };
+		F69A40EF0C1E943500798B45 /* md5.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = md5.cpp; path = ../md5.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40F00C1E943500798B45 /* mailbox.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mailbox.h; path = ../mailbox.h; sourceTree = SOURCE_ROOT; };
+		F69A40F10C1E943500798B45 /* mailbox.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = mailbox.cpp; path = ../mailbox.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40F20C1E943500798B45 /* luascript.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = luascript.h; path = ../luascript.h; sourceTree = SOURCE_ROOT; };
+		F69A40F30C1E943500798B45 /* logger.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = logger.h; path = ../logger.h; sourceTree = SOURCE_ROOT; };
+		F69A40F40C1E943500798B45 /* items.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = items.h; path = ../items.h; sourceTree = SOURCE_ROOT; };
+		F69A40F50C1E943500798B45 /* logger.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = logger.cpp; path = ../logger.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40F60C1E943500798B45 /* items.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = items.cpp; path = ../items.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40F70C1E943500798B45 /* item.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = item.cpp; path = ../item.cpp; sourceTree = SOURCE_ROOT; };
+		F69A40FB0C1E943500798B45 /* ioplayer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ioplayer.h; path = ../ioplayer.h; sourceTree = SOURCE_ROOT; };
+		F69A40FC0C1E943500798B45 /* ioplayer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ioplayer.cpp; path = ../ioplayer.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41030C1E943500798B45 /* iomapserialize.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = iomapserialize.h; path = ../iomapserialize.h; sourceTree = SOURCE_ROOT; };
+		F69A41040C1E943500798B45 /* iomapserialize.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = iomapserialize.cpp; path = ../iomapserialize.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41050C1E943500798B45 /* iomapotbm.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = iomapotbm.h; path = ../iomapotbm.h; sourceTree = SOURCE_ROOT; };
+		F69A41060C1E943500798B45 /* iomapotbm.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = iomapotbm.cpp; path = ../iomapotbm.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41070C1E943500798B45 /* iomap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = iomap.h; path = ../iomap.h; sourceTree = SOURCE_ROOT; };
+		F69A41080C1E943500798B45 /* housetile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = housetile.h; path = ../housetile.h; sourceTree = SOURCE_ROOT; };
+		F69A41090C1E943500798B45 /* housetile.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = housetile.cpp; path = ../housetile.cpp; sourceTree = SOURCE_ROOT; };
+		F69A410A0C1E943500798B45 /* house.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = house.h; path = ../house.h; sourceTree = SOURCE_ROOT; };
+		F69A410B0C1E943500798B45 /* house.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = house.cpp; path = ../house.cpp; sourceTree = SOURCE_ROOT; };
+		F69A410F0C1E943500798B45 /* game.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = game.h; path = ../game.h; sourceTree = SOURCE_ROOT; };
+		F69A41100C1E943500798B45 /* ioaccount.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ioaccount.h; path = ../ioaccount.h; sourceTree = SOURCE_ROOT; };
+		F69A41110C1E943500798B45 /* game.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = game.cpp; path = ../game.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41120C1E943500798B45 /* fileloader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fileloader.h; path = ../fileloader.h; sourceTree = SOURCE_ROOT; };
+		F69A41130C1E943500798B45 /* fileloader.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fileloader.cpp; path = ../fileloader.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41140C1E943500798B45 /* exception.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = exception.h; path = ../exception.h; sourceTree = SOURCE_ROOT; };
+		F69A41150C1E943500798B45 /* exception.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = exception.cpp; path = ../exception.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41160C1E943500798B45 /* enums.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = enums.h; path = ../enums.h; sourceTree = SOURCE_ROOT; };
+		F69A41170C1E943500798B45 /* depot.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = depot.cpp; path = ../depot.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41180C1E943500798B45 /* definitions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = definitions.h; path = ../definitions.h; sourceTree = SOURCE_ROOT; };
+		F69A41190C1E943500798B45 /* databasesqlite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = databasesqlite.h; path = ../databasesqlite.h; sourceTree = SOURCE_ROOT; };
+		F69A411A0C1E943500798B45 /* databasesqlite.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = databasesqlite.cpp; path = ../databasesqlite.cpp; sourceTree = SOURCE_ROOT; };
+		F69A411B0C1E943500798B45 /* databasemysql.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = databasemysql.h; path = ../databasemysql.h; sourceTree = SOURCE_ROOT; };
+		F69A411C0C1E943500798B45 /* databasemysql.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = databasemysql.cpp; path = ../databasemysql.cpp; sourceTree = SOURCE_ROOT; };
+		F69A411D0C1E943500798B45 /* database.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = database.h; path = ../database.h; sourceTree = SOURCE_ROOT; };
+		F69A411E0C1E943500798B45 /* database.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = database.cpp; path = ../database.cpp; sourceTree = SOURCE_ROOT; };
+		F69A411F0C1E943500798B45 /* cylinder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cylinder.h; path = ../cylinder.h; sourceTree = SOURCE_ROOT; };
+		F69A41200C1E943500798B45 /* cylinder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = cylinder.cpp; path = ../cylinder.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41210C1E943500798B45 /* creature.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = creature.cpp; path = ../creature.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41230C1E943500798B45 /* container.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = container.h; path = ../container.h; sourceTree = SOURCE_ROOT; };
+		F69A41240C1E943500798B45 /* container.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = container.cpp; path = ../container.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41260C1E943500798B45 /* configmanager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = configmanager.h; path = ../configmanager.h; sourceTree = SOURCE_ROOT; };
+		F69A41270C1E943500798B45 /* configmanager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = configmanager.cpp; path = ../configmanager.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41280C1E943500798B45 /* condition.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = condition.h; path = ../condition.h; sourceTree = SOURCE_ROOT; };
+		F69A41290C1E943500798B45 /* condition.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = condition.cpp; path = ../condition.cpp; sourceTree = SOURCE_ROOT; };
+		F69A412C0C1E943500798B45 /* combat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = combat.h; path = ../combat.h; sourceTree = SOURCE_ROOT; };
+		F69A412D0C1E943500798B45 /* combat.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = combat.cpp; path = ../combat.cpp; sourceTree = SOURCE_ROOT; };
+		F69A412E0C1E943500798B45 /* creature.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = creature.h; path = ../creature.h; sourceTree = SOURCE_ROOT; };
+		F69A412F0C1E943500798B45 /* chat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = chat.h; path = ../chat.h; sourceTree = SOURCE_ROOT; };
+		F69A41300C1E943500798B45 /* chat.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = chat.cpp; path = ../chat.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41310C1E943500798B45 /* baseevents.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = baseevents.h; path = ../baseevents.h; sourceTree = SOURCE_ROOT; };
+		F69A41320C1E943500798B45 /* baseevents.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = baseevents.cpp; path = ../baseevents.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41330C1E943500798B45 /* ban.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ban.h; path = ../ban.h; sourceTree = SOURCE_ROOT; };
+		F69A41340C1E943500798B45 /* ban.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ban.cpp; path = ../ban.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41350C1E943500798B45 /* networkmessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = networkmessage.h; path = ../networkmessage.h; sourceTree = SOURCE_ROOT; };
+		F69A41360C1E943500798B45 /* monster.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = monster.cpp; path = ../monster.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41370C1E943500798B45 /* allocator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = allocator.h; path = ../allocator.h; sourceTree = SOURCE_ROOT; };
+		F69A41380C1E943500798B45 /* allocator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = allocator.cpp; path = ../allocator.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41390C1E943500798B45 /* admin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = admin.h; path = ../admin.h; sourceTree = SOURCE_ROOT; };
+		F69A413A0C1E943500798B45 /* admin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = admin.cpp; path = ../admin.cpp; sourceTree = SOURCE_ROOT; };
+		F69A413B0C1E943500798B45 /* actions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = actions.h; path = ../actions.h; sourceTree = SOURCE_ROOT; };
+		F69A413D0C1E943500798B45 /* account.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = account.h; path = ../account.h; sourceTree = SOURCE_ROOT; };
+		F69A413E0C1E943500798B45 /* actions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = actions.cpp; path = ../actions.cpp; sourceTree = SOURCE_ROOT; };
+		F69A413F0C1E943500798B45 /* networkmessage.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = networkmessage.cpp; path = ../networkmessage.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41400C1E943500798B45 /* movement.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = movement.h; path = ../movement.h; sourceTree = SOURCE_ROOT; };
+		F69A41410C1E943500798B45 /* itemloader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = itemloader.h; path = ../itemloader.h; sourceTree = SOURCE_ROOT; };
+		F69A41420C1E943500798B45 /* map.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = map.cpp; path = ../map.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41430C1E943500798B45 /* item.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = item.h; path = ../item.h; sourceTree = SOURCE_ROOT; };
+		F69A41440C1E943500798B45 /* otpch.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = otpch.h; path = ../otpch.h; sourceTree = SOURCE_ROOT; };
+		F69A41450C1E943500798B45 /* monsters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = monsters.h; path = ../monsters.h; sourceTree = SOURCE_ROOT; };
+		F69A41460C1E943500798B45 /* luascript.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = luascript.cpp; path = ../luascript.cpp; sourceTree = SOURCE_ROOT; };
+		F69A41470C1E943500798B45 /* map.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = map.h; path = ../map.h; sourceTree = SOURCE_ROOT; };
+		F69A41490C1E943500798B45 /* ioaccount.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ioaccount.cpp; path = ../ioaccount.cpp; sourceTree = SOURCE_ROOT; };
+		F69A414A0C1E943500798B45 /* npc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = npc.h; path = ../npc.h; sourceTree = SOURCE_ROOT; };
+		F69A414B0C1E943500798B45 /* depot.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = depot.h; path = ../depot.h; sourceTree = SOURCE_ROOT; };
+		F69A43750C1EAC8300798B45 /* otserv-mysql */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "otserv-mysql"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F69A44270C1EAED100798B45 /* otserv-sqlite */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "otserv-sqlite"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F69A43710C1EAC8300798B45 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F69A44230C1EAED100798B45 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		550AF8BE11ECD17200CC0107 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F62DEBA70C233B16004E3974 /* Other files */ = {
+			isa = PBXGroup;
+			children = (
+				F62DEBA80C233B4C004E3974 /* config.lua */,
+			);
+			name = "Other files";
+			sourceTree = "<group>";
+		};
+		F69A414C0C1E944200798B45 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				55896D68118DFA0800B3D215 /* connection.h */,
+				55896D69118DFA0800B3D215 /* const.h */,
+				55896D66118DFA0800B3D215 /* beds.cpp */,
+				55896D67118DFA0800B3D215 /* beds.h */,
+				55896D6A118DFA0800B3D215 /* databaseodbc.cpp */,
+				55896D6B118DFA0800B3D215 /* databasepgsql.cpp */,
+				55896D6C118DFA0800B3D215 /* databasepgsql.h */,
+				55896D6D118DFA0800B3D215 /* guild.cpp */,
+				55896D6E118DFA0800B3D215 /* guild.h */,
+				55896D6F118DFA0800B3D215 /* party.cpp */,
+				55896D70118DFA0800B3D215 /* party.h */,
+				55896D71118DFA0800B3D215 /* protocolgame.cpp */,
+				55896D72118DFA0800B3D215 /* protocolgame.h */,
+				55896D73118DFA0800B3D215 /* protocolold.cpp */,
+				55896D74118DFA0800B3D215 /* protocolold.h */,
+				55896D75118DFA0800B3D215 /* quests.cpp */,
+				55896D76118DFA0800B3D215 /* quests.h */,
+				55896D77118DFA0800B3D215 /* sha1.cpp */,
+				55896D78118DFA0800B3D215 /* sha1.h */,
+				F62774110CB8424400FC37DB /* creatureevent.h */,
+				F62774120CB8424400FC37DB /* outputmessage.h */,
+				F62774130CB8424400FC37DB /* protocol.cpp */,
+				F62774140CB8424400FC37DB /* protocol.h */,
+				F62774150CB8424400FC37DB /* protocollogin.h */,
+				F62774160CB8424400FC37DB /* scheduler.cpp */,
+				F62774170CB8424400FC37DB /* server.cpp */,
+				F62774180CB8424400FC37DB /* server.h */,
+				F62774190CB8424400FC37DB /* tasks.cpp */,
+				F62774010CB841CC00FC37DB /* connection.cpp */,
+				F62774020CB841CC00FC37DB /* creatureevent.cpp */,
+				F62774030CB841CC00FC37DB /* outputmessage.cpp */,
+				F62774040CB841CC00FC37DB /* protocollogin.cpp */,
+				F69A41400C1E943500798B45 /* movement.h */,
+				F69A41410C1E943500798B45 /* itemloader.h */,
+				F69A41420C1E943500798B45 /* map.cpp */,
+				F69A41430C1E943500798B45 /* item.h */,
+				F69A41440C1E943500798B45 /* otpch.h */,
+				F69A41450C1E943500798B45 /* monsters.h */,
+				F69A41460C1E943500798B45 /* luascript.cpp */,
+				F69A41470C1E943500798B45 /* map.h */,
+				F69A41490C1E943500798B45 /* ioaccount.cpp */,
+				F69A414A0C1E943500798B45 /* npc.h */,
+				F69A414B0C1E943500798B45 /* depot.h */,
+				F69A412E0C1E943500798B45 /* creature.h */,
+				F69A412F0C1E943500798B45 /* chat.h */,
+				F69A41300C1E943500798B45 /* chat.cpp */,
+				F69A41310C1E943500798B45 /* baseevents.h */,
+				F69A41320C1E943500798B45 /* baseevents.cpp */,
+				F69A41330C1E943500798B45 /* ban.h */,
+				F69A41340C1E943500798B45 /* ban.cpp */,
+				F69A41350C1E943500798B45 /* networkmessage.h */,
+				F69A41360C1E943500798B45 /* monster.cpp */,
+				F69A41370C1E943500798B45 /* allocator.h */,
+				F69A41380C1E943500798B45 /* allocator.cpp */,
+				F69A41390C1E943500798B45 /* admin.h */,
+				F69A413A0C1E943500798B45 /* admin.cpp */,
+				F69A413B0C1E943500798B45 /* actions.h */,
+				F69A413D0C1E943500798B45 /* account.h */,
+				F69A413E0C1E943500798B45 /* actions.cpp */,
+				F69A413F0C1E943500798B45 /* networkmessage.cpp */,
+				F69A411C0C1E943500798B45 /* databasemysql.cpp */,
+				F69A411D0C1E943500798B45 /* database.h */,
+				F69A411E0C1E943500798B45 /* database.cpp */,
+				F69A411F0C1E943500798B45 /* cylinder.h */,
+				F69A41200C1E943500798B45 /* cylinder.cpp */,
+				F69A41210C1E943500798B45 /* creature.cpp */,
+				F69A41230C1E943500798B45 /* container.h */,
+				F69A41240C1E943500798B45 /* container.cpp */,
+				F69A41260C1E943500798B45 /* configmanager.h */,
+				F69A41270C1E943500798B45 /* configmanager.cpp */,
+				F69A41280C1E943500798B45 /* condition.h */,
+				F69A41290C1E943500798B45 /* condition.cpp */,
+				F69A412C0C1E943500798B45 /* combat.h */,
+				F69A412D0C1E943500798B45 /* combat.cpp */,
+				F69A410A0C1E943500798B45 /* house.h */,
+				F69A410B0C1E943500798B45 /* house.cpp */,
+				F69A410F0C1E943500798B45 /* game.h */,
+				F69A41100C1E943500798B45 /* ioaccount.h */,
+				F69A41110C1E943500798B45 /* game.cpp */,
+				F69A41120C1E943500798B45 /* fileloader.h */,
+				F69A41130C1E943500798B45 /* fileloader.cpp */,
+				F69A41140C1E943500798B45 /* exception.h */,
+				F69A41150C1E943500798B45 /* exception.cpp */,
+				F69A41160C1E943500798B45 /* enums.h */,
+				F69A41170C1E943500798B45 /* depot.cpp */,
+				F69A41180C1E943500798B45 /* definitions.h */,
+				F69A41190C1E943500798B45 /* databasesqlite.h */,
+				F69A411A0C1E943500798B45 /* databasesqlite.cpp */,
+				F69A411B0C1E943500798B45 /* databasemysql.h */,
+				F69A40FB0C1E943500798B45 /* ioplayer.h */,
+				F69A40FC0C1E943500798B45 /* ioplayer.cpp */,
+				F69A41030C1E943500798B45 /* iomapserialize.h */,
+				F69A41040C1E943500798B45 /* iomapserialize.cpp */,
+				F69A41050C1E943500798B45 /* iomapotbm.h */,
+				F69A41060C1E943500798B45 /* iomapotbm.cpp */,
+				F69A41070C1E943500798B45 /* iomap.h */,
+				F69A41080C1E943500798B45 /* housetile.h */,
+				F69A41090C1E943500798B45 /* housetile.cpp */,
+				F69A40E40C1E943500798B45 /* player.h */,
+				F69A40E50C1E943500798B45 /* player.cpp */,
+				F69A40E60C1E943500798B45 /* outfit.h */,
+				F69A40E70C1E943500798B45 /* outfit.cpp */,
+				F69A40E80C1E943500798B45 /* otserv.cpp */,
+				F69A40E90C1E943500798B45 /* otsystem.h */,
+				F69A40EA0C1E943500798B45 /* npc.cpp */,
+				F69A40EB0C1E943500798B45 /* movement.cpp */,
+				F69A40EC0C1E943500798B45 /* monsters.cpp */,
+				F69A40ED0C1E943500798B45 /* monster.h */,
+				F69A40EE0C1E943500798B45 /* md5.h */,
+				F69A40EF0C1E943500798B45 /* md5.cpp */,
+				F69A40F00C1E943500798B45 /* mailbox.h */,
+				F69A40F10C1E943500798B45 /* mailbox.cpp */,
+				F69A40F20C1E943500798B45 /* luascript.h */,
+				F69A40F30C1E943500798B45 /* logger.h */,
+				F69A40F40C1E943500798B45 /* items.h */,
+				F69A40F50C1E943500798B45 /* logger.cpp */,
+				F69A40F60C1E943500798B45 /* items.cpp */,
+				F69A40F70C1E943500798B45 /* item.cpp */,
+				F69A40E30C1E943500798B45 /* position.cpp */,
+				F69A40E20C1E943500798B45 /* position.h */,
+				F69A40BE0C1E943500798B45 /* weapons.h */,
+				F69A40BF0C1E943500798B45 /* weapons.cpp */,
+				F69A40C00C1E943500798B45 /* waitlist.h */,
+				F69A40C10C1E943500798B45 /* waitlist.cpp */,
+				F69A40C20C1E943500798B45 /* vocation.h */,
+				F69A40C30C1E943500798B45 /* vocation.cpp */,
+				F69A40C40C1E943500798B45 /* trashholder.h */,
+				F69A40C50C1E943500798B45 /* trashholder.cpp */,
+				F69A40C60C1E943500798B45 /* town.h */,
+				F69A40C70C1E943500798B45 /* tools.h */,
+				F69A40C80C1E943500798B45 /* tools.cpp */,
+				F69A40C90C1E943500798B45 /* tile.h */,
+				F69A40CA0C1E943500798B45 /* tile.cpp */,
+				F69A40CB0C1E943500798B45 /* thing.h */,
+				F69A40CC0C1E943500798B45 /* thing.cpp */,
+				F69A40CD0C1E943500798B45 /* templates.h */,
+				F69A40CE0C1E943500798B45 /* teleport.h */,
+				F69A40CF0C1E943500798B45 /* teleport.cpp */,
+				F69A40D00C1E943500798B45 /* tasks.h */,
+				F69A40D10C1E943500798B45 /* talkaction.h */,
+				F69A40D20C1E943500798B45 /* talkaction.cpp */,
+				F69A40D30C1E943500798B45 /* status.h */,
+				F69A40D40C1E943500798B45 /* status.cpp */,
+				F69A40D50C1E943500798B45 /* spells.h */,
+				F69A40D60C1E943500798B45 /* spells.cpp */,
+				F69A40D70C1E943500798B45 /* spawn.h */,
+				F69A40D80C1E943500798B45 /* spawn.cpp */,
+				F69A40D90C1E943500798B45 /* scriptmanager.h */,
+				F69A40DA0C1E943500798B45 /* scriptmanager.cpp */,
+				F69A40DB0C1E943500798B45 /* scheduler.h */,
+				F69A40DC0C1E943500798B45 /* rsa.h */,
+				F69A40DD0C1E943500798B45 /* rsa.cpp */,
+				F69A40DE0C1E943500798B45 /* raids.h */,
+				F69A40DF0C1E943500798B45 /* raids.cpp */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		F69A41530C1E951400798B45 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F69A44270C1EAED100798B45 /* otserv-sqlite */,
+				F69A43750C1EAC8300798B45 /* otserv-mysql */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F69AE4DA0C1E804900C5F7A1 = {
+			isa = PBXGroup;
+			children = (
+				550AF8BE11ECD17200CC0107 /* Frameworks */,
+				F62DEBA70C233B16004E3974 /* Other files */,
+				F69A414C0C1E944200798B45 /* Source */,
+				F69A41530C1E951400798B45 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F69A42E10C1EAC8300798B45 /* otserv-mysql */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F69A43720C1EAC8300798B45 /* Build configuration list for PBXNativeTarget "otserv-mysql" */;
+			buildPhases = (
+				F69A42E20C1EAC8300798B45 /* Sources */,
+				F69A43710C1EAC8300798B45 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "otserv-mysql";
+			productName = otserv;
+			productReference = F69A43750C1EAC8300798B45 /* otserv-mysql */;
+			productType = "com.apple.product-type.tool";
+		};
+		F69A43930C1EAED100798B45 /* otserv-sqlite */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F69A44240C1EAED100798B45 /* Build configuration list for PBXNativeTarget "otserv-sqlite" */;
+			buildPhases = (
+				F69A43940C1EAED100798B45 /* Sources */,
+				F69A44230C1EAED100798B45 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "otserv-sqlite";
+			productName = otserv;
+			productReference = F69A44270C1EAED100798B45 /* otserv-sqlite */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F69AE4DC0C1E804900C5F7A1 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = F69AE4DD0C1E804900C5F7A1 /* Build configuration list for PBXProject "otserv" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 0;
+			mainGroup = F69AE4DA0C1E804900C5F7A1;
+			productRefGroup = F69A41530C1E951400798B45 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F69A43930C1EAED100798B45 /* otserv-sqlite */,
+				F69A42E10C1EAC8300798B45 /* otserv-mysql */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F69A42E20C1EAC8300798B45 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F627740B0CB841CC00FC37DB /* outputmessage.cpp in Sources */,
+				F69A42E50C1EAC8300798B45 /* actions.cpp in Sources */,
+				F69A42E70C1EAC8300798B45 /* admin.cpp in Sources */,
+				F69A42E90C1EAC8300798B45 /* allocator.cpp in Sources */,
+				F69A42EB0C1EAC8300798B45 /* ban.cpp in Sources */,
+				F69A42ED0C1EAC8300798B45 /* baseevents.cpp in Sources */,
+				F69A42EF0C1EAC8300798B45 /* chat.cpp in Sources */,
+				F69A42F10C1EAC8300798B45 /* combat.cpp in Sources */,
+				F69A42F50C1EAC8300798B45 /* condition.cpp in Sources */,
+				F69A42F70C1EAC8300798B45 /* configmanager.cpp in Sources */,
+				F69A42FA0C1EAC8300798B45 /* container.cpp in Sources */,
+				F69A42FC0C1EAC8300798B45 /* creature.cpp in Sources */,
+				F69A42FE0C1EAC8300798B45 /* cylinder.cpp in Sources */,
+				F69A43000C1EAC8300798B45 /* database.cpp in Sources */,
+				F69A43020C1EAC8300798B45 /* databasemysql.cpp in Sources */,
+				F69A43070C1EAC8300798B45 /* depot.cpp in Sources */,
+				F69A430C0C1EAC8300798B45 /* fileloader.cpp in Sources */,
+				F69A430E0C1EAC8300798B45 /* game.cpp in Sources */,
+				F69A43100C1EAC8300798B45 /* house.cpp in Sources */,
+				F69A43120C1EAC8300798B45 /* housetile.cpp in Sources */,
+				F69A43140C1EAC8300798B45 /* ioaccount.cpp in Sources */,
+				F69A431B0C1EAC8300798B45 /* iomapotbm.cpp in Sources */,
+				F69A431D0C1EAC8300798B45 /* iomapserialize.cpp in Sources */,
+				F69A43250C1EAC8300798B45 /* ioplayer.cpp in Sources */,
+				F69A432B0C1EAC8300798B45 /* item.cpp in Sources */,
+				F69A432E0C1EAC8300798B45 /* items.cpp in Sources */,
+				F69A43300C1EAC8300798B45 /* logger.cpp in Sources */,
+				F69A43320C1EAC8300798B45 /* luascript.cpp in Sources */,
+				F69A43340C1EAC8300798B45 /* mailbox.cpp in Sources */,
+				F69A43360C1EAC8300798B45 /* map.cpp in Sources */,
+				F69A43380C1EAC8300798B45 /* md5.cpp in Sources */,
+				F69A433A0C1EAC8300798B45 /* monster.cpp in Sources */,
+				F69A433C0C1EAC8300798B45 /* monsters.cpp in Sources */,
+				F69A433E0C1EAC8300798B45 /* movement.cpp in Sources */,
+				F69A43400C1EAC8300798B45 /* networkmessage.cpp in Sources */,
+				F69A43420C1EAC8300798B45 /* npc.cpp in Sources */,
+				F69A43450C1EAC8300798B45 /* otserv.cpp in Sources */,
+				F69A43470C1EAC8300798B45 /* outfit.cpp in Sources */,
+				F69A43490C1EAC8300798B45 /* player.cpp in Sources */,
+				F69A434B0C1EAC8300798B45 /* position.cpp in Sources */,
+				F69A434F0C1EAC8300798B45 /* raids.cpp in Sources */,
+				F69A43510C1EAC8300798B45 /* rsa.cpp in Sources */,
+				F69A43540C1EAC8300798B45 /* scriptmanager.cpp in Sources */,
+				F69A43560C1EAC8300798B45 /* spawn.cpp in Sources */,
+				F69A43580C1EAC8300798B45 /* spells.cpp in Sources */,
+				F69A435A0C1EAC8300798B45 /* status.cpp in Sources */,
+				F69A435C0C1EAC8300798B45 /* talkaction.cpp in Sources */,
+				F69A435F0C1EAC8300798B45 /* teleport.cpp in Sources */,
+				F69A43620C1EAC8300798B45 /* thing.cpp in Sources */,
+				F69A43640C1EAC8300798B45 /* tile.cpp in Sources */,
+				F69A43660C1EAC8300798B45 /* tools.cpp in Sources */,
+				F69A43690C1EAC8300798B45 /* trashholder.cpp in Sources */,
+				F69A436B0C1EAC8300798B45 /* vocation.cpp in Sources */,
+				F69A436D0C1EAC8300798B45 /* waitlist.cpp in Sources */,
+				F69A436F0C1EAC8300798B45 /* weapons.cpp in Sources */,
+				F62774090CB841CC00FC37DB /* connection.cpp in Sources */,
+				F627740A0CB841CC00FC37DB /* creatureevent.cpp in Sources */,
+				F627740C0CB841CC00FC37DB /* protocollogin.cpp in Sources */,
+				F627741E0CB8424400FC37DB /* protocol.cpp in Sources */,
+				F627741F0CB8424400FC37DB /* scheduler.cpp in Sources */,
+				F62774200CB8424400FC37DB /* server.cpp in Sources */,
+				F62774210CB8424400FC37DB /* tasks.cpp in Sources */,
+				55896D7B118DFA2E00B3D215 /* beds.cpp in Sources */,
+				55896D7C118DFA3000B3D215 /* databaseodbc.cpp in Sources */,
+				55896D7D118DFA3100B3D215 /* databasepgsql.cpp in Sources */,
+				55896D7E118DFA3100B3D215 /* databasesqlite.cpp in Sources */,
+				55896D7F118DFA3300B3D215 /* exception.cpp in Sources */,
+				55896D80118DFA3400B3D215 /* guild.cpp in Sources */,
+				55896D81118DFA3900B3D215 /* party.cpp in Sources */,
+				55896D82118DFA3D00B3D215 /* protocolgame.cpp in Sources */,
+				55896D83118DFA3E00B3D215 /* protocolold.cpp in Sources */,
+				55896D84118DFA3F00B3D215 /* quests.cpp in Sources */,
+				55896D85118DFA4200B3D215 /* sha1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F69A43940C1EAED100798B45 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F627740F0CB841CC00FC37DB /* outputmessage.cpp in Sources */,
+				F69A43970C1EAED100798B45 /* actions.cpp in Sources */,
+				F69A43990C1EAED100798B45 /* admin.cpp in Sources */,
+				F69A439B0C1EAED100798B45 /* allocator.cpp in Sources */,
+				F69A439D0C1EAED100798B45 /* ban.cpp in Sources */,
+				F69A439F0C1EAED100798B45 /* baseevents.cpp in Sources */,
+				F69A43A10C1EAED100798B45 /* chat.cpp in Sources */,
+				F69A43A30C1EAED100798B45 /* combat.cpp in Sources */,
+				F69A43A70C1EAED100798B45 /* condition.cpp in Sources */,
+				F69A43A90C1EAED100798B45 /* configmanager.cpp in Sources */,
+				F69A43AC0C1EAED100798B45 /* container.cpp in Sources */,
+				F69A43AE0C1EAED100798B45 /* creature.cpp in Sources */,
+				F69A43B00C1EAED100798B45 /* cylinder.cpp in Sources */,
+				F69A43B20C1EAED100798B45 /* database.cpp in Sources */,
+				F69A43B60C1EAED100798B45 /* databasesqlite.cpp in Sources */,
+				F69A43B90C1EAED100798B45 /* depot.cpp in Sources */,
+				F69A43BE0C1EAED100798B45 /* fileloader.cpp in Sources */,
+				F69A43C00C1EAED100798B45 /* game.cpp in Sources */,
+				F69A43C20C1EAED100798B45 /* house.cpp in Sources */,
+				F69A43C40C1EAED100798B45 /* housetile.cpp in Sources */,
+				F69A43C60C1EAED100798B45 /* ioaccount.cpp in Sources */,
+				F69A43CD0C1EAED100798B45 /* iomapotbm.cpp in Sources */,
+				F69A43CF0C1EAED100798B45 /* iomapserialize.cpp in Sources */,
+				F69A43D70C1EAED100798B45 /* ioplayer.cpp in Sources */,
+				F69A43DD0C1EAED100798B45 /* item.cpp in Sources */,
+				F69A43E00C1EAED100798B45 /* items.cpp in Sources */,
+				F69A43E20C1EAED100798B45 /* logger.cpp in Sources */,
+				F69A43E40C1EAED100798B45 /* luascript.cpp in Sources */,
+				F69A43E60C1EAED100798B45 /* mailbox.cpp in Sources */,
+				F69A43E80C1EAED100798B45 /* map.cpp in Sources */,
+				F69A43EA0C1EAED100798B45 /* md5.cpp in Sources */,
+				F69A43EC0C1EAED100798B45 /* monster.cpp in Sources */,
+				F69A43EE0C1EAED100798B45 /* monsters.cpp in Sources */,
+				F69A43F00C1EAED100798B45 /* movement.cpp in Sources */,
+				F69A43F20C1EAED100798B45 /* networkmessage.cpp in Sources */,
+				F69A43F40C1EAED100798B45 /* npc.cpp in Sources */,
+				F69A43F70C1EAED100798B45 /* otserv.cpp in Sources */,
+				F69A43F90C1EAED100798B45 /* outfit.cpp in Sources */,
+				F69A43FB0C1EAED100798B45 /* player.cpp in Sources */,
+				F69A43FD0C1EAED100798B45 /* position.cpp in Sources */,
+				F69A44010C1EAED100798B45 /* raids.cpp in Sources */,
+				F69A44030C1EAED100798B45 /* rsa.cpp in Sources */,
+				F69A44060C1EAED100798B45 /* scriptmanager.cpp in Sources */,
+				F69A44080C1EAED100798B45 /* spawn.cpp in Sources */,
+				F69A440A0C1EAED100798B45 /* spells.cpp in Sources */,
+				F69A440C0C1EAED100798B45 /* status.cpp in Sources */,
+				F69A440E0C1EAED100798B45 /* talkaction.cpp in Sources */,
+				F69A44110C1EAED100798B45 /* teleport.cpp in Sources */,
+				F69A44140C1EAED100798B45 /* thing.cpp in Sources */,
+				F69A44160C1EAED100798B45 /* tile.cpp in Sources */,
+				F69A44180C1EAED100798B45 /* tools.cpp in Sources */,
+				F69A441B0C1EAED100798B45 /* trashholder.cpp in Sources */,
+				F69A441D0C1EAED100798B45 /* vocation.cpp in Sources */,
+				F69A441F0C1EAED100798B45 /* waitlist.cpp in Sources */,
+				F69A44210C1EAED100798B45 /* weapons.cpp in Sources */,
+				F627740D0CB841CC00FC37DB /* connection.cpp in Sources */,
+				F627740E0CB841CC00FC37DB /* creatureevent.cpp in Sources */,
+				F62774100CB841CC00FC37DB /* protocollogin.cpp in Sources */,
+				F62774220CB8424400FC37DB /* protocol.cpp in Sources */,
+				F62774230CB8424400FC37DB /* scheduler.cpp in Sources */,
+				F62774240CB8424400FC37DB /* server.cpp in Sources */,
+				F62774250CB8424400FC37DB /* tasks.cpp in Sources */,
+				55EBB2CD118DFE7500CCFC83 /* beds.cpp in Sources */,
+				55EBB2CF118DFE8300CCFC83 /* party.cpp in Sources */,
+				55EBB2D0118DFE8700CCFC83 /* sha1.cpp in Sources */,
+				55EBB2D1118DFE8B00CCFC83 /* guild.cpp in Sources */,
+				55EBB2D2118DFE8F00CCFC83 /* exception.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F69A43730C1EAC8300798B45 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__USE_MYSQL__,
+					__CONFIG_V2__,
+				);
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					/opt/local/include/mysql5,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
+				);
+				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					/opt/local/lib/mysql5/mysql,
+				);
+				OTHER_LDFLAGS = (
+					"-lxml2",
+					"-lgmp",
+					"-llua",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
+					"-lmysqlclient",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "otserv-mysql";
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		F69A43740C1EAC8300798B45 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__USE_MYSQL__,
+					__CONFIG_V2__,
+				);
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					/opt/local/include/mysql5,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
+				);
+				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					/opt/local/lib/mysql5/mysql,
+				);
+				OTHER_LDFLAGS = (
+					"-lxml2",
+					"-lgmp",
+					"-llua",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
+					"-lmysqlclient",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "otserv-mysql";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		F69A44250C1EAED100798B45 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__USE_SQLITE__,
+					__CONFIG_V2__,
+				);
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
+				);
+				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = /opt/local/lib;
+				OTHER_LDFLAGS = (
+					"-lxml2",
+					"-lgmp",
+					"-llua",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
+					"-lsqlite3",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "otserv-sqlite";
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		F69A44260C1EAED100798B45 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__USE_SQLITE__,
+					__CONFIG_V2__,
+				);
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					/opt/local/include/libxml2,
+					/opt/local/include/boost_asio,
+				);
+				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = /opt/local/lib;
+				OTHER_LDFLAGS = (
+					"-lxml2",
+					"-lgmp",
+					"-llua",
+					"-lboost_thread-mt",
+					"-lboost_regex-mt",
+					"-lboost_system",
+					"-lsqlite3",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "otserv-sqlite";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		F69AE4DE0C1E804900C5F7A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		F69AE4DF0C1E804900C5F7A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F69A43720C1EAC8300798B45 /* Build configuration list for PBXNativeTarget "otserv-mysql" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F69A43730C1EAC8300798B45 /* Debug */,
+				F69A43740C1EAC8300798B45 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F69A44240C1EAED100798B45 /* Build configuration list for PBXNativeTarget "otserv-sqlite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F69A44250C1EAED100798B45 /* Debug */,
+				F69A44260C1EAED100798B45 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F69AE4DD0C1E804900C5F7A1 /* Build configuration list for PBXProject "otserv" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F69AE4DE0C1E804900C5F7A1 /* Debug */,
+				F69AE4DF0C1E804900C5F7A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F69AE4DC0C1E804900C5F7A1 /* Project object */;
+}
