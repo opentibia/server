@@ -1280,7 +1280,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		break;
 
 	case RET_NOTENOUGHSOUL:
-		sendCancel("You do not have enough soul");
+		sendCancel("You do not have enough soul.");
 		break;
 
 	case RET_YOUAREEXHAUSTED:
