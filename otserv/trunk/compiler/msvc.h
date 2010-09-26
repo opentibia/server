@@ -43,6 +43,8 @@
 	#define VISUALC_VERSION 7
 #endif
 
+#define WIN32_LEAN_AND_MEAN
+
 /*
 	Disable deprecated CRT functions limitation.
 	For further information visit:

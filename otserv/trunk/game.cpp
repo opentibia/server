@@ -3015,9 +3015,9 @@ bool Game::internalCloseTrade(Player* player)
 	if((tradePartner && tradePartner->getTradeState() == TRADE_TRANSFER) ||
 		  player->getTradeState() == TRADE_TRANSFER){
 #ifdef __DEBUG__
-  		std::cout << "Warning: [Game::playerCloseTrade] TradeState == TRADE_TRANSFER. " <<
-		  	player->getName() << " " << player->getTradeState() << " , " <<
-		  	tradePartner->getName() << " " << tradePartner->getTradeState() << std::endl;
+		std::cout << "Warning: [Game::playerCloseTrade] TradeState == TRADE_TRANSFER. " <<
+			player->getName() << " " << player->getTradeState() << " , " <<
+			tradePartner->getName() << " " << tradePartner->getTradeState() << std::endl;
 #endif
 		return true;
 	}

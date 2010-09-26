@@ -22,7 +22,7 @@
 #define __OTSERV_CYGWIN_H__
 
 /*
-    Allow Cygwin to access the Windows Socket API
+	Allow Cygwin to access the Windows Socket API
 */
 #if defined __WINDOWS__
 	#define __USE_W32_SOCKETS

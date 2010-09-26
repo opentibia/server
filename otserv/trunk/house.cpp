@@ -402,7 +402,7 @@ bool House::canEditAccessList(uint32_t listId, const Player* player)
 		break;
 	default:
 		return false;
- 	}
+	}
 }
 
 HouseTransferItem* House::getTransferItem()

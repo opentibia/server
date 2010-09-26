@@ -163,10 +163,10 @@ Creature()
 	guildNick = "";
 
 	sex = PLAYERSEX_LAST;
- 	vocation_id = (Vocation_t)0;
+	vocation_id = (Vocation_t)0;
 
- 	town = 0;
- 	lastip = 0;
+	town = 0;
+	lastip = 0;
 
 	windowTextId = 0;
 	writeItem = NULL;
@@ -722,8 +722,8 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier 
 
 	//Need skill up?
 	if(skills[skill][SKILL_TRIES] >= vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1)){
-	 	skills[skill][SKILL_LEVEL]++;
-	 	skills[skill][SKILL_TRIES] = 0;
+		skills[skill][SKILL_LEVEL]++;
+		skills[skill][SKILL_TRIES] = 0;
 		skills[skill][SKILL_PERCENT] = 0;
 		std::stringstream advMsg;
 		if(!g_config.getNumber(ConfigManager::SHOW_NEW_SKILL_LEVEL))
@@ -2513,7 +2513,7 @@ void Player::die()
 
 				skills[i][SKILL_TRIES] = std::max((int32_t)0, (int32_t)(skills[i][SKILL_TRIES] - lostSkillTries));
 			}
-  		}
+		}
 
 		Creature::die();
 		std::string death_msg = g_config.getString(ConfigManager::DEATH_MSG);
@@ -4711,7 +4711,7 @@ void Player::addStamina(int64_t value)
 {
 	int64_t newstamina = stamina + value;
 
-    //stamina may not be bigger than 42 hours, and not smaller than 0
+	//stamina may not be bigger than 42 hours, and not smaller than 0
 	if(newstamina > MAX_STAMINA)
 		newstamina = MAX_STAMINA;
 	if(newstamina < 0)
@@ -4722,11 +4722,11 @@ void Player::addStamina(int64_t value)
 
 int32_t Player::getStaminaMinutes()
 {
-    if(hasFlag(PlayerFlag_HasInfiniteStamina)){
-        return MAX_STAMINA_MINUTES;
-    }
+	if(hasFlag(PlayerFlag_HasInfiniteStamina)){
+		return MAX_STAMINA_MINUTES;
+	}
 
-    return std::min(MAX_STAMINA_MINUTES, int32_t(stamina / 60000));
+	return std::min(MAX_STAMINA_MINUTES, int32_t(stamina / 60000));
 }
 
 void Player::checkIdleTime(uint32_t ticks)

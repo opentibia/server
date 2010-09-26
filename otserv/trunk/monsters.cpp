@@ -951,9 +951,9 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 						}
 
 
-                        if(readXMLInteger(tmpNode, "hidehealth", intValue)){
-                            mType->hideHealth = (intValue!=0);
-                        }
+						if(readXMLInteger(tmpNode, "hidehealth", intValue)){
+							mType->hideHealth = (intValue!=0);
+						}
 
 						if(readXMLInteger(tmpNode, "lureable", intValue)){
 							mType->isLureable = (intValue != 0);

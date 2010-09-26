@@ -313,7 +313,7 @@ void Creature::onWalk()
 		listWalkDir.clear();
 		onWalkAborted();
 		cancelNextWalk = false;
- 	}
+	}
 
 	if(eventWalk != 0){
 		eventWalk = 0;

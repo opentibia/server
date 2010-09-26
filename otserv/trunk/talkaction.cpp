@@ -234,25 +234,25 @@ bool TalkAction::configureEvent(xmlNodePtr p)
 
 bool TalkAction::loadFunction(const std::string& functionName)
 {
- 	if(asLowerCaseString(functionName) == "placenpc"){
+	if(asLowerCaseString(functionName) == "placenpc"){
 		function = placeNpc;
- 	}
- 	else if(asLowerCaseString(functionName) == "sellhouse"){
+	}
+	else if(asLowerCaseString(functionName) == "sellhouse"){
 		function = sellHouse;
- 	}
- 	else if(asLowerCaseString(functionName) == "forceraid"){
+	}
+	else if(asLowerCaseString(functionName) == "forceraid"){
 		function = forceRaid;
- 	}
+	}
 	else if(asLowerCaseString(functionName) == "gminvisible"){
 		function = gmInvisible;
 	}
- 	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
- 	else if(asLowerCaseString(functionName) == "serverdiagnostic"){
+	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	else if(asLowerCaseString(functionName) == "serverdiagnostic"){
 		function = serverDiag;
- 	}
- 	#endif
- 	else{
- 		return false;
+	}
+	#endif
+	else{
+		return false;
 	}
 
 	m_scripted = false;

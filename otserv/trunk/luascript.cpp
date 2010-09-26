@@ -853,7 +853,7 @@ void LuaScriptInterface::pushVariant(lua_State *L, const LuaVariant& var)
 		}
 		case VARIANT_NONE:
 			break;
- 	}
+	}
 }
 
 void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, uint32_t thingid)
@@ -2289,12 +2289,12 @@ int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
 
 int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 {
- 	//setPlayerSkullType(cid, skull_type)
+	//setPlayerSkullType(cid, skull_type)
 	#ifdef __SKULLSYSTEM__
 	uint32_t skull = popNumber(L);
 	uint32_t cid = popNumber(L);
 
- 	ScriptEnviroment* env = getScriptEnv();
+	ScriptEnviroment* env = getScriptEnv();
 
 	Player* player = env->getPlayerByUID(cid);
 
@@ -3183,7 +3183,7 @@ int LuaScriptInterface::luaAddContainerItemEx(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Container* container = env->getContainerByUID(uid);
 	if(container){
-	   	Item* item = env->getItemByUID(virtuid);
+		Item* item = env->getItemByUID(virtuid);
 
 		if(!item){
 			reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
@@ -4654,22 +4654,22 @@ int LuaScriptInterface::luaDoPlayerSetVocation(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerSetSex(lua_State *L)
 {
-    //doPlayerSetSex(cid, sex)
-    uint32_t sex = popNumber(L);
-    uint32_t cid = popNumber(L);
+	//doPlayerSetSex(cid, sex)
+	uint32_t sex = popNumber(L);
+	uint32_t cid = popNumber(L);
 
-    ScriptEnviroment* env = getScriptEnv();
+	ScriptEnviroment* env = getScriptEnv();
 
-    Player* player = env->getPlayerByUID(cid);
-    if(player){
-        player->setSex((PlayerSex_t)sex);
-        lua_pushnumber(L, LUA_NO_ERROR);
-    }
-    else{
-        reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-        lua_pushnumber(L, LUA_ERROR);
-    }
-    return 1;
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->setSex((PlayerSex_t)sex);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
 }
 
 int LuaScriptInterface::luaDebugPrint(lua_State *L)
@@ -6488,11 +6488,11 @@ int LuaScriptInterface::luaDoRemoveCondition(lua_State *L)
 
 	Condition* condition;
 	while((condition = creature->getCondition(conditionType, CONDITIONID_COMBAT, subId))) {
-	      creature->removeCondition(condition);
-	      }
+		  creature->removeCondition(condition);
+		  }
 	while((condition = creature->getCondition(conditionType, CONDITIONID_DEFAULT, subId))) {
-	      creature->removeCondition(condition);
-	      }
+		  creature->removeCondition(condition);
+		  }
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
@@ -8366,7 +8366,7 @@ int LuaScriptInterface::luaIsMonsterName(lua_State *L)
 		lua_pushnumber(L, LUA_FALSE);
 	else
 		lua_pushnumber(L, LUA_TRUE);
-    return 1;
+	return 1;
 }
 
 int LuaScriptInterface::luaIsValidItemId(lua_State *L)

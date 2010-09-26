@@ -71,12 +71,12 @@ struct Abilities{
 			std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
 	} absorb;
 
-    //extra skill modifiers
+	//extra skill modifiers
 	struct Skill {
-            int16_t upgrades[SKILL_LAST+1];
+			int16_t upgrades[SKILL_LAST+1];
 
-            bool any() const;
-            std::ostream& getDescription(std::ostream& os) const;
+			bool any() const;
+			std::ostream& getDescription(std::ostream& os) const;
 	protected:
 			std::ostream& getDescription(std::ostream& os, bool& first, int32_t type) const;
 	} skill;

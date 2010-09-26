@@ -49,8 +49,8 @@
 		#include <tr1/unordered_map>
 		#include <tr1/unordered_set>
 		#define __OTSERV_UNORDERED_MAP_WORKAROUND__ tr1::unordered_map
-        #define __OTSERV_UNORDERED_SET_WORKAROUND__ tr1::unordered_set
-        #define __OTSERV_FUNCTIONAL_HASH_WORKAROUND__ tr1::hash
+		#define __OTSERV_UNORDERED_SET_WORKAROUND__ tr1::unordered_set
+		#define __OTSERV_FUNCTIONAL_HASH_WORKAROUND__ tr1::hash
 	#elif __GNUC_VERSION__ > 30200 // GCC 3.2.0
 		#include <ext/hash_map>
 		#include <ext/hash_set>

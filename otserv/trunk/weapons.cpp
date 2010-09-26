@@ -199,7 +199,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	std::string strValue;
 
 	if(readXMLInteger(p, "id", intValue)){
-	 	id = intValue;
+		id = intValue;
 	}
 	else{
 		std::cout << "Error: [Weapon::configureEvent] Weapon without id." << std::endl;
@@ -207,23 +207,23 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	if(readXMLInteger(p, "lvl", intValue) || readXMLInteger(p, "level", intValue)){
-	 	level = intValue;
+		level = intValue;
 	}
 
 	if(readXMLInteger(p, "maglv", intValue) || readXMLInteger(p, "maglevel", intValue)){
-	 	magLevel = intValue;
+		magLevel = intValue;
 	}
 
 	if(readXMLInteger(p, "mana", intValue)){
-	 	mana = intValue;
+		mana = intValue;
 	}
 
 	if(readXMLInteger(p, "manapercent", intValue)){
-	 	manaPercent = intValue;
+		manaPercent = intValue;
 	}
 
 	if(readXMLInteger(p, "soul", intValue)){
-	 	soul = intValue;
+		soul = intValue;
 	}
 
 	if(readXMLInteger(p, "exhaustion", intValue)){
@@ -393,16 +393,16 @@ int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 
 		int32_t damageModifier = 100;
 		if(player->getLevel() < getReqLevel()){
-            if (isWieldedUnproperly())
-            {
-                double penalty = (getReqLevel() - player->getLevel()) * 0.02;
-                if ( penalty > 0.5 )
-                    penalty = 0.5;
+			if (isWieldedUnproperly())
+			{
+				double penalty = (getReqLevel() - player->getLevel()) * 0.02;
+				if ( penalty > 0.5 )
+					penalty = 0.5;
 
-                damageModifier = damageModifier - (int32_t)(damageModifier * penalty);
-            }
-            else
-                damageModifier = 0;
+				damageModifier = damageModifier - (int32_t)(damageModifier * penalty);
+			}
+			else
+				damageModifier = 0;
 		}
 
 		if(player->getMagicLevel() < getReqMagLv()){
