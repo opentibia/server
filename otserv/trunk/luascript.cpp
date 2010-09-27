@@ -1272,7 +1272,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//getTopCreature(pos)
 	lua_register(m_luaState, "getTopCreature", LuaScriptInterface::luaGetTopCreature);
-	
+
 	//getAllCreatures(pos, <optional> flag)
 	lua_register(m_luaState, "getAllCreatures", LuaScriptInterface::luaGetAllCreatures);
 
@@ -1492,7 +1492,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//isCreature(cid)
 	lua_register(m_luaState, "isCreature", LuaScriptInterface::luaIsCreature);
-	
+
 	//isItemTwoHandedByUID(uid)
 	lua_register(m_luaState, "isItemTwoHandedByUID", LuaScriptInterface::luaIsItemTwoHandedByUID);
 
@@ -1937,7 +1937,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//doPlayerToogleGmInvisible(cid)
 	lua_register(m_luaState, "doPlayerToogleGmInvisible", LuaScriptInterface::luaDoPlayerToogleGmInvisible);
-	
+
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
@@ -2974,7 +2974,7 @@ int LuaScriptInterface::luaDoCreatureAddHealth(lua_State *L)
 int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 {
 	//doPlayerAddMana(cid, mana, <optional: default: 1> withoutAnimation)
-	//if you choose UtamoEffect and mana < 0 then it will show the animation 
+	//if you choose UtamoEffect and mana < 0 then it will show the animation
 	bool withoutAnimation = true;
 	if(lua_gettop(L) >= 3)
 		withoutAnimation = popNumber(L) == LUA_TRUE;
@@ -3915,10 +3915,16 @@ int LuaScriptInterface::luaGetTileThingByTopOrder(lua_State *L)
 int LuaScriptInterface::luaGetAllCreatures(lua_State *L)
 {
 	//getAllCreatures(pos, <optional> flag)
-	//bits for flags: 8 = SHOW INVISIBLE MONSTERS AND GMs, 4 = SHOW NPCs, 2 = SHOW MONSTERS, 1 = SHOW PLAYERS
-	
-	uint32_t flag = 3; //by default shows visible monsters and players without any kind of invisibility flag
-	
+	//bits for flag:
+	//32 = GET NPCS
+	//16 = GET INVISIBLE MONSTERS
+	//8 = GET VISIBLE MONSTERS
+	//4 = GET GMs AT INVISIBLE STATE
+	//2 = GET PLAYERS WITH INVISIBILITY FLAG
+	//1 = GET REGULAR PLAYERS (THOSE WITHOUT ANY KIND OF INVISIBILITY FLAG)
+
+	uint32_t flag = 9; //by default shows visible monsters and players without any kind of invisibility flag
+
 	uint32_t parameters = lua_gettop(L);
 	if (parameters >= 2)
 		flag = popNumber(L);
@@ -3936,18 +3942,26 @@ int LuaScriptInterface::luaGetAllCreatures(lua_State *L)
 
 	lua_newtable(L);
 	uint32_t index = 1;
-	bool showInvisib = ((flag & 8) == 8);
 	CreatureVector* creatures = tile->getCreatures();
-
 	for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-		Player *p = (*cit)->getPlayer();
-		Monster *m = (*cit)->getMonster();
-		Npc *n = (*cit)->getNpc();
+		bool add = false;
+		if(Player *p = (*cit)->getPlayer()) {
+			if(((flag & 1) == 1 && !p->hasFlag(PlayerFlag_CannotBeSeen) && !p->isGmInvisible())||
+				((flag & 2) == 2 && p->hasFlag(PlayerFlag_CannotBeSeen))||
+				((flag & 4) == 4 && p->isGmInvisible())){
+				add = true;
+			}
+		}
+		else if (Monster *m = (*cit)->getMonster()){
+			if (((flag & 8) == 8 && !m->hasCondition(CONDITION_INVISIBLE)) || (flag & 16) == 16){
+				add = true;
+			}
+		}
+		else if ((*cit)->getNpc() && (flag & 32) == 32){
+			add = true;
+		}
 
-		if ((p && ((flag & 1) == 1) && (showInvisib || !p->hasSomeInvisibilityFlag() )) ||
-			(m && ((flag & 2) == 2) && (showInvisib || !m->hasCondition(CONDITION_INVISIBLE) )) ||
-			(n && ((flag & 4) == 4)))
-		{
+		if(add){
 			lua_pushnumber(L, index);
 			env->addThing(*cit);
 			lua_pushnumber(L, (*cit)->getID());
@@ -6545,12 +6559,12 @@ int LuaScriptInterface::luaTargetPositionToVariant(lua_State *L)
 int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 {
 	//variantToNumber(var, <optional> vieweruid, <optional> checkVisibility)
-	/*vieweruid is an optional parameter that is used to determine if invisible GMs or players should be considered when trying to convert 
-	from a position to a uid. If viewerUid is ommited, it uses the point of view of a generic player (no special flags). 
+	/*vieweruid is an optional parameter that is used to determine if invisible GMs or players should be considered when trying to convert
+	from a position to a uid. If viewerUid is ommited, it uses the point of view of a generic player (no special flags).
 	The checkVisibility parameter is about the ConditionInvisible. */
-	
+
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	Creature* viewer = NULL;
 	bool checkVisibility = true;
 	uint16_t parameters = lua_gettop(L);
@@ -6598,13 +6612,13 @@ int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 int LuaScriptInterface::luaVariantToString(lua_State *L)
 {
 	//variantToString(var, <optional> vieweruid, <optional> checkVisibility)
-	/*vieweruid is an optional parameter that is used to determine if invisible GMs or players should be considered when trying to convert 
-	from a position to a uid. If viewerUid is ommited, it uses the point of view of a generic player (no special flags). 
+	/*vieweruid is an optional parameter that is used to determine if invisible GMs or players should be considered when trying to convert
+	from a position to a uid. If viewerUid is ommited, it uses the point of view of a generic player (no special flags).
 	The checkVisibility parameter is about the ConditionInvisible. */
 	LuaVariant var = popVariant(L);
 
 	ScriptEnviroment* env = getScriptEnv();
-	
+
 	Creature* viewer = NULL;
 	bool checkVisibility = true;
 	uint16_t parameters = lua_gettop(L);
