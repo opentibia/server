@@ -95,6 +95,14 @@ CREATE TABLE "guild_members" (
 	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id")
 );
 
+CREATE TABLE "guild_invites" (
+	"player_id" INTEGER NOT NULL,
+	"guild_id" INTEGER NOT NULL,
+	UNIQUE ("player_id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
+);
+
 CREATE TABLE "guild_wars" (
 	"id" INTEGER PRIMARY KEY,
 	"guild_id" INTEGER NOT NULL,
@@ -274,7 +282,7 @@ CREATE TABLE "schema_info" (
 	UNIQUE ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 22);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 23);
 
 CREATE TRIGGER "oncreate_players"
 AFTER INSERT

@@ -101,6 +101,15 @@ CREATE TABLE "guild_members" (
 	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id") ON DELETE CASCADE
 );
 
+CREATE TABLE "guild_invites" (
+	"player_id" INT NOT NULL,
+	"guild_id" INT NOT NULL,
+	
+	UNIQUE ("player_id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
+);
+
 CREATE TABLE "guild_wars" (
 	"id" SERIAL,
 	"guild_id" INT NOT NULL,
@@ -291,7 +300,7 @@ CREATE TABLE "schema_info" (
 	PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 22);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 23);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
