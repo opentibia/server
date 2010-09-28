@@ -97,7 +97,6 @@ Creature()
 	lastAttackBlockType = BLOCK_NONE;
 	addAttackSkillPoint = false;
 	lastAttack = 0;
-	shootRange = 1;
 
 	chaseMode = CHASEMODE_STANDSTILL;
 	fightMode = FIGHTMODE_ATTACK;
@@ -334,12 +333,10 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
 
 					if(ammuItem && ammuItem->getAmmoType() == item->getAmmoType()){
-						shootRange = item->getShootRange();
 						return ammuItem;
 					}
 				}
 				else{
-					shootRange = item->getShootRange();
 					return item;
 				}
 			}
@@ -923,6 +920,22 @@ bool Player::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+bool Player::canWalkthrough(const Creature* creature) const
+{
+	if(!creature->getPlayer()){
+		return false;
+	}
+
+	if(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+		return true;
+	}
+
+	if(g_game.getWorldType().value() == enums::WORLD_TYPE_NOPVP){
+		return getTile()->ground->getID() != ITEM_GLOWING_SWITCH;
+	}
+
+	return false;
+}
 
 Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 {
@@ -1230,7 +1243,7 @@ bool Player::hasShopItemForSale(uint32_t itemId, int32_t subType)
 	for(ShopItemList::const_iterator it = validShopList.begin(); it != validShopList.end(); ++it){
 		if(it->itemId == itemId && (*it).buyPrice > 0){
 			const ItemType& iit = Item::items[itemId];
-			if(iit.stackable || iit.isRune()){
+			if(iit.stackable){
 				return it->subType == subType;
 			}
 
@@ -1549,21 +1562,6 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 		}
 
 		g_game.onPlayerShopClose(this);
-		g_game.cancelRuleViolation(this);
-
-		if(hasFlag(PlayerFlag_CanAnswerRuleViolations)){
-			std::list<Player*> closeReportList;
-			for(RuleViolationsMap::const_iterator it = g_game.getRuleViolations().begin(); it != g_game.getRuleViolations().end(); ++it){
-				if(it->second->gamemaster == this){
-					closeReportList.push_back(it->second->reporter);
-				}
-			}
-
-			for(std::list<Player*>::iterator it = closeReportList.begin(); it != closeReportList.end(); ++it){
-				g_game.closeRuleViolation(*it);
-			}
-		}
-
 		g_chat.removeUserFromAllChannels(this);
 
 		lastLogout = time(NULL);
@@ -2731,25 +2729,64 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 		return RET_NOTPOSSIBLE;
 	}
 
-	const Thing* destThing = __getThing(index);
-	const Item* destItem = NULL;
-	if(destThing)
-		destItem = destThing->getItem();
+	if(index == INDEX_WHEREEVER){
+		uint32_t n = 0;
+		for(SlotType::iterator i = SLOT_FIRST; i < SLOT_LAST; ++i){
+			Item *inventoryItem = getInventoryItem(*i);
 
-	if(destItem){
-		if(destItem->isStackable() && item->getID() == destItem->getID()){
-			maxQueryCount = 100 - destItem->getItemCount();
+			if(inventoryItem){
+				if(Container* subContainer = inventoryItem->getContainer()){
+					uint32_t queryCount = 0;
+					subContainer->__queryMaxCount(INDEX_WHEREEVER, item, item->getItemCount(), queryCount, flags);
+					n += queryCount;
+
+					//iterate through all items, including sub-containers (deep search)
+					for(ContainerIterator cit = subContainer->begin(); cit != subContainer->end(); ++cit){
+						if(Container* tmpContainer  = (*cit)->getContainer()){
+							queryCount = 0;
+							tmpContainer->__queryMaxCount(INDEX_WHEREEVER, item, item->getItemCount(), queryCount, flags);
+							n += queryCount;
+						}
+					}
+				}
+				else if(inventoryItem->isStackable() && item->getID() == inventoryItem->getID() && inventoryItem->getItemCount() < 100){
+					uint32_t remainder = (100 - inventoryItem->getItemCount());
+					if(__queryAdd(i->value(), item, remainder, flags) == RET_NOERROR){
+						n += remainder;
+					}
+				}
+			}
+			//empty slot
+			else if(__queryAdd(i->value(), item, item->getItemCount(), flags) == RET_NOERROR){
+				if(item->isStackable())
+					n += 100;
+				else
+					n += 1;
+			}
 		}
-		else
-			maxQueryCount = 0;
+
+		maxQueryCount = n;
 	}
 	else{
-		if(item->isStackable())
-			maxQueryCount = 100;
-		else
-			maxQueryCount = 1;
+		const Thing* destThing = __getThing(index);
+		const Item* destItem = NULL;
+		if(destThing)
+			destItem = destThing->getItem();
 
-		return RET_NOERROR;
+		if(destItem){
+			if(destItem->isStackable() && item->getID() == destItem->getID() && destItem->getItemCount() < 100)
+				maxQueryCount = 100 - destItem->getItemCount();
+			else
+				maxQueryCount = 0;
+		}
+		else if(__queryAdd(index, item, count, flags) == RET_NOERROR){
+			if(item->isStackable())
+				maxQueryCount = 100;
+			else
+				maxQueryCount = 1;
+
+			return RET_NOERROR;
+		}
 	}
 
 	if(maxQueryCount < count)
@@ -2794,44 +2831,61 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		}
 
 		//find a appropiate slot
+		std::list<Container*> containerList;
 		for(SlotType::iterator i = SLOT_FIRST; i < SLOT_LAST; ++i){
-			if(getInventoryItem(*i) == NULL){
-				if(__queryAdd(i->value(), item, item->getItemCount(), 0) == RET_NOERROR){
+			Item *inventoryItem = getInventoryItem(*i);
+			if(inventoryItem){
+				if(inventoryItem == tradeItem){
+					continue;
+				}
+
+				 //try find an already existing item to stack with
+				if(inventoryItem != item && item->isStackable() && inventoryItem->getID() == item->getID() && inventoryItem->getItemCount() < 100){
+					*destItem = inventoryItem;
 					index = i->value();
 					return this;
 				}
-			}
-		}
+				//check sub-containers
+				else if(Container* subContainer = inventoryItem->getContainer()){
+					Cylinder* tmpCylinder = NULL;
+					int32_t tmpIndex = INDEX_WHEREEVER;
+					Item* tmpDestItem = NULL;
 
-		//try containers
-		std::list<Container*> containerList;
-		for(SlotType::iterator i = SLOT_FIRST; i < SLOT_LAST; ++i){
-			if(getInventoryItem(*i) == tradeItem){
-				continue;
-			}
+					tmpCylinder = subContainer->__queryDestination(tmpIndex, item, &tmpDestItem, flags);
+					if(tmpCylinder && tmpCylinder->__queryAdd(tmpIndex, item, item->getItemCount(), flags) == RET_NOERROR){
+						index = tmpIndex;
+						*destItem = tmpDestItem;
+						return tmpCylinder;
+					}
 
-			if(Container* subContainer = getInventoryItem(*i)->getContainer()){
-				if(subContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
-					index = INDEX_WHEREEVER;
-					*destItem = NULL;
-					return subContainer;
+					containerList.push_back(subContainer);
 				}
-				containerList.push_back(subContainer);
+			}
+			//empty slot
+			else if(__queryAdd(i->value(), item, item->getItemCount(), flags) == RET_NOERROR){
+				index = i->value();
+				*destItem = NULL;
+				return this;
 			}
 		}
 
 		//check deeper in the containers
 		for(std::list<Container*>::iterator it = containerList.begin(); it != containerList.end(); ++it){
 			for(ContainerIterator iit = (*it)->begin(); iit != (*it)->end(); ++iit){
-				if((*iit) == tradeItem){
-					continue;
-				}
+				if(Container* subContainer = (*iit)->getContainer()){
+					if(subContainer == tradeItem){
+						continue;
+					}
 
-				Container* subContainer = dynamic_cast<Container*>(*iit);
-				if(subContainer && subContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
-					index = INDEX_WHEREEVER;
-					*destItem = NULL;
-					return subContainer;
+					Cylinder* tmpCylinder = NULL;
+					int32_t tmpIndex = INDEX_WHEREEVER;
+					Item* tmpDestItem = NULL;
+					tmpCylinder = subContainer->__queryDestination(tmpIndex, item, &tmpDestItem, flags);
+					if(tmpCylinder && tmpCylinder->__queryAdd(tmpIndex, item, item->getItemCount(), flags) == RET_NOERROR){
+						index = tmpIndex;
+						*destItem = tmpDestItem;
+						return tmpCylinder;
+					}
 				}
 			}
 		}
@@ -3045,7 +3099,7 @@ int32_t Player::__getLastIndex() const
 	return *SLOT_LAST;
 }
 
-uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
+uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) const
 {
 	uint32_t count = 0;
 
@@ -3053,34 +3107,35 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, b
 		Item* item = getInventoryItem(*i);
 
 		if(item){
-			if(item->getID() == itemId)
-				count += Item::countByType(item, subType, itemCount);
-
-			Container* container = item->getContainer();
-			if(container)
-				for(ContainerIterator iter = container->begin(), end = container->end(); iter != end; ++iter)
-					if((*iter)->getID() == itemId)
-						count += Item::countByType(*iter, subType, itemCount);
+			if(item->getID() == itemId){
+				count += Item::countByType(item, subType);
+			}
+			else if(Container* container = item->getContainer()){
+				for(ContainerIterator it = container->begin(), end = container->end(); it != end; ++it){
+					if((*it)->getID() == itemId){
+						count += Item::countByType(*it, subType);
+					}
+				}
+			}
 		}
 	}
 
 	return count;
 }
 
-std::map<uint32_t, uint32_t>& Player::__getAllItemTypeCount(
-	std::map<uint32_t, uint32_t>& countMap, bool itemCount /*= true*/) const
+std::map<uint32_t, uint32_t>& Player::__getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const
 {
 	for(SlotType::iterator i = SLOT_FIRST; i < SLOT_LAST; i++){
 		Item* item = getInventoryItem(*i);
 
 		if(item){
-			countMap[item->getID()] += Item::countByType(item, -1, itemCount);
+			countMap[item->getID()] += Item::countByType(item, -1);
 
-			Container* container = item->getContainer();
-
-			if(container)
-				for(ContainerIterator iter = container->begin(), end = container->end(); iter != end; ++iter)
-					countMap[(*iter)->getID()] += Item::countByType(*iter, -1, itemCount);
+			if(Container* container = item->getContainer()){
+				for(ContainerIterator it = container->begin(), end = container->end(); it != end; ++it){
+					countMap[(*it)->getID()] += Item::countByType(*it, -1);
+				}
+			}
 		}
 	}
 

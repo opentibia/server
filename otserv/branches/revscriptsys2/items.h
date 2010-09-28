@@ -38,6 +38,7 @@ enum ItemTypes_t {
 	ITEM_TYPE_TELEPORT,
 	ITEM_TYPE_BED,
 	ITEM_TYPE_KEY,
+	ITEM_TYPE_RUNE,
 	ITEM_TYPE_LAST
 };
 
@@ -107,9 +108,9 @@ public:
 	bool isDepot() const {return (type == ITEM_TYPE_DEPOT);}
 	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
+	bool isRune() const {return (type == ITEM_TYPE_RUNE);}
+	bool isBed() const {return (type == ITEM_TYPE_BED);}
 	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
-	bool isRune() const {return clientCharges;}
-	bool isBed() const {return type == ITEM_TYPE_BED;}
 
 	uint16_t id;
 	uint16_t clientId;
@@ -166,7 +167,6 @@ public:
 	bool isVertical;
 	bool isHorizontal;
 	bool isHangable;
-	bool clientCharges;
 	bool lookThrough;
 	bool pickupable;
 	bool rotateable;

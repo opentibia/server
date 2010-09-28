@@ -235,6 +235,7 @@ public:
 
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
+	virtual bool canWalkthrough(const Creature* creature) const;
 
 	virtual RaceType getRace() const {return RACE_BLOOD;}
 
@@ -288,7 +289,6 @@ public:
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
 	virtual bool hasExtraSwing() {return lastAttack > 0 && ((OTSYS_TIME() - lastAttack) >= getAttackSpeed());}
-	int32_t getShootRange() const {return shootRange;}
 
 	int32_t getSkill(SkillType skilltype, skillsid_t skillinfo) const;
 	bool getAddAttackSkill() const {return addAttackSkillPoint;}
@@ -501,14 +501,6 @@ public:
 		{if(client) client->sendCloseContainer(cid);}
 	void sendChannel(uint16_t channelId, const std::string& channelName)
 		{if(client) client->sendChannel(channelId, channelName);}
-	void sendRuleViolationsChannel(uint16_t channelId)
-		{if(client) client->sendRuleViolationsChannel(channelId);}
-	void sendRemoveReport(const std::string& name)
-		{if(client) client->sendRemoveReport(name);}
-	void sendLockRuleViolation()
-		{if(client) client->sendLockRuleViolation();}
-	void sendRuleViolationCancel(const std::string& name)
-		{if(client) client->sendRuleViolationCancel(name);}
 	void sendQuestLog()
 		{if(client) client->sendQuestLog();}
 	void sendQuestLine(const Quest* quest)
@@ -579,8 +571,8 @@ public:
 	virtual Tile* getParentTile() {return Creature::getParentTile();}
 	virtual const Tile* getParentTile() const {return Creature::getParentTile();}
 
-	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1, bool itemCount = true) const;
-	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap, bool itemCount = true) const;
+	virtual uint32_t __getItemTypeCount(uint16_t itemId, int32_t subType = -1) const;
+	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const;
 
 protected:
 	void checkTradeState(const Item* item);
@@ -669,7 +661,6 @@ protected:
 	BlockType lastAttackBlockType;
 	bool addAttackSkillPoint;
 	uint64_t lastAttack;
-	int32_t shootRange;
 
 	ChaseMode chaseMode;
 	FightMode fightMode;

@@ -533,8 +533,6 @@ public:
 	int lua_Item_getWeight();
 	int lua_Item_isPickupable();
 	int lua_Item_getSubtype();
-	int lua_Item_getWeaponType();
-	int lua_Item_getAmmoType();
 
 	int lua_Item_setItemID();
 	int lua_Item_setCount();

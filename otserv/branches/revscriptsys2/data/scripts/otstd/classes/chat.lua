@@ -1,6 +1,5 @@
 
 CHANNEL_GUILD = 0
-CHANNEL_RULE_VIOLATIONS = 3
 CHANNEL_GAME_CHAT = 4
 CHANNEL_TRADE = 5
 CHANNEL_RL_CHAT = 6
@@ -15,7 +14,7 @@ end
 Channel.getType = Channel.getID
 
 function Channel:message(msg)
-	self:talk(nil, SPEAK_CHANNEL_R2, msg)
+	--self:talk(nil, SPEAK_CHANNEL_R2, msg)
 end
 
 function Channel:speak(player, msg)

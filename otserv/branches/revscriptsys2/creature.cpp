@@ -149,6 +149,12 @@ bool Creature::canSeeCreature(const Creature* creature) const
 	return true;
 }
 
+bool Creature::canWalkthrough(const Creature* creature) const
+{
+	// Since 8.54 update, creatures may walk through others with some restrictions
+	return creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen);
+}
+
 int64_t Creature::getTimeSinceLastMove() const
 {
 	if(lastStep){

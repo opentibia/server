@@ -243,6 +243,10 @@ template<> void MagicEffect__Base::initialize()
 	initAddValue(enums::MAGIC_EFFECT_BATS, "bats", false);
 	initAddValue(enums::MAGIC_EFFECT_SMOKE, "MAGIC_EFFECT_SMOKE", true);
 	initAddValue(enums::MAGIC_EFFECT_SMOKE, "smoke", false);
+	initAddValue(enums::MAGIC_EFFECT_INSECTS, "MAGIC_EFFECT_INSECTS", true);
+	initAddValue(enums::MAGIC_EFFECT_INSECTS, "insects", false);
+	initAddValue(enums::MAGIC_EFFECT_DRAGONHEAD, "MAGIC_EFFECT_DRAGONHEAD", true);
+	initAddValue(enums::MAGIC_EFFECT_DRAGONHEAD, "dragonhead", false);
 	initAddValue(enums::MAGIC_EFFECT_NONE, "MAGIC_EFFECT_NONE", true);
 	initAddValue(enums::MAGIC_EFFECT_UNK, "MAGIC_EFFECT_UNK", true);
 }
@@ -358,14 +362,10 @@ template<> void SpeakClass__Base::initialize()
 	initAddValue(enums::SPEAK_PRIVATE, "SPEAK_PRIVATE", true);
 	initAddValue(enums::SPEAK_CHANNEL_Y, "SPEAK_CHANNEL_Y", true);
 	initAddValue(enums::SPEAK_CHANNEL_W, "SPEAK_CHANNEL_W", true);
-	initAddValue(enums::SPEAK_RVR_CHANNEL, "SPEAK_RVR_CHANNEL", true);
-	initAddValue(enums::SPEAK_RVR_ANSWER, "SPEAK_RVR_ANSWER", true);
-	initAddValue(enums::SPEAK_RVR_CONTINUE, "SPEAK_RVR_CONTINUE", true);
 	initAddValue(enums::SPEAK_BROADCAST, "SPEAK_BROADCAST", true);
 	initAddValue(enums::SPEAK_CHANNEL_R1, "SPEAK_CHANNEL_R1", true);
 	initAddValue(enums::SPEAK_PRIVATE_RED, "SPEAK_PRIVATE_RED", true);
 	initAddValue(enums::SPEAK_CHANNEL_O, "SPEAK_CHANNEL_O", true);
-	initAddValue(enums::SPEAK_CHANNEL_R2, "SPEAK_CHANNEL_R2", true);
 	initAddValue(enums::SPEAK_MONSTER_SAY, "SPEAK_MONSTER_SAY", true);
 	initAddValue(enums::SPEAK_MONSTER_YELL, "SPEAK_MONSTER_YELL", true);
 }
@@ -378,7 +378,6 @@ template<> MessageClass__Base::StringToEnum MessageClass__Base::lstring_to_enum=
 template<> void MessageClass__Base::initialize()
 {
 	initAddValue(enums::MSG_CLASS_FIRST, "MSG_CLASS_FIRST", true);
-	initAddValue(enums::MSG_STATUS_CONSOLE_RED, "MSG_STATUS_CONSOLE_RED", true);
 	initAddValue(enums::MSG_STATUS_CONSOLE_ORANGE2, "MSG_STATUS_CONSOLE_ORANGE2", true);
 	initAddValue(enums::MSG_STATUS_CONSOLE_ORANGE, "MSG_STATUS_CONSOLE_ORANGE", true);
 	initAddValue(enums::MSG_STATUS_WARNING, "MSG_STATUS_WARNING", true);
@@ -388,6 +387,7 @@ template<> void MessageClass__Base::initialize()
 	initAddValue(enums::MSG_INFO_DESCR, "MSG_INFO_DESCR", true);
 	initAddValue(enums::MSG_STATUS_SMALL, "MSG_STATUS_SMALL", true);
 	initAddValue(enums::MSG_STATUS_CONSOLE_BLUE, "MSG_STATUS_CONSOLE_BLUE", true);
+	initAddValue(enums::MSG_STATUS_CONSOLE_RED, "MSG_STATUS_CONSOLE_RED", true);
 	initAddValue(enums::MSG_CLASS_LAST, "MSG_CLASS_LAST", true);
 }
 
@@ -656,6 +656,19 @@ template<> void PartyShieldType__Base::initialize()
 	initAddValue(enums::SHIELD_YELLOW_NOSHAREDEXP, "SHIELD_YELLOW_NOSHAREDEXP", true);
 }
 
+template<> bool GuildEmblemType__Base::initialized = false;
+template<> std::string GuildEmblemType__Base::enum_name = "GuildEmblemType";
+template<> GuildEmblemType__Base::EnumToString GuildEmblemType__Base::enum_to_string = GuildEmblemType__Base::EnumToString();
+template<> GuildEmblemType__Base::StringToEnum GuildEmblemType__Base::string_to_enum = GuildEmblemType__Base::StringToEnum();
+template<> GuildEmblemType__Base::StringToEnum GuildEmblemType__Base::lstring_to_enum = GuildEmblemType__Base::StringToEnum();
+template<> void GuildEmblemType__Base::initialize()
+{
+	initAddValue(enums::EMBLEM_NONE, "EMBLEM_NONE", true);
+	initAddValue(enums::EMBLEM_NONE, "EMBLEM_GREEN", true);
+	initAddValue(enums::EMBLEM_NONE, "EMBLEM_RED", true);
+	initAddValue(enums::EMBLEM_NONE, "EMBLEM_BLUE", true);
+}
+
 template<> bool PlayerFlag__Base::initialized = false;
 template<> std::string PlayerFlag__Base::enum_name = "PlayerFlag";
 template<> PlayerFlag__Base::EnumToString PlayerFlag__Base::enum_to_string = PlayerFlag__Base::EnumToString();
@@ -701,7 +714,6 @@ template<> void PlayerFlag__Base::initialize()
 	initAddValue(enums::PlayerFlag_IgnoreWeaponCheck, "PlayerFlag_IgnoreWeaponCheck", true);
 	initAddValue(enums::PlayerFlag_CannotBeMuted, "PlayerFlag_CannotBeMuted", true);
 	initAddValue(enums::PlayerFlag_IsAlwaysPremium, "PlayerFlag_IsAlwaysPremium", true);
-	initAddValue(enums::PlayerFlag_CanAnswerRuleViolations, "PlayerFlag_CanAnswerRuleViolations", true);
 	initAddValue(enums::PlayerFlag_CanReloadContent, "PlayerFlag_CanReloadContent", true);
 	initAddValue(enums::PlayerFlag_ShowGroupInsteadOfVocation, "PlayerFlag_ShowGroupInsteadOfVocation", true);
 	initAddValue(enums::PlayerFlag_HasInfiniteStamina, "PlayerFlag_HasInfiniteStamina", true);

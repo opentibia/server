@@ -355,6 +355,7 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 
 		//sb.condition.effect = ConditionEffect::createModScript("drunk");
 	}
+	/*
 	else if(asLowerCaseString(name) == "firefield"){
 		sb.field = ITEM_FIREFIELD_PVP;
 	}
@@ -364,6 +365,7 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 	else if(asLowerCaseString(name) == "energyfield"){
 		sb.field = ITEM_ENERGYFIELD_PVP;
 	}
+	*/
 	else if(asLowerCaseString(name) == "firecondition" ||
 			asLowerCaseString(name) == "poisoncondition" ||
 			asLowerCaseString(name) == "energycondition" ||

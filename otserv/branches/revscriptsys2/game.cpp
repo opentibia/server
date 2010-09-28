@@ -1270,6 +1270,10 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			return false;
 		}
+		else if(!toTile->creatures_empty() && !player->hasFlag(PlayerFlag_CanPushAllCreatures)){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			return false;
+		}
 	}
 
 	ReturnValue ret = internalMoveCreature(player, movingCreature, movingCreature->getParentTile(), toTile);
@@ -1971,9 +1975,19 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 ReturnValue Game::internalAddItem(Creature* actor, Cylinder* toCylinder, Item* item, int32_t index /*= INDEX_WHEREEVER*/,
 	uint32_t flags /*= 0*/, bool test /*= false*/)
 {
+	uint32_t remainderCount = 0;
+	return internalAddItem(actor, toCylinder, item, index, flags, test, remainderCount);
+}
+
+ReturnValue Game::internalAddItem(Creature *actor, Cylinder* toCylinder, Item* item, int32_t index,
+	uint32_t flags, bool test, uint32_t& remainderCount)
+{
+	remainderCount = 0;
 	if(toCylinder == NULL || item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
+
+	Cylinder* origToCylinder = toCylinder;
 
 	ReturnValue ret = RET_NOERROR;
 	if(script_system){
@@ -2019,55 +2033,48 @@ ReturnValue Game::internalAddItem(Creature* actor, Cylinder* toCylinder, Item* i
 		return ret;
 	}
 
-	//check how much we can move
+	/*
+	Check if we can move add the whole amount, we do this by checking against the original cylinder,
+	since the queryDestination can return a cylinder that might only hold a part of the full amount.
+	*/
 	uint32_t maxQueryCount = 0;
-	ret = toCylinder->__queryMaxCount(index, item, item->getItemCount(), maxQueryCount, flags);
+	ret = origToCylinder->__queryMaxCount(INDEX_WHEREEVER, item, item->getItemCount(), maxQueryCount, flags);
 
 	if(ret != RET_NOERROR){
 		return ret;
 	}
 
-	uint32_t m = 0;
-	uint32_t n = 0;
-
-	if(item->isStackable()){
-		m = std::min((uint32_t)item->getItemCount(), maxQueryCount);
-	}
-	else
-		m = maxQueryCount;
-
 	if(!test){
-		Item* moveItem = item;
+		if(item->isStackable() && toItem){
 
-		//update item(s)
-		if(item->isStackable()) {
-			if(toItem && toItem->getID() == item->getID()){
+			uint32_t m = 0;
+			uint32_t n = 0;
+
+			m = std::min((uint32_t)item->getItemCount(), maxQueryCount);
+
+			if(toItem->getID() == item->getID()){
 				n = std::min((uint32_t)100 - toItem->getItemCount(), m);
 				toCylinder->__updateThing(actor, toItem, toItem->getID(), toItem->getItemCount() + n);
 			}
 
 			if(m - n > 0){
 				if(m - n != item->getItemCount()){
-					moveItem = Item::CreateItem(item->getID(), m - n);
+					Item* remainderItem = Item::CreateItem(item->getID(), m - n);
+					if(internalAddItem(actor, origToCylinder, remainderItem, INDEX_WHEREEVER, flags, false) != RET_NOERROR){
+						FreeThing(remainderItem);
+						remainderCount = m - n;
+					}
 				}
 			}
 			else{
-				moveItem = NULL;
+				//fully merged with toItem, item will be destroyed
 				FreeThing(item);
 			}
 		}
-
-		if(moveItem){
-			toCylinder->__addThing(actor, index, moveItem);
-
-			int32_t moveItemIndex = toCylinder->__getIndexOfThing(moveItem);
-			if(moveItemIndex != -1){
-				toCylinder->postAddNotification(actor, moveItem, NULL, moveItemIndex);
-			}
-		}
 		else{
-			int32_t itemIndex = toCylinder->__getIndexOfThing(item);
+			toCylinder->__addThing(actor, index, item);
 
+			int32_t itemIndex = toCylinder->__getIndexOfThing(item);
 			if(itemIndex != -1){
 				toCylinder->postAddNotification(actor, item, NULL, itemIndex);
 			}
@@ -2750,12 +2757,7 @@ bool Game::playerOpenChannel(uint32_t playerId, uint16_t channelId)
 		return false;
 	}
 
-	if(channel->getId() != CHANNEL_RULE_REP){
-		player->sendChannel(channel->getId(), channel->getName());
-	}
-	else{
-		player->sendRuleViolationsChannel(channel->getId());
-	}
+	player->sendChannel(channel->getId(), channel->getName());
 
 	return true;
 }
@@ -2804,70 +2806,6 @@ bool Game::playerOpenPrivateChannel(uint32_t playerId, const std::string& receiv
 		player->sendCancel("A player with this name does not exist.");
 
 	return true;
-}
-
-bool Game::playerProcessRuleViolation(uint32_t playerId, const std::string& name)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	if(!player->hasFlag(PlayerFlag_CanAnswerRuleViolations))
-		return false;
-
-	Player* reporter = getPlayerByName(name);
-	if(!reporter){
-		return false;
-	}
-
-	RuleViolationsMap::iterator it = ruleViolations.find(reporter->getID());
-	if(it == ruleViolations.end()){
-		return false;
-	}
-
-	RuleViolation& rvr = *it->second;
-
-	if(!rvr.isOpen){
-		return false;
-	}
-
-	rvr.isOpen = false;
-	rvr.gamemaster = player;
-
-	ChatChannel* channel = g_chat.getChannelById(CHANNEL_RULE_REP);
-	if(channel){
-		for(UsersMap::const_iterator it = channel->getUsers().begin(); it != channel->getUsers().end(); ++it){
-			if(it->second){
-				it->second->sendRemoveReport(reporter->getName());
-			}
-		}
-	}
-
-	return true;
-}
-
-bool Game::playerCloseRuleViolation(uint32_t playerId, const std::string& name)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved())
-		return false;
-
-	Player* reporter = getPlayerByName(name);
-	if(!reporter){
-		return false;
-	}
-
-	return closeRuleViolation(reporter);
-}
-
-bool Game::playerCancelRuleViolation(uint32_t playerId)
-{
-	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved()){
-		return false;
-	}
-
-	return cancelRuleViolation(player);
 }
 
 bool Game::playerCloseNpcChannel(uint32_t playerId)
@@ -4230,9 +4168,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 	switch(type.value()) {
 		case enums::SPEAK_PRIVATE:
 		case enums::SPEAK_PRIVATE_RED:
-		case enums::SPEAK_RVR_ANSWER:
-		case enums::SPEAK_RVR_CONTINUE:
-		case enums::SPEAK_RVR_CHANNEL:
 			break;
 		default:
 			if(!script_system)
@@ -4261,18 +4196,12 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClass type,
 			return playerYell(player, text);
 		case enums::SPEAK_PRIVATE:
 		case enums::SPEAK_PRIVATE_RED:
-		case enums::SPEAK_RVR_ANSWER:
 			return playerSpeakTo(player, type, receiver, text);
 		case enums::SPEAK_CHANNEL_Y:
 		case enums::SPEAK_CHANNEL_R1:
-		case enums::SPEAK_CHANNEL_R2:
 			return playerTalkToChannel(player, type, text, channelId) || playerSay(playerId, 0, SPEAK_SAY, receiver, text);
 		case enums::SPEAK_BROADCAST:
 			return internalBroadcastMessage(player, text);
-		case enums::SPEAK_RVR_CHANNEL:
-			return playerReportRuleViolation(player, text);
-		case enums::SPEAK_RVR_CONTINUE:
-			return playerContinueReport(player, text);
 
 		default:
 			break;
@@ -4359,62 +4288,11 @@ bool Game::playerTalkToChannel(Player* player, SpeakClass type, const std::strin
 	if(type == SPEAK_CHANNEL_R1 && !player->hasFlag(PlayerFlag_CanTalkRedChannel)){
 		type = SPEAK_CHANNEL_Y;
 	}
-	else if(type == SPEAK_CHANNEL_R2 && !player->hasFlag(PlayerFlag_CanTalkRedChannelAnonymous)){
-		type = SPEAK_CHANNEL_Y;
-	}
+	//else if(type == SPEAK_CHANNEL_R2 && !player->hasFlag(PlayerFlag_CanTalkRedChannelAnonymous)){
+	//	type = SPEAK_CHANNEL_Y;
+	//}
 
 	return g_chat.talkToChannel(player, type, text, channelId);
-}
-
-bool Game::playerReportRuleViolation(Player* player, const std::string& text)
-{
-	//Do not allow reports on multiclones worlds
-	//Since reports are name-based
-	if(g_config.getNumber(ConfigManager::ALLOW_CLONES)){
-		player->sendTextMessage(MSG_INFO_DESCR, "Rule violations reports are disabled.");
-		return false;
-	}
-
-	cancelRuleViolation(player);
-
-	shared_ptr<RuleViolation> rvr(new RuleViolation(
-		player,
-		text,
-		std::time(NULL)
-		));
-
-	ruleViolations[player->getID()] = rvr;
-
-	ChatChannel* channel = g_chat.getChannelById(CHANNEL_RULE_REP);
-	if(channel){
-		for(UsersMap::const_iterator it = channel->getUsers().begin(); it != channel->getUsers().end(); ++it){
-			if(it->second){
-				it->second->sendToChannel(player, SPEAK_RVR_CHANNEL, text, CHANNEL_RULE_REP, rvr->time);
-			}
-		}
-		return true;
-	}
-
-	return false;
-}
-
-bool Game::playerContinueReport(Player* player, const std::string& text)
-{
-	RuleViolationsMap::iterator it = ruleViolations.find(player->getID());
-	if(it == ruleViolations.end()){
-		return false;
-	}
-
-	RuleViolation& rvr = *it->second;
-	Player* toPlayer = rvr.gamemaster;
-	if(!toPlayer){
-		return false;
-	}
-
-	toPlayer->sendCreatureSay(player, SPEAK_RVR_CONTINUE, text);
-
-	player->sendTextMessage(MSG_STATUS_SMALL, "Message sent to Gamemaster.");
-	return true;
 }
 
 bool Game::kickPlayer(uint32_t playerId)
@@ -5178,57 +5056,6 @@ void Game::getWorldLightInfo(LightInfo& lightInfo)
 	lightInfo.color = 0xD7;
 }
 
-bool Game::cancelRuleViolation(Player* player)
-{
-	RuleViolationsMap::iterator it = ruleViolations.find(player->getID());
-	if(it == ruleViolations.end()){
-		return false;
-	}
-
-	Player* gamemaster = it->second->gamemaster;
-	if(!it->second->isOpen && gamemaster){
-		//Send to the responder
-		gamemaster->sendRuleViolationCancel(player->getName());
-	}
-	else{
-		//Send to channel
-		ChatChannel* channel = g_chat.getChannelById(CHANNEL_RULE_REP);
-		if(channel){
-			for(UsersMap::const_iterator ut = channel->getUsers().begin(); ut != channel->getUsers().end(); ++ut){
-				if(ut->second){
-					ut->second->sendRemoveReport(player->getName());
-				}
-			}
-		}
-	}
-
-	//Now erase it
-	ruleViolations.erase(it);
-	return true;
-}
-
-bool Game::closeRuleViolation(Player* player)
-{
-	RuleViolationsMap::iterator it = ruleViolations.find(player->getID());
-	if(it == ruleViolations.end()){
-		return false;
-	}
-
-	ruleViolations.erase(it);
-	player->sendLockRuleViolation();
-
-	ChatChannel* channel = g_chat.getChannelById(CHANNEL_RULE_REP);
-	if(channel){
-		for(UsersMap::const_iterator ut = channel->getUsers().begin(); ut != channel->getUsers().end(); ++ut){
-			if(ut->second){
-				ut->second->sendRemoveReport(player->getName());
-			}
-		}
-	}
-
-	return true;
-}
-
 void Game::addCommandTag(std::string tag)
 {
 	bool found = false;
@@ -5305,12 +5132,8 @@ void Game::FreeThing(Thing* thing)
 
 void Game::showUseHotkeyMessage(Player* player, Item* item)
 {
-	int32_t subType = -1;
-	if(item->hasSubType() && !item->hasCharges()){
-		subType = item->getSubType();
-	}
 	const ItemType& it = Item::items[item->getID()];
-	uint32_t itemCount = player->__getItemTypeCount(item->getID(), subType, false);
+	uint32_t itemCount = player->__getItemTypeCount(item->getID(), -1);
 
 	std::stringstream ss;
 	if(itemCount == 1){
@@ -5547,6 +5370,94 @@ bool Game::playerViolationWindow(uint32_t playerId, std::string targetName, uint
 	}
 
 	IOAccount::instance()->saveAccount(account);
+	return true;
+}
+
+bool Game::playerReportViolation(uint32_t playerId, std::string violatorName, uint32_t reportType, uint32_t ruleViolation,
+		std::string comment, std::string translation, uint32_t counter)
+{
+	Player *player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	// should we accept the report even if the violator is offline?
+	Player *violator = getPlayerByName(violatorName);
+	if(!violator || violator->isRemoved())
+		return false;
+
+	// The report is meant to be stored at the database!
+	/*
+	----------------
+	- Report Types -
+	----------------
+
+	 0 -> Name Report
+	 1 -> Statement Report
+	 2 -> Bot/Macro Report
+
+	-------------------
+	- Rule Violations -
+	-------------------
+
+	Name Related
+
+	 0 ->	"insulting"
+		"racist"
+		"sexually related"
+		"drug-related"
+		"generally objectionable"
+
+	 1 ->	"parts of sentence"
+		"badly formatted words"
+		"nonsensical combination of letters"
+
+	 2 ->	"religious or political view",
+		"illegal advertising",
+		"does not fit into Tibia's fantasy setting"
+
+	 3 ->	"implies or incites a violation of the Tibia Rules"
+
+	Statement/Bot Related
+
+	 4 ->	"insulting"
+		"racist"
+		"sexually related"
+		"drug-related"
+		"harassing"
+		"generally objectionable"
+
+	 5 ->	"repeating identical or similar statements within a short period of time"
+		"using badly formatted or nonsensical text"
+
+	 6 ->	"advertising non-game related content"
+		"offering Tibia items for real Money"
+
+	 7 ->	"religious, political or other not topic-related public statements"
+
+	 8 ->	"non-English public statements where not explicitly allowed"
+
+	 9 ->	"statements that imply or incite a violation of the Tibia Rules"
+
+	 10 ->	"bug abuse"
+
+	 11 ->	"game weakness abuse"
+
+	 12 ->	"using unofficial software to play"
+
+	 13 ->	"hacking"
+
+	 14 ->	"multi-clienting"
+
+	 15 ->	"account trading or sharing"
+
+	 16 ->	"threatening a gamemaster because of his or her actions or position"
+
+	 17 ->	"pretending to be a gamemaster or to have influence on a gamemaster"
+	*/
+
+	// guess there is a packet to send when the report is successfully processed
+	player->sendTextMessage(MSG_EVENT_DEFAULT, "Your report has been received!");
+
 	return true;
 }
 

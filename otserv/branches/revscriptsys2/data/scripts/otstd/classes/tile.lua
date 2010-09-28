@@ -25,11 +25,11 @@ function Tile:getPlayers()
 end
 
 function Tile:getTopThing()
-	return self:getThing(1)
+	return self:getThing(-1)
 end
 
 function Tile:getTopItem()
-	return self:getItem(1)
+	return self:getItem(-1)
 end
 
 function Tile:getTopCreature()
@@ -41,7 +41,7 @@ function Tile:getTopCreature()
 end
 
 function Tile:getTopMoveableThing()
-	local t = self:getThing(1)
+	local t = self:getThing(-1)
 	if t and not t:isMoveable() then
 		return nil
 	end

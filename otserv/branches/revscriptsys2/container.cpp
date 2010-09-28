@@ -343,14 +343,30 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 	if(item->isStackable()){
 		uint32_t n = 0;
 		
-		if(index != INDEX_WHEREEVER){
+		if(index == INDEX_WHEREEVER){
+			//Iterate through every item and check how much free stackable slots there is.
+			uint32_t slotIndex = 0;
+			for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit, ++slotIndex){
+
+				if((*cit) != item && (*cit)->getID() == item->getID() && (*cit)->getItemCount() < 100){
+					uint32_t remainder = (100 - (*cit)->getItemCount());
+					if(__queryAdd(slotIndex, item, remainder, flags) == RET_NOERROR){
+						n += remainder;
+					}
+				}
+			}
+		}
+		else{
 			const Thing* destThing = __getThing(index);
 			const Item* destItem = NULL;
 			if(destThing)
 				destItem = destThing->getItem();
 
-			if(destItem && destItem->getID() == item->getID()){
-				n = 100 - destItem->getItemCount();
+			if(destItem && destItem->getID() == item->getID() && destItem->getItemCount() < 100){
+				uint32_t remainder = 100 - destItem->getItemCount();
+				if(__queryAdd(index, item, remainder, flags) == RET_NOERROR){
+					n = remainder;
+				}
 			}
 		}
 
@@ -405,25 +421,45 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 		Container* parentContainer = dynamic_cast<Container*>(getParent());
 		if(parentContainer)
 			return parentContainer;
-		else
-			return this;
-	}
-	else if(index == 255 /*add wherever*/){
-		index = INDEX_WHEREEVER;
-		*destItem = NULL;
+
 		return this;
 	}
-	else{
-		if(index >= (int32_t)capacity()){
-			/*
-			if you have a container, maximize it to show all 20 slots
-			then you open a bag that is inside the container you will have a bag with 8 slots
-			and a "grey" area where the other 12 slots where from the container
-			if you drop the item on that grey area
-			the client calculates the slot position as if the bag has 20 slots
-			*/
 
-			index = INDEX_WHEREEVER;
+	if(index == 255 /*add wherever*/){
+		index = INDEX_WHEREEVER;
+		*destItem = NULL;
+	}
+	else if(index >= (int32_t)capacity()){
+		/*
+		if you have a container, maximize it to show all 20 slots
+		then you open a bag that is inside the container you will have a bag with 8 slots
+		and a "grey" area where the other 12 slots where from the container
+		if you drop the item on that grey area
+		the client calculates the slot position as if the bag has 20 slots
+		*/
+
+		index = INDEX_WHEREEVER;
+		*destItem = NULL;
+	}
+
+	const Item* item = thing->getItem();
+	if(item == NULL){
+		return this;
+	}
+
+	if(item->isStackable()){
+		if(item->getParent() != this){
+			//try find a suitable item to stack with
+			uint32_t n = 0;
+			for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
+				if((*cit) != item && (*cit)->getID() == item->getID() && (*cit)->getItemCount() < 100){
+					*destItem = (*cit);
+					index = n;
+					return this;
+				}
+
+				++n;
+			}
 		}
 
 		if(index != INDEX_WHEREEVER){
@@ -664,51 +700,24 @@ int32_t Container::__getLastIndex() const
 	return size();
 }
 
-uint32_t Container::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
+uint32_t Container::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) const
 {
 	uint32_t count = 0;
-	Item* item = NULL;
-
 	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
-		item = (*it);
-		if(item->getID() == itemId && (subType == -1 || subType == item->getSubType())){
-
-			if(itemCount){
-				count+= item->getItemCount();
-			}
-			else{
-				if(item->isRune()){
-					count+= item->getCharges();
-				}
-				else{
-					count+= item->getItemCount();
-				}
-			}
+		if((*it)->getID() == itemId){
+			count += countByType(*it, subType);
 		}
 	}
 
 	return count;
 }
 
-std::map<uint32_t, uint32_t>& Container::__getAllItemTypeCount(
-	std::map<uint32_t, uint32_t>& countMap, bool itemCount /*= true*/) const
+std::map<uint32_t, uint32_t>& Container::__getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const
 {
 	Item* item = NULL;
 
 	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
-		item = (*it);
-
-		if(itemCount){
-			countMap[item->getID()] += item->getItemCount();
-		}
-		else{
-			if(item->isRune()){
-				countMap[item->getID()] += item->getCharges();
-			}
-			else{
-				countMap[item->getID()] += item->getItemCount();
-			}
-		}
+		countMap[(*it)->getID()] += (*it)->getItemCount();
 	}
 
 	return countMap;

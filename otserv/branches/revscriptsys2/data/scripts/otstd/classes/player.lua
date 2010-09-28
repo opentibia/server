@@ -220,7 +220,7 @@ function Player:getWeapon(ignoreAmmo)
 			if not ignoreAmmo and item:getAmmoType() ~= AMMO_NONE then
 				local ammo = self:getInventoryItem(SLOT_AMMO)
 				if ammo and ammo:getAmmoType() == item:getAmmoType() then
-					return item
+					return ammo
 				end
 			else
 				return item

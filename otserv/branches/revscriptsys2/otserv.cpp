@@ -721,7 +721,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	Status* status = Status::instance();
 	status->setMaxPlayersOnline(g_config.getNumber(ConfigManager::MAX_PLAYERS));
 
-	g_game.setGameState(GAME_STATE_NORMAL);
 	g_game.start(service_manager);
+	g_game.setGameState(GAME_STATE_NORMAL);
 	g_loaderSignal.notify_all();
 }

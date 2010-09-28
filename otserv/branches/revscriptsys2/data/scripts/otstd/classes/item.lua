@@ -104,12 +104,21 @@ function Item:getAttack() return self:getIntegerAttribute("attack") or self:getD
 function Item:getDefaultAttack() return Items[self:getItemID()].attack end
 function Item:setAttack(v) return self:setIntegerAttribute("attack", v) end
 
-function Item:getDefense() return self:getIntegerAttribute("defense") or self:getDefaultAttack() end
+function Item:getDefense() return self:getIntegerAttribute("defense") or self:getDefaultDefense() end
 function Item:getDefaultDefense() return Items[self:getItemID()].defense end
 function Item:setDefense(v) return self:setIntegerAttribute("defense", v) end
 
 function Item:getArmor() return self:getIntegerAttribute("armor") or self:getDefaultArmor() end
 function Item:getDefaultArmor() return Items[self:getItemID()].armor end
 function Item:setArmor(v) return self:setIntegerAttribute("armor", v) end
+
+function Item:getWeaponType() return Items[self:getItemID()].weaponType end
+function Item:getAmmoType() return Items[self:getItemID()].ammoType end
+function Item:getShootType() return Items[self:getItemID()].shootType end
+
+function Item:getShootRange() return Items[self:getItemID()].shootRange end
+function Item:getHitChance() return Items[self:getItemID()].hitChance end
+function Item:getMaxHitChance() return Items[self:getItemID()].maxHitChance end
+function Item:getBreakChance() return Items[self:getItemID()].breakChance end
 
 function Item:isCorpse() return Items[self:getItemID()].corpseType ~= RACE_NONE end

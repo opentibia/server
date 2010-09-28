@@ -52,28 +52,7 @@ enum LightState_t {
 	LIGHT_STATE_SUNRISE
 };
 
-struct RuleViolation {
-	RuleViolation(Player* _reporter, const std::string& _text, uint32_t _time) :
-		reporter(_reporter),
-		gamemaster(NULL),
-		text(_text),
-		time(_time),
-		isOpen(true)
-	{
-	}
-
-	Player* reporter;
-	Player* gamemaster;
-	std::string text;
-	uint32_t time;
-	bool isOpen;
-
-private:
-	RuleViolation(const RuleViolation&);
-};
-
 typedef std::map<std::string, std::string> StorageMap;
-typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 typedef std::vector<Player*> PlayerVector;
 
 namespace Script {
@@ -354,6 +333,8 @@ public:
 
 	ReturnValue internalAddItem(Creature* actor, Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
 		uint32_t flags = 0, bool test = false);
+	ReturnValue Game::internalAddItem(Creature *actor, Cylinder* toCylinder, Item* item, int32_t index,
+		uint32_t flags, bool test, uint32_t& remainderCount);
 	ReturnValue internalRemoveItem(Creature* actor, Item* item, int32_t count = -1,  bool test = false, uint32_t flags = 0);
 
 	/**
@@ -463,9 +444,6 @@ public:
 	bool playerCloseChannel(uint32_t playerId, uint16_t channelId);
 	bool playerOpenPrivateChannel(uint32_t playerId, const std::string& receiver);
 	bool playerCloseNpcChannel(uint32_t playerId);
-	bool playerProcessRuleViolation(uint32_t playerId, const std::string& name);
-	bool playerCloseRuleViolation(uint32_t playerId, const std::string& name);
-	bool playerCancelRuleViolation(uint32_t playerId);
 	bool playerReceivePing(uint32_t playerId);
 	bool playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(uint32_t playerId);
@@ -517,6 +495,8 @@ public:
 	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, ViolationAction actionType,
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
 	bool playerReportBug(uint32_t playerId, std::string comment);
+	bool playerReportViolation(uint32_t playerId, std::string violatorName, uint32_t reportType, uint32_t ruleViolation,
+		std::string comment, std::string translation, uint32_t counter);
 
 	// Script event callbacks, all are in the game class so we don't have to include the script files
 	bool onAccountLogin(std::string& name, uint32_t& number, std::string& password,
@@ -642,10 +622,6 @@ public:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 
-	const RuleViolationsMap& getRuleViolations() const {return ruleViolations;}
-	bool cancelRuleViolation(Player* player);
-	bool closeRuleViolation(Player* player);
-
 	void showUseHotkeyMessage(Player* player, Item* item);
 
 protected:
@@ -654,8 +630,6 @@ protected:
 	bool playerYell(Player* player, const std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClass type, const std::string& receiver, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId);
-	bool playerReportRuleViolation(Player* player, const std::string& text);
-	bool playerContinueReport(Player* player, const std::string& text);
 
 	bool checkReload(Player* player, const std::string& text);
 
@@ -668,9 +642,6 @@ protected:
 
 	//list of items that are in trading state, mapped to the player
 	std::map<Item*, uint32_t> tradeItems;
-
-	//list of reported rule violations, for correct channel listing
-	RuleViolationsMap ruleViolations;
 
 	AutoList<Creature> listCreature;
 	size_t checkCreatureLastIndex;

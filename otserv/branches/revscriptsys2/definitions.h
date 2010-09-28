@@ -24,7 +24,7 @@
 
 #define OTSERV_VERSION "0.7.0_SVN"
 #define OTSERV_NAME "OTServ (branch revscriptsys)"
-#define OTSERV_CLIENT_VERSION "8.50"
+#define OTSERV_CLIENT_VERSION "8.61"
 #define CURRENT_SCHEMA_VERSION 19
 
 #if defined(_WIN32) && !defined(WIN32)

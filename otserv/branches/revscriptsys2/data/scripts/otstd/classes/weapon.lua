@@ -5,7 +5,7 @@ Weapon_mt = {__index = Weapon}
 
 function Weapon:new(weaponID)
 	local weapon = {
-		-- Common for all weapons
+		-- Default weapon params
 		id = weaponID,
 		vocation = "any",
 		level = 0,
@@ -16,28 +16,21 @@ function Weapon:new(weaponID)
 		exhaustion = false,
 		premium = false,
 		unproperly = false,
-		--
-		range = 1,
+
+		-- Combat params
+		--range = 1,
 		damageType = COMBAT_PHYSICALDAMAGE,
 		blockedByDefense = true,
 		blockedByArmor = true,
 
-		-- damage formula
+		-- Distance weapons
+		shootType = nil,
+
+		-- Damage formula
 		damageFormula = nil,
 
-		-- Distance weapons
-		hitChange = 0,
-		maxHitChange = 0,
-		breakChange = 0,
-		ammuAttackValue = 0,
-
-		-- Wands
-		minChange = 0,
-		maxChange = 0,
-
 		-- Callbacks
-		onUseWeapon = nil,
-		onUseFist = nil
+		onUseWeapon = nil
 	}
 	setmetatable(weapon, Weapon_mt)
 	return weapon
@@ -56,7 +49,7 @@ function otstd.damageFormula(player, target, weapon)
 	local attackValue = weapon:getAttack()
 	if weapon:getWeaponType() == WEAPON_AMMO then
 		local bow = player:getWeapon(true)
-		if bow then
+		if bow and bow:getAmmoType() == weapon:getAmmoType() then
 			attackValue = attackValue + bow:getAttack()
 		end
 	end
@@ -76,6 +69,13 @@ function otstd.damageFormula(player, target, weapon)
 	return -math.random(minDamage, maxDamage)
 end
 
+-- Default fist formula callback
+function otstd.fistDamageFormula(player, target)
+	local attackValue = 7 --config["fist_strenght"]
+	local maxDamage = otstd.getWeaponMaxDamage(player:getLevel(), player:getSkill(SKILL_FIST), attackValue, player:getAttackFactor())
+	return -math.random(0, maxDamage)
+end
+
 function otstd.onUseWeapon(event)
 	local weapon = event.weapon
 
@@ -84,6 +84,7 @@ function otstd.onUseWeapon(event)
 	end
 
 	if not weapon then
+		event.target = event.attacked
 		otstd.internalUseFist(event)
 	else
 		local internalWeapon = otstd.weapons[weapon:getItemID()]
@@ -162,15 +163,30 @@ function otstd.onUsedWeapon(event)
 	return true
 end
 
+function otstd.onUsedFist(event)
+	local player = event.player
+
+	if not player:notGainSkill() and
+		player:getAddAttackSkill() then
+		player:advanceSkill(SKILL_FIST, 1)
+	end
+end
+
 function otstd.onWeaponCheck(event)
 	local player = event.player
 	local target = event.target
+	local weapon = event.weapon
 	local internalWeapon = event.internalWeapon
 
-	if not areInRange(player:getPosition(), target:getPosition(), internalWeapon.range) then
+	if not areInRange(player:getPosition(), target:getPosition(), weapon:getShootRange()) then
 		event.damageModifier = 0
 		return false
 	end
+
+	--
+	-- TODO:
+	-- - add a check for distance weapons and check if ammo type matches
+	-- - add a check for wands
 
 	if not player:ignoreWeaponCheck() then
 		if (internalWeapon.premium and not player:isPremium()) or
@@ -200,7 +216,12 @@ function otstd.onWeaponCheck(event)
 
 		-- magic level
 		if internalWeapon.magicLevel > player:getMagicLevel() then
-			event.damageModifier = internalWeapon.unproperly and event.damageModifier/2 or 0
+			if internalWeapon.unproperly then
+				event.damageModifier = event.damageModifier / 2
+			else
+				event.damageModifier = 0
+				return false
+			end
 		end
 	end
 
@@ -240,7 +261,18 @@ end
 
 function otstd.internalUseFist(event)
 	event:skip()
-	print("use fist triggered")
+
+	local player = event.player
+	local target = event.target
+
+
+	local damage = otstd.fistDamageFormula(player, target)
+
+	-- do the damage
+	internalCastSpell(COMBAT_PHYSICALDAMAGE, player, target, damage, true, true)
+
+	-- call finish handler
+	otstd.onUsedFist(event)
 end
 
 function Weapon:register()

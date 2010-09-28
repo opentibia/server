@@ -384,8 +384,6 @@ void Manager::registerClasses() {
 	registerMemberFunction("Item", "getWeight()", &Manager::lua_Item_getWeight);
 	registerMemberFunction("Item", "isPickupable()", &Manager::lua_Item_isPickupable);
 	registerMemberFunction("Item", "getSubtype()", &Manager::lua_Item_getSubtype);
-	registerMemberFunction("Item", "getWeaponType()", &Manager::lua_Item_getWeaponType);
-	registerMemberFunction("Item", "getAmmoType()", &Manager::lua_Item_getAmmoType);
 
 	registerMemberFunction("Item", "setItemID(int newid [, int newtype])", &Manager::lua_Item_setItemID);
 	registerMemberFunction("Item", "setCount(int newcount)", &Manager::lua_Item_setCount);
@@ -4758,7 +4756,13 @@ int LuaState::lua_createItem()
 	}
 	int32_t id = popUnsignedInteger();
 
-	Item* item = Item::CreateItem((uint16_t)id, (count < 0? 0 : count));
+	// the stack size may not be higher than 100
+	const ItemType &it = Item::items[id];
+	if(it.stackable && count > 100){
+		count = 100;
+	}
+
+	Item* item = Item::CreateItem((uint16_t)id, (count < 0 ? 0 : count));
 	item->addRef();
 	pushThing(item);
 	// It will be freed if not assigned to any parent
@@ -4799,20 +4803,6 @@ int LuaState::lua_Item_getSubtype()
 		pushInteger(item->getSubType());
 	else
 		pushNil();
-	return 1;
-}
-
-int LuaState::lua_Item_getWeaponType()
-{
-	Item *item = popItem();
-	push(item->getWeaponType());
-	return 1;
-}
-
-int LuaState::lua_Item_getAmmoType()
-{
-	Item *item = popItem();
-	push(item->getAmmoType());
 	return 1;
 }
 
@@ -5092,7 +5082,6 @@ int LuaState::lua_getItemType()
 	setField(-1, "isHorizontal", it.isHorizontal);
 	setField(-1, "isHangable", it.isHangable);
 	setField(-1, "allowDistRead", it.allowDistRead);
-	setField(-1, "clientCharges", it.clientCharges);
 	setField(-1, "speed", it.speed);
 	setField(-1, "decayTo", it.decayTo);
 	setField(-1, "decayTime", it.decayTime);

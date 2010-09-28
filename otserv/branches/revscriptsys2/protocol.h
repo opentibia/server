@@ -26,8 +26,8 @@
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;
 
-#define CLIENT_VERSION_MIN 850
-#define CLIENT_VERSION_MAX 852
+#define CLIENT_VERSION_MIN 861
+#define CLIENT_VERSION_MAX 861
 
 #define STRING_CLIENT_VERSION "This server requires client version " OTSERV_CLIENT_VERSION "."
 

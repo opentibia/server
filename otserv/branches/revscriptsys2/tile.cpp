@@ -374,8 +374,9 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				Creature* creature;
 				for(uint32_t i = 0; i < creatures_count(); ++i){
 					creature = creatures_get(i);
-					if(creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen))
+					if(monster->canWalkthrough(creature)){
 						continue;
+					}
 
 					if( !creature->getActor() ||
 						!creature->isPushable() ||
@@ -387,7 +388,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 			else if(!creatures_empty()){
 				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
-					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+					if(!monster->canWalkthrough(*cit)){
 						return RET_NOTENOUGHROOM;
 					}
 				}
@@ -432,7 +433,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		else if(const Player* player = creature->getPlayer()){
 			if(!hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags) && !creatures_empty()){
 				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
-					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+					if(!player->canWalkthrough(*cit)){
 						return RET_NOTENOUGHROOM;
 					}
 				}
@@ -464,7 +465,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		else{
 			if(!hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags) && !creatures_empty()){
 				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
-					if(!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+					if(!creature->canWalkthrough(*cit)){
 						return RET_NOTENOUGHROOM;
 					}
 				}
@@ -1000,6 +1001,7 @@ int32_t Tile::getClientIndexOfThing(const Player* player, const Thing* thing) co
 		n += items_topCount();
 	}
 
+	// TODO REVERSE ITERATOR?
 	for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
 		if((*cit) == thing || player->canSeeCreature(*cit)){
 			++n;
@@ -1085,12 +1087,12 @@ int32_t Tile::__getLastIndex() const
 	return getThingCount();
 }
 
-uint32_t Tile::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, bool itemCount /*= true*/) const
+uint32_t Tile::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) const
 {
 	ItemVector vector = items_getListWithItemId(itemId);
 
 	const ItemType& it = Item::items[itemId];
-	if(!it.stackable && itemCount){
+	if(!it.stackable){
 		return vector.size();
 	}
 	
@@ -1098,19 +1100,8 @@ uint32_t Tile::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/, boo
 	Item* item = NULL;
 	for(ItemVector::iterator it = vector.begin(); it != vector.end(); ++it){
 		item = *it;
-		if(subType == -1 || subType == item->getSubType()){
-
-			if(itemCount){
-				count+= item->getItemCount();
-			}
-			else{
-				if(item->isRune()){
-					count+= item->getCharges();
-				}
-				else{
-					count+= item->getItemCount();
-				}
-			}
+		if(item->getID() == itemId){
+			count += Item::countByType(item, subType);
 		}
 	}
 

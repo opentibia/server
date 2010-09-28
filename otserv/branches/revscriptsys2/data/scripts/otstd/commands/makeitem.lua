@@ -7,19 +7,19 @@ MakeItem.groups = {"Community Manager", "Server Administrator"}
 function MakeItem.handler(event)
 	local name = event.param
 	local count = name:match("%s(%d+)")
-	
+
 	if count then
 		name = name:gsub("(%w+)(%w)" .. count .. "(%w)(%w+)", " ")
 		name = name:gsub(count, "")
 	else
 		count = -1
 	end
-	
+
 	name = name:strip_whitespace()
-	
+
 	local itemid = getItemIDByName(name)
 	local item = nil
-	
+
 	--event.creature:sendNote(name[#name])
 	if itemid then
 		item = createItem(itemid, count)
@@ -30,7 +30,7 @@ function MakeItem.handler(event)
 			item = createItem(itemid, count)
 		end
 	end
-	
+
 	if item == nil then
 		id = nil
 		count = 1
@@ -45,7 +45,7 @@ function MakeItem.handler(event)
 			item = createItem(id, count)
 		end
 	end
-	
+
 	if item then
 		event.creature:addItem(item)
 		event.creature:sendNote(

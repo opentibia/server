@@ -12,7 +12,8 @@ function otstd.burnTarget(target, interval, rounds, min, max)
 			}
 	}
 
-	if typeof(target, "Player") then
+	if typeof(target, "Player") and
+		not target:cannotGainInFight() then
 		target:addInFight(config["fight_exhausted"])
 	end
 	target:addCondition(condition)
@@ -22,16 +23,17 @@ end
 function otstd.poisonTarget(target, interval, start, min, max)
 	local condition = {"poisoned", 0, COMBAT_EARTHDAMAGE,
 		["damage"] = {
-				5000,
+				interval,
 				COMBAT_EARTHDAMAGE,
 				first = start,
-				min = -100,
-				max = -100,
+				min = min,
+				max = max,
 				icon = ICON_POISON
 			}
 	}
 
-	if typeof(target, "Player") then
+	if typeof(target, "Player") and
+		not target:cannotGainInFight() then
 		target:addInFight(config["fight_exhausted"])
 	end
 	target:addCondition(condition)
@@ -49,7 +51,8 @@ function otstd.electrifyTarget(target, interval, rounds, min, max)
 			}
 	}
 
-	if typeof(target, "Player") then
+	if typeof(target, "Player") and
+		not target:cannotGainInFight() then
 		target:addInFight(config["fight_exhausted"])
 	end
 	target:addCondition(condition)
@@ -91,13 +94,17 @@ otstd.fields = {
 		[1488] = {handler =
 			function(event)
 				local target = event.moving_creature
-				otstd.burnTarget(target, 10000, 7, -10, -10)
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -10) then
+					otstd.burnTarget(target, 10000, 7, -10, -10)
+				end
 			end
 			},
 		[1490] = {handler =
 			function(event)
 				local target = event.moving_creature
-				otstd.poisonTarget(target, 5000, -5, -100, -100)
+				if internalCastSpell(COMBAT_EARTHDAMAGE, nil, target, -5) then
+					otstd.poisonTarget(target, 5000, -5, -100, -100)
+				end
 			end
 			},
 		[1491] = {handler =
@@ -119,7 +126,9 @@ otstd.fields = {
 		[1493] = {handler =
 			function(event)
 				local target = event.moving_creature
-				otstd.burnTarget(target, 10000, 7, -10, -10)
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -10) then
+					otstd.burnTarget(target, 10000, 7, -10, -10)
+				end
 			end
 			},
 		[1495] = {handler =
@@ -133,7 +142,9 @@ otstd.fields = {
 		[1496] = {handler =
 			function(event)
 				local target = event.moving_creature
-				otstd.poisonTarget(target, 5000, -5, -100, -100)
+				if internalCastSpell(COMBAT_EARTHDAMAGE, nil, target, -5) then
+					otstd.poisonTarget(target, 5000, -5, -100, -100)
+				end
 			end
 			},
 		[1500] = {handler =
@@ -147,13 +158,17 @@ otstd.fields = {
 		[1501] = {handler =
 			function(event)
 				local target = event.moving_creature
-				otstd.burnTarget(target, 10000, 7, -10, -10)
+				if internalCastSpell(COMBAT_FIREDAMAGE, nil, target, -10) then
+					otstd.burnTarget(target, 10000, 7, -10, -10)
+				end
 			end
 			},
 		[1503] = {handler =
 			function(event)
 				local target = event.moving_creature
-				otstd.poisonTarget(target, 5000, -5, -100, -100)
+				if internalCastSpell(COMBAT_EARTHDAMAGE, nil, target, -5) then
+					otstd.poisonTarget(target, 5000, -5, -100, -100)
+				end
 			end
 			},
 		[1504] = {handler =
@@ -233,7 +248,9 @@ otstd.fields = {
 		[8062] = {handler =
 			function(event)
 				local target = event.moving_creature
-				otstd.poisonTarget(target, 5000, -5, -50, -50)
+				if internalCastSpell(COMBAT_EARTHDAMAGE, nil, target, -5) then
+					otstd.poisonTarget(target, 5000, -5, -50, -50)
+				end
 			end
 			}
 	}

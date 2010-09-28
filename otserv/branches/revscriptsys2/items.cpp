@@ -81,7 +81,6 @@ ItemType::ItemType()
 	stopTime      = false;
 	corpseType    = RACE_NONE;
 	fluidSource   = FLUID_NONE;
-	clientCharges = false;
 	allowDistRead = false;
 
 	isVertical		= false;
@@ -201,7 +200,7 @@ int Items::loadFromOtb(std::string file)
 		std::cout << "New version of items.otb detected, a newer version of the server is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
-	else if(Items::dwMinorVersion != CLIENT_VERSION_850){
+	else if(Items::dwMinorVersion != CLIENT_VERSION_861){
 		std::cout << "Another (client) version of items.otb is required." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -266,7 +265,6 @@ int Items::loadFromOtb(std::string file)
 		iType->allowDistRead = hasBitSet(FLAG_ALLOWDISTREAD, flags);
 		iType->rotateable = hasBitSet(FLAG_ROTABLE, flags);
 		iType->canReadText = hasBitSet(FLAG_READABLE, flags);
-		iType->clientCharges = hasBitSet(FLAG_CLIENTCHARGES, flags);
 		iType->lookThrough = hasBitSet(FLAG_LOOKTHROUGH, flags);
 
 		attribute_t attrib;
@@ -441,6 +439,9 @@ bool Items::loadFromXml(const std::string& datadir)
 									else if(asLowerCaseString(strValue) == "bed"){
 										it.type = ITEM_TYPE_BED;
 									}
+									else if(asLowerCaseString(strValue) == "rune"){
+										it.type = ITEM_TYPE_RUNE;
+									}
 									else{
 										std::cout << "Warning: [Items::loadFromXml] " << "Unknown type " << strValue  << std::endl;
 									}
@@ -514,6 +515,11 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(asLowerCaseString(strValue) == "blockprojectile"){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.blockProjectile = (intValue == 1);
+								}
+							}
+							else if(asLowerCaseString(strValue) == "pickupable"){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.pickupable = (intValue == 1);
 								}
 							}
 							else if(asLowerCaseString(strValue) == "allowpickupable"){

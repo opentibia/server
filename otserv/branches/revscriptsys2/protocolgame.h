@@ -139,13 +139,11 @@ private:
 	void parseOpenPriv(NetworkMessage& msg);
 	void parseCloseChannel(NetworkMessage& msg);
 	void parseCloseNpc(NetworkMessage& msg);
-	void parseProcessRuleViolation(NetworkMessage& msg);
-	void parseCloseRuleViolation(NetworkMessage& msg);
-	void parseCancelRuleViolation(NetworkMessage& msg);
 
 	//etc
 	void parseViolationWindow(NetworkMessage& msg);
 	void parseBugReport(NetworkMessage& msg);
+	void parseViolationReport(NetworkMessage &msg);
 	void parseDebugAssert(NetworkMessage& msg);
 	void parseDebug(NetworkMessage& msg);
 
@@ -155,12 +153,8 @@ private:
 
 	void sendChannelsDialog();
 	void sendChannel(uint16_t channelId, const std::string& channelName);
-	void sendRuleViolationsChannel(uint16_t channelId);
 	void sendOpenPrivateChannel(const std::string& receiver);
 	void sendToChannel(const Creature* creature, SpeakClass type, const std::string& text, uint16_t channelId, uint32_t time = 0);
-	void sendRemoveReport(const std::string& name);
-	void sendLockRuleViolation();
-	void sendRuleViolationCancel(const std::string& name);
 	void sendIcons(uint16_t icons);
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
