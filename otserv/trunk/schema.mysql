@@ -343,7 +343,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 23);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 22);
 
 DELIMITER |
 
