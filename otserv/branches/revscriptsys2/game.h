@@ -333,7 +333,7 @@ public:
 
 	ReturnValue internalAddItem(Creature* actor, Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
 		uint32_t flags = 0, bool test = false);
-	ReturnValue Game::internalAddItem(Creature *actor, Cylinder* toCylinder, Item* item, int32_t index,
+	ReturnValue internalAddItem(Creature *actor, Cylinder* toCylinder, Item* item, int32_t index,
 		uint32_t flags, bool test, uint32_t& remainderCount);
 	ReturnValue internalRemoveItem(Creature* actor, Item* item, int32_t count = -1,  bool test = false, uint32_t flags = 0);
 
