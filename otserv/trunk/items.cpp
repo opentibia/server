@@ -1576,7 +1576,7 @@ bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 			// Correct type!
 			if(resistances[c+1] > 0)
 				r = true;
-			dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[c+1]) / 100.);
+			dmg = (int32_t)std::floor((double)dmg * (100 - resistances[c+1]) / 100.);
 		}
 	}
 
