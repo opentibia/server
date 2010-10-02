@@ -174,6 +174,7 @@ void Manager::registerClasses() {
 	registerClass("Channel");
 
 	registerClass("Condition");
+	registerClass("Vocation");
 
 	// Event classes
 	registerMemberFunction("Event", "skip()", &Manager::lua_Event_skip);
@@ -223,6 +224,20 @@ void Manager::registerClasses() {
 	registerMemberFunction("Condition", "addLight(int level, int color)", &Manager::lua_Condition_addLight);
 	registerMemberFunction("Condition", "addDispel(string name)", &Manager::lua_Condition_addDispel);
 	registerMemberFunction("Condition", "addScript(string name [, int interval = nil])", &Manager::lua_Condition_addScript);
+
+	// Vocation
+	registerMemberFunction("Vocation", "getID()", &Manager::lua_Vocation_getID);
+	registerMemberFunction("Vocation", "getName()", &Manager::lua_Vocation_getName);
+	registerMemberFunction("Vocation", "getDescription()", &Manager::lua_Vocation_getDescription);
+
+	registerMemberFunction("Vocation", "getMeleeBaseDamage(WeaponType weaponType)", &Manager::lua_Vocation_getMeleeBaseDamage);
+
+	registerMemberFunction("Vocation", "getMagicBaseDamage()", &Manager::lua_Vocation_getMagicBaseDamage);
+	registerMemberFunction("Vocation", "getWandBaseDamage()", &Manager::lua_Vocation_getWandBaseDamage);
+	registerMemberFunction("Vocation", "getHealingBaseDamage()", &Manager::lua_Vocation_getHealingBaseDamage);
+
+	registerMemberFunction("Vocation", "getBaseDefense()", &Manager::lua_Vocation_getBaseDefense);
+	registerMemberFunction("Vocation", "getArmorDefense()", &Manager::lua_Vocation_getArmorDefense);
 
 	// Creature
 	registerMemberFunction("Creature", "setRawCustomValue(string key, mixed value)", &Manager::lua_Creature_setRawCustomValue);
@@ -336,9 +351,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getMaximumCap()", &Manager::lua_Player_getMaximumCap);
 	registerMemberFunction("Player", "getSex()", &Manager::lua_Player_getSex);
 	registerMemberFunction("Player", "getAccess()", &Manager::lua_Player_getAccess);
-	registerMemberFunction("Player", "getVocationID()", &Manager::lua_Player_getVocationID);
-	registerMemberFunction("Player", "getVocationName()", &Manager::lua_Player_getVocationName);
-	registerMemberFunction("Player", "getVocationDescription()", &Manager::lua_Player_getVocationDescription);
+	registerMemberFunction("Player", "getVocation()", &Manager::lua_Player_getVocation);
 	registerMemberFunction("Player", "getTownID()", &Manager::lua_Player_getTownID);
 	registerMemberFunction("Player", "getGUID()", &Manager::lua_Player_getGUID);
 	registerMemberFunction("Player", "getAccessGroup()", &Manager::lua_Player_getGroup);
@@ -3411,6 +3424,73 @@ int LuaState::lua_Condition_addScript()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Class Vocation
+
+int LuaState::lua_Vocation_getID()
+{
+	Vocation *voc = popVocation();
+	pushInteger(voc->getID());
+	return 1;
+}
+
+int LuaState::lua_Vocation_getName()
+{
+	Vocation *voc = popVocation();
+	pushString(voc->getVocName());
+	return 1;
+}
+
+int LuaState::lua_Vocation_getDescription()
+{
+	Vocation *voc = popVocation();
+	pushString(voc->getVocDescription());
+	return 1;
+}
+
+int LuaState::lua_Vocation_getMeleeBaseDamage()
+{
+	WeaponType weaponType = popEnum<WeaponType>();
+	Vocation *voc = popVocation();
+	pushInteger(voc->getMeleeBaseDamage(weaponType));
+	return 1;
+}
+
+int LuaState::lua_Vocation_getMagicBaseDamage()
+{
+	Vocation *voc = popVocation();
+	pushInteger(voc->getMagicBaseDamage());
+	return 1;
+}
+
+int LuaState::lua_Vocation_getWandBaseDamage()
+{
+	Vocation *voc = popVocation();
+	pushInteger(voc->getWandBaseDamage());
+	return 1;
+}
+
+int LuaState::lua_Vocation_getHealingBaseDamage()
+{
+	Vocation *voc = popVocation();
+	pushInteger(voc->getHealingBaseDamage());
+	return 1;
+}
+
+int LuaState::lua_Vocation_getBaseDefense()
+{
+	Vocation *voc = popVocation();
+	pushInteger(voc->getBaseDefense());
+	return 1;
+}
+
+int LuaState::lua_Vocation_getArmorDefense()
+{
+	Vocation *voc = popVocation();
+	pushInteger(voc->getArmorDefense());
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Class Creature
 
 int LuaState::lua_Creature_getID()
@@ -4320,29 +4400,12 @@ int LuaState::lua_Player_addManaSpent()
 	return 1;
 }
 
-int LuaState::lua_Player_getVocationID()
+int LuaState::lua_Player_getVocation()
 {
 	Player* p = popPlayer();
-	push(p->getVocationId());
+	pushVocation(p->getVocation());
 	return 1;
 }
-
-int LuaState::lua_Player_getVocationName()
-{
-	Player* p = popPlayer();
-	Vocation* vocation = p->getVocation();
-	push(vocation->getVocName());
-	return 1;
-}
-
-int LuaState::lua_Player_getVocationDescription()
-{
-	Player* p = popPlayer();
-	Vocation* vocation = p->getVocation();
-	push(vocation->getVocDescription());
-	return 1;
-}
-
 
 int LuaState::lua_Player_getSoulPoints()
 {

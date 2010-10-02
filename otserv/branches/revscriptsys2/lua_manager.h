@@ -179,6 +179,7 @@ public:
 	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
 	Container* popContainer(Script::ErrorMode mode = Script::ERROR_THROW);
 	Condition* popCondition(Script::ErrorMode mode = Script::ERROR_THROW);
+	Vocation* popVocation(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
 	Town* popTown(Script::ErrorMode mode = Script::ERROR_THROW);
 	House* popHouse(Script::ErrorMode mode = Script::ERROR_THROW);
@@ -194,6 +195,7 @@ public:
 	void pushHouse(House* house);
 	void pushChannel(ChatChannel* channel);
 	void pushCondition(Condition* condition);
+	void pushVocation(Vocation* vocation);
 	void pushWaypoint(Waypoint_ptr pos);
 	void pushOutfit(const OutfitType& outfit);
 	template<class E, int size_>
@@ -360,6 +362,17 @@ public:
 	int lua_Condition_addDispel();
 	int lua_Condition_addScript();
 
+	// - - Vocation
+	int lua_Vocation_getID();
+	int lua_Vocation_getName();
+	int lua_Vocation_getDescription();
+	int lua_Vocation_getMeleeBaseDamage();
+	int lua_Vocation_getMagicBaseDamage();
+	int lua_Vocation_getWandBaseDamage();
+	int lua_Vocation_getHealingBaseDamage();
+	int lua_Vocation_getBaseDefense();
+	int lua_Vocation_getArmorDefense();
+
 	// - - Creature
 	int lua_Creature_getID();
 	int lua_Creature_getOrientation();
@@ -478,9 +491,7 @@ public:
 	int lua_Player_getSex();
 	int lua_Player_getAccess();
 	int lua_Player_getGroup();
-	int lua_Player_getVocationID();
-	int lua_Player_getVocationName();
-	int lua_Player_getVocationDescription();
+	int lua_Player_getVocation();
 	int lua_Player_getTownID();
 	int lua_Player_getGUID();
 	int lua_Player_getPremiumDays();

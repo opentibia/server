@@ -22,60 +22,52 @@ if USE_PGSQL
 MAYBE_PGSQL = databasepgsql.cpp databasepgsql.h
 endif
 
-EXTRA_DIST=autogen.sh \
+EXTRA_DIST = autogen.sh \
 	\
-	schema.mysql  schema.pgsql  schema.sqlite config.lua.dist \
+	schema.mysql schema.pgsql schema.sqlite config.lua.dist \
 	AUTHORS Doxyfile LICENSE Makefile.am README README.DATABASE \
 	\
 	\
-	account.h	 map.h	           scriptmanager.h \
-	actions.h	 md5.h	           server.h \
-	admin.h		 definitions.h	   monster.h	     sha1.h \
-	allocator.h	 depot.h	   monsters.h	     spawn.h \
-	ban.h		 enums.h	   movement.h	     spells.h \
-	baseevents.h	 exception.h	   networkmessage.h  status.h \
-	beds.h		 fileloader.h	   npc.h	     talkaction.h \
-	chat.h		 game.h		   otpch.h	     tasks.h \
-	combat.h	 house.h	   otsystem.h	     teleport.h \
-	commands.h	 housetile.h	   outfit.h	     templates.h \
-	condition.h	 ioaccount.h	   outputmessage.h   thing.h \
-	config.h	 iomap.h	   party.h	     tile.h \
-	configmanager.h  iomapotbm.h	   player.h	     tools.h \
-	connection.h	 iomapserialize.h  position.h	     town.h \
-	const.h		 iomapxml.h	   protocolgame.h    trashholder.h \
-	container.h	 ioplayer.h	   protocol.h	     vocation.h \
-	creatureevent.h  item.h		   protocollogin.h   waitlist.h \
-	creature.h	 itemloader.h	   protocolold.h     waypoints.h \
-	cylinder.h	 items.h	   quests.h	     weapons.h \
-	database.h	 logger.h	   raids.h \
-	luascript.h	 rsa.h \
-	mailbox.h	 scheduler.h
-	
+	actor.h admin.h allocator.h ban.h beds.h \
+	boost_common.h chat.h classes.h combat.h \
+	condition.h condition_attributes.h configmanager.h \
+	connection.h const.h container.h creature.h \
+	creature_manager.h creature_type.h cylinder.h \
+	database.h definitions.h depot.h enum.h enums.h \
+	exception.h fileloader.h game.h house.h housetile.h \
+	ioaccount.h iomap.h iomapotbm.h iomapserialize.h \
+	ioplayer.h item.h item_attributes.h itemloader.h \
+	items.h logger.h lua_manager.h map.h md5.h \
+	networkmessage.h otpch.h otsystem.h outfit.h \
+	outputmessage.h party.h player.h position.h \
+	protocolgame.h protocollogin.h protocolold.h \
+	rsa.h scheduler.h script_environment.h script_event.h \
+	script_listener.h script_manager.h server.h sha1.h \
+	shared_ptr.h spawn.h status.h tasks.h teleport.h \
+	templates.h thing.h tile.h tools.h town.h \
+	trashholder.h vocation.h waitlist.h waypoints.h
+
 
 
 
 otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
-	lua_manager.cpp    enums.cpp           condition_attributes.cpp \
-	account.cpp        map.cpp             rsa.cpp \
-	md5.cpp            scheduler.cpp       admin.cpp \
-	server.cpp         allocator.cpp       depot.cpp  \
-	ban.cpp	           exception.cpp       sha1.cpp \
-	fileloader.cpp     networkmessage.cpp  spawn.cpp \
-	beds.cpp           game.cpp            status.cpp \
-	chat.cpp           house.cpp           otserv.cpp \
-	combat.cpp         housetile.cpp       const.cpp \
-	ioaccount.cpp      outputmessage.cpp   tasks.cpp \
-	condition.cpp      iomapotbm.cpp       party.cpp           teleport.cpp \
-	configmanager.cpp  iomapserialize.cpp  player.cpp          thing.cpp \
-	connection.cpp     position.cpp	       tile.cpp \
-	container.cpp      ioplayer.cpp        protocol.cpp        tools.cpp \
-	creature.cpp       item.cpp	       protocolgame.cpp \
-	items.cpp          protocollogin.cpp   vocation.cpp \
-	cylinder.cpp       logger.cpp	       protocolold.cpp     waitlist.cpp \
-	database.cpp       weapons.cpp         script_environment.cpp \
-	script_manager.cpp item_attributes.cpp trashholder.cpp \
-	script_event.cpp   script_listener.cpp script_functions.cpp \
-	creature_type.cpp  creature_manager.cpp actor.cpp
+	actor.cpp admin.cpp allocator.cpp ban.cpp \
+	beds.cpp chat.cpp combat.cpp condition.cpp \
+	condition_attributes.cpp configmanager.cpp \
+	connection.cpp const.cpp container.cpp creature.cpp \
+	creature_manager.cpp creature_type.cpp cylinder.cpp \
+	database.cpp depot.cpp enums.cpp exception.cpp \
+	fileloader.cpp game.cpp house.cpp housetile.cpp \
+	ioaccount.cpp iomapotbm.cpp iomapserialize.cpp \
+	ioplayer.cpp item.cpp item_attributes.cpp items.cpp \
+	logger.cpp lua_manager.cpp map.cpp md5.cpp networkmessage.cpp \
+	otpch.cpp otserv.cpp outputmessage.cpp party.cpp \
+	player.cpp position.cpp protocol.cpp protocolgame.cpp \
+	protocollogin.cpp protocolold.cpp rsa.cpp scheduler.cpp \
+	script_environment.cpp script_event.cpp script_functions.cpp \
+	script_listener.cpp script_manager.cpp server.cpp sha1.cpp \
+	spawn.cpp status.cpp tasks.cpp teleport.cpp thing.cpp \
+	tile.cpp tools.cpp trashholder.cpp vocation.cpp waitlist.cpp
 
 pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
 
@@ -91,5 +83,5 @@ enums:
 distclean-local:
 	-rm -f config.lua.dist config.lua \
 	enums.cpp enums.h \
-	condition_attributes.h condition_attributes.cpp
+	condition_attributes.cpp condition_attributes.h
 

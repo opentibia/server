@@ -1,3 +1,7 @@
+-- TODO:
+-- - Distance weapons hit chance formula
+-- - Wand support
+
 otstd.weapons = {}
 
 Weapon = {}
@@ -11,20 +15,16 @@ function Weapon:new(weaponID)
 		level = 0,
 		magicLevel = 0,
 		mana = 0,
-		manapercent = 0,
+		manaPercent = 0,
 		soul = 0,
 		exhaustion = false,
 		premium = false,
 		unproperly = false,
 
 		-- Combat params
-		--range = 1,
 		damageType = COMBAT_PHYSICALDAMAGE,
 		blockedByDefense = true,
 		blockedByArmor = true,
-
-		-- Distance weapons
-		shootType = nil,
 
 		-- Damage formula
 		damageFormula = nil,
@@ -35,9 +35,6 @@ function Weapon:new(weaponID)
 	setmetatable(weapon, Weapon_mt)
 	return weapon
 end
-
--- Used to handle default weapons
-otstd.defaultWeapon = Weapon:new(0)
 
 -- Formula to get weapon max damage based on player's level, skill and attack factor
 function otstd.getWeaponMaxDamage(level, attackSkill, attackValue, attackFactor)
@@ -66,14 +63,22 @@ function otstd.damageFormula(player, target, weapon)
 		end
 	end
 
+	-- vocation multipliers
+	local vocation = player:getVocation()
+	if vocation then
+		local meleeBaseDamage = vocation:getMeleeBaseDamage(weapon:getWeaponType())
+		if meleeBaseDamage ~= 1.0 then
+			maxDamage = maxDamage * meleeBaseDamage
+			minDamage = minDamage * meleeBaseDamage
+		end
+	end
+
 	return -math.random(minDamage, maxDamage)
 end
 
 -- Default fist formula callback
 function otstd.fistDamageFormula(player, target)
-	local attackValue = 7 --config["fist_strenght"]
-	local maxDamage = otstd.getWeaponMaxDamage(player:getLevel(), player:getSkill(SKILL_FIST), attackValue, player:getAttackFactor())
-	return -math.random(0, maxDamage)
+	return -math.random(0, otstd.getWeaponMaxDamage(player:getLevel(), player:getSkill(SKILL_FIST), 7 --[[config["fist_strenght"]], player:getAttackFactor()))
 end
 
 function otstd.onUseWeapon(event)
@@ -89,13 +94,14 @@ function otstd.onUseWeapon(event)
 	else
 		local internalWeapon = otstd.weapons[weapon:getItemID()]
 		if not internalWeapon then
-			internalWeapon = otstd.defaultWeapon
+			error("onUseWeapon event triggered with an unknown weapon. (ItemID: " .. weapon:getItemID() .. ")")
 		end
 
 		event.internalWeapon = internalWeapon
 		event.target = event.attacked
 		event.damageModifier = 100
 
+		-- damage modifier will be used only if weaponcheck returns ok
 		if otstd.onWeaponCheck(event) then
 			if internalWeapon.onUseWeapon then
 				internalWeapon:onUseWeapon(event)
@@ -178,22 +184,29 @@ function otstd.onWeaponCheck(event)
 	local weapon = event.weapon
 	local internalWeapon = event.internalWeapon
 
-	if not areInRange(player:getPosition(), target:getPosition(), weapon:getShootRange()) then
-		event.damageModifier = 0
-		return false
+	local shootRange = weapon:getShootRange()
+
+	-- If is a two-handed distance weapon we may check the ammo types
+	-- and get the bow range
+	if weapon:getWeaponType() == WEAPON_AMMO then
+		local bow = player:getWeapon(true)
+		if bow:getWeaponType() ~= WEAPON_DIST or
+			bow:getAmmoType() ~= weapon:getAmmoType() then
+			return false
+		end
+
+		shootRange = bow:getShootRange()
 	end
 
-	--
-	-- TODO:
-	-- - add a check for distance weapons and check if ammo type matches
-	-- - add a check for wands
+	if not areInRange(player:getPosition(), target:getPosition(), shootRange) then
+		return false
+	end
 
 	if not player:ignoreWeaponCheck() then
 		if (internalWeapon.premium and not player:isPremium()) or
 			(internalWeapon.mana > player:getMana()) or
 			(internalWeapon.soul > player:getSoulPoints()) or
-			(not checkVocation(player:getVocationName(), internalWeapon.vocation)) then
-			event.damageModifier = 0
+			(not checkVocation(player:getVocation(), internalWeapon.vocation)) then
 			return false
 		end
 
@@ -209,7 +222,6 @@ function otstd.onWeaponCheck(event)
 
 				event.damageModifier = event.damageModifier - (event.damageModifier * penalty)
 			else
-				event.damageModifier = 0
 				return false
 			end
 		end
@@ -219,7 +231,6 @@ function otstd.onWeaponCheck(event)
 			if internalWeapon.unproperly then
 				event.damageModifier = event.damageModifier / 2
 			else
-				event.damageModifier = 0
 				return false
 			end
 		end
@@ -250,6 +261,12 @@ function otstd.internalUseWeapon(event)
 	-- do the damage
 	internalCastSpell(internalWeapon.damageType, player, target, damage,
 		internalWeapon.blockedByShield, internalWeapon.blockedByArmor)
+
+	-- if weapon has a shoot effect send it
+	local shootType = weapon:getShootType()
+	if shootType ~= SHOOT_EFFECT_NONE then
+		sendDistanceEffect(player:getPosition(), target:getPosition(), shootType)
+	end
 
 	-- call finish handler
 	if internalWeapon.onUsedWeapon then

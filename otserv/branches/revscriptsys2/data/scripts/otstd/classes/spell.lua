@@ -222,7 +222,7 @@ function otstd.onSpellCheck(event)
 			caster:sendCancel(RET_YOUNEEDAWEAPONTOUSETHISSPELL)
 		elseif spell.premium and not caster:isPremium() then
 			caster:sendCancel(RET_YOUNEEDPREMIUMACCOUNT)
-		elseif not checkVocation(caster:getVocationName(), spell.vocation) then
+		elseif not checkVocation(caster:getVocation(), spell.vocation) then
 			caster:sendCancel(RET_YOURVOCATIONCANNOTUSETHISSPELL)
 		else
 			return true

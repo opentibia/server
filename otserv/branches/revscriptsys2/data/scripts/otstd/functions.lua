@@ -270,23 +270,18 @@ function areInRange(p1, p2, dx, dy, dz)
 end
 
 function checkVocation(vocation, vocationList)
-	if typeof(vocationList, "string") then
-		local i, j = string.find(vocationList:lower(), "any")
-		if i and j then
-			return true
-		end
-
-		i, j = string.find(vocation:lower(), vocationList:lower())
-		if i and j then
-			return true
-		end
-
-	elseif typeof(vocationList, "table") then
-		for _, voc in ipairs(vocationList) do
-			local i, j = string.find(vocation:lower(), voc:lower())
-			if i and j then
-				--print(string.sub(vocation, i, j))
+	if typeof(vocation, "Vocation") then
+		if typeof(vocationList, "string") then
+			if vocationList:lower() == "any" or
+				vocation:getName():lower() == vocationList:lower() then
 				return true
+			end
+		elseif typeof(vocationList, "table") then
+			for _, v in ipairs(vocationList) do
+				if v:lower() == "any" or
+					vocation:getName():lower() == v:lower() then
+					return true
+				end
 			end
 		end
 	end

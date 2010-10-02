@@ -521,6 +521,16 @@ void LuaState::pushCondition(Condition* condition)
 	}
 }
 
+void LuaState::pushVocation(Vocation* vocation)
+{
+	if(vocation) {
+		Script::ObjectID* objid = pushClassInstance("Vocation");
+		*objid = environment->addObject(vocation);
+	} else {
+		pushNil();
+	}
+}
+
 void LuaState::pushWaypoint(Waypoint_ptr wp)
 {
 	if(wp) {
@@ -751,6 +761,22 @@ Condition* LuaState::popCondition(Script::ErrorMode mode /* = Script::ERROR_THRO
 	pop();
 
 	return (Condition*)environment->getObject(*objid);
+}
+
+Vocation* LuaState::popVocation(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	getMetaObject();
+
+	if(!isUserdata(-1)) {
+		HandleError(mode, std::string("Couldn't pop vocation, top object is not of valid type (") + luaL_typename(state, -1) + ")");
+		pop();
+		return NULL;
+	}
+
+	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
+	pop();
+
+	return (Vocation*)environment->getObject(*objid);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

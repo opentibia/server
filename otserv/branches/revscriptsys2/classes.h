@@ -77,5 +77,6 @@ class QTreeLeafNode;
 struct LootBlock;
 struct Quest;
 struct ShopItem;
+class Vocation;
 
 #endif
