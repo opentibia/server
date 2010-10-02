@@ -418,41 +418,26 @@ bool Items::loadFromXml(const std::string& datadir)
 	xmlDocPtr schemaDoc = xmlReadFile(xmlSchema.c_str(), NULL, XML_PARSE_NONET);
 	if(schemaDoc != NULL){
 		xmlSchemaParserCtxtPtr schemaParserContext = xmlSchemaNewDocParserCtxt(schemaDoc);
-		if(schemaParserContext == NULL){
-			xmlFreeDoc(schemaDoc);
-			return false;
-		}
-
-		xmlSchemaPtr schema = xmlSchemaParse(schemaParserContext);
-		if(schema == NULL)
-		{
+		if(schemaParserContext != NULL){
+			xmlSchemaPtr schema = xmlSchemaParse(schemaParserContext);
+			if(schema != NULL){
+				xmlSchemaValidCtxtPtr validContext = xmlSchemaNewValidCtxt(schema);
+				if(validContext != NULL){
+					int returnVal = xmlSchemaValidateDoc(validContext, doc);
+					if(returnVal != 0){
+						if(returnVal > 0){
+							std::cout << std::endl << "Warning: [XMLSCHEMA] items.xml could not be validated against XSD" << std::endl;
+						}
+						else{
+							std::cout << std::endl << "Warning: [XMLSCHEMA] validation generated an internal error." << std::endl;
+						}
+					}
+					xmlSchemaFreeValidCtxt(validContext);
+				}
+				xmlSchemaFree(schema);
+			}
 			xmlSchemaFreeParserCtxt(schemaParserContext);
-			xmlFreeDoc(schemaDoc);
-			return false;
 		}
-
-		xmlSchemaValidCtxtPtr validContext = xmlSchemaNewValidCtxt(schema);
-			
-		if(validContext == NULL) {
-			xmlSchemaFree(schema);
-			xmlSchemaFreeParserCtxt(schemaParserContext);
-			xmlFreeDoc(schemaDoc);
-			return false; 
-		}
-
-		int returnVal = xmlSchemaValidateDoc(validContext, doc);
-		if(returnVal > 0){
-			std::cout << std::endl << "Warning: [XMLSCHEMA] items.xml could not be validated against XSD" << std::endl;
-			return false;
-		}
-		else{
-			std::cout << std::endl << "Warning: [XMLSCHEMA] validation generated an internal error." << std::endl;
-			return false;
-		}
-
-		xmlSchemaFreeValidCtxt(validContext);
-		xmlSchemaFree(schema);
-		xmlSchemaFreeParserCtxt(schemaParserContext);
 		xmlFreeDoc(schemaDoc);
 	}
 
