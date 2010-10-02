@@ -219,16 +219,20 @@ bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildF
 
 	//If both guilds have leaders that can afford the war, return true..
 	if(guildPaid && opponentPaid){
-		guildLeader->balance -= guildFee;
-		if(guildLeader->isOffline()){
-			IOPlayer::instance()->savePlayer(guildLeader);
-			delete guildLeader;
+		if(guildLeader){
+			guildLeader->balance -= guildFee;
+			if(guildLeader->isOffline()){
+				IOPlayer::instance()->savePlayer(guildLeader);
+				delete guildLeader;
+			}
 		}
 
-		opponentLeader->balance -= opponentFee;
-		if(opponentLeader->isOffline()){
-			IOPlayer::instance()->savePlayer(opponentLeader);
-			delete opponentLeader;
+		if(opponentLeader){
+			opponentLeader->balance -= opponentFee;
+			if(opponentLeader->isOffline()){
+				IOPlayer::instance()->savePlayer(opponentLeader);
+				delete opponentLeader;
+			}
 		}
 
 		return true;
