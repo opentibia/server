@@ -1319,7 +1319,12 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"summon") == 0){
 						int32_t chance = 100;
 						int32_t speed = 1000;
-
+						int32_t max = 1;
+						
+						if(readXMLInteger(tmpNode, "max" intValue)){
+							max = intValue;
+						}
+						
 						if(readXMLInteger(tmpNode, "speed", intValue) || readXMLInteger(tmpNode, "interval", intValue)){
 							speed = intValue;
 						}
@@ -1332,6 +1337,7 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 							summonBlock_t sb;
 							sb.name = strValue;
 							sb.speed = speed;
+							sb.max = max;
 							sb.chance = chance;
 
 							mType->summonList.push_back(sb);
