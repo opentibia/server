@@ -597,10 +597,10 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 		lua_pushnumber(L, cid);
 		m_scriptInterface->pushVariant(L, var);
 
-		int32_t result = m_scriptInterface->callFunction(2);
+		bool result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_NO_ERROR);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. Weapon::executeUseWeapon" << std::endl;

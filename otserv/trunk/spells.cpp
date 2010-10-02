@@ -193,10 +193,10 @@ bool BaseSpell::internalExecuteCastSpell(Event *event, Creature* creature, const
 		else
 			lua_pushnil(L);
 
-		result = (m_scriptInterface->callFunction(3) != LUA_ERROR);
+		result = m_scriptInterface->callFunction(3);
 
 		m_scriptInterface->releaseScriptEnv();
-		return(true);
+		return result;
 	}
 	return(false);
 }

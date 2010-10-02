@@ -982,10 +982,10 @@ uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& 
 		LuaScriptInterface::pushPosition(L, toPos, 0);
 		LuaScriptInterface::pushPosition(L, fromPos, 0);
 
-		int32_t result = m_scriptInterface->callFunction(4);
+		bool result = m_scriptInterface->callFunction(4);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. MoveEvent::executeStep" << std::endl;
@@ -1029,10 +1029,10 @@ uint32_t MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
 		LuaScriptInterface::pushThing(L, item, itemid);
 		lua_pushnumber(L, slot);
 
-		int32_t result = m_scriptInterface->callFunction(3);
+		bool result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. MoveEvent::executeEquip" << std::endl;
@@ -1079,10 +1079,10 @@ uint32_t MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position
 		LuaScriptInterface::pushThing(L, tileItem, itemidTile);
 		LuaScriptInterface::pushPosition(L, pos, 0);
 
-		int32_t result = m_scriptInterface->callFunction(3);
+		bool result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. MoveEvent::executeAddRemItem" << std::endl;

@@ -269,10 +269,10 @@ uint32_t CreatureEvent::executeOnLogin(Player* player)
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 
-		int32_t result = m_scriptInterface->callFunction(1);
+		bool result = m_scriptInterface->callFunction(1);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnLogin" << std::endl;
@@ -302,10 +302,10 @@ uint32_t CreatureEvent::executeOnLogout(Player* player)
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 
-		int32_t result = m_scriptInterface->callFunction(1);
+		bool result = m_scriptInterface->callFunction(1);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnLogout" << std::endl;
@@ -337,10 +337,10 @@ uint32_t CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, corpseid);
 
-		int32_t result = m_scriptInterface->callFunction(2);
+		bool result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnDie" << std::endl;
@@ -371,12 +371,12 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, targetId);
-		lua_pushnumber(L, (lastHit ? LUA_TRUE : LUA_FALSE) );
+		lua_pushnumber(L, (lastHit ? true : false) );
 
-		int32_t result = m_scriptInterface->callFunction(3);
+		bool result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] __ENABLE_SERVER_DIAGNOSTIC__Call stack overflow. CreatureEvent::executeOnKill" << std::endl;
@@ -409,10 +409,10 @@ uint32_t CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint
 		lua_pushnumber(L, oldLevel);
 		lua_pushnumber(L, newLevel);
 
-		int32_t result = m_scriptInterface->callFunction(4);
+		bool result = m_scriptInterface->callFunction(4);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnAdvance" << std::endl;
@@ -457,9 +457,9 @@ uint32_t CreatureEvent::executeOnLook(Player* player, Thing* target, uint16_t it
 
 		lua_pushnumber(L, itemId);
 
-		int32_t result = m_scriptInterface->callFunction(3);
+		bool result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnLook" << std::endl;

@@ -219,7 +219,7 @@ bool Npc::loadFromXml(const std::string& filename)
 		if(readXMLInteger(root, "lookdir", intValue)){
 			initialLookDir = (Direction) intValue;
 		}
-		
+
 		if(readXMLInteger(root, "autowalk", intValue)){
 			//Deprecated attribute.
 			if(intValue == 0){
@@ -3044,7 +3044,7 @@ int NpcScriptInterface::luaActionSay(lua_State* L)
 	bool publicize = true;
 
 	if(parameters >= 3){
-		publicize = (popNumber(L) == LUA_TRUE);
+		publicize = popBoolean(L);
 	}
 
 	if(parameters >= 2){
@@ -3401,7 +3401,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 
 	if(lua_istable(L, -1) == 0){
 		reportError(__FUNCTION__, "item list is not a table.");
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
@@ -3422,7 +3422,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 	player = env->getPlayerByUID(popNumber(L));
 	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
@@ -3431,7 +3431,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 
 	if(!npc){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
@@ -3439,7 +3439,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 	player->setShopOwner(npc, buyCallback, sellCallback);
 	player->openShopWindow(items);
 
-	lua_pushnumber(L, LUA_NO_ERROR);
+	lua_pushboolean(L, true);
 	return 1;
 }
 
@@ -3451,14 +3451,14 @@ int NpcScriptInterface::luaCloseShopWindow(lua_State *L)
 	Player* player = env->getPlayerByUID(popNumber(L));
 	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
 	Npc* npc = env->getNpc();
 	if(!npc){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
@@ -3484,12 +3484,12 @@ int NpcScriptInterface::luaCloseShopWindow(lua_State *L)
 
 int NpcScriptInterface::luaDoSellItem(lua_State *L)
 {
-	//doSellItem(cid, itemid, amount, <optional> subtype, <optional> actionid, <optional: default: 1> canDropOnMap)
+	//doSellItem(cid, itemid, amount, <optional> subtype, <optional> actionid, <optional: default: true> canDropOnMap)
 	int32_t parameters = lua_gettop(L);
 
 	bool canDropOnMap = true;
 	if(parameters > 5){
-		canDropOnMap = (popNumber(L) == LUA_TRUE);
+		canDropOnMap = popBoolean(L);
 	}
 
 	uint32_t actionId = 0;
@@ -3513,7 +3513,7 @@ int NpcScriptInterface::luaDoSellItem(lua_State *L)
 	Player* player = env->getPlayerByUID(popNumber(L));
 	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 

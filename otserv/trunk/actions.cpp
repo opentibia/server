@@ -630,10 +630,10 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
 			LuaScriptInterface::pushPosition(L, posEx, 0);
 		}
 
-		int32_t result = m_scriptInterface->callFunction(5);
+		bool result = m_scriptInterface->callFunction(5);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. Action::executeUse" << std::endl;
