@@ -15,6 +15,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/threads.h>
+#include <libxml/xmlschemas.h>
 //boost
 #include <boost/config.hpp>
 #include "boost_common.h"

@@ -42,6 +42,7 @@
 
 #if !defined(__WINDOWS__)
 	#include <unistd.h> // for access()
+	#include <signal.h> // for sigemptyset()
 #endif
 
 #if !defined(__WINDOWS__)

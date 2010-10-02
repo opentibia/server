@@ -363,6 +363,7 @@ bool Items::loadFromXml(const std::string& datadir)
 {
 	m_datadir = datadir;
 	std::string filename = m_datadir + "/items/items.xml";
+	std::string xmlSchema = m_datadir + "/items/items.xsd";
 
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	int intValue;
@@ -370,6 +371,30 @@ bool Items::loadFromXml(const std::string& datadir)
 	uint32_t id = 0;
 
 	if(doc){
+
+		// parse xml validation file
+		xmlDocPtr schemaDoc = xmlReadFile(xmlSchema.c_str(), NULL, XML_PARSE_NONET);
+		if(schemaDoc) {
+			xmlSchemaParserCtxtPtr schemaParserCtxt = xmlSchemaNewDocParserCtxt(schemaDoc);
+			if(schemaParserCtxt) {
+				xmlSchemaPtr schema = xmlSchemaParse(schemaParserCtxt);
+				if(schema) {
+					xmlSchemaValidCtxtPtr validCtxt = xmlSchemaNewValidCtxt(schema);
+					if(validCtxt) {
+						int ret = xmlSchemaValidateDoc(validCtxt, doc);
+						if(ret != 0) {
+							std::cout << std::endl << "Warning: [XMLSCHEMA] items.xml could not be validated against XSD (Error Code: " << ret << ")" << std::endl;
+						}
+						xmlSchemaFreeValidCtxt(validCtxt);
+					}
+					xmlSchemaFree(schema);
+				}
+				xmlSchemaFreeParserCtxt(schemaParserCtxt);
+			}
+			xmlFreeDoc(schemaDoc);
+		}
+
+		// start loading
 		xmlNodePtr root = xmlDocGetRootElement(doc);
 
 		if(xmlStrcmp(root->name,(const xmlChar*)"items") != 0){
@@ -380,6 +405,10 @@ bool Items::loadFromXml(const std::string& datadir)
 		xmlNodePtr itemNode = root->children;
 		while(itemNode){
 			if(xmlStrcmp(itemNode->name,(const xmlChar*)"item") == 0){
+
+				//
+				//int ret = xmlSchemaValidateOneElement(validCtxt, itemNode);
+
 				if(readXMLInteger(itemNode, "id", intValue)){
 					id = intValue;
 
@@ -1309,7 +1338,7 @@ bool Abilities::Absorb::reduce(CombatType ctype, int32_t& dmg) const
 
 	if(resistances[ctype.index()] > 0)
 		r = true;
-	dmg = (int32_t)std::ceil((double)dmg * (100 - resistances[ctype.index()]) / 100.);
+	dmg = (int32_t)std::floor((double)dmg * (100 - resistances[ctype.index()]) / 100.);
 	
 	return r;
 }

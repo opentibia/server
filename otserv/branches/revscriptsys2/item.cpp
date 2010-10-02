@@ -921,6 +921,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		if(it.wieldInfo & WIELDINFO_VOCREQ){
 			s << it.vocationString;
+
 		}
 		else{
 			s << "players";
