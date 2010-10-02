@@ -17654,8 +17654,8 @@
 		<attribute key="maxTextLen" value="512"/>
 		<attribute key="writeOnceItemId" value="7726"/>
 	</item>
-	<item id="7728" name=""/>
-	<item id="7729" name=""/>
+	<item id="7728"/>
+	<item id="7729"/>
 	<item id="7730" name="blue legs">
 		<attribute key="weight" value="1800"/>
 		<attribute key="armor" value="8"/>
@@ -20032,7 +20032,7 @@
 	</item>
 	<item id="8580" article="a" name="sewer grate"/>
 	<item id="8581" article="a" name="Zirella's cart" editorsuffix=" (Tutorial)"/>
-	<item id="8577" name=""/>
+	<item id="8577"/>
 	<item id="8578" name="grass"/>
 	<item id="8579" article="a" name="hole"/>
 	<item id="8580" article="a" name="grate"/>
