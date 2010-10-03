@@ -167,7 +167,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[SHOW_CRASH_WINDOW] = getGlobalBoolean(L, "show_crash_window", true);
 	m_confInteger[IDLE_TIME] = getGlobalNumber(L, "max_idle_time", 16*60*1000);
 	m_confInteger[IDLE_TIME_WARNING] = getGlobalNumber(L, "max_idle_time_warning", 15*60*1000);
-	m_confInteger[ATTACK_SPEED] = getGlobalNumber(L, "attackspeed", 2000);
 	m_confInteger[HOUSE_ONLY_PREMIUM] = getGlobalBoolean(L, "house_only_premium", true);
 	m_confInteger[HOUSE_LEVEL] = getGlobalNumber(L, "house_level", 1);
 	m_confInteger[HOUSE_TILE_PRICE] = getGlobalNumber(L, "house_tile_price", 100);

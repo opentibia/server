@@ -3713,7 +3713,7 @@ void Player::getPathSearchParams(const Creature* creature, FindPathParams& fpp) 
 
 uint32_t Player::getAttackSpeed() const
 {
-	return g_config.getNumber(ConfigManager::ATTACK_SPEED);
+	return vocation->getAttackSpeed();
 }
 
 void Player::onAttacking(uint32_t interval)
