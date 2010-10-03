@@ -395,6 +395,16 @@ public:
 	virtual bool getCombatValues(int32_t& min, int32_t& max) {return false;}
 
 	size_t getSummonCount() const {return summons.size();}
+	uint32_t getSummonCount(std::string _type)
+    {
+        uint32_t count = 0;
+        const std::list<Creature*>& summons = getSummons();
+        std::list<Creature*>::const_iterator it = summons.begin();
+        for(;it != summons.end();it++)
+            if((*it)->getName() == _type)
+                count++;
+        return count;
+    };
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
 	void setLossSkill(bool _skillLoss) {skillLoss = _skillLoss;}
 
