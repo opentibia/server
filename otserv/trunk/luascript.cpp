@@ -1185,7 +1185,7 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerSkullEndTime", LuaScriptInterface::luaGetPlayerSkullEndTime);
 
 	//getPlayerUnjustKills(cid)
-	lua_register(m_luaState, "getPlayerSkullUnjustKills", LuaScriptInterface::luaGetPlayerUnjustKills);
+	lua_register(m_luaState, "getPlayerUnjustKills", LuaScriptInterface::luaGetPlayerUnjustKills);
 
 	//getPlayerAccountBalance(cid)
 	lua_register(m_luaState, "getPlayerAccountBalance", LuaScriptInterface::luaGetPlayerAccountBalance);
@@ -2337,7 +2337,7 @@ int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
 		if(flagindex < PlayerFlag_LastFlag){
-			lua_pushnumber(L, player->hasFlag((PlayerFlags)flagindex) ? true : false);
+			lua_pushboolean(L, player->hasFlag((PlayerFlags)flagindex) ? true : false);
 		}
 		else{
 			reportErrorFunc("No valid flag index.");
@@ -3086,13 +3086,13 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 			}
 			else{
 				//stackable item stacked with existing object, newItem will be released
-				lua_pushnil(L);
+				lua_pushnumber(L, 0);
 				return 1;
 			}
 		}
 	}
 
-	lua_pushnil(L);
+	lua_pushnumber(L, 0);
 	return 1;
 }
 
@@ -3542,7 +3542,7 @@ int LuaScriptInterface::luaGetTownIdByName(lua_State *L)
 		lua_pushnumber(L, town->getTownID());
 	}
 	else{
-		lua_pushnil(L);
+		lua_pushnumber(L, 0);
 	}
 	return 1;
 }
@@ -3558,7 +3558,7 @@ int LuaScriptInterface::luaGetTownNameById(lua_State *L)
 		lua_pushstring(L, townName.c_str());
 	}
 	else{
-		lua_pushnil(L);
+		lua_pushnumber(L, 0);
 	}
 	return 1;
 }
@@ -4095,13 +4095,13 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 			}
 			else{
 				//stackable item stacked with existing object, newItem will be released
-				lua_pushnil(L);
+				lua_pushnumber(L, 0);
 				return 1;
 			}
 		}
 	}
 
-	lua_pushnil(L);
+	lua_pushnumber(L, 0);
 	return 1;
 }
 
@@ -4192,7 +4192,7 @@ int LuaScriptInterface::luaDoCreateTeleport(lua_State *L)
 	}
 	else{
 		//stackable item stacked with existing object, newItem will be released
-		lua_pushnil(L);
+		lua_pushnumber(L, 0);
 	}
 	return 1;
 }
@@ -4364,11 +4364,11 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 				lua_pushnumber(L, house->getId());
 			}
 			else{
-				lua_pushnil(L);
+				lua_pushnumber(L, 0);
 			}
 		}
 		else{
-			lua_pushnil(L);
+			lua_pushnumber(L, 0);
 		}
 	}
 	else{
@@ -7163,7 +7163,7 @@ int LuaScriptInterface::luaGetIPByPlayerName(lua_State *L)
 		lua_pushnumber(L, player->getIP());
 	}
 	else{
-		lua_pushnil(L);
+		lua_pushnumber(L, 0);
 	}
 	return 1;
 }
@@ -7234,7 +7234,7 @@ int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
         lua_pushnumber(L, guid);
 	}
 	else {
-	    lua_pushnil(L);
+	    lua_pushnumber(L, 0);
 	}
 
 	return 1;
@@ -7389,13 +7389,13 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 			}
 			else{
 				//stackable item stacked with existing object, newItem will be released
-				lua_pushnil(L);
+				lua_pushnumber(L, 0);
 				return 1;
 			}
 		}
 	}
 
-	lua_pushnil(L);
+	lua_pushnumber(L, 0);
 	return 1;
 }
 
@@ -8152,7 +8152,7 @@ int LuaScriptInterface::luaGetCreatureByName(lua_State *L)
 		lua_pushnumber(L, cid);
 	}
 	else{
-		lua_pushnil(L);
+		lua_pushnumber(L, 0);
 	}
 	return 1;
 }
