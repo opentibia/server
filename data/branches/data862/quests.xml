@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<quests>
+<!--
+	<quest name="OpenTibia Example" startstorageid="1000" startstoragevalue="1">
+		<mission name="Mission I" storageid="1000" startvalue="1" endvalue="1">
+			<missionstate id="1" description="This is description of Mission I." />
+		</mission>
+	</quest>
+-->
+</quests>

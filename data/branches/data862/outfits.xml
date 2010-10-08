@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<outfits>
+	<outfit id="1" premium="0">
+		<list type="female" looktype="136" name="Citizen"/>
+		<list type="male" looktype="128" name="Citizen"/>
+	</outfit>
+
+	<outfit id="2" premium="0">
+		<list type="female" looktype="137" name="Hunter"/>
+		<list type="male" looktype="129" name="Hunter"/>
+	</outfit>
+
+	<outfit id="3" premium="0">
+		<list type="female" looktype="138" name="Mage"/>
+		<list type="male" looktype="130" name="Mage"/>
+	</outfit>
+
+	<outfit id="4" premium="0">
+		<list type="female" looktype="139" name="Knight"/>
+		<list type="male" looktype="131" name="Knight"/>
+	</outfit>
+
+	<outfit id="5" premium="1">
+		<list type="female" looktype="140" name="Noblewoman"/>
+		<list type="male" looktype="132" name="Nobleman"/>
+	</outfit>
+
+	<outfit id="6" premium="1">
+		<list type="female" looktype="141" name="Summoner"/>
+		<list type="male" looktype="133" name="Summoner"/>
+	</outfit>
+
+	<outfit id="7" premium="1">
+		<list type="female" looktype="142" name="Warrior"/>
+		<list type="male" looktype="134" name="Warrior"/>
+	</outfit>
+
+	<outfit id="8" premium="1">
+		<list type="female" looktype="147" name="Barbarian"/>
+		<list type="male" looktype="143" name="Barbarian"/>
+	</outfit>
+
+	<outfit id="9" premium="1">
+		<list type="female" looktype="148" name="Druid"/>
+		<list type="male" looktype="144" name="Druid"/>
+	</outfit>
+
+	<outfit id="10" premium="1">
+		<list type="female" looktype="149" name="Wizard"/>
+		<list type="male" looktype="145" name="Wizard"/>
+	</outfit>
+
+	<outfit id="11" premium="1">
+		<list type="female" looktype="150" name="Oriental"/>
+		<list type="male" looktype="146" name="Oriental"/>
+	</outfit>
+
+	<outfit id="12" premium="1" default="0">
+		<list type="female" looktype="155" name="Pirate"/>
+		<list type="male" looktype="151" name="Pirate"/>
+	</outfit>
+
+	<outfit id="13" premium="1" default="0">
+		<list type="female" looktype="156" name="Assassin"/>
+		<list type="male" looktype="152" name="Assassin"/>
+	</outfit>
+
+	<outfit id="14" premium="1" default="0">
+		<list type="female" looktype="157" name="Beggar"/>
+		<list type="male" looktype="153" name="Beggar"/>
+	</outfit>
+
+	<outfit id="15" premium="1" default="0">
+		<list type="female" looktype="158" name="Shaman"/>
+		<list type="male" looktype="154" name="Shaman"/>
+	</outfit>
+
+	<outfit id="16" premium="1" default="0">
+		<list type="female" looktype="252" name="Norsewoman"/>
+		<list type="male" looktype="251" name="Norseman"/>
+	</outfit>
+
+	<outfit id="17" premium="1" default="0">
+		<list type="female" looktype="269" name="Nightmare"/>
+		<list type="male" looktype="268" name="Nightmare"/>
+	</outfit>
+
+	<outfit id="18" premium="1" default="0">
+		<list type="female" looktype="270" name="Jester"/>
+		<list type="male" looktype="273" name="Jester"/>
+	</outfit>
+
+	<outfit id="19" premium="1" default="0">
+		<list type="female" looktype="279" name="Brotherhood"/>
+		<list type="male" looktype="278" name="Brotherhood"/>
+	</outfit>
+
+	<outfit id="20" premium="1" default="0">
+		<list type="female" looktype="288" name="Demonhunter"/>
+		<list type="male" looktype="289" name="Demonhunter"/>
+	</outfit>
+
+	<outfit id="21" premium="1" default="0">
+		<list type="female" looktype="324" name="Yalaharian"/>
+		<list type="male" looktype="325" name="Yalaharian"/>
+	</outfit>
+
+	<outfit id="22" premium="1" default="0">
+		<list type="female" looktype="336" name="Warmaster"/>
+		<list type="male" looktype="335" name="Warmaster"/>
+	</outfit>
+	
+	<outfit id="23" premium="1" default="0">
+		<list type="female" looktype="366" name="Wayfarer"/>
+		<list type="male" looktype="367" name="Wayfarer"/>
+	</outfit>
+
+	<outfit id="24" default="0">
+		<list type="female" looktype="329" name="Wedding"/>
+		<list type="male" looktype="328" name="Wedding"/>
+	</outfit>
+
+	<outfit id="25">
+		<list type="femalegod" looktype="75" name="Gamemaster"/>
+		<list type="malegod" looktype="75" name="Gamemaster"/>
+		<list type="femalegm" looktype="75" name="Gamemaster"/>
+		<list type="malegm" looktype="75" name="Gamemaster"/>
+	</outfit>
+
+	<outfit id="26">
+		<list type="femalegod" looktype="266" name="Community Manager"/>
+		<list type="malegod" looktype="266" name="Community Manager"/>
+		<list type="femalecm" looktype="266" name="Community Manager"/>
+		<list type="malecm" looktype="266" name="Community Manager"/>
+	</outfit>
+
+	<outfit id="27">
+		<list type="femalegod" looktype="302" name="God"/>
+		<list type="malegod" looktype="302" name="God"/>
+		<list type="femalecm" looktype="302" name="God"/>
+		<list type="malecm" looktype="302" name="God"/>
+	</outfit>
+</outfits>

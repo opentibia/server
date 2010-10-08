@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Quara Mantassin Scout" nameDescription="a quara mantassin scout" race="blood" experience="100" speed="270" manacost="480">
+	<health now="220" max="220"/>
+	<look type="72" corpse="6064"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag staticattack="90"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="1000" skill="60" attack="55"/>
+	</attacks>
+	<defenses armor="15" defense="15">
+		<defense name="invisible" interval="1000" chance="30" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity ice="1"/>
+		<immunity fire="1"/>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="10">
+		<voice sentence="Zuerk Pachak!"/>
+		<voice sentence="Shrrrr"/>
+	</voices>
+	<loot>
+		<item id="2670" countmax="5" chance="20000"/><!-- shrimp -->
+		<item id="5895" countmax="1" chance="2000"/><!-- fish fin -->
+		<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+		<item id="2377" chance="1818"/><!-- two-handed sword -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="5895" countmax="1" chance="3333"/><!-- fish fin -->
+				<item id="2229" countmax="1" chance="4000"/><!-- skull -->
+				<item id="2165" chance="1250"/><!-- stealth ring -->
+				<item id="2146" countmax="1" chance="1400"/><!-- small sapphire -->
+			</inside>
+		</item>
+	</loot>
+</monster>

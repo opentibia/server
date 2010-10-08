@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Vampire Bride" nameDescription="a vampire bride" race="blood" experience="1050" speed="220" manacost="0">
+	<health now="1200" max="1200"/>
+	<look type="312" corpse="9660"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-0" max="-200"/>
+		<attack name="lifedrain" interval="2000" chance="20" range="1" min="-0" max="-150">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="8" range="7" min="-0" max="-150">
+			<attribute key="shootEffect" value="suddendeath"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="physical" interval="1000" chance="35" range="7" min="-0" max="-170">
+			<attribute key="shootEffect" value="energy"/>
+		</attack>
+	</attacks>
+	<defenses armor="17" defense="23"/>
+	<elements>
+		<element energyPercent="10"/>
+		<element earthPercent="80"/>
+		<element icePercent="15"/>
+		<element firePercent="-10"/>
+		<element holyPercent="-25"/>
+	</elements>
+	<immunities>
+		<immunity death="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="4000" chance="100">
+		<voice sentence="Kneel before your Mistress!"/>
+		<voice sentence="Dead is the new alive."/>
+		<voice sentence="Come, let me kiss you, darling. Oh wait, I meant kill."/>
+		<voice sentence="Enjoy the pain - I know you love it."/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="84" chance="100000"/><!-- gold coin -->
+		<item id="7588" chance="8000"/><!-- strong health potion -->
+		<item id="7589" chance="8000"/><!-- strong mana potion -->
+		<item id="2145" chance="6000"/><!-- small diamond -->
+		<item id="2127" chance="5000"/><!-- esmerald blange -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2186" chance="2000"/><!-- moonlight rod -->
+				<item id="9837" chance="2000"/><!-- velvet tapestry -->
+				<item id="5670" chance="1200"/><!-- voodo skull -->
+				<item id="9808" chance="1200"/><!-- rusty armor -->
+				<item id="2195" chance="300"/><!-- boots of haste -->
+			</inside>
+		</item>
+	</loot>
+</monster>
