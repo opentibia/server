@@ -1079,7 +1079,7 @@ bool ConditionSoul::setParam(ConditionParam_t param, int32_t value)
 ConditionDamage::ConditionDamage(ConditionId_t _id, ConditionType_t _type) :
 Condition(_id, _type, 0)
 {
- 	delayed = false;
+	delayed = false;
 	forceUpdate = false;
 	owner = 0;
 	minDamage = 0;

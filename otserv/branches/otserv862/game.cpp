@@ -1437,10 +1437,8 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 
 	if(!test){
 		if(item->isStackable() && toItem){
-			uint32_t m = 0;
 			uint32_t n = 0;
-
-			m = std::min((uint32_t)item->getItemCount(), maxQueryCount);
+			uint32_t m = std::min((uint32_t)item->getItemCount(), maxQueryCount);
 
 			if(toItem->getID() == item->getID()){
 				n = std::min((uint32_t)100 - toItem->getItemCount(), m);
@@ -1454,7 +1452,14 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 						FreeThing(remainderItem);
 						remainderCount = m - n;
 					}
+				}
+				else{
+					toCylinder->__addThing(index, item);
 
+					int32_t itemIndex = toCylinder->__getIndexOfThing(item);
+					if(itemIndex != -1){
+						toCylinder->postAddNotification(item, NULL, itemIndex);
+					}
 				}
 			}
 			else{
@@ -3010,9 +3015,9 @@ bool Game::internalCloseTrade(Player* player)
 	if((tradePartner && tradePartner->getTradeState() == TRADE_TRANSFER) ||
 		  player->getTradeState() == TRADE_TRANSFER){
 #ifdef __DEBUG__
-  		std::cout << "Warning: [Game::playerCloseTrade] TradeState == TRADE_TRANSFER. " <<
-		  	player->getName() << " " << player->getTradeState() << " , " <<
-		  	tradePartner->getName() << " " << tradePartner->getTradeState() << std::endl;
+		std::cout << "Warning: [Game::playerCloseTrade] TradeState == TRADE_TRANSFER. " <<
+			player->getName() << " " << player->getTradeState() << " , " <<
+			tradePartner->getName() << " " << tradePartner->getTradeState() << std::endl;
 #endif
 		return true;
 	}

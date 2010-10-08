@@ -889,7 +889,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			prevDesc = true;
 		}
 
-        if(it.defense != 0){
+		if(it.defense != 0){
 			if(prevDesc)
 				s << ", ";
 

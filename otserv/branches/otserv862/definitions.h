@@ -82,7 +82,7 @@ enum passwordType_t{
 #define make_str(str) xmake_str(str)
 
 /*
-    Compiler setup
+	Compiler setup
 */
 #if defined __GNUC__
 	#include "compiler/gcc.h"
@@ -96,8 +96,8 @@ enum passwordType_t{
 #endif
 
 /*
-    If the compiler supports the upcoming standard,
-    call some of the useful headers.
+	If the compiler supports the upcoming standard,
+	call some of the useful headers.
 */
 #ifdef __OTSERV_CXX0X__
 	#include <cstdint>

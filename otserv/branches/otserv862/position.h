@@ -40,8 +40,8 @@ enum Direction {
 class Position{
 public:
 
-  	Position() : x(0), y(0), z(0) { };
-	~Position() {};
+	Position() : x(0), y(0), z(0) { };
+	virtual ~Position() {};
 
 	template<int32_t deltax, int32_t deltay, int32_t deltaz>
 	inline static bool areInRange(const Position& p1, const Position& p2){

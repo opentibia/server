@@ -697,8 +697,8 @@ public:
 	void addStamina(int64_t value);
 	void removeStamina(int64_t value) {addStamina(-value);}
 	int32_t getStaminaMinutes();
-    int32_t getStamina() {return stamina;}
-    int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
+	int32_t getStamina() {return stamina;}
+	int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
 
 	//depots
 	DepotMap depots;

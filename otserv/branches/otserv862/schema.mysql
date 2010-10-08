@@ -113,6 +113,15 @@ CREATE TABLE `guild_members` (
 	FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
+CREATE TABLE `guild_invites` (
+	`player_id` INT UNSIGNED NOT NULL,
+	`guild_id` INT UNSIGNED NOT NULL COMMENT 'guild',
+	
+	UNIQUE (`player_id`),
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
 CREATE TABLE `guild_wars` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`guild_id` INT UNSIGNED NOT NULL COMMENT 'the guild which declared the war',

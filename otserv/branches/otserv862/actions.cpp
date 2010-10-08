@@ -423,13 +423,6 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index,
 bool Actions::executeUseEx(Action* action, Player* player, Item* item, const PositionEx& fromPosEx,
 	const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId)
 {
-	if(isHotkey){
-		int32_t subType = -1;
-		if(item->hasSubType() && !item->hasCharges()){
-			subType = item->getSubType();
-		}
-	}
-
 	if(!action->executeUse(player, item, fromPosEx, toPosEx, true, creatureId)){
 		return false;
 	}
@@ -637,10 +630,10 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
 			LuaScriptInterface::pushPosition(L, posEx, 0);
 		}
 
-		int32_t result = m_scriptInterface->callFunction(5);
+		bool result = m_scriptInterface->callFunction(5);
 		m_scriptInterface->releaseScriptEnv();
 
-		return (result != LUA_FALSE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. Action::executeUse" << std::endl;

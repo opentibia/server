@@ -755,10 +755,10 @@ bool ScriptEvent::executeEvent()
 
 		m_scriptInterface.pushFunction(m_scriptId);
 
-		int32_t result = m_scriptInterface.callFunction(0);
+		bool result = m_scriptInterface.callFunction(0);
 		m_scriptInterface.releaseScriptEnv();
 
-		return (result == LUA_TRUE);
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. ScriptEvent::executeEvent" << std::endl;

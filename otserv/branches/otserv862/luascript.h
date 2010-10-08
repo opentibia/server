@@ -48,14 +48,6 @@ class Condition;
 class Npc;
 class Spell;
 
-enum LUA_RET_CODE{
-	LUA_NO_ERROR = 0,
-	LUA_ERROR = -1,
-	LUA_TRUE = 1,
-	LUA_FALSE = 0,
-	LUA_NULL = 0
-};
-
 enum LuaVariantType_t{
 	VARIANT_NONE = 0,
 	VARIANT_NUMBER,
@@ -301,7 +293,7 @@ public:
 	bool pushFunction(int32_t functionId);
 
 	static int luaErrorHandler(lua_State* L);
-	int32_t callFunction(uint32_t nParams);
+	bool callFunction(uint32_t nParams);
 
 	//push/pop common structures
 	static void pushThing(lua_State *L, Thing* thing, uint32_t thingid);
@@ -313,6 +305,7 @@ public:
 	static LuaVariant popVariant(lua_State *L);
 	static void popPosition(lua_State *L, PositionEx& position);
 	static void popPosition(lua_State *L, Position& position, uint32_t& stackpos);
+	static bool popBoolean(lua_State *L);
 	static uint32_t popNumber(lua_State *L);
 	static double popFloatNumber(lua_State *L);
 	static std::string popString(lua_State *L);
@@ -513,7 +506,7 @@ protected:
 	#ifdef __GUILDWARSLUARELOAD__
 	static int luaDoUpdateGuildWar(lua_State* L);
 	#endif
-	
+
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);
 	static int luaGetWorldLight(lua_State *L);

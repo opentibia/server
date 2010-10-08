@@ -880,7 +880,7 @@ void Monster::onThinkDefense(uint32_t interval)
 				continue;
 			}
 
-			if((it->chance >= (uint32_t)random_range(1, 100))){
+			if((it->chance >= (uint32_t)random_range(1, 100)) && getSummonCount(it->name) < it->max){  
 				Monster* summon = Monster::createMonster(it->name);
 				if(summon){
 					const Position& summonPos = getPosition();

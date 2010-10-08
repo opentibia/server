@@ -26,7 +26,7 @@
 MissionState::MissionState(std::string _description, uint32_t _missionID)
 {
 	description = _description;
- 	missionID = _missionID;
+	missionID = _missionID;
 }
 
 Mission::Mission(std::string _missionName, uint32_t _storageID, uint32_t _startValue, int32_t _endValue)

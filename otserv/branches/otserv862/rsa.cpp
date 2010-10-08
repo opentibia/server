@@ -54,8 +54,8 @@ void RSA::setKey(char* p, char* q, char* d)
 	m_d = d;
 
 	m_u = inverse(m_p, m_q);
-  	m_dp = m_d % (m_p-1);
-  	m_dq = m_d % (m_q-1);
+	m_dp = m_d % (m_p-1);
+	m_dq = m_d % (m_q-1);
 
 	m_keySet = true;
 }
@@ -72,12 +72,12 @@ bool RSA::decrypt(char* msg, int32_t size)
 	Big c = from_binary(size, msg);
 	//chinese remainder theorem
 	Big v1 = std::pow( c % m_p, m_dp, m_p );
-  	Big v2 = std::pow( c % m_q, m_dq, m_q );
-  	Big u2 = ((v2 - v1)*m_u % m_q);
-  	if(u2 < 0){
+	Big v2 = std::pow( c % m_q, m_dq, m_q );
+	Big u2 = ((v2 - v1)*m_u % m_q);
+	if(u2 < 0){
 		u2 = u2 + m_q;
 	}
-  	Big z = v1 + u2*m_p;
+	Big z = v1 + u2*m_p;
 
 	//Big z = std::pow(c, m_d, m_p*m_q);
 
@@ -137,7 +137,7 @@ bool RSA::encrypt(char* msg, int32_t size, const char* key)
 	mpz_init2(c, 1024);
 
 	mpz_t e;
-    mpz_init(e);
+	mpz_init(e);
 	mpz_set_ui(e,65537);
 
 	mpz_t mod;

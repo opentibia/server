@@ -101,6 +101,15 @@ CREATE TABLE "guild_members" (
 	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id") ON DELETE CASCADE
 );
 
+CREATE TABLE "guild_invites" (
+	"player_id" INT NOT NULL,
+	"guild_id" INT NOT NULL,
+	
+	UNIQUE ("player_id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
+);
+
 CREATE TABLE "guild_wars" (
 	"id" SERIAL,
 	"guild_id" INT NOT NULL,

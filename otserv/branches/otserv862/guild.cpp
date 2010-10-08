@@ -219,16 +219,20 @@ bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildF
 
 	//If both guilds have leaders that can afford the war, return true..
 	if(guildPaid && opponentPaid){
-		guildLeader->balance -= guildFee;
-		if(guildLeader->isOffline()){
-			IOPlayer::instance()->savePlayer(guildLeader);
-			delete guildLeader;
+		if(guildLeader){
+			guildLeader->balance -= guildFee;
+			if(guildLeader->isOffline()){
+				IOPlayer::instance()->savePlayer(guildLeader);
+				delete guildLeader;
+			}
 		}
 
-		opponentLeader->balance -= opponentFee;
-		if(opponentLeader->isOffline()){
-			IOPlayer::instance()->savePlayer(opponentLeader);
-			delete opponentLeader;
+		if(opponentLeader){
+			opponentLeader->balance -= opponentFee;
+			if(opponentLeader->isOffline()){
+				IOPlayer::instance()->savePlayer(opponentLeader);
+				delete opponentLeader;
+			}
 		}
 
 		return true;
@@ -239,41 +243,41 @@ bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildF
 #else
 bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee)
 {
-    //Tries to get first leader that has enough money
-    Database* db = Database::instance();
-    DBResult* result;
-    DBQuery query;
+	//Tries to get first leader that has enough money
+	Database* db = Database::instance();
+	DBResult* result;
+	DBQuery query;
 
-    bool guildPaid = false, opponentPaid = false;
-    Player* guildLeader = NULL;
-    Player* opponentLeader = NULL;
-    query << "SELECT `owner_id` FROM `guilds` WHERE `id` = " << guildId;
-    if((result = db->storeQuery(query.str()))){
-            if(Player* player = g_game.getPlayerByGuidEx(result->getDataInt("owner_id"))){
+	bool guildPaid = false, opponentPaid = false;
+	Player* guildLeader = NULL;
+	Player* opponentLeader = NULL;
+	query << "SELECT `owner_id` FROM `guilds` WHERE `id` = " << guildId;
+	if((result = db->storeQuery(query.str()))){
+			if(Player* player = g_game.getPlayerByGuidEx(result->getDataInt("owner_id"))){
 
-                    if((int32_t)player->balance >= guildFee){
+					if((int32_t)player->balance >= guildFee){
 
-                            guildPaid = true;
+							guildPaid = true;
 
-                            guildLeader = player;
+							guildLeader = player;
 
-                    }
-            }
-    }
-    query.str("");
-    query << "SELECT `owner_id` FROM `guilds` WHERE `id` = " << opponentId;
-    if((result = db->storeQuery(query.str()))){
-            if(Player* player = g_game.getPlayerByGuidEx(result->getDataInt("owner_id"))){
+					}
+			}
+	}
+	query.str("");
+	query << "SELECT `owner_id` FROM `guilds` WHERE `id` = " << opponentId;
+	if((result = db->storeQuery(query.str()))){
+			if(Player* player = g_game.getPlayerByGuidEx(result->getDataInt("owner_id"))){
 
-                    if((int32_t)player->balance >= opponentFee){
+					if((int32_t)player->balance >= opponentFee){
 						
-                            opponentPaid = true;
+							opponentPaid = true;
 
-                            opponentLeader = player;
-                    }
-            }
-    }
-    query.str("");
+							opponentLeader = player;
+					}
+			}
+	}
+	query.str("");
 
 	//If both guilds have leaders that can afford the war, return true..
 	if(guildPaid && opponentPaid){

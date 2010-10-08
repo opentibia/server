@@ -414,8 +414,8 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 	DBQuery query;
 
 	DBResult* result = db->storeQuery("SELECT * FROM `map_store`;");
- 	if(!result)
- 		return false;
+	if(!result)
+		return false;
 
 	do {
 		int32_t houseid = result->getDataInt("house_id");
@@ -463,12 +463,12 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 					loadItem(propStream, tile);
 				}
 			}
- 		}
+		}
 	} while(result->next());
 
 	db->freeResult(result);
 
- 	return true;
+	return true;
 }
 
 bool IOMapSerialize::loadContainer(PropStream& propStream, Container* container)
@@ -609,36 +609,36 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent, bool dep
 
 bool IOMapSerialize::saveMapBinary(Map* map)
 {
- 	Database* db = Database::instance();
- 	DBQuery query;
- 	DBTransaction transaction(db);
+	Database* db = Database::instance();
+	DBQuery query;
+	DBTransaction transaction(db);
 	DBInsert stmt(db);
 	stmt.setQuery("INSERT INTO `map_store` (`house_id`, `data`) VALUES ");
 
 
 	//Start the transaction
- 	if(!transaction.begin())
- 		return false;
+	if(!transaction.begin())
+		return false;
 
 	if(!db->executeQuery("DELETE FROM `map_store`;"))
- 		return false;
+		return false;
 
 	//clear old tile data
- 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin();
+	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin();
 		it != Houses::getInstance().getHouseEnd();
 		++it)
 	{
- 		//save house items
- 		House* house = it->second;
+		//save house items
+		House* house = it->second;
 		PropWriteStream stream;
 		for(HouseTileList::iterator tile_iter = house->getTileBegin();
 			tile_iter != house->getTileEnd();
 			++tile_iter)
 		{
 			if(!saveTile(stream, *tile_iter)){
- 				return false;
- 			}
- 		}
+				return false;
+			}
+		}
 
 		uint32_t attributesSize;
 		const char* attributes = stream.getStream(attributesSize);
@@ -647,13 +647,13 @@ bool IOMapSerialize::saveMapBinary(Map* map)
 
 		if(!stmt.addRow(query))
 			return false;
- 	}
+	}
 
 	if(!stmt.execute())
 		return false;
 
- 	//End the transaction
- 	return transaction.commit();
+	//End the transaction
+	return transaction.commit();
 }
 
 bool IOMapSerialize::saveItem(PropWriteStream& stream, const Item* item)
