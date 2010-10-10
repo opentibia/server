@@ -807,7 +807,7 @@ SimpleUpdateQuery updateQueries[] = {
 			UNIQUE (`player_id`),\n\
 			FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,\n\
 			FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE\n\
-		) ENGINE = InnoDB;"
+		) ENGINE = InnoDB;",
 			NULL
 		},
 		{// SQLite
