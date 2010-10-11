@@ -69,8 +69,8 @@ CREATE TABLE `players` (
 	`balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
 	`stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds',
 	`online` TINYINT(1) NOT NULL DEFAULT 0,
-	`rank_id` INT NOT NULL,
-	`guildnick` VARCHAR(255) NOT NULL,
+	`rank_id` INT NOT NULL COMMENT 'only if you use __OLD_GUILD_SYSTEM__',
+	`guildnick` VARCHAR(255) NOT NULL COMMENT 'only if you use __OLD_GUILD_SYSTEM__',
 
 	PRIMARY KEY (`id`),
 	UNIQUE (`name`),
@@ -343,7 +343,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 22);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 24);
 
 DELIMITER |
 
