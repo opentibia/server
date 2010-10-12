@@ -1847,8 +1847,11 @@ void LuaScriptInterface::registerFunctions()
 	//getIPBanList()
 	lua_register(m_luaState, "getIPBanList", LuaScriptInterface::luaGetIPBanList);
 
-	//getPlayersByAccountNumber(account)
-	lua_register(m_luaState, "getPlayersByAccountNumber", LuaScriptInterface::luaGetPlayersByAccountNumber);
+	//getPlayerByAccountNumber(account)
+	lua_register(m_luaState, "getPlayerByAccountNumber", LuaScriptInterface::luaGetPlayerByAccountNumber);
+
+	//getPlayerAccountId(cid)
+	lua_register(m_luaState, "getPlayerAccountId", LuaScriptInterface::luaGetPlayerAccountId);
 
 	//getAccountNumberByPlayerName(name)
 	lua_register(m_luaState, "getAccountNumberByPlayerName", LuaScriptInterface::luaGetAccountNumberByPlayerName);
@@ -1943,6 +1946,10 @@ void LuaScriptInterface::registerFunctions()
 
 	//doPlayerToogleGmInvisible(cid)
 	lua_register(m_luaState, "doPlayerToogleGmInvisible", LuaScriptInterface::luaDoPlayerToogleGmInvisible);
+
+	//addPremiumTime(cid, days)
+	lua_register(m_luaState, "addPremiumTime", LuaScriptInterface::luaAddPremiumTime);
+
 
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
@@ -2062,6 +2069,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 
 		case PlayerInfoUnjustKills:
 		{
+			#ifdef __UMBYOTS_LOSE_FRAGS__
+			value = player->getUnjustifiedKills();
+			#else
 			lua_newtable(L);
 			setField(L, "day", IOPlayer::instance()->getPlayerUnjustKillCount(player, UNJUST_KILL_PERIOD_DAY) );
 			setField(L, "dayRedSkull", g_config.getNumber(ConfigManager::KILLS_PER_DAY_RED_SKULL) );
@@ -2074,8 +2084,7 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			setField(L, "month", IOPlayer::instance()->getPlayerUnjustKillCount(player, UNJUST_KILL_PERIOD_MONTH));
 			setField(L, "monthRedSkull", g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) );
 			setField(L, "monthBlackSkull", g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) );
-			return 1;
-
+			#endif
 			break;
 		}
 
@@ -2098,6 +2107,9 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			break;
 		case PlayerInfoGmInvisible:
 			value = player->isGmInvisible();
+			break;
+		case PlayerInfoAccountId:
+			value = player->getAccountId();
 			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
@@ -2252,6 +2264,11 @@ int LuaScriptInterface::luaGetPlayerIp(lua_State *L)
 int LuaScriptInterface::luaIsGmInvisible(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoGmInvisible);
+}
+
+int LuaScriptInterface::luaGetPlayerAccountId(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoAccountId);
 }
 //
 
@@ -7131,7 +7148,7 @@ int LuaScriptInterface::luaIsMoveable(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaGetPlayersByAccountNumber(lua_State *L)
+int LuaScriptInterface::luaGetPlayerByAccountNumber(lua_State *L)
 {
 	//GetPlayerByAccountNumber(accountNumber)
 	uint32_t accno = popNumber(L);
@@ -9002,6 +9019,42 @@ int LuaScriptInterface::luaDoPlayerToogleGmInvisible(lua_State *L)
 
 	return 1;
 }
+
+int LuaScriptInterface::luaAddPremiumTime(lua_State *L)
+{
+	//addPremiumTime(cid, days)
+	uint32_t days = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	if(days < 1){
+		lua_pushboolean(L, false);
+		return 1;
+	}
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	std::string accountName;
+	IOAccount::instance()->getAccountName(player->getAccountId(), accountName);
+	Account account =  IOAccount::instance()->loadAccount(accountName, true);
+
+	if(account.premEnd < std::time(NULL)){
+		account.premEnd = std::time(NULL) + (days * 24 * 60 * 60);
+	}
+	else{
+		account.premEnd += (days * 24 * 60 * 60);
+	}
+	IOAccount::instance()->saveAccount(account);
+	lua_pushboolean(L, true);
+	return 1;
+}
+
 #ifdef __GUILDWARSLUARELOAD__
 int32_t LuaScriptInterface::luaDoUpdateGuildWar(lua_State* L)
 {

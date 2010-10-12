@@ -222,7 +222,8 @@ enum PlayerInfo_t{
 	PlayerInfoPremium,
 	PlayerInfoLastLogin,
 	PlayerInfoIp,
-	PlayerInfoGmInvisible
+	PlayerInfoGmInvisible,
+	PlayerInfoAccountId
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -400,7 +401,7 @@ protected:
 
 	//queries
 	static int luaGetPlayerGUIDByName(lua_State *L);
-	static int luaGetPlayersByAccountNumber(lua_State *L);
+	static int luaGetPlayerByAccountNumber(lua_State *L);
 	static int luaGetAccountNumberByPlayerName(lua_State *L);
 	static int luaGetIPByPlayerName(lua_State *L);
 	static int luaGetPlayersByIPAddress(lua_State *L);
@@ -503,6 +504,8 @@ protected:
 
 	static int luaIsGmInvisible(lua_State *L);
 	static int luaDoPlayerToogleGmInvisible(lua_State *L);
+	static int luaGetPlayerAccountId(lua_State *L);
+	static int luaAddPremiumTime(lua_State *L);
 	#ifdef __GUILDWARSLUARELOAD__
 	static int luaDoUpdateGuildWar(lua_State* L);
 	#endif
