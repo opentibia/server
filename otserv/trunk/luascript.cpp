@@ -2081,6 +2081,7 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			setField(L, "month", IOPlayer::instance()->getPlayerUnjustKillCount(player, UNJUST_KILL_PERIOD_MONTH));
 			setField(L, "monthRedSkull", g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) );
 			setField(L, "monthBlackSkull", g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) );
+			return 1;
 			break;
 		}
 
