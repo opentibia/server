@@ -47,7 +47,7 @@ public:
 	RuneSpell* getRuneSpell(uint32_t id);
 	RuneSpell* getRuneSpellByName(const std::string& name);
 
-	InstantSpell* getInstantSpell(const std::string words);
+	InstantSpell* getInstantSpell(const std::string& words);
 	InstantSpell* getInstantSpellByName(std::string name);
 
 	uint32_t getInstantSpellCount(const Player* player);

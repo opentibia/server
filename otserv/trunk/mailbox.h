@@ -57,7 +57,7 @@ public:
 	
 	static bool getDepotId(const std::string& strTown, uint32_t& depotId);
 	static bool getRepicient(Item* item, std::string& name, uint32_t& depotId);
-	static bool sendItemTo(const std::string name, uint32_t depotId, Item* item);
+	static bool sendItemTo(const std::string& name, uint32_t depotId, Item* item);
 	static bool sendItem(Item* item);
 	static bool canSend(const Item* item);
 };

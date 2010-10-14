@@ -130,7 +130,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	loadConditions(player, result);
 
 	// you need to set the vocation after conditions in order to ensure the proper regeneration rates for the vocation
-	player->setVocation(result->getDataInt("vocation"));
+	if(!player->setVocation(result->getDataInt("vocation"))){
+		return false;
+	}
 	// this stuff has to go after the vocation is set
 	player->mana = result->getDataInt("mana");
 	player->manaMax = result->getDataInt("manamax");
@@ -362,7 +364,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	loadConditions(player, result);
 
 	// you need to set the vocation after conditions in order to ensure the proper regeneration rates for the vocation
-	player->setVocation(result->getDataInt("vocation"));
+	if(!player->setVocation(result->getDataInt("vocation"))){
+		return false;
+	}
 	// this stuff has to go after the vocation is set
 	player->mana = result->getDataInt("mana");
 	player->manaMax = result->getDataInt("manamax");

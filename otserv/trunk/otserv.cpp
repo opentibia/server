@@ -145,9 +145,6 @@ void closeRunfile(void)
 
 int main(int argc, char *argv[])
 {
-	// Set seed for rand()
-	std::srand((unsigned int)OTSYS_TIME());
-
 	// Parse any command line (and display help text)
 	if(!parseCommandLine(g_command_opts, std::vector<std::string>(argv, argv + argc))){
 		return 0;
@@ -414,7 +411,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... " << std::flush;
-	srand((unsigned int)OTSYS_TIME());
+	std::srand((unsigned int)OTSYS_TIME());
 	std::cout << "[done]" << std::endl;
 
 #if defined LUA_CONFIGFILE

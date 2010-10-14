@@ -196,7 +196,7 @@ public:
 	int16_t getViolationLevel() const {return violationLevel;}
 	std::string getGroupName() const {return groupName;}
 
-	void setVocation(uint32_t vocId);
+	bool setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
 	Vocation* getVocation() const {return vocation;};
 

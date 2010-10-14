@@ -57,7 +57,7 @@ public:
 	bool addFrag(uint32_t enemyId) const;
 	bool isAtWar() const { return !enemyGuilds.empty(); }
 	bool hasDeclaredWar(uint32_t warId) const;
-	void broadcastMessage(SpeakClasses type, const std::string msg) const;
+	void broadcastMessage(SpeakClasses type, const std::string& msg) const;
 
 	uint32_t isEnemy(uint32_t enemyId) const;
 	void addEnemy(uint32_t enemyId, uint32_t warId);

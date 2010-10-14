@@ -256,9 +256,8 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	while(vocationNode){
 		if(xmlStrcmp(vocationNode->name,(const xmlChar*)"vocation") == 0){
 			if(readXMLString(vocationNode, "name", strValue)){
-				int32_t vocationId = g_vocations.getVocationId(strValue);
-
-				if(vocationId != -1){
+				int32_t vocationId = 0;
+				if(g_vocations.getVocationId(strValue, vocationId)){
 					vocWeaponMap[vocationId] = true;
 					intValue = 1;
 					readXMLInteger(vocationNode, "showInDescription", intValue);

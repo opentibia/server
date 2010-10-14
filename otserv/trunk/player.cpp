@@ -219,10 +219,12 @@ Player::~Player()
 #endif
 }
 
-void Player::setVocation(uint32_t vocId)
+bool Player::setVocation(uint32_t vocId)
 {
+	if(!g_vocations.getVocation(vocId, vocation)){
+		return false;
+	}
 	vocation_id = (Vocation_t)vocId;
-	vocation = g_vocations.getVocation(vocId);
 
 	//Update health/mana gain condition
 	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
@@ -235,6 +237,8 @@ void Player::setVocation(uint32_t vocId)
 
 	//Set the player's max soul according to their vocation
 	soulMax = vocation->getSoulMax();
+
+	return true;
 }
 
 uint32_t Player::getVocationId() const

@@ -823,7 +823,8 @@ bool LuaScriptInterface::callFunction(uint32_t nParams)
 	if(ret != 0){
 		LuaScriptInterface::reportError(NULL, LuaScriptInterface::popString(m_luaState));
 		result = false;
-	} else {
+	}
+	else {
 		result = (int32_t)LuaScriptInterface::popBoolean(m_luaState);
 	}
 	lua_remove(m_luaState, error_index);
@@ -4677,14 +4678,15 @@ int LuaScriptInterface::luaDoPlayerSetVocation(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 
 	Player* player = env->getPlayerByUID(cid);
+	bool result = false;
 	if(player){
-		player->setVocation(voc);
-		lua_pushboolean(L, true);
+		result = player->setVocation(voc);
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushboolean(L, false);
-	}
+	}	
+	lua_pushboolean(L, result);
+
 	return 1;
 }
 

@@ -108,7 +108,7 @@ void Mailbox::postRemoveNotification(Thing* thing, const Cylinder* newParent, in
 	getParent()->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 }
 
-bool Mailbox::sendItemTo(const std::string name, uint32_t depotId, Item* item)
+bool Mailbox::sendItemTo(const std::string& name, uint32_t depotId, Item* item)
 {
 	uint32_t guid;
 	std::string dbname = name;
