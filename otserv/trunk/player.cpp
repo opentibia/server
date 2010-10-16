@@ -1038,7 +1038,7 @@ bool Player::canWalkthrough(const Creature* creature) const
 		return true;*/
 
 	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures) ||
-		(creature->getTile() && creature->getTile()->ground->getID() == ITEM_GLOWING_SWITCH)||
+		(creature->getTile()->ground != NULL && creature->getTile()->ground->getID() == ITEM_GLOWING_SWITCH)||
 		(creature->getPlayer() &&
 				(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen) ||
 				creature->getPlayer()->isGmInvisible())) )
