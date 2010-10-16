@@ -982,8 +982,8 @@ void LuaScriptInterface::popPosition(lua_State *L, Position& position, uint32_t&
 
 bool LuaScriptInterface::popBoolean(lua_State *L)
 {
-    lua_pop(L, 1);
-    return (lua_toboolean(L, 0) != 0);
+	lua_pop(L, 1);
+	return (lua_toboolean(L, 0) != 0);
 }
 
 uint32_t LuaScriptInterface::popNumber(lua_State *L)
@@ -7220,7 +7220,7 @@ int LuaScriptInterface::luaGetAccountNumberByPlayerName(lua_State *L)
 	Player* player = g_game.getPlayerByName(name);
 
 	if(player){
-        lua_pushnumber(L, player->getAccountId());
+		lua_pushnumber(L, player->getAccountId());
 	}
 	else{
 		uint32_t account_id = 0;
@@ -7247,10 +7247,10 @@ int LuaScriptInterface::luaGetPlayerGUIDByName(lua_State *L)
 		lua_pushnumber(L, player->getGUID());
 	}
 	else if (IOPlayer::instance()->getGuidByName(guid, name)){
-        lua_pushnumber(L, guid);
+		lua_pushnumber(L, guid);
 	}
 	else {
-	    lua_pushnumber(L, 0);
+		lua_pushnumber(L, 0);
 	}
 
 	return 1;

@@ -76,7 +76,6 @@ struct LuaVariant{
 
 class LuaScriptInterface;
 class Game;
-class Npc;
 
 class ScriptEnviroment
 {
@@ -92,9 +91,9 @@ public:
 	bool setCallbackId(int32_t callbackId, LuaScriptInterface* scriptInterface);
 	void setEventDesc(const std::string& desc) {m_eventdesc = desc;}
 
-	std::string getEventDesc() {return m_eventdesc;}
-	int32_t getScriptId() {return m_scriptId;}
-	int32_t getCallbackId() {return m_callbackId;}
+	std::string getEventDesc() const {return m_eventdesc;}
+	int32_t getScriptId() const {return m_scriptId;}
+	int32_t getCallbackId() const {return m_callbackId;}
 	LuaScriptInterface* getScriptInterface() {return m_interface;}
 
 	void setTimerEvent() {m_timerEvent = true;}
