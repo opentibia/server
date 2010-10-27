@@ -51,15 +51,15 @@ function onLogin(cid)
 		if(getPlayerSex(cid) == 0) then
 			lookType = 136
 		end
+		local house = House.getHouseByOwner(cid)
+		if(house) and getBooleanFromString(getConfigInfo("house_only_premium"), true) then
+			house:setOwner(0) --Remove the house from the player, the server takes care of the rest
+		end
 		doCreatureChangeOutfit(cid, {lookType = lookType, lookHead = 78, lookBody = 69, lookLegs = 97, lookFeet = 95, lookAddons = 0})
 		setPlayerStorageValue(cid, STORAGE_PREMIUM_ACCOUNT, 1)
 	end
 
-	--Remove house
-	local house = House.getHouseByOwner(cid)
-	if(house) then
-		house:setOwner(0) --Remove the house from the player, the server takes care of the rest
-	end
+
 
 	--Teleport to free town, change here
 	--[[
