@@ -1948,8 +1948,8 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerToogleGmInvisible(cid)
 	lua_register(m_luaState, "doPlayerToogleGmInvisible", LuaScriptInterface::luaDoPlayerToogleGmInvisible);
 
-	//addPremiumTime(cid, days)
-	lua_register(m_luaState, "addPremiumTime", LuaScriptInterface::luaAddPremiumTime);
+	//doPlayerAddPremiumDays(cid, days)
+	lua_register(m_luaState, "doPlayerAddPremiumDays", LuaScriptInterface::luaDoPlayerAddPremiumDays);
 
 
 	#ifdef __GUILDWARSLUARELOAD__
@@ -9019,9 +9019,9 @@ int LuaScriptInterface::luaDoPlayerToogleGmInvisible(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaAddPremiumTime(lua_State *L)
+int LuaScriptInterface::luaDoPlayerAddPremiumDays(lua_State *L)
 {
-	//addPremiumTime(cid, days)
+	//doPlayerAddPremiumDays(cid, days)
 	uint32_t days = popNumber(L);
 	uint32_t cid = popNumber(L);
 
