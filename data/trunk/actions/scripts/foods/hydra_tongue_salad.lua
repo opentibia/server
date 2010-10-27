@@ -14,7 +14,7 @@ function onUse(cid, item, frompos, item2, topos)
 
 	local sound = SPECIAL_FOODS[item.itemid][1]
 
-	if not(doAddCondition(cid, exhaust) then
+	if not(doAddCondition(cid, exhaust)) then
 		return false
 	end
 
