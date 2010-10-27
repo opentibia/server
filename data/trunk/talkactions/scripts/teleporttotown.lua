@@ -1,14 +1,14 @@
 function onSay(cid, words, param)
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
-		return FALSE
+		return false
 	end
 
 	local townid = getTownIdByName(param)
 	if(townid ~= 0) then
 		local new_pos = getTownTemplePosition(townid)
 		local old_pos = getPlayerPosition(cid)
-		if(doTeleportThing(cid, new_pos) ~= LUA_ERROR) then
+		if(doTeleportThing(cid, new_pos)) then
 			if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
 				doSendMagicEffect(old_pos, CONST_ME_POFF)
 				doSendMagicEffect(new_pos, CONST_ME_TELEPORT)
@@ -20,5 +20,5 @@ function onSay(cid, words, param)
 		doPlayerSendCancel(cid, "Town does not exist.")
 	end
 
-	return FALSE
+	return false
 end

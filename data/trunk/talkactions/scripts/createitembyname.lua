@@ -2,7 +2,7 @@ function onSay(cid, words, param)
 	if param == "" then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
-		return FALSE
+		return false
 	end
 
 	local playerPos = getPlayerPosition(cid)
@@ -33,7 +33,7 @@ function onSay(cid, words, param)
 	if itemname:len() == 0 then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned.")
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
-		return FALSE
+		return false
 	end
 
 	if stringPos3 ~= length then
@@ -45,15 +45,15 @@ function onSay(cid, words, param)
 	end
 
 	local itemid = getItemIdByName(itemname)
-	if itemid == LUA_ERROR then
+	if itemid == false then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "There isn't any item named "..itemname..".")
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
-		return FALSE
+		return false
 	end
 
 	local item = doCreateItemEx(itemid, itemcount)
-	if item ~= LUA_ERROR then
-		if doPlayerAddItemEx(cid, item, TRUE) ~= RETURNVALUE_NOERROR then
+	if item ~= false then
+		if doPlayerAddItemEx(cid, item, true) ~= RETURNVALUE_NOERROR then
 			doRemoveItem(item)
 			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned.")
 			doSendMagicEffect(playerPos, CONST_ME_POFF)
@@ -63,5 +63,5 @@ function onSay(cid, words, param)
 		end
 	end
 
-	return FALSE
+	return false
 end

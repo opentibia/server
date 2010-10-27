@@ -36,7 +36,7 @@ local function updateTarget()
 		for i=1, table.getn(list) do
 			local _target = list[i]
 			if(_target ~= 0) then
-				if(isPlayer(_target) == TRUE and isSkulled(_target)) then
+				if(isPlayer(_target) and isSkulled(_target)) then
 					if(selfFollow(_target)) then
 						target = _target
 						if(target ~= prevTarget) then

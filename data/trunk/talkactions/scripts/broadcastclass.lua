@@ -1,7 +1,7 @@
 function onSay(cid, words, param, channel)
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the message that will be broadcasted.")
-		return FALSE
+		return false
 	end
 
 	local t = string.explode(param, ";", 1)
@@ -11,5 +11,5 @@ function onSay(cid, words, param, channel)
 		broadcastMessage(t[2], MESSAGE_TYPES[t[1]])
 	end
 
-	return FALSE
+	return false
 end

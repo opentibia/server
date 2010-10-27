@@ -36,7 +36,7 @@ if(Queue == nil) then
 	
 	-- Returns true if the given cid is already in the queue.
 	function Queue:isInQueue(cid)
-		return (isInArray(self.customers, cid) == TRUE)
+		return (isInArray(self.customers, cid) )
 	end
 	
 	-- Removes and returns the first cid from the queue

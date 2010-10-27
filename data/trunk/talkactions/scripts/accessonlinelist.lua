@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
-		return FALSE
+		return false
 	end
 
 	local accessLevelMin = 0
@@ -49,5 +49,5 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Total: " .. j .. " players online.")
 	end
 
-	return FALSE
+	return false
 end

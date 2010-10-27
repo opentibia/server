@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
-		return FALSE
+		return false
 	end
 
 	local guid = getPlayerGUIDByName(param)
@@ -17,5 +17,5 @@ function onSay(cid, words, param)
 	end
 
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, str)
-	return FALSE
+	return false
 end

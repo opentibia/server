@@ -18,15 +18,15 @@ local TILE_SNOW = {
 
 
 function onStepIn(cid, item, pos)
-	if (isPlayer(cid) == TRUE and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == TRUE) then
-		return TRUE
+	if (isPlayer(cid) and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) ) then
+		return true
 	end
 
 	if (TILE_SNOW[item.itemid] ~= nil) then
 		doTransformItem(item.uid, TILE_SNOW[item.itemid])
 		doDecayItem(item.uid)
-		return TRUE
+		return true
 	end
 
-	return FALSE
+	return false
 end

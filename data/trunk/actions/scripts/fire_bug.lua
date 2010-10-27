@@ -6,12 +6,12 @@ function onUse(cid, item, frompos, item2, topos)
 			doPlayerAddHealth(cid, -5)
 			doSendMagicEffect(frompos, CONST_ME_EXPLOSIONAREA)
 			doRemoveItem(item.uid)
-			return TRUE
+			return true
 		end
 		doTransformItem(item2.uid, ITEM_SUGAR_CANE_BURNED)
 		doDecayItem(item2.uid)
-		return TRUE
+		return true
 	end
 	-- Add more items that can be burned
-	return FALSE
+	return false
 end

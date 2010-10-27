@@ -8,7 +8,7 @@ local stake = {
 
 function onUse(cid, item, frompos, item2, topos) 
 	if (stake[item2.itemid] == nil) then
-		return FALSE
+		return false
 	end
 	
 	if(item2.uid == cid) then
@@ -23,5 +23,5 @@ function onUse(cid, item, frompos, item2, topos)
 	end
 		
 	doTransformItem(item2.uid, item2.itemid + 1)
-	return TRUE
+	return true
 end

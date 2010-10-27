@@ -11,8 +11,8 @@ function onUse(cid, item, frompos, item2, topos)
 			doDecayItem(item2.uid)
 		end
 		doSendMagicEffect(topos, CONST_ME_POFF)
-		return TRUE
+		return true
 	end
 
-	return FALSE
+	return false
 end

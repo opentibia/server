@@ -18,14 +18,14 @@ local CHANGEABLE_BEDS = {
 }
 
 local function getBedPartnerDirection(itemid)
-	local dir = LUA_ERROR
-	if isInArray(NORTH_BEDS, itemid) == TRUE then
+	local dir = false
+	if isInArray(NORTH_BEDS, itemid)  then
 		dir = SOUTH
-	elseif isInArray(SOUTH_BEDS, itemid) == TRUE then
+	elseif isInArray(SOUTH_BEDS, itemid)  then
 		dir = NORTH
-	elseif isInArray(EAST_BEDS, itemid) == TRUE then
+	elseif isInArray(EAST_BEDS, itemid)  then
 		dir = WEST
-	elseif isInArray(WEST_BEDS, itemid) == TRUE then
+	elseif isInArray(WEST_BEDS, itemid)  then
 		dir = EAST
 	end
 
@@ -35,7 +35,7 @@ end
 function onUse(cid, item, frompos, item2, topos)
 	local changeBed = MODIFICATION_BEDS[item.itemid]
 	if (isInArray(CHANGEABLE_BEDS, item2.itemid) == FALSE) then
-		return FALSE
+		return false
 	end
 
 	if frompos.x == CONTAINER_POSITION then
@@ -70,9 +70,9 @@ function onUse(cid, item, frompos, item2, topos)
 
 			doRemoveItem(item.uid)
 		else
-			return FALSE
+			return false
 		end
 	end
 
-	return TRUE
+	return true
 end

@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
-		return FALSE
+		return false
 	end
 
 	local townid = string.match(param, "(%d+)")
@@ -15,7 +15,7 @@ function onSay(cid, words, param)
 	local f = 0
 	local s = 0
 	for i, house in ipairs(houselist) do
-		if cleanHouse(house) == TRUE then
+		if cleanHouse(house)  then
 			s = s + 1
 		else
 			f = f + 1
@@ -23,5 +23,5 @@ function onSay(cid, words, param)
 	end
 
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "" .. s .. " house" .. (s > 1 and "s" or "") .. " cleaned (" .. f .. " failed)")
-	return TRUE
+	return true
 end

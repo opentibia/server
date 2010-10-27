@@ -57,7 +57,7 @@ local knife = {
 }
 
 function onUse(cid, item, frompos, item2, topos)
-	if isInArray(ICE_CUBE, item2.itemid) == TRUE and ICE_CUBE.last ~= item2.itemid then
+	if isInArray(ICE_CUBE, item2.itemid) and ICE_CUBE.last ~= item2.itemid then
 		local random = math.random(1, 10)
 		doSendMagicEffect(getThingPos(item2.uid), CONST_ME_BLOCKHIT)
 		if random >= 5 then
@@ -65,11 +65,11 @@ function onUse(cid, item, frompos, item2, topos)
 		else
 			doRemoveItem(item2.uid)
 		end
-		return TRUE
+		return true
 	end
 
 	if (knife[item2.itemid] == nil) then
-		return FALSE
+		return false
 	end
 
 	if (math.random(1, 15) == 1) then
@@ -86,5 +86,5 @@ function onUse(cid, item, frompos, item2, topos)
 	doTransformItem(item2.uid, item2.itemid + 1)
 	doDecayItem(item2.uid)
 
-	return TRUE
+	return true
 end

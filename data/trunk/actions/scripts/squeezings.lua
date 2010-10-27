@@ -29,33 +29,33 @@ function onUse(cid, item, frompos, item2, topos)
 	local tim = getPlayerStorageValue(cid, STORAGE_VALUE_LOCATION)
 	if tim ~= -1 and os.time() < tim then
 		doPlayerSay(cid, "The tool jammed. Please wait " .. -(os.time()-tim) .. " seconds before using it again.", TALKTYPE_ORANGE)
-		return TRUE
+		return true
 	end
 	if math.random(1, 10) == 1 then
 		setPlayerStorageValue(cid, STORAGE_VALUE_LOCATION, os.time()+60)
 		doPlayerSay(cid, "The tool jammed. Please wait 60 seconds before using it again.", TALKTYPE_ORANGE)
-		return TRUE
+		return true
 	end
 
 	--Rope
 	if(topos.x == 0 and topos.y == 0 and topos.z == 0) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
-		return TRUE
+		return true
 	end
 
 	if(topos.x == CONTAINER_POSITION) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
-		return TRUE
+		return true
 	end
 
 	local newPos = {x = topos.x, y = topos.y, z = topos.z, stackpos = 0}
 	local groundItem = getThingfromPos(newPos)
-	if (isInArray(ROPE_SPOT, groundItem.itemid) == TRUE) then
+	if (isInArray(ROPE_SPOT, groundItem.itemid) ) then
 		newPos.y = newPos.y + 1
 		newPos.z = newPos.z - 1
 		doTeleportThing(cid, newPos)
-		return TRUE
-	elseif (isInArray(OPENED_HOLE, groundItem.itemid) == TRUE or isInArray(OPENED_TRAP, groundItem.itemid) == TRUE or isInArray(DOWN_LADDER, groundItem.itemid) == TRUE) then
+		return true
+	elseif (isInArray(OPENED_HOLE, groundItem.itemid) or isInArray(OPENED_TRAP, groundItem.itemid) or isInArray(DOWN_LADDER, groundItem.itemid) ) then
 		newPos.y = newPos.y + 1
 		downPos = {x = topos.x, y = topos.y, z = topos.z + 1, stackpos = 255}
 		downItem = getThingfromPos(downPos)
@@ -64,18 +64,18 @@ function onUse(cid, item, frompos, item2, topos)
 		else
 			doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 		end
-		return TRUE
+		return true
 	end
 	
 	--Shovel
-	if (isInArray(CLOSED_HOLE, item2.itemid) == TRUE) then
+	if (isInArray(CLOSED_HOLE, item2.itemid) ) then
 		if item2.itemid == 8579 then
 			doTransformItem(item2.uid, 8585)
 		else
 			doTransformItem(item2.uid, item2.itemid + 1)
 		end
 		doDecayItem(item2.uid)
-		return TRUE
+		return true
 	elseif (item2.itemid == TILE_SAND) then
 		if (item2.actionid == TUMB_ENTRANCE) then
 			if (math.random(1, 5) == 1) then
@@ -103,36 +103,36 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 		doSendMagicEffect(topos, CONST_ME_POFF)
 		doDecayItem(item2.uid)
-		return TRUE
+		return true
 	end
 
 	--Pick
 	local itemGround = getThingFromPos({x = topos.x, y = topos.y, z = topos.z + 1, stackpos = STACKPOS_GROUND})
-	if(isInArray(ROPE_SPOT, itemGround.itemid) == TRUE) then
+	if(isInArray(ROPE_SPOT, itemGround.itemid) ) then
 		doTransformItem(item2.uid, MUD_HOLE2)
 		doSendMagicEffect(topos, CONST_ME_POFF)
 		addEvent(__doTransformHole2__, duration, {oldType = item2.itemid, pos = topos})
-		return TRUE
+		return true
 	end
 	if(item2.itemid == FRAGILE_ICE) then
 		doTransformItem(item2.uid, ICE_FISHHOLE)
 		doSendMagicEffect(topos, CONST_ME_BLOCKHIT)
-		return TRUE
+		return true
 	end
 	
 	--Machete
-	if (isInArray(JUNGLE_GRASS_REMOVE, item2.itemid) == TRUE) then
+	if (isInArray(JUNGLE_GRASS_REMOVE, item2.itemid) ) then
 		doRemoveItem(item2.uid)
-		return TRUE
-	elseif (isInArray(JUNGLE_GRASS_TRANSFORM, item2.itemid) == TRUE) then
+		return true
+	elseif (isInArray(JUNGLE_GRASS_TRANSFORM, item2.itemid) ) then
 		doTransformItem(item2.uid, item2.itemid - 1)
 		doDecayItem(item2.uid)
-		return TRUE
-	elseif (isInArray(SPIDER_WEB, item2.itemid) == TRUE) then
+		return true
+	elseif (isInArray(SPIDER_WEB, item2.itemid) ) then
 		doTransformItem(item2.uid, item2.itemid +6)
 		doDecayItem(item2.uid)
-		return TRUE
+		return true
 	end
-	return FALSE
+	return false
 end
 

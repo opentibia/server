@@ -5,7 +5,7 @@
 	<instant name="House Subowner List" words="aleta som" enabled="1" function="editHouseSubOwner"></instant>
 	<instant name="House Door List" words="aleta grav" enabled="1" function="editHouseDoor"></instant>
 	<instant name="House Kick" words="alana sio" params="1" enabled="1" function="houseKick"></instant>
-  
+	
 	<!-- Rune Spells -->
 	<rune name="adevo grav pox" id="2285" lvl="14" maglv="0" blocktype="solid" charges="3" script="attack/poison_field.lua">
 	</rune>
@@ -371,18 +371,18 @@
 	<instant name="Fierce Berserk" words="exori gran" lvl="70" mana="340" prem="1" selftarget="1" script="attack/fierce_berserk.lua">
 		<vocation name="Knight"/>   <vocation name="Elite Knight"/>
 	</instant>
-  	<instant name="Train Party" words="utito mas sio" lvl="32" mana="0" prem="1" aggressive="0" selftarget="1" script="support/party_knight.lua">
-    		<vocation name="Knight" /> <vocation name="Elite Knight" />
-  	</instant>
+		<instant name="Train Party" words="utito mas sio" lvl="32" mana="0" prem="1" aggressive="0" selftarget="1" script="support/party_knight.lua">
+				<vocation name="Knight" /> <vocation name="Elite Knight" />
+		</instant>
 	<instant name="Protect Party" words="utamo mas sio" lvl="32" mana="0" prem="1" aggressive="0" selftarget="1" script="support/party_paladin.lua">
-    		<vocation name="Paladin" /> <vocation name="Royal Paladin" />
-  	</instant>
+				<vocation name="Paladin" /> <vocation name="Royal Paladin" />
+		</instant>
 	<instant name="Heal Party" words="utura mas sio" lvl="32" mana="0" prem="1" aggressive="0" selftarget="1" script="support/party_druid.lua">
-    		<vocation name="Druid" /> <vocation name="Elder Druid" />
-  	</instant>
+				<vocation name="Druid" /> <vocation name="Elder Druid" />
+		</instant>
 	<instant name="Enchant Party" words="utori mas sio" lvl="32" mana="0" prem="1" aggressive="0" selftarget="1" script="support/party_sorcerer.lua">
-    		<vocation name="Sorcerer" /> <vocation name="Master Sorcerer" />
-  	</instant>
+				<vocation name="Sorcerer" /> <vocation name="Master Sorcerer" />
+		</instant>
 	<instant name="Protector" words="utamo tempo" lvl="55" mana="200" prem="1" selftarget="1" script="support/protector.lua">
 		<vocation name="Knight"/>   <vocation name="Elite Knight"/>
 	</instant>

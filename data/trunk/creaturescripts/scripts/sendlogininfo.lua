@@ -29,5 +29,5 @@ function onLogin(cid)
 		doSendMagicEffect(playerPos, CONST_ME_TELEPORT)
 	end
 
-	return TRUE
+	return true
 end

@@ -11,19 +11,19 @@ end
 
 function onUse(cid, item, fromPosition, itemEx, toPosition)
 	local itemGround = getThingFromPos({x = toPosition.x, y = toPosition.y, z = toPosition.z + 1, stackpos = STACKPOS_GROUND})
-	if(isInArray(ROPE_SPOT, itemGround.itemid) == TRUE) then
+	if(isInArray(ROPE_SPOT, itemGround.itemid) ) then
 		doTransformItem(itemEx.uid, MUD_HOLE)
 		doSendMagicEffect(toPosition, CONST_ME_POFF)
 		addEvent(__doTransformHole__, duration, {oldType = itemEx.itemid, pos = toPosition})
-		return TRUE
+		return true
 	end
 
 	if(itemEx.itemid == FRAGILE_ICE) then
 		doTransformItem(itemEx.uid, ICE_FISHHOLE)
 		doSendMagicEffect(toPosition, CONST_ME_BLOCKHIT)
-		return TRUE
+		return true
 	end
 
-	return FALSE
+	return false
 end
 

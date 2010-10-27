@@ -7,7 +7,7 @@ function onLook(cid, target, itemid)
 		--target nil means looking at an object in shop npc window, so it will work for backpacks at shop windows
 			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You can buy this backpack for a very cheap price.")
 		end
-		return FALSE --don't use default description
+		return false --don't use default description
 	end	
 	if target ~= nil then
 		if target.type == 1 and getPlayerName(target.uid) == "Zeus" then
@@ -20,11 +20,11 @@ function onLook(cid, target, itemid)
 			--as target isn't nil, it won't appear for bananas inside of a npc window shop
 			doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Yummy banana!")
 		else
-			return TRUE --use default description
+			return true --use default description
 		end
 	else
-		return TRUE --use default description
+		return true --use default description
 	end
 
-	return FALSE --don't use default description
+	return false --don't use default description
 end

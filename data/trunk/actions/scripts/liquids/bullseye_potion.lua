@@ -4,10 +4,10 @@ setConditionParam(condition, CONDITION_PARAM_SKILL_DISTANCE, 5)
 setConditionParam(condition, CONDITION_PARAM_SKILL_SHIELD, -10)
 
 function onUse(cid, item, frompos, item2, topos)
-	if(doTargetCombatCondition(0, cid, condition, CONST_ME_MAGIC_RED) == LUA_ERROR) then
-		return FALSE
+	if not doTargetCombatCondition(0, cid, condition, CONST_ME_MAGIC_RED) then
+		return false
 	end
 
 	doRemoveItem(item.uid)
-	return TRUE
+	return true
 end

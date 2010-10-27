@@ -5,11 +5,11 @@ function onUse(cid, item, frompos, item2, topos)
 		doPlayerSay(cid, "Blewing out the candle.", TALKTYPE_ORANGE_1)
 		doTransformItem(item.uid, item.itemid - 1)
 		doSendMagicEffect(frompos, CONST_ME_POFF)
-		return TRUE
+		return true
 	end
 
 	if FOODS[item.itemid] == nil then
-		return FALSE
+		return false
 	end
 
 	local size = FOODS[item.itemid][1]
@@ -17,12 +17,12 @@ function onUse(cid, item, frompos, item2, topos)
 
 	if (getPlayerFood(cid) + size > MAX_FOOD) then
 		doPlayerSendCancel(cid, "You are full.")
-		return TRUE
+		return true
 	end
 	doPlayerFeed(cid, size)
 	doRemoveItem(item.uid, 1)
 	doPlayerSay(cid, sound, TALKTYPE_ORANGE_1)
-	return TRUE
+	return true
 
 
 end

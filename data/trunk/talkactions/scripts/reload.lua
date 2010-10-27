@@ -1,11 +1,11 @@
 function onSay(cid, words, param)
 	if getPlayerFlagValue(cid, PLAYERFLAG_CANRELOADCONTENT) == FALSE then
-		return TRUE
+		return true
 	end
 
 	if param == "" then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
-		return FALSE
+		return false
 	end
 
 	if param == "actions" or param == "action" then
@@ -44,5 +44,5 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Reloaded " .. param .. ".")
 	end
 
-	return FALSE
+	return false
 end

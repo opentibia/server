@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
-		return FALSE
+		return false
 	else
 		param = tonumber(param)
 	end
@@ -12,5 +12,5 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Invalid parameter.")
 	end
 
-	return FALSE
+	return false
 end

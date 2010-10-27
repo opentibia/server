@@ -13,8 +13,8 @@ function onUse(cid, item, frompos, item2, topos)
 		doTransformItem(item2.uid, ITEM_SUGAR_CANE)
 		doCreateItem(ITEM_BUNCH_SUGAR_CANE, 1, topos)
 	else 
-		return FALSE
+		return false
 	end
 	doDecayItem(item2.uid)
-	return TRUE
+	return true
 end

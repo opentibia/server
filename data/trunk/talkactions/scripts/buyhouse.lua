@@ -4,7 +4,7 @@ function onSay(cid, words, param)
 	if(house == nil) then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You must be looking at a house to buy one.")
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_RED, words)
-		return FALSE
+		return false
 	end
 
 	if(house:buy(cid)) then
@@ -14,5 +14,5 @@ function onSay(cid, words, param)
 	end
 
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_RED, words)
-	return FALSE
+	return false
 end

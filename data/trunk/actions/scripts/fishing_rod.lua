@@ -99,12 +99,12 @@ function onUse(cid, item, frompos, item2, topos)
 
 	if(topos.x == CONTAINER_POSITION) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
-		return TRUE
+		return true
 	end
 	
-	if (isInArray(NOFISH_WATER, item2.itemid) == TRUE) then
+	if (isInArray(NOFISH_WATER, item2.itemid) ) then
 		doSendMagicEffect(topos, CONST_ME_LOSEENERGY)
-		return TRUE
+		return true
 	end
 
 	if (item2.itemid == ITEM_WATER_ELEMENTAL_CORPSE) then
@@ -114,19 +114,19 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 		doSendMagicEffect(topos, CONST_ME_WATERSPLASH)
 		doTransformItem(item2.uid, item2.itemid + 1)
-		return TRUE
+		return true
 	end
 
 	local formula = (getPlayerSkill(cid, CONST_SKILL_FISHING) / 200) + (0.85 * math.random())
 	local useNail = (item.itemid == ITEM_MECHANICAL_FISHING_ROD)
 	local hasFished = false;
 
-	local canGainSkill = not(getTilePzInfo(getThingPos(cid)) == TRUE or
+	local canGainSkill = not(getTilePzInfo(getThingPos(cid)) or
 		(getPlayerItemCount(cid, ITEM_WORM) < 1 and item.itemid == ITEM_FISHING_ROD) or
 		(getPlayerItemCount(cid, ITEM_NAIL) < 1 and item.itemid == ITEM_MECHANICAL_FISHING_ROD))
 
 	-- First verify the most common case
-	if (isInArray(FISH_WATER, item2.itemid) == TRUE) then
+	if (isInArray(FISH_WATER, item2.itemid) ) then
 		-- The water has a fish. Verify if the player can gain skills
 		if(canGainSkill) then
 			if(formula > 0.7) then
@@ -167,7 +167,7 @@ function onUse(cid, item, frompos, item2, topos)
 			doPlayerAddSkillTry(cid, CONST_SKILL_FISHING, 2)
 		end
 	else
-		return FALSE
+		return false
 	end
 
 	if useNail and hasFished then
@@ -177,5 +177,5 @@ function onUse(cid, item, frompos, item2, topos)
 	end
 	doDecayItem(item2.uid)
 
-	return TRUE
+	return true
 end

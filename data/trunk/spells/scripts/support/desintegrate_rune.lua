@@ -1,6 +1,6 @@
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_BLOCKHIT)
-setCombatParam(combat, COMBAT_PARAM_PZBLOCK, TRUE)
+setCombatParam(combat, COMBAT_PARAM_PZBLOCK, true)
 
 function onCastSpell(cid, var)
 	local pos = variantToPosition(var)
@@ -17,5 +17,5 @@ function onCastSpell(cid, var)
 
 	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 	doSendMagicEffect(getPlayerPosition(cid), CONST_ME_POFF)
-	return LUA_ERROR
+	return true
 end

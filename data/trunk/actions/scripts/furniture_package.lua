@@ -1,6 +1,6 @@
 function onUse(cid, item, frompos, item2, topos)
 	if (CONSTRUCTIONS[item.itemid] == nil) then
-		return FALSE
+		return false
 	elseif (frompos.x == CONTAINER_POSITION) then
 		doPlayerSendCancel(cid, "You must put the construction kit on the floor first.")
 	elseif not(House.getHouseByPos(frompos)) then
@@ -10,5 +10,5 @@ function onUse(cid, item, frompos, item2, topos)
 		doSendMagicEffect(frompos, CONST_ME_POFF)
 	end
 	
-	return TRUE
+	return true
 end

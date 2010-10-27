@@ -21,5 +21,5 @@ function onSay(cid, words, param)
 	end
 
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, str)
-	return FALSE
+	return false
 end

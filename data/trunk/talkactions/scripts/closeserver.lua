@@ -12,7 +12,7 @@ function onSay(cid, words, param)
 	end
 
 	if(param == "serversave") then
-		doSaveServer(TRUE)
+		doSaveServer(true)
 	else
 		doSaveServer(FALSE)
 	end
@@ -21,5 +21,5 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Server is now closed.")
 	end
 
-	return FALSE
+	return false
 end

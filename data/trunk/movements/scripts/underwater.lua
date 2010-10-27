@@ -4,7 +4,7 @@ setConditionParam(drown, CONDITION_PARAM_PERIODICDAMAGE, 50) -- 50 damage each 2
 
 function onStepIn(cid, item, pos)
 	if(isPlayer(cid) == FALSE) then
-		return TRUE
+		return true
 	end
 
 	if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
@@ -14,15 +14,15 @@ function onStepIn(cid, item, pos)
 	if(hasCondition(cid, CONDITION_DROWN) == FALSE) then
 		doAddCondition(cid, drown)
 	end
-	return TRUE
+	return true
 end
 
 function onStepOut(cid, item, pos)
 	if(isPlayer(cid) == FALSE) then
-		return TRUE
+		return true
 	end
-	if(hasCondition(cid, CONDITION_DROWN) == TRUE) then
+	if(hasCondition(cid, CONDITION_DROWN)) then
 		doRemoveCondition(cid, CONDITION_DROWN)
 	end
-	return TRUE
+	return true
 end

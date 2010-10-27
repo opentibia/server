@@ -6,7 +6,7 @@ setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
 
 local condition = createConditionObject(CONDITION_ATTRIBUTES)
 setConditionParam(condition, CONDITION_PARAM_SUBID, 2)
-setConditionParam(condition, CONDITION_PARAM_BUFF_SPELL, TRUE)
+setConditionParam(condition, CONDITION_PARAM_BUFF_SPELL, true)
 setConditionParam(condition, CONDITION_PARAM_TICKS, 2 * 60 * 1000)
 setConditionParam(condition, CONDITION_PARAM_SKILL_SHIELD, 2)
 
@@ -19,7 +19,7 @@ function onCastSpell(cid, var)
 	if(membersList == nil or type(membersList) ~= 'table' or #membersList <= 1) then
 		doPlayerSendCancel(cid, "You have to be in a party to cast this spell.")
 		doSendMagicEffect(pos, CONST_ME_POFF)
-		return LUA_ERROR
+		return true
 	end
 
 	local affectedList = {}
@@ -32,20 +32,20 @@ function onCastSpell(cid, var)
 	if(#affectedList <= 1) then
 		doPlayerSendCancel(cid, "No party members in range.")
 		doSendMagicEffect(pos, CONST_ME_POFF)
-		return LUA_ERROR
+		return true
 	end
 
 	local mana = math.ceil((0.9 ^ (#membersList - 1) * baseMana) * #affectedList)
 	if(getPlayerMana(cid) < mana) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHMANA)
 		doSendMagicEffect(pos, CONST_ME_POFF)
-		return LUA_ERROR
+		return true
 	end
 
-	if(doCombat(cid, combat, var) ~= LUA_NO_ERROR) then
+	if(not doCombat(cid, combat, var)) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 		doSendMagicEffect(pos, CONST_ME_POFF)
-		return LUA_ERROR
+		return true
 	end
 
 	doPlayerAddMana(cid, -(mana))
@@ -54,5 +54,5 @@ function onCastSpell(cid, var)
 		doAddCondition(pid, condition)
 	end
 
-	return LUA_NO_ERROR
+	return true
 end

@@ -4,7 +4,7 @@ function onAddItem(item, tile, pos)
 
 	if not(isLevelDoor or isVocationDoor) then
 		-- It's a normal door, we don't need special descriptions.
-		return TRUE
+		return true
 	end
 
 	if(isLevelDoor) then
@@ -20,5 +20,5 @@ function onAddItem(item, tile, pos)
 		local voc = vocDescriptions[item.actionid-2000]
 		doSetItemSpecialDescription(item.uid, "It is a gate for " .. voc .. ".\n Only the worthy may pass.")
 	end
-	return TRUE
+	return true
 end

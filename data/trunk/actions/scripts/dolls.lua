@@ -26,7 +26,7 @@ local USED_DOLLS = {
 function onUse(cid, item, frompos, item2, topos)
 
 	if DOLLS[item.itemid] == nil then
-		return FALSE
+		return false
 	end
 
 	local random = math.random(1, #DOLLS[item.itemid])
@@ -46,12 +46,12 @@ function onUse(cid, item, frompos, item2, topos)
 		doSendMagicEffect(topos, CONST_ME_SOUND_YELLOW)
 		sound = sound .. getPlayerName(cid) .. "."
 		doPlayerSay(cid, sound, TALKTYPE_ORANGE_1)
-		return TRUE
+		return true
 	end
 
 	doPlayerSay(cid, sound, TALKTYPE_ORANGE_1)
 	doTransformItem(item.uid, USED_DOLLS[item.itemid])
 	doDecayItem(item.uid)
 
-    return TRUE
+	return true
 end

@@ -1,15 +1,15 @@
 function onSay(cid, words, param)
 	if(param == "") then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
-		return FALSE
+		return false
 	end
 
 	local destPos = getWaypointPositionByName(param)
 	local creature = getCreatureByName(param)
-	if(destPos == LUA_ERROR) then
+	if(destPos == false) then
 		if creature == cid or creature == 0 then
 			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature, player or waypoint not found.")
-			return FALSE
+			return false
 		else
 			destPos = getCreaturePosition(creature)
 		end
@@ -22,7 +22,7 @@ function onSay(cid, words, param)
 
 	if creatureAccess < getPlayerAccess(cid) then
 		local oldPlayerPos = getPlayerPosition(cid)
-		if(doTeleportThing(cid, destPos) ~= LUA_ERROR) then
+		if(doTeleportThing(cid, destPos)) then
 			if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
 				doSendMagicEffect(oldPlayerPos, CONST_ME_POFF)
 				doSendMagicEffect(destPos, CONST_ME_TELEPORT)
@@ -34,5 +34,5 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You do not have access to do that.")
 	end
 
-	return FALSE
+	return false
 end

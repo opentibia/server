@@ -1,7 +1,7 @@
 function onStepOut(cid, item, topos, frompos)
 	if(item.actionid == 0) then
 		-- This is not a special door
-		return TRUE
+		return true
 	end
 
 	local movepos = {x=frompos.x, y=frompos.y+1, z=frompos.z}
@@ -13,5 +13,5 @@ function onStepOut(cid, item, topos, frompos)
 	end
 
 	doTransformItem(item.uid, item.itemid-1)
-	return TRUE
+	return true
 end

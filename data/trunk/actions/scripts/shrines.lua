@@ -27,11 +27,11 @@ function onUse(cid, item, frompos, item2, topos)
 		doRemoveItem(item.uid, 1)
 		doTransformItem(item2.uid, HOTA_FULL)
 		doSendMagicEffect(topos, CONST_ME_MAGIC_RED)
-		return TRUE
+		return true
 	end
 
 	if (isInArray(SHRINES[item.itemid], item2.itemid) == FALSE) then
-		return FALSE
+		return false
 	end
 
 	local count = item.type ~= 0 and item.type or 1
@@ -41,27 +41,27 @@ function onUse(cid, item, frompos, item2, topos)
 
 	if (getPlayerLevel(cid) < requiredLevel) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHLEVEL)
-		return TRUE
+		return true
 	end
 
 	if (isPremium(cid) == FALSE) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_YOUNEEDPREMIUMACCOUNT)
-		return TRUE
+		return true
 	end
 
 	if (getPlayerMana(cid) < manaCost) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHMANA)
-		return TRUE
+		return true
 	end
 
 	if (getPlayerSoul(cid) < soulCost) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHSOUL)
-		return TRUE
+		return true
 	end
 
 	doPlayerAddMana(cid, -manaCost)
 	doPlayerAddSoul(cid, -soulCost)
 	doTransformItem(item.uid, ENCHANTED_GEMS[item.itemid], count)
 
-	return TRUE
+	return true
 end

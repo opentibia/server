@@ -36,5 +36,5 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Total: " .. total .. " players online.")
 	end
 
-	return FALSE
+	return false
 end

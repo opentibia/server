@@ -10,8 +10,5 @@ setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, 0)
 setCombatCondition(combat, conditionAttrib)
  
 function onCastSpell(cid, var)
-	if(doCombat(cid, combat, var) == LUA_NO_ERROR) then
-		return LUA_NO_ERROR
-	end
-	return LUA_ERROR
+	return doCombat(cid, combat, var)
 end

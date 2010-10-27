@@ -9,5 +9,5 @@ function onUse(cid, item, frompos, item2, topos)
 		doSendMagicEffect(frompos, CONST_ME_SOUND_YELLOW)
 		doPlayerAddItem(cid, ITEM_PLATINUM_COIN, 1)
 	end
-	return TRUE
+	return true
 end

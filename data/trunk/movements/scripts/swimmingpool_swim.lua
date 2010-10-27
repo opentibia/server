@@ -10,7 +10,7 @@ local conditions =
 function removeHarmfulConditions(cid)
 	-- Remove all bad conditions before swimming
 	for i, v in ipairs(conditions) do
-		if(hasCondition(cid, v) == TRUE) then
+		if(hasCondition(cid, v) ) then
 			doRemoveCondition(cid, v)
 		end
 	end
@@ -18,7 +18,7 @@ end
 
 function onStepIn(cid, item, topos, frompos)
 
-	if(isPlayer(cid) == TRUE) then
+	if(isPlayer(cid) ) then
 		-- check if the player logged into the water
 		if(not(frompos.x == 0 and frompos.y == 0 and frompos.z == 0)) then
 			local fromGround = getTileItemById(frompos, 4820)
@@ -33,7 +33,7 @@ function onStepIn(cid, item, topos, frompos)
 end
 
 function onStepOut(cid, item, topos, frompos)
-	if(isPlayer(cid) == TRUE) then
+	if(isPlayer(cid) ) then
 		local toGround = getTileItemById(topos, 4820)
 		if(toGround.itemid == 0) then
 			doRemoveCondition(cid, CONDITION_OUTFIT)

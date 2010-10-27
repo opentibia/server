@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
 	-- Disabled for security reasons
 	if true then --getPlayerAccess(cid) < 10 then
-		return TRUE
+		return true
 	end
 	local v = getConfigValue(param)
 
@@ -10,5 +10,5 @@ function onSay(cid, words, param)
 	else
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, param .. " = nil")
 	end
-	return FALSE
+	return false
 end

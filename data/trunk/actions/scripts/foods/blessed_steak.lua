@@ -3,7 +3,7 @@ setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('minactionexinte
 
 function onUse(cid, item, frompos, item2, topos)
 	if SPECIAL_FOODS[item.itemid] == nil then
-		return FALSE
+		return false
 	end
 
 	local sound = SPECIAL_FOODS[item.itemid][1]
@@ -11,13 +11,13 @@ function onUse(cid, item, frompos, item2, topos)
 	local playerMaxMana = getPlayerMaxMana(cid)
 	local playerMana = getPlayerMana(cid)
 
-	if not(doAddCondition(cid, exhaust) == LUA_NO_ERROR) then
-		return FALSE
+	if not(doAddCondition(cid, exhaust)) then
+		return false
 	end
 
 	doPlayerAddMana(cid, playerMaxMana - playerMana)
 	doRemoveItem(item.uid, 1)
 	doPlayerSay(cid, sound, TALKTYPE_ORANGE_1)
-	return TRUE
+	return true
 
 end

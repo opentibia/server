@@ -5,7 +5,7 @@ local FIREWALKER_BOOTS = 9933
 function onUse(cid, item, frompos, item2, topos)
 
 	if ENCHANTABLE_WEAPONS[item2.itemid] == nil then
-		return FALSE
+		return false
 	end
 
 	local count = ENCHANTABLE_WEAPONS[item2.itemid][5]
@@ -18,7 +18,7 @@ function onUse(cid, item, frompos, item2, topos)
 
 	-- Fire weapons
 	elseif (item.itemid == ENCHANTED_SMALL_RUBY) then
-		if isInArray(WORN_FIREWALKER_BOOTS, item2.itemid) == TRUE then
+		if isInArray(WORN_FIREWALKER_BOOTS, item2.itemid)  then
 			doTransformItem(item2.uid, FIREWALKER_BOOTS)
 		else
 			doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][1], count)
@@ -27,7 +27,7 @@ function onUse(cid, item, frompos, item2, topos)
 
 	-- Earth weapons
 	elseif (item.itemid == ENCHANTED_SMALL_EMERALD) then
-		if isInArray(DRACOYLE, item2.itemid) == TRUE then
+		if isInArray(DRACOYLE, item2.itemid)  then
 			doTransformItem(item2.uid, item2.itemid -1)
 		else
 			doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][4], count)
@@ -39,10 +39,10 @@ function onUse(cid, item, frompos, item2, topos)
 		doTransformItem(item2.uid, ENCHANTABLE_WEAPONS[item2.itemid][3], count)
 		doRemoveItem(item.uid, 1)
 	else
-		return FALSE
+		return false
 	end
 
 	doDecayItem(item2.uid)
-	return TRUE
+	return true
 
 end

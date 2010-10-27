@@ -17,8 +17,5 @@ setCombatCondition(combat, conditionSlow)
 setCombatCondition(combat, conditionExhaustHeal)
  
 function onCastSpell(cid, var)
-	if(doCombat(cid, combat, var) == LUA_NO_ERROR) then
-		return LUA_NO_ERROR
-	end
-	return LUA_ERROR
+	return doCombat(cid, combat, var);
 end

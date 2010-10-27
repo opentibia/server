@@ -1,6 +1,6 @@
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_PHYSICALDAMAGE)
-setCombatParam(combat, COMBAT_PARAM_BLOCKARMOR, TRUE)
+setCombatParam(combat, COMBAT_PARAM_BLOCKARMOR, true)
 setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_ETHEREALSPEAR)
 
 function getSpellDamage(cid, weaponSkill, weaponAttack, attackStrength)

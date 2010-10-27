@@ -35,8 +35,8 @@ function oracle(cid, message, keywords, parameters, node)
 		else
 			doPlayerSetVocation(cid,voc)
 			doPlayerSetTown(cid,townid)
-        	doTeleportThing(cid,destination)
-        end
+			doTeleportThing(cid,destination)
+		end
 	else
 		error('Destination:', destination, 'Vocation:', vocation, 'Townid:', townid)
 	end

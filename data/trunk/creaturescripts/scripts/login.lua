@@ -32,7 +32,7 @@ function onLogin(cid)
 	end
 
 	--Promotes player if necessary
-	if(isPremium(cid) == TRUE) then
+	if(isPremium(cid) ) then
 		if(getPlayerStorageValue(cid, STORAGE_PROMOTION) == 1 and getPlayerVocation(cid) <= 4) then
 			doPlayerSetVocation(cid, getPlayerVocation(cid)+4)
 			doPlayerRemoveSkillLossPercent(cid, 30)
@@ -41,7 +41,7 @@ function onLogin(cid)
 		if(getPlayerStorageValue(cid, STORAGE_PREMIUM_ACCOUNT) == 1) then
 			setPlayerStorageValue(cid, STORAGE_PREMIUM_ACCOUNT, -1)
 		end
-		return TRUE
+		return true
 	end
 
 	--Player is not premium - remove premium privileges
@@ -76,5 +76,5 @@ function onLogin(cid)
 		setPlayerStorageValue(cid, STORAGE_PROMOTION, 1)
 	end
 
-	return TRUE
+	return true
 end

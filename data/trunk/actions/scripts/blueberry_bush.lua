@@ -6,5 +6,5 @@ function onUse(cid, item, frompos, item2, topos)
 	doTransformItem(item.uid, ITEM_BLUEBERRY_EMPTY)
 	doCreateItem(ITEM_BLUEBERRY, ITEM_BLUEBERRY_COUNT, frompos)
 	doDecayItem(item.uid)
-	return TRUE
+	return true
 end

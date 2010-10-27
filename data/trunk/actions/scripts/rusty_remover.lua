@@ -29,7 +29,7 @@ local rustyItems = {
 function onUse(cid, item, frompos, item2, topos)
 
 	if rustyItems[item2.itemid] == nil then
-		return FALSE
+		return false
 	end
 
 	if math.random(1, 100) > 50 then
@@ -43,5 +43,5 @@ function onUse(cid, item, frompos, item2, topos)
 
 	doRemoveItem(item.uid, 1)
 
-	return TRUE
+	return true
 end

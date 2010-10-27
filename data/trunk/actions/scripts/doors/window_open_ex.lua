@@ -3,9 +3,9 @@
 
 function onUse(cid, item, frompos, item2, topos)
 	if not(House.getHouseByPos(frompos)) then
-		return FALSE
+		return false
 	end
 
 	doTransformItem(item.uid, item.itemid+1145)
-	return TRUE
+	return true
 end

@@ -6,5 +6,5 @@ function onSay(cid, words, param)
 	else
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You do not own a house!")
 	end
-	return FALSE
+	return false
 end

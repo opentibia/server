@@ -67,51 +67,51 @@ if(Modules == nil) then
 
 
 
-    --Usage:
-        -- local node1 = keywordHandler:addKeyword({'promot'}, StdModule.say, {npcHandler = npcHandler, text = 'I can promote you for 20000 gold coins. Do you want me to promote you?'})
-        --         node1:addChildKeyword({'yes'}, StdModule.promotePlayer, {npcHandler = npcHandler, cost = 20000, level = 20}, text = 'Congratulations! You are now promoted.')
-        --         node1:addChildKeyword({'no'}, StdModule.say, {npcHandler = npcHandler, text = 'Allright then. Come back when you are ready.'}, reset = true)
+	--Usage:
+		-- local node1 = keywordHandler:addKeyword({'promot'}, StdModule.say, {npcHandler = npcHandler, text = 'I can promote you for 20000 gold coins. Do you want me to promote you?'})
+		--         node1:addChildKeyword({'yes'}, StdModule.promotePlayer, {npcHandler = npcHandler, cost = 20000, level = 20}, text = 'Congratulations! You are now promoted.')
+		--         node1:addChildKeyword({'no'}, StdModule.say, {npcHandler = npcHandler, text = 'Allright then. Come back when you are ready.'}, reset = true)
 		
 local function getPromotedVocation(voc)
-        if(voc >= 1 and voc <= 4) then
-                return voc + 4
-        else
-                return voc
-        end
+		if(voc >= 1 and voc <= 4) then
+				return voc + 4
+		else
+				return voc
+		end
 end
 		
-    function StdModule.promotePlayer(cid, message, keywords, parameters, node)
-        local npcHandler = parameters.npcHandler
-        if(npcHandler == nil) then
-            print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] StdModule.promotePlayer called without any npcHandler instance.')
+	function StdModule.promotePlayer(cid, message, keywords, parameters, node)
+		local npcHandler = parameters.npcHandler
+		if(npcHandler == nil) then
+			print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] StdModule.promotePlayer called without any npcHandler instance.')
 			return false
-        end
-        if(not npcHandler:isFocused(cid)) then
-            return false
-        end
+		end
+		if(not npcHandler:isFocused(cid)) then
+			return false
+		end
 
-        if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == true or parameters.premium == false) then
-            local currentVoc = getPlayerVocation(cid)
-            local promotedVoc = getPromotedVocation(currentVoc)
-            
-            if(currentVoc == promotedVoc) then
-                npcHandler:say('You are already promoted!', cid)
-            elseif(getPlayerLevel(cid) < parameters.level) then
-                npcHandler:say('I am sorry, but I can only promote you once you have reached level ' .. parameters.level .. '.', cid)
-            elseif(doPlayerRemoveMoney(cid, parameters.cost) ~= TRUE) then
-                npcHandler:say('You do not have enough money!', cid)
-            else
-                doPlayerSetVocation(cid, promotedVoc)
-                doPlayerRemoveSkillLossPercent(cid, 30)
+		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == true or parameters.premium == false) then
+			local currentVoc = getPlayerVocation(cid)
+			local promotedVoc = getPromotedVocation(currentVoc)
+			
+			if(currentVoc == promotedVoc) then
+				npcHandler:say('You are already promoted!', cid)
+			elseif(getPlayerLevel(cid) < parameters.level) then
+				npcHandler:say('I am sorry, but I can only promote you once you have reached level ' .. parameters.level .. '.', cid)
+			elseif(not doPlayerRemoveMoney(cid, parameters.cost)) then
+				npcHandler:say('You do not have enough money!', cid)
+			else
+				doPlayerSetVocation(cid, promotedVoc)
+				doPlayerRemoveSkillLossPercent(cid, 30)
 				setPlayerStorageValue(cid, STORAGE_PROMOTION, -1)
-                npcHandler:say(parameters.text, cid)
-            end
-        else
-            npcHandler:say("You need a premium account in order to get promoted", cid)
-        end
-        npcHandler:resetNpc()
-        return true
-    end
+				npcHandler:say(parameters.text, cid)
+			end
+		else
+			npcHandler:say("You need a premium account in order to get promoted", cid)
+		end
+		npcHandler:resetNpc()
+		return true
+	end
 	
 	--Usage:
 		--local node1 = keywordHandler:addKeyword({'wisdom of solitude'}, StdModule.say, {npcHandler = npcHandler, onlyFocus = true, text = 'Do you want to buy wisdom of solitude for 2000 (plus level depending amount) gold?'})
@@ -135,7 +135,7 @@ end
 				price = (price + ((math.min(parameters.endLevel, getPlayerLevel(cid)) - parameters.startLevel) * parameters.levelCost))
 			end
 
-			if(getPlayerBless(cid, parameters.number)) == TRUE then
+			if(getPlayerBless(cid, parameters.number))  then
 				npcHandler:say("Gods have already blessed you with this blessing!", cid)
 			elseif doPlayerRemoveMoney(cid, price) == FALSE then
 				npcHandler:say("You don't have enough money for blessing.", cid)
@@ -162,12 +162,12 @@ end
 			return false
 		end
 
-		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium == false) then
+		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) or parameters.premium == false) then
 			if(parameters.level ~= nil and getPlayerLevel(cid) < parameters.level) then
 				npcHandler:say('You must reach level ' .. parameters.level .. ' before I can let you go there.', cid)
-			elseif(doPlayerRemoveMoney(cid, parameters.cost) ~= TRUE) then
+			elseif(not doPlayerRemoveMoney(cid, parameters.cost)) then
 				npcHandler:say('You do not have enough money!', cid)
-			elseif(isPzLocked(cid) == TRUE) then
+			elseif(isPzLocked(cid) ) then
 				npcHandler:say('Get out of there with this blood!', cid)
 			else
 				doTeleportThing(cid, parameters.destination)
@@ -237,11 +237,11 @@ end
 		for i, word in pairs(keywords) do
 			if(type(word) == 'string') then
 				if string.find(message, word) and not string.find(message, '[%w+]' .. word) and not string.find(message, word .. '[%w+]') then
-	        		return true
-	    		end
-	    	end
-    	end
-    	return false
+					return true
+				end
+			end
+		end
+		return false
 	end
 
 
@@ -435,9 +435,9 @@ end
 		local destination = parentParameters.destination
 		local premium = parentParameters.premium
 
-		if(isPzLocked(cid) ~= TRUE or parameters.checkPzBlock ~= true) then
-			if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium ~= true) then
-				if(doPlayerRemoveMoney(cid, cost) ~= TRUE) then
+		if(not isPzLocked(cid) or not parameters.checkPzBlock) then
+			if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) or not parameters.premium) then
+				if not doPlayerRemoveMoney(cid, cost) then
 					npcHandler:say('You do not have enough money!', cid)
 				else
 					npcHandler:say('It was a pleasure doing business with you.', cid, true, false)
@@ -482,8 +482,8 @@ end
 		local destination = parameters.destination
 		local premium = parameters.premium
 
-		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) == TRUE or parameters.premium ~= true) then
-			if(doPlayerRemoveMoney(cid, cost) == TRUE) then
+		if(isPlayerPremiumCallback == nil or isPlayerPremiumCallback(cid) or not parameters.premium) then
+			if(doPlayerRemoveMoney(cid, cost) ) then
 				doTeleportThing(cid, destination)
 				doSendMagicEffect(destination, 10)
 			end
@@ -575,7 +575,7 @@ end
 			end
 
 			if(itemid ~= nil and cost ~= nil) then
-				if((isItemRune(itemid) == TRUE or isItemFluidContainer(itemid) == TRUE) and charges == nil) then
+				if((isItemRune(itemid) or isItemFluidContainer(itemid) ) and charges == nil) then
 					print('[Warning - ' .. getCreatureName(getNpcCid()) .. '] NpcSystem:', 'Charges missing for parameter item:' , item)
 				else
 					self:addBuyableItem(nil, itemid, cost, charges)
@@ -634,11 +634,11 @@ end
 		for i, word in pairs(keywords) do
 			if(type(word) == 'string') then
 				if string.find(message, word) and not string.find(message, '[%w+]' .. word) and not string.find(message, word .. '[%w+]') then
-	        		return true
-	    		end
-	    	end
-    	end
-    	return false
+					return true
+				end
+			end
+		end
+		return false
 	end
 
 	-- Resets the module-specific variables.
@@ -700,9 +700,9 @@ end
 	ShopModule.doPlayerAddItem = function(cid, itemid, subType, amount, ignoreCapacity, buyWithBackpacks, backpackId)
 		local amount = amount or 1
 		local subType = subType or 0
-		local ignoreCapacity = ignoreCapacity and TRUE or FALSE
+		local ignoreCapacity = ignoreCapacity and true or false
 
-		if(isItemStackable(itemid) == TRUE) then
+		if(isItemStackable(itemid) ) then
 			if(buyWithBackpacks) then
 				local backpack = doCreateItemEx(backpackId, 1)
 				doAddContainerItem(backpack, itemid, amount)
@@ -852,7 +852,7 @@ end
 		if(subType < 1) then
 			subType = -1
 		end
-		if(doPlayerRemoveItem(cid, itemid, amount, subType) == TRUE) then
+		if(doPlayerRemoveItem(cid, itemid, amount, subType) ) then
 			local msg = self.npcHandler:getMessage(MESSAGE_ONSELL)
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)

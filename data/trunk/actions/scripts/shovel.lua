@@ -12,7 +12,7 @@ local function __doTransformHole__(parameters)
 end
 
 function onUse(cid, item, frompos, item2, topos)
-	if (isInArray(CLOSED_HOLE, item2.itemid) == TRUE) then
+	if (isInArray(CLOSED_HOLE, item2.itemid) ) then
 		if item2.itemid == 8579 then
 			doTransformItem(item2.uid, 8585)
 		else
@@ -45,9 +45,9 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 		doSendMagicEffect(topos, CONST_ME_POFF)
 	else
-		return FALSE
+		return false
 	end
 
 	doDecayItem(item2.uid)
-	return TRUE
+	return true
 end
