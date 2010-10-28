@@ -433,7 +433,12 @@ void LuaState::pushThing(Thing* thing)
 		Script::ObjectID* objid = NULL;
 
 		if(item->getContainer()) {
-			objid = pushClassInstance("Container");
+			if(item->getContainer()->getDepot()){
+				objid = pushClassInstance("Depot");
+			}
+			else {
+				objid = pushClassInstance("Container");
+			}
 		}
 		else if(item->getTeleport()) {
 			objid = pushClassInstance("Teleport");
@@ -742,6 +747,17 @@ Container* LuaState::popContainer(Script::ErrorMode mode /* = Script::ERROR_THRO
 	if(t) {
 		Container* i = t->getContainer();
 		if(!i) HandleError(mode, "Object is not a container.");
+		return i;
+	}
+	return NULL;
+}
+
+Depot* LuaState::popDepot(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	Container* t = popContainer(mode);
+	if(t) {
+		Depot* i = t->getDepot();
+		if(!i) HandleError(mode, "Object is not a depot.");
 		return i;
 	}
 	return NULL;

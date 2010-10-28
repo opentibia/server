@@ -178,6 +178,7 @@ public:
 	Actor* popActor(Script::ErrorMode mode = Script::ERROR_THROW);
 	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
 	Container* popContainer(Script::ErrorMode mode = Script::ERROR_THROW);
+	Depot* popDepot(Script::ErrorMode mode = Script::ERROR_THROW);
 	Condition* popCondition(Script::ErrorMode mode = Script::ERROR_THROW);
 	Vocation* popVocation(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
@@ -510,7 +511,9 @@ public:
 	int lua_Player_addItem();
 	int lua_Player_removeItem();
 	int lua_Player_getItemTypeCount();
-
+	int lua_Player_getDepot();
+	int lua_Player_addDepot();
+	
 	int lua_Player_setVocation();
 	int lua_Player_setTown();
 	int lua_Player_addExperience();
@@ -565,6 +568,10 @@ public:
 	int lua_Container_getItems();
 	int lua_Container_getContentDescription();
 
+	// - Depot
+	int lua_Depot_getDepotID();
+	int lua_Depot_setDepotID();
+	
 	// - Tile
 	int lua_Tile_getThing();
 	int lua_Tile_getCreatures();

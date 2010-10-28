@@ -164,7 +164,8 @@ void Manager::registerClasses() {
 	registerClass("Item", "Thing");
 	registerClass("Teleport", "Item");
 	registerClass("Container", "Item");
-
+	registerClass("Depot", "Container");
+	
 	registerClass("Tile");
 
 	registerClass("Town");
@@ -368,6 +369,9 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "removeItem(int id [, int type [,int count]])", &Manager::lua_Player_removeItem);
 	registerMemberFunction("Player", "getInventoryItem(SlotType slot)", &Manager::lua_Player_getInventoryItem);
 	registerMemberFunction("Player", "getSlot(Item item)", &Manager::lua_Player_getSlot);
+	registerMemberFunction("Player", "getDepot(int id [, boolean autoCreate = nil])", &Manager::lua_Player_getDepot);
+	registerMemberFunction("Player", "addDepot(int id, Depot depot)", &Manager::lua_Player_addDepot);
+
 	registerMemberFunction("Player", "addExperience(int experience)", &Manager::lua_Player_addExperience);
 	registerMemberFunction("Player", "setTown(Town town)", &Manager::lua_Player_setTown);
 	registerMemberFunction("Player", "setVocation(int vocationid)", &Manager::lua_Player_setVocation);
@@ -425,6 +429,10 @@ void Manager::registerClasses() {
 	registerGlobalFunction("getItemIDByName(string name)", &Manager::lua_getItemIDByName);
 	registerGlobalFunction("isValidItemID(int id)", &Manager::lua_isValidItemID);
 
+	// Depot
+	registerMemberFunction("Depot", "getDepotID()", &Manager::lua_Depot_getDepotID);
+	registerMemberFunction("Depot", "setDepotID(int id)", &Manager::lua_Depot_setDepotID);
+	
 	// Tile
 	registerMemberFunction("Tile", "getThing(int index)", &Manager::lua_Tile_getThing);
 	registerMemberFunction("Tile", "getCreatures([Creature who = nil])", &Manager::lua_Tile_getCreatures);
@@ -4553,6 +4561,30 @@ int LuaState::lua_Player_getInventoryItem()
 	else
 		pushNil();
 
+	return 1;
+}
+
+int LuaState::lua_Player_getDepot()
+{
+	bool autoCreate = false;
+	if(getStackSize() > 2){
+		autoCreate = popBoolean();
+	}
+
+	uint32_t depotId = popUnsignedInteger();
+	Player* player = popPlayer();
+
+	pushThing(player->getDepot(depotId, autoCreate));
+	return 1;
+}
+
+int LuaState::lua_Player_addDepot()
+{
+	Depot* depot = popDepot();
+	uint32_t depotId = popUnsignedInteger();
+	Player* player = popPlayer();
+
+	pushBoolean(player->addDepot(depot, depotId));
 	return 1;
 }
 
