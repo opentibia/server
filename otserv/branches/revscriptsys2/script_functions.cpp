@@ -434,10 +434,10 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "getItem(int index)", &Manager::lua_Tile_getItem);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
-	registerMemberFunction("Tile", "getItemsWithItemID()", &Manager::lua_Tile_getItemsWithItemID);
-	registerMemberFunction("Tile", "getItemsWithActionID()", &Manager::lua_Tile_getItemsWithActionID);
-	registerMemberFunction("Tile", "getItemWithItemID()", &Manager::lua_Tile_getItemWithItemID);
-	registerMemberFunction("Tile", "getItemWithActionID()", &Manager::lua_Tile_getItemWithActionID);
+	registerMemberFunction("Tile", "getItemsWithItemID(int aid)", &Manager::lua_Tile_getItemsWithItemID);
+	registerMemberFunction("Tile", "getItemsWithActionID(int itemid)", &Manager::lua_Tile_getItemsWithActionID);
+	registerMemberFunction("Tile", "getItemWithItemID(int itemid)", &Manager::lua_Tile_getItemWithItemID);
+	registerMemberFunction("Tile", "getItemWithActionID(int aid)", &Manager::lua_Tile_getItemWithActionID);
 	registerMemberFunction("Tile", "queryAdd()", &Manager::lua_Tile_queryAdd);
 	registerMemberFunction("Tile", "hasProperty(TileProp prop)", &Manager::lua_Tile_hasProperty);
 
