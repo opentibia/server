@@ -79,11 +79,9 @@ std::string asUpperCaseString(const std::string& source)
 	return s;
 }
 
-int strcasecmp(const std::string& s1, const std::string& s2)
-{
-	return strcasecmp(s1.c_str(), s2.c_str());
-}
-
+#if VISUALC_VERSION < 10
+// for some reason, having trouble compiling this under vc10
+// TODO: Find a proper fix for this!
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
@@ -95,6 +93,7 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 
 	return false;
 }
+#endif
 
 #if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)

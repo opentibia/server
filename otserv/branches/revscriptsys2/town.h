@@ -72,7 +72,7 @@ public:
 	Town* getTown(const std::string& townname)
 	{
 		for(TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it){
-			if(strcasecmp(it->second->getName().c_str(), townname.c_str()) == 0){
+			if(boost::algorithm::iequals(it->second->getName(), townname)){
 				return it->second;
 			}
 		}

@@ -25,6 +25,7 @@
 #include "configmanager.h"
 #include "housetile.h"
 #include "player.h"
+#include "depot.h"
 #include "ioplayer.h"
 #include "game.h"
 #include "actor.h"
@@ -5253,6 +5254,26 @@ int LuaState::lua_isValidItemID()
 
 	const ItemType& it = Item::items[(uint16_t)id];
 	pushBoolean(id >= 100 && it.id != 0);
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Class Depot
+
+int LuaState::lua_Depot_getDepotID()
+{
+	Depot* depot = popDepot();
+
+	pushInteger(depot->getDepotId());
+	return 1;
+}
+
+int LuaState::lua_Depot_setDepotID()
+{
+	uint32_t id = popUnsignedInteger();
+	Depot* depot = popDepot();
+
+	depot->setDepotId(id);
 	return 1;
 }
 

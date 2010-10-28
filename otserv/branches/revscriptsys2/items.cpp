@@ -679,7 +679,7 @@ bool Items::loadFromXml(const std::string& datadir)
 										it.slotPosition |= SLOTPOSITION_BACKPACK;
 										it.wieldPosition = SLOT_BACKPACK;
 									}
-									else if(strcasecmp(strValue.c_str(), "two-handed") == 0){
+									else if(boost::algorithm::iequals(strValue, "two-handed") == 0){
 										it.slotPosition |= SLOTPOSITION_TWO_HAND;
 										it.wieldPosition = SLOT_HAND;
 									}
@@ -1351,7 +1351,7 @@ int32_t Items::getItemIdByName(const std::string& name)
 		do{
 			iType = items.getElement(i);
 			if(iType){
-				if(strcasecmp(name.c_str(), iType->name.c_str()) == 0){
+				if(boost::algorithm::iequals(name, iType->name)){
 					return i;
 				}
 			}

@@ -27,58 +27,6 @@
 #define OTSERV_CLIENT_VERSION "8.61"
 #define CURRENT_SCHEMA_VERSION 19
 
-#if defined(_WIN32) && !defined(WIN32)
-	#define WIN32
-#endif
-
-#if defined(WIN32) && !defined(__WINDOWS__)
-	#define __WINDOWS__
-#endif
-
-#if defined(__WINDOWS__) && !defined(_WIN32)
-	#define _WIN32
-#endif
-
-#ifdef __MINGW32__
-	#define XML_GCC_FREE
-	//Cross-compiling
-	#ifndef __WINDOWS__
-		#define __WINDOWS__
-	#endif
-#endif
-
-//Cross-compiling
-#ifdef __CYGWIN__
-	#undef WIN32
-	#undef _WIN32
-	#undef WINDOWS
-	#undef __WINDOWS__
-	#define HAVE_ERRNO_AS_DEFINE
-#endif
-
-#ifdef XML_GCC_FREE
-	#define xmlFreeOTSERV(s)	free(s)
-#else
-	#define xmlFreeOTSERV(s)	xmlFree(s)
-#endif
-
-#ifdef __USE_MINIDUMP__
-	#ifndef __EXCEPTION_TRACER__
-		#define __EXCEPTION_TRACER__
-	#endif
-#endif
-
-#ifdef __DEBUG_EXCEPTION_REPORT__
-	#define DEBUG_REPORT int *a = NULL; *a = 1;
-#else
-	#ifdef __EXCEPTION_TRACER__
-		#include "exception.h"
-		#define DEBUG_REPORT ExceptionHandler::dumpStack();
-	#else
-		#define DEBUG_REPORT
-	#endif
-#endif
-
 #ifdef __USE_SQLITE__
 	#define SINGLE_SQL_DRIVER
 #endif
@@ -121,27 +69,42 @@ enum passwordType_t{
 
 // Boost won't complain about non-working function
 #define BOOST_ASIO_ENABLE_CANCELIO 1
-#if defined _WIN32 || defined __WINDOWS__ || defined WIN32
-#  ifndef WIN32
-#    define WIN32
-#  endif
-#  ifndef __WINDOWS__
-#    define __WINDOWS__
-#  endif
-#  ifndef _WIN32
-#    define _WIN32
-#  endif
-#endif
-
-#if defined __WINDOWS__
-
-#if defined _MSC_VER && defined NDEBUG
-	#define _SECURE_SCL 0
-	#define HAS_ITERATOR_DEBUGGING 0
-#endif
 
 #ifndef __FUNCTION__
 	#define	__FUNCTION__ __func__
+#endif
+
+#define xmake_str(str) #str
+#define make_str(str) xmake_str(str)
+
+/*
+    Compiler setup
+*/
+#if defined __GNUC__
+	#include "compiler\gcc.h"
+	#ifdef __MINGW32__
+		#include "compiler\mingw32.h"
+	#elif defined __CYGWIN__
+		#include "compiler\cygwin.h"
+	#endif
+#elif defined(_MSC_VER)
+	#include "compiler\msvc.h"
+#endif
+
+/*
+    After setting up the compiler we need to
+    solve the differences to make the code portable.
+*/
+#include "compiler\workarounds.h"
+
+/*
+    If the compiler supports the upcoming standard,
+    call some of the useful headers.
+*/
+#ifdef __OTSERV_CXX0X__
+	#include <cstdint>
+	#include <unordered_map>
+	#include <unordered_set>
 #endif
 
 #ifdef _WIN32_WINNT
@@ -154,99 +117,24 @@ enum passwordType_t{
 //Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
 
-#ifdef __GNUC__
-	#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 3)
-		#include <ext/hash_map>
-		#include <ext/hash_set>
-		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
-		#define OTSERV_HASH_SET __gnu_cxx::hash_set
-	#else
-		#ifndef __GXX_EXPERIMENTAL_CXX0X__
-			#include <tr1/unordered_map>
-			#include <tr1/unordered_set>
-		#else
-			// We can use C++0x features here
-			#include <unordered_map>
-			#include <unordered_set>
-		#endif
-
-		#define OTSERV_HASH_MAP std::tr1::unordered_map
-		#define OTSERV_HASH_SET std::tr1::unordered_set
-	#endif
-	#include <assert.h>
-	#define ATOI64 atoll
-
+#ifdef __DEBUG_EXCEPTION_REPORT__
+	#define DEBUG_REPORT int *a = NULL; *a = 1;
 #else
-	typedef unsigned long long uint64_t;
-
-	#ifndef NOMINMAX
-		#define NOMINMAX
+	#ifdef __EXCEPTION_TRACER__
+		#include "exception.h"
+		#define DEBUG_REPORT ExceptionHandler::dumpStack();
+	#else
+		#define DEBUG_REPORT
 	#endif
-
-	#include <hash_map>
-	#include <hash_set>
-	#include <limits>
-	#include <assert.h>
-	#include <time.h>
-
-	#define OTSERV_HASH_MAP stdext::hash_map
-	#define OTSERV_HASH_SET stdext::hash_set
-
-	#include <cstring>
-	inline int strcasecmp(const char *s1, const char *s2)
-	{
-		return ::_stricmp(s1, s2);
-	}
-
-	inline int strncasecmp(const char *s1, const char *s2, size_t n)
-	{
-		return ::_strnicmp(s1, s2, n);
-	}
-
-	typedef signed long long int64_t;
-	typedef unsigned long uint32_t;
-	typedef signed long int32_t;
-	typedef unsigned short uint16_t;
-	typedef signed short int16_t;
-	typedef unsigned char uint8_t;
-	typedef signed char int8_t;
-
-	#define ATOI64 _atoi64
-
-	#pragma warning(disable:4786) // msvc too long debug names in stl
-	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
-	#pragma warning(disable:4244) //'argument' : conversion from 'type1' to 'type2', possible loss of data
-	#pragma warning(disable:4267) //'var' : conversion from 'size_t' to 'type', possible loss of data
-
 #endif
 
-//*nix systems
+#ifdef XML_GCC_FREE
+	#define xmlFreeOTSERV(s)	free(s)
 #else
-	#include <stdint.h>
-	#include <string.h>
-	#include <assert.h>
-
-	#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 3)
-		#include <ext/hash_map>
-		#include <ext/hash_set>
-		#define OTSERV_HASH_MAP __gnu_cxx::hash_map
-		#define OTSERV_HASH_SET __gnu_cxx::hash_set
-	#else
-		#ifndef __GXX_EXPERIMENTAL_CXX0X__
-			#include <tr1/unordered_map>
-			#include <tr1/unordered_set>
-		#else
-			// these only work, for some reason, with c++0x standard enabled
-			#include <unordered_map>
-			#include <unordered_set>
-		#endif
-
-		#define OTSERV_HASH_MAP std::tr1::unordered_map
-		#define OTSERV_HASH_SET std::tr1::unordered_set
-	#endif
-	#define ATOI64 atoll
-
+	#define xmlFreeOTSERV(s)	xmlFree(s)
 #endif
+
+//#define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__ //experimental
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)

@@ -27,6 +27,8 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
 //std
 #include <algorithm>
 #include <list>
