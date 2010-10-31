@@ -680,7 +680,7 @@ bool Items::loadFromXml(const std::string& datadir)
 										it.slotPosition |= SLOTPOSITION_BACKPACK;
 										it.wieldPosition = SLOT_BACKPACK;
 									}
-									else if(boost::algorithm::iequals(strValue, "two-handed") == 0){
+									else if(boost::algorithm::iequals(strValue, "two-handed")){
 										it.slotPosition |= SLOTPOSITION_TWO_HAND;
 										it.wieldPosition = SLOT_HAND;
 									}

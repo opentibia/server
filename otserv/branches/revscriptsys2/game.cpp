@@ -657,8 +657,16 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 			}
 			else if(type == STACKPOS_USEITEM){
 				//First check items with topOrder 2 (ladders, signs, splashes)
-				Item* item = tile->getItemByTopOrder(2);
-				if(item){// && g_actions->hasAction(item)){
+				//TODO: Find proper solution for the 2 hacks below!
+
+				//HACK: For some reason we tried to "get" the item below the depot instead (if the depot is on top)
+				Item* item = tile->items_getItemWithType(ITEM_TYPE_DEPOT);
+				if(!item || (tile->items_downCount() - tile->items_topCount()) == 1){
+					item = tile->getItemByTopOrder(2);
+				}
+
+				//HACK: For some reason we tried to "get" a splash below an item/corpse instead (if the corpse is on top)
+				if(item && (!item->isSplash() || (item->isSplash() && !tile->items_firstTop()))){
 					thing = item;
 				}
 				else{

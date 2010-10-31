@@ -33,16 +33,19 @@ function otstd.depot_tiles.registerHandlers()
 				local tile = map:getTile(pos)
 				for _, tileItem in ipairs(tile:getItems()) do
 					if table.find(otstd.depot_lockers, tileItem:getItemID()) and typeof(tileItem, "Depot") then
-						local depot = event.moving_creature:getDepot(tileItem:getDepotID())
-						local count = depot:getItemHoldingCount()
+						local depot = event.moving_creature:getDepot(tileItem:getDepotID(), true)
 						
-						if count ~= 1 then
-							event.moving_creature:sendCancel("Your depot contains " .. count .. " items.")
-						else
-							event.moving_creature:sendCancel("Your depot contains " .. count .. " item.")
+						if depot then
+							local count = depot:getItemHoldingCount()
+							
+							if count ~= 1 then
+								event.moving_creature:sendCancel("Your depot contains " .. count .. " items.")
+							else
+								event.moving_creature:sendCancel("Your depot contains " .. count .. " item.")
+							end
+							
+							break
 						end
-						
-						break
 					end
 				end
 			end
