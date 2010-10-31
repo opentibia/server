@@ -23,16 +23,6 @@
 #include "status.h"
 #include "player.h"
 
-WaitingList::WaitingList()
-{
-	//
-}
-
-WaitingList::~WaitingList()
-{
-	waitList.clear();
-}
-
 WaitListIterator WaitingList::findClient(const Player* player, uint32_t& slot)
 {
 	slot = 1;

@@ -49,7 +49,6 @@ void Dispatcher::dispatcherThread(void* p)
 	ExceptionHandler dispatcherExceptionHandler;
 	dispatcherExceptionHandler.InstallHandler();
 	#endif
-	srand((unsigned int)OTSYS_TIME());
 	#ifdef __DEBUG_SCHEDULER__
 	std::cout << "Starting Dispatcher" << std::endl;
 	#endif

@@ -30,7 +30,7 @@ enum DistributionType_t {
 	DISTRO_NORMAL
 };
 
-void replaceString(std::string& str, const std::string sought, const std::string replacement);
+void replaceString(std::string& str, const std::string& sought, const std::string& replacement);
 void trim_right(std::string& source, const std::string& t = "\n\t ");
 void trim_left(std::string& source, const std::string& t = "\n\t ");
 void trim(std::string& source, const std::string& t = "\n\t ");

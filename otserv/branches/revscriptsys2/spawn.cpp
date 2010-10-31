@@ -266,6 +266,8 @@ Spawn::Spawn(const Position& _pos, int32_t _radius)
 	radius = _radius;
 	interval = DEFAULTSPAWN_INTERVAL;
 	checkSpawnEvent = 0;
+	despawnRange = 0;
+	despawnRadius = 0;
 }
 
 Spawn::~Spawn()

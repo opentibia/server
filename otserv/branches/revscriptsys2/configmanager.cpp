@@ -199,10 +199,10 @@ bool ConfigManager::reload()
 
 const std::string& ConfigManager::getString(uint32_t _what) const
 {
-	if(m_isLoaded && _what < LAST_STRING_CONFIG)
+	if(m_isLoaded && _what < LAST_STRING_CONFIG){
 		return m_confString[_what];
-	else
-	{
+	}
+	else{
 		std::cout << "Warning: [ConfigManager::getString] " << _what << std::endl;
 		return m_confString[DUMMY_STR];
 	}
@@ -210,10 +210,10 @@ const std::string& ConfigManager::getString(uint32_t _what) const
 
 int64_t ConfigManager::getNumber(uint32_t _what) const
 {
-	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
+	if(m_isLoaded && _what < LAST_INTEGER_CONFIG){
 		return m_confInteger[_what];
-	else
-	{
+	}
+	else{
 		std::cout << "Warning: [ConfigManager::getNumber] " << _what << std::endl;
 		return 0;
 	}
@@ -221,10 +221,10 @@ int64_t ConfigManager::getNumber(uint32_t _what) const
 
 double ConfigManager::getFloat(uint32_t _what) const
 {
-	if(m_isLoaded && _what < LAST_FLOAT_CONFIG)
+	if(m_isLoaded && _what < LAST_FLOAT_CONFIG){
 		return m_confFloat[_what];
-	else
-	{
+	}
+	else{
 		std::cout << "Warning: [ConfigManager::getFloat] " << _what << std::endl;
 		return 0;
 	}
@@ -232,13 +232,11 @@ double ConfigManager::getFloat(uint32_t _what) const
 
 bool ConfigManager::setNumber(uint32_t _what, int64_t _value)
 {
-	if(_what < LAST_INTEGER_CONFIG)
-	{
+	if(_what < LAST_INTEGER_CONFIG){
 		m_confInteger[_what] = _value;
 		return true;
 	}
-	else
-	{
+	else{
 		std::cout << "Warning: [ConfigManager::setNumber] " << _what << std::endl;
 		return false;
 	}
@@ -246,13 +244,11 @@ bool ConfigManager::setNumber(uint32_t _what, int64_t _value)
 
 bool ConfigManager::setString(uint32_t _what, const std::string& _value)
 {
-	if(_what < LAST_STRING_CONFIG)
-	{
+	if(_what < LAST_STRING_CONFIG){
 		m_confString[_what] = _value;
 		return true;
 	}
-	else
-	{
+	else{
 		std::cout << "Warning: [ConfigManager::setString] " << _what << std::endl;
 		return false;
 	}
@@ -370,6 +366,7 @@ void ConfigManager::moveValue(lua_State* from, lua_State* to)
 				lua_insert(to, -2); // Move key above value
 				lua_settable(to, -3); // Set the key
 			}
+			break;
 		default:
 			break;
 	}

@@ -1251,7 +1251,7 @@ namespace Script {
 	namespace OnActorCastSpell {
 		class Event : public Script::Event {
 		public:
-			Event(Actor* actor, Creature* target, const std::string name);
+			Event(Actor* actor, Creature* target, const std::string& name);
 			~Event();
 
 			std::string getName() const {return "OnActorCastSpell";}

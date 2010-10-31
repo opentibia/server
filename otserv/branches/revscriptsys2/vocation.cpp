@@ -52,10 +52,10 @@ bool Vocations::loadFromXml(const std::string& datadir)
 		p = root->children;
 
 		while(p){
-			std::string str;
-			int intVal;
-			float floatVal;
 			if(xmlStrcmp(p->name, (const xmlChar*)"vocation") == 0){
+				std::string str;
+				int intVal;
+				float floatVal;
 				Vocation* voc = NULL;
 				xmlNodePtr skillNode;
 				if(readXMLInteger(p, "id", intVal)){

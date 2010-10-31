@@ -82,6 +82,7 @@ ItemType::ItemType()
 	corpseType    = RACE_NONE;
 	fluidSource   = FLUID_NONE;
 	allowDistRead = false;
+	lookThrough	  = false;
 
 	isVertical		= false;
 	isHorizontal	= false;

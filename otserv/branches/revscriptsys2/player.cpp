@@ -3165,10 +3165,12 @@ void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* 
 		// as the list was updated in postRemoveNotification
 		assert(i? i->getContainer() != NULL : true);
 
-		if(i)
+		if(i){
 			requireListUpdate = i->getContainer()->getHoldingPlayer() != this;
-		else
+		}
+		else{
 			requireListUpdate = oldParent != this;
+		}
 
 		updateInventoryWeight();
 		updateItemsLight();

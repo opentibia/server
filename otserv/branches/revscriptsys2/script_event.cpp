@@ -1232,19 +1232,19 @@ OnLook::Event::~Event()
 
 bool OnLook::Event::check_match(const ScriptInformation& info)
 {
-	if(info.method == FILTER_NONE)
+	if(info.method == FILTER_NONE){
 		return true;
+	}
 
-	if(object) {
+	if(object){
 		Item* item = object->getItem();
-		Creature* creature = object->getCreature();
-
 		switch(info.method) {
 			case FILTER_ITEMID:
 				return item && item->getID() == info.id;
 			case FILTER_ACTIONID:
 				return item && item->getActionId() == info.id;
-			default: break;
+			default:
+				break;
 		}
 	}
 	return false;
@@ -2509,7 +2509,7 @@ void OnActorLoadSpell::Event::update_instance(Manager& state, Environment& envir
 // Triggered when an Actor casts a spell
 
 
-OnActorCastSpell::Event::Event(Actor* actor, Creature* target, const std::string name) :
+OnActorCastSpell::Event::Event(Actor* actor, Creature* target, const std::string& name) :
 	actor(actor),
 	target(target),
 	name(name)

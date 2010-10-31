@@ -267,6 +267,8 @@ int main(int argc, char *argv[])
 #endif
 	// Don't run destructors, may hang!
 	exit(0);
+
+	return EXIT_SUCCESS;
 }
 
 bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
@@ -384,7 +386,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... " << std::flush;
-	srand((unsigned int)OTSYS_TIME());
+	std::srand((unsigned int)OTSYS_TIME());
 	std::cout << "[done]" << std::endl;
 
 #if defined LUA_CONFIGFILE

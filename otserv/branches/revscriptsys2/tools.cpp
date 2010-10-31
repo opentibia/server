@@ -27,7 +27,7 @@
 
 extern ConfigManager g_config;
 
-void replaceString(std::string& str, const std::string sought, const std::string replacement)
+void replaceString(std::string& str, const std::string& sought, const std::string& replacement)
 {
 	size_t pos = 0;
 	size_t start = 0;
@@ -221,17 +221,18 @@ float box_muller(float m, float s)
 	// normal random variate generator
 	// mean m, standard deviation s
 
-	float x1, x2, w, y1;
+	float y1;
 	static float y2;
 	static int use_last = 0;
 
-	if(use_last)			// use value from previous call
-	{
+	if(use_last){
+		// use value from previous call
 		y1 = y2;
 		use_last = 0;
 	}
-	else
-	{
+	else{
+		double w = 0.00;
+		float x1, x2;
 		do {
 			double r1 = (((float)(rand()) / RAND_MAX));
 			double r2 = (((float)(rand()) / RAND_MAX));
@@ -247,7 +248,7 @@ float box_muller(float m, float s)
 		use_last = 1;
 	}
 
-	return( m + y1 * s );
+	return m + y1 * s;
 }
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_UNIFORM*/)

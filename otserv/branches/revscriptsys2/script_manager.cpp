@@ -458,7 +458,6 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s)
 	}
 	assert(s[0] == '(');
 	s.erase(s.begin());
-	int32_t optional_level = 0;
 	// We can't have optional arguments in two places in the argument list
 	bool already_optional = false;
 
@@ -469,6 +468,7 @@ Manager::ComposedCallback_ptr Manager::parseFunctionDeclaration(std::string s)
 		// Do nothing
 	}
 	else {
+		int32_t optional_level = 0;
 		if(s[0] == '[') {
 			optional_level += 1;
 			s.erase(s.begin());
