@@ -487,8 +487,6 @@ protected:
 	static int luaGetInstantSpellInfoByName(lua_State *L);
 	static int luaGetInstantSpellWords(lua_State *L);
 
-	static int luaIsPremium(lua_State *L);
-
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
 

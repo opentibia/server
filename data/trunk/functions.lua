@@ -862,3 +862,7 @@ end
 function isNumber(str)
 	return tonumber(str) ~= nil
 end
+
+function isPremium(cid)
+	return (isPlayer(cid) == true and (getPlayerPremiumDays(cid) > 0) or getPlayerFlagValue(cid, PLAYERFLAG_ISALWAYSPREMIUM) == true)
+end
