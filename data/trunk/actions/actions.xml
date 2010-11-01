@@ -198,7 +198,7 @@
 	
 	<!-- Teleport Items -->
 	<action itemid="430" script="teleport.lua"/>
-	<action itemid="1369" script="teleport.lua"/>
+	<action actionid="1369" script="teleport.lua"/>
 	<action itemid="1386" script="teleport.lua"/>
 	<action itemid="3678" script="teleport.lua"/>
 	<action itemid="5543" script="teleport.lua"/>
@@ -656,6 +656,9 @@
 	<action itemid="10483" script="doors/door_open_horizontal.lua"/>
 	<action itemid="10484" script="doors/questdoor_closed.lua"/>
 	<action itemid="10485" script="doors/door_open_vertical.lua"/>
+	
+	<action itemid="10791" script="doors/questdoor_closed.lua"/>
+	<action itemid="10792" script="doors/door_open_vertical.lua"/>
 	
 	<!-- Windows -->
 	<action itemid="6436" script="doors/window_open.lua"/>

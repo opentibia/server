@@ -149,9 +149,9 @@
 	<moveevent event="AddItem" itemid="11099" function="onAddField" />
 
 	<!-- Walkable waters -->
-	<moveevent event="StepIn" itemid="4820" script="swimmingpool_swim.lua" />
-	<moveevent event="StepOut" itemid="4820" script="swimmingpool_swim.lua" />
-	<moveevent event="AddItem" itemid="4820" tileitem="1" script="swimmingpool_item.lua" />
+	<moveevent event="StepIn" fromitemid="4620" toitemid="4625" script="swimmingpool_swim.lua" />
+	<moveevent event="StepOut" fromitemid="4620" toitemid="4625" script="swimmingpool_swim.lua" />
+	<moveevent event="AddItem" fromitemid="4620" toitemid="4625" tileitem="1" script="swimmingpool_item.lua" />
 
 	<!-- Underwater -->
 	<moveevent event="StepIn" itemid="5405" script="underwater.lua" />
@@ -792,7 +792,21 @@
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</moveevent>
 	<moveevent event="DeEquip" itemid="9776" slot="armor" function="onDeEquipItem"/>
-
+	<moveevent event="Equip" itemid="11301" slot="armor" level="50" function="onEquipItem">
+		<vocation name="Knight"/>
+		<vocation name="Elite Knight" showInDescription="0"/>
+		<vocation name="Paladin"/>
+		<vocation name="Royal Paladin" showInDescription="0"/>
+	</moveevent>
+	<moveevent event="DeEquip" itemid="11301" slot="armor" function="onDeEquipItem"/>
+	<moveevent event="Equip" itemid="11356" slot="armor" level="60" function="onEquipItem">
+		<vocation name="Sorcerer"/>
+		<vocation name="Master Sorcerer" showInDescription="0"/>
+		<vocation name="Druid"/>
+		<vocation name="Elder Druid" showInDescription="0"/>
+	</moveevent>
+	<moveevent event="DeEquip" itemid="11356" slot="armor" function="onDeEquipItem"/>
+	
 	<!-- Legs -->
 	<moveevent event="Equip" itemid="2477" slot="legs" function="onEquipItem">
 		<vocation name="Knight"/>

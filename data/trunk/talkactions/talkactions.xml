@@ -42,5 +42,5 @@
 	<talkaction words="!leavehouse" access="0" script="leavehouse.lua"/>
 	<talkaction words="!houseinfo" access="0" script="houseinfo.lua"/>
 	<talkaction words="!online" access="0" script="onlinelist.lua"/>
-	<talkaction words="!unjustkills" access="0" script="unjustkills.lua"/>
+	<talkaction words="!frags" access="0" script="frags.lua"/>
 </talkactions>
