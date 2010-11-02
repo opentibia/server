@@ -302,8 +302,8 @@ BEFORE DELETE
 ON "players"
 FOR EACH ROW
 BEGIN
-	SELECT RAISE(ROLLBACK, 'DELETE on table "players" violates foreign: "ownerid" from table "guilds"')
-	WHERE (SELECT "id" FROM "guilds" WHERE "ownerid" = OLD."id") IS NOT NULL;
+	SELECT RAISE(ROLLBACK, 'DELETE on table "players" violates foreign: "owner_id" from table "guilds"')
+	WHERE (SELECT "id" FROM "guilds" WHERE "owner_id" = OLD."id") IS NOT NULL;
 
 	DELETE FROM "player_viplist" WHERE "player_id" = OLD."id" OR "vip_id" = OLD."id";
 	DELETE FROM "player_storage" WHERE "player_id" = OLD."id";
@@ -313,7 +313,7 @@ BEGIN
 	DELETE FROM "player_spells" WHERE "player_id" = OLD."id";
 	DELETE FROM "bans" WHERE "type" = 2 AND "value" = OLD."id";
 	DELETE FROM "guild_members" WHERE "player_id" = OLD."id";
-	UPDATE "houses" SET "owner" = 0 WHERE "owner" = OLD."id";
+	UPDATE "houses" SET "owner" = 0 WHERE "owner_id" = OLD."id";
 END;
 
 CREATE TRIGGER "ondelete_accounts"
