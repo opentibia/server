@@ -30,7 +30,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return true
 	end
 
-	if (isInArray(SHRINES[item.itemid], item2.itemid) == FALSE) then
+	if (isInArray(SHRINES[item.itemid], item2.itemid) == false) then
 		return false
 	end
 
@@ -44,7 +44,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return true
 	end
 
-	if (isPremium(cid) == FALSE) then
+	if (isPremium(cid) == false) then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_YOUNEEDPREMIUMACCOUNT)
 		return true
 	end

@@ -137,7 +137,7 @@ end
 
 			if(getPlayerBless(cid, parameters.number))  then
 				npcHandler:say("Gods have already blessed you with this blessing!", cid)
-			elseif doPlayerRemoveMoney(cid, price) == FALSE then
+			elseif doPlayerRemoveMoney(cid, price) == false then
 				npcHandler:say("You don't have enough money for blessing.", cid)
 			else
 				npcHandler:say("You have been blessed by one of the five gods!", cid)

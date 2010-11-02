@@ -13,7 +13,7 @@ end
 
 -- move to a creature
 function moveToCreature(id)
-	if(isCreature(id) == FALSE) then
+	if(isCreature(id) == false) then
 		debugPrint('moveToCreature(): creature not found.')
 		return false
 	end

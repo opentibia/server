@@ -24,7 +24,7 @@ local function goToOrigPos()
 end
 
 local function updateTarget()
-	if(isPlayer(target) == FALSE) then
+	if(isPlayer(target) == false) then
 		goToOrigPos()
 	elseif(not isSkulled(target)) then
 		target = 0

@@ -36,7 +36,7 @@ function onSay(cid, words, param)
 	end
 
 	if(doTeleportThing(cid, newPos)) then
-		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
+		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false) then
 			doSendMagicEffect(oldPos, CONST_ME_POFF)
 			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_TELEPORT)
 		end

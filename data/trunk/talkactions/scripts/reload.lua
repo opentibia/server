@@ -1,5 +1,5 @@
 function onSay(cid, words, param)
-	if getPlayerFlagValue(cid, PLAYERFLAG_CANRELOADCONTENT) == FALSE then
+	if getPlayerFlagValue(cid, PLAYERFLAG_CANRELOADCONTENT) == false then
 		return true
 	end
 

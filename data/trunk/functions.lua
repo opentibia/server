@@ -77,11 +77,11 @@ end
 
 function getPlayerByName(name)
 	local player = getCreatureByName(name)
-	if player ~= LUA_NULL and isPlayer(player) == true then
+	if player ~= 0 and isPlayer(player) == true then
 		return player
 	end
 
-	return LUA_NULL
+	return false
 end
 
 function doPlayerSay(cid, text, textType)
@@ -655,7 +655,7 @@ function doPlayerAddLevel(cid, level)
 		return doPlayerAddExp(cid, experience)
 	end
 
-	return LUA_FALSE
+	return false
 end
 
 function doPlayerRemoveLevel(cid, level)
@@ -664,7 +664,7 @@ function doPlayerRemoveLevel(cid, level)
 		return doPlayerRemoveExp(cid, experience)
 	end
 
-	return LUA_FALSE
+	return false
 end
 
 -- Functions made by Jiddo

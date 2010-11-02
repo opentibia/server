@@ -4,7 +4,7 @@ function onSay(cid, words, param)
 		return false
 	end
 
-	if isMonsterName(param) == FALSE then
+	if isMonsterName(param) == false then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "There isn't any monster named "..param..".")
 		return false
 	end

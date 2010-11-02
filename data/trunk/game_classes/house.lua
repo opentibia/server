@@ -44,7 +44,7 @@ end
 	end
 
 	function House.getHouseByOwner(cid)
-		if(isPlayer(cid) == FALSE) then
+		if(isPlayer(cid) == false) then
 			error('House.getHouseByOwner(): Player not found!')
 			return nil
 		end
@@ -178,7 +178,7 @@ end
 		end
 
 		local cid = tonumber(cid)
-		if(isPlayer(cid) == FALSE) then
+		if(isPlayer(cid) == false) then
 			error('House:buy(): Player does not exist!')
 			return false
 		end
@@ -197,7 +197,7 @@ end
 			return false
 		end
 
-		if(HOUSE_CONFIG.needPremium and isPremium(cid) == FALSE) then
+		if(HOUSE_CONFIG.needPremium and isPremium(cid) == false) then
 			doPlayerSendCancel(cid, 'Only premium players are able to buy a house.')
 			return false
 		end
@@ -207,7 +207,7 @@ end
 			return false
 		end
 
-		if(doPlayerRemoveMoney(cid, housePrice) == FALSE) then
+		if(doPlayerRemoveMoney(cid, housePrice) == false) then
 			doPlayerSendCancel(cid, 'You do not have enough money.')
 			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, 'Price: ' .. housePrice .. '.')
 			return false

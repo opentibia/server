@@ -34,7 +34,7 @@ end
 
 function onUse(cid, item, frompos, item2, topos)
 	local changeBed = MODIFICATION_BEDS[item.itemid]
-	if (isInArray(CHANGEABLE_BEDS, item2.itemid) == FALSE) then
+	if (isInArray(CHANGEABLE_BEDS, item2.itemid) == false) then
 		return false
 	end
 
@@ -48,7 +48,7 @@ function onUse(cid, item, frompos, item2, topos)
 		local dir = getBedPartnerDirection(item2.itemid)
 		local basePos = {x=topos.x, y=topos.y, z=topos.z, stackpos=topos.stackpos}
 		local nextPos = getPosByDir({x=topos.x, y=topos.y, z=topos.z, stackpos=topos.stackpos}, dir)
-		local newBed = LUA_NULL
+		local newBed = 0
 
 		if basePos.x < nextPos.x then
 			newBed = {changeBed[2][1], changeBed[2][2]}
@@ -60,7 +60,7 @@ function onUse(cid, item, frompos, item2, topos)
 			newBed = {changeBed[1][1], changeBed[1][2]}
 		end
 
-		if newBed ~= LUA_NULL then
+		if newBed ~= 0 then
 			doTransformItem(getThingFromPos(basePos).uid, newBed[1])
 			doTransformItem(getThingFromPos(nextPos).uid, newBed[2])
 

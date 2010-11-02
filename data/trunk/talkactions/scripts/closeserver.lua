@@ -3,7 +3,7 @@ function onSay(cid, words, param)
 
 	local casterRemoved = false
 	for i, uid in ipairs(getPlayersOnlineList()) do
-		if getPlayerFlagValue(uid, PLAYERFLAG_CANALWAYSLOGIN) == FALSE then
+		if getPlayerFlagValue(uid, PLAYERFLAG_CANALWAYSLOGIN) == false then
 			if uid == cid then
 				casterRemoved = true
 			end
@@ -14,7 +14,7 @@ function onSay(cid, words, param)
 	if(param == "serversave") then
 		doSaveServer(true)
 	else
-		doSaveServer(FALSE)
+		doSaveServer(false)
 	end
 
 	if not casterRemoved then

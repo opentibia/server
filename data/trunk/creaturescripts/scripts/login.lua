@@ -16,7 +16,7 @@ function onLogin(cid)
 	if getPlayerStorageValue(cid, STORAGE_DEATH_BAG) == 1 then
 		if getPlayerSlotItem(cid, CONST_SLOT_BACKPACK).uid == 0 then
 			local item_bag = doCreateItemEx(ITEM_BAG, 1)
-			doPlayerAddItemEx(cid, item_bag, FALSE, CONST_SLOT_BACKPACK)
+			doPlayerAddItemEx(cid, item_bag, false, CONST_SLOT_BACKPACK)
 		end
 		setPlayerStorageValue(cid, STORAGE_DEATH_BAG, -1)
 	end

@@ -1,8 +1,8 @@
 function onUse(cid, item, frompos, item2, topos)
 	if (item2.actionid == 0 or
-	   (isInArray(LOCKED_DOORS, item2.itemid) == FALSE and
-	    isInArray(LOCKED_DOORS, item2.itemid-1) == FALSE and
-		isInArray(LOCKED_DOORS, item2.itemid-2) == FALSE)) then
+	   (isInArray(LOCKED_DOORS, item2.itemid) == false and
+	    isInArray(LOCKED_DOORS, item2.itemid-1) == false and
+		isInArray(LOCKED_DOORS, item2.itemid-2) == false)) then
 		return false
 	end
 

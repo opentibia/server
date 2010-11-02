@@ -1,6 +1,6 @@
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_GREEN)
-setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, FALSE)
+setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, false)
 
 local conditionHaste = createConditionObject(CONDITION_HASTE)
 local conditionExhaustCombat = createConditionObject(CONDITION_EXHAUST_COMBAT)

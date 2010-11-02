@@ -13,7 +13,7 @@ function onSay(cid, words, param)
 	local itemcount = param[2] ~= nil and tonumber(param[2]) or 1
 	local count = math.min(itemcount, 100)
 	
-	if isValidItemId(itemid) == FALSE then
+	if isValidItemId(itemid) == false then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Invalid item id.")	
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
 		return false

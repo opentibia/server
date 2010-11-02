@@ -6,21 +6,21 @@ local combatHealth = createCombatObject()
 setCombatParam(combatHealth, COMBAT_PARAM_TYPE, COMBAT_HEALING)
 setCombatParam(combatHealth, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
 setCombatParam(combatHealth, COMBAT_PARAM_TARGETCASTERORTOPMOST, true)
-setCombatParam(combatHealth, COMBAT_PARAM_AGGRESSIVE, FALSE)
+setCombatParam(combatHealth, COMBAT_PARAM_AGGRESSIVE, false)
 setCombatParam(combatHealth, COMBAT_PARAM_DISPEL, CONDITION_PARALYZE)
 setCombatFormula(combatHealth, COMBAT_FORMULA_DAMAGE, HEALTH_REGEN[1], 0, HEALTH_REGEN[2], 0)
 
 local combatMana = createCombatObject()
 setCombatParam(combatMana, COMBAT_PARAM_TYPE, COMBAT_MANADRAIN)
 setCombatParam(combatMana, COMBAT_PARAM_TARGETCASTERORTOPMOST, true)
-setCombatParam(combatMana, COMBAT_PARAM_AGGRESSIVE, FALSE)
+setCombatParam(combatMana, COMBAT_PARAM_AGGRESSIVE, false)
 setCombatFormula(combatMana, COMBAT_FORMULA_DAMAGE, MANA_REGEN[1], 0, MANA_REGEN[2], 0)
 
 local exhaust = createConditionObject(CONDITION_EXHAUST_POTION)
 setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('minactionexinterval'))
 
 function onUse(cid, item, frompos, item2, topos)
-	if(isPlayer(item2.uid) == FALSE)then
+	if(isPlayer(item2.uid) == false)then
 		return false
 	end
 

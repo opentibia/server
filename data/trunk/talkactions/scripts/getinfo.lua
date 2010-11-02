@@ -6,7 +6,7 @@ function onSay(cid, words, param)
 
 	local player = getPlayerByName(param)
 	local str = ""
-	if player ~= LUA_NULL then
+	if player ~= 0 then
 		local pos = getPlayerPosition(player)
 
 		str = str .. "Name: " .. getPlayerName(player) .. "\n"

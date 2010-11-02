@@ -30,7 +30,7 @@ function doPlayerAddQuestReward(cid, parameters)
 	local requiredMagicLevel = parameters.requiredMagicLevel or 0
 	local requiredSoul = parameters.requiredSoul or 0
 	local requiredStorageValue = parameters.requiredStorageValue
-	local premiumRequired = parameters.premiumRequired or FALSE
+	local premiumRequired = parameters.premiumRequired or false
 	local itemName = parameters.itemName
 	local storageValue = parameters.storageValue
 	local containerId = parameters.containerId or 1987
@@ -54,7 +54,7 @@ function doPlayerAddQuestReward(cid, parameters)
 	
 	if (requiredVocation ~= nil) then
 		if (type(requiredVocation) == "table") then
-			if (isInArray(requiredVocation, getPlayerVocation(cid)) == FALSE) then
+			if (isInArray(requiredVocation, getPlayerVocation(cid)) == false) then
 				doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "Your vocation can not to take this reward.")
 				return true
 			end
@@ -95,7 +95,7 @@ function doPlayerAddQuestReward(cid, parameters)
 		end
 	end
 	
-	if (premiumRequired ~= FALSE and isPremium(cid) == FALSE) then
+	if (premiumRequired ~= false and isPremium(cid) == false) then
 		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "A premium account is required to take this reward.")
 		return false
 	end

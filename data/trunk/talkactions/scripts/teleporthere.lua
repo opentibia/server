@@ -5,13 +5,13 @@ function onSay(cid, words, param)
 	end
 
 	local creature = getCreatureByName(param)
-	if creature == cid or creature == LUA_NULL then
+	if creature == cid or creature == 0 then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature or player not found.")
 		return false
 	end
 
 	local creatureAccess = 0
-	if(isPlayer(creature) == LUA_TRUE) then
+	if(isPlayer(creature) == true) then
 		creatureAccess = getPlayerAccess(creature)
 	end
 

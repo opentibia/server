@@ -79,7 +79,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return true
 	end
 
-	if(isCreature(item2.uid) == FALSE) then
+	if(isCreature(item2.uid) == false) then
 		if(item.type == TYPE_EMPTY) then
 			if(item.itemid == ITEM_RUM_FLASK and isInArray(DISTILLERY, item2.itemid) ) then
 				if(item2.actionid == DISTILLERY_FULL) then

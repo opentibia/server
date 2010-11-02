@@ -22,7 +22,7 @@ function onStepIn(cid, item, topos, frompos)
 		-- check if the player logged into the water
 		if(not(frompos.x == 0 and frompos.y == 0 and frompos.z == 0)) then
 			local fromGround = getTileItemById(frompos, 4820)
-			if(fromGround.itemid == 0 and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == FALSE) then
+			if(fromGround.itemid == 0 and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false) then
 				doSendMagicEffect(getThingPos(cid), CONST_ME_WATERSPLASH)
 			end
 		end
