@@ -447,7 +447,7 @@ end
 function getPlayerByAccountNumber(acc)
 	players = getPlayersByAccountNumber(acc)
 	if #players == 0 then
-		return 0
+		return false
 	end
 	return players[1]
 end

@@ -48,7 +48,7 @@ local function calculateWidth(lootList, index)
 		end
 		return math.max(math.ceil(ret),1)
 	else
-		return 0
+		return false
 	end
 end
 

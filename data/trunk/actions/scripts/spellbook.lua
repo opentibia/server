@@ -32,5 +32,5 @@ function onUse(cid, item, frompos, item2, topos)
 	end
 		
 	doShowTextDialog(cid, item.itemid, text)
-	return 1
+	return true
 end
