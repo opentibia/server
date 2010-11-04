@@ -1033,22 +1033,15 @@ bool Player::canSeeCreature(const Creature* creature) const
 
 bool Player::canWalkthrough(const Creature* creature) const
 {
-	/*if(creature->getPlayer() && creature->getPlayer()->isGmInvisible() &&
-		!canSeeGmInvisible((Player*)creature->getPlayer()))
-		return true;*/
- 
-	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures) ||
-		(creature->getPlayer() &&
-				(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen) ||
-				creature->getPlayer()->isGmInvisible())) )
-		{
-			return true;
-		}
-    else if (creature->getTile()->ground != NULL && creature->getTile()->ground->getID() == ITEM_GLOWING_SWITCH)
-    {
-        return false;
-    }
- 
+	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures)
+		|| (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag())){
+		return true;
+	}
+	if (creature->getTile() && creature->getTile()->ground
+		&& creature->getTile()->ground->getID() == ITEM_GLOWING_SWITCH){
+		return false;
+	}
+
 	return (Combat::checkPVPExtraRestrictions(this, creature, true) != RET_NOERROR);
 }
 
