@@ -1221,6 +1221,9 @@ void LuaScriptInterface::registerFunctions()
 	//setPlayerStorageValue(cid, valueid, newvalue)
 	lua_register(m_luaState, "setPlayerStorageValue", LuaScriptInterface::luaSetPlayerStorageValue);
 
+	//isPremium(cid) 	 
+	lua_register(m_luaState, "isPremium", LuaScriptInterface::luaIsPremium);
+
 	//getPlayerLastLogin(cid)
 	lua_register(m_luaState, "getPlayerLastLogin", LuaScriptInterface::luaGetPlayerLastLogin);
 
@@ -2275,6 +2278,11 @@ int LuaScriptInterface::luaGetPlayerAccountBalance(lua_State *L)
 int LuaScriptInterface::luaIsPzLocked(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoPzLock);
+}
+
+int LuaScriptInterface::luaIsPremium(lua_State *L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoPremium);
 }
 
 int LuaScriptInterface::luaGetPlayerLastLogin(lua_State *L)
