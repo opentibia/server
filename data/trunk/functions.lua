@@ -445,7 +445,7 @@ function string.strip_whitespace(str)
 end
 
 function getPlayerByAccountNumber(acc)
-	players = getPlayersByAccountNumber(acc)
+	players = getPlayerByAccountNumber(acc)
 	if #players == 0 then
 		return false
 	end
