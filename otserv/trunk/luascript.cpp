@@ -1959,60 +1959,83 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 {
 	uint32_t cid = popNumber(L);
 	ScriptEnviroment* env = getScriptEnv();
-	int32_t value;
 
 	const Player* player = env->getPlayerByUID(cid);
-	if(player){
-		switch(info){
+	if(!player){
+		std::stringstream error_str;
+		error_str << "Player not found. info = " << info;
+		reportErrorFunc(error_str.str());
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	switch(info){
 		case PlayerInfoAccess:
-			value = player->getAccessLevel();
-			break;
+		{
+			lua_pushnumber(L, player->getAccessLevel());
+			return 1;
+		}
 		case PlayerInfoLevel:
-			value = player->getLevel();
-			break;
+		{
+			lua_pushnumber(L, player->getLevel());
+			return 1;
+		}
 		case PlayerInfoMagLevel:
-			value = player->getMagicLevel();
-			break;
+		{
+			lua_pushnumber(L, player->getMagicLevel());
+			return 1;
+		}
 		case PlayerInfoMana:
-			value = player->getMana();
-			break;
+		{
+			lua_pushnumber(L, player->getMana());
+			return 1;
+		}
 		case PlayerInfoMaxMana:
-			value = player->getMaxMana();
-			break;
+		{
+			lua_pushnumber(L, player->getMaxMana());
+			return 1;
+		}
 		case PlayerInfoMasterPos:
 		{
 			Position pos;
 			pos = player->masterPos;
 			pushPosition(L, pos, 0);
 			return 1;
-			break;
 		}
 		case PlayerInfoFood:
 		{
-			value = 0;
+			int32_t value = 0;
 
 			Condition* condition = player->getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
 			if(condition){
 				value = condition->getTicks() / 1000;
 			}
-			else{
-				value = 0;
-			}
-			break;
+
+			lua_pushnumber(L, value);
+			return 1;
 		}
 		case PlayerInfoVocation:
-			value = player->getVocationId();
-			break;
+		{
+			lua_pushnumber(L, player->getVocationId());
+			return 1;
+		}
 		case PlayerInfoSoul:
-			value = player->getPlayerInfo(PLAYERINFO_SOUL);
-			break;
+		{
+			lua_pushnumber(L, player->getPlayerInfo(PLAYERINFO_SOUL));
+			return 1;
+		}
 		case PlayerInfoFreeCap:
-			value = (int)player->getFreeCapacity();
-			break;
+		{
+			lua_pushnumber(L, (int)player->getFreeCapacity());
+			return 1;
+		}
 		case PlayerInfoGuildId:
-			value = player->getGuildId();
-			break;
+		{
+			lua_pushnumber(L, player->getGuildId());
+			return 1;
+		}
 		case PlayerInfoGuildName:
+		{
 			if(player->getGuild()){
 				lua_pushstring(L, player->getGuild()->getName().c_str());
 			}
@@ -2021,31 +2044,45 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			}
 			return 1;
 			break;
+		}
 		case PlayerInfoGuildRank:
+		{
 			lua_pushstring(L, player->guildRank.c_str());
 			return 1;
-			break;
+		}
 		case PlayerInfoGuildNick:
+		{
 			lua_pushstring(L, player->guildNick.c_str());
 			return 1;
-			break;
+		}
 		case PlayerInfoGuildLevel:
-			value = player->guildLevel;
-			break;
+		{
+			lua_pushnumber(L, player->guildLevel);
+			return 1;
+		}
 		case PlayerInfoSex:
-			value = player->getSex();
-			break;
+		{
+			lua_pushnumber(L, player->getSex());
+			return 1;
+		}
 		case PlayerInfoTown:
-			value = player->getTown();
-			break;
+		{
+			lua_pushnumber(L, player->getTown());
+			return 1;
+		}
 		case PlayerInfoGUID:
-			value = player->getGUID();
-			break;
+		{
+			lua_pushnumber(L, player->getGUID());
+			return 1;
+		}
 		case PlayerInfoPremiumDays:
-			value = player->getPremiumDays();
-			break;
+		{
+			lua_pushnumber(L, player->getPremiumDays());
+			return 1;
+		}
 		case PlayerInfoSkullEndTime:
 		{
+			int32_t value = 0;
 			#ifdef __SKULLSYSTEM__
 			switch(player->getSkull()){
 				case SKULL_RED:
@@ -2055,14 +2092,12 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 					value = player->lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION);
 					break;
 
-				default:
-					value = 0;
-					break;
+				default: break;
 			}
-			#else
-			value = 0;
 			#endif
-			break;
+
+			lua_pushnumber(L, value);
+			return 1;
 		}
 
 		case PlayerInfoUnjustKills:
@@ -2080,49 +2115,53 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			setField(L, "monthRedSkull", g_config.getNumber(ConfigManager::KILLS_PER_MONTH_RED_SKULL) );
 			setField(L, "monthBlackSkull", g_config.getNumber(ConfigManager::KILLS_PER_MONTH_BLACK_SKULL) );
 			return 1;
-			break;
 		}
 
 		case PlayerInfoBalance:
 		{
-			value = player->balance;
-			break;
+			lua_pushnumber(L, player->balance);
+			return 1;
 		}
 		case PlayerInfoPzLock:
-			value = player->isPzLocked();
-			break;
+		{
+			lua_pushboolean(L, player->isPzLocked());
+			return 1;
+		}
+		case PlayerInfoPremium:
+		{
+			lua_pushboolean(L, player->isPremium());
+			return 1;
+		}
 		case PlayerInfoLastLogin:
-			value = player->getLastLoginSaved();
-			break;
+		{
+			lua_pushnumber(L, player->getLastLoginSaved());
+			return 1;
+		}
 		case PlayerInfoIp:
-			value = player->getIP();
-			break;
+		{
+			lua_pushnumber(L, player->getIP());
+			return 1;
+		}
 		case PlayerInfoGmInvisible:
-			value = player->isGmInvisible();
-			break;
+		{
+			lua_pushboolean(L, player->isGmInvisible());
+			return 1;
+		}
 		case PlayerInfoAccountId:
-			value = player->getAccountId();
-			break;
+		{
+			lua_pushnumber(L, player->getAccountId());
+			return 1;
+		}
 		default:
+		{
 			std::string error_str = "Unknown player info. info = " + info;
 			reportErrorFunc(error_str);
-			value = 0;
-			break;
+			lua_pushnumber(L, 0);
+			return 1;
 		}
-		lua_pushnumber(L, value);
-		return 1;
 	}
-	else{
-		std::stringstream error_str;
-		error_str << "Player not found. info = " << info;
-		reportErrorFunc(error_str.str());
-		lua_pushboolean(L, false);
-		return 1;
-	}
-
-	lua_pushboolean(L, true);
-	return 1;
 }
+
 //getPlayer[Info](uid)
 int LuaScriptInterface::luaGetPlayerFood(lua_State *L)
 {
@@ -4928,7 +4967,7 @@ int LuaScriptInterface::luaIsHouseGuildHall(lua_State *L)
 
 	House* house = Houses::getInstance().getHouse(houseid);
 	if(house){
-		lua_pushnumber(L, (house->isGuildHall() ? true : false));
+		lua_pushboolean(L, (house->isGuildHall() ? true : false));
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
@@ -7109,7 +7148,7 @@ int LuaScriptInterface::luaIsCorpse(lua_State *L)
 	Item* item = env->getItemByUID(uid);
 	if(item){
 		const ItemType& it = Item::items[item->getID()];
-		lua_pushnumber(L, (it.corpseType != RACE_NONE ? true : false));
+		lua_pushboolean(L, (it.corpseType != RACE_NONE ? true : false));
 	}
 	else{
 		lua_pushboolean(L, false);
@@ -7602,7 +7641,7 @@ int LuaScriptInterface::luaCanPlayerWearOutfit(lua_State *L)
 
 	Outfit outfit;
 	if(Outfits::getInstance()->getOutfit(lookType, outfit)){
-		lua_pushnumber(L, (player->canWearOutfit(outfit.outfitId, addon)? true : false));
+		lua_pushboolean(L, (player->canWearOutfit(outfit.outfitId, addon)? true : false));
 		return 1;
 	}
 
@@ -8208,7 +8247,7 @@ int LuaScriptInterface::luaHasProperty(lua_State *L)
 		hasProp = item->getTile()->hasProperty((ITEMPROPERTY)prop);
 	}
 
-	lua_pushnumber(L, hasProp? true : false);
+	lua_pushboolean(L, hasProp? true : false);
 	return 1;
 }
 
@@ -8382,7 +8421,7 @@ int LuaScriptInterface::luaIsSightClear(lua_State *L)
 	popPosition(L, fromPos);
 
 	bool result = g_game.isSightClear(fromPos, toPos, floorCheck);
-	lua_pushnumber(L, (result ? true : false));
+	lua_pushboolean(L, (result ? true : false));
 	return 1;
 }
 
@@ -8508,7 +8547,7 @@ int LuaScriptInterface::luaRemovePlayerBan(lua_State *L)
 
 	bool b = g_bans.removePlayerBans(name);
 
-	lua_pushnumber(L, b? true : false);
+	lua_pushboolean(L, b? true : false);
 	return 1;
 }
 
@@ -8519,7 +8558,7 @@ int LuaScriptInterface::luaRemoveAccountBan(lua_State *L)
 
 	bool b = g_bans.removeAccountBans(accno);
 
-	lua_pushnumber(L, b? true : false);
+	lua_pushboolean(L, b? true : false);
 	return 1;
 }
 
@@ -8534,7 +8573,7 @@ int LuaScriptInterface::luaRemoveIPBan(lua_State *L)
 	uint32_t ip = popNumber(L);
 	bool b = g_bans.removeIpBans(ip, mask);
 
-	lua_pushnumber(L, b? true : false);
+	lua_pushboolean(L, b? true : false);
 	return 1;
 }
 

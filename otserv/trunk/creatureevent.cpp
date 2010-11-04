@@ -371,7 +371,7 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, targetId);
-		lua_pushnumber(L, (lastHit ? true : false) );
+		lua_pushboolean(L, (lastHit ? true : false) );
 
 		bool result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
