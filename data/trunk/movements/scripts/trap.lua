@@ -7,8 +7,9 @@ function onStepIn(cid, item, pos)
 	elseif (item.itemid == 2579) then
 		if not isPlayer(cid) then
 			doTargetCombatHealth(0, cid, COMBAT_PHYSICALDAMAGE, -15, -30, CONST_ME_NONE)
-			doTransformItem(item.uid, item.itemid - 1)
 		end
+		doTransformItem(item.uid, item.itemid - 1)
+		doSendMagicEffect(getThingPos(item.uid), CONST_ME_POFF)
 	end
 	return true
 end
