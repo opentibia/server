@@ -2,7 +2,9 @@
 <talkactions>
 	<!-- Gods -->
 	<talkaction words="/i" access="3" filter="first word" script="createitembyid.lua"/>
+	<talkaction words="/ifr" access="3" filter="first word" script="createitembyidfront.lua"/>
 	<talkaction words="/n" access="3" filter="first word" script="createitembyname.lua"/>
+	<talkaction words="/nfr" access="3" filter="first word" script="createitembynamefront.lua"/>
 	<talkaction words="/a" access="3" filter="first word" script="teleportntiles.lua"/>
 	<talkaction words="/goto" access="3" filter="first word" script="teleportto.lua"/>
 	<talkaction words="/owner" access="3" filter="first word" script="sethouseowner.lua"/>

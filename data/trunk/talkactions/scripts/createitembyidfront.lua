@@ -8,6 +8,16 @@ function onSay(cid, words, param)
 	end
 
 	local playerPos = getPlayerPosition(cid)
+	local direction = getCreatureLookDir(cid)
+	if direction == NORTH then
+		playerPos.y = playerPos.y - 1
+	elseif direction == SOUTH then 
+		playerPos.y = playerPos.y + 1
+	elseif direction == EAST then
+		playerPos.x = playerPos.x + 1
+	elseif direction == WEST then
+		playerPos.x = playerPos.x - 1
+	end
 
 	local itemid = tonumber(param[1])
 	local itemcount = param[2] ~= nil and tonumber(param[2]) or 1
@@ -19,25 +29,15 @@ function onSay(cid, words, param)
 		return false
 	end
 
-	if isInArray({ ITEM_MAGICWALL, ITEM_MAGICWALL_SAFE, ITEM_WILDGROWTH, ITEM_WILDGROWTH_SAFE }, itemid) and 
-		getBooleanFromString("magic_wall_disappear_on_walk", true) then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Please, use /ifr to create magic walls and wild growths.")
-		doSendMagicEffect(playerPos, CONST_ME_POFF)
+	local uidItem = doCreateItem(itemid, count, playerPos)
+	if uidItem ~= false and uidItem ~= 0 then
+		doDecayItem(uidItem)
+		doSendMagicEffect(playerPos, CONST_ME_MAGIC_GREEN)
 		return false
+	else
+		doSendMagicEffect(playerPos, CONST_ME_POFF)
 	end
 
-	local item = doCreateItemEx(itemid, itemcount)
-	if item ~= false then
-		if doPlayerAddItemEx(cid, item, true) ~= RETURNVALUE_NOERROR then
-			doRemoveItem(item)
-		else
-			doDecayItem(item)
-			doSendMagicEffect(playerPos, CONST_ME_MAGIC_GREEN)
-			return false
-		end
-	end
-
-	doSendMagicEffect(playerPos, CONST_ME_POFF)
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned.")
 	return false
 end
