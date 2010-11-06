@@ -125,7 +125,7 @@ Creature()
 
 	lastTimeRequestOutfit = 0;
 
-	for(int32_t i = 0; i < 11; i++){
+	for(int32_t i = 0; i < 11; ++i){
 		inventory[i] = NULL;
 		inventoryAbilities[i] = false;
 	}
@@ -194,7 +194,7 @@ Creature()
 
 Player::~Player()
 {
-	for(int i = 0; i < 11; i++){
+	for(int i = 0; i < 11; ++i){
 		if(inventory[i]){
 			inventory[i]->setParent(NULL);
 			inventory[i]->releaseThing2();
@@ -204,7 +204,7 @@ Player::~Player()
 	}
 
 	DepotMap::iterator it;
-	for(it = depots.begin();it != depots.end(); it++){
+	for(it = depots.begin();it != depots.end(); ++it){
 		it->second->releaseThing2();
 	}
 
@@ -353,7 +353,7 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 {
 	Item* item;
 
-	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; ++slot){
 		item = getInventoryItem((slots_t)slot);
 		if(!item){
 			continue;
@@ -478,7 +478,7 @@ void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
 	Item* item;
 	shield = NULL;
 	weapon = NULL;
-	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; ++slot){
 		item = getInventoryItem((slots_t)slot);
 		if(item){
 			switch(item->getWeaponType()){
@@ -3450,7 +3450,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) c
 {
 	uint32_t count = 0;
 
-	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
+	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		Item* item = inventory[i];
 
 		if(item){
@@ -3472,7 +3472,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) c
 
 std::map<uint32_t, uint32_t>& Player::__getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const
 {
-	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
+	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		Item* item = inventory[i];
 
 		if(item){

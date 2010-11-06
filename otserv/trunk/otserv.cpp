@@ -105,9 +105,7 @@ time_t start_time;
 
 void ErrorMessage(const char* message) {
 	std::cout << std::endl << std::endl << "Error: " << message << std::endl;
-
-	std::string s;
-	std::cin >> s;
+	std::cin.get();
 }
 
 void ErrorMessage(std::string m){
@@ -130,7 +128,15 @@ CommandLineOptions g_command_opts;
 
 bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args);
 void mainLoader(const CommandLineOptions& command_opts, ServiceManager* servicer);
-void badAllocationHandler();
+
+void badAllocationHandler()
+{
+	// Use functions that only use stack allocation
+	static const char* errorMessage = 
+		"Allocation failed, server out of memory.\nDecrease the size of your map or download the 64 bits version.";
+	puts(errorMessage);
+	std::exit(EXIT_SUCCESS);
+}
 
 #if !defined(__WINDOWS__)
 // Runfile, for running OT as daemon in the background. If the server is shutdown by internal
@@ -277,9 +283,9 @@ int main(int argc, char *argv[])
 	mainExceptionHandler.RemoveHandler();
 #endif
 	// Don't run destructors, may hang!
-	std::exit(0);
+	std::exit(EXIT_SUCCESS);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
@@ -390,16 +396,6 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		++argi;
 	}
 	return true;
-}
-
-void badAllocationHandler()
-{
-	// Use functions that only use stack allocation
-	puts("Allocation failed, server out of memory.\nDecrease the size of your map or compile in 64-bit mode.");
-	char buf[1024];
-	if (fgets(buf, 1024, stdin)) //this weird "if" was added to prevent a compilation warning at g++
-		exit(-1);
-	exit(-1);
 }
 
 void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_manager)
@@ -565,9 +561,9 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << "[done]" << std::endl;
 
 	//load scripts
-	if (command_opts.skip_scripts == false){
-		if(ScriptingManager::getInstance()->loadScriptSystems() == false){
-			exit(-1);
+	if (!command_opts.skip_scripts){
+		if(!ScriptingManager::getInstance()->loadScriptSystems()){
+			std::exit(-1);
 		}
 	}
 	else{

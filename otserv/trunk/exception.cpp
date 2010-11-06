@@ -22,8 +22,6 @@
 
 #if defined __EXCEPTION_TRACER__
 
-#include "exception.h"
-#include "configmanager.h"
 #include <boost/thread.hpp>
 #include <iostream>
 #include <fstream>
@@ -31,21 +29,15 @@
 #include <ctime>
 #include <cstdlib>
 #include <map>
+#include "exception.h"
+#include "configmanager.h"
 
 extern ConfigManager g_config;
 
 #if defined __WINDOWS__
 
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
-		#include <windows.h>
-		#include "dbghelp.h"
-
-		// based on dbghelp.h
-		typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
-			CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-			CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-			CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
-
+			
 		int ExceptionHandler::ref_counter = 0;
 
 	#elif __GNUC__
@@ -107,7 +99,7 @@ bool ExceptionHandler::InstallHandler()
 
 		++ref_counter;
 		if(ref_counter == 1){
-			::SetUnhandledExceptionFilter(ExceptionHandler::MiniDumpExceptionHandler);
+			SetUnhandledExceptionFilter(ExceptionHandler::MiniDumpExceptionHandler);
 		}
 
 	#elif __GNUC__
@@ -152,7 +144,7 @@ bool ExceptionHandler::RemoveHandler()
 
 		--ref_counter;
 		if(ref_counter == 0){
-			::SetUnhandledExceptionFilter(NULL);
+			SetUnhandledExceptionFilter(NULL);
 		}
 
 	#elif __GNUC__
@@ -179,72 +171,60 @@ bool ExceptionHandler::RemoveHandler()
 #if defined __WINDOWS__
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
 
-		long ExceptionHandler::MiniDumpExceptionHandler(struct _EXCEPTION_POINTERS *pExceptionInfo)
+		long ExceptionHandler::MiniDumpExceptionHandler(EXCEPTION_POINTERS* exceptionPointers /*= NULL*/)
 		{
-			HMODULE hDll = NULL;
-			char szAppPath[_MAX_PATH];
-			std::string strAppDirectory;
+			// Alerts the user about what is happening
+			std::cout << "Unhandled exception. Generating minidump..." << std::endl;
+		
+			// Get system time
+			SYSTEMTIME systemTime;
+			GetSystemTime(&systemTime);
 
-			GetModuleFileName(NULL, szAppPath, _MAX_PATH);
-			strAppDirectory = szAppPath;
-			strAppDirectory = strAppDirectory.substr(0, strAppDirectory.rfind("\\"));
-			if(strAppDirectory.rfind('\\') != strAppDirectory.size()){
-				strAppDirectory += '\\';
-			}
+			// Format file name
+			// "otserv_DD-MM-YYYY_HH-MM-SS.mdmp"
+			char fileName[64] = {"\0"};
+			sprintf(fileName, "otserv_%02u-%02u-%04u_%02u-%02u-%02u.mdmp",
+				systemTime.wDay, systemTime.wMonth, systemTime.wYear,
+				systemTime.wHour, systemTime.wMinute, systemTime.wSecond);
 
-			std::string strFileNameDbgHelp = strAppDirectory + "DBGHELP.DLL";
-			hDll = ::LoadLibrary(strFileNameDbgHelp.c_str());
+			// Create the dump file
+			HANDLE hFile = CreateFileA(fileName, GENERIC_READ|GENERIC_WRITE,
+							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
+							NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-			if(!hDll){
-				// load any version we can
-				hDll = ::LoadLibrary("DBGHELP.DLL");
-			}
-
-			if(!hDll){
-				std::cout << "Could not generate report - DBGHELP.DLL could not be found." << std::endl;
+			// If we cannot create the file, then we cannot dump the memory
+			if(!hFile || hFile == INVALID_HANDLE_VALUE){
+				std::cout << "Cannot create dump file. Error: " << GetLastError() << std::endl;
 				return EXCEPTION_CONTINUE_SEARCH;
 			}
 
-			MINIDUMPWRITEDUMP pDump = (MINIDUMPWRITEDUMP)::GetProcAddress( hDll, "MiniDumpWriteDump");
-			if(!pDump){
-				std::cout << "Could not generate report - DBGHELP.DLL is to old." << std::endl;
+			// Collect the exception information
+			MINIDUMP_EXCEPTION_INFORMATION exceptionInformation;
+			exceptionInformation.ClientPointers = FALSE;
+			exceptionInformation.ExceptionPointers = exceptionPointers;
+			exceptionInformation.ThreadId = GetCurrentThreadId();
+
+			// Get the process and it's Id
+			HANDLE hProcess = GetCurrentProcess();
+			DWORD ProcessId = GetProcessId(hProcess);
+
+			// Dump flags
+			MINIDUMP_TYPE flags = (MINIDUMP_TYPE)(MiniDumpNormal);
+
+			// Write dump to file
+			BOOL dumpResult = MiniDumpWriteDump(hProcess, ProcessId, hFile, flags,
+												&exceptionInformation, NULL, NULL);
+
+			// Warns if we cannot generate the dump
+			if(!dumpResult){
+				std::cout << "Cannot generate minidump. Error: " << GetLastError() << std::endl;
+				CloseHandle(hFile);
 				return EXCEPTION_CONTINUE_SEARCH;
 			}
 
-			SYSTEMTIME stLocalTime;
-			GetLocalTime(&stLocalTime);
+			// Close dump file
+			CloseHandle(hFile);
 
-			char dumpfile[250] = {'\0'};
-			sprintf(dumpfile, "%04d-%02d-%02d_%02d%02d%02d.dmp",
-				stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay,
-				stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond);
-
-			std::string strFileNameDump = strAppDirectory + dumpfile;
-
-			HANDLE hFile = ::CreateFile(strFileNameDump.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
-										FILE_ATTRIBUTE_NORMAL, NULL );
-
-			if(hFile == INVALID_HANDLE_VALUE){
-				std::cout << "Could not create memory dump file." << std::endl;
-				return EXCEPTION_EXECUTE_HANDLER;
-			}
-
-			_MINIDUMP_EXCEPTION_INFORMATION ExInfo;
-
-			ExInfo.ThreadId = ::GetCurrentThreadId();
-			ExInfo.ExceptionPointers = pExceptionInfo;
-			ExInfo.ClientPointers = NULL;
-
-			std::cout << "Generating minidump file... " << dumpfile << std::endl;
-
-			BOOL bOK = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, NULL, NULL );
-			if(!bOK){
-				std::cout << "Could not dump memory to file." << std::endl;
-				::CloseHandle(hFile);
-				return EXCEPTION_CONTINUE_SEARCH;
-			}
-
-			::CloseHandle(hFile);
 			return EXCEPTION_EXECUTE_HANDLER;
 		}
 

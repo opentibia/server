@@ -78,7 +78,7 @@ void Scheduler::schedulerThread(void* p)
 		#endif
 
 		// the mutex is locked again now...
-		if(ret == false && (scheduler->m_threadState != STATE_TERMINATED)){
+		if(!ret && (scheduler->m_threadState != STATE_TERMINATED)){
 			// ok we had a timeout, so there has to be an event we have to execute...
 			task = scheduler->m_eventList.top();
 			scheduler->m_eventList.pop();

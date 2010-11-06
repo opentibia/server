@@ -178,7 +178,7 @@ public:
 	void resetSyncFlag(syncflags_t flag) {syncFlags &= ~(uint32_t)flag;}
 
 	void setLastWarning(time_t _lastWarning) {lastWarning = _lastWarning;}
-	time_t getLastWarning() {return lastWarning;}
+	time_t getLastWarning() const {return lastWarning;}
 
 	void setPayRentWarnings(uint32_t warnings) {rentWarnings = warnings;}
 	uint32_t getPayRentWarnings() const {return rentWarnings;}

@@ -101,11 +101,11 @@ Item* Item::CreateItem(PropStream& propStream)
 
 bool Item::loadItem(xmlNodePtr node, Container* parent)
 {
-	int32_t intValue;
-	std::string strValue;
-
 	if(xmlStrcmp(node->name, (const xmlChar*)"item") == 0){
+		int32_t intValue;
+		std::string strValue;
 		Item* item = NULL;
+
 		if(readXMLInteger(node, "id", intValue)){
 			item = Item::CreateItem(intValue);
 		}

@@ -49,7 +49,7 @@ FileLoader::~FileLoader()
 	NodeStruct::clearNet(m_root);
 	delete[] m_buffer;
 
-	for(int i = 0; i < CACHE_BLOCKS; i++){
+	for(int i = 0; i < CACHE_BLOCKS; ++i){
 		if(m_cached_data[i].data)
 			delete[] m_cached_data[i].data;
 	}
@@ -479,7 +479,7 @@ inline unsigned long FileLoader::getCacheBlock(unsigned long pos)
 	bool found = false;
 	unsigned long i;
 	unsigned long base_pos = pos & ~(m_cache_size - 1);
-	for(i = 0; i < CACHE_BLOCKS; i++){
+	for(i = 0; i < CACHE_BLOCKS; ++i){
 		if(m_cached_data[i].loaded){
 			if(m_cached_data[i].base == base_pos){
 				found = true;
@@ -498,14 +498,14 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 	long i;
 	long loading_cache = -1;
 	long base_pos = pos & ~(m_cache_size - 1);
-	for(i = 0; i < CACHE_BLOCKS; i++){
+	for(i = 0; i < CACHE_BLOCKS; ++i){
 		if(!m_cached_data[i].loaded){
 			loading_cache = i;
 			break;
 		}
 	}
 	if(loading_cache == -1){
-		for(i = 0; i < CACHE_BLOCKS; i++){
+		for(i = 0; i < CACHE_BLOCKS; ++i){
 			if((long)(labs((long)m_cached_data[i].base - base_pos)) > (long)(2*m_cache_size)){
 				loading_cache = i;
 				break;

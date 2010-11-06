@@ -472,7 +472,7 @@ void ProtocolAdmin::adminCommandPayHouses()
 	}
 }
 
-Item* ProtocolAdmin::createMail(const std::string xmlData, std::string& name, uint32_t& depotId)
+Item* ProtocolAdmin::createMail(const std::string& xmlData, std::string& name, uint32_t& depotId)
 {
 	xmlDocPtr doc = xmlParseMemory(xmlData.c_str(), strlen(xmlData.c_str()));
 	if(!doc){
@@ -734,12 +734,12 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 	return true;
 }
 
-bool AdminProtocolConfig::isEnabled()
+bool AdminProtocolConfig::isEnabled() const
 {
 	return m_enabled;
 }
 
-bool AdminProtocolConfig::onlyLocalHost()
+bool AdminProtocolConfig::onlyLocalHost() const
 {
 	return m_onlyLocalHost;
 }
@@ -797,12 +797,12 @@ bool AdminProtocolConfig::allowIP(uint32_t ip)
 	}
 }
 
-bool AdminProtocolConfig::requireLogin()
+bool AdminProtocolConfig::requireLogin() const
 {
 	return m_requireLogin;
 }
 
-bool AdminProtocolConfig::requireEncryption()
+bool AdminProtocolConfig::requireEncryption() const
 {
 	return m_requireEncryption;
 }

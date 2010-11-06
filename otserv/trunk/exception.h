@@ -18,12 +18,17 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#if defined __EXCEPTION_TRACER__
-
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
 
 #include "definitions.h"
+
+#if defined __EXCEPTION_TRACER__
+
+#if defined _MSC_VER || defined __USE_MINIDUMP__
+	#include <Windows.h>
+	#include <dbghelp.h>
+#endif
 
 class ExceptionHandler
 {
@@ -38,7 +43,7 @@ private:
 
 	#if defined _MSC_VER || defined __USE_MINIDUMP__
 
-		static long __stdcall MiniDumpExceptionHandler(struct _EXCEPTION_POINTERS *pExceptionInfo);
+		static long WINAPI MiniDumpExceptionHandler(EXCEPTION_POINTERS* exceptionPointers = NULL);
 		static int ref_counter;
 
 	#elif __GNUC__

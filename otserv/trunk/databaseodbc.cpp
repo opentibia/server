@@ -211,7 +211,7 @@ std::string DatabaseODBC::escapeBlob(const char* s, uint32_t length)
 {
 	std::string buf = "'";
 
-	for(uint32_t i = 0; i < length; i++){
+	for(uint32_t i = 0; i < length; ++i){
 		switch(s[i]){
 			case '\'':
 				buf += "\'\'";
@@ -249,7 +249,7 @@ std::string DatabaseODBC::_parse(const std::string &s)
 	query.reserve(s.size());
 	bool inString = false;
 	uint8_t ch;
-	for(uint32_t a = 0; a < s.length(); a++){
+	for(uint32_t a = 0; a < s.length(); ++a){
 		ch = s[a];
 
 		if(ch == '\''){
@@ -362,7 +362,7 @@ ODBCResult::ODBCResult(SQLHSTMT stmt)
 	int16_t numCols;
 	SQLNumResultCols(m_handle, &numCols);
 
-	for(int32_t i = 1; i <= numCols; i++){
+	for(int32_t i = 1; i <= numCols; ++i){
 		char* name = new char[129];
 		SQLDescribeCol(m_handle, i, (SQLCHAR*)name, 129, NULL, NULL, NULL, NULL, NULL);
 		m_listNames[name] = i;

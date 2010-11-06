@@ -1772,7 +1772,7 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 
-		for(int i = 0; i < (int32_t)container->size() && money > 0; i++){
+		for(int i = 0; i < (int32_t)container->size() && money > 0; ++i){
 			Item* item = container->getItem(i);
 
 			if((tmpContainer = item->getContainer())){
@@ -1791,7 +1791,7 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 	}
 
 	MoneyMap::iterator it2;
-	for(it2 = moneyMap.begin(); it2 != moneyMap.end() && money > 0; it2++){
+	for(it2 = moneyMap.begin(); it2 != moneyMap.end() && money > 0; ++it2){
 		Item* item = it2->second;
 		internalRemoveItem(item);
 
@@ -2743,7 +2743,7 @@ bool Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 
 	std::map<Item*, uint32_t>::const_iterator it;
 	const Container* container = NULL;
-	for(it = tradeItems.begin(); it != tradeItems.end(); it++) {
+	for(it = tradeItems.begin(); it != tradeItems.end(); ++it) {
 		if(tradeItem == it->first ||
 			((container = dynamic_cast<const Container*>(tradeItem)) && container->isHoldingItem(it->first)) ||
 			((container = dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(tradeItem)))

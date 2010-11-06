@@ -72,7 +72,7 @@ public:
 	void addPlayerDamageMonster(Player* player, uint32_t points);
 	void clearPlayerPoints(Player* player);
 
-	const PlayerVector& getMemberList() {return memberList;}
+	const PlayerVector& getMemberList() const {return memberList;}
 
 protected:
 	bool sharedExpActive;

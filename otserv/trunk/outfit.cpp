@@ -53,10 +53,9 @@ bool Outfits::loadFromXml(const std::string& datadir)
 		p = root->children;
 
 		while(p){
-			int32_t intValue;
-			std::string strValue;
-
 			if(xmlStrcmp(p->name, (const xmlChar*)"outfit") == 0){
+				int32_t intValue;
+				std::string strValue;
 				if(readXMLInteger(p, "id", intValue)){
 					Outfit outfit;
 					outfit.outfitId = intValue;
@@ -118,7 +117,7 @@ bool Outfits::loadFromXml(const std::string& datadir)
 									playersex = PLAYERSEX_MALE_GOD;
 								}
 								else{
-									std::cout << "Invalid playersex " << strValue << " for an outfit." << std::endl;
+									std::cout << "Invalid player sex " << strValue << " for an outfit." << std::endl;
 									pchild = pchild->next;
 									continue;
 								}

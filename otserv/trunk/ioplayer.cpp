@@ -792,7 +792,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	query.str("");
 
 	//skills
-	for(int32_t i = 0; i <= 6; i++){
+	for(int32_t i = 0; i <= 6; ++i){
 		query << "UPDATE `player_skills` SET `value` = " << player->skills[i][SKILL_LEVEL] << ", `count` = " << player->skills[i][SKILL_TRIES] << " WHERE `player_id` = " << player->getGUID() << " AND `skillid` = " << i;
 
 		if(!db->executeQuery(query.str())){
@@ -883,7 +883,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 
 	stmt.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
 	player->genReservedStorageRange();
-	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
+	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd(); ++cit){
 		query << player->getGUID() << ", " << cit->first << ", " << cit->second;
 		if(!stmt.addRow(query)){
 			return false;

@@ -233,7 +233,7 @@ class DBQuery : public std::stringstream
 
 public:
 	DBQuery();
-	~DBQuery();
+	virtual ~DBQuery();
 
 protected:
 	static boost::recursive_mutex database_lock;

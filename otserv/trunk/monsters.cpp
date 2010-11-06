@@ -146,7 +146,7 @@ void Monsters::pushSpellParameters(const std::string name, LuaScriptInterface* e
 
 void MonsterType::createLoot(Container* corpse)
 {
-	for(LootItems::const_iterator it = lootItems.begin(); it != lootItems.end() && (corpse->capacity() - corpse->size() > 0); it++){
+	for(LootItems::const_iterator it = lootItems.begin(); it != lootItems.end() && (corpse->capacity() - corpse->size() > 0); ++it){
 		std::list<Item*> itemList = createLootItem(*it);
 		if(!itemList.empty()){
 			for(std::list<Item*>::iterator iit = itemList.begin(); iit != itemList.end(); ++iit){
@@ -216,14 +216,14 @@ void MonsterType::createLootContainer(Container* parent, const LootBlock& lootbl
 {
 	if(parent->size() < parent->capacity()){
 		LootItems::const_iterator it;
-		for(it = lootblock.childLoot.begin(); it != lootblock.childLoot.end(); it++){
+		for(it = lootblock.childLoot.begin(); it != lootblock.childLoot.end(); ++it){
 			std::list<Item*> itemList = createLootItem(*it);
 			if(!itemList.empty()){
 				for(std::list<Item*>::iterator iit = itemList.begin(); iit != itemList.end(); ++iit){
 					Item* tmpItem = *iit;
 					if(Container* container = tmpItem->getContainer()){
 						createLootContainer(container, *it);
-						if(container->size() == 0 && it->dropEmpty == false){
+						if(container->size() == 0 && !it->dropEmpty){
 							delete container;
 						}
 						else{
@@ -1524,6 +1524,6 @@ uint32_t Monsters::getIdByName(const std::string& name)
 
 Monsters::~Monsters()
 {
-	for(MonsterMap::iterator it = monsters.begin(); it != monsters.end(); it++)
+	for(MonsterMap::iterator it = monsters.begin(); it != monsters.end(); ++it)
 		delete it->second;
 }

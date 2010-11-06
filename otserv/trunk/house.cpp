@@ -198,7 +198,7 @@ void House::setAccessList(uint32_t listId, const std::string& textlist)
 			CreatureVector::iterator cit;
 			for(cit = creatures->begin(); cit != creatures->end(); ++cit){
 				Player* player = (*cit)->getPlayer();
-				if(player && isInvited(player) == false){
+				if(player && !isInvited(player)){
 					kickList.push_back(player);
 				}
 			}

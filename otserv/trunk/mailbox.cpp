@@ -185,7 +185,7 @@ bool Mailbox::getRepicient(Item* item, std::string& name, uint32_t& depotId)
 	if(item->getID() == ITEM_PARCEL){
 		Container* parcel = item->getContainer();
 		if(parcel){
-			for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); cit++){
+			for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); ++cit){
 				if((*cit)->getID() == ITEM_LABEL){
 					item = (*cit);
 					

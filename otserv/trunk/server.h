@@ -121,7 +121,7 @@ public:
 	template <typename ProtocolType>
 	bool add(uint16_t port);
 
-	bool is_running() const {return m_acceptors.empty() == false;}
+	bool is_running() const {return !m_acceptors.empty();}
 	std::list<uint16_t> get_ports() const;
 protected:
 	void die();
