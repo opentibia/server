@@ -25120,6 +25120,770 @@
 		<attribute key="weight" value="150"/>
 		<attribute key="slotType" value="necklace"/>
 	</item>
+	<item id="11793" article="a" name="skull pillar"/>
+	<item id="11794" article="a" name="skull pillar"/>
+	<item id="11795" article="a" name="skull pillar"/>
+	<item id="11797" article="a" name="skull pillar"/>
+	<item id="12284" article="a" name="marked crate">
+		<attribute key="description" value="This crate has been marked with lizard symbols. It is large enough for a grown person to fit in."/>
+		<attribute key="weight" value="8000"/>
+	</item>
+	<item id="12285" article="a" name="lump of clay">
+		<attribute key="description" value="This clay has been dug from the temple grounds."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12286" article="a" name="lump of clay">
+		<attribute key="description" value="This clay has been dug from the temple grounds."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12287" article="a" name="sacred bowl">
+		<attribute key="description" value="This bowl was made from sacred wood and is currently untreated."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12288" article="a" name="sacred bowl">
+		<attribute key="description" value="This bowl was made from sacred wood and is currently untreated."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12289" article="a" name="sacred bowl with sacred water">
+		<attribute key="description" value="The water in this bowl has been purified."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12290" name="sacred coal">
+		<attribute key="description" value="Purified by sacred fires, this coal has the power to cleanse a significant amount of impure water."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12295" name="unworked sacred wood">
+		<attribute key="description" value="This chunk was cut from sacred wood in the temple complex and looks ideal for carving."/>
+	</item>
+	<item id="12297" name="sacred earth">
+		<attribute key="description" value="This clay has been dug from sacred ground."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12300" article="a" name="lump of sacred clay">
+		<attribute key="description" value="This clay has been mixed with sacred earth."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12302" article="a" name="sacred bowl">
+		<attribute key="description" value="This bowl was made from sacred wood and is currently untreated."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+	<item id="12303" article="a" name="sacred bowl of purification">
+		<attribute key="description" value="This bowl was coated with sacred clay and can be used to purify small amounts of corrupted water."/>
+		<attribute key="weight" value="1000"/>
+	</item>
+ 
+	<item id="12318" article="a" name="replica of the sceptre">
+		<attribute key="weight" value="1400"/>
+	</item>
+	<item id="12320" article="a" name="flask of plant poison">
+		<attribute key="weight" value="180"/>
+		<attribute key="description" value="This plant poison is meant to destroy the growths near the Keeper's lair deep beneath the gardens."/>
+	</item>
+ 
+	<item id="12323" article="a" name="the tail of the keeper">
+		<attribute key="weight" value="450"/>
+	</item>
+	<item id="12324" article="a" name="part of snake sceptre">
+		<attribute key="weight" value="800"/>
+	</item>
+	<item id="12325" article="a" name="part of snake sceptre">
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="12326" article="a" name="part of snake sceptre">
+		<attribute key="weight" value="400"/>
+	</item>
+	<item id="12327" article="a" name="snake sceptre">
+		<attribute key="weight" value="1400"/>
+	</item>
+	<item id="12328" article="an" name="interdimensional potion">
+		<attribute key="weight" value="180"/>
+		<attribute key="description" value="This potion will help you enter the dreams of any lifeform."/>
+	</item>
+ 
+	<item id="12382" article="a" name="scribbled sheet of paper">
+		<attribute key="weight" value="250"/>
+		<attribute key="description" value="Only a single word is scribbled on the sheet: SOLOSARASATIQUARIUM."/>
+	</item>
+ 
+	<item id="12399" article="a" name="girlish hair decoration">
+		<attribute key="weight" value="50"/>
+	</item>
+	<item id="12400" article="a" name="protective charm">
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12401" article="a" name="bamboo stick">
+		<attribute key="weight" value="112"/>
+	</item>
+	<item id="12402" name="hair of a banshee">
+		<attribute key="weight" value="46"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12403" article="a" name="battle stone">
+		<attribute key="weight" value="150"/>
+		<attribute key="description" value="It seems to be perfect to shape a weapon from it. Someone could definitely be interested in it."/>
+	</item>
+	<item id="12404" name="black wool">
+		<attribute key="weight" value="118"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12405" article="a" name="blood preservation">
+		<attribute key="weight" value="80"/>
+		<attribute key="description" value="Someone put a cocktail straw in it."/>
+	</item>
+	<item id="12406" article="a" name="small notebook">
+		<attribute key="weight" value="80"/>
+		<attribute key="description" value="It contains a long list of 'saved maidens' and their addresses. Someone might be interested in it."/>
+	</item>
+	<item id="12407" article="a" name="broken crossbow">
+		<attribute key="weight" value="130"/>
+	</item>
+	<item id="12408" article="a" name="broken shamanic staff">
+		<attribute key="weight" value="128"/>
+	</item>
+	<item id="12409" article="a" name="broken helmet">
+		<attribute key="weight" value="156"/>
+	</item>
+	<item id="12410" article="a" name="luminous orb">
+		<attribute key="weight" value="94"/>
+	</item>
+	<item id="12411" article="a" name="cultish symbol">
+		<attribute key="weight" value="82"/>
+	</item>
+	<item id="12412" article="a" name="dirty turban">
+		<attribute key="weight" value="134"/>
+	</item>
+	<item id="12413" article="a" name="dragon's tail" plural="dragon tails">
+		<attribute key="weight" value="250"/>
+	</item>
+	<item id="12414" article="a" name="geomancer's robe" plural="geomancer robes">
+		<attribute key="weight" value="130"/>
+		<attribute key="description" value="It's too tiny to be worn by humans."/>
+	</item>
+	<item id="12415" article="a" name="pineapple">
+		<attribute key="weight" value="750"/>
+	</item>
+	<item id="12416" article="an" name="aubergine">
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="12417" name="broccoli">
+		<attribute key="weight" value="300"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12418" article="a" name="cauliflower">
+		<attribute key="weight" value="680"/>
+	</item>
+	<item id="12419" article="a" name="geomancer's staff" plural="geomancer staffs">
+		<attribute key="weight" value="122"/>
+	</item>
+	<item id="12420" article="an" name="elven scouting glass">
+		<attribute key="weight" value="80"/>
+	</item>
+	<item id="12421" article="an" name="elven astral observer">
+		<attribute key="weight" value="112"/>
+	</item>
+	<item id="12422" article="a" name="flask of embalming fluid" plural="flasks of embalming fluid">
+		<attribute key="weight" value="75"/>
+	</item>
+	<item id="12423" article="a" name="ghoul snack">
+		<attribute key="weight" value="140"/>
+	</item>
+	<item id="12425" article="a" name="hunter's quiver" plural="hunter quivers">
+		<attribute key="weight" value="132"/>
+	</item>
+	<item id="12426" article="a" name="jewelled belt">
+		<attribute key="weight" value="124"/>
+	</item>
+	<item id="12427" article="a" name="kongra's shoulderpad" plural="kongra shoulderpads">
+		<attribute key="weight" value="140"/>
+	</item>
+	<item id="12428" article="a" name="minotaur horn">
+		<attribute key="weight" value="111"/>
+	</item>
+	<item id="12429" article="a" name="purple robe">
+		<attribute key="weight" value="230"/>
+		<attribute key="description" value="It's too large to be worn by humans, but rather light."/>
+	</item>
+	<item id="12430" article="a" name="miraculum">
+		<attribute key="weight" value="140"/>
+	</item>
+	<item id="12431" article="a" name="necromantic robe">
+		<attribute key="weight" value="220"/>
+		<attribute key="description" value="A dark curse prevents you from wearing it."/>
+	</item>
+	<item id="12432" name="nettle spit">
+		<attribute key="weight" value="90"/>
+		<attribute key="showcount" value="0"/>
+		<attribute key="description" value="Yuck. This might only be interesting to botanists."/>
+	</item>
+	<item id="12433" name="orcish gear">
+		<attribute key="weight" value="180"/>
+		<attribute key="showcount" value="0"/>
+		<attribute key="description" value="The strong smell of orcish sweat sticks to it."/>
+	</item>
+	<item id="12434" article="a" name="shamanic hood">
+		<attribute key="weight" value="90"/>
+	</item>
+	<item id="12435" name="orc leather">
+		<attribute key="weight" value="50"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12436" article="a" name="skull belt">
+		<attribute key="weight" value="116"/>
+	</item>
+	<item id="12437" article="a" name="pelvis bone">
+		<attribute key="weight" value="130"/>
+	</item>
+	<item id="12439" article="a" name="piece of archer armor" plural="pieces of archer armor">
+		<attribute key="weight" value="110"/>
+	</item>
+	<item id="12440" article="a" name="pile of grave earth" plural="piles of grave earth">
+		<attribute key="weight" value="98"/>
+	</item>
+	<item id="12441" article="a" name="poison spider shell">
+		<attribute key="weight" value="130"/>
+	</item>
+	<item id="12442" article="a" name="noble turban">
+		<attribute key="weight" value="144"/>
+	</item>
+	<item id="12443" article="a" name="quara tentacle">
+		<attribute key="weight" value="107"/>
+	</item>
+	<item id="12444" article="an" name="quara eye">
+		<attribute key="weight" value="80"/>
+	</item>
+	<item id="12445" article="a" name="mantassin tail">
+		<attribute key="weight" value="115"/>
+	</item>
+	<item id="12446" article="a" name="quara pincer">
+		<attribute key="weight" value="107"/>
+	</item>
+	<item id="12447" article="a" name="quara bone">
+		<attribute key="weight" value="144"/>
+	</item>
+	<item id="12448" article="a" name="rope belt">
+		<attribute key="weight" value="97"/>
+		<attribute key="description" value="Though the name implies it, this simple and thin belt is not suited to be used as rope."/>
+	</item>
+	<item id="12449" article="a" name="safety pin">
+		<attribute key="weight" value="50"/>
+	</item>
+ 
+	<item id="12466" article="a" name="scroll of heroic deeds" plural="scrolls of heroic deeds">
+		<attribute key="weight" value="79"/>
+	</item>
+	<item id="12467" article="a" name="banana sash" plural="banana sashes">
+		<attribute key="weight" value="68"/>
+	</item>
+	<item id="12468" article="a" name="small flask of eyedrops" plural="small flasks of eyedrops">
+		<attribute key="weight" value="50"/>
+	</item>
+	<item id="12469" article="a" name="small pitchfork">
+		<attribute key="weight" value="110"/>
+	</item>
+	<item id="12470" article="a" name="colourful feather">
+		<attribute key="weight" value="36"/>
+	</item>
+	<item id="12471" article="a" name="trollroot">
+		<attribute key="description" value="Distinctive shape and flavour."/>
+		<attribute key="weight" value="140"/>
+	</item>
+ 
+	<item id="12495" article="a" name="goblin ear">
+		<attribute key="weight" value="75"/>
+	</item>
+	<item id="12496" article="a" name="marked crate"/>
+	<item id="12497" name="Jean Pierre's Cookbook II">
+		<attribute key="weight" value="1500"/>
+		<attribute key="description" value="It was given to you by the djinn maitre and contains new recipes you cooked."/>
+	</item>
+ 
+	<item id="12500" article="a" name="faded last will">
+		<attribute key="description" value="Supposedly the last will of someone. Whatever may have been written on it is long vanished."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="12501" article="an" name="exquisite silk">
+		<attribute key="weight" value="10"/>
+	</item>
+	<item id="12502" article="a" name="spectral cloth">
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="12503" article="an" name="exquisite wood">
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="12504" article="a" name="strong sinew">
+		<attribute key="weight" value="35"/>
+	</item>
+	<item id="12505" article="an" name="old iron">
+		<attribute key="weight" value="222"/>
+	</item>
+	<item id="12506" article="a" name="flexible dragon scale">
+		<attribute key="weight" value="80"/>
+	</item>
+	<item id="12507" article="a" name="mystic root">
+		<attribute key="weight" value="60"/>
+	</item>
+	<item id="12508" article="a" name="magic crystal">
+		<attribute key="weight" value="140"/>
+	</item>
+ 
+	<item id="12527" article="a" name="dead brimstone bug">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="12528"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
+	<item id="12528" article="a" name="dead brimstone bug">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="12538"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
+	</item>
+ 
+	<item id="12538" article="a" name="dead brimstone bug">
+		<attribute key="decayTo" value="12539"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="venom"/>
+	</item>
+	<item id="12539" article="a" name="dead brimstone bug">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="60"/>
+		<attribute key="corpseType" value="venom"/>
+	</item>
+	<item id="12540" article="a" name="coconut shrimp bake">
+		<attribute key="description" value="It looks as if it was sealed with milky goodness."/>
+		<attribute key="weight" value="2000"/>
+	</item>
+	<item id="12541" article="a" name="helmet of the deep">
+		<attribute key="weight" value="21000"/>
+		<attribute key="armor" value="2"/>
+		<attribute key="slotType" value="head"/>
+		<attribute key="suppressDrown" value="1"/>
+		<attribute key="speed" value="600"/>
+	</item>
+	<item id="12542" article="a" name="pot of blackjack">
+		<attribute key="description" value="Nomads state that this meal fills you with energy several times before the pot is empty."/>
+		<attribute key="weight" value="1200"/>
+	</item>
+	<item id="12543" article="a" name="demonic candy ball">
+		<attribute key="description" value="You're never sure what demonic balls will do, but they sure taste sweet and exciting."/>
+		<attribute key="weight" value="950"/>
+	</item>
+	<item id="12544" article="a" name="sweet mangonaise elixir">
+		<attribute key="description" value="It's said to have incredible effects if you drink it while wearing a magical ring with time limit."/>
+		<attribute key="weight" value="300"/>
+	</item>
+ 
+	<item id="12559" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned ultimate healing rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12560" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned ultimate healing rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12561" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned heavy magic missile rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12562" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned heavy magic missile rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12563" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned explosion rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12564" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned explosion rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12565" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned sudden death rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12566" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned sudden death rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12567" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned magic wall rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12568" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned magic wall rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12569" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned animated dead rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12570" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned animated dead rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12571" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned great fireball rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12572" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned great fireball rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12573" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned fireball rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12574" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned fireball rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12575" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned thunderstorm rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12576" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned thunderstorm rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12577" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned icicle rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12578" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned icicle rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12579" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned avalanche rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12580" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned avalanche rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12581" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned magic wall rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12582" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned magic wall rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12583" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned energy bomb rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12584" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned energy bomb rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12585" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned paralyze rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12586" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned paralyze rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12587" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned desintegrate rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12588" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned desintegrate rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12589" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned chameleon rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12590" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned chameleon rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12591" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned energy wall rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12592" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned energy wall rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12593" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned soulfire rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12594" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned soulfire rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12595" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned destroy field rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12596" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned destroy field rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12597" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned wild growth rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12598" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned wild growth rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12599" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned fire bomb rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12600" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned fire bomb rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12601" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned poison bomb rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12602" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned poison bomb rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12603" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned poison wall rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12604" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned poison wall rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12605" article="a" name="silver rune emblem">
+		<attribute key="description" value="It's an adorned fire field rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12606" article="a" name="golden rune emblem">
+		<attribute key="description" value="It's an adorned fire field rune."/>
+		<attribute key="weight" value="120"/>
+	</item>
+	<item id="12607" article="an" name="elite draken mail">
+		<attribute key="weight" value="12000"/>
+		<attribute key="armor" value="15"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="speed" value="20"/>
+	</item>
+	<item id="12608" article="a" name="broken key ring">
+		<attribute key="weight" value="50"/>
+	</item>
+	<item id="12609" article="a" name="dead draken elite">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="12610"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="12610" article="a" name="dead draken elite">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="12611"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="12611" article="a" name="dead draken elite">
+		<attribute key="decayTo" value="12612"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="12612" article="a" name="dead draken elite">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="60"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="12613" article="a" name="twiceslicer">
+		<attribute key="weight" value="18000"/>
+		<attribute key="defense" value="30"/>
+		<attribute key="attack" value="47"/>
+		<attribute key="weaponType" value="sword"/>
+		<attribute key="slotType" value="two-handed"/>
+	</item>
+	<item id="12614" name="draken sulphur">
+		<attribute key="weight" value="68"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12615" name="draken wristbands">
+		<attribute key="weight" value="78"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12616" article="a" name="broken draken mail">
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="12617" article="a" name="broken slicer">
+		<attribute key="weight" value="140"/>
+	</item>
+ 
+	<item id="12622" article="a" name="tentacle piece">
+		<attribute key="weight" value="300"/>
+	</item>
+	<item id="12623" article="a" name="dead draken abomination">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="12624"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="12624" article="a" name="dead draken abomination">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="12625"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="blood"/>
+		<attribute key="fluidSource" value="blood"/>
+	</item>
+	<item id="12625" article="a" name="dead draken abomination">
+		<attribute key="decayTo" value="12626"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="12626" article="a" name="dead draken abomination">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="60"/>
+		<attribute key="corpseType" value="blood"/>
+	</item>
+	<item id="12627" article="an" name="eye of corruption" plural="eyes of corruption">
+		<attribute key="weight" value="93"/>
+	</item>
+	<item id="12628" article="a" name="tail of corruption" plural="tails of corruption">
+		<attribute key="weight" value="93"/>
+	</item>
+	<item id="12629" article="a" name="scale of corruption" plural="scales of corruption">
+		<attribute key="weight" value="93"/>
+	</item>
+	<item id="12630" article="a" name="cobra crown">
+		<attribute key="weight" value="850"/>
+		<attribute key="armor" value="3"/>
+		<attribute key="magicpoints" value="2"/>
+		<attribute key="absorbPercentFire" value="-5"/>
+		<attribute key="absorbPercentEarth" value="5"/>
+		<attribute key="slotType" value="head"/>
+	</item>
+	<item id="12631" article="a" name="dead souleater">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="12632"/>
+		<attribute key="duration" value="10"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
+	<item id="12632" article="a" name="dead souleater">
+		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="12633"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
+	<item id="12633" article="a" name="dead souleater">
+		<attribute key="decayTo" value="12634"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
+	<item id="12634" article="a" name="dead souleater">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="60"/>
+		<attribute key="corpseType" value="undead"/>
+	</item>
+	<item id="12635" article="a" name="souleater trophy">
+		<attribute key="weight" value="500"/>
+	</item>
+	<item id="12636" name="lizard essence">
+		<attribute key="weight" value="150"/>
+	</item>
+	<item id="12637" name="ectoplasmic sushi">
+		<attribute key="weight" value="400"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12638" article="a" name="dragonfruit">
+		<attribute key="weight" value="350"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12639" name="peas">
+		<attribute key="weight" value="80"/>
+		<attribute key="showcount" value="0"/>
+	</item>
+	<item id="12640" article="a" name="downy feather">
+		<attribute key="weight" value="32"/>
+	</item>
+	<item id="12642" article="a" name="royal draken mail">
+		<attribute key="weight" value="13000"/>
+		<attribute key="armor" value="16"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="skillShield" value="3"/>
+		<attribute key="absorbPercentPhysical" value="5"/>
+	</item>
+	<item id="12643" article="a" name="royal scale robe">
+		<attribute key="weight" value="4500"/>
+		<attribute key="armor" value="10"/>
+		<attribute key="slotType" value="body"/>
+		<attribute key="magicpoints" value="5"/>
+		<attribute key="absorbPercentFire" value="5"/>
+	</item>
+	<item id="12644" article="a" name="shield of corruption">
+		<attribute key="weight" value="4900"/>
+		<attribute key="defense" value="36"/>
+		<attribute key="skillSword" value="3"/>
+		<attribute key="weaponType" value="shield"/>
+	</item>
+	<item id="12645" article="an" name="elite draken helmet">
+		<attribute key="weight" value="12000"/>
+		<attribute key="armor" value="9"/>
+		<attribute key="slotType" value="head"/>
+		<attribute key="absorbPercentDeath" value="3"/>
+		<attribute key="skillDist" value="1"/>
+	</item>
+	<item id="12646" name="draken boots">
+		<attribute key="armor" value="3"/>
+		<attribute key="speed" value="30"/>
+		<attribute key="weight" value="2500"/>
+	</item>
+	<item id="12647" article="a" name="snake god's wristguard">
+		<attribute key="description" value="It shows your spells and can also shield against attack when worn."/>
+		<attribute key="weight" value="2800"/>
+		<attribute key="magicpoints" value="3"/>
+		<attribute key="defense" value="14"/>
+		<attribute key="weaponType" value="shield"/>
+	</item>
+	<item id="12649" article="a" name="blade of corruption">
+		<attribute key="weight" value="6400"/>
+		<attribute key="defense" value="29"/>
+		<attribute key="attack" value="48"/>
+		<attribute key="weaponType" value="sword"/>
+		<attribute key="extradef" value="2"/>
+	</item>
+	<item id="12651" article="a" name="black jade cobra">
+		<attribute key="weight" value="650"/>
+	</item>
+	<item id="12655" article="an" name="botany almanach">
+		<attribute key="description" value="The title of this heavy book reads: 'Rabaz' Unabridged Almanach Of Botany'."/>
+		<attribute key="weight" value="1500"/>
+	</item>
+	<item id="12656" article="a" name="sedge hat">
+		<attribute key="description" value="This simple hat might be more worth than what it looks like."/>
+		<attribute key="weight" value="1800"/>
+		<attribute key="armor" value="2"/>
+		<attribute key="slotType" value="head"/>
+	</item>
+	<item id="12657" article="an" name="old cape">
+		<attribute key="description" value="This old cape might be worth more than what it looks like."/>
+		<attribute key="weight" value="3500"/>
+		<attribute key="armor" value="1"/>
+		<attribute key="slotType" value="body"/>
+	</item>
+	<item id="12658" article="a" name="brimstone fang">
+		<attribute key="weight" value="112"/>
+	</item>
+	<item id="12659" article="a" name="brimstone shell">
+		<attribute key="weight" value="112"/>
+	</item>
+	<item id="12660" name="trashed draken boots">
+		<attribute key="description" value="They will expire within a short time, sell them back to Esrik before they do."/>
+		<attribute key="weight" value="2500"/>
+	</item>
 	<item id="20001" name="water"/>
 	<item id="20002" name="blood"/>
 	<item id="20003" name="beer"/>
