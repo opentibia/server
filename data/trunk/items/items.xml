@@ -25426,7 +25426,7 @@
 		<attribute key="weight" value="140"/>
 	</item>
  
-	<item id="12527" article="a" name="dead brimstone bug">
+	<item id="12527" article="a" name="dead brimstone bug" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="12528"/>
 		<attribute key="duration" value="10"/>
@@ -25676,7 +25676,7 @@
 	<item id="12608" article="a" name="broken key ring">
 		<attribute key="weight" value="50"/>
 	</item>
-	<item id="12609" article="a" name="dead draken elite">
+	<item id="12609" article="a" name="dead draken elite" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="12610"/>
 		<attribute key="duration" value="10"/>
@@ -25725,7 +25725,7 @@
 	<item id="12622" article="a" name="tentacle piece">
 		<attribute key="weight" value="300"/>
 	</item>
-	<item id="12623" article="a" name="dead draken abomination">
+	<item id="12623" article="a" name="dead draken abomination" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="12624"/>
 		<attribute key="duration" value="10"/>
@@ -25766,7 +25766,7 @@
 		<attribute key="absorbPercentEarth" value="5"/>
 		<attribute key="slotType" value="head"/>
 	</item>
-	<item id="12631" article="a" name="dead souleater">
+	<item id="12631" article="a" name="dead souleater" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="12632"/>
 		<attribute key="duration" value="10"/>
