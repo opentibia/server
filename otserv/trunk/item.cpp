@@ -739,7 +739,7 @@ std::string Item::getLongName(const ItemType& it, int32_t lookDistance,
 		}
 	}
 	else{
-		s << "an item of type " << it.id;
+		s << "an item of type " << it.id << ", please report it to gamemaster";
 	}
 
 	return s.str();
