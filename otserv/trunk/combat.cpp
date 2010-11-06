@@ -757,20 +757,22 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 			}
 		}
 		if(p_caster){
-			if(itemId == ITEM_WILDGROWTH){
-					if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
-							g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
-					{
-						itemId = ITEM_WILDGROWTH_SAFE;
-					}
-			}
-			if(itemId == ITEM_MAGICWALL){
-					if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
-							g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
-					{
-						itemId = ITEM_MAGICWALL_SAFE;
-					}
+			if (p_caster->getLevel() < g_config.getNumber(ConfigManager::MIN_PVP_LEVEL)){
+				if(itemId == ITEM_WILDGROWTH){
+						if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
+								g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
+						{
+							itemId = ITEM_WILDGROWTH_SAFE;
+						}
 				}
+				if(itemId == ITEM_MAGICWALL){
+						if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
+								g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
+						{
+							itemId = ITEM_MAGICWALL_SAFE;
+						}
+				}
+			}
 			if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD){
 					itemId = ITEM_FIREFIELD_SAFE;

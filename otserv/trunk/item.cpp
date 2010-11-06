@@ -639,7 +639,8 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 
 	switch(prop){
 		case BLOCKSOLID:
-			if(it.blockSolid)
+			if(it.blockSolid
+				|| it.id == ITEM_MAGICWALL_SAFE || it.id == ITEM_WILDGROWTH_SAFE) //ugly hack until I find out what is wrong with the otb file
 				return true;
 			break;
 

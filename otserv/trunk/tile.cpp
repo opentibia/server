@@ -738,7 +738,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
 						//
 					}
-					else if(iiType.blockSolid){
+					else if(iiType.blockSolid ||
+							iiType.id == ITEM_MAGICWALL_SAFE || iiType.id == ITEM_WILDGROWTH_SAFE){ //ugly hack until I find out what is wrong with the otb file
 						if(item->isPickupable()){
 							if(iiType.allowPickupable){
 								continue;
