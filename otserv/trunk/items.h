@@ -137,6 +137,7 @@ public:
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
 	bool isRune() const {return (type == ITEM_TYPE_RUNE);}
 	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
+	bool isSolidForItems() const { return id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE;}
 
 	//[ added for beds system
 	bool isBed() const {return type == ITEM_TYPE_BED;}

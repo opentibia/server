@@ -39,7 +39,7 @@ extern MoveEvents* g_moveEvents;
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 Tile& Tile::null_tile = real_null_tile;
 
-bool Tile::hasProperty(enum ITEMPROPERTY prop) const
+bool Tile::hasProperty(enum ITEMPROPERTY prop, bool checkSolidForItems /* =false */) const
 {
 	if(ground && ground->hasProperty(prop)){
 		return true;
@@ -47,7 +47,7 @@ bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 
 	if(const TileItemVector* items = getItemList()){
 		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-			if((*it)->hasProperty(prop))
+			if((*it)->hasProperty(prop) || (checkSolidForItems && (*it)->isSolidForItems()))
 				return true;
 		}
 	}
@@ -738,8 +738,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					if(itemIsHangable && (iiType.isHorizontal || iiType.isVertical)){
 						//
 					}
-					else if(iiType.blockSolid ||
-							iiType.id == ITEM_MAGICWALL_SAFE || iiType.id == ITEM_WILDGROWTH_SAFE){ //ugly hack until I find out what is wrong with the otb file
+					else if(iiType.blockSolid || iiType.isSolidForItems()){
 						if(item->isPickupable()){
 							if(iiType.allowPickupable){
 								continue;

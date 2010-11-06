@@ -888,7 +888,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
-			else if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
+			else if(blockingSolid && tile->hasProperty(BLOCKSOLID, true)){
 				player->sendCancelMessage(RET_NOTENOUGHROOM);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
