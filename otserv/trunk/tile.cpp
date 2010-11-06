@@ -47,7 +47,7 @@ bool Tile::hasProperty(enum ITEMPROPERTY prop, bool checkSolidForItems /* =false
 
 	if(const TileItemVector* items = getItemList()){
 		for(ItemVector::const_iterator it = items->begin(); it != items->end(); ++it){
-			if((*it)->hasProperty(prop) || (checkSolidForItems && (*it)->isSolidForItems()))
+			if((*it)->hasProperty(prop) || (prop == BLOCKSOLID && checkSolidForItems && (*it)->isSolidForItems()))
 				return true;
 		}
 	}
