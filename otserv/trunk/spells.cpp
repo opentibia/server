@@ -1900,25 +1900,48 @@ ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId
 	return result;
 }
 
+//Transforms a item (reagentId) into another item (conjureId) of a certain amount (conjureCount)
+//If successful, return a RET_NOERROR
+//If unsuccessful, returns RET_NOTPOSSIBLE, or RET_YOUNEEDAMAGICITEMTOCASTSPELL
 ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId,
 	uint32_t conjureCount, uint32_t reagentId, slots_t slot, bool test /*= false*/)
 {
+	//If a reagent is needed
 	if(reagentId != 0){
+		//Get the item from the player's inventory slot
 		Item* item = player->getInventoryItem(slot);
+		//If the item exists, and the id is equal to the reagentId
 		if(item && item->getID() == reagentId){
-			if(item->isStackable() && item->getItemCount() != 1){ //TODO? reagentCount
-				return RET_YOUNEEDTOSPLITYOURSPEARS;
-			}
-
+			//If testing, return here
 			if(test){
 				return RET_NOERROR;
 			}
 
-			Item* newItem = g_game.transformItem(item, conjureId, conjureCount);
-			if(newItem){
-				g_game.startDecay(newItem);
+			//If item is stackable, and there is more than one present
+			if(item->isStackable() && item->getItemCount() != 1){
+				//remove one
+				g_game.internalRemoveItem(item, 1);
+				//create the new item according to conjureId and the conjureCount
+				Item* tempItem = Item::CreateItem(conjureId, conjureCount);
+				//If item was not created, return not possible
+				if(!tempItem)
+					return RET_NOTPOSSIBLE;
+				//Add the item to the player,
+				if(g_game.internalPlayerAddItem(player, tempItem) != RET_NOERROR){
+					//if the item could not be added, delete it
+					delete tempItem;
+					return RET_NOTPOSSIBLE;
+				}
 			}
-
+			else{
+				//Otherwise, transform the item into the new item
+				Item* newItem = g_game.transformItem(item, conjureId, conjureCount);
+				if(newItem){
+					//Start decay for item (example: staff -> enchanted staff [lasts 60 seconds)
+					g_game.startDecay(newItem);
+				}
+			}
+			//If everything was successful, return no error
 			return RET_NOERROR;
 		}
 	}

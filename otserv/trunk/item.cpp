@@ -183,7 +183,8 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 		}
 	}
 	else if(it.charges != 0){
-		if(_count != 0){
+		//if count is higher than 1, override default charges
+		if(_count > 1){
 			setCharges(_count);
 		}
 		else{
