@@ -15,7 +15,7 @@ function onSay(cid, words, param)
 		creatureAccess = getPlayerAccess(creature)
 	end
 
-	if creatureAccess < getPlayerAccess(cid) then
+	if creatureAccess <= getPlayerAccess(cid) then
 		local playerPos = getPlayerPosition(cid)
 		local oldCreaturePos = getCreaturePosition(creature)
 		if(doTeleportThing(creature, playerPos)) then
