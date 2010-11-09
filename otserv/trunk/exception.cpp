@@ -215,10 +215,14 @@ bool ExceptionHandler::RemoveHandler()
 			BOOL dumpResult = MiniDumpWriteDump(hProcess, ProcessId, hFile, flags,
 												&exceptionInformation, NULL, NULL);
 
-			// Warns if we cannot generate the dump
+			// Delete the dump file if we cannot generate the crash trace
 			if(!dumpResult){
 				std::cout << "Cannot generate minidump. Error: " << GetLastError() << std::endl;
+				
+				//Close file and delete it
 				CloseHandle(hFile);
+				DeleteFileA(fileName);
+				
 				return EXCEPTION_CONTINUE_SEARCH;
 			}
 
