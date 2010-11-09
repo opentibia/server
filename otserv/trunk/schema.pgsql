@@ -74,8 +74,6 @@ CREATE TABLE "players" (
 	FOREIGN KEY ("account_id") REFERENCES "accounts" ("id") ON DELETE CASCADE,
 	FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
 );
-INSERT INTO "players" VALUES (1, 'Administrator', 1, 6, 2, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
-INSERT INTO "players" VALUES (2, 'Player', 1, 1, 1, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
 
 CREATE TABLE "guilds" (
 	"id" SERIAL,
@@ -377,5 +375,8 @@ AFTER INSERT
 ON "players"
 FOR EACH ROW
 EXECUTE PROCEDURE "oncreate_players"();
+
+INSERT INTO "players" VALUES (1, 'Administrator', 1, 6, 2, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
+INSERT INTO "players" VALUES (2, 'Player', 1, 1, 1, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
 
 # to add your own privileges for players/gms please use this flag generator http://hem.bredband.net/johannesrosen/playerflags.html
