@@ -1221,7 +1221,7 @@ void LuaScriptInterface::registerFunctions()
 	//setPlayerStorageValue(cid, valueid, newvalue)
 	lua_register(m_luaState, "setPlayerStorageValue", LuaScriptInterface::luaSetPlayerStorageValue);
 
-	//isPremium(cid) 	 
+	//isPremium(cid)
 	lua_register(m_luaState, "isPremium", LuaScriptInterface::luaIsPremium);
 
 	//getPlayerLastLogin(cid)
@@ -4264,13 +4264,13 @@ int LuaScriptInterface::luaGetPlayerStorageValue(lua_State *L)
 			lua_pushboolean(L, true);
 		}
 		else{
-			lua_pushnumber(L, -1);
+			lua_pushnumber(L, false);
 			lua_pushboolean(L, false);
 		}
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, -1);
+		lua_pushnumber(L, false);
 		lua_pushboolean(L, false);
 	}
 	return 2;
@@ -4720,7 +4720,7 @@ int LuaScriptInterface::luaDoPlayerSetVocation(lua_State *L)
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-	}	
+	}
 	lua_pushboolean(L, result);
 
 	return 1;
