@@ -4264,13 +4264,13 @@ int LuaScriptInterface::luaGetPlayerStorageValue(lua_State *L)
 			lua_pushboolean(L, true);
 		}
 		else{
-			lua_pushboolean(L, false);
+			lua_pushnumber(L, -1);
 			lua_pushboolean(L, false);
 		}
 	}
 	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushboolean(L, false);
+		lua_pushnumber(L, -1);
 		lua_pushboolean(L, false);
 	}
 	return 2;
