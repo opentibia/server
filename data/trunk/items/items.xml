@@ -25840,6 +25840,7 @@
 		<attribute key="armor" value="3"/>
 		<attribute key="speed" value="30"/>
 		<attribute key="weight" value="2500"/>
+		<attribute key="slotType" value="feet"/>
 	</item>
 	<item id="12647" article="a" name="snake god's wristguard">
 		<attribute key="description" value="It shows your spells and can also shield against attack when worn."/>
