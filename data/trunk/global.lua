@@ -27,8 +27,8 @@ TRUE = true
 FALSE = false
 
 -- Error consts
-LUA_ERROR = false
-LUA_NO_ERROR = true
+LUA_ERROR = -1
+LUA_NO_ERROR = 0
 LUA_NULL = 0
 
 CONTAINER_POSITION = 65535

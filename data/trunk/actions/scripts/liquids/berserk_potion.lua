@@ -4,7 +4,7 @@ setConditionParam(condition, CONDITION_PARAM_SKILL_MELEE, 5)
 setConditionParam(condition, CONDITION_PARAM_SKILL_SHIELD, -10)
 
 function onUse(cid, item, frompos, item2, topos)
-	if not doTargetCombatCondition(0, cid, condition, CONST_ME_MAGIC_RED) then
+	if doTargetCombatCondition(0, cid, condition, CONST_ME_MAGIC_RED) == LUA_ERROR then
 		return false
 	end
 

@@ -56,14 +56,14 @@ function onSay(cid, words, param)
 	end
 
 	local itemid = getItemIdByName(itemname)
-	if itemid == false then
+	if itemid == LUA_ERROR then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "There isn't any item named "..itemname..".")
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
 		return false
 	end
 
 	local uidItem = doCreateItem(itemid, itemcount, playerPos)
-	if uidItem ~= false and uidItem ~= 0 then
+	if uidItem ~= LUA_ERROR and uidItem ~= LUA_NULL then
 		doDecayItem(uidItem)
 		doSendMagicEffect(playerPos, CONST_ME_MAGIC_GREEN)
 		return false

@@ -14,14 +14,14 @@ setCombatCallback(combat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 function onCastSpell(cid, var)
 
 	--send effects
-	if doCombat(cid, combat, var) then
+	if doCombat(cid, combat, var) == LUA_NO_ERROR then
 		doSendMagicEffect(getCreaturePosition(cid), CONST_ME_MAGIC_BLUE)
 		if isCreature(var.number)  then
 			if cid ~= var.number then
 				doSendMagicEffect(getCreaturePosition(var.number), CONST_ME_MAGIC_GREEN)
 			end
 		end
+		return true
 	end
-
-	return true
+	return false
 end

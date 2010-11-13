@@ -6,7 +6,7 @@ function onSay(cid, words, param)
 
 	local guid = getPlayerGUIDByName(param)
 	local str= "Player not found."
-	if guid ~= 0 then
+	if guid ~= LUA_NULL then
 		str = getPlayerNameByGUID(guid)
 		local house = House.getHouseByOwnerGUID(guid)
 		if house ~= nil then

@@ -45,7 +45,7 @@ function onSay(cid, words, param)
 	end
 
 	local itemid = getItemIdByName(itemname)
-	if itemid == false then
+	if itemid == LUA_ERROR then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "There isn't any item named "..itemname..".")
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
 		return false
@@ -59,7 +59,7 @@ function onSay(cid, words, param)
 	end
 
 	local item = doCreateItemEx(itemid, itemcount)
-	if item ~= false then
+	if item ~= LUA_ERROR then
 		if doPlayerAddItemEx(cid, item, true) ~= RETURNVALUE_NOERROR then
 			doRemoveItem(item)
 			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned.")

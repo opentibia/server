@@ -12,7 +12,7 @@ function onUse(cid, item, frompos, item2, topos)
 
 	local sound = SPECIAL_FOODS[item.itemid][1]
 
-	if not(doAddCondition(cid, condition) or doAddCondition(cid, exhaust)) then
+	if not(doAddCondition(cid, condition) == LUA_NO_ERROR or doAddCondition(cid, exhaust) == LUA_NO_ERROR) then
 		return false
 	end
 

@@ -22,108 +22,108 @@ end
 
 function doPlayerAddHealth(cid, health, filter)
 	filter = filter == false and false or true
-	if isPlayer(cid) == true then
-		if doCreatureAddHealth(cid, health, filter) then
-			return true
+	if isPlayer(cid) then
+		if doCreatureAddHealth(cid, health, filter) ~= LUA_ERROR then
+			return LUA_NO_ERROR
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function getPlayerPosition(cid)
-	if isPlayer(cid) == true then
+	if isPlayer(cid) then
 		local position = getCreaturePosition(cid)
-		if position ~= false then
+		if position ~= LUA_ERROR then
 			return position
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function getPlayerHealth(cid)
-	if isPlayer(cid) == true then
+	if isPlayer(cid) then
 		local health = getCreatureHealth(cid)
-		if health ~= false then
+		if health ~= LUA_ERROR then
 			return health
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function getPlayerMaxHealth(cid)
-	if isPlayer(cid) == true then
+	if isPlayer(cid) then
 		local maxHealth = getCreatureMaxHealth(cid)
-		if maxHealth ~= false then
+		if maxHealth ~= LUA_ERROR then
 			return maxHealth
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function getPlayerName(cid)
-	if isPlayer(cid) == true then
+	if isPlayer(cid) then
 		local name = getCreatureName(cid)
-		if name ~= false then
+		if name ~= LUA_ERROR then
 			return name
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function getPlayerByName(name)
 	local player = getCreatureByName(name)
-	if player ~= 0 and isPlayer(player) == true then
+	if player ~= LUA_NULL and isPlayer(player) then
 		return player
 	end
 
-	return false
+	return LUA_NULL
 end
 
 function doPlayerSay(cid, text, textType)
-	if isPlayer(cid) == true then
-		if doCreatureSay(cid, text, textType) then
-			return true
+	if isPlayer(cid) then
+		if doCreatureSay(cid, text, textType) ~= LUA_ERROR then
+			return LUA_NO_ERROR
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function getPlayerLight(cid)
-	if isPlayer(cid) == true then
+	if isPlayer(cid) then
 		local light = getCreatureLight(cid)
-		if light ~= false then
+		if light ~= LUA_ERROR then
 			return light
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function getPlayerLookDir(cid)
-	if isPlayer(cid) == true then
+	if isPlayer(cid) then
 		local lookDir = getCreatureLookDir(cid)
-		if lookDir ~= false then
+		if lookDir ~= LUA_ERROR then
 			return lookDir
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function doSetPlayerLight(cid, lightLevel, lightColor, lightTime)
-	if isPlayer(cid) == true then
-		if doSetCreatureLight(cid, lightLevel, lightColor, lightTime) then
-			return true
+	if isPlayer(cid) then
+		if doSetCreatureLight(cid, lightLevel, lightColor, lightTime) ~= LUA_ERROR then
+			return LUA_NO_ERROR
 		end
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function getCreaturePos(pos)
@@ -136,7 +136,7 @@ end
 
 -- Other functions
 function isPlayer(cid)
-	if (isCreature(cid) == true and cid >= PLAYER_ID_RANGE and cid < MONSTER_ID_RANGE) then
+	if (isCreature(cid) and cid >= PLAYER_ID_RANGE and cid < MONSTER_ID_RANGE) then
 		return true
 	end
 
@@ -144,7 +144,7 @@ function isPlayer(cid)
 end
 
 function isMonster(cid)
-	if (isCreature(cid) == true and cid >= MONSTER_ID_RANGE and cid < NPC_ID_RANGE) then
+	if (isCreature(cid) and cid >= MONSTER_ID_RANGE and cid < NPC_ID_RANGE) then
 		return true
 	end
 
@@ -152,7 +152,7 @@ function isMonster(cid)
 end
 
 function isNPC(cid)
-	if (isCreature(cid) == true and cid >= NPC_ID_RANGE) then
+	if (isCreature(cid) and cid >= NPC_ID_RANGE) then
 		return true
 	end
 
@@ -160,39 +160,39 @@ function isNPC(cid)
 end
 
 function isSorcerer(cid)
-	if(isPlayer(cid) == false) then
+	if not isPlayer(cid) then
 		debugPrint("isSorcerer: Player not found.")
 		return false
 	end
 
-	return (isInArray({1,5}, getPlayerVocation(cid)) == true)
+	return isInArray({1,5}, getPlayerVocation(cid))
 end
 
 function isDruid(cid)
-	if(isPlayer(cid) == false) then
+	if not isPlayer(cid) then
 		debugPrint("isDruid: Player not found.")
 		return false
 	end
 
-	return (isInArray({2,6}, getPlayerVocation(cid)) == true)
+	return isInArray({2,6}, getPlayerVocation(cid))
 end
 
 function isPaladin(cid)
-	if(isPlayer(cid) == false) then
+	if not isPlayer(cid) then
 		debugPrint("isPaladin: Player not found.")
 		return false
 	end
 
-	return (isInArray({3,7}, getPlayerVocation(cid)) == true)
+	return isInArray({3,7}, getPlayerVocation(cid))
 end
 
 function isKnight(cid)
-	if(isPlayer(cid) == false) then
+	if not isPlayer(cid) then
 		debugPrint("isKnight: Player not found.")
 		return false
 	end
 
-	return (isInArray({4,8}, getPlayerVocation(cid)) == true)
+	return isInArray({4,8}, getPlayerVocation(cid))
 end
 
 function getDirectionTo(pos1, pos2)
@@ -603,7 +603,7 @@ function doPlayerUpdateItemLossPercent(cid)
 end
 
 function doPlayerAddBless(cid, blessid)
-	if getPlayerBless(cid, blessid) == false then
+	if not getPlayerBless(cid, blessid) then
 		doPlayerRemoveSkillLossPercent(cid, 8)
 		local storageid = STORAGE_BLESSES + blessid
 		setPlayerStorageValue(cid, storageid, 1)
@@ -612,7 +612,7 @@ function doPlayerAddBless(cid, blessid)
 end
 
 function doPlayerRemoveBless(cid, blessid)
-	if getPlayerBless(cid, blessid) == true then
+	if getPlayerBless(cid, blessid) then
 		doPlayerRemoveSkillLossPercent(cid, -8)
 		local storageid = STORAGE_BLESSES + blessid
 		setPlayerStorageValue(cid, storageid, -1)
@@ -631,7 +631,7 @@ function getBlessPrice(level)
 end
 
 function getPlayerRequiredExperience(cid, level)
-	if isPlayer(cid) == true and level >= 1 then
+	if isPlayer(cid) and level >= 1 then
 		local playerLevel = getPlayerLevel(cid)
 		local experienceLeft = 0
 		local levelExp = 0
@@ -646,11 +646,11 @@ function getPlayerRequiredExperience(cid, level)
 		return experienceLeft
 	end
 
-	return false
+	return LUA_ERROR
 end
 
 function doPlayerAddLevel(cid, level)
-	if isPlayer(cid) == true and level >= 1 then
+	if isPlayer(cid) and level >= 1 then
 		local experience = getPlayerRequiredExperience(cid, getPlayerLevel(cid)+level)
 		return doPlayerAddExp(cid, experience)
 	end
@@ -659,7 +659,7 @@ function doPlayerAddLevel(cid, level)
 end
 
 function doPlayerRemoveLevel(cid, level)
-	if isPlayer(cid) == true and level >= 1 then
+	if isPlayer(cid) and level >= 1 then
 		local experience = getPlayerRequiredExperience(cid, getPlayerLevel(cid)-level)
 		return doPlayerRemoveExp(cid, experience)
 	end
@@ -669,7 +669,7 @@ end
 
 -- Functions made by Jiddo
 function doPlayerGiveItem(cid, itemid, count, charges)
-	local hasCharges = (isItemRune(itemid) == true or isItemFluidContainer(itemid) == true)
+	local hasCharges = (isItemRune(itemid) or isItemFluidContainer(itemid))
 	if(hasCharges and charges == nil) then
 		charges = 1
 	end
@@ -680,26 +680,26 @@ function doPlayerGiveItem(cid, itemid, count, charges)
 		if(hasCharges) then
 			tempcount = charges
 		end
-		if(isItemStackable(itemid) == true) then
+		if isItemStackable(itemid) then
 			tempcount = math.min (100, count)
 		end
 
 		local ret = doPlayerAddItem(cid, itemid, tempcount)
-		if(ret == false) then
+		if(ret == LUA_ERROR) then
 			ret = doCreateItem(itemid, tempcount, getPlayerPosition(cid))
 		end
 
-		if(ret ~= false) then
+		if(ret ~= LUA_ERROR) then
 			if(hasCharges) then
 				count = count-1
 			else
 				count = count-tempcount
 			end
 		else
-			return false
+			return LUA_ERROR
 		end
 	end
-	return true
+	return LUA_NO_ERROR
 end
 
 function doPlayerTakeItem(cid, itemid, count)
@@ -707,54 +707,54 @@ function doPlayerTakeItem(cid, itemid, count)
 
 		while count > 0 do
 			local tempcount = 0
-			if(isItemStackable(itemid) == true) then
+			if isItemStackable(itemid) then
 				tempcount = math.min (100, count)
 			else
 				tempcount = 1
 			end
 			local ret = doPlayerRemoveItem(cid, itemid, tempcount)
 
-			if(ret ~= false) then
+			if(ret ~= LUA_ERROR) then
 				count = count-tempcount
 			else
-				return false
+				return LUA_ERROR
 			end
 		end
 
 		if(count == 0) then
-			return true
+			return LUA_NO_ERROR
 		end
 	end
-	return false
+	return LUA_ERROR
 end
 
 function doPlayerBuyItem(cid, itemid, count, cost, charges)
 	if(doPlayerRemoveMoney(cid, cost) == true) then
 		return doPlayerGiveItem(cid, itemid, count, charges)
 	end
-	return false
+	return LUA_ERROR
 end
 
 function doPlayerSellItem(cid, itemid, count, cost)
-	if doPlayerTakeItem(cid, itemid, count) then
-		if not doPlayerAddMoney(cid, cost) then
+	if doPlayerTakeItem(cid, itemid, count) == LUA_NO_ERROR then
+		if doPlayerAddMoney(cid, cost) ~= LUA_NO_ERROR then
 			error('Could not add money to ' .. getPlayerName(cid) .. '(' .. cost .. 'gp)')
 		end
-		return true
+		return LUA_NO_ERROR
 	end
-	return false
+	return LUA_ERROR
 
 end
 
 function getContainerCapById(itemid)
 	local container = doCreateItemEx(itemid, 1)
 	local capacity = getContainerCap(container)
-	if capacity ~= false then
+	if capacity ~= LUA_ERROR then
 		doRemoveItem(container)
 		return capacity
 	else
 		doRemoveItem(container)
-		return false
+		return LUA_ERROR
 	end
 end
 
@@ -821,13 +821,13 @@ end
 function doBroadcastMessage(message, class)
 	local messageClass = class or MESSAGE_STATUS_WARNING
 	if messageClass < MESSAGE_CLASS_FIRST or messageClass > MESSAGE_CLASS_LAST then
-		return false
+		return LUA_ERROR
 	end
 
 	for i, cid in ipairs(getPlayersOnlineList()) do
 		doPlayerSendTextMessage(cid, messageClass, message)
 	end
-	return true
+	return LUA_NO_ERROR
 end
 
 --default is the returned value if the value of input is missing or invalid

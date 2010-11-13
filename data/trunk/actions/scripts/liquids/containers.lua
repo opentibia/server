@@ -51,24 +51,24 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 
 		if(item.type == TYPE_MANA_FLUID) then
-			if not doPlayerAddMana(cid, math.random(80, 160)) then
+			if doPlayerAddMana(cid, math.random(80, 160)) == LUA_ERROR then
 				return false
 			end
 			doCreatureSay(cid, "Aaaah...", TALKTYPE_ORANGE_1)
 			doSendMagicEffect(topos, CONST_ME_MAGIC_BLUE)
 		elseif(item.type == TYPE_LIFE_FLUID) then
-			if not doPlayerAddHealth(cid, math.random(40, 75)) then
+			if doPlayerAddHealth(cid, math.random(40, 75)) == LUA_ERROR then
 				return false
 			end
 			doCreatureSay(cid, "Aaaah...", TALKTYPE_ORANGE_1)
 			doSendMagicEffect(topos, CONST_ME_MAGIC_BLUE)
 		elseif(isInArray(alcoholDrinks, item.type) ) then
-			if not doTargetCombatCondition(0, cid, drunk, CONST_ME_NONE) then
+			if doTargetCombatCondition(0, cid, drunk, CONST_ME_NONE) == LUA_ERROR then
 				return false
 			end
 			doCreatureSay(cid, "Aaah...", TALKTYPE_ORANGE_1)
 		elseif(isInArray(poisonDrinks, item.type) ) then
-			if not doTargetCombatCondition(0, cid, poison, CONST_ME_NONE) then
+			if doTargetCombatCondition(0, cid, poison, CONST_ME_NONE) == LUA_ERROR then
 				return false
 			end
 		else

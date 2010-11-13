@@ -8,12 +8,12 @@ local function doRemoveField(cid, pos)
 	if(field.itemid ~= 0 and (field.itemid < ITEM_SEARINGFIRE_STAGE_FIRST or field.itemid > ITEM_SEARINGFIRE_STAGE_LAST)) then
 		doRemoveItem(field.uid)
 		doSendMagicEffect(pos, CONST_ME_POFF)
-		return true
+		return LUA_NO_ERROR
 	end
 
 	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 	doSendMagicEffect(playerPos, CONST_ME_POFF)
-	return true
+	return LUA_ERROR
 end
 
 function onCastSpell(cid, var)
@@ -29,5 +29,5 @@ function onCastSpell(cid, var)
 
 	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 	doSendMagicEffect(getPlayerPosition(cid), CONST_ME_POFF)
-	return true
+	return LUA_ERROR
 end

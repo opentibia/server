@@ -10,7 +10,8 @@ setCombatCondition(combat, condition)
 function onCastSpell(cid, var)
 	if doCombat(cid, combat, var) then
 		doSendMagicEffect(getCreaturePosition(cid), CONST_ME_MAGIC_GREEN)
+		return LUA_NO_ERROR
 	end
 
-	return true
+	return LUA_ERROR
 end

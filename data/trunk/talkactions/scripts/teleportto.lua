@@ -6,8 +6,8 @@ function onSay(cid, words, param)
 
 	local destPos = getWaypointPositionByName(param)
 	local creature = getCreatureByName(param)
-	if(destPos == false) then
-		if creature == cid or creature == 0 then
+	if destPos == LUA_ERROR then
+		if creature == cid or creature == LUA_NULL then
 			doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Creature, player or waypoint not found.")
 			return false
 		else
@@ -22,8 +22,8 @@ function onSay(cid, words, param)
 
 	if creatureAccess <= getPlayerAccess(cid) then
 		local oldPlayerPos = getPlayerPosition(cid)
-		if(doTeleportThing(cid, destPos)) then
-			if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false) then
+		if doTeleportThing(cid, destPos) == LUA_NO_ERROR then
+			if not getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) then
 				doSendMagicEffect(oldPlayerPos, CONST_ME_POFF)
 				doSendMagicEffect(destPos, CONST_ME_TELEPORT)
 			end
