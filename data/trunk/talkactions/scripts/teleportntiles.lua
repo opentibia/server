@@ -10,12 +10,12 @@ function onSay(cid, words, param)
 	end
 
 	local oldPos = getPlayerPosition(cid)
-	if(oldPos ~= LUA_NO_ERROR) then
+	if(oldPos == LUA_ERROR) then
 		return false
 	end
 
 	local newPos = getPlayerPosition(cid)
-	if(newPos ~= LUA_NO_ERROR) then
+	if(newPos == LUA_ERROR) then
 		return false
 	end
 

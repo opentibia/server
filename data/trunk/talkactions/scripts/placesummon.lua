@@ -10,7 +10,7 @@ function onSay(cid, words, param)
 	end
 
 	local summon = doPlayerSummonCreature(cid, param, getPlayerPosition(cid))
-	if summon == LUA_NO_ERROR then
+	if summon ~= LUA_ERROR then
 		doSendMagicEffect(getCreaturePosition(summon), CONST_ME_MAGIC_RED)
 	else
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTENOUGHROOM)

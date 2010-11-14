@@ -42,7 +42,7 @@ function onCastSpell(cid, var)
 		return LUA_ERROR
 	end
 
-	if(not doCombat(cid, combat, var)) then
+	if doCombat(cid, combat, var) == LUA_ERROR then
 		doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 		doSendMagicEffect(pos, CONST_ME_POFF)
 		return LUA_ERROR
