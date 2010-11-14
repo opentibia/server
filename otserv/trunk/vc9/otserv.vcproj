@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lua5.1.lib libmysql.lib mpir.lib libxml2_debug.lib"
+				AdditionalDependencies="lua5.1.lib libmysql.lib mpir.lib libxml2_debug.lib dbghelp.lib"
 				OutputFile="$(OutDir)\otservd.exe"
 				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(LIBICONV_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(MPIR_LIB_PATH)&quot;"
 				GenerateDebugInformation="true"
@@ -133,7 +133,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lua5.1.lib libmysql.lib mpir.lib libxml2.lib"
+				AdditionalDependencies="lua5.1.lib libmysql.lib mpir.lib libxml2.lib dbghelp.lib"
 				OutputFile="$(OutDir)\otserv.exe"
 				AdditionalLibraryDirectories="&quot;$(BOOST_LIB_PATH)&quot;;&quot;$(LIBXML_LIB_PATH)&quot;;&quot;$(LIBICONV_LIB_PATH)&quot;;&quot;$(MYSQL_LIB_PATH)&quot;;&quot;$(LUA_LIB_PATH)&quot;;&quot;$(MPIR_LIB_PATH)&quot;"
 				GenerateDebugInformation="false"
