@@ -90,7 +90,7 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = atoi(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -102,7 +102,7 @@ bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = ATOI64(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -114,7 +114,7 @@ bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = atof(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -156,7 +156,7 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 			value = nodeValue;
 		}
 
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -171,7 +171,7 @@ bool readXMLContentString(xmlNodePtr node, std::string& value)
 			value = nodeValue;
 		}
 
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 

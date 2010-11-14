@@ -28,6 +28,7 @@
 #include "connection.h"
 #include "outputmessage.h"
 #include "ban.h"
+#include "logger.h"
 
 extern BanManager g_bans;
 

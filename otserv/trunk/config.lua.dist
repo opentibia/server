@@ -153,9 +153,6 @@ party_exp_mul = 5
 -- This system works as in Tibia, time in milliseconds
 login_attack_delay = 10*1000
 
--- Show error window when server crashes?
-show_crash_window = true
-
 -- AFK Configuration (in milliseconds, but use values for minutes)
 -- Maximum time a player can stay away from keyboard before being kicked
 max_idle_time = 16*60*1000

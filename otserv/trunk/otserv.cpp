@@ -38,13 +38,6 @@
 	#include <signal.h> // for sigemptyset()
 #endif
 
-#if !defined(__WINDOWS__)
-	#define OTSERV_ACCESS(file,mode) access(file,mode)
-#else
-	#define OTSERV_ACCESS(file,mode) _access(file,mode)
-#endif
-
-
 #include "monsters.h"
 #include "npc.h"
 #include "outfit.h"
@@ -63,17 +56,13 @@
 #include "status.h"
 #include "admin.h"
 
+#include "exception.h"
+#include "networkmessage.h"
+
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
 #endif
 
-
-#ifdef BOOST_NO_EXCEPTIONS
-	#include <exception>
-	void boost::throw_exception(std::exception const & e){
-		std::cout << "Boost exception: " << e.what() << std::endl;
-	}
-#endif
 
 Game g_game;
 Dispatcher g_dispatcher;
@@ -92,11 +81,6 @@ boost::condition_variable g_loaderSignal;
 boost::unique_lock<boost::mutex> g_loaderUniqueLock(g_loaderLock);
 
 extern AdminProtocolConfig* g_adminConfig;
-
-#if defined __EXCEPTION_TRACER__
-#include "exception.h"
-#endif
-#include "networkmessage.h"
 
 #if !defined(__WINDOWS__)
 time_t start_time;
@@ -132,7 +116,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* servicer
 void badAllocationHandler()
 {
 	// Use functions that only use stack allocation
-	static const char* errorMessage = 
+	static const char* errorMessage =
 		"Allocation failed, server out of memory.\nDecrease the size of your map or download the 64 bits version.";
 	puts(errorMessage);
 	std::exit(EXIT_SUCCESS);
@@ -149,11 +133,15 @@ void closeRunfile(void)
 }
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char** argv)
 {
+	// Provides stack traces when the server crashes
+	ExceptionHandler mainExceptionHandler;
+	mainExceptionHandler.InstallHandler();
+
 	// Parse any command line (and display help text)
 	if(!parseCommandLine(g_command_opts, std::vector<std::string>(argv, argv + argc))){
-		return 0;
+		return EXIT_SUCCESS;
 	}
 
 	// Setup bad allocation handler
@@ -198,12 +186,6 @@ int main(int argc, char *argv[])
 #ifdef __OTSERV_ALLOCATOR_STATS__
 	// This keeps track of all allocations, can be used to find memory leak
 	boost::thread(boost::bind(&allocatorStatsThread, (void*)NULL));
-#endif
-
-	// Provides stack traces when the server crashes, if compiled in.
-#if defined __EXCEPTION_TRACER__
-	ExceptionHandler mainExceptionHandler;
-	mainExceptionHandler.InstallHandler();
 #endif
 
 	std::cout << ":: " OTSERV_NAME " Version " OTSERV_VERSION << std::endl;
@@ -279,11 +261,7 @@ int main(int argc, char *argv[])
 		ErrorMessage("No services running. Server is not online.");
 	}
 
-#if defined __EXCEPTION_TRACER__
 	mainExceptionHandler.RemoveHandler();
-#endif
-	// Don't run destructors, may hang!
-	std::exit(EXIT_SUCCESS);
 
 	return EXIT_SUCCESS;
 }
@@ -483,18 +461,11 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 #endif
 	std::cout << ":: Using data directory " << g_config.getString(ConfigManager::DATA_DIRECTORY).c_str() << "... " << std::flush;
-	/* Won't compile! access is not standard
-	if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
-		ErrorMessage("Data directory does not exist!");
-		exit(-1);
-	}
-	*/
 	std::cout << "[done]" << std::endl;
 
 	std::cout << ":: Checking Database Connection... ";
 	Database* db = Database::instance();
-	if(db == NULL || !db->isConnected())
-	{
+	if(db == NULL || !db->isConnected()){
 		ErrorMessage("Database Connection Failed!");
 		exit(-1);
 	}
@@ -612,12 +583,15 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 
-	if(asLowerCaseString(worldType) == "pvp" || asLowerCaseString(worldType) == "openpvp")
+	if(asLowerCaseString(worldType) == "pvp" || asLowerCaseString(worldType) == "openpvp"){
 		g_game.setWorldType(WORLD_TYPE_OPEN_PVP);
-	else if(asLowerCaseString(worldType) == "no-pvp" || asLowerCaseString(worldType) == "optionalpvp")
+	}
+	else if(asLowerCaseString(worldType) == "no-pvp" || asLowerCaseString(worldType) == "optionalpvp"){
 		g_game.setWorldType(WORLD_TYPE_OPTIONAL_PVP);
-	else if(asLowerCaseString(worldType) == "pvp-enforced" || asLowerCaseString(worldType) == "hardcorepvp")
+	}
+	else if(asLowerCaseString(worldType) == "pvp-enforced" || asLowerCaseString(worldType) == "hardcorepvp"){
 		g_game.setWorldType(WORLD_TYPE_HARDCORE_PVP);
+	}
 	else{
 		ErrorMessage("Unknown world type!");
 		exit(-1);
@@ -765,9 +739,11 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	g_game.start(service_manager);
 
-	if(command_opts.start_closed)
+	if(command_opts.start_closed){
 		g_game.setGameState(GAME_STATE_CLOSED);
-	else
+	}
+	else{
 		g_game.setGameState(GAME_STATE_NORMAL);
+	}
 	g_loaderSignal.notify_all();
 }

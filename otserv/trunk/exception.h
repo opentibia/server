@@ -23,9 +23,7 @@
 
 #include "definitions.h"
 
-#if defined __EXCEPTION_TRACER__
-
-#if defined _MSC_VER || defined __USE_MINIDUMP__
+#ifdef __WINDOWS__
 	#include <Windows.h>
 	#include <dbghelp.h>
 #endif
@@ -37,31 +35,13 @@ public:
 	~ExceptionHandler();
 	bool InstallHandler();
 	bool RemoveHandler();
-	static void dumpStack();
+
 private:
-#if defined __WINDOWS__
-
-	#if defined _MSC_VER || defined __USE_MINIDUMP__
-
-		static long WINAPI MiniDumpExceptionHandler(EXCEPTION_POINTERS* exceptionPointers = NULL);
-		static int ref_counter;
-
-	#elif __GNUC__
-
-		struct SEHChain{
-				SEHChain *prev;
-				void *SEHfunction;
-			};
-			SEHChain chain;
-			bool LoadMap();
-			static bool isMapLoaded;
-		#endif
-
-	#endif
-
+#ifdef __WINDOWS__
+	static long WINAPI MiniDumpExceptionHandler(EXCEPTION_POINTERS* exceptionPointers = NULL);
+	static int ref_counter;
+#endif
 	bool isInstalled;
 };
-
-#endif
 
 #endif

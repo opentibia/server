@@ -86,11 +86,6 @@ enum passwordType_t{
 */
 #if defined __GNUC__
 	#include "compiler/gcc.h"
-	#ifdef __MINGW32__
-		#include "compiler/mingw32.h"
-	#elif defined __CYGWIN__
-		#include "compiler/cygwin.h"
-	#endif
 #elif defined(_MSC_VER)
 	#include "compiler/msvc.h"
 #endif
@@ -117,28 +112,16 @@ enum passwordType_t{
 //Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
 
-#ifdef __DEBUG_EXCEPTION_REPORT__
-	#define DEBUG_REPORT int *a = NULL; *a = 1;
-#else
-	#ifdef __EXCEPTION_TRACER__
-		#include "exception.h"
-		#define DEBUG_REPORT ExceptionHandler::dumpStack();
-	#else
-		#define DEBUG_REPORT
-	#endif
-#endif
-
-#ifdef XML_GCC_FREE
-	#define xmlFreeOTSERV(s)	free(s)
-#else
-	#define xmlFreeOTSERV(s)	xmlFree(s)
-#endif
-
 #define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__ //experimental
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)
 	#define __SKULLSYSTEM__
+#endif
+
+// Boost exception handling must be enabled
+#ifdef BOOST_NO_EXCEPTIONS
+	#error "Boost exception handling must be enabled."
 #endif
 
 #endif

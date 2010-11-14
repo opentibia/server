@@ -19,15 +19,12 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include "exception.h"
 #include "tasks.h"
 #include "outputmessage.h"
 #include "game.h"
 
 extern Game g_game;
-
-#if defined __EXCEPTION_TRACER__
-#include "exception.h"
-#endif
 
 Dispatcher::Dispatcher()
 {
@@ -44,10 +41,10 @@ void Dispatcher::start()
 void Dispatcher::dispatcherThread(void* p)
 {
 	Dispatcher* dispatcher = (Dispatcher*)p;
-	#if defined __EXCEPTION_TRACER__
+
 	ExceptionHandler dispatcherExceptionHandler;
 	dispatcherExceptionHandler.InstallHandler();
-	#endif
+
 	#ifdef __DEBUG_SCHEDULER__
 	std::cout << "Starting Dispatcher" << std::endl;
 	#endif
@@ -61,7 +58,7 @@ void Dispatcher::dispatcherThread(void* p)
 		Task* task = NULL;
 
 		// check if there are tasks waiting
-		taskLockUnique.lock(); //getDispatcher().m_taskLock.lock();
+		taskLockUnique.lock();
 
 		if(dispatcher->m_taskList.empty()){
 			//if the list is empty wait for signal
@@ -103,9 +100,8 @@ void Dispatcher::dispatcherThread(void* p)
 			#endif
 		}
 	}
-#if defined __EXCEPTION_TRACER__
+
 	dispatcherExceptionHandler.RemoveHandler();
-#endif
 }
 
 void Dispatcher::addTask(Task* task, bool push_front /*= false*/)
