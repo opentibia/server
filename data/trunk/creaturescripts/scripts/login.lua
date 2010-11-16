@@ -8,7 +8,7 @@ function onLogin(cid)
 	registerCreatureEvent(cid, "Give_Bag_After_Death")
 	
 	--Register the Stage event
-	if getBooleanFromString(getConfigInfo("experience_stages"), false) then
+	if getBooleanFromString(getConfigInfo("experience_stages"), true) then
 		registerCreatureEvent(cid, "ExpStage")
 		checkStageChange(cid)
 	end
