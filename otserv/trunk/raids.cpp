@@ -38,6 +38,7 @@ Raids::Raids()
 	running = NULL;
 	lastRaidEnd = 0;
 	checkRaidsEvent = 0;
+	ScriptEvent::initScriptInterface();
 }
 
 Raids::~Raids()
@@ -198,6 +199,7 @@ void Raids::clear()
 	started = false;
 	running = NULL;
 	lastRaidEnd = 0;
+	ScriptEvent::reInitScriptInterface();
 }
 
 void Raids::reload()
@@ -704,12 +706,17 @@ LuaScriptInterface ScriptEvent::m_scriptInterface("Raid Interface");
 ScriptEvent::ScriptEvent() :
 Event(&m_scriptInterface)
 {
-	m_scriptInterface.initState();
+	//m_scriptInterface.initState();
 }
 
 void ScriptEvent::reInitScriptInterface()
 {
 	m_scriptInterface.reInitState();
+}
+
+void ScriptEvent::initScriptInterface()
+{
+	m_scriptInterface.initState();
 }
 
 
