@@ -32,6 +32,8 @@
 	<talkaction words="/bc" access="2" filter="first word" script="broadcastclass.lua"/>
 	<talkaction words="/invisible" access="2" filter="first word" script="gminvisible.lua"/>
 	<talkaction words="/info" access="2" filter="first word" script="getinfo.lua"/>
+	<talkaction words="/z" access="1" filter="first word" script="testeffect.lua"/> 	 
+	<talkaction words="/zt" access="1" filter="first word" script="testtutorial.lua"/>
 
 	<!-- Tutors -->
 	<talkaction words="/serverinfo" access="1" script="serverinfo.lua"/>
