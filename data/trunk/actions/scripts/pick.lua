@@ -11,7 +11,7 @@ end
 
 function onUse(cid, item, fromPosition, itemEx, toPosition)
 	local itemGround = getThingFromPos({x = toPosition.x, y = toPosition.y, z = toPosition.z + 1, stackpos = STACKPOS_GROUND})
-	if(isInArray(ROPE_SPOT, itemGround.itemid) and isMoveable(itemEx.uid) == false) then
+	if(isInArray(ROPE_SPOT, itemGround.itemid) and isMoveable(itemEx.uid) == false and isCorpse(itemEx.uid) == false) then
 		doTransformItem(itemEx.uid, MUD_HOLE)
 		doSendMagicEffect(toPosition, CONST_ME_POFF)
 		addEvent(__doTransformHole__, duration, {oldType = itemEx.itemid, pos = toPosition})
