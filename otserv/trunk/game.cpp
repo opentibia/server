@@ -2015,6 +2015,8 @@ bool Game::playerMove(uint32_t playerId, Direction dir)
 	std::list<Direction> dirs;
 	dirs.push_back(dir);
 
+	player->setNextWalkActionTask(NULL);
+
 	return player->startAutoWalk(dirs);
 }
 
@@ -2255,7 +2257,7 @@ bool Game::playerAutoWalk(uint32_t playerId, std::list<Direction>& listDir)
 		return false;
 
 	player->resetIdle();
-	player->setNextWalkTask(NULL);
+	player->setNextWalkActionTask(NULL);
 	return player->startAutoWalk(listDir);
 }
 

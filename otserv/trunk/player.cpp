@@ -118,7 +118,6 @@ Creature()
 	walkTask = NULL;
 	walkTaskEvent = 0;
 	actionTaskEvent = 0;
-	nextStepEvent = 0;
 
 	idleTime = 0;
 	idleWarned = false;
@@ -1936,19 +1935,6 @@ void Player::setNextWalkActionTask(SchedulerTask* task)
 	delete walkTask;
 	walkTask = task;
 	resetIdle();
-}
-
-void Player::setNextWalkTask(SchedulerTask* task)
-{
-	if(nextStepEvent != 0){
-		g_scheduler.stopEvent(nextStepEvent);
-		nextStepEvent = 0;
-	}
-
-	if(task){
-		nextStepEvent = g_scheduler.addEvent(task);
-		resetIdle();
-	}
 }
 
 void Player::setNextActionTask(SchedulerTask* task)

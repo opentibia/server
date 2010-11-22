@@ -715,7 +715,6 @@ protected:
 	void updateInventoryWeight();
 
 	void setNextWalkActionTask(SchedulerTask* task);
-	void setNextWalkTask(SchedulerTask* task);
 	void setNextActionTask(SchedulerTask* task);
 
 	void onDie();
@@ -776,7 +775,6 @@ protected:
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 	uint32_t actionTaskEvent;
-	uint32_t nextStepEvent;
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 
