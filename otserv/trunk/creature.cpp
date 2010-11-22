@@ -155,14 +155,14 @@ bool Creature::canBeSeen(const Creature* viewer, bool checkVisibility/*=true*/) 
 	  any kind of special flag to see invisible creatures or GMs*/
 	if (viewer && checkVisibility)
 		return viewer->canSeeCreature(this);
-	
+
 	if (getPlayer() &&
 		(getPlayer()->hasFlag(PlayerFlag_CannotBeSeen) ||
 		(getPlayer()->isGmInvisible() &&
 		(!viewer || !viewer->getPlayer() || !viewer->getPlayer()->canSeeGmInvisible(getPlayer()))))){
 		return false;
 	}
-	
+
 	if (checkVisibility)
 		return (viewer && viewer->canSeeInvisibility()) || !isInvisible();
 	return true;
@@ -357,15 +357,17 @@ bool Creature::getNextStep(Direction& dir, uint32_t& flags)
 
 bool Creature::startAutoWalk(std::list<Direction>& listDir)
 {
+	bool cancelNextWalkVar = (listWalkDir.size() > 1 && listDir.size() <= 1);
 	listWalkDir = listDir;
-	addEventWalk(listDir.size() == 1);
+	addEventWalk(listDir.size() == 1, cancelNextWalkVar);
+
 	return true;
 }
 
-void Creature::addEventWalk(bool firstStep)
+void Creature::addEventWalk(bool firstStep /* = false */, bool cancelNextWalkVar /* = false */)
 {
 	//static int64_t last_time = OTSYS_TIME();
-	cancelNextWalk = false;
+	cancelNextWalk = cancelNextWalkVar;
 
 	if (getStepSpeed() <= 0)
 		return;
