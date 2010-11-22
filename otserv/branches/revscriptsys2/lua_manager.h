@@ -728,6 +728,7 @@ public:
 	LuaThread_ptr newThread(const std::string& name);
 	void scheduleThread(int32_t schedule, LuaThread_ptr thread);
 	void runScheduledThreads();
+	void freeThread(LuaThread_ptr thread);
 
 	struct ThreadSchedule {
 		time_t scheduled_time;

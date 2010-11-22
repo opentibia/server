@@ -919,6 +919,12 @@ void LuaStateManager::runScheduledThreads()
 	}
 }
 
+void LuaStateManager::freeThread(LuaThread_ptr thread)
+{
+	ThreadMap::iterator iter = threads.find(thread->state);
+	threads.erase(iter);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Child Thread
 
@@ -946,8 +952,16 @@ LuaThread::LuaThread(Script::Manager* manager, lua_State* L) :
 LuaThread::~LuaThread()
 {
 	if(reference && state)
+	{
 		// Make coroutine available to GC again
+		lua_getglobal(state, "coroutine");
+		lua_pushthread(state);
+		lua_getfield(state, -2, "status");
+		lua_call(state, 1, 1);
+		std::cout << lua_tostring(state, -1) << std::endl;
+		lua_pop(state, 2);
 		luaL_unref(state, LUA_REGISTRYINDEX, reference);
+	}
 }
 
 void LuaThread::reset()

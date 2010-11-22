@@ -68,6 +68,8 @@ bool Event::call(Manager& state, Environment& environment, Listener_ptr listener
 	int32_t ms = thread->run(1);
 	if(ms > 0)
 		state.scheduleThread(ms, thread);
+	else
+		state.freeThread(thread);
 
 	if(thread->ok() == false) {
 		reference = state.unReference(reference);
