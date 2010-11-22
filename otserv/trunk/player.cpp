@@ -4858,4 +4858,6 @@ void Player::toogleGmInvisible()
 				it->second->notifyLogIn(this);
 		}
 	}
+
+	//TODO: fire StepIn/StepOut events
 }

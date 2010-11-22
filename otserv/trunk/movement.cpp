@@ -761,10 +761,12 @@ uint32_t MoveEvent::AddItemField(Item* item, Item* tileItem, const Position& pos
 		Tile* tile = item->getTile();
 		if(CreatureVector* creatures = tile->getCreatures()){
 			for(CreatureVector::iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				field->onStepInField(*cit);
+				//totally invisible GMs shouldn't call for onStep events
+				if (!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasSomeInvisibilityFlag()){
+					field->onStepInField(*cit);
+				}
 			}
 		}
-
 		return 1;
 	}
 
@@ -946,6 +948,11 @@ uint32_t MoveEvent::DeEquipItem(MoveEvent* moveEvent, Player* player, Item* item
 
 uint32_t MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& fromPos, const Position& toPos)
 {
+	//totally invisible players shouldn't call for onStep events
+	if (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag()){
+		return 1;
+	}
+
 	if(m_scripted){
 		return executeStep(creature, item, fromPos, toPos);
 	}

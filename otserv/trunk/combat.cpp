@@ -1606,6 +1606,9 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 bool MagicField::isBlocking(const Creature* creature) const
 {
 	if (id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE){
+		if (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag()){
+			return false;
+		}
 		uint32_t ownerId = getOwner();
 		if (ownerId !=0){
 			Creature *owner = g_game.getCreatureByID(ownerId);
