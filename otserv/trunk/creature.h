@@ -258,7 +258,7 @@ public:
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
-	void addEventWalk(bool firstStep = false, bool cancelNextWalkVar = false);
+	void addEventWalk(bool firstStep = false);
 	void stopEventWalk();
 	void goToFollowCreature();
 
