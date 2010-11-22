@@ -1,5 +1,5 @@
 function onSay(cid, words, param)
-	local table = getPlayerSkullUnjustKills(cid)
+	local table = getPlayerUnjustKills(cid)
 	local timestamp = getPlayerSkullEndTime(cid)
 	local skulltype = getPlayerSkullType(cid)
 	local dateTable = os.date("*t", timestamp)
