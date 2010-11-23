@@ -275,6 +275,10 @@ show_house_prices = false
 -- The amount of events that can be called inside eachother
 script_recursion_depth = 16
 
+-- Include extra information when a script encounters an error.
+-- HIGHLY RECOMMENDED if you are editing scripts
+detailed_script_errors = true
+
 -- Database configuration
 -- options: mysql, sqlite, odbc or pgsql
 database_type = "mysql"
