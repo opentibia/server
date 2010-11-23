@@ -201,7 +201,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	m_confInteger[MIN_PVP_LEVEL_APPLIES_TO_SUMMONS] = getGlobalBoolean(L, "min_pvp_level_applies_to_summons", true);
 	#endif
-	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 2);
+	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 3);
 	m_confInteger[EXPERIENCE_STAGES] = getGlobalBoolean(L, "experience_stages", false);
 	m_isLoaded = true;
 	return true;
