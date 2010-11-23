@@ -669,7 +669,7 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
-		if(player->getMana() < getManaCost(player) && !player->hasFlag(PlayerFlag_HasInfiniteMana)){
+		if (!Spell::playerHasEnoughManaToCast(player, getManaCost(player))){
 			player->sendCancelMessage(RET_NOTENOUGHMANA);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
@@ -1676,7 +1676,7 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 			return false;
 		}
 
-		if(player->getMana() < manaCost){
+		if (!Spell::playerHasEnoughManaToCast(player, manaCost)){
 			player->sendCancelMessage(RET_NOTENOUGHMANA);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
@@ -2245,7 +2245,7 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		manaCost = convinceCreature->getMonster()->getManaCost();
 	}
 
-	if(!player->hasFlag(PlayerFlag_HasInfiniteMana) && player->getMana() < manaCost){
+	if (!Spell::playerHasEnoughManaToCast(player, manaCost)){
 		player->sendCancelMessage(RET_NOTENOUGHMANA);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
