@@ -196,7 +196,7 @@ bool BaseSpell::internalExecuteCastSpell(Event *event, Creature* creature, const
 		result = m_scriptInterface->callFunction(3);
 
 		m_scriptInterface->releaseScriptEnv();
-		return result;
+		return true;
 	}
 	return(false);
 }
