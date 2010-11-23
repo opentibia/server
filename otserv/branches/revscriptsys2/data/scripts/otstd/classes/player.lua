@@ -366,7 +366,7 @@ function Player:cannotGainInFight()
 	return self:hasGroupFlag(PlayerFlag_NotGainInFight)
 end
 
-function Player:notGainSkill()
+function Player:cannotGainSkill()
 	return self:hasGroupFlag(PlayerFlag_NotGainSkill)
 end
 

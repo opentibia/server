@@ -118,7 +118,10 @@ public:
 	void setGuildNick(const std::string& nick) {guildNick = nick;}
 
 	void setFlags(uint64_t flags){ groupFlags = flags;}
-	bool hasFlag(PlayerFlags flag) const { return (0 != (groupFlags & ((uint64_t)1 << flag.value())));}
+	bool hasFlag(PlayerFlags flag) const {
+		uint64_t v = (uint64_t(1) << flag.value());
+		return (groupFlags & v) != 0;
+	}
 
 	uint16_t getPremiumDays() const {return premiumDays;}
 	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}

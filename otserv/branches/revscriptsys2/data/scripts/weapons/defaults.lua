@@ -1,5 +1,5 @@
 -- Wand Formula
-function formulaWand(minDamage, maxDamage)
+local function formulaWand(minDamage, maxDamage)
 	return function(player, target, weapon)
 		return -math.random(minDamage, maxDamage)
 	end
@@ -12,10 +12,9 @@ local defaultWeapons = {
 }
 
 function registerDefaultWeapons()
-	local weapon = nil
 	for weaponID, info in pairs(defaultWeapons) do
 		-- create the weapon
-		weapon = Weapon:new(weaponID)
+		local weapon = Weapon:new(weaponID)
 
 		-- set infos
 

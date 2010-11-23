@@ -120,7 +120,7 @@ function otstd.onUsedWeapon(event)
 	local internalWeapon = event.internalWeapon
 
 	-- Add skill points
-	if not player:notGainSkill() and
+	if not player:cannotGainSkill() and
 		player:getAddAttackSkill() then
 		local skillType = nil
 		local weaponType = weapon:getWeaponType()

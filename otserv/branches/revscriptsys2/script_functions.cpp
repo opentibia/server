@@ -3028,7 +3028,7 @@ int LuaState::lua_Tile_getItem()
 	if(index < 0) {
 		index = lastindex + index;
 	}
-	if(index > lastindex) {
+	if(index > lastindex || lastindex == 0) {
 		throw Error("Tile:getItem: Index out of range!");
 	}
 	assert(index >= 0);
