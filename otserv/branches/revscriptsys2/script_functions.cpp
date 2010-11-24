@@ -3634,7 +3634,7 @@ int LuaState::lua_Creature_getBaseSpeed()
 int LuaState::lua_Creature_isPushable()
 {
 	Creature* creature = popCreature();
-	pushInteger(creature->isPushable());
+	pushBoolean(creature->isPushable());
 	return 1;
 }
 
