@@ -627,14 +627,16 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(player->isPzLocked() && !player->getTile()->hasFlag(TILESTATE_PVPZONE) && hasFlag(TILESTATE_PVPZONE)){
-				//player is trying to enter a pvp zone while being pz-locked
-				return RET_PLAYERISPZLOCKEDENTERPVPZONE;
-			}
+			if(player->getTile()){
+				if(player->isPzLocked() && !player->getTile()->hasFlag(TILESTATE_PVPZONE) && hasFlag(TILESTATE_PVPZONE)){
+					//player is trying to enter a pvp zone while being pz-locked
+					return RET_PLAYERISPZLOCKEDENTERPVPZONE;
+				}
 
-			if(player->isPzLocked() && player->getTile()->hasFlag(TILESTATE_PVPZONE) && !hasFlag(TILESTATE_PVPZONE)){
-				//player is trying to leave a pvp zone while being pz-locked
-				return RET_PLAYERISPZLOCKEDLEAVEPVPZONE;
+				if(player->isPzLocked() && player->getTile()->hasFlag(TILESTATE_PVPZONE) && !hasFlag(TILESTATE_PVPZONE)){
+					//player is trying to leave a pvp zone while being pz-locked
+					return RET_PLAYERISPZLOCKEDLEAVEPVPZONE;
+				}
 			}
 
 			if(hasFlag(TILESTATE_NOPVPZONE) && player->isPzLocked()){
