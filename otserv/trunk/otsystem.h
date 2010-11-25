@@ -31,7 +31,7 @@ inline int64_t OTSYS_TIME()
 {
 	timeb t;
 	ftime(&t);
-	return t.millitm + t.time * 1000;
+	return int64_t(t.millitm) + int64_t(t.time) * 1000;
 }
 
 #endif
