@@ -7082,15 +7082,21 @@ int LuaScriptInterface::luaIsValidUID(lua_State *L)
 
 int LuaScriptInterface::luaIsCreatureImmuneToCondition(lua_State *L)
 {
-	//isCreatureImmuneToCondition(cid, conditionType)
+	//isCreatureImmuneToCondition(cid, conditionType, <optional> aggressive)
+	bool aggressive;
+	int32_t parameters = lua_gettop(L);
+	if (parameters >= 3)
+		aggressive = popBoolean(L);
 	ConditionType_t conditionType = (ConditionType_t) popNumber(L);
+	if (parameters < 3)
+		aggressive = Condition::canBeAggressive(conditionType);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
-		if (creature->isImmune(conditionType))
+		if (creature->isImmune(conditionType, aggressive))
 			lua_pushboolean(L, true);
 		else
 			lua_pushboolean(L, false);
@@ -7101,7 +7107,6 @@ int LuaScriptInterface::luaIsCreatureImmuneToCondition(lua_State *L)
 	}
 	return 1;
 }
-
 
 int LuaScriptInterface::luaIsCreature(lua_State *L)
 {

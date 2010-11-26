@@ -709,7 +709,7 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 		for(std::list<const Condition*>::const_iterator it = params.conditionList.begin(); it != params.conditionList.end(); ++it){
 			const Condition* condition = *it;
 
-			if(caster == target || !target->isImmune(condition->getType())){
+			if(caster == target || !target->isImmune(condition->getType(), params.isAggressive)){
 				Condition* conditionCopy = condition->clone();
 				if(caster){
 					conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());

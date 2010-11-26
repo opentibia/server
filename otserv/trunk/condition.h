@@ -129,6 +129,7 @@ public:
 	int32_t getTicks() const { return ticks; }
 	void setTicks(int32_t newTicks);
 
+	static bool canBeAggressive(ConditionType_t type);
 	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param = 0);
 	static Condition* createCondition(PropStream& propStream);
 

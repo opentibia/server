@@ -348,7 +348,7 @@ public:
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);
 	bool isImmune(CombatType_t type) const;
-	bool isImmune(ConditionType_t type) const;
+	bool isImmune(ConditionType_t type, bool aggressive = true) const;
 	bool hasShield() const;
 	virtual bool isAttackable() const;
 

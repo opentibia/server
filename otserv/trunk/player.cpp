@@ -4186,13 +4186,13 @@ bool Player::isImmune(CombatType_t type) const
 	return Creature::isImmune(type);
 }
 
-bool Player::isImmune(ConditionType_t type) const
+bool Player::isImmune(ConditionType_t type, bool aggressive /* = true */) const
 {
-	if(hasFlag(PlayerFlag_CannotBeAttacked)){
+	if(hasFlag(PlayerFlag_CannotBeAttacked) && aggressive){
 		return true;
 	}
 
-	return Creature::isImmune(type);
+	return Creature::isImmune(type, aggressive);
 }
 
 bool Player::isAttackable() const

@@ -155,14 +155,14 @@ bool Creature::canBeSeen(const Creature* viewer, bool checkVisibility/*=true*/) 
 	  any kind of special flag to see invisible creatures or GMs*/
 	if (viewer && checkVisibility)
 		return viewer->canSeeCreature(this);
-	
+
 	if (getPlayer() &&
 		(getPlayer()->hasFlag(PlayerFlag_CannotBeSeen) ||
 		(getPlayer()->isGmInvisible() &&
 		(!viewer || !viewer->getPlayer() || !viewer->getPlayer()->canSeeGmInvisible(getPlayer()))))){
 		return false;
 	}
-	
+
 	if (checkVisibility)
 		return (viewer && viewer->canSeeInvisibility()) || !isInvisible();
 	return true;
@@ -1567,7 +1567,7 @@ bool Creature::isImmune(CombatType_t type) const
 	return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type);
 }
 
-bool Creature::isImmune(ConditionType_t type) const
+bool Creature::isImmune(ConditionType_t type, bool aggressive /* = true */) const
 {
 	return ((getConditionImmunities() & (uint32_t)type) == (uint32_t)type);
 }
