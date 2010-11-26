@@ -365,7 +365,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Player", "getGuildRank()", &Manager::lua_Player_getGuildRank);
 	registerMemberFunction("Player", "getGuildNick()", &Manager::lua_Player_getGuildNick);
 
-	registerMemberFunction("Player", "getItemCount(int itemid)", &Manager::lua_Player_getItemCount);
+	registerMemberFunction("Player", "getItemCount(int itemid [,int type])", &Manager::lua_Player_getItemCount);
 	registerMemberFunction("Player", "addItem(Item item [, SlotType slot = nil [, boolean canDropOnMap = nil]])", &Manager::lua_Player_addItem);
 	registerMemberFunction("Player", "removeItem(int id [, int type [,int count]])", &Manager::lua_Player_removeItem);
 	registerMemberFunction("Player", "getInventoryItem(SlotType slot)", &Manager::lua_Player_getInventoryItem);
@@ -440,7 +440,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "getCreatures([Creature who = nil])", &Manager::lua_Tile_getCreatures);
 
 	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
-	registerMemberFunction("Tile", "getItemCount(int itemid)", &Manager::lua_Tile_getItemCount);
+	registerMemberFunction("Tile", "getItemCount(int itemid [, int type])", &Manager::lua_Tile_getItemCount);
 	registerMemberFunction("Tile", "getItem(int index)", &Manager::lua_Tile_getItem);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
@@ -3111,9 +3111,12 @@ int LuaState::lua_Tile_getItemWithItemID()
 }
 
 int LuaState::lua_Tile_getItemCount() {
-	int32_t type = popInteger();
+	int32_t subtype = -1;
+	if (getStackSize() > 2)
+		subtype = popInteger();
+	int32_t itemid = popInteger();
 	Tile* tile = popTile();
-	push(tile->__getItemTypeCount(type));
+	push(tile->__getItemTypeCount(itemid, subtype));
 	return 1;
 }
 
@@ -4606,9 +4609,12 @@ int LuaState::lua_Player_getSlot()
 
 int LuaState::lua_Player_getItemCount()
 {
-	int32_t type = popInteger();
+	int32_t subtype = -1;
+	if (getStackSize() > 2)
+		subtype = popInteger();
+	int32_t itemid = popInteger();
 	Player* player = popPlayer();
-	push(player->__getItemTypeCount(type));
+	push(player->__getItemTypeCount(itemid, subtype));
 	return 1;
 }
 

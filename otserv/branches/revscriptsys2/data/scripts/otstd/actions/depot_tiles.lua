@@ -53,8 +53,10 @@ function otstd.depot_tiles.registerHandlers()
 
 		if otstd.depot_listeners[data[2]] then
 			stopListener(otstd.depot_listeners[data[2]])
-		end		
+		end
 		
+		-- TODO
+		-- This is bad, makes all switches de-indent when you walk over them
 		otstd.depot_listeners[data[2]] = registerOnAnyCreatureMoveOut("itemid", data[2], function(event)
 			local item = event.fromTile:getItemWithItemID(data[2])
 			item:setItemID(data[1])

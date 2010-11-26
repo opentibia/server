@@ -172,7 +172,7 @@ end
 function otstd.onUsedFist(event)
 	local player = event.player
 
-	if not player:notGainSkill() and
+	if not player:cannotGainSkill() and
 		player:getAddAttackSkill() then
 		player:advanceSkill(SKILL_FIST, 1)
 	end

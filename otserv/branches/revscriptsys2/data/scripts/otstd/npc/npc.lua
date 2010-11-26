@@ -257,14 +257,25 @@ function NPC:onHearInternal(message, class)
 				if exchange.sell then
 					if containsMessage(message, exchange[1] or exchange.name) then
 						-- Ooo, the item we want to sell!
-						local count = string.match(message, "%d+") or 1
+						local count = nil
+						if exchange.all then
+							count = self.focus:getItemCount(exchange.id, exchange.type)
+						else
+							count = string.match(message, "%d+") or 1
+						end
+						
 						local params = {
 							itemname = getItemNameByID(exchange.id, count);
-							itemcount = count;
+							itemcount = count or 0;
 							price = exchange.sell * count;
 							}
-
-						self:say(self.exchangeSell or self.standardReplies.exchangeSell, params)
+						
+						if exchange.all and (not count or count <= 0) then
+							self:say(exchange.none_phrase or self.exchangeSellNoItems or self.standardReplies.exchangeSellNoItems)
+						else
+							self:say(exchange.sell_phrase or self.exchangeSell or self.standardReplies.exchangeSell, params)
+						end
+						
 						local reply = self:listen()
 						if containsAgreement(reply) then
 							if self.focus:removeItem(exchange.id, exchange.type or -1, count) then
@@ -292,7 +303,7 @@ function NPC:onHearInternal(message, class)
 							price = exchange.buy*count;
 							}
 
-						self:say(self.exchangeBuy or self.standardReplies.exchangeBuy, params)
+						self:say(self.buy_phrase or self.exchangeBuy or self.standardReplies.exchangeBuy, params)
 						local reply = self:listen()
 						if containsAgreement(reply) then
 							-- Check if we have the money first

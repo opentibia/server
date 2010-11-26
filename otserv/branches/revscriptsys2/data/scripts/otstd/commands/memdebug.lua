@@ -20,8 +20,8 @@ function DebugMemory.handler(event)
 		end
 		s = s .. "\n"
 	end
-	event.creature:sendNote("Thread is " .. tostring(coroutine.running()) .. "\nMemory use is " .. collectgarbage("count") .. ".\n" .. s)
 	collectgarbage("collect")
+	event.creature:sendNote("Thread is " .. tostring(coroutine.running()) .. "\nMemory use is " .. collectgarbage("count") .. ".\n" .. s)
 end
 
 DebugMemory:register()

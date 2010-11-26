@@ -47,6 +47,7 @@ NPC.standardReplies = {
 	["bored"] = "I don't have time for this.";
 	["busy"] = "Hello $name, there is $customers people in line before you.";
 	["exchangeSell"] = "Do you want to sell $itemname for $price gold?";
+	["exchangeSellNoItems"] = "You do not have any.";
 	["exchangeBuy"] = "Do you want to buy $itemname for $price gold?";
 	["exchangeSellComplete"] = "Thank you for the goods.";
 	["exchangeBuyComplete"] = "Thank you for your purchase.";
