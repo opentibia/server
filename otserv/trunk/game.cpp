@@ -1021,13 +1021,6 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 		ret = internalMoveCreature(creature, fromTile, toTile, flags);
 	}
 
-	if(ret != RET_NOERROR){
-		if(Player* player = creature->getPlayer()){
-			player->sendCancelMessage(ret);
-			player->sendCancelWalk();
-		}
-	}
-
 	return ret;
 }
 

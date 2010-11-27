@@ -297,7 +297,12 @@ void Creature::onWalk()
 		Direction dir;
 		uint32_t flags = FLAG_IGNOREFIELDDAMAGE;
 		if(getNextStep(dir, flags)){
-			if(g_game.internalMoveCreature(this, dir, flags) != RET_NOERROR){
+			ReturnValue ret = g_game.internalMoveCreature(this, dir, flags);
+			if(ret != RET_NOERROR){
+				if(Player* player = getPlayer()){
+					player->sendCancelMessage(ret);
+					player->sendCancelWalk();
+				}
 				forceUpdateFollowPath = true;
 			}
 		}
