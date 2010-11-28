@@ -22,7 +22,7 @@ function Weapon:new(weaponID)
 		unproperly = false,
 
 		-- Combat params
-		damageType = COMBAT_PHYSICALDAMAGE,
+		combatType = COMBAT_PHYSICALDAMAGE,
 		blockedByDefense = true,
 		blockedByArmor = true,
 
@@ -247,7 +247,6 @@ function otstd.internalUseWeapon(event)
 	local weapon = event.weapon
 	local internalWeapon = event.internalWeapon
 
-	-- at this point, weapon shouldn't and won't be nil
 	-- get max min damages
 	local damage = 0
 	if internalWeapon.damageFormula then
@@ -259,7 +258,7 @@ function otstd.internalUseWeapon(event)
 	damage = (damage * event.damageModifier) / 100
 
 	-- do the damage
-	internalCastSpell(internalWeapon.damageType, player, target, damage,
+	internalCastSpell(internalWeapon.combatType, player, target, damage,
 		internalWeapon.blockedByShield, internalWeapon.blockedByArmor)
 
 	-- if weapon has a shoot effect send it
