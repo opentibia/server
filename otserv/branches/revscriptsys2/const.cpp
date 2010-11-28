@@ -664,9 +664,9 @@ template<> GuildEmblemType__Base::StringToEnum GuildEmblemType__Base::lstring_to
 template<> void GuildEmblemType__Base::initialize()
 {
 	initAddValue(enums::EMBLEM_NONE, "EMBLEM_NONE", true);
-	initAddValue(enums::EMBLEM_NONE, "EMBLEM_GREEN", true);
-	initAddValue(enums::EMBLEM_NONE, "EMBLEM_RED", true);
-	initAddValue(enums::EMBLEM_NONE, "EMBLEM_BLUE", true);
+	initAddValue(enums::EMBLEM_GREEN, "EMBLEM_GREEN", true);
+	initAddValue(enums::EMBLEM_RED, "EMBLEM_RED", true);
+	initAddValue(enums::EMBLEM_BLUE, "EMBLEM_BLUE", true);
 }
 
 template<> bool PlayerFlag__Base::initialized = false;
