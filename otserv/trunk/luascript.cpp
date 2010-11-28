@@ -4001,30 +4001,32 @@ int LuaScriptInterface::luaGetAllCreatures(lua_State *L)
 	lua_newtable(L);
 	uint32_t index = 1;
 	CreatureVector* creatures = tile->getCreatures();
-	for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-		bool add = false;
-		if(Player *p = (*cit)->getPlayer()) {
-			if(((flag & 1) == 1 && !p->hasFlag(PlayerFlag_CannotBeSeen) && !p->isGmInvisible())||
-				((flag & 2) == 2 && p->hasFlag(PlayerFlag_CannotBeSeen))||
-				((flag & 4) == 4 && p->isGmInvisible())){
+	if (creatures){
+		for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+			bool add = false;
+			if(Player *p = (*cit)->getPlayer()) {
+				if(((flag & 1) == 1 && !p->hasFlag(PlayerFlag_CannotBeSeen) && !p->isGmInvisible())||
+					((flag & 2) == 2 && p->hasFlag(PlayerFlag_CannotBeSeen))||
+					((flag & 4) == 4 && p->isGmInvisible())){
+					add = true;
+				}
+			}
+			else if (Monster *m = (*cit)->getMonster()){
+				if (((flag & 8) == 8 && !m->hasCondition(CONDITION_INVISIBLE)) || (flag & 16) == 16){
+					add = true;
+				}
+			}
+			else if ((*cit)->getNpc() && (flag & 32) == 32){
 				add = true;
 			}
-		}
-		else if (Monster *m = (*cit)->getMonster()){
-			if (((flag & 8) == 8 && !m->hasCondition(CONDITION_INVISIBLE)) || (flag & 16) == 16){
-				add = true;
-			}
-		}
-		else if ((*cit)->getNpc() && (flag & 32) == 32){
-			add = true;
-		}
 
-		if(add){
-			lua_pushnumber(L, index);
-			env->addThing(*cit);
-			lua_pushnumber(L, (*cit)->getID());
-			lua_settable(L, -3);
-			index++;
+			if(add){
+				lua_pushnumber(L, index);
+				env->addThing(*cit);
+				lua_pushnumber(L, (*cit)->getID());
+				lua_settable(L, -3);
+				index++;
+			}
 		}
 	}
 	return 1;
