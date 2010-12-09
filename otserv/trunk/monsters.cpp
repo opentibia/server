@@ -1300,6 +1300,18 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 						if(readXMLInteger(tmpNode, "deathPercent", intValue)){
 							mType->elementMap[COMBAT_DEATHDAMAGE] = intValue;
 						}
+                        if(readXMLInteger(tmpNode, "drownPercent", intValue)){
+							mType->elementMap[COMBAT_DROWNDAMAGE] = intValue;
+						}
+                        if(readXMLInteger(tmpNode, "lifeDrainPercent", intValue)){
+							mType->elementMap[COMBAT_LIFEDRAIN] = intValue;
+						}
+                        if(readXMLInteger(tmpNode, "manaDrainPercent", intValue)){
+							mType->elementMap[COMBAT_MANADRAIN] = intValue;
+						}
+                        if(readXMLInteger(tmpNode, "healingPercent", intValue)){
+							mType->elementMap[COMBAT_HEALING] = intValue;
+						}
 					}
 					tmpNode = tmpNode->next;
 				}
