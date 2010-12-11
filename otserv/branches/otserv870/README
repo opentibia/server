@@ -1,0 +1,140 @@
+============================================
+========== OpenTibia Server 0.6.3 ==========
+============================================
+===== www.otserv.org	www.otfans.net =====
+============================================
+
+
+What is this?
+	OTServ is a free MMORPG emulation, that creates a own gameworld server,
+	based on the CIPSoft's Tibia.
+
+How does it work?
+	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7, 7.71, 
+	7.8, 7.81, ,7.82, 7.9, 7.92, 8.0, 8.1, 8.11, 8.2 ,8.21, 8.22, 8.3, 8.4, 8.41, 8.42, 8.5, 
+	8.51, 8.52, 8.53, 8.54, 8.55, 8.56, 8.57.
+	
+	OTServ is now played using Tibia 8.60 and 8.61.
+
+	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here
+	http://www.otchanger.net/
+
+	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
+	double clicking it. 
+	
+	You have to execute some sql queries from schema.mysql, schema.pgsql or even schema.sqlite.
+	And check it out. Once you are done, have a look around in the folders
+	and take a look at the config.lua
+
+	NEVER ever enter your real acc# and/or password when not connecting to the CIP servers.
+	Then you are logged in.
+
+
+Credits?
+
+	-Project Admins
+
+	Remere
+	SimOne
+	Khaos				(Inactive)
+	Tliff			 	(Inactive)
+	Spin				(Inactive)
+	Shi'Voc				(Inactive)
+
+	-Forum Administrators
+
+	GriZzm0
+	Stormer
+	Mackan
+	Tythor Zeth
+	Tliff				(Inactive)
+	Yorick				(Inactive)
+	Pekay				(Inactive)
+	Nuker				(Inactive)
+	verkon				(Inactive)
+	Evo					(Inactive)
+
+	-Active Developers
+
+	Assassina			OpenTibia
+	hackerpotato		OpenTibia
+	Nostradamus			POT/OpenTibia
+	rafaelhamdan		OpenTibia
+	Sim0ne				OpenTibia
+
+	-Inactive Developers
+
+	Acrimon				Initial project developer
+	Haktivex			Initial project developer
+	Fandoras			Initial project developer
+	Reebow				Special protocol support
+	Privateer			Documentation on the protocol
+	Aire				OpenTibia
+	Anstice				OpenTibia
+	Arkold Thos			OpenTibia (Linux porter)
+	bruno				OpenTibia (ODBC driver)
+	Heliton				OpenTibia (scripting)
+	Jiddo				OpenTibia (scripting)
+	Winghawk			OpenTibia (scripting)
+	Blackdemon			OpenTibia
+	FightingElf			OpenTibia
+	Gecko				OpenTibia
+	Pedro B.			OpenTibia
+	Matkus				OpenTibia
+	OsoSangre			OpenTibia
+	Smygflik			OpenTibia
+	Snack				OpenTibia
+	TiMMit				OpenTibia
+	Primer				OpenTibia/OTClient (MAC porter)
+	j4K3xBl4sT3r		OpenTibia/OTClient
+	Wrzasq				POT/OpenTibia (database)
+	Kilouco				YATC
+	nfries88			YATC/OpenTibia
+	the fike			Advisory, optimization
+	Vitor				Advisory, optimization
+	Decar				Fansite
+	Torvik				Item list
+
+	-Contribuitors
+	Those are some users that helped the project with patches or bug reports.
+	
+	adakraz, Bennet, Dored, Pietia10, Quintinon, Fusion666, Joffily, Ispiro, slawkens, Umby, Rogier1337, pajlada,
+	Fernando Coutinho, Sapphire, Lithium, Proglin, LooS!k, Jason, nicaw, Xidaozu, Talaturen, The Chaos, Junkfood,
+	Beet Da Brat, honux, Ruly, Steeled Blade, Xera, BurnMc, Cayan, BlackKnight, Thomac, mike2k1, SuperGillis,
+	wik, Tijn, _X_Dead_X_, Skulldiggers, NeWsOfTzzz, kijano, Rex, DimiGhost, dark-bart, DeathClaw, Steelberg, Jero,
+	TechnoPirate, Mozila, Thax, Ashganek, RicarDog, ZeroCoolz, K-Zodron, gerax, Urmel, Cip, wasabi, Jovial, Yurez,
+	Rebell, Ilidian, blaxskull, dabobath, Mindrage, Eventide, MedionAktiver, Czepek, krt, mmb, Iyashii, Mazen, Figgi, 
+	Rith, Rizz, Vinny, YobaK, Nexoz, Ferrus
+	
+	
+	And special thanks to all otfans.net moderators.
+
+Help?
+	We always need help. Post on the forum:
+	OTFans - http://otfans.net
+		English community, the official site of OpenTibia. Also containing the OTWiki
+
+	OTServNews - http://otservnews.org/
+		Always latest news from OpenTibia world.
+
+	Want account maker for your server? Find one here:
+	OTServ-AAC - http://otserv-aac.info
+		Website that used to promote "good" AAC scripts, now is a website for POT (PHP OTServ Toolkit)
+
+	Need to promote your server? Put it on servers list:
+	OTServList - http://www.otservlist.org
+		Official OTServ list, you dont need any other ;).
+
+	Necesitas ayuda?
+	Tibia4 - http://otserv.es/
+		Official spanish-talking otserv site.
+
+
+	Note that only websites mentioned in this document are treated as official support of OTServ.
+	No other websites are officialy affiliated with OTServ.
+
+Anything else?
+	Yes! There are utilities available as a seperate package soon at the sourceforge site
+	where the otserv project is, check out Releases there soon on best utilites that are
+	most helpful.
+	We have a chat room now as well on #otserv at irc.quakenet.org.

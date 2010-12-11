@@ -1,0 +1,701 @@
+CREATE TABLE "accounts" (
+	"id" INTEGER PRIMARY KEY NOT NULL,
+	"name" VARCHAR(32) NOT NULL,
+	"password" VARCHAR(255) NOT NULL,
+	"email" VARCHAR(255) NOT NULL DEFAULT '',
+	"premend" INTEGER NOT NULL DEFAULT 0,
+	"blocked" BOOLEAN NOT NULL DEFAULT 0,
+	"warnings" INTEGER NOT NULL DEFAULT 0,
+	UNIQUE("name")
+);
+INSERT INTO "accounts" VALUES (1, 'tibia', 'tibia', '', 0, 0, 0);
+
+CREATE TABLE "groups" (
+	"id" INTEGER PRIMARY KEY,
+	"name" VARCHAR(255) NOT NULL,
+	"flags" INTEGER NOT NULL DEFAULT 0,
+	"access" INTEGER NOT NULL DEFAULT 0,
+	"violation" INTEGER NOT NULL DEFAULT 0,
+	"maxdepotitems" INTEGER NOT NULL,
+	"maxviplist" INTEGER NOT NULL
+);
+INSERT INTO "groups" VALUES (1, 'Player', 0, 0, 0, 2000, 100),(2, 'Tutor', 16777216, 0, 0, 2000, 100),(3, 'Sennior Tutor', 274894684160, 0, 0, 2000, 100),(4, 'Community Manager', 69681547968463, 2, 0, 1000, 100),(5, 'Game Master', 69681547968463, 2, 0, 1000, 100),(6, 'GOD/OWNER', 57171953819640, 3, 0, 2000, 100);
+
+CREATE TABLE "players" (
+	"id" INTEGER PRIMARY KEY NOT NULL,
+	"name" VARCHAR(255) NOT NULL,
+	"account_id" INTEGER NOT NULL,
+	"group_id" INTEGER NOT NULL,
+	"sex" INTEGER NOT NULL DEFAULT 0,
+	"vocation" INTEGER NOT NULL DEFAULT 0,
+	"experience" INTEGER NOT NULL DEFAULT 0,
+	"level" INTEGER NOT NULL DEFAULT 1,
+	"maglevel" INTEGER NOT NULL DEFAULT 0,
+	"health" INTEGER NOT NULL DEFAULT 100,
+	"healthmax" INTEGER NOT NULL DEFAULT 100,
+	"mana" INTEGER NOT NULL DEFAULT 100,
+	"manamax" INTEGER NOT NULL DEFAULT 100,
+	"manaspent" INTEGER NOT NULL DEFAULT 0,
+	"soul" INTEGER NOT NULL DEFAULT 0,
+	"direction" INTEGER NOT NULL DEFAULT 0,
+	"lookbody" INTEGER NOT NULL DEFAULT 10,
+	"lookfeet" INTEGER NOT NULL DEFAULT 10,
+	"lookhead" INTEGER NOT NULL DEFAULT 10,
+	"looklegs" INTEGER NOT NULL DEFAULT 10,
+	"looktype" INTEGER NOT NULL DEFAULT 136,
+	"lookaddons" INTEGER NOT NULL DEFAULT 0,
+	"posx" INTEGER NOT NULL DEFAULT 0,
+	"posy" INTEGER NOT NULL DEFAULT 0,
+	"posz" INTEGER NOT NULL DEFAULT 0,
+	"cap" INTEGER NOT NULL DEFAULT 0,
+	"lastlogin" INTEGER NOT NULL DEFAULT 0,
+	"lastlogout" INTEGER NOT NULL DEFAULT 0,
+	"lastip" INTEGER NOT NULL DEFAULT 0,
+	"save" INTEGER NOT NULL DEFAULT 1,
+	"conditions" BLOB NOT NULL,
+	"skull_type" INTEGER NOT NULL DEFAULT 0,
+	"skull_time" INTEGER NOT NULL DEFAULT 0,
+	"loss_experience" INTEGER NOT NULL DEFAULT 100,
+	"loss_mana" INTEGER NOT NULL DEFAULT 100,
+	"loss_skills" INTEGER NOT NULL DEFAULT 100,
+	"loss_items" INTEGER NOT NULL DEFAULT 10,
+	"loss_containers" INTEGER NOT NULL DEFAULT 100,
+	"town_id" INTEGER NOT NULL,
+	"balance" INTEGER NOT NULL DEFAULT 0,
+	"stamina" INTEGER NOT NULL DEFAULT 151200000,
+	"online" BOOLEAN NOT NULL DEFAULT 0,
+	"rank_id" INTEGER NOT NULL,
+	"guildnick" VARCHAR(255) NOT NULL,
+	UNIQUE ("name"),
+	FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
+	FOREIGN KEY ("group_id") REFERENCES "groups" ("id")
+);
+
+CREATE TABLE "guilds" (
+	"id" INTEGER PRIMARY KEY,
+	"name" VARCHAR(255) NOT NULL,
+	"owner_id" INTEGER NOT NULL,
+	"creationdate" INTEGER NOT NULL,
+	UNIQUE ("name"),
+	FOREIGN KEY ("owner_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "guild_ranks" (
+	"id" INTEGER PRIMARY KEY,
+	"guild_id" INTEGER NOT NULL,
+	"name" VARCHAR(255) NOT NULL,
+	"level" INTEGER NOT NULL,
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
+);
+
+CREATE TABLE "guild_members" (
+	"player_id" INTEGER NOT NULL,
+	"rank_id" INTEGER NOT NULL,
+	"nick" VARCHAR(255) NOT NULL DEFAULT '',
+	UNIQUE ("player_id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
+	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id")
+);
+
+CREATE TABLE "guild_invites" (
+	"player_id" INTEGER NOT NULL,
+	"guild_id" INTEGER NOT NULL,
+	UNIQUE ("player_id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
+);
+
+CREATE TABLE "guild_wars" (
+	"id" INTEGER PRIMARY KEY,
+	"guild_id" INTEGER NOT NULL,
+	"opponent_id" INTEGER NOT NULL,
+	"frag_limit" INTEGER NOT NULL DEFAULT 10,
+	"declaration_date" INTEGER NOT NULL,
+	"end_date" INTEGER NOT NULL,
+	"guild_fee" INTEGER NOT NULL DEFAULT 1000,
+	"opponent_fee" INTEGER NOT NULL DEFAULT 1000,
+	"guild_frags" INTEGER NOT NULL DEFAULT 0,
+	"opponent_frags" INTEGER NOT NULL DEFAULT 0,
+	"comment" VARCHAR(255) NOT NULL DEFAULT '',
+	"status" INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id"),
+	FOREIGN KEY ("opponent_id") REFERENCES "guilds" ("id")
+);
+
+CREATE TABLE "player_viplist" (
+	"player_id" INT NOT NULL,
+	"vip_id" INT NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
+	FOREIGN KEY ("vip_id") REFERENCES "players" ("id") ON DELETE CASCADE
+);
+
+CREATE TABLE "houses" (
+	"id" INTEGER PRIMARY KEY,
+	"townid" INTEGER NOT NULL DEFAULT 0,
+	"name" VARCHAR(100) NOT NULL,
+	"price" INTEGER NOT NULL DEFAULT 0,
+	"rent" INTEGER NOT NULL DEFAULT 0,
+	"guildhall" BOOLEAN NOT NULL DEFAULT 0,
+	"tiles" INTEGER NOT NULL DEFAULT 0,
+	"doors" INTEGER NOT NULL DEFAULT 0,
+	"beds" INTEGER NOT NULL DEFAULT 0,
+	"owner" INTEGER NOT NULL DEFAULT 0,
+	"paid" INTEGER NOT NULL DEFAULT 0,
+	"warnings" INTEGER NOT NULL DEFAULT 0,
+	"lastwarning" INTEGER NOT NULL DEFAULT 0,
+	"clear" BOOLEAN NOT NULL DEFAULT 0
+);
+
+CREATE TABLE "house_auctions" (
+	"id" INTEGER PRIMARY KEY,
+	"house_id" INTEGER NOT NULL,
+	"player_id" INTEGER NOT NULL,
+	"bid" INTEGER NOT NULL DEFAULT 0,
+	"limit" INTEGER NOT NULL DEFAULT 0,
+	"endtime" INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("house_id") REFERENCES "houses" ("id")
+);
+
+CREATE TABLE "house_lists" (
+	"house_id" INTEGER NOT NULL,
+	"listid" INTEGER NOT NULL,
+	"list" TEXT NOT NULL,
+	FOREIGN KEY ("house_id") REFERENCES "houses" ("id")
+);
+
+CREATE TABLE "player_deaths" (
+	"id" INTEGER PRIMARY KEY,
+	"player_id" INTEGER NOT NULL,
+	"date" INTEGER NOT NULL,
+	"level" INTEGER NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "killers" (
+	"id" INTEGER PRIMARY KEY,
+	"death_id" INTEGER NOT NULL,
+	"final_hit" SMALLINT NOT NULL DEFAULT 1,
+	FOREIGN KEY ("death_id") REFERENCES "player_deaths" ("id")
+);
+
+CREATE TABLE "environment_killers" (
+	"kill_id" INTEGER NOT NULL,
+	"name" VARCHAR(255) NOT NULL,
+	FOREIGN KEY ("kill_id") REFERENCES "killers" ("id")
+);
+
+CREATE TABLE "player_killers" (
+	"kill_id" INTEGER NOT NULL,
+	"player_id" INTEGER NOT NULL,
+	"unjustified" SMALLINT NOT NULL DEFAULT 0,
+	FOREIGN KEY ("kill_id") REFERENCES "killers" ("id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "player_depotitems" (
+	"player_id" INTEGER NOT NULL,
+	"sid" INTEGER NOT NULL,
+	"pid" INTEGER NOT NULL DEFAULT 0,
+	"itemtype" INTEGER NOT NULL,
+	"count" INTEGER NOT NULL DEFAULT 0,
+	"attributes" BLOB NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "player_skills" (
+	"player_id" INTEGER NOT NULL,
+	"skillid" INTEGER NOT NULL,
+	"value" INTEGER NOT NULL DEFAULT 0,
+	"count" INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "player_storage" (
+	"player_id" INTEGER NOT NULL,
+	"key" INTEGER NOT NULL,
+	"value" INTEGER NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "tiles" (
+	"id" INTEGER PRIMARY KEY,
+	"house_id" INTEGER NOT NULL DEFAULT 0,
+	"x" INTEGER NOT NULL,
+	"y" INTEGER NOT NULL,
+	"z" INTEGER NOT NULL,
+	FOREIGN KEY ("house_id") REFERENCES "houses" ("id")
+);
+
+CREATE TABLE "tile_items" (
+	"tile_id" INTEGER NOT NULL,
+	"sid" INTEGER NOT NULL,
+	"pid" INTEGER NOT NULL DEFAULT 0,
+	"itemtype" INTEGER NOT NULL,
+	"count" INTEGER NOT NULL DEFAULT 0,
+	"attributes" BLOB NOT NULL,
+	FOREIGN KEY ("tile_id") REFERENCES "tiles" ("id")
+);
+
+CREATE TABLE "map_store" (
+	"house_id" INTEGER NOT NULL,
+	"data" BLOB NOT NULL,
+	UNIQUE("house_id")
+);
+
+CREATE TABLE "player_items" (
+	"player_id" INT NOT NULL,
+	"sid" INT NOT NULL,
+	"pid" INT NOT NULL DEFAULT 0,
+	"itemtype" INT NOT NULL,
+	"count" INT NOT NULL DEFAULT 0,
+	"attributes" BLOB NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "player_spells" (
+	"player_id" INTEGER NOT NULL,
+	"name" VARCHAR(255) NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "bans" (
+	"id" INTEGER PRIMARY KEY,
+	"type" INTEGER NOT NULL,
+	"value" INTEGER NOT NULL,
+	"param" INTEGER NOT NULL DEFAULT 0,
+	"active" BOOLEAN NOT NULL DEFAULT 1,
+	"expires" INTEGER NOT NULL DEFAULT 0,
+	"added" INTEGER NOT NULL DEFAULT 0,
+	"admin_id" INTEGER,
+	"comment" VARCHAR(1024) NOT NULL DEFAULT '',
+	"reason" INTEGER NOT NULL DEFAULT 0,
+	"action" INTEGER NOT NULL DEFAULT 0,
+	"statement" VARCHAR(255) NOT NULL DEFAULT ''
+);
+
+CREATE TABLE "global_storage" (
+	"key" INTEGER NOT NULL,
+	"value" INTEGER NOT NULL
+);
+
+CREATE TABLE "schema_info" (
+	"name" VARCHAR(255) NOT NULL,
+	"value" VARCHAR(255) NOT NULL,
+	UNIQUE ("name")
+);
+
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 24);
+
+CREATE TRIGGER "oncreate_players"
+AFTER INSERT
+ON "players"
+BEGIN
+	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 0, 10);
+	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 1, 10);
+	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 2, 10);
+	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 3, 10);
+	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 4, 10);
+	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 5, 10);
+	INSERT INTO "player_skills" ("player_id", "skillid", "value") VALUES (NEW."id", 6, 10);
+END;
+
+CREATE TRIGGER "ondelete_players"
+BEFORE DELETE
+ON "players"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'DELETE on table "players" violates foreign: "owner_id" from table "guilds"')
+	WHERE (SELECT "id" FROM "guilds" WHERE "owner_id" = OLD."id") IS NOT NULL;
+
+	DELETE FROM "player_viplist" WHERE "player_id" = OLD."id" OR "vip_id" = OLD."id";
+	DELETE FROM "player_storage" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_skills" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_items" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_depotitems" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_spells" WHERE "player_id" = OLD."id";
+	DELETE FROM "bans" WHERE "type" = 2 AND "value" = OLD."id";
+	DELETE FROM "guild_members" WHERE "player_id" = OLD."id";
+	UPDATE "houses" SET "owner" = 0 WHERE "owner_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_accounts"
+BEFORE DELETE
+ON "accounts"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "players" WHERE "account_id" = OLD."id";
+	DELETE FROM "bans" WHERE "type" = 3 AND "value" = OLD."id";
+END;
+
+CREATE TRIGGER "oncreate_guilds"
+AFTER INSERT ON "guilds"
+BEGIN
+	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Leader", 3, NEW."id");
+	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Vice-Leader", 2, NEW."id");
+	INSERT INTO "guild_ranks" ("name", "level", "guild_id") VALUES ("Member", 1, NEW."id");
+END;
+
+CREATE TRIGGER "ondelete_guilds"
+BEFORE DELETE
+ON "guilds"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "guild_ranks" WHERE "guild_id" = OLD."id";
+	DELETE FROM "guild_wars" WHERE "guild_id" = OLD."id" OR "opponent_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_guild_ranks"
+BEFORE DELETE
+ON "guild_ranks"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "guild_members" WHERE "rank_id" = OLD."id";
+END;
+
+CREATE TRIGGER "oninsert_players"
+BEFORE INSERT
+ON "players"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "players" violates foreign: "account_id"')
+	WHERE NEW."account_id" IS NULL
+		OR (SELECT "id" FROM "accounts" WHERE "id" = NEW."account_id") IS NULL;
+
+	SELECT RAISE(ROLLBACK, 'INSERT on table "players" violates foreign: "group_id"')
+	WHERE NEW."group_id" IS NULL
+		OR (SELECT "id" FROM "groups" WHERE "id" = NEW."group_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_players"
+BEFORE UPDATE
+ON "players"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "players" violates foreign: "account_id"')
+	WHERE NEW."account_id" IS NULL
+		OR (SELECT "id" FROM "accounts" WHERE "id" = NEW."account_id") IS NULL;
+
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "players" violates foreign: "group_id"')
+	WHERE NEW."group_id" IS NULL
+		OR (SELECT "id" FROM "groups" WHERE "id" = NEW."group_id") IS NULL;
+END;
+
+CREATE TRIGGER "ondelete_groups"
+BEFORE DELETE
+ON "groups"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'DELETE on table "groups" violates foreign: "group_id" from table "players"')
+	WHERE (SELECT "id" FROM "players" WHERE "group_id" = OLD."id") IS NOT NULL;
+END;
+
+CREATE TRIGGER "oninsert_guilds"
+BEFORE INSERT
+ON "guilds"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "guilds" violates foreign: "owner_id"')
+	WHERE NEW."owner_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."owner_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_guilds"
+BEFORE UPDATE
+ON "guilds"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "guilds" violates foreign: "owner_id"')
+	WHERE NEW."owner_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."owner_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_guild_ranks"
+BEFORE INSERT
+ON "guild_ranks"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "guild_ranks" violates foreign: "guild_id"')
+	WHERE NEW."guild_id" IS NULL
+		OR (SELECT "id" FROM "guilds" WHERE "id" = NEW."guild_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_guild_ranks"
+BEFORE UPDATE
+ON "guild_ranks"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "guild_ranks" violates foreign: "guild_id"')
+	WHERE NEW."guild_id" IS NULL
+		OR (SELECT "id" FROM "guilds" WHERE "id" = NEW."guild_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_guild_members"
+BEFORE INSERT
+ON "guild_members"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "guild_members" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+
+	SELECT RAISE(ROLLBACK, 'INSERT on table "guild_members" violates foreign: "rank_id"')
+	WHERE NEW."rank_id" IS NULL
+		OR (SELECT "id" FROM "guild_ranks" WHERE "id" = NEW."rank_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_guild_members"
+BEFORE UPDATE
+ON "guild_members"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "guild_members" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "guild_members" violates foreign: "rank_id"')
+	WHERE NEW."rank_id" IS NULL
+		OR (SELECT "id" FROM "guild_ranks" WHERE "id" = NEW."rank_id") IS NULL;
+END;
+
+CREATE TRIGGER "ondelete_houses"
+BEFORE DELETE
+ON "houses"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "house_lists" WHERE "house_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_tiles"
+BEFORE DELETE
+ON "tiles"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "tile_items" WHERE "tile_id" = OLD."id";
+END;
+
+CREATE TRIGGER "oninsert_house_lists"
+BEFORE INSERT
+ON "house_lists"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "house_lists" violates foreign: "house_id"')
+	WHERE NEW."house_id" IS NULL
+		OR (SELECT "id" FROM "houses" WHERE "id" = NEW."house_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_house_lists"
+BEFORE UPDATE
+ON "house_lists"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "house_lists" violates foreign: "house_id"')
+	WHERE NEW."house_id" IS NULL
+		OR (SELECT "id" FROM "houses" WHERE "id" = NEW."house_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_player_depotitems"
+BEFORE INSERT
+ON "player_depotitems"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_depotitems" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_player_depotitems"
+BEFORE UPDATE
+ON "player_depotitems"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "player_depotitems" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_player_skills"
+BEFORE INSERT
+ON "player_skills"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_skills" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_player_skills"
+BEFORE UPDATE
+ON "player_skills"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "player_skills" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_player_storage"
+BEFORE INSERT
+ON "player_storage"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_storage" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_player_deaths"
+BEFORE INSERT
+ON "player_deaths"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_deaths" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_player_deaths"
+BEFORE UPDATE
+ON "player_deaths"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "player_deaths" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_killers"
+BEFORE INSERT
+ON "killers"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "killers" violates foreign: "death_id"')
+	WHERE NEW."death_id" IS NULL
+		OR (SELECT "id" FROM "player_deaths" WHERE "id" = NEW."death_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_killers"
+BEFORE UPDATE
+ON "killers"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "killers" violates foreign: "death_id"')
+	WHERE NEW."death_id" IS NULL
+		OR (SELECT "id" FROM "player_deaths" WHERE "id" = NEW."death_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_environment_killers"
+BEFORE INSERT
+ON "environment_killers"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "enviroment_killers" violates foreign: "kill_id"')
+	WHERE NEW."kill_id" IS NULL
+		OR (SELECT "id" FROM "killers" WHERE "id" = NEW."kill_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_environment_killers"
+BEFORE UPDATE
+ON "environment_killers"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "enviroment_killers" violates foreign: "kill_id"')
+	WHERE NEW."kill_id" IS NULL
+		OR (SELECT "id" FROM "killers" WHERE "id" = NEW."kill_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_player_killers"
+BEFORE INSERT
+ON "player_killers"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_killers" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+	
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_killers" violates foreign: "kill_id"')
+	WHERE NEW."kill_id" IS NULL
+		OR (SELECT "id" FROM "killers" WHERE "id" = NEW."kill_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_player_killers"
+BEFORE UPDATE
+ON "player_killers"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "player_killers" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+		
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "killers" violates foreign: "kill_id"')
+	WHERE NEW."kill_id" IS NULL
+		OR (SELECT "id" FROM "killers" WHERE "id" = NEW."kill_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_player_viplist"
+BEFORE INSERT
+ON "player_viplist"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_viplist" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_viplist" violates foreign: "vip_id"')
+	WHERE NEW."vip_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."vip_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_player_viplist"
+BEFORE UPDATE
+ON "player_viplist"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "player_viplist" violates foreign: "vip_id"')
+	WHERE NEW."vip_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."vip_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_tile_items"
+BEFORE INSERT
+ON "tile_items"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "tile_items" violates foreign: "tile_id"')
+	WHERE NEW."tile_id" IS NULL
+		OR (SELECT "id" FROM "tiles" WHERE "id" = NEW."tile_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_tile_items"
+BEFORE UPDATE
+ON "tile_items"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "tile_items" violates foreign: "tile_id"')
+	WHERE NEW."tile_id" IS NULL
+		OR (SELECT "id" FROM "tiles" WHERE "id" = NEW."tile_id") IS NULL;
+END;
+
+CREATE TRIGGER "oninsert_player_spells"
+BEFORE INSERT
+ON "player_spells"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'INSERT on table "player_spells" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+CREATE TRIGGER "onupdate_player_spells"
+BEFORE UPDATE
+ON "player_spells"
+FOR EACH ROW
+BEGIN
+	SELECT RAISE(ROLLBACK, 'UPDATE on table "player_spells" violates foreign: "player_id"')
+	WHERE NEW."player_id" IS NULL
+		OR (SELECT "id" FROM "players" WHERE "id" = NEW."player_id") IS NULL;
+END;
+
+INSERT INTO "players" VALUES (1, 'Administrator', 1, 6, 2, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
+INSERT INTO "players" VALUES (2, 'Player', 1, 1, 1, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
+
+# to add your own privileges for players/gms please use this flag generator http://hem.bredband.net/johannesrosen/playerflags.html
