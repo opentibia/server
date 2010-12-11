@@ -464,6 +464,8 @@ enum ConstantItemID {
 	ITEM_LETTER_STAMPED   = 2598,
 	ITEM_LABEL            = 2599,
 
+	ITEM_GLOWING_SWITCH   = 11063,
+
 	ITEM_DOCUMENT_RO      = 1968 //read-only
 };
 ]])

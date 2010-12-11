@@ -223,8 +223,6 @@ namespace enums {
 		MAGIC_EFFECT_GHOST = 0x41,
 		MAGIC_EFFECT_BATS = 0x42,
 		MAGIC_EFFECT_SMOKE = 0x43,
-		MAGIC_EFFECT_INSECTS = 0x44,
-		MAGIC_EFFECT_DRAGONHEAD = 0x45,
 		MAGIC_EFFECT_NONE = 0xFF,
 		MAGIC_EFFECT_UNK = 0xFFFF,
 	}; // end enum
@@ -303,8 +301,6 @@ typedef Enum<enums::MagicEffect, enums::MAGIC_EFFECT_UNK + 1> MagicEffect__Base;
 	const MagicEffect MAGIC_EFFECT_GHOST(enums::MAGIC_EFFECT_GHOST);
 	const MagicEffect MAGIC_EFFECT_BATS(enums::MAGIC_EFFECT_BATS);
 	const MagicEffect MAGIC_EFFECT_SMOKE(enums::MAGIC_EFFECT_SMOKE);
-	const MagicEffect MAGIC_EFFECT_INSECTS(enums::MAGIC_EFFECT_INSECTS);
-	const MagicEffect MAGIC_EFFECT_DRAGONHEAD(enums::MAGIC_EFFECT_DRAGONHEAD);
 	const MagicEffect MAGIC_EFFECT_NONE(enums::MAGIC_EFFECT_NONE);
 	const MagicEffect MAGIC_EFFECT_UNK(enums::MAGIC_EFFECT_UNK);
 //end enum definitions
@@ -421,12 +417,16 @@ namespace enums {
 		SPEAK_PRIVATE = 0x06,
 		SPEAK_CHANNEL_Y = 0x07,
 		SPEAK_CHANNEL_W = 0x08,
-		SPEAK_BROADCAST = 0x09,
-		SPEAK_CHANNEL_R1 = 0x0A,
-		SPEAK_PRIVATE_RED = 0x0B,
-		SPEAK_CHANNEL_O = 0x0C,
-		SPEAK_MONSTER_SAY = 0x0D,
-		SPEAK_MONSTER_YELL = 0x0E,
+		SPEAK_RVR_CHANNEL = 0x09,
+		SPEAK_RVR_ANSWER = 0x0A,
+		SPEAK_RVR_CONTINUE = 0x0B,
+		SPEAK_BROADCAST = 0x0C,
+		SPEAK_CHANNEL_R1 = 0x0D,
+		SPEAK_PRIVATE_RED = 0x0E,
+		SPEAK_CHANNEL_O = 0x0F,
+		SPEAK_CHANNEL_R2 = 0x11,
+		SPEAK_MONSTER_SAY = 0x13,
+		SPEAK_MONSTER_YELL = 0x14,
 	}; // end enum
 } // end namespace
 
@@ -443,28 +443,32 @@ typedef Enum<enums::SpeakClass, enums::SPEAK_MONSTER_YELL + 1> SpeakClass__Base;
 	const SpeakClass SPEAK_PRIVATE(enums::SPEAK_PRIVATE);
 	const SpeakClass SPEAK_CHANNEL_Y(enums::SPEAK_CHANNEL_Y);
 	const SpeakClass SPEAK_CHANNEL_W(enums::SPEAK_CHANNEL_W);
+	const SpeakClass SPEAK_RVR_CHANNEL(enums::SPEAK_RVR_CHANNEL);
+	const SpeakClass SPEAK_RVR_ANSWER(enums::SPEAK_RVR_ANSWER);
+	const SpeakClass SPEAK_RVR_CONTINUE(enums::SPEAK_RVR_CONTINUE);
 	const SpeakClass SPEAK_BROADCAST(enums::SPEAK_BROADCAST);
 	const SpeakClass SPEAK_CHANNEL_R1(enums::SPEAK_CHANNEL_R1);
 	const SpeakClass SPEAK_PRIVATE_RED(enums::SPEAK_PRIVATE_RED);
 	const SpeakClass SPEAK_CHANNEL_O(enums::SPEAK_CHANNEL_O);
+	const SpeakClass SPEAK_CHANNEL_R2(enums::SPEAK_CHANNEL_R2);
 	const SpeakClass SPEAK_MONSTER_SAY(enums::SPEAK_MONSTER_SAY);
 	const SpeakClass SPEAK_MONSTER_YELL(enums::SPEAK_MONSTER_YELL);
 //end enum definitions
 
 namespace enums {
 	enum MessageClass {
-			MSG_CLASS_FIRST	= 0x0D,
-			MSG_STATUS_CONSOLE_ORANGE2 = MSG_CLASS_FIRST,
-			MSG_STATUS_CONSOLE_ORANGE = 0x0E,
-			MSG_STATUS_WARNING = 0x0F,
-			MSG_EVENT_ADVANCE = 0x10,
-			MSG_EVENT_DEFAULT = 0x11,
-			MSG_STATUS_DEFAULT = 0x12,
-			MSG_INFO_DESCR = 0x13,
-			MSG_STATUS_SMALL = 0x14,
-			MSG_STATUS_CONSOLE_BLUE = 0x15,
-			MSG_STATUS_CONSOLE_RED = 0x16,
-			MSG_CLASS_LAST = MSG_STATUS_CONSOLE_RED
+		MSG_CLASS_FIRST = 0x12,
+		MSG_STATUS_CONSOLE_RED = MSG_CLASS_FIRST,
+		MSG_STATUS_CONSOLE_ORANGE2 = 0x13,
+		MSG_STATUS_CONSOLE_ORANGE = 0x14,
+		MSG_STATUS_WARNING = 0x15,
+		MSG_EVENT_ADVANCE = 0x16,
+		MSG_EVENT_DEFAULT = 0x17,
+		MSG_STATUS_DEFAULT = 0x18,
+		MSG_INFO_DESCR = 0x19,
+		MSG_STATUS_SMALL = 0x1A,
+		MSG_STATUS_CONSOLE_BLUE = 0x1B,
+		MSG_CLASS_LAST = MSG_STATUS_CONSOLE_BLUE,
 	}; // end enum
 } // end namespace
 
@@ -474,6 +478,7 @@ typedef Enum<enums::MessageClass, enums::MSG_CLASS_LAST + 1> MessageClass__Base;
 
 //begin enum definitions
 	const MessageClass MSG_CLASS_FIRST(enums::MSG_CLASS_FIRST);
+	const MessageClass MSG_STATUS_CONSOLE_RED(enums::MSG_STATUS_CONSOLE_RED);
 	const MessageClass MSG_STATUS_CONSOLE_ORANGE2(enums::MSG_STATUS_CONSOLE_ORANGE2);
 	const MessageClass MSG_STATUS_CONSOLE_ORANGE(enums::MSG_STATUS_CONSOLE_ORANGE);
 	const MessageClass MSG_STATUS_WARNING(enums::MSG_STATUS_WARNING);
@@ -483,7 +488,6 @@ typedef Enum<enums::MessageClass, enums::MSG_CLASS_LAST + 1> MessageClass__Base;
 	const MessageClass MSG_INFO_DESCR(enums::MSG_INFO_DESCR);
 	const MessageClass MSG_STATUS_SMALL(enums::MSG_STATUS_SMALL);
 	const MessageClass MSG_STATUS_CONSOLE_BLUE(enums::MSG_STATUS_CONSOLE_BLUE);
-	const MessageClass MSG_STATUS_CONSOLE_RED(enums::MSG_STATUS_CONSOLE_RED);
 	const MessageClass MSG_CLASS_LAST(enums::MSG_CLASS_LAST);
 //end enum definitions
 
@@ -879,35 +883,24 @@ typedef Enum<enums::PartyShieldType, enums::SHIELD_YELLOW_NOSHAREDEXP + 1> Party
 	const PartyShieldType SHIELD_YELLOW_NOSHAREDEXP(enums::SHIELD_YELLOW_NOSHAREDEXP);
 //end enum definitions
 
-namespace enums {
-	enum GuildEmblemType {
-		EMBLEM_NONE = 0,
-		EMBLEM_GREEN = 1,
-		EMBLEM_RED = 2,
-		EMBLEM_BLUE = 3
-	}; // end enum
-} // end namespace
-
-typedef Enum<enums::GuildEmblemType, enums::EMBLEM_BLUE + 1> GuildEmblemType;
-
-typedef Enum<enums::GuildEmblemType, enums::EMBLEM_BLUE + 1> GuildEmblemType__Base;
-
-//begin enum definitions
-	const GuildEmblemType EMBLEM_NONE(enums::EMBLEM_NONE);
-	const GuildEmblemType EMBLEM_GREEN(enums::EMBLEM_GREEN);
-	const GuildEmblemType EMBLEM_RED(enums::EMBLEM_RED);
-	const GuildEmblemType EMBLEM_BLUE(enums::EMBLEM_BLUE);
-//end enum definitions
-
 //begin raw definitions
+
 enum ConstantItemID {
+	ITEM_FIREFIELD_PVP    = 1492,
+	ITEM_FIREFIELD_NOPVP  = 1500,
+
+	ITEM_POISONFIELD_PVP    = 1496,
+	ITEM_POISONFIELD_NOPVP  = 1503,
+
+	ITEM_ENERGYFIELD_PVP    = 1495,
+	ITEM_ENERGYFIELD_NOPVP  = 1504,
+
 	ITEM_COINS_GOLD       = 2148,
 	ITEM_COINS_PLATINUM   = 2152,
 	ITEM_COINS_CRYSTAL    = 2160,
 
 	ITEM_DEPOT            = 2594,
 	ITEM_LOCKER1          = 2589,
-	ITEM_GLOWING_SWITCH   = 11063,
 
 	ITEM_MALE_CORPSE      = 6080,
 	ITEM_FEMALE_CORPSE    = 6081,
@@ -928,6 +921,8 @@ enum ConstantItemID {
 	ITEM_LETTER           = 2597,
 	ITEM_LETTER_STAMPED   = 2598,
 	ITEM_LABEL            = 2599,
+
+	ITEM_GLOWING_SWITCH   = 11063,
 
 	ITEM_DOCUMENT_RO      = 1968 //read-only
 };
@@ -973,6 +968,7 @@ namespace enums {
 		PlayerFlag_IgnoreWeaponCheck,
 		PlayerFlag_CannotBeMuted,
 		PlayerFlag_IsAlwaysPremium,
+		PlayerFlag_CanAnswerRuleViolations,
 		PlayerFlag_CanReloadContent,
 		PlayerFlag_ShowGroupInsteadOfVocation,
 		PlayerFlag_HasInfiniteStamina,
@@ -1028,6 +1024,7 @@ typedef Enum<enums::PlayerFlag, enums::PlayerFlag_LastFlag + 1> PlayerFlag__Base
 	const PlayerFlag PlayerFlag_IgnoreWeaponCheck(enums::PlayerFlag_IgnoreWeaponCheck);
 	const PlayerFlag PlayerFlag_CannotBeMuted(enums::PlayerFlag_CannotBeMuted);
 	const PlayerFlag PlayerFlag_IsAlwaysPremium(enums::PlayerFlag_IsAlwaysPremium);
+	const PlayerFlag PlayerFlag_CanAnswerRuleViolations(enums::PlayerFlag_CanAnswerRuleViolations);
 	const PlayerFlag PlayerFlag_CanReloadContent(enums::PlayerFlag_CanReloadContent);
 	const PlayerFlag PlayerFlag_ShowGroupInsteadOfVocation(enums::PlayerFlag_ShowGroupInsteadOfVocation);
 	const PlayerFlag PlayerFlag_HasInfiniteStamina(enums::PlayerFlag_HasInfiniteStamina);

@@ -633,6 +633,8 @@ public:
 	int lua_Waypoint_getPosition();
 
 	// - Game
+	int lua_setGameState();
+	int lua_saveGameState();
 	int lua_sendMagicEffect();
 	int lua_sendDistanceEffect();
 	int lua_sendAnimatedText();

@@ -515,12 +515,57 @@ typedef Enum<enums::WorldType, enums::WORLD_TYPE_PVPE + 1> WorldType__Base;
 	const WorldType WORLD_TYPE_PVPE(enums::WORLD_TYPE_PVPE);
 //end enum definitions
 
+namespace enums {
+	enum GameState {
+		GAME_STATE_STARTUP,
+		GAME_STATE_INIT,
+		GAME_STATE_NORMAL,
+		GAME_STATE_CLOSED,
+		GAME_STATE_SHUTDOWN,
+		GAME_STATE_CLOSING,
+	}; // end enum
+} // end namespace
+
+typedef Enum<enums::GameState, enums::GAME_STATE_CLOSING + 1> GameState;
+
+typedef Enum<enums::GameState, enums::GAME_STATE_CLOSING + 1> GameState__Base;
+
+//begin enum definitions
+	const GameState GAME_STATE_STARTUP(enums::GAME_STATE_STARTUP);
+	const GameState GAME_STATE_INIT(enums::GAME_STATE_INIT);
+	const GameState GAME_STATE_NORMAL(enums::GAME_STATE_NORMAL);
+	const GameState GAME_STATE_CLOSED(enums::GAME_STATE_CLOSED);
+	const GameState GAME_STATE_SHUTDOWN(enums::GAME_STATE_SHUTDOWN);
+	const GameState GAME_STATE_CLOSING(enums::GAME_STATE_CLOSING);
+//end enum definitions
+
+namespace enums {
+	enum ServerSaveType {
+		SERVER_SAVE_FULL,
+		SERVER_SAVE_BINARY,
+		SERVER_SAVE_RELATIONAL,
+		SERVER_SAVE_NORMAL,
+		SERVER_SAVE_SHALLOW,
+	}; // end enum
+} // end namespace
+
+typedef Enum<enums::ServerSaveType, enums::SERVER_SAVE_SHALLOW + 1> ServerSaveType;
+
+typedef Enum<enums::ServerSaveType, enums::SERVER_SAVE_SHALLOW + 1> ServerSaveType__Base;
+
+//begin enum definitions
+	const ServerSaveType SERVER_SAVE_FULL(enums::SERVER_SAVE_FULL);
+	const ServerSaveType SERVER_SAVE_BINARY(enums::SERVER_SAVE_BINARY);
+	const ServerSaveType SERVER_SAVE_RELATIONAL(enums::SERVER_SAVE_RELATIONAL);
+	const ServerSaveType SERVER_SAVE_NORMAL(enums::SERVER_SAVE_NORMAL);
+	const ServerSaveType SERVER_SAVE_SHALLOW(enums::SERVER_SAVE_SHALLOW);
+//end enum definitions
+
 namespace Script {
 namespace enums {
 	enum ListenerType {
 		ON_SAY_LISTENER,
 		ON_USE_ITEM_LISTENER,
-		ON_USE_WEAPON_LISTENER,
 		ON_EQUIP_ITEM_LISTENER,
 		ON_MOVE_CREATURE_LISTENER,
 		ON_MOVE_ITEM_LISTENER,
@@ -551,6 +596,7 @@ namespace enums {
 		ON_CONDITION_LISTENER,
 		ON_ACTOR_LOAD_SPELL_LISTENER,
 		ON_ACTOR_CAST_SPELL_LISTENER,
+		ON_USE_WEAPON_LISTENER,
 		ON_THINK_LISTENER,
 		ON_HEAR_LISTENER,
 		ON_SPOT_CREATURE_LISTENER,
@@ -565,7 +611,6 @@ typedef Enum<Script::enums::ListenerType, Script::enums::ON_LOSE_CREATURE_LISTEN
 //begin enum definitions
 	const ListenerType ON_SAY_LISTENER(enums::ON_SAY_LISTENER);
 	const ListenerType ON_USE_ITEM_LISTENER(enums::ON_USE_ITEM_LISTENER);
-	const ListenerType ON_USE_WEAPON_LISTENER(enums::ON_USE_WEAPON_LISTENER);
 	const ListenerType ON_EQUIP_ITEM_LISTENER(enums::ON_EQUIP_ITEM_LISTENER);
 	const ListenerType ON_MOVE_CREATURE_LISTENER(enums::ON_MOVE_CREATURE_LISTENER);
 	const ListenerType ON_MOVE_ITEM_LISTENER(enums::ON_MOVE_ITEM_LISTENER);
@@ -596,6 +641,7 @@ typedef Enum<Script::enums::ListenerType, Script::enums::ON_LOSE_CREATURE_LISTEN
 	const ListenerType ON_CONDITION_LISTENER(enums::ON_CONDITION_LISTENER);
 	const ListenerType ON_ACTOR_LOAD_SPELL_LISTENER(enums::ON_ACTOR_LOAD_SPELL_LISTENER);
 	const ListenerType ON_ACTOR_CAST_SPELL_LISTENER(enums::ON_ACTOR_CAST_SPELL_LISTENER);
+	const ListenerType ON_USE_WEAPON_LISTENER(enums::ON_USE_WEAPON_LISTENER);
 	const ListenerType ON_THINK_LISTENER(enums::ON_THINK_LISTENER);
 	const ListenerType ON_HEAR_LISTENER(enums::ON_HEAR_LISTENER);
 	const ListenerType ON_SPOT_CREATURE_LISTENER(enums::ON_SPOT_CREATURE_LISTENER);

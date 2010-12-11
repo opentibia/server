@@ -36,15 +36,6 @@ enum stackPosType_t{
 	STACKPOS_USEITEM
 };
 
-enum GameState_t {
-	GAME_STATE_STARTUP,
-	GAME_STATE_INIT,
-	GAME_STATE_NORMAL,
-	GAME_STATE_CLOSED,
-	GAME_STATE_SHUTDOWN,
-	GAME_STATE_CLOSING
-};
-
 enum LightState_t {
 	LIGHT_STATE_DAY,
 	LIGHT_STATE_NIGHT,
@@ -559,9 +550,9 @@ public:
 	void updateCreatureSkull(Player* player);
 #endif
 
-	GameState_t getGameState();
-	void setGameState(GameState_t newState);
-	bool saveServer(bool payHouses, bool shallowSave = false);
+	GameState getGameState();
+	void setGameState(GameState newState);
+	bool saveServer(ServerSaveType saveType);
 	void saveGameState();
 	void loadGameState();
 	void refreshMap(Map::TileMap::iterator* begin = NULL, int clean_max = 0);
@@ -690,7 +681,7 @@ protected:
 	uint32_t healExhaustionTicks;
 	uint32_t stairhopExhaustion;
 
-	GameState_t gameState;
+	GameState gameState;
 	WorldType worldType;
 
 	ServiceManager* service_manager;

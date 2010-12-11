@@ -118,12 +118,12 @@ void Game::setWorldType(WorldType type)
 	worldType = type;
 }
 
-GameState_t Game::getGameState()
+GameState Game::getGameState()
 {
 	return gameState;
 }
 
-void Game::setGameState(GameState_t newState)
+void Game::setGameState(GameState newState)
 {
 	if(gameState == GAME_STATE_SHUTDOWN){
 		//Can't go back from this state.
@@ -131,8 +131,8 @@ void Game::setGameState(GameState_t newState)
 	}
 
 	if(gameState != newState){
-		switch(newState){
-			case GAME_STATE_INIT:
+		switch(newState.value()){
+			case enums::GAME_STATE_INIT:
 			{
 				Spawns::getInstance()->startup();
 
@@ -140,7 +140,7 @@ void Game::setGameState(GameState_t newState)
 				break;
 			}
 
-			case GAME_STATE_SHUTDOWN:
+			case enums::GAME_STATE_SHUTDOWN:
 			{
 				//kick all players that are still online
 				AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
@@ -160,15 +160,15 @@ void Game::setGameState(GameState_t newState)
 				break;
 			}
 
-			case GAME_STATE_CLOSED:
+			case enums::GAME_STATE_CLOSED:
 			{
 				g_bans.clearTemporaryBans();
 				break;
 			}
 
-			case GAME_STATE_STARTUP:
-			case GAME_STATE_CLOSING:
-			case GAME_STATE_NORMAL:
+			case enums::GAME_STATE_STARTUP:
+			case enums::GAME_STATE_CLOSING:
+			case enums::GAME_STATE_NORMAL:
 			default:
 				break;
 		}
@@ -176,8 +176,14 @@ void Game::setGameState(GameState_t newState)
 	}
 }
 
-bool Game::saveServer(bool payHouses, bool shallowSave /*=false*/)
+bool Game::saveServer(ServerSaveType saveType)
 {
+	std::string old_type = g_config.getString(ConfigManager::MAP_STORAGE_TYPE);
+	if (saveType == SERVER_SAVE_RELATIONAL){
+		g_config.setString(ConfigManager::MAP_STORAGE_TYPE, "relational");
+	}
+
+
 	uint64_t start = OTSYS_TIME();
 
 	saveGameState();
@@ -187,13 +193,13 @@ bool Game::saveServer(bool payHouses, bool shallowSave /*=false*/)
 		++it)
 	{
 		it->second->loginPosition = it->second->getPosition();
-		IOPlayer::instance()->savePlayer(it->second, shallowSave);
+		IOPlayer::instance()->savePlayer(it->second, saveType == SERVER_SAVE_SHALLOW);
 	}
 
-	if(shallowSave)
+	if(saveType == SERVER_SAVE_SHALLOW)
 		return true;
 
-	if(payHouses){
+	if(saveType == SERVER_SAVE_FULL){
 		Houses::getInstance().payHouses();
 	}
 
@@ -201,7 +207,9 @@ bool Game::saveServer(bool payHouses, bool shallowSave /*=false*/)
 
 	std::cout << "Notice: Server saved. Process took " <<
 		(OTSYS_TIME() - start)/(1000.) << "s." << std::endl;
-
+	
+	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, old_type);
+	
 	return ret;
 }
 

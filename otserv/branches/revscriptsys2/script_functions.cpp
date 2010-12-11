@@ -102,6 +102,8 @@ void Manager::registerClasses() {
 	registerEnum<TileProp>();
 	registerEnum<ZoneType>();
 	registerEnum<WorldType>();
+	registerEnum<GameState>();
+	registerEnum<ServerSaveType>();
 	registerEnum<Script::ListenerType>();
 	registerEnum<MechanicType>();
 	registerEnum<ConditionId>();
@@ -628,6 +630,9 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("sendAnimatedText(position where, int color, string text)", &Manager::lua_sendAnimatedText);
 
 	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
+	
+	registerGlobalFunction("setGameState(GameState gamestate)", &Manager::lua_setGameState);
+	registerGlobalFunction("saveGameState([ServerSaveType type])", &Manager::lua_saveGameState);
 
 	registerGlobalFunction("setGlobalValue(string key, string text)", &Manager::lua_setGlobalValue);
 	registerGlobalFunction("getGlobalValue(string key)", &Manager::lua_getGlobalValue);
@@ -5640,6 +5645,26 @@ int LuaState::lua_Waypoint_getName()
 
 ///////////////////////////////////////////////////////////////////////////////
 // (Class) Game
+
+int LuaState::lua_setGameState()
+{
+	GameState type = popEnum<GameState>();
+
+	g_dispatcher.addTask(createTask(boost::bind(&Game::setGameState, &g_game, type)));
+	pushBoolean(true);
+	return 1;
+}
+
+int LuaState::lua_saveGameState()
+{
+	ServerSaveType type = SERVER_SAVE_NORMAL;
+	if (getStackSize() > 0)
+		type = popEnum<ServerSaveType>();
+
+	g_dispatcher.addTask(createTask(boost::bind(&Game::saveServer, &g_game, type)));
+	pushBoolean(true);
+	return 1;
+}
 
 int LuaState::lua_sendMagicEffect()
 {

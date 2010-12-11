@@ -369,6 +369,35 @@ template<> void WorldType__Base::initialize()
 	initAddValue(enums::WORLD_TYPE_PVPE, "WORLD_TYPE_PVPE", true);
 }
 
+template<> bool GameState__Base::initialized = false;
+template<> std::string GameState__Base::enum_name = "GameState";
+template<> GameState__Base::EnumToString GameState__Base::enum_to_string = GameState__Base::EnumToString();
+template<> GameState__Base::StringToEnum GameState__Base::string_to_enum = GameState__Base::StringToEnum();
+template<> GameState__Base::StringToEnum GameState__Base::lstring_to_enum= GameState__Base::StringToEnum();
+template<> void GameState__Base::initialize()
+{
+	initAddValue(enums::GAME_STATE_STARTUP, "GAME_STATE_STARTUP", true);
+	initAddValue(enums::GAME_STATE_INIT, "GAME_STATE_INIT", true);
+	initAddValue(enums::GAME_STATE_NORMAL, "GAME_STATE_NORMAL", true);
+	initAddValue(enums::GAME_STATE_CLOSED, "GAME_STATE_CLOSED", true);
+	initAddValue(enums::GAME_STATE_SHUTDOWN, "GAME_STATE_SHUTDOWN", true);
+	initAddValue(enums::GAME_STATE_CLOSING, "GAME_STATE_CLOSING", true);
+}
+
+template<> bool ServerSaveType__Base::initialized = false;
+template<> std::string ServerSaveType__Base::enum_name = "ServerSaveType";
+template<> ServerSaveType__Base::EnumToString ServerSaveType__Base::enum_to_string = ServerSaveType__Base::EnumToString();
+template<> ServerSaveType__Base::StringToEnum ServerSaveType__Base::string_to_enum = ServerSaveType__Base::StringToEnum();
+template<> ServerSaveType__Base::StringToEnum ServerSaveType__Base::lstring_to_enum= ServerSaveType__Base::StringToEnum();
+template<> void ServerSaveType__Base::initialize()
+{
+	initAddValue(enums::SERVER_SAVE_FULL, "SERVER_SAVE_FULL", true);
+	initAddValue(enums::SERVER_SAVE_BINARY, "SERVER_SAVE_BINARY", true);
+	initAddValue(enums::SERVER_SAVE_RELATIONAL, "SERVER_SAVE_RELATIONAL", true);
+	initAddValue(enums::SERVER_SAVE_NORMAL, "SERVER_SAVE_NORMAL", true);
+	initAddValue(enums::SERVER_SAVE_SHALLOW, "SERVER_SAVE_SHALLOW", true);
+}
+
 template<> bool Script::ListenerType__Base::initialized = false;
 template<> std::string Script::ListenerType__Base::enum_name = "ListenerType";
 template<> Script::ListenerType__Base::EnumToString Script::ListenerType__Base::enum_to_string = Script::ListenerType__Base::EnumToString();
@@ -378,7 +407,6 @@ template<> void Script::ListenerType__Base::initialize()
 {
 	initAddValue(Script::enums::ON_SAY_LISTENER, "ON_SAY_LISTENER", true);
 	initAddValue(Script::enums::ON_USE_ITEM_LISTENER, "ON_USE_ITEM_LISTENER", true);
-	initAddValue(Script::enums::ON_USE_WEAPON_LISTENER, "ON_USE_WEAPON_LISTENER", true);
 	initAddValue(Script::enums::ON_EQUIP_ITEM_LISTENER, "ON_EQUIP_ITEM_LISTENER", true);
 	initAddValue(Script::enums::ON_MOVE_CREATURE_LISTENER, "ON_MOVE_CREATURE_LISTENER", true);
 	initAddValue(Script::enums::ON_MOVE_ITEM_LISTENER, "ON_MOVE_ITEM_LISTENER", true);
@@ -409,6 +437,7 @@ template<> void Script::ListenerType__Base::initialize()
 	initAddValue(Script::enums::ON_CONDITION_LISTENER, "ON_CONDITION_LISTENER", true);
 	initAddValue(Script::enums::ON_ACTOR_LOAD_SPELL_LISTENER, "ON_ACTOR_LOAD_SPELL_LISTENER", true);
 	initAddValue(Script::enums::ON_ACTOR_CAST_SPELL_LISTENER, "ON_ACTOR_CAST_SPELL_LISTENER", true);
+	initAddValue(Script::enums::ON_USE_WEAPON_LISTENER, "ON_USE_WEAPON_LISTENER", true);
 	initAddValue(Script::enums::ON_THINK_LISTENER, "ON_THINK_LISTENER", true);
 	initAddValue(Script::enums::ON_HEAR_LISTENER, "ON_HEAR_LISTENER", true);
 	initAddValue(Script::enums::ON_SPOT_CREATURE_LISTENER, "ON_SPOT_CREATURE_LISTENER", true);

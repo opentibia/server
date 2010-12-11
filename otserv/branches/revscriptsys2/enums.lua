@@ -226,6 +226,23 @@ enum ("WorldType",
 	"WORLD_TYPE_PVPE"
 )
 
+enum ("GameState",
+	"GAME_STATE_STARTUP",
+	"GAME_STATE_INIT",
+	"GAME_STATE_NORMAL",
+	"GAME_STATE_CLOSED",
+	"GAME_STATE_SHUTDOWN",
+	"GAME_STATE_CLOSING"
+)
+
+enum ("ServerSaveType",
+	"SERVER_SAVE_FULL",
+	"SERVER_SAVE_BINARY",
+	"SERVER_SAVE_RELATIONAL",
+	"SERVER_SAVE_NORMAL",
+	"SERVER_SAVE_SHALLOW"
+)
+
 enum ("Script::ListenerType",
 	-- Not tied to a creature
 	"ON_SAY_LISTENER",
@@ -261,6 +278,7 @@ enum ("Script::ListenerType",
 	"ON_CONDITION_LISTENER",
 	"ON_ACTOR_LOAD_SPELL_LISTENER",
 	"ON_ACTOR_CAST_SPELL_LISTENER",
+	"ON_USE_WEAPON_LISTENER",
 	-- Creature specific only
 	"ON_THINK_LISTENER",
 	"ON_HEAR_LISTENER",

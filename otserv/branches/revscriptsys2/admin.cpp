@@ -588,7 +588,7 @@ void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 
 void ProtocolAdmin::adminCommandSaveServer(bool shallow)
 {
-	g_game.saveServer(false, shallow);
+	g_game.saveServer(shallow ? SERVER_SAVE_SHALLOW : SERVER_SAVE_NORMAL);
 	addLogLine(this, LOGTYPE_EVENT, 1, "save server ok");
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
@@ -601,11 +601,7 @@ void ProtocolAdmin::adminCommandSaveServer(bool shallow)
 
 void ProtocolAdmin::adminCommandRelationalSaveServer()
 {
-	std::string old_type = g_config.getString(ConfigManager::MAP_STORAGE_TYPE);
-	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, "relational");
-	g_game.saveServer(false);
-	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, old_type);
-	addLogLine(this, LOGTYPE_EVENT, 1, "relational save server ok");
+	g_game.saveServer(SERVER_SAVE_RELATIONAL);
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
