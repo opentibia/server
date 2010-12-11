@@ -6,7 +6,7 @@ getThingfromPos = getThingFromPos
 getPlayerBalance = getPlayerAccountBalance
 broadcastMessage = doBroadcastMessage
 broadcastMessageEx = broadcastMessage
-
+getPlayersByAccountNumber = getPlayerByAccountNumber
 
 function setExperienceRate(cid, value)
 	return doPlayerSetRate(cid, LEVEL_EXPERIENCE, value)
@@ -442,14 +442,6 @@ function string.strip_whitespace(str)
 		return string.sub(str, 1, _end)
 	end
 	return str
-end
-
-function getPlayerByAccountNumber(acc)
-	players = getPlayerByAccountNumber(acc)
-	if #players == 0 then
-		return false
-	end
-	return players[1]
 end
 
 function convertIntToIP(int, mask)

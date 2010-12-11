@@ -24460,8 +24460,8 @@
 	<item id="11206" name="red lantern">
 		<attribute key="weight" value="116"/>
 	</item>
-	<item id="11207" name="mummy doll">
-		<attribute key="weight" value="116"/>
+	<item id="11207" name="mini mummy">
+		<attribute key="weight" value="450"/>
 	</item>
 	<item id="11208" name="rotten piece of cloth" plural="rotten pieces of cloth">
 		<attribute key="weight" value="60"/>
@@ -24473,12 +24473,12 @@
 		<attribute key="weight" value="120"/>
 	</item>
 	<item id="11211" name="stuffed toad">
-		<attribute key="weight" value="116"/>
+		<attribute key="weight" value="450"/>
 	</item>
 	<item id="11212" name="winter wolf fur">
 		<attribute key="weight" value="110"/>
 	</item>
-	<item id="11213" name="acorn">
+	<item id="11213" name="acorn" plural="acorns">
 		<attribute key="weight" value="50"/>
 	</item>
 	<item id="11214" name="antlers" plural="antlers">
@@ -24493,7 +24493,7 @@
 	<item id="11217" name="carniphila seeds" plural="carniphila's seeds">
 		<attribute key="weight" value="35"/>
 	</item>
-	<item id="11218" name="centipede leg">
+	<item id="11218" name="centipede leg" plural="centipede legs">
 		<attribute key="weight" value="68"/>
 	</item>
 	<item id="11219" name="compass" plural="compasses">

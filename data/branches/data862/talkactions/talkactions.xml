@@ -15,6 +15,7 @@
 	<talkaction words="/shutdown" access="3" filter="first word" script="shutdown.lua"/>
 	<talkaction words="/serverdiag" access="3" filter="first word" function="serverDiagnostic"/>
 	<talkaction words="/reload" access="3" filter="first word" script="reload.lua"/>
+	<talkaction words="/ban" access="3" filter="first word" script="banmanager.lua"/>
 
 	<!-- Gamemasters -->
 	<talkaction words="/up" access="2" filter="first word" script="floorchange.lua"/>
