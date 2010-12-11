@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="dragon" nameDescription="a dragon" race="blood" experience="700" speed="180" manacost="0">
+	<health now="1000" max="1000"/>
+	<look type="34" corpse="5973"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="300"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-28" max="-120"/>
+		<attack name="fire" interval="200" chance="4" range="7" radius="4" target="1" min="-60" max="-110">
+			<attribute key="shootEffect" value="fire"/>
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+		<attack name="fire" interval="200" chance="5" length="8" spread="3" min="-100" max="-170">
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="18">
+		<defense name="healing" interval="500" chance="6" min="34" max="56">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="80"/>
+		<element energyPercent="20"/>
+		<element icePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity fire="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+		<voices interval="5000" chance="10">
+		<voice sentence="GROOOOAAAAAAAAR" yell="1"/>
+		<voice sentence="FCHHHH" yell="1"/>
+	</voices>
+	<loot>
+		<item id="2672" countmax="3" chance1="32730" chancemax="0"/> -- dragon ham
+		<item id="2148" countmax="100" chance1="20784" chancemax="0"/> -- gold coin
+		<item id="2148" countmax="10" chance="10784" chancemax="0"/> -- gold coin
+		<item id="2398" chance="19640"/> -- mace :: Def 11 :: Atk 16
+		<item id="2455" chance="9560"/> -- crossbow
+		<item id="2434" chance="550"/> -- dragon hammer :: Def 20 :: Atk 32
+		<item id="2509" chance="14140"/> -- steel shield :: Def 21
+		<item id="2406" chance="25370"/> -- short sword :: Def 11 :: Atk 11
+		<item id="2647" chance="2310"/> -- plate legs :: Arm 7
+		<item id="2457" chance="2490"/> -- steel helmet :: Arm 6
+		<item id="2387" chance="700"/> -- double axe :: Def 12 :: Atk 35
+		<item id="7430" chance="150"/> -- dragonbone staff :: Def 18 :: Atk 35
+		<item id="2397" chance="4040"/> -- longsword :: Def 14 :: Atk 17
+		<item id="7588" chance="1120"/> -- strong health potion
+		<item id="2546" countmax="12" chance1="6835" chancemax="0"/> -- burst arrow
+		<item id="5877" countmax="1" chance1="880" chancemax="0"/> -- green dragon leather
+		<item id="1987" chance="99000"> -- bag
+		<inside>
+			<item id="2187" chance="1120"/> -- wand of inferno
+			<item id="2516" chance="520"/> -- dragon shield :: Def 31
+			<item id="2145" countmax="3" chance1="520" chancemax="0"/> -- small diamond
+			<item id="2177" chance="240"/> -- life crystal
+			<item id="2413" chance="1910"/> -- broad sword :: Def 23 :: Atk 26
+			<item id="2409" chance="330"/> -- serpent sword :: Def 15 :: Atk 26
+			<item id="5920" countmax="1" chance1="1120" chancemax="0"/> -- green dragon scale
+		</inside>
+		</item>
+	</loot>
+</monster>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<houses>
+  <house name="Main Street 2a" houseid="1" entryx="92" entryy="87" entryz="6" rent="1500" townid="1" size="24"/>
+  <house name="Main street 1a" houseid="2" entryx="92" entryy="87" entryz="7" rent="1500" townid="1" size="24"/>
+  <house name="Main street 1b" houseid="3" entryx="101" entryy="87" entryz="7" rent="1500" townid="1" size="24"/>
+  <house name="Main street 1c" houseid="4" entryx="110" entryy="87" entryz="7" rent="1500" townid="1" size="24"/>
+  <house name="Main Street 2b" houseid="5" entryx="101" entryy="87" entryz="6" rent="1500" townid="1" size="24"/>
+  <house name="Main Street 2c" houseid="6" entryx="110" entryy="87" entryz="6" rent="1500" townid="1" size="24"/>
+  <house name="Shop 1" houseid="7" entryx="122" entryy="98" entryz="6" rent="1100" townid="1" size="28"/>
+  <house name="Boat Stream 1" houseid="8" entryx="73" entryy="126" entryz="7" rent="1200" townid="1" size="13"/>
+  <house name="Main street 3a" houseid="9" entryx="91" entryy="121" entryz="7" rent="1500" townid="1" size="18"/>
+  <house name="Main street 3b" houseid="10" entryx="99" entryy="121" entryz="7" rent="1500" townid="1" size="18"/>
+  <house name="Main street 3d" houseid="11" entryx="115" entryy="121" entryz="7" rent="1500" townid="1" size="18"/>
+  <house name="Main street 3c" houseid="12" entryx="107" entryy="121" entryz="7" rent="1500" townid="1" size="18"/>
+  <house name="Boat Stream 2" houseid="13" entryx="73" entryy="120" entryz="7" rent="1200" townid="1" size="13"/>
+  <house name="Shop 2a" houseid="14" entryx="67" entryy="101" entryz="6" rent="600" townid="1" size="10"/>
+  <house name="Shop 2b" houseid="15" entryx="67" entryy="107" entryz="6" rent="900" townid="1" size="16"/>
+  <house name="Shop 2c" houseid="16" entryx="68" entryy="101" entryz="6" rent="1000" townid="1" size="14"/>
+  <house name="Shop 2d" houseid="17" entryx="69" entryy="108" entryz="6" rent="1000" townid="1" size="15"/>
+  <house name="Sea View 1" houseid="18" entryx="53" entryy="159" entryz="7" rent="1300" townid="1" size="23"/>
+  <house name="Sea View 2" houseid="19" entryx="59" entryy="159" entryz="7" rent="1300" townid="1" size="23"/>
+  <house name="Pleasant Home 1" houseid="20" entryx="118" entryy="75" entryz="7" rent="1100" townid="1" size="21"/>
+  <house name="Pleasant Home 2" houseid="21" entryx="120" entryy="89" entryz="7" rent="1100" townid="1" size="17"/>
+  <house name="Smally Wally 1" houseid="22" entryx="122" entryy="120" entryz="7" rent="400" townid="1" size="7"/>
+  <house name="Smally Wally 2" houseid="23" entryx="122" entryy="125" entryz="7" rent="400" townid="1" size="7"/>
+  <house name="Smally Wally 3" houseid="24" entryx="132" entryy="125" entryz="7" rent="400" townid="1" size="7"/>
+  <house name="Smally Wally 4" houseid="25" entryx="132" entryy="120" entryz="7" rent="400" townid="1" size="7"/>
+  <house name="Tharkasian Road 1" houseid="26" entryx="92" entryy="131" entryz="7" rent="900" townid="1" size="8"/>
+  <house name="Tharkasian Road 2" houseid="27" entryx="99" entryy="134" entryz="7" rent="1300" townid="1" size="16"/>
+  <house name="Tharkas Guildhall 2" houseid="28" entryx="99" entryy="145" entryz="7" rent="7200" townid="1" size="324"/>
+  <house name="Tharkas Guildhall 1" houseid="29" entryx="99" entryy="138" entryz="7" rent="5400" townid="1" size="166"/>
+  <house name="Tharkas Farm 1" houseid="30" entryx="98" entryy="157" entryz="7" rent="1350" townid="1" size="22"/>
+  <house name="Tharkas Farm 2" houseid="31" entryx="98" entryy="151" entryz="7" rent="1350" townid="1" size="22"/>
+  <house name="Camel Avenue 1" houseid="32" entryx="287" entryy="284" entryz="7" rent="1200" townid="2" size="47"/>
+  <house name="Camel Avenue 2" houseid="33" entryx="287" entryy="390" entryz="7" rent="800" townid="2" size="38"/>
+  <house name="Camel Avenue 3" houseid="34" entryx="286" entryy="414" entryz="7" rent="1200" townid="2" size="51"/>
+  <house name="Camel Avenue 4" houseid="35" entryx="290" entryy="421" entryz="7" rent="500" townid="2" size="18"/>
+  <house name="Camel Avenue 5" houseid="36" entryx="290" entryy="426" entryz="7" rent="500" townid="2" size="18"/>
+  <house name="Camel Avenue 6" houseid="37" entryx="290" entryy="431" entryz="7" rent="500" townid="2" size="18"/>
+  <house name="Camel Avenue 7" houseid="38" entryx="276" entryy="430" entryz="7" rent="500" townid="2" size="18"/>
+  <house name="Camel Avenue 8" houseid="39" entryx="276" entryy="425" entryz="7" rent="500" townid="2" size="18"/>
+  <house name="Camel Avenue 9" houseid="40" entryx="276" entryy="420" entryz="7" rent="500" townid="2" size="18"/>
+  <house name="Camel Avenue 10" houseid="41" entryx="302" entryy="415" entryz="7" rent="2000" townid="2" size="79"/>
+  <house name="Oasis Road 1" houseid="42" entryx="299" entryy="398" entryz="7" rent="2100" townid="2" size="70"/>
+  <house name="Oasis Road 2" houseid="43" entryx="311" entryy="398" entryz="7" rent="2100" townid="2" size="69"/>
+  <house name="Oasis Road 3" houseid="44" entryx="322" entryy="398" entryz="7" rent="2100" townid="2" size="70"/>
+  <house name="Oasis Guildhall" houseid="45" entryx="323" entryy="405" entryz="7" rent="6000" townid="2" size="190"/>
+  <house name="Oasis Road 4" houseid="46" entryx="323" entryy="415" entryz="7" rent="1600" townid="2" size="71"/>
+  <house name="Oasis Road 5" houseid="47" entryx="323" entryy="425" entryz="7" rent="1700" townid="2" size="72"/>
+  <house name="Oasis Road 6" houseid="48" entryx="323" entryy="428" entryz="7" rent="1400" townid="2" size="68"/>
+  <house name="Oasis Road 7" houseid="49" entryx="302" entryy="403" entryz="7" rent="900" townid="2" size="37"/>
+  <house name="Oasis Road 8" houseid="50" entryx="312" entryy="403" entryz="7" rent="900" townid="2" size="45"/>
+  <house name="Oasis Road 9" houseid="51" entryx="312" entryy="426" entryz="7" rent="900" townid="2" size="48"/>
+  <house name="Oasis Road 10" houseid="52" entryx="302" entryy="426" entryz="7" rent="900" townid="2" size="40"/>
+  <house name="Barrancas Street 1" houseid="53" entryx="297" entryy="378" entryz="7" rent="1100" townid="2" size="45"/>
+  <house name="Barrancas Street 2" houseid="54" entryx="312" entryy="378" entryz="7" rent="1650" townid="2" size="62"/>
+  <house name="Barrancas Street 3" houseid="55" entryx="321" entryy="378" entryz="7" rent="850" townid="2" size="40"/>
+</houses>

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Dworc Fleshhunter" nameDescription="a dworc fleshhunter" race="blood" experience="35" speed="240" manacost="0">
+	<health now="85" max="85"/>
+	<look type="215" corpse="6058"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="8"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="25" attack="17" poison="20"/>
+		<attack name="physical" interval="1000" chance="9" range="7" min="-5" max="-15">
+			<attribute key="shootEffect" value="throwingknife"/>
+		</attack>
+	</attacks>
+	<defenses armor="3" defense="8"/>
+	<elements>
+		<element earthPercent="100"/>
+		<element deathPercent="-15"/>
+		<element firePercent="-10"/>
+		<element icePercent="-10"/>
+	</elements>
+	<voices interval="5000" chance="10">
+		<voice sentence="Grak brrretz!"/>
+		<voice sentence="Grow truk grrrrr."/>
+		<voice sentence="Prek tars, dekklep zurk."/>
+	</voices>
+	<loot>
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="12" chance="100000"/><!-- gold coin -->
+		<item id="2666" countmax="2" chance="40000"/><!--  -->
+		<item id="2512" chance="10000"/><!-- wooden shield -->
+		<item id="2530" chance="4000"/><!-- copper shield -->
+		<item id="3956" countmax="3" chance="10000"/><!-- elephant tusk -->
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="3952" chance="500"/><!-- didgeridoo -->
+				<item id="2385" chance="6666"/><!-- sabre -->
+				<item id="2464" chance="5000"/><!-- chain armor -->
+				<item id="2420" chance="5000"/><!-- machete -->
+				<item id="2448" chance="5000"/><!-- studded club -->
+				<item id="2007" chance="20000"/><!-- blue bottle -->
+			</inside>
+		</item>
+	</loot>
+</monster>

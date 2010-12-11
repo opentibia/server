@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<npc name="Mailman Maily" floorchange="0" walkinterval="2500">
+	<health now="150" max="150"/>
+	<look type="133" head="20" body="120" legs="75" feet="13"/>
+
+	<interaction range="3" idletimeout="30">
+		<!--This will include the postman interaction, in this way several npc can use the same interaction-->
+		<include file="postman.xml"/>
+		
+		<interact keywords="hi" focus="1">
+			<!--These are the alternative keywords-->
+			<keywords>hello</keywords>
+			
+			<response text="Hello. How may I help you |NAME|?"/>
+		</interact>
+
+		<interact keywords="bye" focus="0">
+			<!--These are the alternative keywords-->
+			<keywords>farewell</keywords>
+			
+			<response text="It was a pleasure to help you."/>
+		</interact>
+
+		<!--
+		<interact event="onBusy">
+			<response text="One moment please, |NAME|.">
+				<action name="addqueue" value="|PLAYER|"/>
+			</response>
+		</interact>
+		-->
+
+		<interact event="onPlayerLeave" focus="0">
+			<response text="It was a pleasure to help you |NAME|."/>
+		</interact>
+		
+		<interact keywords="name">
+			<response text="My name is |NPCNAME|."/>
+		</interact>
+
+		<interact keywords="job">
+			<response text="I am working here at the post office. If you have questions about the Royal Tibia Mail System or the depots ask me."/>
+		</interact>
+	 
+	</interaction>
+	
+</npc>

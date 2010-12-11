@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<npc name="Cityguard" floorchange="0" walkinterval="0" speed="900" script="cityguard.lua">
+	<health now="150" max="150"/>
+	<look type="131" head="19" body="19" legs="19" feet="19"/>
+
+	<interaction range="3" idletimeout="60">
+
+		<interact keywords="hi" focus="1">
+			<keywords>hello</keywords>
+
+			<response text="Nothing to see here, move along.">
+				<action name="idle" value="1"/>
+			</response>
+		</interact>
+
+		<interact keywords="bye" focus="0">
+			<keywords>farewell</keywords>
+			
+			<response text="Good bye."/>
+		</interact>
+	</interaction>
+	
+</npc>

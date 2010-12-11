@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<npc name="Merchant Glut" floorchange="0" walkinterval="4000" speed="220">
+	<health now="150" max="150"/>
+	<look type="100" head="0" body="0" legs="0" feet="0"/>
+	
+	<interaction range="3" idletimeout="30" defaultpublic="0">
+		<!--This will include the bankman interaction, in this way several npc can use the same interaction-->
+		<include file="merchant.xml"/>
+		
+		<interact keywords="hi" focus="1">
+			<!--These are the alternative keywords-->
+			<keywords>hello</keywords>
+			
+			<response text="Hello. How may I help you |NAME|?"/>
+		</interact>
+
+		<interact keywords="bye" focus="0">
+			<!--These are the alternative keywords-->
+			<keywords>farewell</keywords>
+
+			<response text="It was a pleasure to help you."/>
+		</interact>
+
+		<!--
+		<interact event="onBusy">
+			<response text="One moment please, |NAME|.">
+				<action name="addqueue" value="|PLAYER|"/>
+			</response>
+		</interact>
+		-->
+
+		<interact event="onPlayerLeave" focus="0">
+			<response text="It was a pleasure to help you |NAME|."/>
+		</interact>
+		
+		<interact keywords="name">
+			<response text="My name is |NPCNAME|."/>
+		</interact>
+
+		<interact keywords="job">
+			<response text="I am a merchant, my job is to serve you!"/>
+		</interact>
+
+		<interact keywords="wares">
+			<list>runes</list>
+			<list>tapestry</list>
+			<list>food</list>
+			<list>vials</list>
+			<list>backpack</list>
+			<response>
+				<action name="script">
+				<![CDATA[
+					openShopWindow(cid, itemlist, -1, -1)
+				]]>
+				</action>
+			</response>
+		</interact>
+
+		<interact event="onPlayerShopSell">
+			<response>
+				<action name="price" value="|SELLPRICE|"/>
+				<action name="script">
+				<![CDATA[
+					if(doPlayerRemoveItem(cid, _state.itemid, _state.amount, _state.subtype) == TRUE) then
+						doPlayerAddMoney(cid, _state.price * _state.amount)
+						selfSay("Here you are.", cid)
+					else
+						selfSay("Sorry, you do not have one.", cid)
+					end
+				]]>
+				</action>
+			</response>
+		</interact>
+		
+		<interact event="onPlayerShopBuy">
+			<response>
+				<action name="price" value="|BUYPRICE|"/>
+				<action name="script">
+				<![CDATA[
+					if(getPlayerMoney(cid) >= _state.amount * _state.price) then
+						--doSellItem(cid, itemid, amount, <optional> subtype, <optional> actionid, <optional: default: 1> canDropOnMap)
+						local sellAmount = doSellItem(cid, _state.itemid, _state.amount, _state.subtype, 0, 0)
+
+						if(sellAmount ~= _state.amount) then
+							if(sellAmount == 0) then
+								selfSay("Sorry, but you don't have room to take it.", cid)
+								return
+							elseif(sellAmount > 0) then
+								selfSay("I've sold some for you, but it seems you can't carry more than this. I won't take more money than necessary.", cid)
+								doPlayerRemoveMoney(cid, sellAmount * _state.price)
+								return
+							end
+						end
+
+						selfSay("Here you are.", cid)
+						doPlayerRemoveMoney(cid, _state.price * _state.amount)
+					else
+						selfSay("Sorry, you do not have enough gold.", cid)
+					end
+				]]>
+				</action>
+			</response>
+		</interact>
+
+		<interact event="onPlayerShopClose">
+			<response text="It was a pleasure to help you."/>
+		</interact>
+		
+		<interact keywords="sell;|AMOUNT|;|LIST|">
+			<!-- See merchant.xml to add more items/lists-->
+			<list>runes</list>
+			<list>tapestry</list>
+			<list>food</list>
+			<list>vials</list>
+			<list>backpack</list>
+
+			<response>
+				<action name="amount" value="|AMOUNT|"/>
+				<action name="price" value="|SELLPRICE|"/>
+
+				<action name="script">
+				<![CDATA[
+					if(_state.amount > 1) then
+						selfSay("Do you want to sell " .. _state.amount .. " " .. _state.listpname .. " for " ..  _state.price * _state.amount .. " gold?", cid)
+					else
+						selfSay("Do you want to sell " .. _state.listname .. " for " .. _state.price .. " gold?", cid)
+					end
+				]]>
+				</action>
+
+				<interact keywords="yes">
+					<response param="noamount" text="Sorry, you do not have one."/>
+					<response param="lowamount" text="Sorry, you do not have that many."/>
+					<response text="Ok. Here is your money.">
+						<action name="sell" value="|PRICE|"/>
+					</response>
+				</interact>
+				
+			</response>
+		</interact>
+
+		<interact keywords="buy;|AMOUNT|;|LIST|">
+			<!-- See merchant.xml to add more items/lists-->
+			<list>runes</list>
+			<list>tapestry</list>
+			<list>food</list>
+			<list>vials</list>
+			<list>backpack</list>
+
+			<response>
+				<action name="amount" value="|AMOUNT|"/>
+				<action name="price" value="|BUYPRICE|"/>
+
+				<action name="script">
+				<![CDATA[
+					if(_state.price == 0) then
+						selfSay("Sorry, I do not sell that.", cid)
+						return
+					end
+					
+					if(_state.amount > 1) then
+						selfSay("Do you want to buy " .. _state.amount .. " " .. _state.listpname .. " for " ..  _state.price * _state.amount .. " gold?", cid)
+					else
+						selfSay("Do you want to buy " .. _state.listname .. " for " .. _state.price .. " gold?", cid)
+					end
+				]]>
+				</action>
+
+				<interact keywords="yes">
+					<response param="lowmoney" text="Sorry, you do not have enough gold."/>
+					<response text="Thank you. Here it is.">
+						<action name="buy" value="|PRICE|"/>
+					</response>
+				</interact>
+
+			</response>
+		</interact>
+	</interaction>
+	
+</npc>

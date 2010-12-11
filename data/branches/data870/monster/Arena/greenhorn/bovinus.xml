@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Bovinus" nameDescription="bovinus" race="blood" experience="60" speed="170">
+	<health now="150" max="150"/>
+	<look type="25" corpse="7349"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag staticattack="78"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-1" max="-40"/>
+	</attacks>
+	<elements>
+		<element firePercent="20"/>
+	</elements>
+	<defenses armor="9" defense="11"/>
+</monster>

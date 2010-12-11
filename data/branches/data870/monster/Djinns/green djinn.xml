@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Green Djinn" nameDescription="a green djinn" race="blood" experience="215" speed="220" manacost="0">
+	<health now="330" max="330"/>
+	<look type="51" corpse="6016"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-60" max="-120"/>
+		<attack name="fire" interval="1000" chance="50" range="7" min="-45" max="-75">
+			<attribute key="shootEffect" value="fire"/>
+		</attack>
+		<attack name="energycondition" interval="2000" chance="34" range="7" min="-50" max="-90">
+			<attribute key="shootEffect" value="energy"/>
+		</attack>
+		<attack name="lifedrain" interval="3000" chance="25" range="7" min="-55" max="-105">
+			<attribute key="shootEffect" value="suddendeath"/>
+		</attack>
+		<attack name="drunk" interval="1000" chance="15" range="7">
+			<attribute key="shootEffect" value="energy"/>
+			<attribute key="areaEffect" value="energyarea"/>
+		</attack>
+		<attack name="outfit" interval="1000" chance="17" range="7" monster="rat" duration="30000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="18" defense="10"/>
+	<elements>
+		<element firePercent="80"/>
+		<element energyPercent="50"/>
+		<element physicalPercent="30"/>
+		<element deathPercent="20"/>
+		<element icePercent="-10"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>>
+	<voices interval="5000" chance="10">
+		<voice sentence="I grant you a deathwish!"/>
+		<voice sentence="Muhahahaha!"/>
+		<voice sentence="I wish you a merry trip to hell!"/>
+		<voice sentence="Good wishes are for fairytales"/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="20" chance="100000"/><!-- gold coin -->
+		<item id="7378" countmax="2" chance="2000"/><!-- royal spear -->
+		<item id="2149" countmax="4" chance="6666"/><!-- small emerald -->
+		<item id="2187" chance="1111"/><!-- wand of inferno -->
+		<item id="2696" chance="10000"/><!-- cheese -->
+		<item id="2747" chance="10000"/><!-- grave flower -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2062" chance="5000"/><!-- small oil lamp -->
+				<item id="2148" countmax="20" chance="100000"/><!-- gold coin -->
+				<item id="2176" chance="2000"/><!-- orb -->
+				<item id="5910" countmax="1" chance="5000"/><!-- green piece of cloth -->
+			</inside>
+		</item>
+	</loot>
+</monster>

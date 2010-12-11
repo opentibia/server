@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Giant Spider" nameDescription="a giant spider" race="venom" experience="900" speed="280" manacost="0">
+	<health now="1300" max="1300"/>
+	<look type="38" corpse="5977"/>
+	<targetchange interval="5000" chance="28"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="82"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-26" max="-300" poison="-140"/>
+		<attack name="poisonfield" interval="300" chance="6" range="7" radius="1" target="1">
+			<attribute key="shootEffect" value="poison"/>
+		</attack>
+		<attack name="earth" interval="500" chance="7" range="7" min="-40" max="-70">
+			<attribute key="shootEffect" value="smallearth"/>
+			<attribute key="areaEffect" value="carniphila"/>
+		</attack>
+	</attacks>
+	<defenses armor="20" defense="20">
+		<defense name="speed" interval="1000" chance="6" speedchange="310" duration="20000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="20"/>
+		<element icePercent="20"/>
+		<element firePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="0"/>
+		<immunity paralyze="0"/>
+		<immunity outfit="1"/>
+		<immunity earth="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="poison spider" interval="1000" chance="30" max="2"/>
+	</summons>
+	<loot>
+		<item id="2169" chance="750"/> -- time ring
+		<item id="2148" countmax="50" chance1="90000" chancemax="0"/> -- gold coin
+		<item id="2545" countmax="12" chance1="81630" chancemax="0"/> -- poison arrow
+		<item id="2463" chance="10340"/> -- plate armor :: Arm 10
+		<item id="2171" chance="200"/> -- platinum amulet :: Arm 2
+		<item id="5879" countmax="1" chance1="1940" chancemax="0"/> -- giant spider silk
+		<item id="1987" chance="100000"> -- bag
+		<inside>
+			<item id="2148" countmax="65" chance1="90000" chancemax="0"/> -- gold coin
+			<item id="2457" chance="5540"/> -- steel helmet :: Arm 6
+			<item id="7588" chance="860"/> -- strong health potion
+			<item id="2476" chance="280"/> -- knight armor :: Arm 12
+			<item id="2477" chance="350"/> -- knight legs :: Arm 8
+			<item id="2478" chance="7700"/> -- brass legs :: Arm 5
+			<item id="7901" chance="100"/> -- lightning headband :: Arm 5
+		</inside>
+		</item>
+	</loot>
+</monster>

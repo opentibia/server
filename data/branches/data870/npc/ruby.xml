@@ -1,0 +1,201 @@
+<?xml version="1.0"?>
+<npc name="Ruby" floorchange="0" walkinterval="4000"  script="ruby.lua">
+	<health now="150" max="150"/>
+	<look type="133" head="20" body="120" legs="75" feet="13"/>
+	
+	<interaction range="3" idletimeout="30">
+		
+		<interact keywords="hi" focus="1">
+			<!--These are the keywords will trigger this interaction-->
+			<keywords>hello</keywords>
+
+			<response>
+				<action name="script">
+				<![CDATA[
+					if(getPlayerSex(cid)) == 0 then
+						selfSay("Welcome on board, Madam " .. getCreatureName(cid) .. ".", cid)
+					else
+						selfSay("Welcome on board, Sir " .. getCreatureName(cid) .. ".", cid)
+					end
+				]]>
+				</action>
+			</response>
+			
+		</interact>
+
+		<interact keywords="bye" focus="0">
+			<keywords>farewell</keywords>
+			<response text="Good bye. Recommend us, if you were satisfied with our service.">
+				<!--
+				<action name="script">
+					doRemoveCreature(getNpcCid());
+				</action>
+				-->
+			</response>
+		</interact>
+		
+		<!--
+		If the event onBusy exists, the npc will make a queue like Tibia, if the event is removed
+		the npc will be able to talk to all customers at the same time without problems.
+		-->
+
+		<interact event="onBusy">
+			<response text="One moment please, |NAME|.">
+				<action name="addqueue" value="|PLAYER|"/>
+			</response>
+		</interact>
+
+		<!--This event triggers if the player goes to far away from the npc/logout/idle timeout-->
+		<interact event="onPlayerLeave" focus="0">
+			<response text="Good bye. Recommend us, if you were satisfied with our service."/>
+		</interact>
+
+		<!---Example of calling a script function, check ruby.lua-->
+		<interact focus="1">
+			<!--These are the keywords will trigger this interaction-->
+			<keywords>asshole</keywords>
+			<keywords>stupid</keywords>
+			<keywords>idiot</keywords>
+			<keywords>fuck</keywords>
+			<keywords>fag</keywords>
+
+			<response function="onSayCurse">
+				<action name="idle" value="1"/>
+				<action name="scriptparam" value="|PLAYER|"/>
+				<action name="scriptparam" value="|TEXT|"/>
+			</response>
+		</interact>
+
+		<interact focus="0">
+			<!--These are the keywords will trigger this interaction-->
+			<keywords>asshole</keywords>
+			<keywords>stupid</keywords>
+			<keywords>idiot</keywords>
+			<keywords>fuck</keywords>
+			<keywords>fag</keywords>
+
+			<response function="onSayCurse">
+				<action name="idle" value="1"/>
+				<action name="scriptparam" value="|PLAYER|"/>
+				<action name="scriptparam" value="|TEXT|"/>
+			</response>
+		</interact>
+
+		<interact keywords="edron">
+			<response text="Do you want a passage to Edron for |PRICE| gold?">
+				<action name="topic" value="1"/>
+				<action name="price" value="200"/>
+			</response>
+		</interact>
+		
+		<interact topic="1" keywords="yes">
+			<response param="pzblock" text="First get rid of those blood stains! You are not going to ruin my vehicle!"/>
+			<response param="lowmoney" text="You don't have enough money."/>
+			<response text="Have a nice trip!">
+				<action name="idle" value="1"/>
+				<action name="takemoney" value="|PRICE|"/>
+				<action name="teleport" value="120;120;7"/>
+				<action name="effect" value="teleport"/>
+			</response>
+		</interact>
+
+		<!-- Example of another way to do it, instead of using topic variable-->
+		<interact keywords="thais">
+			<response text="Do you want a passage to Thais for |PRICE| gold?">
+				<action name="price" value="200"/>
+
+				<interact keywords="yes">
+					<response param="pzblock" text="First get rid of those blood stains! You are not going to ruin my vehicle!"/>
+					<response param="lowmoney" text="You don't have enough money."/>
+					<response text="Have a nice trip!">
+						<action name="idle" value="1"/>
+						<action name="takemoney" value="|PRICE|"/>
+						<action name="effect" value="teleport"/>
+						<action name="teleport" value="120;120;7"/>
+					</response>
+				</interact>
+
+				<!-- This response is being used when a player says something else than 'yes' -->
+				<interact keywords="|*|">
+					<response text="Maybe some other time."/>
+				</interact>
+
+				</response>
+		</interact>
+
+		<!--Example of using storage values, storageComp can be less/lessorequal/equal/greater/greaterorequal-->
+		<!--In this example it checks if the storage value of 5500 is less than 0-->
+		<!--Another way to write it would be storageValue="-1" storageComp="equal"-->
+		<!--Basically we check if the storage id of 5500 is -1, ie. not having any value yet.-->
+		<interact keywords="secret" storageId="5500" storageValue="0" storageComp="less">
+			<response text="So you want to know my secret?">
+				<interact keywords="yes">
+					<response text="The secret im not really a captain, im just an example npc!">
+						<action name="storage" key="5500"  value="1"/>
+					</response>
+				</interact>
+			</response>
+		</interact>
+
+		<interact keywords="secret" storageId="5500" storageValue="1" storageComp="equal">
+			<response text="You already know my secret, now leave me alone!">
+				<action name="idle" value="1"/>
+			</response>
+		</interact>
+		<!-->End of example of using storage value-->
+
+		<!-- Sell item(s) interaction, see merchant glut with an example of an npc with list items-->
+		<interact keywords="sell;|AMOUNT|;brass;helmet">
+			<keywords>sell;brass;helmet</keywords>
+			
+			<response text="Do you want to sell |AMOUNT| brass helmet for |PRICE| gold?">
+				<action name="topic" value="2"/>
+				<action name="item" value="2460"/>
+				<action name="price" value="200"/>
+				<action name="amount" value="|AMOUNT|"/>
+			</response>
+		</interact>
+		
+		<interact keywords="sell;|AMOUNT|;brass;legs">
+			<keywords>sell;brass;legs</keywords>
+			
+			<response text="Do you want to sell |AMOUNT| brass legs for |PRICE| gold?">
+				<action name="topic" value="2"/>
+				<action name="item" value="2468"/>
+				<action name="price" value="400"/>
+				<action name="amount" value="|AMOUNT|"/>
+			</response>
+		</interact>
+
+		<interact topic="2" keywords="yes">
+			<response param="noamount" text="Sorry you do not have one."/>
+			<response param="lowamount" text="Sorry, you do not have so many."/>
+			<response text="Ok. Here is your money.">
+				<action name="sell" value="|PRICE|"/>
+			</response>
+		</interact>
+		<!-- End of sell item(s) interaction-->
+
+		<!-- Buy item(s) interaction, see merchant glut for a real seller/buyer npc-->
+		<interact keywords="buy;|AMOUNT|;brass;helmet">
+			<keywords>buy;brass;legs</keywords>
+			
+			<response text="Do you want to buy |AMOUNT| brass helmet for |PRICE| gold?">
+				<action name="topic" value="3"/>
+				<action name="item" value="2460"/>
+				<action name="price" value="200"/>
+				<action name="amount" value="|AMOUNT|"/>
+			</response>
+		</interact>
+
+		<interact topic="3" keywords="yes">
+			<response param="lowmoney" text="Come back when you have the money!"/>
+			<response text="Here you are.">
+				<action name="buy" value="|PRICE|"/>
+			</response>
+		</interact>
+		<!-- End of buy item(s) interaction-->
+		
+	</interaction>
+	
+</npc>

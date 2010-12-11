@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Norgle Glacierbeard" nameDescription="norgle glacierbeard" race="blood" experience="2100" speed="195" manacost="0">
+	<health now="4300" max="4300"/>
+	<look type="257" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" min="-100" max="-230"/>
+		<!--<attack name="Smokewave" interval="1000" chance="35"/> -->
+	</attacks>
+	<defenses armor="25" defense="27"/>
+	<elements>
+		<element icePercent="100"/>
+		<element deathPercent="-9"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="5">
+		<voice sentence="I'll extinguish you warmbloods."/>
+		<voice sentence="REVENGE!"/>
+		<voice sentence="Far too hot."/>
+		<voice sentence="DISGUSTING WARMBLOODS!"/>
+		<voice sentence="Revenge is sweetest when served cold."/>
+	</voices>
+</monster>

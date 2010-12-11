@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Lizard Templar" nameDescription="a lizard templar" race="blood" experience="115" speed="220" manacost="0">
+	<health now="410" max="410"/>
+	<look type="113" corpse="4251"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="44" attack="30"/>
+	</attacks>
+	<defenses armor="16" defense="19"/>
+	<elements>
+		<element earthPercent="100"/>
+		<element energyPercent="20"/>
+		<element icePercent="10"/>
+		<element firePercent="-10"/>
+	</elements>
+	<voices interval="5000" chance="10">
+		<voice sentence="Hissss!"/>
+	</voices>
+	<loot>
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="70" chance="100000"/><!-- gold coin -->
+		<item id="2376" chance="20000"/><!-- sword -->
+		<item id="3973" chance="300"/><!-- tusk shield -->
+		<item id="2463" chance="2000"/><!-- plate armor -->
+		<item id="5876" countmax="1" chance="5000"/><!-- lizard leather -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="3974" chance="500"/><!-- sentinel shield -->
+				<item id="2457" chance="3333"/><!-- steel helmet -->
+				<item id="3963" chance="433"/><!-- templar scytheblade -->
+				<item id="5881" countmax="1" chance="5000"/><!-- lizard scale -->
+			</inside>
+		</item>
+	</loot>
+</monster>
