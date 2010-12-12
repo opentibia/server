@@ -2061,7 +2061,7 @@ ReturnValue Game::internalAddItem(Creature *actor, Cylinder* toCylinder, Item* i
 	}
 
 	if(!test){
-		if(item->isStackable() && toItem){
+		if(item->isStackable() && toItem && toItem->getID() == item->getID()){
 
 			uint32_t m = 0;
 			uint32_t n = 0;
