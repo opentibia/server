@@ -192,11 +192,13 @@ function onSay(creature, words, param)
 	end
 	
 	if #params == 0 then
-		-- Print all bans
-		doSendBanListMessage(creature, "$player $account $ip")
+	return false
 	elseif #params == 1 then
 		if params[1] == "ip" then
 			doSendBanListMessage(creature, "$ip")
+		elseif params[1] == "all" then
+		-- Print all bans
+		doSendBanListMessage(creature, "$player $account $ip")
 		elseif params[1] == "player" or params[1] == "p" then
 			doSendBanListMessage(creature, "$player")
 		elseif params[1] == "account" or params[1] == "acc" or params[1] == "a" then
