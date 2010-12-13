@@ -35,7 +35,7 @@ function onUse(cid, item, frompos, item2, topos)
 	end
 
 	local var = numberToVariant(item2.uid)
-	if doCombat(cid, combatHealth, var) == LUA_ERROR or doCombat(cid, combatMana, var) == LUA_ERROR then
+	if not doCombat(cid, combatHealth, var) or not doCombat(cid, combatMana, var) then
 		return false
 	end
 

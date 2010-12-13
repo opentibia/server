@@ -14,15 +14,16 @@ addDamageCondition(condition, 6, 2000, -1)
 setCombatCondition(xCombat, condition)
 
 function onUseWeapon(cid, var)
-	local ret = doCombat(cid, combat, var)
-	if ret == LUA_NO_ERROR then
-		local target = variantToNumber(var)
-		if target ~= LUA_NULL then
-			-- chance to poison the enemy
-			local chance = math.random(0, 100)
-			if(chance > 90) then
-				ret = doCombat(cid, xCombat, var)
-			end
+	if not doCombat(cid, combat, var) then
+		return false
+	end
+
+	local target = variantToNumber(var)
+	if(target ~= LUA_NULL) then
+		-- chance to poison the enemy
+		local chance = math.random(0, 100)
+		if(chance > 90) then
+			ret = doCombat(cid, xCombat, var)
 		end
 	end
 	return ret

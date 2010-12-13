@@ -10,12 +10,12 @@ function onSay(cid, words, param)
 	end
 
 	local oldPos = getPlayerPosition(cid)
-	if(oldPos == LUA_ERROR) then
+	if(oldPos == false) then
 		return false
 	end
 
 	local newPos = getPlayerPosition(cid)
-	if(newPos == LUA_ERROR) then
+	if(newPos == false) then
 		return false
 	end
 
@@ -35,8 +35,8 @@ function onSay(cid, words, param)
 		return false
 	end
 
-	if doTeleportThing(cid, newPos) == LUA_NO_ERROR then
-		if not getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) then
+	if(doTeleportThing(cid, newPos)) then
+		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false) then
 			doSendMagicEffect(oldPos, CONST_ME_POFF)
 			doSendMagicEffect(getPlayerPosition(cid), CONST_ME_TELEPORT)
 		end

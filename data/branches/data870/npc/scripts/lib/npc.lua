@@ -15,12 +15,12 @@ end
 function moveToCreature(id)
 	if(isCreature(id) == false) then
 		debugPrint('moveToCreature(): creature not found.')
-		return LUA_ERROR
+		return false
 	end
 
 	local pos = getCreaturePosition(id)
 	selfMoveTo(pos.x, pos.y, pos.z)
-	return LUA_NO_ERROR
+	return true
 end
 
 function selfGotoIdle()

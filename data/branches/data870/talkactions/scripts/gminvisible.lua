@@ -8,7 +8,7 @@ function onSay(cid, words, param)
 		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You are now invisible.")
 	else
 		doSendMagicEffect(pos, CONST_ME_TELEPORT)
-		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You are now visible.")
+		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You are now visible.")	
 	end
 	return false
 end

@@ -34,7 +34,7 @@ end
 
 function onUse(cid, item, frompos, item2, topos)
 	local changeBed = MODIFICATION_BEDS[item.itemid]
-	if not isInArray(CHANGEABLE_BEDS, item2.itemid) then
+	if (isInArray(CHANGEABLE_BEDS, item2.itemid) == false) then
 		return false
 	end
 

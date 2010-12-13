@@ -30,7 +30,7 @@ function onSay(cid, words, param)
 	end
 
 	local uidItem = doCreateItem(itemid, count, playerPos)
-	if uidItem ~= LUA_ERROR and uidItem ~= LUA_NULL then
+	if uidItem ~= false and uidItem ~= LUA_NULL then
 		doDecayItem(uidItem)
 		doSendMagicEffect(playerPos, CONST_ME_MAGIC_GREEN)
 		return false

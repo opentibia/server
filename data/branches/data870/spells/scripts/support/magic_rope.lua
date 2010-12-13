@@ -10,9 +10,9 @@ function onCastSpell(cid, var)
 		newpos.z = newpos.z - 1
 		doTeleportThing(cid, newpos)
 		doSendMagicEffect(pos, CONST_ME_TELEPORT)
-		return LUA_ERROR
+		return true
 	end
 	doPlayerSendDefaultCancel(cid, RETURNVALUE_NOTPOSSIBLE)
 	doSendMagicEffect(pos, CONST_ME_POFF)
-	return LUA_NO_ERROR
+	return true
 end

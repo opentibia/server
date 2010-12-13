@@ -3401,7 +3401,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 
 	if(lua_istable(L, -1) == 0){
 		reportError(__FUNCTION__, "item list is not a table.");
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
@@ -3422,7 +3422,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 	player = env->getPlayerByUID(popNumber(L));
 	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
@@ -3431,7 +3431,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 
 	if(!npc){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
@@ -3439,7 +3439,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 	player->setShopOwner(npc, buyCallback, sellCallback);
 	player->openShopWindow(items);
 
-	lua_pushnumber(L, LUA_NO_ERROR);
+	lua_pushboolean(L, true);
 	return 1;
 }
 
@@ -3451,14 +3451,14 @@ int NpcScriptInterface::luaCloseShopWindow(lua_State *L)
 	Player* player = env->getPlayerByUID(popNumber(L));
 	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
 	Npc* npc = env->getNpc();
 	if(!npc){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 
@@ -3513,7 +3513,7 @@ int NpcScriptInterface::luaDoSellItem(lua_State *L)
 	Player* player = env->getPlayerByUID(popNumber(L));
 	if(!player){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
+		lua_pushboolean(L, false);
 		return 1;
 	}
 

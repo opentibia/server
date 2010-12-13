@@ -11,7 +11,7 @@ function onUse(cid, item, frompos, item2, topos)
 	local playerMaxHealth = getPlayerMaxHealth(cid)
 	local playerHealth = getPlayerHealth(cid)
 
-	if doAddCondition(cid, exhaust) ~= LUA_NO_ERROR then
+	if not(doAddCondition(cid, exhaust)) then
 		return false
 	end
 

@@ -1,5 +1,5 @@
 local conditionAttrib = createConditionObject(CONDITION_ATTRIBUTES)
-local conditionSlow = createConditionObject(CONDITION_PARALYZE)
+ local conditionSlow = createConditionObject(CONDITION_PARALYZE)
 local conditionExhaustHeal = createConditionObject(CONDITION_EXHAUST_HEAL)
 
 

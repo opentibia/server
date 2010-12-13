@@ -28,7 +28,7 @@ function onUse(cid, item, frompos, item2, topos)
 		return true
 	end
 
-	if doCombat(cid, combat, numberToVariant(item2.uid)) == LUA_ERROR then
+	if(not doCombat(cid, combat, numberToVariant(item2.uid))) then
 		return false
 	end
 

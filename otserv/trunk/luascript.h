@@ -48,12 +48,6 @@ class Condition;
 class Npc;
 class Spell;
 
-enum LUA_RET_CODE{
-	LUA_NO_ERROR = 0,
-	LUA_ERROR = -1,
-	LUA_NULL = 0
-};
-
 enum LuaVariantType_t{
 	VARIANT_NONE = 0,
 	VARIANT_NUMBER,
