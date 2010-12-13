@@ -4,13 +4,13 @@
 -- usage /ban add, account, character_name, lenght_in_days_numeric_number (default until server save)  -- will ban whole account
 -- usage /ban remove, player, character_name -- will delete ban on player
 -- usage /ban remove, account, character_name -- will delete ban on account
--- usage /ban remove, ip, character_name -- will delete ban on IP (Can somebody check it out ? 0 errors in console (doesn't work))
+-- usage /ban remove, ip, character_name -- will delete ban on IP (There is still erorr with "No IP was unbanned.")
 
 -- CHECKING
--- usage /ban -- shows all bans (Doesn't works error with strip_whitespace)
--- usage /ban player -- shows player bans(when there is someone banned the function getPlayerBanList fails I hope somebody can fix the function)
--- usage /ban account -- shows account bans(when there is someone banned the function getAccountBanList fails I hope somebody can fix the function)
--- usage /ban ip -- shows ip bans(when there is someone banned the function getIPBanList fails (Error during getDataInt(action).Error during getDataString(statement).) however it prints banned ips.
+-- usage /ban all -- shows all bans
+-- usage /ban player -- shows player bans
+-- usage /ban account -- shows account bans (There is still error with that)
+-- usage /ban ip -- shows ip bans
 function convertSecondsToText(s)
 	if s == 0 then
 		return "0 seconds"
