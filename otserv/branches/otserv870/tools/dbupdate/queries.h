@@ -814,6 +814,19 @@ SimpleUpdateQuery updateQueries[] = {
 			NULL
 		}
 	},
+	{25,
+		{// PgSQL
+			NULL
+		},
+		{// MySQL
+		"ALTER TABLE `players` ADD `lookmount` INT NOT NULL DEFAULT 0;",
+		"ALTER TABLE `players` ADD `ridingmount` TINYINT(1) NOT NULL DEFAULT 0;",
+			NULL
+		},
+		{// SQLite
+			NULL
+		}
+	},
 };
 
 #endif

@@ -160,6 +160,8 @@ public:
 		#endif
 		HEIGHT_MINIMUM_FOR_IDLE,
 		EXPERIENCE_STAGES,
+		ENABLE_COOLDOWN,
+		ENABLE_MOUNTS,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

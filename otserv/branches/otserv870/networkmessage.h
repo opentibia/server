@@ -122,6 +122,12 @@ public:
 		*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
 		m_ReadPos += 4; m_MsgSize += 4;
 	}
+	void AddU64(uint64_t value){
+		if(!canAdd(8))
+			return;
+		*(uint64_t*)(m_MsgBuf + m_ReadPos) = value;
+		m_ReadPos += 8; m_MsgSize += 8;
+	}
 #else
 	void AddU16(uint16_t value){
 		if(!canAdd(2))
@@ -134,6 +140,12 @@ public:
 			return;
 		*(uint32_t*)(m_MsgBuf + m_ReadPos) = swap_uint32(value);
 		m_ReadPos += 4; m_MsgSize += 4;
+	}
+	void AddU64(uint64_t value){
+		if(!canAdd(8))
+			return;
+		*(uint64_t*)(m_MsgBuf + m_ReadPos) = swap_uint64(value);
+		m_ReadPos += 8; m_MsgSize += 8;
 	}
 #endif
 

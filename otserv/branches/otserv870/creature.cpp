@@ -30,6 +30,7 @@
 #include "configmanager.h"
 #include "party.h"
 #include "monsters.h"
+#include "mount.h"
 #include <string>
 #include <sstream>
 #include <vector>
@@ -57,6 +58,9 @@ Creature::Creature() :
 	master = NULL;
 	lootDrop = true;
 	skillLoss = true;
+
+	ridingMount = false;
+	mountSpeed = 0;
 
 	health     = 1000;
 	healthMax  = 1000;
@@ -358,6 +362,22 @@ bool Creature::getNextStep(Direction& dir, uint32_t& flags)
 	}
 
 	return false;
+}
+
+void Creature::setCurrentOutfit(Outfit_t outfit)
+{
+	currentOutfit = outfit;
+	if(outfit.lookMount){
+		Mount mount;
+		if(Mounts::getInstance()->getMount(outfit.lookMount, mount)){
+			mountSpeed = mount.speed;
+		}
+	}
+}
+
+void Creature::setRidingMount(bool isRiding)
+{
+	ridingMount = isRiding;
 }
 
 bool Creature::startAutoWalk(std::list<Direction>& listDir)

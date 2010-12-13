@@ -28,6 +28,7 @@
 #include "depot.h"
 #include "cylinder.h"
 #include "outfit.h"
+#include "mount.h"
 #include "enums.h"
 #include "vocation.h"
 #include "protocolgame.h"
@@ -385,7 +386,7 @@ public:
 	virtual float getDefenseFactor() const;
 
 	void addCombatExhaust(uint32_t ticks);
-	void addHealExhaust(uint32_t ticks);
+	void addSpellExhaust(SpellGroups_t group, uint32_t ticks);
 	void addInFightTicks(uint32_t ticks, bool pzlock = false);
 	void addDefaultRegeneration(uint32_t addTicks);
 
@@ -450,6 +451,10 @@ public:
 	bool canWearOutfit(uint32_t outfitId, uint32_t addons);
 	bool addOutfit(uint32_t outfitId, uint32_t addons);
 	bool removeOutfit(uint32_t outfitId, uint32_t addons);
+	bool canRideMount(uint32_t mountId);
+	bool addMount(uint32_t mountId);
+	bool removeMount(uint32_t mountId);
+	bool hasMounts() {return !mounts.empty();}
 	bool canLogout();
 	void broadcastLoot(Creature* creature, Container* corpse);
 	bool checkPzBlock(Player* targetPlayer);
@@ -635,6 +640,8 @@ public:
 		{if(client) client->sendOpenPrivateChannel(receiver);}
 	void sendOutfitWindow()
 		{if(client) client->sendOutfitWindow();}
+	void sendSpellCooldown(uint16_t spellId, uint32_t cooldown, bool isGroup)
+		{if(client) client->sendSpellCooldown(spellId, cooldown, isGroup);}
 	void sendCloseContainer(uint32_t cid)
 		{if(client) client->sendCloseContainer(cid);}
 	void sendChannel(uint16_t channelId, const std::string& channelName)
@@ -678,6 +685,9 @@ public:
 	int64_t getLastTimeRequestOutfit() const { return lastTimeRequestOutfit; }
 	void setLastTimeRequestOutfitAsNow() { lastTimeRequestOutfit = OTSYS_TIME(); }
 
+	int64_t getLastTimeMounted() const { return lastTimeMounted; }
+	void setLastTimeMountedAsNow() { lastTimeMounted = OTSYS_TIME(); }
+
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
@@ -699,6 +709,10 @@ public:
 	int32_t getStaminaMinutes();
 	int32_t getStamina() {return stamina;}
 	int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
+
+	//spell exhaustion
+	void setExhaustion(uint16_t spellId, uint32_t exhaustion) {exhaustionMap[spellId] = int64_t(exhaustion) + OTSYS_TIME();}
+	bool hasExhaustion(uint16_t spellId) {return (exhaustionMap[spellId] > OTSYS_TIME());}
 
 	//depots
 	DepotMap depots;
@@ -781,6 +795,7 @@ protected:
 	int32_t idleTime;
 	bool idleWarned;
 	int64_t lastTimeRequestOutfit;
+	int64_t lastTimeMounted;
 
 	double inventoryWeight;
 	double capacity;
@@ -797,6 +812,8 @@ protected:
 	bool addAttackSkillPoint;
 	uint64_t lastAttack;
 	int32_t shootRange;
+
+	std::map<uint16_t, int64_t> exhaustionMap;
 
 	chaseMode_t chaseMode;
 	fightMode_t fightMode;
@@ -866,6 +883,7 @@ protected:
 	LightInfo itemsLight;
 
 	OutfitMap outfits;
+	MountMap mounts;
 	bool requestedOutfitWindow;
 
 	//read/write storage data

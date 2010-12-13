@@ -1482,6 +1482,21 @@ void LuaScriptInterface::registerFunctions()
 	//canPlayerWearOutfit(cid, looktype, addons)
 	lua_register(m_luaState, "canPlayerWearOutfit", LuaScriptInterface::luaCanPlayerWearOutfit);
 
+	//doPlayerAddMount(cid, looktype)
+	lua_register(m_luaState, "doPlayerAddMount", LuaScriptInterface::luaDoPlayerAddMount);
+
+	//doPlayerRemoveMount(cid, looktype)
+	lua_register(m_luaState, "doPlayerRemoveMount", LuaScriptInterface::luaDoPlayerRemoveMount);
+
+	//doPlayerAddMountEx(cid, mountid)
+	lua_register(m_luaState, "doPlayerAddMountEx", LuaScriptInterface::luaDoPlayerAddMountEx);
+
+	//doPlayerRemoveMountEx(cid, mountid)
+	lua_register(m_luaState, "doPlayerRemoveMountEx", LuaScriptInterface::luaDoPlayerRemoveMountEx);
+
+	//canPlayerRideMount(cid, looktype)
+	lua_register(m_luaState, "canPlayerRideMount", LuaScriptInterface::luaCanPlayerRideMount);
+
 	//doSetCreatureLight(cid, lightLevel, lightColor, time)
 	lua_register(m_luaState, "doSetCreatureLight", LuaScriptInterface::luaDoSetCreatureLight);
 
@@ -6790,6 +6805,7 @@ int LuaScriptInterface::luaSetCreatureOutfit(lua_State *L)
 	outfit.lookLegs = getField(L, "lookLegs");
 	outfit.lookFeet = getField(L, "lookFeet");
 	outfit.lookAddons = getField(L, "lookAddons");
+	outfit.lookMount = getField(L, "lookMount");
 	lua_pop(L, 1);
 
 	uint32_t cid = popNumber(L);
@@ -6832,6 +6848,7 @@ int LuaScriptInterface::luaGetCreatureOutfit(lua_State *L)
 		setField(L, "lookLegs", outfit.lookLegs);
 		setField(L, "lookFeet", outfit.lookFeet);
 		setField(L, "lookAddons", outfit.lookAddons);
+		setField(L, "lookMount", outfit.lookMount);
 
 		return 1;
 	}
@@ -7665,6 +7682,125 @@ int LuaScriptInterface::luaCanPlayerWearOutfit(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaDoPlayerAddMount(lua_State *L)
+{
+	//Consider using doPlayerAddMountEx instead
+	//doPlayerAddMount(cid, looktype)
+	uint32_t lookType = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Mount mount;
+	if(Mounts::getInstance()->getMount(lookType, mount)){
+		player->addMount(mount.mountId);
+		lua_pushboolean(L, true);
+		return 1;
+	}
+
+	lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerRemoveMount(lua_State *L)
+{
+	//Consider using doPlayerRemoveMountEx instead
+	//doPlayerRemoveMount(cid, looktype)
+	uint32_t lookType = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Mount mount;
+	if(Mounts::getInstance()->getMount(lookType, mount)){
+		player->removeMount(mount.mountId);
+		lua_pushboolean(L, true);
+	}
+
+	lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerAddMountEx(lua_State *L)
+{
+	//doPlayerAddMountEx(cid, mountid)
+	uint32_t mountId = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	if(!player->addMount(mountId)){
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerRemoveMountEx(lua_State *L)
+{
+	//doPlayerRemoveMountEx(cid, mountid)
+	uint32_t mountId = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	player->removeMount(mountId);
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaCanPlayerRideMount(lua_State *L)
+{
+	//canPlayerRideMount(cid, looktype)
+	uint32_t lookType = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Mount mount;
+	if(Mounts::getInstance()->getMount(lookType, mount)){
+		lua_pushboolean(L, player->canRideMount(mount.mountId));
+		return 1;
+	}
+
+	lua_pushboolean(L, false);
+	return 1;
+}
+
 int LuaScriptInterface::luaDoCreatureChangeOutfit(lua_State *L)
 {
 	//doCreatureChangeOutfit(cid, outfit)
@@ -7675,6 +7811,7 @@ int LuaScriptInterface::luaDoCreatureChangeOutfit(lua_State *L)
 	outfit.lookLegs = getField(L, "lookLegs");
 	outfit.lookFeet = getField(L, "lookFeet");
 	outfit.lookAddons = getField(L, "lookAddons");
+	outfit.lookMount = getField(L, "lookMount");
 	lua_pop(L, 1);
 
 	uint32_t cid = popNumber(L);
@@ -8632,7 +8769,7 @@ int LuaScriptInterface::luaGetAccountBanList(lua_State *L)
 		const Ban& ban = *iter;
 		lua_pushnumber(L, index);
 
-		lua_createtable(L, 8, 0);
+		lua_createtable(L, 9, 0);
 		setField(L, "accountId", ban.value);
 		Account acc = IOAccount::instance()->loadAccount(ban.value, true);
 		setField(L, "accountName", acc.name);

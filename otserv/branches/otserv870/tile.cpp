@@ -483,6 +483,13 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		}
 	}
 
+	//dismount
+	if(creature->isRidingMount() && newTile->hasFlag(TILESTATE_PROTECTIONZONE)){
+		creature->setRidingMount(false);
+		g_game.changeSpeed(creature, 0);
+		g_game.internalCreatureChangeOutfit(creature, creature->getCurrentOutfit());
+	}
+
 	//remove the creature
 	__removeThing(creature, 0);
 

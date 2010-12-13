@@ -41,6 +41,7 @@
 #include "monsters.h"
 #include "npc.h"
 #include "outfit.h"
+#include "mount.h"
 #include "vocation.h"
 #include "scriptmanager.h"
 #include "configmanager.h"
@@ -561,6 +562,19 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	Outfits* outfits = Outfits::getInstance();
 	if(!outfits->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
+		exit(-1);
+	}
+	std::cout << "[done]" << std::endl;
+
+	// load mounts data
+	filename.str("");
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "mounts.xml";
+	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
+	Mounts* mounts = Mounts::getInstance();
+	if(!mounts->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());

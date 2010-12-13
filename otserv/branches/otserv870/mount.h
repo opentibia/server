@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_OUTFIT_H__
-#define __OTSERV_OUTFIT_H__
+#ifndef __OTSERV_MOUNT_H__
+#define __OTSERV_MOUNT_H__
 
 #include "definitions.h"
 #include "enums.h"
@@ -28,46 +28,40 @@
 #include <map>
 #include <list>
 
-struct Outfit{
-	Outfit() : outfitId(0), lookType(0), addons(0), isPremium(false), isDefault(false), name("") {}
-	uint32_t outfitId;
+struct Mount{
+	Mount() : mountId(0), lookType(0), speed(0), isPremium(false), isDefault(false), name("") {}
+	uint32_t mountId;
 	uint32_t lookType;
-	uint32_t addons;
+	uint32_t speed;
 	bool isPremium;
 	bool isDefault;
 	std::string name;
 };
 
-//typedef std::map<uint32_t, OutfitList > OutfitMap;
+typedef std::map<uint32_t, Mount > MountMap;
 
-typedef std::list<Outfit> OutfitList;
-typedef std::map<uint32_t, Outfit > OutfitMap;
-
-class Outfits
+class Mounts
 {
 public:
-	~Outfits();
+	~Mounts();
 
-	static Outfits* getInstance()
+	static Mounts* getInstance()
 	{
-		static Outfits instance;
+		static Mounts instance;
 		return &instance;
 	}
 
 	bool loadFromXml(const std::string& datadir);
 	bool reload();
 
-	uint32_t getOutfitId(uint32_t lookType);
-	bool getOutfit(uint32_t lookType, Outfit& outfit);
-	bool getOutfit(uint32_t outfitId, PlayerSex_t sex, Outfit& outfit);
-	const OutfitMap& getOutfits(PlayerSex_t playersex);
+	bool getMount(uint32_t value, Mount& mount, bool isId = false);
+	MountMap getMounts() {return mounts;}
 
 private:
-	Outfits();
+	Mounts();
 
 	std::string m_datadir;
-	OutfitList allOutfits;
-	std::map<PlayerSex_t, OutfitMap > outfitMaps;
+	MountMap mounts;
 };
 
 #endif

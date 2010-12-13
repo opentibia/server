@@ -662,6 +662,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseSetOutfit(msg);
 		break;
 
+	case 0xD4: // mount/unmount
+		parseMountCreature(msg);
+		break;
+
 	case 0xDC:
 		parseAddVip(msg);
 		break;
@@ -1065,6 +1069,7 @@ void ProtocolGame::parseSetOutfit(NetworkMessage& msg)
 	uint8_t looklegs = msg.GetByte();
 	uint8_t lookfeet = msg.GetByte();
 	uint8_t lookaddons = msg.GetByte();
+	uint16_t lookmount = msg.GetU16();
 
 	Outfit_t newOutfit;
 	newOutfit.lookType = looktype;
@@ -1073,8 +1078,28 @@ void ProtocolGame::parseSetOutfit(NetworkMessage& msg)
 	newOutfit.lookLegs = looklegs;
 	newOutfit.lookFeet = lookfeet;
 	newOutfit.lookAddons = lookaddons;
+	newOutfit.lookMount = lookmount;
 
 	addGameTask(&Game::playerChangeOutfit, player->getID(), newOutfit);
+}
+
+void ProtocolGame::parseMountCreature(NetworkMessage& msg)
+{
+	if(player->getTile()->hasFlag(TILESTATE_PROTECTIONZONE)){
+		player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
+	}
+	else if(!player->hasMounts() || !player->getCurrentOutfit().lookMount){
+		sendOutfitWindow();
+	}
+	else if((OTSYS_TIME() - player->getLastTimeMounted()) >= 2000){
+		player->setRidingMount(msg.GetByte() == 1);
+		g_game.changeSpeed(player, 0);
+		player->setLastTimeMountedAsNow();
+		g_game.internalCreatureChangeOutfit(player, player->defaultOutfit);
+	}
+	else{
+		player->sendCancel("Please wait 2 seconds before mounting again.");
+	}
 }
 
 void ProtocolGame::parseUseItem(NetworkMessage& msg)
@@ -2422,6 +2447,7 @@ void ProtocolGame::sendHouseWindow(uint32_t windowTextId, House* _house,
 void ProtocolGame::sendOutfitWindow()
 {
 	#define MAX_NUMBER_OF_OUTFITS 25
+	#define MAX_NUMBER_OF_MOUNTS 25
 	//client 8.0 outfits limit is 25
 
 	NetworkMessage_ptr msg = getOutputBuffer();
@@ -2434,6 +2460,13 @@ void ProtocolGame::sendOutfitWindow()
 		for(OutfitMap::iterator it = player->outfits.begin(); it != player->outfits.end(); ++it){
 			if(player->canWearOutfit(it->first, it->second.addons)){
 				outfitList.push_back(it->second);
+			}
+		}
+
+		std::list<Mount> mountList;
+		for(MountMap::iterator it = player->mounts.begin(); it != player->mounts.end(); ++it){
+			if(player->canRideMount(it->first)){
+				mountList.push_back(it->second);
 			}
 		}
 
@@ -2464,6 +2497,44 @@ void ProtocolGame::sendOutfitWindow()
 			msg->AddString("");
 			msg->AddByte(player->getDefaultOutfit().lookAddons);
 		}
+
+		if(!mountList.empty() && g_config.getBoolean(ConfigManager::ENABLE_MOUNTS)){
+			if(mountList.size()+1 > MAX_NUMBER_OF_MOUNTS){
+				msg->AddByte(MAX_NUMBER_OF_MOUNTS);
+			}
+			else{
+				msg->AddByte(mountList.size()+1);
+			}
+
+			uint32_t counter = 0;
+			std::list<Mount>::const_iterator it;
+			for(it = mountList.begin(); it != mountList.end() && (counter < MAX_NUMBER_OF_MOUNTS-1); ++it, ++counter){
+				msg->AddU16(it->lookType);
+				msg->AddString(it->name);
+			}
+			msg->AddU16(0x00);
+			msg->AddString("No Mount");
+		}
+		else{
+			msg->AddByte(1);
+			msg->AddU16(0x00);
+			msg->AddString("No Mount");
+		}
+	}
+}
+
+void ProtocolGame::sendSpellCooldown(uint16_t spellId, uint32_t cooldown, bool isGroup)
+{
+	if(!spellId || !cooldown)
+		return;
+
+	NetworkMessage_ptr msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+		msg->AddByte(isGroup ? 0xA5 : 0xA4);
+		msg->AddU16(spellId);
+		msg->AddU16((uint16_t)cooldown);
+		msg->AddByte(0x00);
 	}
 }
 
@@ -2527,6 +2598,7 @@ void ProtocolGame::sendReLoginWindow()
 	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x28);
+		msg->AddByte(0x64);
 	}
 }
 
@@ -2628,10 +2700,10 @@ void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)
 	msg->AddU32((uint32_t)(player->getFreeCapacity() * 100));
 	uint64_t experience = player->getExperience();
 	if(experience <= 0x7FFFFFFF){
-		msg->AddU32(player->getExperience());
+		msg->AddU64(player->getExperience());
 	}
 	else{
-		msg->AddU32(0x00); //Client debugs after 2,147,483,647 exp
+		msg->AddU64(0x00); //Client debugs after 2,147,483,647 exp
 	}
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
 	msg->AddByte(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT));
@@ -2751,6 +2823,7 @@ void ProtocolGame::AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* cre
 	else{
 		msg->AddU16(outfit.lookTypeEx);
 	}
+	msg->AddU16(creature->isRidingMount() ? outfit.lookMount : 0x00);
 }
 
 void ProtocolGame::AddWorldLight(NetworkMessage_ptr msg, const LightInfo& lightInfo)

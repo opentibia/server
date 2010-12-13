@@ -33,15 +33,14 @@ class Party;
 typedef std::map<uint32_t, Player*> UsersMap;
 
 enum ChannelID {
-	CHANNEL_GUILD      = 0x00,
-	CHANNEL_RULE_REP   = 0x03,
-	CHANNEL_GAME_CHAT  = 0x04,
-	CHANNEL_TRADE      = 0x05,
-	CHANNEL_TRADE_ROOK = 0x06,
-	CHANNEL_RL_CHAT    = 0x07,
-	CHANNEL_PARTY      = 0x08,
-	CHANNEL_HELP       = 0x09,
-	CHANNEL_PRIVATE    = 0xFFFF
+	CHANNEL_GUILD          = 0x00,
+	CHANNEL_RULE_REP       = 0x03,
+	CHANNEL_ADVERTISE      = 0x04,
+	CHANNEL_ADVERTISE_ROOK = 0x05,
+	CHANNEL_HELP           = 0x06,
+	CHANNEL_WORLD_CHAT     = 0x07,
+	CHANNEL_PARTY          = 0x08,
+	CHANNEL_PRIVATE        = 0xFFFF
 };
 
 class ChatChannel

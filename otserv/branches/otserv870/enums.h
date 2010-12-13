@@ -245,6 +245,7 @@ struct Outfit_t{
 		lookType   = 0;
 		lookTypeEx = 0;
 		lookAddons = 0;
+		lookMount  = 0;
 	}
 
 	uint32_t lookType;
@@ -254,6 +255,7 @@ struct Outfit_t{
 	uint32_t lookLegs;
 	uint32_t lookFeet;
 	uint32_t lookAddons;
+	uint32_t lookMount;
 };
 
 struct LightInfo{
@@ -301,7 +303,9 @@ enum reloadTypes_t {
 	RELOAD_TYPE_SPELLS = 6,
 	RELOAD_TYPE_RAIDS = 7,
 	RELOAD_TYPE_CREATURESCRIPTS = 8,
-	RELOAD_TYPE_LAST = RELOAD_TYPE_CREATURESCRIPTS
+	RELOAD_TYPE_OUTFITS = 9,
+	RELOAD_TYPE_MOUNTS = 10,
+	RELOAD_TYPE_LAST = RELOAD_TYPE_MOUNTS
 };
 
 #endif

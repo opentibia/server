@@ -140,6 +140,7 @@
     <ClInclude Include="..\md5.h" />
     <ClInclude Include="..\monster.h" />
     <ClInclude Include="..\monsters.h" />
+    <ClInclude Include="..\mount.h" />
     <ClInclude Include="..\movement.h" />
     <ClInclude Include="..\networkmessage.h" />
     <ClInclude Include="..\npc.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="..\md5.cpp" />
     <ClCompile Include="..\monster.cpp" />
     <ClCompile Include="..\monsters.cpp" />
+    <ClCompile Include="..\mount.cpp" />
     <ClCompile Include="..\movement.cpp" />
     <ClCompile Include="..\networkmessage.cpp" />
     <ClCompile Include="..\npc.cpp" />

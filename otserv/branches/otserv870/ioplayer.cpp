@@ -51,7 +51,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`groups`.`name` AS `groupname`, `groups`.`flags` AS `groupflags`, `groups`.`access` AS `access`, \
 		`groups`.`maxviplist` AS `maxviplist`, `groups`.`maxdepotitems` AS `maxdepotitems`, `groups`.`violation` AS `violation`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
-		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
+		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `lookmount`, `ridingmount`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
 		`skull_type`, `loss_experience`, `loss_mana`, `loss_skills`, \
 		`loss_items`, `loss_containers`, `town_id`, `balance`, `stamina` \
@@ -285,7 +285,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`groups`.`name` AS `groupname`, `groups`.`flags` AS `groupflags`, `groups`.`access` AS `access`, \
 		`groups`.`maxviplist` AS `maxviplist`, `groups`.`maxdepotitems` AS `maxdepotitems`, `groups`.`violation` AS `violation`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
-		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
+		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `lookmount`, `ridingmount`, `posx`, `posy`, \
 		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
 		`skull_type`, `loss_experience`, `loss_mana`, `loss_skills`, \
 		`loss_items`, `loss_containers`, `rank_id`, `guildnick`, `town_id`, `balance`, `stamina` \
@@ -517,6 +517,7 @@ void IOPlayer::loadOutfit(Player* player, DBResult* result)
 	player->defaultOutfit.lookLegs = result->getDataInt("looklegs");
 	player->defaultOutfit.lookFeet = result->getDataInt("lookfeet");
 	player->defaultOutfit.lookAddons = result->getDataInt("lookaddons");
+	player->defaultOutfit.lookMount = result->getDataInt("lookmount");
 
 	uint32_t outfitId = Outfits::getInstance()->getOutfitId(player->defaultOutfit.lookType);
 	bool canWearOutfit = true;
@@ -540,7 +541,24 @@ void IOPlayer::loadOutfit(Player* player, DBResult* result)
 		}
 	}
 
-	player->currentOutfit = player->defaultOutfit;
+	Mount mount;
+	bool canRideMount = Mounts::getInstance()->getMount(player->defaultOutfit.lookMount, mount);
+	if(mount.mountId && canRideMount){
+		if(player->defaultOutfit.lookMount != mount.lookType){
+			player->defaultOutfit.lookMount = mount.lookType;
+		}
+	}
+	else{
+		//Just pick the first default mount we can find
+		const MountMap& default_mounts = Mounts::getInstance()->getMounts();
+		if(!default_mounts.empty()){
+			mount = (*default_mounts.begin()).second;
+			player->defaultOutfit.lookMount = mount.lookType;
+		}
+	}
+
+	player->setCurrentOutfit(player->defaultOutfit);
+	player->setRidingMount(result->getDataInt("ridingmount") == 1);
 }
 
 void IOPlayer::loadSkills(Player* player, DBResult* result)
@@ -755,6 +773,8 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	<< ", `looklegs` = " << (int32_t)player->defaultOutfit.lookLegs
 	<< ", `looktype` = " << (int32_t)player->defaultOutfit.lookType
 	<< ", `lookaddons` = " << (int32_t)player->defaultOutfit.lookAddons
+	<< ", `lookmount` = " << (int32_t)player->defaultOutfit.lookMount
+	<< ", `ridingmount` = " << (player->isRidingMount() ? 1 : 0)
 	<< ", `maglevel` = " << player->magLevel
 	<< ", `mana` = " << player->mana
 	<< ", `manamax` = " << player->manaMax

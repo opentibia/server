@@ -123,6 +123,7 @@ Creature()
 	idleWarned = false;
 
 	lastTimeRequestOutfit = 0;
+	lastTimeMounted = 0;
 
 	for(int32_t i = 0; i < 11; ++i){
 		inventory[i] = NULL;
@@ -955,7 +956,6 @@ void Player::addStorageValue(const uint32_t key, const int32_t value)
 		}
 		//for backward compatibility
 		else if(IS_IN_KEYRANGE(key, OUTFITS_RANGE)){
-			Outfit outfit;
 			uint32_t lookType = value >> 16;
 			uint32_t addons = value & 0xFF;
 			if(addons <= 3){
@@ -966,6 +966,15 @@ void Player::addStorageValue(const uint32_t key, const int32_t value)
 			}
 			else{
 				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int32_t)(value) << " player: " << getName() << std::endl;
+			}
+		}
+		else if(IS_IN_KEYRANGE(key, MOUNTSID_RANGE)){
+			addMount(value);
+		}
+		else if(IS_IN_KEYRANGE(key, MOUNTS_RANGE)){
+			Mount mount;
+			if(Mounts::getInstance()->getMount(value, mount)){
+				addMount(mount.mountId);
 			}
 		}
 		else{
@@ -1055,7 +1064,7 @@ bool Player::canBePushedBy(const Player *player) const
 		uint32_t p_level = g_config.getNumber(ConfigManager::MIN_PVP_LEVEL);
 		if (player_level < p_level && victim_level >= p_level)
 			return false;
-		}
+	}
 	return isPushable();
 }
 
@@ -2580,10 +2589,10 @@ void Player::addCombatExhaust(uint32_t ticks)
 	}
 }
 
-void Player::addHealExhaust(uint32_t ticks)
+void Player::addSpellExhaust(SpellGroups_t group, uint32_t ticks)
 {
 	if(!hasFlag(PlayerFlag_HasNoExhaustion)){
-		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_HEAL, ticks, 0);
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, (ConditionType_t)(1 << (20 + group)), ticks, 0);
 		addCondition(condition);
 	}
 }
@@ -4548,6 +4557,50 @@ bool Player::removeOutfit(uint32_t outfitId, uint32_t addons)
 	return false;
 }
 
+bool Player::canRideMount(uint32_t mountId)
+{
+	MountMap::iterator it = mounts.find(mountId);
+	if(it != mounts.end()){
+		if(it->second.isPremium && !isPremium()){
+			return false;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Player::addMount(uint32_t mountId)
+{
+	Mount mount;
+	if(Mounts::getInstance()->getMount(mountId, mount, true)){
+		MountMap::iterator it = mounts.find(mountId);
+		if(it != mounts.end()){
+			return true;
+		}
+
+		mounts[mountId] = mount;
+		return true;
+	}
+	else{
+		//std::cout << getName() << " mount " << mountId << " does not exist." << std::endl;
+	}
+
+	return false;
+}
+
+bool Player::removeMount(uint32_t mountId)
+{
+	MountMap::iterator it = mounts.find(mountId);
+	if(it != mounts.end()){
+		mounts.erase(it);
+		return true;
+	}
+
+	return false;
+}
+
 void Player::setSex(PlayerSex_t player_sex)
 {
 	if(sex != player_sex){
@@ -4561,6 +4614,16 @@ void Player::setSex(PlayerSex_t player_sex)
 			}
 
 			addOutfit(it->first, it->second.addons);
+		}
+
+		//add default mounts to player mounts
+		const MountMap& default_mounts = Mounts::getInstance()->getMounts();
+		for(MountMap::const_iterator it = default_mounts.begin(); it != default_mounts.end(); ++it){
+			if(!it->second.isDefault){
+				continue;
+			}
+
+			addMount(it->second.mountId);
 		}
 	}
 }
@@ -4588,6 +4651,30 @@ void Player::genReservedStorageRange()
 		base_key++;
 		if(base_key > PSTRG_OUTFITSID_RANGE_START + PSTRG_OUTFITSID_RANGE_SIZE){
 			std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 outfits!." << std::endl;
+			break;
+		}
+	}
+
+	//generate mounts range
+	base_key = PSTRG_MOUNTSID_RANGE_START + 1;
+
+	const MountMap& default_mounts = Mounts::getInstance()->getMounts();
+	for(MountMap::const_iterator it = mounts.begin(); it != mounts.end(); ++it){
+		MountMap::const_iterator default_it = default_mounts.find(it->first);
+		if(default_it != default_mounts.end()){
+			if(default_it->second.isDefault)
+				continue;
+		}
+		else{
+			//outfit does not exist
+			continue;
+		}
+
+		int32_t value = (it->first << 16);
+		storageMap[base_key] = value;
+		base_key++;
+		if(base_key > PSTRG_MOUNTSID_RANGE_START + PSTRG_MOUNTSID_RANGE_SIZE){
+			std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 mounts!." << std::endl;
 			break;
 		}
 	}

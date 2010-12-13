@@ -67,6 +67,7 @@ protected:
 
 	RunesMap runes;
 	InstantsMap instants;
+	uint16_t ids;
 
 	friend class CombatSpell;
 	LuaScriptInterface m_scriptInterface;
@@ -121,6 +122,9 @@ public:
 	void postCastSpell(Player* player, bool finishedSpell = true, bool payCost = true) const;
 	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;
 
+	uint16_t getId() const {return id;}
+	void setId(uint16_t _id) {id = _id;}
+
 	int32_t getManaCost(const Player* player) const;
 	int32_t getSoulCost(const Player* player) const;
 	uint32_t getLevel() const {return level;}
@@ -132,6 +136,9 @@ public:
 				 || p->hasFlag(PlayerFlag_HasInfiniteMana));
 	}
 	int32_t getManaPercent() const {return manaPercent;}
+	Spells_t getIcon() const {return icon;}
+	int32_t getExhaustion() const {return exhaustion;}
+	std::map<SpellGroups_t, uint32_t> getGroupExhaustions() const {return groupExhaustions;}
 	const bool isPremium() const {return premium;}
 	bool hasArea() const {return areaSpell;}
 	void setArea(bool b) {areaSpell = b;}
@@ -148,6 +155,8 @@ protected:
 	bool playerInstantSpellCheck(Player* player, const Position& toPos);
 	bool playerRuneSpellCheck(Player* player, const Position& toPos);
 
+	uint16_t id;
+
 	bool learnable;
 	bool enabled;
 	bool premium;
@@ -158,7 +167,9 @@ protected:
 	int32_t manaPercent;
 	int32_t soul;
 	int32_t range;
+	Spells_t icon;
 	int32_t exhaustion;
+	std::map<SpellGroups_t, uint32_t> groupExhaustions;
 	bool needTarget;
 	bool needWeapon;
 	bool selfTarget;

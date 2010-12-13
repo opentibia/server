@@ -205,7 +205,7 @@ public:
 	int32_t getStepDuration(Direction dir) const;
 	int32_t getStepDuration() const;
 	virtual int32_t getStepSpeed() const {return getSpeed();}
-	int32_t getSpeed() const {return getBaseSpeed() + varSpeed;}
+	int32_t getSpeed() const {return getBaseSpeed() + varSpeed + getMountSpeed();}
 	void setSpeed(int32_t varSpeedDelta)
 	{
 		int32_t oldSpeed = getSpeed();
@@ -251,8 +251,11 @@ public:
 	virtual bool hasHiddenHealth() const { return false; }
 
 	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
-	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
+	void setCurrentOutfit(Outfit_t outfit);
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
+	const bool isRidingMount() const {return ridingMount;}
+	void setRidingMount(bool isRiding);
+	const int32_t getMountSpeed() const {return (ridingMount ? mountSpeed : 0);}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
 	ZoneType_t getZone() const {return getTile()->getZone();}
 
@@ -446,6 +449,8 @@ protected:
 
 	Outfit_t currentOutfit;
 	Outfit_t defaultOutfit;
+	bool ridingMount;
+	int32_t mountSpeed;
 
 	Position masterPos;
 	int32_t masterRadius;

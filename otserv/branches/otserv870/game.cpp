@@ -898,7 +898,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 	}
 
 
-	if (!movingCreature->canBePushedBy(player)){
+	if(!movingCreature->canBePushedBy(player)){
 		player->sendCancelMessage(RET_NOTMOVEABLE);
 		return false;
 	}
@@ -3952,7 +3952,7 @@ void Game::checkCreatures()
 
 void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 {
-	int32_t varSpeed = creature->getSpeed() - creature->getBaseSpeed();
+	int32_t varSpeed = creature->getSpeed() - creature->getBaseSpeed() - creature->getMountSpeed();
 	varSpeed += varSpeedDelta;
 
 	creature->setSpeed(varSpeed);
@@ -4985,6 +4985,12 @@ void Game::reloadInfo(reloadTypes_t info)
 			break;
 		case RELOAD_TYPE_CREATURESCRIPTS:
 			g_creatureEvents->reload();
+			break;
+		case RELOAD_TYPE_OUTFITS:
+			Outfits::getInstance()->reload();
+			break;
+		case RELOAD_TYPE_MOUNTS:
+			Mounts::getInstance()->reload();
 			break;
 	}
 }

@@ -101,6 +101,7 @@ private:
 
 	void parseRequestOutfit(NetworkMessage& msg);
 	void parseSetOutfit(NetworkMessage& msg);
+	void parseMountCreature(NetworkMessage& msg);
 	void parseSay(NetworkMessage& msg);
 	void parseLookAt(NetworkMessage& msg);
 	void parseFightModes(NetworkMessage& msg);
@@ -209,6 +210,8 @@ private:
 	void sendTextWindow(uint32_t windowTextId, uint32_t itemId, const std::string& text);
 	void sendHouseWindow(uint32_t windowTextId, House* house, uint32_t listId, const std::string& text);
 	void sendOutfitWindow();
+
+	void sendSpellCooldown(uint16_t spellId, uint32_t cooldown, bool isGroup);
 
 	void sendVIPLogIn(uint32_t guid);
 	void sendVIPLogOut(uint32_t guid);

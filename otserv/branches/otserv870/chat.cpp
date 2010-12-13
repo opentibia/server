@@ -148,7 +148,7 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string&
 		return false;
 
 	// Add trade muted condition
-	if(getId() == CHANNEL_TRADE || getId() == CHANNEL_TRADE_ROOK){
+	if(getId() == CHANNEL_ADVERTISE || getId() == CHANNEL_ADVERTISE_ROOK){
 		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_TRADE_MUTED, 120000, 0);
 		fromPlayer->addCondition(condition);
 	}
@@ -182,25 +182,21 @@ Chat::Chat()
 	if(newChannel)
 		m_normalChannels[CHANNEL_RULE_REP] = newChannel;
 
-	newChannel = new ChatChannel(CHANNEL_GAME_CHAT, "Game-Chat");
-	if(newChannel)
-		m_normalChannels[CHANNEL_GAME_CHAT] = newChannel;
-
-	newChannel = new ChatChannel(CHANNEL_TRADE, "Trade");
-	if(newChannel)
-		m_normalChannels[CHANNEL_TRADE] = newChannel;
-
-	newChannel = new ChatChannel(CHANNEL_TRADE_ROOK, "Trade-Rookgaard");
-	if(newChannel)
-		m_normalChannels[CHANNEL_TRADE_ROOK] = newChannel;
-
-	newChannel = new ChatChannel(CHANNEL_RL_CHAT, "RL-Chat");
-	if(newChannel)
-		m_normalChannels[CHANNEL_RL_CHAT] = newChannel;
-
 	newChannel = new ChatChannel(CHANNEL_HELP, "Help");
 	if(newChannel)
 		m_normalChannels[CHANNEL_HELP] = newChannel;
+
+	newChannel = new ChatChannel(CHANNEL_ADVERTISE, "Advertising");
+	if(newChannel)
+		m_normalChannels[CHANNEL_ADVERTISE] = newChannel;
+
+	newChannel = new ChatChannel(CHANNEL_ADVERTISE_ROOK, "Advertising-Rookgaard");
+	if(newChannel)
+		m_normalChannels[CHANNEL_ADVERTISE_ROOK] = newChannel;
+
+	newChannel = new ChatChannel(CHANNEL_WORLD_CHAT, "World-Chat");
+	if(newChannel)
+		m_normalChannels[CHANNEL_WORLD_CHAT] = newChannel;
 
 	newChannel = new PrivateChatChannel(CHANNEL_PRIVATE, "Private Chat Channel");
 	if(newChannel)
@@ -429,17 +425,16 @@ bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& t
 		}
 		// Players can't speak in these channels while they're level 1
 		// Also, there is a delay of 2 minutes for trade and trade rook
-		case CHANNEL_TRADE:
-		case CHANNEL_TRADE_ROOK:
-		case CHANNEL_RL_CHAT:
-		case CHANNEL_GAME_CHAT:
+		case CHANNEL_ADVERTISE:
+		case CHANNEL_ADVERTISE_ROOK:
+		case CHANNEL_WORLD_CHAT:
 		{
 			if(!player->hasFlag(PlayerFlag_CannotBeMuted)){
 				if(player->getLevel() < 2){
 					player->sendCancel("You may not speak into channels as long as you are on level 1.");
 					return true;
 				}
-				else if((channelId == CHANNEL_TRADE || channelId == CHANNEL_TRADE_ROOK) && player->hasCondition(CONDITION_TRADE_MUTED)){
+				else if((channelId == CHANNEL_ADVERTISE || channelId == CHANNEL_ADVERTISE_ROOK) && player->hasCondition(CONDITION_TRADE_MUTED)){
 					player->sendCancel("You may only place one offer in two minutes.");
 					return true;
 				}
@@ -499,9 +494,9 @@ ChannelList Chat::getChannelList(Player* player)
 			continue;
 		}
 		if(!player->hasFlag(PlayerFlag_CannotBeMuted)){
-			if(itn->first == CHANNEL_TRADE && player->getVocationId() == 0)
+			if(itn->first == CHANNEL_ADVERTISE && player->getVocationId() == 0)
 				continue;
-			if(itn->first == CHANNEL_TRADE_ROOK && player->getVocationId() != 0)
+			if(itn->first == CHANNEL_ADVERTISE_ROOK && player->getVocationId() != 0)
 				continue;
 		}
 
@@ -561,9 +556,9 @@ ChatChannel* Chat::getChannel(Player* player, uint16_t channelId)
 	if(nit != m_normalChannels.end()){
 		if(channelId == CHANNEL_RULE_REP && !player->hasFlag(PlayerFlag_CanAnswerRuleViolations))
 			return NULL;
-		else if(channelId == CHANNEL_TRADE && player->getVocationId() == 0)
+		else if(channelId == CHANNEL_ADVERTISE && player->getVocationId() == 0)
 			return NULL;
-		else if(channelId == CHANNEL_TRADE_ROOK && player->getVocationId() != 0)
+		else if(channelId == CHANNEL_ADVERTISE_ROOK && player->getVocationId() != 0)
 			return NULL;
 
 		return nit->second;

@@ -40,7 +40,7 @@ extern Vocations g_vocations;
 extern ConfigManager g_config;
 
 Spells::Spells():
-m_scriptInterface("Spell Interface")
+ids(0), m_scriptInterface("Spell Interface")
 {
 	m_scriptInterface.initState();
 }
@@ -115,6 +115,7 @@ void Spells::clear()
 		delete it2->second;
 	}
 	instants.clear();
+	ids = 0;
 }
 
 LuaScriptInterface& Spells::getScriptInterface()
@@ -151,9 +152,11 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 		return false;
 
 	if(instant){
+		instant->setId(ids++);
 		instants[instant->getWords()] = instant;
 	}
 	else if(rune){
+		rune->setId(ids++);
 		runes[rune->getRuneItemId()] = rune;
 	}
 	else{
@@ -471,13 +474,15 @@ bool CombatSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 
 Spell::Spell()
 {
+	id = 0;
 	level = 0;
 	magLevel = 0;
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
 	range = -1;
-	exhaustion = -1;
+	icon = SPELL_NONE;
+	exhaustion = 1000;
 	needTarget = false;
 	needWeapon = false;
 	selfTarget = false;
@@ -553,8 +558,27 @@ bool Spell::configureSpell(xmlNodePtr p)
 	 	soul = intValue;
 	}
 
+	if(readXMLInteger(p, "icon", intValue)){
+		icon = (Spells_t)intValue;
+	}
+
 	if(readXMLInteger(p, "exhaustion", intValue)){
 		exhaustion = intValue;
+	}
+
+	if(readXMLString(p, "groupicons", strValue)){
+		std::vector<std::string> split = explodeString(strValue, ",");
+		for(std::vector<std::string>::iterator it = split.begin(); it != split.end(); it++){
+			groupExhaustions[(SpellGroups_t)atoi((*it).c_str())] = 0;
+		}
+	}
+
+	if(readXMLString(p, "groupexhaustions", strValue)){
+		int32_t i = 0;
+		std::vector<std::string> split = explodeString(strValue, ",");
+		for(std::map<SpellGroups_t, uint32_t>::iterator it = groupExhaustions.begin(); it != groupExhaustions.end(); it++, i++){
+			groupExhaustions[it->first] = atoi(split[i].c_str());
+		}
 	}
 
 	if(readXMLInteger(p, "prem", intValue)){
@@ -645,9 +669,7 @@ bool Spell::playerSpellCheck(Player* player) const
 			}
 		}
 
-		if( (isAggressive && player->hasCondition(CONDITION_EXHAUST_COMBAT)) ||
-			(!isAggressive && player->hasCondition(CONDITION_EXHAUST_HEAL)) )
-		{
+		if(player->hasExhaustion(getId())){
 			player->sendCancelMessage(RET_YOUAREEXHAUSTED);
 
 			if(isInstant()){
@@ -655,6 +677,18 @@ bool Spell::playerSpellCheck(Player* player) const
 			}
 
 			return false;
+		}
+
+		for(std::map<SpellGroups_t, uint32_t>::const_iterator it = groupExhaustions.begin(); it != groupExhaustions.end(); it++){
+			if(player->hasCondition((ConditionType_t)(1 << (20 + it->first)))){
+				player->sendCancelMessage(RET_YOUAREEXHAUSTED);
+
+				if(isInstant()){
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				}
+
+				return false;
+			}
 		}
 
 		if(player->getLevel() < level){
@@ -942,19 +976,17 @@ void Spell::postCastSpell(Player* player, bool finishedCast /*= true*/, bool pay
 {
 	if(finishedCast){
 		if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
-			if(exhaustion != 0){
-				if(isAggressive){
-					if(exhaustion == -1)
-						player->addCombatExhaust(g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED));
-					else
-						player->addCombatExhaust(exhaustion);
+			bool enableCooldown = g_config.getBoolean(ConfigManager::ENABLE_COOLDOWN);
+			for(std::map<SpellGroups_t, uint32_t>::const_iterator it = groupExhaustions.begin(); it != groupExhaustions.end(); it++){
+				player->addSpellExhaust(it->first, it->second);
+				if(enableCooldown){
+					player->sendSpellCooldown(uint16_t(it->first), uint16_t(it->second) / 250, true);
 				}
-				else{
-					if(exhaustion == -1)
-						player->addHealExhaust(g_config.getNumber(ConfigManager::HEAL_EXHAUSTED));
-					else
-						player->addHealExhaust(exhaustion);
-				}
+			}
+
+			player->setExhaustion(getId(), exhaustion);
+			if(enableCooldown){
+				player->sendSpellCooldown(uint16_t(getIcon()), uint16_t(getExhaustion()) / 250, false);
 			}
 		}
 	}

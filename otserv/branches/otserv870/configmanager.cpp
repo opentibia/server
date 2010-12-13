@@ -203,6 +203,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	#endif
 	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 3);
 	m_confInteger[EXPERIENCE_STAGES] = getGlobalBoolean(L, "experience_stages", false);
+	m_confInteger[ENABLE_COOLDOWN] = getGlobalBoolean(L, "enable_cooldown", true);
+	m_confInteger[ENABLE_MOUNTS] = getGlobalBoolean(L, "enable_mounts", true);
 	m_isLoaded = true;
 	return true;
 }

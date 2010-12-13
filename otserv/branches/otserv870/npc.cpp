@@ -270,6 +270,10 @@ bool Npc::loadFromXml(const std::string& filename)
 					if(readXMLInteger(p, "addons", intValue)){
 						defaultOutfit.lookAddons = intValue;
 					}
+
+					if(readXMLInteger(p, "mount", intValue)){
+						defaultOutfit.lookMount = intValue;
+					}
 				}
 				else if(readXMLInteger(p, "typeex", intValue)){
 					defaultOutfit.lookTypeEx = intValue;
@@ -763,6 +767,12 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						}
 						else if(strValue == "exhaust_heal"){
 							prop.condition = CONDITION_EXHAUST_HEAL;
+						}
+						else if(strValue == "exhaust_support"){
+							prop.condition = CONDITION_EXHAUST_SUPPORT;
+						}
+						else if(strValue == "exhaust_special"){
+							prop.condition = CONDITION_EXHAUST_SPECIAL;
 						}
 						else if(strValue == "exhaust_potion" || strValue == "exhaust_others"){
 							prop.condition = CONDITION_EXHAUST_OTHERS;

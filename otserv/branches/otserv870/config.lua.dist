@@ -267,6 +267,12 @@ min_pvp_level = 0
 -- (experimental code - requires otserv to be compiled with flag __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__)
 min_pvp_level_applies_to_summons = true
 
+--Enable mounts?
+enable_mounts = true
+
+--Enable spellcooldown?
+enable_cooldown = true
+
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
 maxmessagebuffer = 4
 

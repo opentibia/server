@@ -37,6 +37,7 @@ Outfits::~Outfits()
 
 bool Outfits::loadFromXml(const std::string& datadir)
 {
+	m_datadir = datadir;
 	std::string filename = datadir + "outfits.xml";
 
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
@@ -143,7 +144,15 @@ bool Outfits::loadFromXml(const std::string& datadir)
 		}
 		xmlFreeDoc(doc);
 	}
+
 	return true;
+}
+
+bool Outfits::reload()
+{
+	allOutfits.clear();
+	outfitMaps.clear();
+	return loadFromXml(m_datadir);
 }
 
 uint32_t Outfits::getOutfitId(uint32_t lookType)

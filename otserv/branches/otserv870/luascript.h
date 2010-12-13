@@ -500,6 +500,12 @@ protected:
 	static int luaDoPlayerRemoveOutfitEx(lua_State *L);
 	static int luaCanPlayerWearOutfit(lua_State *L);
 
+	static int luaDoPlayerAddMount(lua_State *L);
+	static int luaDoPlayerRemoveMount(lua_State *L);
+	static int luaDoPlayerAddMountEx(lua_State *L);
+	static int luaDoPlayerRemoveMountEx(lua_State *L);
+	static int luaCanPlayerRideMount(lua_State *L);	
+	
 	static int luaIsGmInvisible(lua_State *L);
 	static int luaDoPlayerToogleGmInvisible(lua_State *L);
 	static int luaGetPlayerAccountId(lua_State *L);

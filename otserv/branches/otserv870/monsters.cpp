@@ -65,6 +65,7 @@ void MonsterType::reset()
 	outfit.lookType   = 0;
 	outfit.lookTypeEx = 0;
 	outfit.lookAddons = 0;
+	outfit.lookMount  = 0;
 	lookCorpse = 0;
 
 	conditionImmunities = 0;
@@ -1017,6 +1018,10 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 
 					if(readXMLInteger(p, "addons", intValue)){
 						mType->outfit.lookAddons = intValue;
+					}
+
+					if(readXMLInteger(p, "mount", intValue)){
+						mType->outfit.lookMount = intValue;
 					}
 				}
 				else if(readXMLInteger(p, "typeex", intValue)){
