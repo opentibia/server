@@ -34,6 +34,12 @@ function onSay(cid, words, param)
 	elseif param == "creaturescripts" or param == "creaturescript" or param == "cs" then
 		doReloadInfo(RELOAD_TYPE_CREATURESCRIPTS)
 		param = "creaturescripts"
+	elseif param == "outfits" or param == "outfit" then
+		doReloadInfo(RELOAD_TYPE_OUTFITS)
+		param = "outfits"
+	elseif param == "mounts" or param == "mount" then
+		doReloadInfo(RELOAD_TYPE_MOUNTS)
+		param = "mounts"	
 	else
 		param = ""
 	end

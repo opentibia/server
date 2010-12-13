@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<mounts>
+   <mount id="1" looktype="368" name="Widow Queen" premium="0" speed="20"/>
+   <mount id="2" looktype="369" name="Racing Bird" premium="0" speed="0"/>
+   <mount id="3" looktype="370" name="War Bear" premium="0" speed="20"/>
+   <mount id="4" looktype="371" name="Black Sheep" premium="0" speed="0"/>
+   <mount id="5" looktype="372" name="Midnight Panther" premium="0" speed="0"/>
+   <mount id="6" looktype="373" name="Draptor" premium="0" speed="0"/>
+   <mount id="7" looktype="374" name="Titanica" premium="0" speed="0"/>
+   <mount id="8" looktype="375" name="Tin Lizzard" premium="0" speed="30"/>
+   <mount id="9" looktype="376" name="Blazebringer" premium="0" speed="30"/>
+   <mount id="10" looktype="377" name="Rapid Boar" premium="0" speed="20"/>
+   <mount id="11" looktype="378" name="Stampor" premium="0" speed="20"/>
+   <mount id="12" looktype="379" name="Undead Cavebear" premium="0" speed="0"/>
+</mounts>

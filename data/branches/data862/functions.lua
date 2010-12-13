@@ -430,7 +430,7 @@ function string.explode(p, d, m)
 end
 
 function string.strip_whitespace(str)
-	if str == nil then return str end
+	if #str < 1 then return str end
 	local start = string.find(str, "[^%s]") -- First non-whitespace character
 	local _end = #str + 1 - string.find(str:reverse(), "[^%s]") -- Last non-whitespace character
 
