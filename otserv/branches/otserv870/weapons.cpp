@@ -983,7 +983,7 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 {
 	if((ammoAction == AMMOACTION_MOVE || ammoAction == AMMOACTION_MOVEBACK) &&
-			breakChance > 0 && random_range(1, 100) < breakChance){
+			breakChance > 0 && random_range(1, 100) <= breakChance){
 		int32_t newCount = std::max(0, item->getItemCount() - 1);
 		g_game.transformItem(item, item->getID(), newCount);
 	}
@@ -1105,6 +1105,9 @@ bool WeaponWand::configureEvent(xmlNodePtr p)
 		}
 		else if(asLowerCaseString(strValue) == "holy"){
 			params.combatType = COMBAT_HOLYDAMAGE;
+		}
+		else if(asLowerCaseString(strValue) == "bleed"){
+			params.combatType = COMBAT_BLEEDDAMAGE;
 		}
 	}
 

@@ -4102,6 +4102,12 @@ bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature*
 				break;
 			}
 
+			case COMBAT_BLEEDDAMAGE:
+			{
+				hitEffect = NM_ME_DRAW_BLOOD;
+				break;
+			}
+
 			default:
 				hitEffect = NM_ME_PUFF;
 				break;
@@ -4265,6 +4271,13 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 					{
 						textColor = TEXTCOLOR_RED;
 						hitEffect = NM_ME_MAGIC_BLOOD;
+						break;
+					}
+
+					case COMBAT_BLEEDDAMAGE:
+					{
+						textColor = TEXTCOLOR_RED;
+						hitEffect = NM_ME_DRAW_BLOOD;
 						break;
 					}
 
@@ -4952,6 +4965,28 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 		return true;
 	}
 	return false;
+}
+
+bool Game::playerMountCreature(uint32_t playerId, bool mount)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	if(player->getTile()->hasFlag(TILESTATE_PROTECTIONZONE))
+		player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
+	else if(!player->hasMounts() || !player->getCurrentOutfit().lookMount)
+		player->sendOutfitWindow();
+	else if((OTSYS_TIME() - player->getLastTimeMounted()) >= 2000){
+		player->setLastTimeMountedAsNow();
+		player->setRidingMount(mount);
+		changeSpeed(player, 0);
+		internalCreatureChangeOutfit(player, player->getCurrentOutfit());
+		}
+		         else{
+                 player->sendCancel("Please wait 2 seconds before mounting again.");
+	}
+	return true;
 }
 
 void Game::reloadInfo(reloadTypes_t info)

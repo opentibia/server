@@ -54,6 +54,10 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 		return NULL;
 	}
 
+	if(it.stackable && !_count){
+		_count = 1;
+	}
+
 	if(it.id != 0){
 		if(it.isDepot()){
 			newItem = new Depot(_type);

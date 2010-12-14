@@ -318,6 +318,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\mount.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\map.cpp"
 				>
 			</File>
@@ -639,6 +643,10 @@
 				RelativePath="..\mailbox.h"
 				>
 			</File>
+			<File
+				RelativePath="..\mount.h"
+				>
+			</File>			
 			<File
 				RelativePath="..\map.h"
 				>

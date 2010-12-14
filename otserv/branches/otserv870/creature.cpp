@@ -375,11 +375,6 @@ void Creature::setCurrentOutfit(Outfit_t outfit)
 	}
 }
 
-void Creature::setRidingMount(bool isRiding)
-{
-	ridingMount = isRiding;
-}
-
 bool Creature::startAutoWalk(std::list<Direction>& listDir)
 {
 	listWalkDir = listDir;

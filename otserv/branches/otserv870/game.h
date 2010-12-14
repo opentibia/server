@@ -464,6 +464,7 @@ public:
 	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
 	bool playerReportBug(uint32_t playerId, std::string comment);
+	bool playerMountCreature(uint32_t playerId, bool mount);
 
 	void cleanup();
 	void shutdown();

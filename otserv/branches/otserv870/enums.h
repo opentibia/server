@@ -47,10 +47,11 @@ enum CombatType_t {
 	COMBAT_ICEDAMAGE        = 512,
 	COMBAT_HOLYDAMAGE       = 1024,
 	COMBAT_DEATHDAMAGE      = 2048,
-	COMBAT_LAST             = COMBAT_DEATHDAMAGE
+	COMBAT_BLEEDDAMAGE      = 4096,
+	COMBAT_LAST             = COMBAT_BLEEDDAMAGE
 };
 
-const int COMBAT_COUNT = 13;
+const int COMBAT_COUNT = 14;
 
 enum CombatParam_t{
 	COMBATPARAM_COMBATTYPE				= 1,

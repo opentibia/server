@@ -254,7 +254,7 @@ public:
 	void setCurrentOutfit(Outfit_t outfit);
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	const bool isRidingMount() const {return ridingMount;}
-	void setRidingMount(bool isRiding);
+	void setRidingMount(bool isRiding) {ridingMount = isRiding;}
 	const int32_t getMountSpeed() const {return (ridingMount ? mountSpeed : 0);}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
 	ZoneType_t getZone() const {return getTile()->getZone();}

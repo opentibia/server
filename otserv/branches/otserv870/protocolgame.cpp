@@ -1085,21 +1085,8 @@ void ProtocolGame::parseSetOutfit(NetworkMessage& msg)
 
 void ProtocolGame::parseMountCreature(NetworkMessage& msg)
 {
-	if(player->getTile()->hasFlag(TILESTATE_PROTECTIONZONE)){
-		player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
-	}
-	else if(!player->hasMounts() || !player->getCurrentOutfit().lookMount){
-		sendOutfitWindow();
-	}
-	else if((OTSYS_TIME() - player->getLastTimeMounted()) >= 2000){
-		player->setRidingMount(msg.GetByte() == 1);
-		g_game.changeSpeed(player, 0);
-		player->setLastTimeMountedAsNow();
-		g_game.internalCreatureChangeOutfit(player, player->defaultOutfit);
-	}
-	else{
-		player->sendCancel("Please wait 2 seconds before mounting again.");
-	}
+	bool mount = msg.GetByte() == 1;
+	addGameTask(&Game::playerMountCreature, player->getID(), mount);
 }
 
 void ProtocolGame::parseUseItem(NetworkMessage& msg)
@@ -2698,13 +2685,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)
 	msg->AddU16(player->getHealth());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
 	msg->AddU32((uint32_t)(player->getFreeCapacity() * 100));
-	uint64_t experience = player->getExperience();
-	if(experience <= 0x7FFFFFFF){
-		msg->AddU64(player->getExperience());
-	}
-	else{
-		msg->AddU64(0x00); //Client debugs after 2,147,483,647 exp
-	}
+	msg->AddU64(player->getExperience());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
 	msg->AddByte(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT));
 	msg->AddU16(player->getMana());

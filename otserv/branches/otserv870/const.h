@@ -470,7 +470,8 @@ enum Icons_t{
 	ICON_CURSED     = 2048,
 	ICON_PARTY_BUFF = 4096,
 	ICON_PZBLOCK    = 8192,
-	ICON_PZ         = 16384
+	ICON_PZ         = 16384,
+	ICON_BLEEDING   = 32768
 };
 
 enum WeaponType_t {

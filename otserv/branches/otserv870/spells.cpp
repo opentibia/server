@@ -1940,8 +1940,8 @@ ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId
 {
 	//If a reagent is needed
 	if(reagentId != 0){
-		//Get the item from the player's inventory slot
-		Item* item = player->getInventoryItem(slot);
+		//Get the item from the player's inventory
+		Item* item = player->getFirstItemById(reagentId);
 		//If the item exists, and the id is equal to the reagentId
 		if(item && item->getID() == reagentId){
 			//If testing, return here

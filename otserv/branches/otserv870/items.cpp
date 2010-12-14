@@ -1111,6 +1111,11 @@ bool Items::loadFromXml(const std::string& datadir)
 								it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_PHYSICALDAMAGE)] = intValue;
 							}
 						}
+						else if(asLowerCaseString(strValue) == "absorbpercentbleed"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.absorb.resistances[CombatTypeToIndex(COMBAT_BLEEDDAMAGE)] = intValue;
+							}
+						}
 						else if(asLowerCaseString(strValue) == "suppressdrunk"){
 							if(readXMLInteger(itemAttributesNode, "value", intValue)){
 								it.abilities.conditionSuppressions |= CONDITION_DRUNK;
@@ -1154,6 +1159,11 @@ bool Items::loadFromXml(const std::string& datadir)
 						else if(asLowerCaseString(strValue) == "suppresscurse"){
 							if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
 								it.abilities.conditionSuppressions |= CONDITION_CURSED;
+							}
+						}
+						else if(asLowerCaseString(strValue) == "suppressbleed"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue) && intValue != 0){
+								it.abilities.conditionSuppressions |= CONDITION_BLEEDING;
 							}
 						}
 						else if(asLowerCaseString(strValue) == "preventitemloss"){
@@ -1203,6 +1213,10 @@ bool Items::loadFromXml(const std::string& datadir)
 								//	damageCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_PHYSICAL);
 								//	combatType = COMBAT_PHYSICALDAMAGE;
 								//}
+								else if(asLowerCaseString(strValue) == "bleed"){
+									conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_BLEEDING);
+									combatType = COMBAT_BLEEDDAMAGE;
+								}
 								else{
 									std::cout << "Warning: [Items::loadFromXml] " << "Unknown field value " << strValue  << std::endl;
 								}

@@ -339,6 +339,41 @@ Item* Player::getEquippedItem(slots_t slot) const
 	return NULL;
 }
 
+Item* Player::getFirstItemById(uint32_t id) const
+{
+	std::list<Container*> listContainer;
+	ItemList::const_iterator it;
+	Item* tmpItem = NULL;
+	Container* tmpContainer = NULL;
+
+	for(int32_t slot = SLOT_FIRST; slot <= SLOT_LAST; slot++){
+		tmpItem = getInventoryItem((slots_t)slot);
+		if(tmpItem->getID() == id){
+			return tmpItem;
+		}
+		else if((tmpContainer = tmpItem->getContainer())){
+			listContainer.push_back(tmpContainer);
+		}
+	}
+
+	while(!listContainer.empty()){
+		Container* container = listContainer.front();
+		listContainer.pop_front();
+
+		for(it = container->getItems(); it != container->getEnd(); ++it){
+			tmpItem = *it;
+			if(tmpItem->getID() == id){
+				return tmpItem;
+			}
+			else if((tmpContainer = tmpItem->getContainer())){
+				listContainer.push_back(tmpContainer);
+			}
+		}
+	}
+	
+	return NULL;
+}
+
 void Player::setConditionSuppressions(uint32_t conditions, bool remove)
 {
 	if(!remove){
@@ -1041,13 +1076,14 @@ bool Player::canSeeCreature(const Creature* creature) const
 
 bool Player::canWalkthrough(const Creature* creature) const
 {
-	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures)
-		|| (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag())){
-		return true;
-	}
 	if (creature->getTile() && creature->getTile()->ground
 		&& creature->getTile()->ground->getID() == ITEM_GLOWING_SWITCH){
 		return false;
+	}
+
+	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures)
+		|| (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag())){
+		return true;
 	}
 
 	return (Combat::checkPVPExtraRestrictions(this, creature, true) != RET_NOERROR);

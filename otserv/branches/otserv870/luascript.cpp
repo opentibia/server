@@ -6927,7 +6927,7 @@ int LuaScriptInterface::luaGetGlobalStorageValue(lua_State *L)
 		lua_pushboolean(L, true);
 	}
 	else{
-		lua_pushboolean(L, false);
+		lua_pushnumber(L, -1);
 		lua_pushboolean(L, false);
 	}
 	return 2;

@@ -210,6 +210,7 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_FREEZING:
 		case CONDITION_DAZZLED:
 		case CONDITION_CURSED:
+		case CONDITION_BLEEDING:
 		{
 			return new ConditionDamage(_id, _type);
 			break;
@@ -1524,6 +1525,10 @@ uint16_t ConditionDamage::getIcons() const
 
 		case CONDITION_CURSED:
 			icons |= ICON_CURSED;
+			break;
+
+		case CONDITION_BLEEDING:
+			icons |= ICON_BLEEDING;
 			break;
 
 		default:

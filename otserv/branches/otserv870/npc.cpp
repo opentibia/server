@@ -789,6 +789,9 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						else if(strValue == "muted"){
 							prop.condition = CONDITION_MUTED;
 						}
+						else if(strValue == "bleed"){
+							prop.condition = CONDITION_BLEEDING;
+						}
 					}
 
 					if(readXMLInteger(tmpNode, "b1", intValue)){

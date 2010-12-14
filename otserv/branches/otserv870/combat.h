@@ -391,6 +391,7 @@ inline std::string CombatTypeName(CombatType_t combat) {
 		case COMBAT_ICEDAMAGE: return "ice";
 		case COMBAT_HOLYDAMAGE: return "holy";
 		case COMBAT_DEATHDAMAGE: return "death";
+		case COMBAT_BLEEDDAMAGE: return "bleed";
 	}
 	return "none";
 }
