@@ -1657,7 +1657,7 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 	else{
 		const ItemType& it = items[getID()];
 		if(it.condition){
-			if (canOwnerHarm(creature)){
+			if(canOwnerHarm(creature)){
 				Condition* conditionCopy = it.condition->clone();
 				uint32_t ownerId = getOwner();
 				if(ownerId != 0 && purposeful){
@@ -1668,6 +1668,46 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 						{
 							conditionCopy->setParam(CONDITIONPARAM_OWNER, ownerId);
 						}
+					}
+				}
+
+				if(Player* player = creature->getPlayer()){
+					if(ConditionDamage* conditionDamage = (ConditionDamage*)conditionCopy){
+						Item* tmpItem = NULL;
+						for(int32_t i = SLOT_FIRST; i <= SLOT_LAST; i++){
+							if((tmpItem = player->getInventoryItem((slots_t)i))){
+								if(tmpItem->getWieldPosition() != i){
+									continue;
+								}
+
+								const ItemType& it = items[tmpItem->getID()];
+								std::map<uint16_t, int16_t>::const_iterator id = it.abilities.absorbFieldDamage.find(getID());
+								if(id != it.abilities.absorbFieldDamage.end()){
+									int32_t index = 0, length = conditionDamage->getLength();
+									std::list<IntervalInfo> damageList;
+									for(; index < length; index++){
+										IntervalInfo info = conditionDamage->popFrontDamage();
+										info.value = (int32_t)std::floor((double)info.value * (100 - id->second) / 100.);
+										damageList.push_back(info);
+										conditionDamage->setTicks(conditionDamage->getTicks() - info.interval);
+									}
+
+									index = 0;
+									length -= it.abilities.conditionCount;
+									conditionDamage->clearDamageList();
+									for(std::list<IntervalInfo>::iterator itt = damageList.begin(); itt != damageList.end(); itt++){
+										conditionDamage->addDamage(1, itt->interval, itt->value);
+										if(++index == length)
+											break;
+									}
+								}
+							}
+						}
+						if(conditionDamage->getTotalDamage() > 0){
+							conditionDamage->setParam(CONDITIONPARAM_FORCEUPDATE, true);
+						}
+						creature->addCondition(conditionDamage);
+						return;
 					}
 				}
 				creature->addCondition(conditionCopy);

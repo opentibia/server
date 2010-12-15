@@ -341,32 +341,32 @@ Item* Player::getEquippedItem(slots_t slot) const
 
 Item* Player::getFirstItemById(uint32_t id) const
 {
-	std::list<Container*> listContainer;
-	ItemList::const_iterator it;
 	Item* tmpItem = NULL;
 	Container* tmpContainer = NULL;
-
+	std::list<Container*> listContainer;
 	for(int32_t slot = SLOT_FIRST; slot <= SLOT_LAST; slot++){
-		tmpItem = getInventoryItem((slots_t)slot);
-		if(tmpItem->getID() == id){
-			return tmpItem;
-		}
-		else if((tmpContainer = tmpItem->getContainer())){
-			listContainer.push_back(tmpContainer);
-		}
-	}
-
-	while(!listContainer.empty()){
-		Container* container = listContainer.front();
-		listContainer.pop_front();
-
-		for(it = container->getItems(); it != container->getEnd(); ++it){
-			tmpItem = *it;
+		if((tmpItem = getInventoryItem((slots_t)slot))){
 			if(tmpItem->getID() == id){
 				return tmpItem;
 			}
 			else if((tmpContainer = tmpItem->getContainer())){
 				listContainer.push_back(tmpContainer);
+			}
+		}
+	}
+
+	ItemList::const_iterator it;
+	while(!listContainer.empty()){
+		Container* container = listContainer.front();
+		listContainer.pop_front();
+		for(it = container->getItems(); it != container->getEnd(); ++it){
+			if((tmpItem = *it)){
+				if(tmpItem->getID() == id){
+					return tmpItem;
+				}
+				else if((tmpContainer = tmpItem->getContainer())){
+					listContainer.push_back(tmpContainer);
+				}
 			}
 		}
 	}

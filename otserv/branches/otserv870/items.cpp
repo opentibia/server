@@ -1186,6 +1186,27 @@ bool Items::loadFromXml(const std::string& datadir)
 								it.abilities.conditionSuppressions |= CONDITION_PHYSICAL;
 							}
 						}*/
+						else if(asLowerCaseString(strValue) == "absorbpercentfirefield"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.absorbFieldDamage[ITEM_FIREFIELD] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_FIREFIELD+1] = intValue;
+							}
+						}
+						else if(asLowerCaseString(strValue) == "absorbpercentenergyfield"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.absorbFieldDamage[ITEM_ENERGYFIELD] = intValue;
+							}
+						}
+						else if(asLowerCaseString(strValue) == "absorbpercentpoisonfield"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.absorbFieldDamage[ITEM_POISONFIELD] = intValue;
+							}
+						}
+						else if(asLowerCaseString(strValue) == "reduceconditioncount"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.conditionCount = intValue;
+							}
+						}
 						else if(asLowerCaseString(strValue) == "field"){
 							it.group = ITEM_GROUP_MAGICFIELD;
 							it.type = ITEM_TYPE_MAGICFIELD;

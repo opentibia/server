@@ -1308,6 +1308,7 @@ void Creature::onTickCondition(ConditionType_t type, int32_t interval, bool& bRe
 			case CONDITION_ENERGY: bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE); break;
 			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_EARTHDAMAGE); break;
 			case CONDITION_DROWN: bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE); break;
+			case CONDITION_BLEEDING: bRemove = (field->getCombatType() != COMBAT_BLEEDDAMAGE); break;
 			default:
 				break;
 		}

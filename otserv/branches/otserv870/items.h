@@ -81,6 +81,12 @@ struct Abilities{
 			std::ostream& getDescription(std::ostream& os, bool& first, int32_t type) const;
 	} skill;
 
+	//field damage
+	std::map<uint16_t, int16_t> absorbFieldDamage;
+
+	//condition manipulating
+	uint16_t conditionCount;
+
 	//elemental damage
 	CombatType_t elementType;
 	int16_t elementDamage;

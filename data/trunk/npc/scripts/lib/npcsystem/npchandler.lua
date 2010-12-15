@@ -595,7 +595,7 @@ if(NpcHandler == nil) then
 
 	-- Makes the npc represented by this instance of NpcHandler say something.
 	--	This implements the currently set type of talkdelay.
-	--	shallDelay is a boolean value. If it is false, the message is not delayed. Default value is false.
+	--	shallDelay is a boolean value. If it is false, the message is not delayed. Default value is true.
 	function NpcHandler:say(message, focus, publicize, shallDelay)
 		if(shallDelay == nil) then
 			shallDelay = true

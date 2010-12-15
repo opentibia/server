@@ -22830,6 +22830,8 @@
 		<attribute key="description" value="Wearing these boots reduces the damage gotten from fiery ground."/>
 		<attribute key="weight" value="950"/>
 		<attribute key="armor" value="2"/>
+		<attribute key="absorbpercentfirefield" value="90"/>
+		<attribute key="reduceconditioncount" value="5"/>
 		<attribute key="slotType" value="feet"/>
 		<attribute key="decayTo" value="10022"/>
 		<attribute key="transformDeEquipTo" value="9933"/>
