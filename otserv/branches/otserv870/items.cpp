@@ -1190,16 +1190,20 @@ bool Items::loadFromXml(const std::string& datadir)
 							if(readXMLInteger(itemAttributesNode, "value", intValue)){
 								it.abilities.absorbFieldDamage[ITEM_FIREFIELD] = intValue;
 								it.abilities.absorbFieldDamage[ITEM_FIREFIELD+1] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_FIREFIELD_NOT_DECAYING] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_FIREFIELD_NOT_DECAYING+1] = intValue;
 							}
 						}
 						else if(asLowerCaseString(strValue) == "absorbpercentenergyfield"){
 							if(readXMLInteger(itemAttributesNode, "value", intValue)){
 								it.abilities.absorbFieldDamage[ITEM_ENERGYFIELD] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_ENERGYFIELD_NOT_DECAYING] = intValue;
 							}
 						}
 						else if(asLowerCaseString(strValue) == "absorbpercentpoisonfield"){
 							if(readXMLInteger(itemAttributesNode, "value", intValue)){
 								it.abilities.absorbFieldDamage[ITEM_POISONFIELD] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_POISONFIELD_NOT_DECAYING] = intValue;
 							}
 						}
 						else if(asLowerCaseString(strValue) == "reduceconditioncount"){
