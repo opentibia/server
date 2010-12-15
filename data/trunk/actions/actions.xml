@@ -1,10 +1,7 @@
 <?xml version="1.0"?>
 <actions>
-	<!-- Quest Rewards (only for example) -->
-	<action uniqueid="1000" script="quest_reward.lua"/>
-	<action uniqueid="1001" script="quest_reward.lua"/>
-	<action uniqueid="1002" script="quest_reward.lua"/>
-	<action uniqueid="1003" script="quest_reward.lua"/>
+	<!-- Quest System (based on map editor) -->
+	<action actionid="2000" script="system.lua"/>
 	
 	<!-- Tools -->
 	<action itemid="5942" script="blessed_wooden_stake.lua"/>
