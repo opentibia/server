@@ -162,6 +162,7 @@ public:
 		EXPERIENCE_STAGES,
 		ENABLE_COOLDOWN,
 		ENABLE_MOUNTS,
+		PUSH_INTERVAL,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

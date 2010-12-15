@@ -298,6 +298,7 @@ protected:
 
 	static RuneSpellFunction Illusion;
 	static RuneSpellFunction Convince;
+	static RuneSpellFunction Soulfire;
 
 	bool internalCastSpell(Creature* creature, const LuaVariant& var);
 

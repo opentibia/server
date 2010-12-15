@@ -465,6 +465,7 @@ public:
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
 	bool playerReportBug(uint32_t playerId, std::string comment);
 	bool playerMountCreature(uint32_t playerId, bool mount);
+	bool playerRegisterWalkAction(uint32_t playerId, SchedulerTask* task);
 
 	void cleanup();
 	void shutdown();
