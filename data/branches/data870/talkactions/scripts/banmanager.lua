@@ -1,15 +1,16 @@
 -- BANNING
 -- usage /ban add, player, character_name, lenght_in_days_numeric_number (default until server save) -- will ban Player
--- usage /ban add, ip , character_name, lenght_in_days_numeric_number (default until server save) -- will ban IP
+-- usage /ban add, ip , character_name, lenght_in_days_numeric_number (default until server save) -- will ban IP 
 -- usage /ban add, account, character_name, lenght_in_days_numeric_number (default until server save)  -- will ban whole account
 -- usage /ban remove, player, character_name -- will delete ban on player
 -- usage /ban remove, account, character_name -- will delete ban on account
--- usage /ban remove, ip, character_name -- will delete ban on IP (There is still erorr with "No IP was unbanned.")
+-- usage /ban remove, ip, character_name -- will delete ban on IP (Warning if you want to unban a character with specific IP instead of character_name you have to first ban it in that way)
+
 
 -- CHECKING
 -- usage /ban all -- shows all bans
 -- usage /ban player -- shows player bans
--- usage /ban account -- shows account bans (There is still error with that)
+-- usage /ban account -- shows account bans
 -- usage /ban ip -- shows ip bans
 function convertSecondsToText(s)
 	if s == 0 then
@@ -127,7 +128,7 @@ function doSendBanListMessage(creature, format)
 					if ban["expires"] > 0 then
 						dt = os.date("%c", ban["expires"])
 					end
-					local bantext = "#" .. ban["accountId"] .. " until " .. dt .. "\n"
+					local bantext = "" .. ban["accountName"] .. " until " .. dt .. "\n"
 					if #ss + #bantext > 250 then
 						-- Can't find in one message
 						doPlayerSendTextMessage(creature, MESSAGE_STATUS_CONSOLE_BLUE, ss)

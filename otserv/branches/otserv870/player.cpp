@@ -1620,6 +1620,12 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 
 		if(!storedConditionList.empty()){
 			for(ConditionList::const_iterator it = storedConditionList.begin(); it != storedConditionList.end(); ++it){
+				if((*it)->getType() == CONDITION_REGENERATION && (*it)->getSubId() == 0){
+					(*it)->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
+					(*it)->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
+					(*it)->setParam(CONDITIONPARAM_MANAGAIN, vocation->getManaGainAmount());
+					(*it)->setParam(CONDITIONPARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
+				}
 				addCondition(*it);
 			}
 

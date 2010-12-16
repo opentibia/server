@@ -631,6 +631,15 @@ bool Spell::configureSpell(xmlNodePtr p)
 		isAggressive = (intValue == 1);
 	}
 
+	if(groupExhaustions.empty()){
+		if(isAggressive){
+			groupExhaustions[SPELLGROUP_MELEE] = g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED);
+		}
+		else{
+			groupExhaustions[SPELLGROUP_HEALING] = g_config.getNumber(ConfigManager::HEAL_EXHAUSTED);
+		}
+	}
+
 	xmlNodePtr vocationNode = p->children;
 	while(vocationNode){
 		if(xmlStrcmp(vocationNode->name,(const xmlChar*)"vocation") == 0){

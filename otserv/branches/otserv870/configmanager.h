@@ -163,6 +163,7 @@ public:
 		ENABLE_COOLDOWN,
 		ENABLE_MOUNTS,
 		PUSH_INTERVAL,
+		WANDS_INTERRUPT_SWING,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

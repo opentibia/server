@@ -1122,6 +1122,15 @@ bool WeaponWand::configureWeapon(const ItemType& it)
 	return Weapon::configureWeapon(it);
 }
 
+bool WeaponWand::interruptSwing() const
+{
+	if(!g_config.getNumber(ConfigManager::WANDS_INTERRUPT_SWING)){
+		return false;
+	}
+
+	return true;
+}
+
 int32_t WeaponWand::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t minValue = minChange;

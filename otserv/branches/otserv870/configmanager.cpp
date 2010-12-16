@@ -206,6 +206,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[ENABLE_COOLDOWN] = getGlobalBoolean(L, "enable_cooldown", true);
 	m_confInteger[ENABLE_MOUNTS] = getGlobalBoolean(L, "enable_mounts", true);
 	m_confInteger[PUSH_INTERVAL] = getGlobalNumber(L, "push_interval", 2000);
+	m_confInteger[WANDS_INTERRUPT_SWING] = getGlobalBoolean(L, "wands_interrupt_swing", true);
 	m_isLoaded = true;
 	return true;
 }
