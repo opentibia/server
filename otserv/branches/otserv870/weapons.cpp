@@ -1124,7 +1124,7 @@ bool WeaponWand::configureWeapon(const ItemType& it)
 
 bool WeaponWand::interruptSwing() const
 {
-	if(!g_config.getNumber(ConfigManager::WANDS_INTERRUPT_SWING)){
+	if(!g_config.getBoolean(ConfigManager::WANDS_INTERRUPT_SWING)){
 		return false;
 	}
 

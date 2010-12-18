@@ -170,13 +170,13 @@ void Items::clear()
 
 bool Items::reload()
 {
-	//TODO?
-	/*
-	for (ItemMap::iterator it = items.begin(); it != items.end(); it++){
-		delete it->second->condition;
-	}
-	return loadFromXml(m_datadir);
-	*/
+	clear();
+	/*items.clear();
+	if(!items.size())
+		return false;*/
+
+	if(loadFromOtb(m_datadir))
+		return loadFromXml(m_datadir);
 	return false;
 }
 

@@ -684,6 +684,7 @@ public:
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 	uint32_t getNextActionTime() const;
 	virtual uint32_t getAttackSpeed() const;
+	void setLastAttackAsNow() { lastAttack = OTSYS_TIME(); }
 	int64_t getLastTimeRequestOutfit() const { return lastTimeRequestOutfit; }
 	void setLastTimeRequestOutfitAsNow() { lastTimeRequestOutfit = OTSYS_TIME(); }
 

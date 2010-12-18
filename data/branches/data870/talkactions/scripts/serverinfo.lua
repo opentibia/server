@@ -4,7 +4,8 @@ local config = {
 	rate_skill = getConfigValue('rate_skill'),
 	rate_loot = getConfigValue('rate_loot'),
 	rate_mag = getConfigValue('rate_mag'),
-	rent_period = getConfigValue('houserentperiod')
+	rent_period = getConfigValue('houserentperiod'),
+	protection_level = getConfigValue('min_pvp_level')
 }
 
 function onSay(cid, words, param)
@@ -14,6 +15,7 @@ function onSay(cid, words, param)
 	str = str .. "Magic Rate: " .. config.rate_mag .. "x\n"
 	str = str .. "Skill Rate: " .. config.rate_skill .. "x\n"
 	str = str .. "Loot Rate: " .. config.rate_loot .. "x"
+	str = str .. "Protection Level: " .. config.protection_level .. ""
 	
 	-- Add house renting info
 	if(config.rent_period ~= "never") then

@@ -2878,6 +2878,11 @@ bool Player::hasCapacity(const Item* item, uint32_t count) const
 ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {
+	Player* self = const_cast<Player*>(this);
+	if(self == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+	
 	const Item* item = thing->getItem();
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
@@ -2972,6 +2977,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 						}
 					}
 				}
+				if(item->getWeaponType() != WEAPON_NONE && ret == RET_NOERROR){
+					self->setLastAttackAsNow();
+				}
 			}
 			break;
 		case SLOT_LEFT:
@@ -3012,6 +3020,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 						}
 					}
 				}
+				if(item->getWeaponType() != WEAPON_NONE && ret == RET_NOERROR){
+					self->setLastAttackAsNow();
+				}
 			}
 			break;
 		case SLOT_LEGS:
@@ -3042,6 +3053,27 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			break;
 	}
 
+	if(ret == RET_BOTHHANDSNEEDTOBEFREE && (index == SLOT_LEFT || index == SLOT_RIGHT)){
+		Item* tmpItem = NULL;
+		Container* tmpContainer = NULL;
+		slots_t setSlot = (slots_t)index;
+		if(inventory[setSlot]){
+			for(int i = SLOT_FIRST; i <= SLOT_LAST; i++){
+				tmpItem = getInventoryItem((slots_t)i);
+				if(tmpItem){
+					tmpContainer = tmpItem->getContainer();
+					if(tmpContainer && (tmpContainer->getItemCount() != tmpContainer->getItemHoldingCount())){
+						self->sendRemoveInventoryItem(setSlot, inventory[setSlot]);
+						self->onRemoveInventoryItem(setSlot, inventory[setSlot]);
+						g_game.internalAddItem(tmpContainer, inventory[setSlot], INDEX_WHEREEVER, FLAG_NOLIMIT);
+						self->inventory[setSlot] = NULL;
+						break;
+					}
+				}
+			}
+		}
+	}	
+	
 	if(ret == RET_NOERROR || ret == RET_NOTENOUGHROOM){
 		//need an exchange with source?
 		if(getInventoryItem((slots_t)index) != NULL){
@@ -4708,12 +4740,11 @@ void Player::genReservedStorageRange()
 				continue;
 		}
 		else{
-			//outfit does not exist
+			//mount does not exist
 			continue;
 		}
 
-		int32_t value = (it->first << 16);
-		storageMap[base_key] = value;
+		storageMap[base_key] = it->first;
 		base_key++;
 		if(base_key > PSTRG_MOUNTSID_RANGE_START + PSTRG_MOUNTSID_RANGE_SIZE){
 			std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 mounts!." << std::endl;

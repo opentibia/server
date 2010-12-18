@@ -164,6 +164,7 @@ public:
 		ENABLE_MOUNTS,
 		PUSH_INTERVAL,
 		WANDS_INTERRUPT_SWING,
+		MONSTER_SPAWN_WALKBACK,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

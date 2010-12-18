@@ -21,6 +21,7 @@
 
 #include "outfit.h"
 #include "tools.h"
+#include "player.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <iostream>
@@ -152,7 +153,16 @@ bool Outfits::reload()
 {
 	allOutfits.clear();
 	outfitMaps.clear();
-	return loadFromXml(m_datadir);
+	bool result = loadFromXml(m_datadir);
+	if(result){
+		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
+		it != Player::listPlayer.list.end();
+		++it)
+		{
+			it->second->setSex(it->second->getSex());
+		}
+	}
+	return result;
 }
 
 uint32_t Outfits::getOutfitId(uint32_t lookType)

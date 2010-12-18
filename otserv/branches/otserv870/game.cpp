@@ -3420,6 +3420,7 @@ bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMo
 	if(!player || player->isRemoved())
 		return false;
 
+	player->setLastAttackAsNow();
 	player->setFightMode(fightMode);
 	player->setChaseMode(chaseMode);
 	player->setSafeMode(safeMode);
@@ -5044,6 +5045,9 @@ void Game::reloadInfo(reloadTypes_t info)
 			break;
 		case RELOAD_TYPE_MOUNTS:
 			Mounts::getInstance()->reload();
+			break;
+		case RELOAD_TYPE_ITEMS:
+			Item::items.reload();
 			break;
 	}
 }

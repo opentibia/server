@@ -21,6 +21,7 @@
 
 #include "mount.h"
 #include "tools.h"
+#include "player.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <iostream>
@@ -98,7 +99,16 @@ bool Mounts::loadFromXml(const std::string& datadir)
 bool Mounts::reload()
 {
 	mounts.clear();
-	return loadFromXml(m_datadir);
+	bool result = loadFromXml(m_datadir);
+	if(result){
+		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
+		it != Player::listPlayer.list.end();
+		++it)
+		{
+			it->second->setSex(it->second->getSex());
+		}
+	}
+	return result;
 }
 
 bool Mounts::getMount(uint32_t value, Mount& mount, bool isId)

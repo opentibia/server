@@ -39,7 +39,10 @@ function onSay(cid, words, param)
 		param = "outfits"
 	elseif param == "mounts" or param == "mount" then
 		doReloadInfo(RELOAD_TYPE_MOUNTS)
-		param = "mounts"	
+		param = "mounts"
+	elseif param == "items" or param == "item" then
+		doReloadInfo(RELOAD_TYPE_ITEMS)
+		param = "items"
 	else
 		param = ""
 	end
