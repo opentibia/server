@@ -366,6 +366,21 @@ bool Condition::updateCondition(const Condition* addCondition)
 	return true;
 }
 
+bool Condition::canBeAggressive(ConditionType_t type) //static
+{
+	switch((int32_t) type){
+		case CONDITION_NONE:
+		case CONDITION_HASTE:
+		case CONDITION_INVISIBLE:
+		case CONDITION_LIGHT:
+		case CONDITION_REGENERATION:
+			return false;
+			break;
+		default:
+			return true;
+	}
+}
+
 ConditionGeneric::ConditionGeneric(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) :
 Condition(_id, _type, _ticks)
 {

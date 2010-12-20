@@ -183,27 +183,26 @@ bool Vocations::loadFromXml(const std::string& datadir)
 	return true;
 }
 
-Vocation* Vocations::getVocation(uint32_t vocId)
+bool Vocations::getVocation(const uint32_t& vocationId, Vocation*& vocation)
 {
-	VocationsMap::iterator it = vocationsMap.find(vocId);
+	VocationsMap::const_iterator it = vocationsMap.find(vocationId);
 	if(it != vocationsMap.end()){
-		return it->second;
+		vocation = it->second;
+		return true;
 	}
-	else{
-		std::cout << "Warning: [Vocations::getVocation] Vocation " << vocId << " not found." << std::endl;
-		return &def_voc;
-	}
+	std::cout << "Warning: [Vocations::getVocation] Vocation " << vocationId << " not found." << std::endl;
+	return false;
 }
 
-int32_t Vocations::getVocationId(const std::string& name)
+bool Vocations::getVocationId(const std::string& name, int32_t& vocationId) const
 {
-	for(VocationsMap::iterator it = vocationsMap.begin(); it != vocationsMap.end(); ++it){
+	for(VocationsMap::const_iterator it = vocationsMap.begin(); it != vocationsMap.end(); ++it){
 		if(boost::algorithm::iequals(it->second->name, name)){
-			return it->first;
+			vocationId = it->first;
+			return true;
 		}
 	}
-
-	return -1;
+	return false;
 }
 
 Vocation::Vocation()

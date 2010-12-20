@@ -101,11 +101,11 @@ Item* Item::CreateItem(PropStream& propStream)
 
 bool Item::loadItem(xmlNodePtr node, Container* parent)
 {
-	int32_t intValue;
-	std::string strValue;
-
 	if(xmlStrcmp(node->name, (const xmlChar*)"item") == 0){
+		int32_t intValue;
+		std::string strValue;
 		Item* item = NULL;
+
 		if(readXMLInteger(node, "id", intValue)){
 			item = Item::CreateItem(intValue);
 		}
@@ -183,7 +183,8 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 		}
 	}
 	else if(it.charges != 0){
-		if(_count != 0){
+		//if count is higher than 1, override default charges
+		if(_count > 1){
 			setCharges(_count);
 		}
 		else{
@@ -738,7 +739,7 @@ std::string Item::getLongName(const ItemType& it, int32_t lookDistance,
 		}
 	}
 	else{
-		s << "an item of type " << it.id;
+		s << "an item of type " << it.id << ", please report it to gamemaster";
 	}
 
 	return s.str();

@@ -778,8 +778,8 @@ void ProtocolGame::GetFloorDescription(NetworkMessage_ptr msg, int32_t x, int32_
 {
 	Tile* tile;
 
-	for(int32_t nx = 0; nx < width; nx++){
-		for(int32_t ny = 0; ny < height; ny++){
+	for(int32_t nx = 0; nx < width; ++nx){
+		for(int32_t ny = 0; ny < height; ++ny){
 			tile = g_game.getTile(x + nx + offset, y + ny + offset, z);
 
 			if(tile){
@@ -828,7 +828,7 @@ void ProtocolGame::checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &remo
 	// to many known creatures?
 	if(knownCreatureList.size() > 250){
 		// lets try to remove one from the end of the list
-		for (int n = 0; n < 250; n++){
+		for (int n = 0; n < 250; ++n){
 			removedKnown = knownCreatureList.front();
 
 			Creature* c = g_game.getCreatureByID(removedKnown);
@@ -2175,12 +2175,11 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 				//player light level
 				AddCreatureLight(msg, creature);
 
-				for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
-					bool online;
+				for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); ++it){
 					std::string vip_name;
 					if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
 						Player *p = g_game.getPlayerByName(vip_name);
-						online = (p && (!p->isGmInvisible() || player->canSeeGmInvisible(p)));
+						bool online = (p && (!p->isGmInvisible() || player->canSeeGmInvisible(p)));
 						sendVIP((*it), vip_name, online);
 					}
 				}
@@ -2447,7 +2446,7 @@ void ProtocolGame::sendOutfitWindow()
 			}
 
 			uint32_t counter = 0;
-			std::list<Outfit>::iterator it;
+			std::list<Outfit>::const_iterator it;
 			for(it = outfitList.begin(); it != outfitList.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
 				msg->AddU16(it->lookType);
 				msg->AddString(it->name);
@@ -2496,7 +2495,7 @@ void ProtocolGame::sendVIP(uint32_t guid, const std::string& name, bool isOnline
 		msg->AddByte(0xD2);
 		msg->AddU32(guid);
 		msg->AddString(name);
-		msg->AddByte(isOnline == true ? 1 : 0);
+		msg->AddByte(isOnline ? 1 : 0);
 	}
 }
 
@@ -2528,6 +2527,7 @@ void ProtocolGame::sendReLoginWindow()
 	if(msg){
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x28);
+        msg->AddByte(0x64);
 	}
 }
 

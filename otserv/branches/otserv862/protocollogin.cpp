@@ -120,7 +120,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	uint32_t serverip = serverIPs[0].first;
-	for(uint32_t i = 0; i < serverIPs.size(); i++){
+	for(uint32_t i = 0; i < serverIPs.size(); ++i){
 		if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
 			serverip = serverIPs[i].first;
 			break;
@@ -152,7 +152,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		output->AddByte(0x64);
 		output->AddByte((uint8_t)account.charList.size());
 		std::list<std::string>::iterator it;
-		for(it = account.charList.begin(); it != account.charList.end(); it++){
+		for(it = account.charList.begin(); it != account.charList.end(); ++it){
 			output->AddString((*it));
 			output->AddString(g_config.getString(ConfigManager::WORLD_NAME));
 			output->AddU32(serverip);

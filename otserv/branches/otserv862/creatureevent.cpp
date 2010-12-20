@@ -87,7 +87,7 @@ bool CreatureEvents::registerEvent(Event* event, xmlNodePtr p)
 			if(oldEvent){
 				// if there was an event with the same that is not loaded
 				// (happens when realoading), it is reused
-				if(oldEvent->isLoaded() == false &&
+				if(!oldEvent->isLoaded() &&
 					oldEvent->getEventType() == creatureEvent->getEventType()){
 					oldEvent->copyEvent(creatureEvent);
 				}
@@ -247,7 +247,7 @@ void CreatureEvent::clearEvent()
 	m_isLoaded = false;
 }
 
-uint32_t CreatureEvent::executeOnLogin(Player* player)
+bool CreatureEvent::executeOnLogin(Player* player)
 {
 	//onLogin(cid)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -280,7 +280,7 @@ uint32_t CreatureEvent::executeOnLogin(Player* player)
 	}
 }
 
-uint32_t CreatureEvent::executeOnLogout(Player* player)
+bool CreatureEvent::executeOnLogout(Player* player)
 {
 	//onLogout(cid)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -313,7 +313,7 @@ uint32_t CreatureEvent::executeOnLogout(Player* player)
 	}
 }
 
-uint32_t CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
+bool CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 {
 	//onDie(cid, corpse)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -348,7 +348,7 @@ uint32_t CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 	}
 }
 
-uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool lastHit)
+bool CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool lastHit)
 {
 	//onKill(cid, target, lasthit)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -371,7 +371,7 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool
 		m_scriptInterface->pushFunction(m_scriptId);
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, targetId);
-		lua_pushnumber(L, (lastHit ? true : false) );
+		lua_pushboolean(L, (lastHit ? true : false) );
 
 		bool result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
@@ -384,7 +384,7 @@ uint32_t CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool
 	}
 }
 
-uint32_t CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
+bool CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
 {
 	//onAdvance(cid, type, oldlevel, newlevel)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -420,7 +420,7 @@ uint32_t CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint
 	}
 }
 
-uint32_t CreatureEvent::executeOnLook(Player* player, Thing* target, uint16_t itemId)
+bool CreatureEvent::executeOnLook(Player* player, Thing* target, uint16_t itemId)
 {
 	//onLook(cid, thing, itemId)
 	if(m_scriptInterface->reserveScriptEnv()){

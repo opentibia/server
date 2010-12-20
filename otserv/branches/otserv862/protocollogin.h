@@ -23,6 +23,9 @@
 
 #include "definitions.h"
 #include "protocol.h"
+#include <vector>
+
+typedef std::vector<std::pair<uint32_t, uint32_t> > IPList;
 
 class NetworkMessage;
 class OutputMessage;

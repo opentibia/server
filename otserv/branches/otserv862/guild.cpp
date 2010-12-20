@@ -483,7 +483,7 @@ bool Guild::hasDeclaredWar(uint32_t warId) const
 	return false;
 }
 
-void Guild::broadcastMessage(SpeakClasses type, const std::string msg) const
+void Guild::broadcastMessage(SpeakClasses type, const std::string& msg) const
 {
 	ChatChannel* channel = g_chat.getGuildChannel(getId());
 	if(channel){

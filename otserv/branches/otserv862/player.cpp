@@ -118,14 +118,13 @@ Creature()
 	walkTask = NULL;
 	walkTaskEvent = 0;
 	actionTaskEvent = 0;
-	nextStepEvent = 0;
 
 	idleTime = 0;
 	idleWarned = false;
 
 	lastTimeRequestOutfit = 0;
 
-	for(int32_t i = 0; i < 11; i++){
+	for(int32_t i = 0; i < 11; ++i){
 		inventory[i] = NULL;
 		inventoryAbilities[i] = false;
 	}
@@ -151,7 +150,9 @@ Creature()
 	for(int32_t i = LEVEL_FIRST; i <= LEVEL_LAST; ++i){
 		rateValue[i] = 1.0f;
 	}
-
+#ifdef _FAIRFIGHTRULES_
+    fairFightReduction = false;
+#endif
 	maxDepotLimit = 1000;
 	maxVipLimit = 50;
 	groupFlags = 0;
@@ -194,7 +195,7 @@ Creature()
 
 Player::~Player()
 {
-	for(int i = 0; i < 11; i++){
+	for(int i = 0; i < 11; ++i){
 		if(inventory[i]){
 			inventory[i]->setParent(NULL);
 			inventory[i]->releaseThing2();
@@ -204,7 +205,7 @@ Player::~Player()
 	}
 
 	DepotMap::iterator it;
-	for(it = depots.begin();it != depots.end(); it++){
+	for(it = depots.begin();it != depots.end(); ++it){
 		it->second->releaseThing2();
 	}
 
@@ -219,10 +220,12 @@ Player::~Player()
 #endif
 }
 
-void Player::setVocation(uint32_t vocId)
+bool Player::setVocation(uint32_t vocId)
 {
+	if(!g_vocations.getVocation(vocId, vocation)){
+		return false;
+	}
 	vocation_id = (Vocation_t)vocId;
-	vocation = g_vocations.getVocation(vocId);
 
 	//Update health/mana gain condition
 	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0);
@@ -235,6 +238,8 @@ void Player::setVocation(uint32_t vocId)
 
 	//Set the player's max soul according to their vocation
 	soulMax = vocation->getSoulMax();
+
+	return true;
 }
 
 uint32_t Player::getVocationId() const
@@ -349,7 +354,7 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 {
 	Item* item;
 
-	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; ++slot){
 		item = getInventoryItem((slots_t)slot);
 		if(!item){
 			continue;
@@ -474,7 +479,7 @@ void Player::getShieldAndWeapon(const Item* &shield, const Item* &weapon) const
 	Item* item;
 	shield = NULL;
 	weapon = NULL;
-	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+	for(uint32_t slot = SLOT_RIGHT; slot <= SLOT_LEFT; ++slot){
 		item = getInventoryItem((slots_t)slot);
 		if(item){
 			switch(item->getWeaponType()){
@@ -1029,18 +1034,14 @@ bool Player::canSeeCreature(const Creature* creature) const
 
 bool Player::canWalkthrough(const Creature* creature) const
 {
-	/*if(creature->getPlayer() && creature->getPlayer()->isGmInvisible() &&
-		!canSeeGmInvisible((Player*)creature->getPlayer()))
-		return true;*/
-
-	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures) ||
-		(creature->getTile() && creature->getTile()->ground->getID() == ITEM_GLOWING_SWITCH)||
-		(creature->getPlayer() &&
-				(creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen) ||
-				creature->getPlayer()->isGmInvisible())) )
-		{
-			return true;
-		}
+	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures)
+		|| (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag())){
+		return true;
+	}
+	if (creature->getTile() && creature->getTile()->ground
+		&& creature->getTile()->ground->getID() == ITEM_GLOWING_SWITCH){
+		return false;
+	}
 
 	return (Combat::checkPVPExtraRestrictions(this, creature, true) != RET_NOERROR);
 }
@@ -1938,19 +1939,6 @@ void Player::setNextWalkActionTask(SchedulerTask* task)
 	resetIdle();
 }
 
-void Player::setNextWalkTask(SchedulerTask* task)
-{
-	if(nextStepEvent != 0){
-		g_scheduler.stopEvent(nextStepEvent);
-		nextStepEvent = 0;
-	}
-
-	if(task){
-		nextStepEvent = g_scheduler.addEvent(task);
-		resetIdle();
-	}
-}
-
 void Player::setNextActionTask(SchedulerTask* task)
 {
 	if(actionTaskEvent != 0){
@@ -2395,14 +2383,87 @@ void Player::onDie()
 		IOPlayer::instance()->addPlayerDeath(this, killers);
 		std::set<uint32_t> tmpList;
 
+#ifdef _FAIRFIGHTRULES_
+        uint32_t playersLevelSum = 0;
+        uint32_t totalDamage = 0;
+        uint32_t damageSum = 0;
+        for(CountMapEx::const_iterator cit = damageMap.begin(); cit != damageMap.end(); cit++)
+        {
+            uint32_t thingDamage = 0;
+            for(std::list<RecentBlock_t>::const_iterator cit2 = cit->second.recents.begin(); 
+                cit2 != cit->second.recents.end(); cit2++)
+                thingDamage += cit2->value;
+
+            totalDamage += thingDamage;
+            if(Creature* attacker = g_game.getCreatureByID(cit->first))
+            {
+                Player* player = attacker->getPlayer();
+                if(player && !isWarPartner(player)) 
+                {                                   
+                    damageSum += thingDamage;       
+                    playersLevelSum += player->getLevel();
+                }
+
+                attacker->onAttackedCreatureKilled(this);
+            }
+        }
+
+        if(g_config.getBoolean(ConfigManager::FAIRFIGHT) && playersLevelSum > getLevel())
+        {
+            double damagePercent = (double)damageSum / totalDamage;
+            if(damagePercent >= (double)g_config.getNumber(ConfigManager::DAMAGEFLAG1_FAIRFIGHT) / 100)
+            {
+                fairFightReduction = true;
+            }
+            else if(damagePercent >= (double)g_config.getNumber(ConfigManager::DAMAGEFLAG2_FAIRFIGHT) / 100)
+            {
+                Creature* lhc = g_game.getCreatureByID(lastHitThing);
+                if(lhc->isPlayerSummon() || lhc->getPlayer())
+                    fairFightReduction = true;
+            }
+#ifdef _FAIRFIGHTRULES_DEBUG_
+            std::cout << getName() << " died and " << (double)damageSum*100 / totalDamage << "% of the recent damage received came through players." << std::endl;
+            std::cout << "Players Damage: " << damageSum << std::endl;
+            std::cout << "Total Damage: " << totalDamage << std::endl;
+            std::cout << "Statistics for the damage dealt in the last " << g_config.getNumber(ConfigManager::TIME_FAIRFIGHT) << " milliseconds: " << std::endl;
+
+            Creature *creature;
+            for(CountMapEx::iterator it = damageMap.begin(); it != damageMap.end(); it++)
+            {
+                damageSum = 0;
+                for(std::list<RecentBlock_t>::const_iterator cit = it->second.recents.begin(); cit != it->second.recents.end(); cit++)
+                    damageSum += cit->value;
+
+                if(creature = g_game.getCreatureByID(it->first))
+                    std::cout << creature->getName();
+                else
+                    std::cout << "Non creatures";
+
+                std::cout << " dealt " << (double)damageSum*100 / totalDamage << "% of the received damage." << std::endl;
+            }
+
+            std::cout << std::endl;
+#endif
+        }
+#else
+        for(CountMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it)
+        {
+            if(Creature* attacker = g_game.getCreatureByID((*it).first))
+                attacker->onAttackedCreatureKilled(this);
+        }
+#endif
+
 		for(DeathList::const_iterator it = killers.begin(); it != killers.end(); ++it){
 			if(it->isCreatureKill()){
 				Creature* attacker = it->getKillerCreature();
-				Player* attackerPlayer = attacker->getPlayer();
+                Player* attackerPlayer;
 
 				if(attacker->isPlayerSummon()){
 					attackerPlayer = attacker->getPlayerMaster();
 				}
+                else{
+                    attackerPlayer = attacker->getPlayer();
+                }
 
 				if(attackerPlayer){
 					if(getGuild() && attackerPlayer->getGuild()){
@@ -2454,8 +2515,15 @@ void Player::die()
 		loginPosition = masterPos;
 
 		if(skillLoss){
-			uint64_t expLost = getLostExperience();
+            uint64_t expLost = getLostExperience();
 
+#ifdef _FAIRFIGHTRULES_
+            double fairFightReduction = 1.;
+            if(fairFightReduction)
+                fairFightReduction = getFairFightReduction();
+
+            expLost *= fairFightReduction;
+#endif
 			//Level loss
 			removeExperience(expLost, false);
 			double lostPercent = 1. - (double(experience - expLost) / double(experience)); // 0.1 if 10% was lost
@@ -2469,8 +2537,12 @@ void Player::die()
 			}
 
 			sumMana += manaSpent;
-
-			double lostPercentMana = lostPercent * lossPercent[LOSS_MANASPENT] / 100;
+#ifdef _FAIRFIGHTRULES_
+			double lostPercentMana = fairFightReduction * lostPercent * lossPercent[LOSS_MANASPENT] / 100;
+#else
+            double lostPercentMana = lostPercent * lossPercent[LOSS_MANASPENT] / 100;
+#endif
+            
 			lostMana = (int32_t)std::ceil(sumMana * lostPercentMana);
 
 			while((uint32_t)lostMana > manaSpent && magLevel > 0){
@@ -3450,7 +3522,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) c
 {
 	uint32_t count = 0;
 
-	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
+	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		Item* item = inventory[i];
 
 		if(item){
@@ -3472,7 +3544,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) c
 
 std::map<uint32_t, uint32_t>& Player::__getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const
 {
-	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
+	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		Item* item = inventory[i];
 
 		if(item){
@@ -3772,20 +3844,20 @@ uint64_t Player::getGainedExperience(Creature* attacker) const
 	if(g_game.getWorldType() == WORLD_TYPE_HARDCORE_PVP && g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP) > 0){
 		Player* attackerPlayer = attacker->getPlayer();
 		if(attackerPlayer && attackerPlayer != this && skillLoss){
-				/*Formula
-				a = attackers level * 0.9
-				b = victims level
-				c = victims experience
+			/*Formula
+			a = attackers level * 0.9
+			b = victims level
+			c = victims experience
 
-				y = (1 - (a / b)) * 0.05 * c
-				*/
+			y = (1 - (a / b)) * 0.05 * c
+			*/
 
-				uint32_t a = (int32_t)std::floor(attackerPlayer->getLevel() * 0.9);
-				uint32_t b = getLevel();
-				uint64_t c = getExperience();
+			uint32_t a = (int32_t)std::floor(attackerPlayer->getLevel() * 0.9);
+			uint32_t b = getLevel();
+			uint64_t c = getExperience();
 
-				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor(getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ));
-				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP);
+			uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor(getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ));
+			return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP);
 		}
 	}
 
@@ -3900,9 +3972,10 @@ void Player::onEndCondition(ConditionType_t type, bool lastCondition)
 	Creature::onEndCondition(type, lastCondition);
 
 	if(type == CONDITION_INFIGHT){
-		onIdleStatus();
-		pzLocked = false;
+        if(getHealth() > 0)
+		    onIdleStatus();
 
+        pzLocked = false;
 #ifdef __SKULLSYSTEM__
 		if(getSkull() != SKULL_RED && getSkull() != SKULL_BLACK){
 			clearAttacked();
@@ -4200,13 +4273,13 @@ bool Player::isImmune(CombatType_t type) const
 	return Creature::isImmune(type);
 }
 
-bool Player::isImmune(ConditionType_t type) const
+bool Player::isImmune(ConditionType_t type, bool aggressive /* = true */) const
 {
-	if(hasFlag(PlayerFlag_CannotBeAttacked)){
+	if(hasFlag(PlayerFlag_CannotBeAttacked) && aggressive){
 		return true;
 	}
 
-	return Creature::isImmune(type);
+	return Creature::isImmune(type, aggressive);
 }
 
 bool Player::isAttackable() const
@@ -4858,4 +4931,12 @@ void Player::toogleGmInvisible()
 				it->second->notifyLogIn(this);
 		}
 	}
+
+	//TODO: fire StepIn/StepOut events
 }
+#ifdef _FAIRFIGHTRULES_
+double Player::getFairFightReduction()
+{
+    return 0.5; // Add a formula here
+}
+#endif

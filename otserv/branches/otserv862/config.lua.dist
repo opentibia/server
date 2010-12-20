@@ -153,9 +153,6 @@ party_exp_mul = 5
 -- This system works as in Tibia, time in milliseconds
 login_attack_delay = 10*1000
 
--- Show error window when server crashes?
-show_crash_window = true
-
 -- AFK Configuration (in milliseconds, but use values for minutes)
 -- Maximum time a player can stay away from keyboard before being kicked
 max_idle_time = 16*60*1000
@@ -196,9 +193,9 @@ death_msg = "You are dead."
 
 
 --how many floors away of a player should a monster be to become idle?
---WARNING: setting this as any number bigger than two may increase CPU usage while
---setting this to any value smaller than two will make nearly impossible to rope monsters from a hole
-height_minimum_for_idle = 2
+--WARNING: setting this as any number bigger than 3 may increase CPU usage and
+--setting this to any value smaller than 2 will make nearly impossible to rope monsters from a hole
+height_minimum_for_idle = 3
 
 -- Stamina Configuration
 -- Gain stamina rate - 1 second offline = X milliseconds of stamina
@@ -243,6 +240,12 @@ fist_strength = 7
 -- The addition 'war charge' to start a guild war (default: 1000)
 -- To disable set to 0
 guild_war_fee = 1000
+
+-- Fair Fight Rules
+fairfight_enable = true
+fairfight_hit_percent1 = 40
+fairfight_hit_percent2 = 20 -- Only if last hit was from a player
+fairfight_hit_time = 60*1000 -- milliseconds
 
 -- Allow gamemaster multiclient login to everybody?
 allow_gamemaster_multiclient = false

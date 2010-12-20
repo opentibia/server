@@ -93,7 +93,7 @@ bool Map::saveMap()
 {
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
 	bool saved = false;
-	for(uint32_t tries = 0; tries < 3; tries++){
+	for(uint32_t tries = 0; tries < 3; ++tries){
 		if(IOMapSerialize->saveMap(this)){
 			saved = true;
 			break;
@@ -104,7 +104,7 @@ bool Map::saveMap()
 		return false;
 
 	saved = false;
-	for(uint32_t tries = 0; tries < 3; tries++){
+	for(uint32_t tries = 0; tries < 3; ++tries){
 		if(IOMapSerialize->saveHouseInfo(this)){
 			saved = true;
 			break;
@@ -387,7 +387,7 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos,
 	if(centerPos.z < MAP_MAX_LAYERS){
 		bool foundCache = false;
 		bool cacheResult = false;
-		if(minRangeX == 0 && maxRangeX == 0 && minRangeY == 0 && maxRangeY == 0 && multifloor == true && checkforduplicate == false) {
+		if(minRangeX == 0 && maxRangeX == 0 && minRangeY == 0 && maxRangeY == 0 && multifloor && !checkforduplicate) {
 			SpectatorCache::iterator it = spectatorCache.find(centerPos);
 			if(it != spectatorCache.end()){
 				list = *it->second;
@@ -1036,7 +1036,7 @@ AStarNode* AStarNodes::getBestNode()
 	uint32_t best_node = 0;
 	bool found = false;
 
-	for(uint32_t i = 0; i < curNode; i++){
+	for(uint32_t i = 0; i < curNode; ++i){
 		if(nodes[i].f < best_node_f && openNodes[i] == 1){
 			found = true;
 			best_node_f = nodes[i].f;
@@ -1078,7 +1078,7 @@ void AStarNodes::openNode(AStarNode* node)
 uint32_t AStarNodes::countClosedNodes()
 {
 	uint32_t counter = 0;
-	for(uint32_t i = 0; i < curNode; i++){
+	for(uint32_t i = 0; i < curNode; ++i){
 		if(openNodes[i] == 0){
 			counter++;
 		}
@@ -1089,7 +1089,7 @@ uint32_t AStarNodes::countClosedNodes()
 uint32_t AStarNodes::countOpenNodes()
 {
 	uint32_t counter = 0;
-	for(uint32_t i = 0; i < curNode; i++){
+	for(uint32_t i = 0; i < curNode; ++i){
 		if(openNodes[i] == 1){
 			counter++;
 		}
@@ -1099,7 +1099,7 @@ uint32_t AStarNodes::countOpenNodes()
 
 bool AStarNodes::isInList(int32_t x, int32_t y)
 {
-	for(uint32_t i = 0; i < curNode; i++){
+	for(uint32_t i = 0; i < curNode; ++i){
 		if(nodes[i].x == x && nodes[i].y == y){
 			return true;
 		}
@@ -1109,7 +1109,7 @@ bool AStarNodes::isInList(int32_t x, int32_t y)
 
 AStarNode* AStarNodes::getNodeInList(int32_t x, int32_t y)
 {
-	for(uint32_t i = 0; i < curNode; i++){
+	for(uint32_t i = 0; i < curNode; ++i){
 		if(nodes[i].x == x && nodes[i].y == y){
 			return &nodes[i];
 		}

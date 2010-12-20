@@ -196,7 +196,7 @@ bool BaseSpell::internalExecuteCastSpell(Event *event, Creature* creature, const
 		result = m_scriptInterface->callFunction(3);
 
 		m_scriptInterface->releaseScriptEnv();
-		return result;
+		return true;
 	}
 	return(false);
 }
@@ -237,7 +237,7 @@ RuneSpell* Spells::getRuneSpellByName(const std::string& name)
 	return NULL;
 }
 
-InstantSpell* Spells::getInstantSpell(const std::string words)
+InstantSpell* Spells::getInstantSpell(const std::string& words)
 {
 	InstantSpell* result = NULL;
 	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
@@ -611,9 +611,8 @@ bool Spell::configureSpell(xmlNodePtr p)
 	while(vocationNode){
 		if(xmlStrcmp(vocationNode->name,(const xmlChar*)"vocation") == 0){
 			if(readXMLString(vocationNode, "name", strValue)){
-				int32_t vocationId = g_vocations.getVocationId(strValue);
-
-				if(vocationId != -1){
+				int32_t vocationId = 0;
+				if(g_vocations.getVocationId(strValue, vocationId)){
 					vocSpellMap[vocationId] = true;
 				}
 				else{
@@ -670,7 +669,7 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
-		if(player->getMana() < getManaCost(player) && !player->hasFlag(PlayerFlag_HasInfiniteMana)){
+		if (!Spell::playerHasEnoughManaToCast(player, getManaCost(player))){
 			player->sendCancelMessage(RET_NOTENOUGHMANA);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
@@ -889,7 +888,7 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
 			}
-			else if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
+			else if(blockingSolid && tile->hasProperty(BLOCKSOLID, true)){
 				player->sendCancelMessage(RET_NOTENOUGHROOM);
 				g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 				return false;
@@ -1677,7 +1676,7 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 			return false;
 		}
 
-		if(player->getMana() < manaCost){
+		if (!Spell::playerHasEnoughManaToCast(player, manaCost)){
 			player->sendCancelMessage(RET_NOTENOUGHMANA);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
@@ -1901,25 +1900,48 @@ ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId
 	return result;
 }
 
+//Transforms a item (reagentId) into another item (conjureId) of a certain amount (conjureCount)
+//If successful, return a RET_NOERROR
+//If unsuccessful, returns RET_NOTPOSSIBLE, or RET_YOUNEEDAMAGICITEMTOCASTSPELL
 ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId,
 	uint32_t conjureCount, uint32_t reagentId, slots_t slot, bool test /*= false*/)
 {
+	//If a reagent is needed
 	if(reagentId != 0){
+		//Get the item from the player's inventory slot
 		Item* item = player->getInventoryItem(slot);
+		//If the item exists, and the id is equal to the reagentId
 		if(item && item->getID() == reagentId){
-			if(item->isStackable() && item->getItemCount() != 1){ //TODO? reagentCount
-				return RET_YOUNEEDTOSPLITYOURSPEARS;
-			}
-
+			//If testing, return here
 			if(test){
 				return RET_NOERROR;
 			}
 
-			Item* newItem = g_game.transformItem(item, conjureId, conjureCount);
-			if(newItem){
-				g_game.startDecay(newItem);
+			//If item is stackable, and there is more than one present
+			if(item->isStackable() && item->getItemCount() != 1){
+				//remove one
+				g_game.internalRemoveItem(item, 1);
+				//create the new item according to conjureId and the conjureCount
+				Item* tempItem = Item::CreateItem(conjureId, conjureCount);
+				//If item was not created, return not possible
+				if(!tempItem)
+					return RET_NOTPOSSIBLE;
+				//Add the item to the player,
+				if(g_game.internalPlayerAddItem(player, tempItem) != RET_NOERROR){
+					//if the item could not be added, delete it
+					delete tempItem;
+					return RET_NOTPOSSIBLE;
+				}
 			}
-
+			else{
+				//Otherwise, transform the item into the new item
+				Item* newItem = g_game.transformItem(item, conjureId, conjureCount);
+				if(newItem){
+					//Start decay for item (example: staff -> enchanted staff [lasts 60 seconds)
+					g_game.startDecay(newItem);
+				}
+			}
+			//If everything was successful, return no error
 			return RET_NOERROR;
 		}
 	}
@@ -2223,7 +2245,7 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		manaCost = convinceCreature->getMonster()->getManaCost();
 	}
 
-	if(!player->hasFlag(PlayerFlag_HasInfiniteMana) && player->getMana() < manaCost){
+	if (!Spell::playerHasEnoughManaToCast(player, manaCost)){
 		player->sendCancelMessage(RET_NOTENOUGHMANA);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;

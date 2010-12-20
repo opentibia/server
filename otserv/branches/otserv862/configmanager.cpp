@@ -164,7 +164,6 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[REMOVE_RUNE_CHARGES] = getGlobalBoolean(L, "remove_rune_charges", true);
 	m_confInteger[REMOVE_WEAPON_CHARGES] = getGlobalBoolean(L, "remove_weapon_charges", true);
 	m_confInteger[LOGIN_ATTACK_DELAY] = getGlobalNumber(L, "login_attack_delay", 10*1000);
-	m_confInteger[SHOW_CRASH_WINDOW] = getGlobalBoolean(L, "show_crash_window", true);
 	m_confInteger[IDLE_TIME] = getGlobalNumber(L, "max_idle_time", 16*60*1000);
 	m_confInteger[IDLE_TIME_WARNING] = getGlobalNumber(L, "max_idle_time_warning", 15*60*1000);
 	m_confInteger[HOUSE_ONLY_PREMIUM] = getGlobalBoolean(L, "house_only_premium", true);
@@ -202,8 +201,14 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	m_confInteger[MIN_PVP_LEVEL_APPLIES_TO_SUMMONS] = getGlobalBoolean(L, "min_pvp_level_applies_to_summons", true);
 	#endif
-	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 2);
+	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 3);
 	m_confInteger[EXPERIENCE_STAGES] = getGlobalBoolean(L, "experience_stages", false);
+#ifdef _FAIRFIGHTRULES_
+    m_confInteger[FAIRFIGHT] = getGlobalBoolean(L, "fairfight_enable", true);
+    m_confInteger[DAMAGEFLAG1_FAIRFIGHT] = getGlobalNumber(L, "fairfight_hit_percent1", 40);
+    m_confInteger[DAMAGEFLAG2_FAIRFIGHT] = getGlobalNumber(L, "fairfight_hit_percent2", 20);
+    m_confInteger[TIME_FAIRFIGHT] = getGlobalNumber(L, "fairfight_hit_time", 60*1000);
+#endif
 	m_isLoaded = true;
 	return true;
 }

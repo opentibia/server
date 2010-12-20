@@ -90,7 +90,7 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = atoi(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -102,7 +102,7 @@ bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = ATOI64(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -114,7 +114,7 @@ bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = atof(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -129,7 +129,7 @@ bool utf8ToLatin1(char* intext, std::string& outtext)
 		return false;
 	}
 
-	int inlen  = strlen(intext);
+	int inlen = strlen(intext);
 	if(inlen == 0){
 		return false;
 	}
@@ -156,7 +156,7 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 			value = nodeValue;
 		}
 
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -171,7 +171,7 @@ bool readXMLContentString(xmlNodePtr node, std::string& value)
 			value = nodeValue;
 		}
 
-		xmlFreeOTSERV(nodeValue);
+		xmlFree(nodeValue);
 		return true;
 	}
 
@@ -277,13 +277,13 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 void hexdump(unsigned char *_data, int _len) {
 	int i;
 	for(; _len > 0; _data += 16, _len -= 16) {
-		for (i = 0; i < 16 && i < _len; i++)
+		for (i = 0; i < 16 && i < _len; ++i)
 			fprintf(stderr, "%02x ", _data[i]);
-		for(; i < 16; i++)
+		for(; i < 16; ++i)
 			fprintf(stderr, "   ");
 
 		fprintf(stderr, " ");
-		for(i = 0; i < 16 && i < _len; i++)
+		for(i = 0; i < 16 && i < _len; ++i)
 			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
 
 		fprintf(stderr, "\n");
@@ -308,7 +308,7 @@ std::string urlEncode(const char* str)
 {
 	std::string out;
 	const char* it;
-	for(it = str; *it != 0; it++){
+	for(it = str; *it != 0; ++it){
 		char ch = *it;
 		if(!(ch >= '0' && ch <= '9') &&
 			!(ch >= 'A' && ch <= 'Z') &&

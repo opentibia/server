@@ -98,7 +98,7 @@ struct DeathEntry{
 
 protected:
 	boost::any data;
-	int32_t damage;
+	uint32_t damage;
 	bool isUnjust;
 
 	friend struct DeathLessThan;
@@ -309,7 +309,7 @@ public:
 	Condition* getCondition(ConditionType_t type, ConditionId_t id, uint32_t subId) const;
 	void executeConditions(uint32_t interval);
 	bool hasCondition(ConditionType_t type, bool checkTime = true) const;
-	virtual bool isImmune(ConditionType_t type) const;
+	virtual bool isImmune(ConditionType_t type, bool aggressive = true) const;
 	virtual bool isImmune(CombatType_t type) const;
 	virtual bool isSuppress(ConditionType_t type) const;
 	virtual uint32_t getDamageImmunities() const { return 0; }
@@ -345,7 +345,11 @@ public:
 	virtual void onAttacked() {};
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points) {};
+#ifdef _FAIRFIGHTRULES_
+    virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
+#else
 	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points) {};
+#endif
 	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points) {};
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
@@ -395,14 +399,15 @@ public:
 	virtual bool getCombatValues(int32_t& min, int32_t& max) {return false;}
 
 	size_t getSummonCount() const {return summons.size();}
-	uint32_t getSummonCount(std::string _type)
+	uint32_t getSummonCount(const std::string& _type)
 	{
 		uint32_t count = 0;
 		const std::list<Creature*>& summons = getSummons();
 		std::list<Creature*>::const_iterator it = summons.begin();
-		for(;it != summons.end();it++)
-			if((*it)->getName() == _type)
+		for(; it != summons.end(); ++it)
+			if((*it)->getName() == _type){
 				count++;
+			}
 		return count;
 	};
 	void setDropLoot(bool _lootDrop) {lootDrop = _lootDrop;}
@@ -475,16 +480,46 @@ protected:
 	Creature* attackedCreature;
 
 	struct CountBlock_t{
+        CountBlock_t()
+        {
+            total = 0;
+            ticks = 0;
+            hits = 0;
+        }
+
 		int32_t total;
 		int64_t ticks;
 		uint32_t hits;
 	};
 
+#ifdef _FAIRFIGHTRULES_
+    struct RecentBlock_t{
+        RecentBlock_t(int32_t _value, int64_t _ticks){
+            value = _value;
+            ticks = _ticks;
+        }
+
+        int32_t value;
+        int64_t ticks;
+    };
+
+    struct Blocks_t{
+        std::list<RecentBlock_t> recents;
+        CountBlock_t total;
+    };
+
+    typedef std::map<uint32_t, Blocks_t> CountMapEx;
+#endif
+
 	typedef std::map<uint32_t, CountBlock_t> CountMap;
+#ifdef _FAIRFIGHTRULES_
+	CountMapEx damageMap;
+#else
 	CountMap damageMap;
+#endif
 	CountMap healMap;
 	CombatType_t lastDamageSource;
-	uint32_t lastHitCreature;
+	uint32_t lastHitThing;
 	uint32_t blockCount;
 	uint32_t blockTicks;
 

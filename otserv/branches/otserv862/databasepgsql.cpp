@@ -184,7 +184,7 @@ std::string DatabasePgSQL::_parse(const std::string &s)
 
 	bool inString = false;
 	uint8_t ch;
-	for(uint32_t a = 0; a < s.length(); a++){
+	for(uint32_t a = 0; a < s.length(); ++a){
 		ch = s[a];
 
 		if(ch == '\''){

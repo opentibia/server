@@ -47,7 +47,7 @@ public:
 	RuneSpell* getRuneSpell(uint32_t id);
 	RuneSpell* getRuneSpellByName(const std::string& name);
 
-	InstantSpell* getInstantSpell(const std::string words);
+	InstantSpell* getInstantSpell(const std::string& words);
 	InstantSpell* getInstantSpellByName(std::string name);
 
 	uint32_t getInstantSpellCount(const Player* player);
@@ -126,6 +126,11 @@ public:
 	uint32_t getLevel() const {return level;}
 	uint32_t getMagicLevel() const {return magLevel;}
 	int32_t getMana() const {return mana;}
+	static bool playerHasEnoughManaToCast(const Player *p, int32_t manaCost)
+	{
+		return (p->getMana() >= manaCost || p->hasFlag(PlayerFlag_IgnoreSpellCheck)
+				 || p->hasFlag(PlayerFlag_HasInfiniteMana));
+	}
 	int32_t getManaPercent() const {return manaPercent;}
 	const bool isPremium() const {return premium;}
 	bool hasArea() const {return areaSpell;}

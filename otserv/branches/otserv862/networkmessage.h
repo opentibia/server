@@ -24,6 +24,7 @@
 #include "definitions.h"
 #include "otsystem.h"
 #include "const.h"
+#include <string>
 #include <boost/shared_ptr.hpp>
 
 class Item;
@@ -139,7 +140,7 @@ public:
 	void AddBytes(const char* bytes, uint32_t size);
 	void AddPaddingBytes(uint32_t n);
 
-	void AddString(const std::string &value){AddString(value.c_str());}
+	void AddString(const std::string& value){AddString(value.c_str());}
 	void AddString(const char* value);
 
 

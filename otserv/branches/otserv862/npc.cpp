@@ -1576,7 +1576,7 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 		if(response->getAmount() != -1){
 			if(npcState->itemId > 0){
 				const ItemType& it = Item::items[npcState->itemId];
-				if(it.id != 0 && it.stackable == false)
+				if(it.id != 0 && !it.stackable)
 					npcState->amount = (int32_t)std::min((int32_t)response->getAmount(), (int32_t)g_config.getNumber(ConfigManager::NPC_MAX_NONESTACKABLE_SELL_AMOUNT));
 				else
 					npcState->amount = response->getAmount();

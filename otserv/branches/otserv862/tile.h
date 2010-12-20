@@ -178,7 +178,7 @@ public:
 	uint32_t getTopItemCount() const;
 	uint32_t getDownItemCount() const;
 
-	bool hasProperty(enum ITEMPROPERTY prop) const;
+	bool hasProperty(enum ITEMPROPERTY prop, bool checkSemiSolid = false) const;
 	bool hasProperty(Item* exclude, enum ITEMPROPERTY prop) const;
 
 	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}

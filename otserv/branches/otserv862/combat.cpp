@@ -359,12 +359,15 @@ bool Combat::isInPvpZone(const Creature* attacker, const Creature* target)
 bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 {
 	#ifdef __SKULLSYSTEM__
-	const Player* attackerPlayer = attacker->getPlayer();
-	const Player* targetPlayer = target->getPlayer();
+    const Player* attackerPlayer;
+    const Player* targetPlayer = target->getPlayer();
 
-	if(attacker->isPlayerSummon()){
-		attackerPlayer = attacker->getPlayerMaster();
-	}
+    if(attacker->isPlayerSummon()){
+        attackerPlayer = attacker->getPlayerMaster();
+    }
+    else{
+        attackerPlayer = attacker->getPlayer();
+    }
 
 	if(	attackerPlayer == NULL ||
 		targetPlayer == NULL ||
@@ -709,7 +712,7 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 		for(std::list<const Condition*>::const_iterator it = params.conditionList.begin(); it != params.conditionList.end(); ++it){
 			const Condition* condition = *it;
 
-			if(caster == target || !target->isImmune(condition->getType())){
+			if(caster == target || !target->isImmune(condition->getType(), params.isAggressive)){
 				Condition* conditionCopy = condition->clone();
 				if(caster){
 					conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
@@ -757,20 +760,22 @@ void Combat::combatTileEffects(const SpectatorVec& list, Creature* caster, Tile*
 			}
 		}
 		if(p_caster){
-			if(itemId == ITEM_WILDGROWTH){
-					if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
-							g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
-					{
-						itemId = ITEM_WILDGROWTH_SAFE;
-					}
-			}
-			if(itemId == ITEM_MAGICWALL){
-					if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
-							g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
-					{
-						itemId = ITEM_MAGICWALL_SAFE;
-					}
+			if (p_caster->getLevel() < g_config.getNumber(ConfigManager::MIN_PVP_LEVEL)){
+				if(itemId == ITEM_WILDGROWTH){
+						if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
+								g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
+						{
+							itemId = ITEM_WILDGROWTH_SAFE;
+						}
 				}
+				if(itemId == ITEM_MAGICWALL){
+						if (	g_config.getBoolean(ConfigManager::CAN_PASS_THROUGH) &&
+								g_config.getNumber(ConfigManager::MIN_PVP_LEVEL) > 0)
+						{
+							itemId = ITEM_MAGICWALL_SAFE;
+						}
+				}
+			}
 			if(g_game.getWorldType() == WORLD_TYPE_OPTIONAL_PVP || tile->hasFlag(TILESTATE_NOPVPZONE)){
 				if(itemId == ITEM_FIREFIELD){
 					itemId = ITEM_FIREFIELD_SAFE;
@@ -1604,6 +1609,9 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 bool MagicField::isBlocking(const Creature* creature) const
 {
 	if (id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE){
+		if (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag()){
+			return false;
+		}
 		uint32_t ownerId = getOwner();
 		if (ownerId !=0){
 			Creature *owner = g_game.getCreatureByID(ownerId);

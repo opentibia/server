@@ -84,7 +84,7 @@ Creature::Creature() :
 
 	attackedCreature = NULL;
 	lastDamageSource = COMBAT_NONE;
-	lastHitCreature = 0;
+	lastHitThing = 0;
 
 	blockCount = 0;
 	blockTicks = 0;
@@ -155,14 +155,14 @@ bool Creature::canBeSeen(const Creature* viewer, bool checkVisibility/*=true*/) 
 	  any kind of special flag to see invisible creatures or GMs*/
 	if (viewer && checkVisibility)
 		return viewer->canSeeCreature(this);
-	
+
 	if (getPlayer() &&
 		(getPlayer()->hasFlag(PlayerFlag_CannotBeSeen) ||
 		(getPlayer()->isGmInvisible() &&
 		(!viewer || !viewer->getPlayer() || !viewer->getPlayer()->canSeeGmInvisible(getPlayer()))))){
 		return false;
 	}
-	
+
 	if (checkVisibility)
 		return (viewer && viewer->canSeeInvisibility()) || !isInvisible();
 	return true;
@@ -297,7 +297,12 @@ void Creature::onWalk()
 		Direction dir;
 		uint32_t flags = FLAG_IGNOREFIELDDAMAGE;
 		if(getNextStep(dir, flags)){
-			if(g_game.internalMoveCreature(this, dir, flags) != RET_NOERROR){
+			ReturnValue ret = g_game.internalMoveCreature(this, dir, flags);
+			if(ret != RET_NOERROR){
+				if(Player* player = getPlayer()){
+					player->sendCancelMessage(ret);
+					player->sendCancelWalk();
+				}
 				forceUpdateFollowPath = true;
 			}
 		}
@@ -804,9 +809,12 @@ void Creature::onDie()
 			}
 		}
 	}
-
-	for(CountMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		if(Creature* attacker = g_game.getCreatureByID((*it).first)){
+#ifdef _FAIRFIGHTRULES_
+	for(CountMapEx::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+#else
+    for(CountMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+#endif
+		if(Creature* attacker = g_game.getCreatureByID(it->first)){
 			attacker->onAttackedCreatureKilled(this);
 		}
 	}
@@ -862,15 +870,23 @@ Item* Creature::dropCorpse()
 DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 {
 	DeathList list;
-	Creature* lhc = g_game.getCreatureByID(lastHitCreature);
-	if(lhc){
-		list.push_back(DeathEntry(lhc, 0, Combat::isUnjustKill(lhc, this))); // Final Hit killer
-	}
-	else{
-		list.push_back(DeathEntry(CombatTypeName(lastDamageSource), 0));
-	}
-
-	if(assist_count == 0){
+	Creature* lhc = g_game.getCreatureByID(lastHitThing);
+#ifndef _FAIRFIGHTRULES_
+    if(lhc){                                                                                             
+        list.push_back(DeathEntry(lhc, 0, Combat::isUnjustKill(lhc, this))); // Final Hit killer
+    }
+    else{
+        list.push_back(DeathEntry(CombatTypeName(lastDamageSource), 0));
+    }
+#else                                                                                                    
+    if(lhc){
+        list.push_back(DeathEntry(lhc, damageMap[lastHitThing].total.total, Combat::isUnjustKill(lhc, this))); // Final Hit killer
+    }
+    else{
+        list.push_back(DeathEntry(CombatTypeName(lastDamageSource), damageMap[0].recents.front().value)); 
+    }                                                                   // Unless we work on a reference for each type of
+#endif                                                                  // non-creature thing that have damaged the player,
+	if(assist_count == 0){                                              // the death entry can only store the last damage.
 		return list;
 	}
 	else if(assist_count == 1){
@@ -878,9 +894,13 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		Creature* mdc = NULL;
 		int32_t mostDamage = 0;
 		int64_t now = OTSYS_TIME();
-
-		for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-			const CountBlock_t& cb = it->second;
+#ifdef _FAIRFIGHTRULES_
+		for(CountMapEx::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+			const CountBlock_t& cb = it->second.total;
+#else
+        for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+            const CountBlock_t& cb = it->second;
+#endif
 			if(cb.total > mostDamage && (now - cb.ticks <= g_config.getNumber(ConfigManager::IN_FIGHT_DURATION))){
 				Creature* tmpDamageCreature = g_game.getCreatureByID(it->first);
 				if(tmpDamageCreature){
@@ -891,7 +911,7 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		}
 
 		if(mdc && mdc != lhc){
-			if(lhc && (mdc->getMaster() == lhc || lhc->getMaster() == mdc || (lhc->getMaster() && lhc->getMaster() == mdc->getMaster()))){
+			if(lhc && (mdc->getMaster() == lhc || lhc->getMaster() == mdc || lhc->getMaster() == mdc->getMaster())){
 				return list;
 			}
 			else{
@@ -903,8 +923,13 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 		int64_t now = OTSYS_TIME();
 
 		// Add all (recent) damagers to the list
-		for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-			const CountBlock_t& cb = it->second;
+#ifdef _FAIRFIGHTRULES_
+		for(CountMapEx::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+			const CountBlock_t& cb = it->second.total;
+#else
+        for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+            const CountBlock_t& cb = it->second;
+#endif
 			if(now - cb.ticks <= g_config.getNumber(ConfigManager::IN_FIGHT_DURATION)){
 				Creature* mdc = g_game.getCreatureByID(it->first);
 				// Player who made last hit is not included in assist list
@@ -968,10 +993,17 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 
 bool Creature::hasBeenAttacked(uint32_t attackerId) const
 {
-	CountMap::const_iterator it = damageMap.find(attackerId);
+#ifdef _FAIRFIGHTRULES_
+	CountMapEx::const_iterator it = damageMap.find(attackerId);
 	if(it != damageMap.end()){
-		return (OTSYS_TIME() - it->second.ticks <= g_config.getNumber(ConfigManager::IN_FIGHT_DURATION));
+		return (OTSYS_TIME() - it->second.total.ticks <= g_config.getNumber(ConfigManager::IN_FIGHT_DURATION));
 	}
+#else
+    CountMap::const_iterator it = damageMap.find(attackerId);
+    if(it != damageMap.end()){
+        return (OTSYS_TIME() - it->second.ticks <= g_config.getNumber(ConfigManager::IN_FIGHT_DURATION));
+    }
+#endif
 
 	return false;
 }
@@ -1028,6 +1060,9 @@ void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t 
 	if(attacker){
 		attacker->onAttackedCreatureDrainHealth(this, damage);
 	}
+    else{
+        addDamagePoints(NULL, damage);
+    }
 }
 
 void Creature::drainMana(Creature* attacker, int32_t points)
@@ -1038,6 +1073,9 @@ void Creature::drainMana(Creature* attacker, int32_t points)
 	if(attacker){
 		attacker->onAttackedCreatureDrainMana(this, points);
 	}
+    else{
+        addDamagePoints(NULL, points);
+    }
 }
 
 BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
@@ -1192,14 +1230,20 @@ double Creature::getDamageRatio(Creature* attacker) const
 	int32_t totalDamage = 0;
 	int32_t attackerDamage = 0;
 
-	CountBlock_t cb;
-	for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		cb = it->second;
-
-		totalDamage += cb.total;
+#ifdef _FAIRFIGHTRULES_
+	for(CountMapEx::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+		totalDamage += it->second.total.total;
+#else
+    for(CountMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+        totalDamage += it->second.total;
+#endif
 
 		if(it->first == attacker->getID()){
-			attackerDamage += cb.total;
+#ifdef _FAIRFIGHTRULES_
+			attackerDamage += it->second.total.total;
+#else
+            attackerDamage += it->second.total;
+#endif
 		}
 	}
 
@@ -1215,22 +1259,30 @@ void Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
 {
 	if(damagePoints > 0){
 		uint32_t attackerId = (attacker ? attacker->getID() : 0);
+#ifdef _FAIRFIGHTRULES_        
+        int64_t time = OTSYS_TIME();
+        damageMap[attackerId].total.hits++;
+        damageMap[attackerId].total.ticks = time;
+        damageMap[attackerId].total.total += damagePoints;
+        for(std::list<RecentBlock_t>::iterator it = damageMap[attackerId].recents.begin(); 
+            it != damageMap[attackerId].recents.end(); )
+        {
+            if(time - it->ticks >= g_config.getNumber(ConfigManager::TIME_FAIRFIGHT)){
+                damageMap[attackerId].recents.pop_front();
+                it = damageMap[attackerId].recents.begin();
+            }
+            else{
+                break;
+            }
+        }
 
-		CountMap::iterator it = damageMap.find(attackerId);
-		if(it == damageMap.end()){
-			CountBlock_t cb;
-			cb.ticks = OTSYS_TIME();
-			cb.total = damagePoints;
-			cb.hits = 1;
-			damageMap[attackerId] = cb;
-		}
-		else{
-			it->second.total += damagePoints;
-			it->second.ticks = OTSYS_TIME();
-			it->second.hits++;
-		}
-
-		lastHitCreature = attackerId;
+        damageMap[attackerId].recents.push_back(RecentBlock_t(damagePoints, time));
+#else
+        damageMap[attackerId].hits++;
+        damageMap[attackerId].total += damagePoints;
+        damageMap[attackerId].ticks = OTSYS_TIME();
+#endif
+		lastHitThing = attackerId;
 	}
 }
 
@@ -1239,19 +1291,9 @@ void Creature::addHealPoints(Creature* caster, int32_t healthPoints)
 	if(healthPoints > 0){
 		uint32_t casterId = (caster ? caster->getID() : 0);
 
-		CountMap::iterator it = healMap.find(casterId);
-		if(it == healMap.end()){
-			CountBlock_t cb;
-			cb.ticks = OTSYS_TIME();
-			cb.total = healthPoints;
-			cb.hits = 0;
-			healMap[casterId] = cb;
-		}
-		else{
-			it->second.total += healthPoints;
-			it->second.ticks = OTSYS_TIME();
-			it->second.hits++;
-		}
+    	healMap[casterId].total += healthPoints;
+		healMap[casterId].ticks = OTSYS_TIME();
+		healMap[casterId].hits++;
 	}
 }
 
@@ -1301,17 +1343,20 @@ void Creature::onCombatRemoveCondition(const Creature* attacker, Condition* cond
 
 void Creature::onIdleStatus()
 {
-	if(getHealth() > 0){
-		healMap.clear();
-		damageMap.clear();
-	}
+	healMap.clear();
+	damageMap.clear();
 }
 
 void Creature::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	target->addDamagePoints(this, points);
 }
-
+#ifdef _FAIRFIGHTRULES_
+void Creature::onAttackedCreatureDrainMana(Creature* target, int32_t points)
+{
+    target->addDamagePoints(this, points);
+}
+#endif
 void Creature::onTargetCreatureGainHealth(Creature* target, int32_t points)
 {
 	target->addHealPoints(this, points);
@@ -1567,7 +1612,7 @@ bool Creature::isImmune(CombatType_t type) const
 	return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type);
 }
 
-bool Creature::isImmune(ConditionType_t type) const
+bool Creature::isImmune(ConditionType_t type, bool aggressive /* = true */) const
 {
 	return ((getConditionImmunities() & (uint32_t)type) == (uint32_t)type);
 }

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -40,7 +40,7 @@ Mission::Mission(std::string _missionName, uint32_t _storageID, uint32_t _startV
 
 Mission::~Mission()
 {
-	for(uint32_t it = 0; it != state.size(); it++){
+	for(uint32_t it = 0; it != state.size(); ++it){
 		delete state[it];
 	}
 	state.clear();
@@ -88,10 +88,10 @@ bool Mission::isStarted(Player* player) const
 
 bool Mission::isCompleted(Player* player) const
 {
-	uint32_t value;
 	if(player){
-		player->getStorageValue(storageID, (int32_t&)value);
-		if(value == endValue){
+		int32_t value;
+		player->getStorageValue(storageID, value);
+		if(uint32_t(value) == endValue){
 			return true;
 		}
 	}
@@ -119,7 +119,7 @@ Quest::Quest(std::string _name, uint16_t _id, uint32_t _startStorageID, uint32_t
 Quest::~Quest()
 {
 	MissionsList::iterator it;
-	for(it = missions.begin(); it != missions.end(); it++){
+	for(it = missions.begin(); it != missions.end(); ++it){
 		delete (*it);
 	}
 	missions.clear();
@@ -128,7 +128,7 @@ Quest::~Quest()
 uint16_t Quest::getMissionsCount(Player* player) const
 {
 	uint16_t count = 0;
-	for(MissionsList::const_iterator it = missions.begin(); it != missions.end(); it++){
+	for(MissionsList::const_iterator it = missions.begin(); it != missions.end(); ++it){
 		if((*it)->isStarted(player)){
 			count++;
 		}
@@ -139,7 +139,7 @@ uint16_t Quest::getMissionsCount(Player* player) const
 bool Quest::isCompleted(Player* player)
 {
 	MissionsList::iterator it;
-	for(it = missions.begin(); it != missions.end(); it++){
+	for(it = missions.begin(); it != missions.end(); ++it){
 		if(!(*it)->isCompleted(player))
 			return false;
 	}
@@ -165,7 +165,7 @@ Quests::Quests()
 Quests::~Quests()
 {
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); it++)
+	for(it = quests.begin(); it != quests.end(); ++it)
 		delete (*it);
 	quests.clear();
 }
@@ -173,7 +173,7 @@ Quests::~Quests()
 bool Quests::reload()
 {
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); it++)
+	for(it = quests.begin(); it != quests.end(); ++it)
 		delete (*it);
 	quests.clear();
 
@@ -198,13 +198,13 @@ bool Quests::loadFromXml(const std::string& _filename)
 					uint32_t startStorageID = 0, startStorageValue = 0;
 					if(readXMLString(p, "name", strValue))
 						name = strValue;
-						
+
 					if(readXMLInteger(p, "startstorageid", intValue))
 						startStorageID = intValue;
 
 					if(readXMLInteger(p, "startstoragevalue", intValue))
 						startStorageValue = intValue;
-					
+
 					Quest *quest = new Quest(name, id, startStorageID, startStorageValue);
 					xmlNodePtr tmpNode = p->children;
 					while(tmpNode){
@@ -219,7 +219,7 @@ bool Quests::loadFromXml(const std::string& _filename)
 
 							if(readXMLInteger(tmpNode, "startvalue", intValue))
 								startValue = intValue;
-							
+
 							if(readXMLInteger(tmpNode, "endvalue", intValue))
 								endValue = intValue;
 
@@ -265,7 +265,7 @@ bool Quests::loadFromXml(const std::string& _filename)
 Quest *Quests::getQuestByID(uint16_t id)
 {
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); it++){
+	for(it = quests.begin(); it != quests.end(); ++it){
 		if((*it)->getID() == id)
 			return (*it);
 	}
@@ -276,7 +276,7 @@ uint16_t Quests::getQuestsCount(Player* player)
 {
 	uint16_t count = 0;
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); it++){
+	for(it = quests.begin(); it != quests.end(); ++it){
 		if((*it)->isStarted(player))
 			count++;
 	}

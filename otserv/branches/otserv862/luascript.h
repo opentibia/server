@@ -76,7 +76,6 @@ struct LuaVariant{
 
 class LuaScriptInterface;
 class Game;
-class Npc;
 
 class ScriptEnviroment
 {
@@ -92,9 +91,9 @@ public:
 	bool setCallbackId(int32_t callbackId, LuaScriptInterface* scriptInterface);
 	void setEventDesc(const std::string& desc) {m_eventdesc = desc;}
 
-	std::string getEventDesc() {return m_eventdesc;}
-	int32_t getScriptId() {return m_scriptId;}
-	int32_t getCallbackId() {return m_callbackId;}
+	std::string getEventDesc() const {return m_eventdesc;}
+	int32_t getScriptId() const {return m_scriptId;}
+	int32_t getCallbackId() const {return m_callbackId;}
 	LuaScriptInterface* getScriptInterface() {return m_interface;}
 
 	void setTimerEvent() {m_timerEvent = true;}
@@ -222,7 +221,8 @@ enum PlayerInfo_t{
 	PlayerInfoPremium,
 	PlayerInfoLastLogin,
 	PlayerInfoIp,
-	PlayerInfoGmInvisible
+	PlayerInfoGmInvisible,
+	PlayerInfoAccountId
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -400,7 +400,7 @@ protected:
 
 	//queries
 	static int luaGetPlayerGUIDByName(lua_State *L);
-	static int luaGetPlayersByAccountNumber(lua_State *L);
+	static int luaGetPlayerByAccountNumber(lua_State *L);
 	static int luaGetAccountNumberByPlayerName(lua_State *L);
 	static int luaGetIPByPlayerName(lua_State *L);
 	static int luaGetPlayersByIPAddress(lua_State *L);
@@ -476,6 +476,7 @@ protected:
 	static int luaGetPlayerPremiumDays(lua_State *L);
 	static int luaGetPlayerAccountBalance(lua_State *L);
 	static int luaGetPlayerByNameWildcard(lua_State *L);
+	static int luaIsPremium(lua_State *L);
 	static int luaGetPlayerLastLogin(lua_State *L);
 	static int luaGetPlayerExperience(lua_State *L);
 
@@ -486,8 +487,6 @@ protected:
 	static int luaGetPlayerInstantSpellCount(lua_State *L);
 	static int luaGetInstantSpellInfoByName(lua_State *L);
 	static int luaGetInstantSpellWords(lua_State *L);
-
-	static int luaIsPremium(lua_State *L);
 
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
@@ -503,6 +502,8 @@ protected:
 
 	static int luaIsGmInvisible(lua_State *L);
 	static int luaDoPlayerToogleGmInvisible(lua_State *L);
+	static int luaGetPlayerAccountId(lua_State *L);
+	static int luaDoPlayerAddPremiumDays(lua_State *L);
 	#ifdef __GUILDWARSLUARELOAD__
 	static int luaDoUpdateGuildWar(lua_State* L);
 	#endif

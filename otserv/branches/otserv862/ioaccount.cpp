@@ -91,3 +91,19 @@ bool IOAccount::getPassword(const std::string& accountname, const std::string &n
 
 	return false;
 }
+
+bool IOAccount::getAccountName(uint32_t accountId, std::string &accountName)
+{
+	Database* db = Database::instance();
+	DBQuery query;
+	DBResult* result;
+
+	query << "SELECT `accounts`.`name` AS `name` FROM `accounts` WHERE `accounts`.`id` = " << accountId;
+	if((result = db->storeQuery(query.str()))){
+		accountName = result->getDataString("name");
+		db->freeResult(result);
+		return true;
+	}
+
+	return false;
+}

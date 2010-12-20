@@ -81,12 +81,12 @@ public:
 	void copyEvent(CreatureEvent* creatureEvent);
 
 	//scripting
-	uint32_t executeOnLogin(Player* player);
-	uint32_t executeOnLogout(Player* player);
-	uint32_t executeOnDie(Creature* creature, Item* corpse);
-	uint32_t executeOnKill(Creature* creature, Creature* target, bool lastHit);
-	uint32_t executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
-	uint32_t executeOnLook(Player* player, Thing* target, uint16_t itemId);
+	bool executeOnLogin(Player* player);
+	bool executeOnLogout(Player* player);
+	bool executeOnDie(Creature* creature, Item* corpse);
+	bool executeOnKill(Creature* creature, Creature* target, bool lastHit);
+	bool executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
+	bool executeOnLook(Player* player, Thing* target, uint16_t itemId);
 	//
 
 protected:

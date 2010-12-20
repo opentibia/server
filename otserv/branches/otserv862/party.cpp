@@ -395,6 +395,12 @@ void Party::shareExperience(uint64_t experience, bool fromMonster)
 
 bool Party::canUseSharedExperience(const Player* player) const
 {
+	//Player should not be able to gain bonus on shared experience
+	//if there's no one in his party - this occurs when invitation is not accepted
+	if(!memberList.size()){
+		return false;
+	}
+
 	uint32_t highestLevel = getLeader()->getLevel();
 	for(PlayerVector::const_iterator it = memberList.begin(); it != memberList.end(); ++it){
 		if( (*it)->getLevel() > highestLevel){

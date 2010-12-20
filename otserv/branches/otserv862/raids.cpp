@@ -38,6 +38,7 @@ Raids::Raids()
 	running = NULL;
 	lastRaidEnd = 0;
 	checkRaidsEvent = 0;
+	ScriptEvent::initScriptInterface();
 }
 
 Raids::~Raids()
@@ -198,6 +199,7 @@ void Raids::clear()
 	started = false;
 	running = NULL;
 	lastRaidEnd = 0;
+	ScriptEvent::reInitScriptInterface();
 }
 
 void Raids::reload()
@@ -209,7 +211,7 @@ void Raids::reload()
 Raid* Raids::getRaidByName(const std::string& name)
 {
 	RaidList::iterator it;
-	for(it = raidList.begin(); it != raidList.end(); it++){
+	for(it = raidList.begin(); it != raidList.end(); ++it){
 		if(boost::algorithm::iequals((*it)->getName(), name)){
 			return (*it);
 		}
@@ -234,7 +236,7 @@ Raid::~Raid()
 	stopEvents();
 
 	RaidEventVector::iterator it;
-	for(it = raidEvents.begin(); it != raidEvents.end(); it++) {
+	for(it = raidEvents.begin(); it != raidEvents.end(); ++it) {
 		delete (*it);
 	}
 	raidEvents.clear();
@@ -639,7 +641,7 @@ bool AreaSpawnEvent::configureRaidEvent(xmlNodePtr eventNode)
 AreaSpawnEvent::~AreaSpawnEvent()
 {
 	MonsterSpawnList::iterator it;
-	for(it = m_spawnList.begin(); it != m_spawnList.end(); it++){
+	for(it = m_spawnList.begin(); it != m_spawnList.end(); ++it){
 		delete (*it);
 	}
 
@@ -663,11 +665,11 @@ void AreaSpawnEvent::addMonster(const std::string& monsterName, uint32_t minAmou
 bool AreaSpawnEvent::executeEvent()
 {
 	MonsterSpawnList::iterator it;
-	for(it = m_spawnList.begin(); it != m_spawnList.end(); it++) {
+	for(it = m_spawnList.begin(); it != m_spawnList.end(); ++it) {
 		MonsterSpawn* spawn = (*it);
 
 		uint32_t amount = random_range(spawn->minAmount, spawn->maxAmount);
-		for(unsigned int i = 0; i < amount; i++){
+		for(unsigned int i = 0; i < amount; ++i){
 			Monster* monster = Monster::createMonster(spawn->name);
 			if(!monster){
 				std::cout << "[Error] Raids: Cant create monster " << spawn->name << std::endl;
@@ -675,7 +677,7 @@ bool AreaSpawnEvent::executeEvent()
 			}
 
 			bool success = false;
-			for(int tries = 0; tries < MAXIMUM_TRIES_PER_MONSTER; tries++){
+			for(int tries = 0; tries < MAXIMUM_TRIES_PER_MONSTER; ++tries){
 				Position pos;
 				pos.x = random_range(m_fromPos.x, m_toPos.x);
 				pos.y = random_range(m_fromPos.y, m_toPos.y);
@@ -704,12 +706,17 @@ LuaScriptInterface ScriptEvent::m_scriptInterface("Raid Interface");
 ScriptEvent::ScriptEvent() :
 Event(&m_scriptInterface)
 {
-	m_scriptInterface.initState();
+	//m_scriptInterface.initState();
 }
 
 void ScriptEvent::reInitScriptInterface()
 {
 	m_scriptInterface.reInitState();
+}
+
+void ScriptEvent::initScriptInterface()
+{
+	m_scriptInterface.initState();
 }
 
 

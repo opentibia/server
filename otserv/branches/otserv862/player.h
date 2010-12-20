@@ -196,7 +196,7 @@ public:
 	int16_t getViolationLevel() const {return violationLevel;}
 	std::string getGroupName() const {return groupName;}
 
-	void setVocation(uint32_t vocId);
+	bool setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
 	Vocation* getVocation() const {return vocation;};
 
@@ -345,10 +345,14 @@ public:
 	bool hasSafeMode() const {return safeMode;}
 	uint16_t getIcons() const;
 
+#ifdef _FAIRFIGHTRULES_
+    double getFairFightReduction();
+#endif
+
 	//combat functions
 	virtual bool setAttackedCreature(Creature* creature);
 	bool isImmune(CombatType_t type) const;
-	bool isImmune(ConditionType_t type) const;
+	bool isImmune(ConditionType_t type, bool aggressive = true) const;
 	bool hasShield() const;
 	virtual bool isAttackable() const;
 
@@ -715,7 +719,6 @@ protected:
 	void updateInventoryWeight();
 
 	void setNextWalkActionTask(SchedulerTask* task);
-	void setNextWalkTask(SchedulerTask* task);
 	void setNextActionTask(SchedulerTask* task);
 
 	void onDie();
@@ -776,7 +779,6 @@ protected:
 	uint32_t MessageBufferTicks;
 	int32_t MessageBufferCount;
 	uint32_t actionTaskEvent;
-	uint32_t nextStepEvent;
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 
@@ -835,6 +837,10 @@ protected:
 
 	//rate value variables
 	double rateValue[LEVEL_LAST + 1];
+
+#ifdef _FAIRFIGHTRULES_
+    bool fairFightReduction;
+#endif
 
 	LearnedInstantSpellList learnedInstantSpellList;
 

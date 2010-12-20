@@ -41,6 +41,7 @@ public:
 	bool saveAccount(Account account);
 
 	bool getPassword(const std::string& accountname, const std::string& name, std::string& password);
+	bool getAccountName(uint32_t accountId, std::string &accountName);
 };
 
 #endif

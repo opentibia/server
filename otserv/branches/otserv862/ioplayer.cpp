@@ -130,7 +130,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	loadConditions(player, result);
 
 	// you need to set the vocation after conditions in order to ensure the proper regeneration rates for the vocation
-	player->setVocation(result->getDataInt("vocation"));
+	if(!player->setVocation(result->getDataInt("vocation"))){
+		return false;
+	}
 	// this stuff has to go after the vocation is set
 	player->mana = result->getDataInt("mana");
 	player->manaMax = result->getDataInt("manamax");
@@ -362,7 +364,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	loadConditions(player, result);
 
 	// you need to set the vocation after conditions in order to ensure the proper regeneration rates for the vocation
-	player->setVocation(result->getDataInt("vocation"));
+	if(!player->setVocation(result->getDataInt("vocation"))){
+		return false;
+	}
 	// this stuff has to go after the vocation is set
 	player->mana = result->getDataInt("mana");
 	player->manaMax = result->getDataInt("manamax");
@@ -788,7 +792,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	query.str("");
 
 	//skills
-	for(int32_t i = 0; i <= 6; i++){
+	for(int32_t i = 0; i <= 6; ++i){
 		query << "UPDATE `player_skills` SET `value` = " << player->skills[i][SKILL_LEVEL] << ", `count` = " << player->skills[i][SKILL_TRIES] << " WHERE `player_id` = " << player->getGUID() << " AND `skillid` = " << i;
 
 		if(!db->executeQuery(query.str())){
@@ -879,7 +883,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 
 	stmt.setQuery("INSERT INTO `player_storage` (`player_id` , `key` , `value` ) VALUES ");
 	player->genReservedStorageRange();
-	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
+	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd(); ++cit){
 		query << player->getGUID() << ", " << cit->first << ", " << cit->second;
 		if(!stmt.addRow(query)){
 			return false;
