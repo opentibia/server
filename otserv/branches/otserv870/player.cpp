@@ -1003,14 +1003,8 @@ void Player::addStorageValue(const uint32_t key, const int32_t value)
 				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int32_t)(value) << " player: " << getName() << std::endl;
 			}
 		}
-		else if(IS_IN_KEYRANGE(key, MOUNTSID_RANGE)){
-			addMount(value);
-		}
 		else if(IS_IN_KEYRANGE(key, MOUNTS_RANGE)){
-			Mount mount;
-			if(Mounts::getInstance()->getMount(value, mount)){
-				addMount(mount.mountId);
-			}
+			addMount(value);
 		}
 		else{
 			//warning
@@ -4730,7 +4724,7 @@ void Player::genReservedStorageRange()
 	}
 
 	//generate mounts range
-	base_key = PSTRG_MOUNTSID_RANGE_START + 1;
+	base_key = PSTRG_MOUNTS_RANGE_START + 1;
 
 	const MountMap& default_mounts = Mounts::getInstance()->getMounts();
 	for(MountMap::const_iterator it = mounts.begin(); it != mounts.end(); ++it){
@@ -4746,7 +4740,7 @@ void Player::genReservedStorageRange()
 
 		storageMap[base_key] = it->first;
 		base_key++;
-		if(base_key > PSTRG_MOUNTSID_RANGE_START + PSTRG_MOUNTSID_RANGE_SIZE){
+		if(base_key > PSTRG_MOUNTSID_RANGE_START + PSTRG_MOUNTS_RANGE_SIZE){
 			std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 mounts!." << std::endl;
 			break;
 		}

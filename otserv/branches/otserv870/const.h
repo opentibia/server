@@ -703,10 +703,6 @@ const int32_t violationStatements[maxViolationLevel + 1] =
 #define PSTRG_MOUNTS_RANGE_START   (PSTRG_RESERVED_RANGE_START + 2000)
 #define PSTRG_MOUNTS_RANGE_SIZE    500
 
-//[2500 - 3000]
-#define PSTRG_MOUNTSID_RANGE_START   (PSTRG_RESERVED_RANGE_START + 2500)
-#define PSTRG_MOUNTSID_RANGE_SIZE    500
-
 #define IS_IN_KEYRANGE(key, range) (key >= PSTRG_##range##_START && ((key - PSTRG_##range##_START) < PSTRG_##range##_SIZE))
 
 #endif

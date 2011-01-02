@@ -77,7 +77,7 @@ bool Mounts::loadFromXml(const std::string& datadir)
 							mount.speed = intValue;
 						}
 
-						mounts[mount.lookType] = mount;
+						mounts[mount.mountId] = mount;
 					}
 					else{
 						std::cout << "Missing looktype or name for a mount." << std::endl;
@@ -114,18 +114,18 @@ bool Mounts::reload()
 bool Mounts::getMount(uint32_t value, Mount& mount, bool isId)
 {
 	if(isId){
-		for(MountMap::iterator it = mounts.begin(); it != mounts.end(); it++){
-			if(it->second.mountId == value){
-				mount = it->second;
-				return true;
-			}
-		}
-	}
-	else{
 		MountMap::iterator it = mounts.find(value);
 		if(it != mounts.end()){
 			mount = it->second;
-			return true;
+			return true
+		}
+	}
+	else{
+		for(MountMap::iterator it = mounts.begin(); it != mounts.end(); it++){
+			if(it->second.lookType == value){
+				mount = it->second;
+				return true;
+			}
 		}
 	}
 
