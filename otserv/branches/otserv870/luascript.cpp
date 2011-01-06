@@ -1972,8 +1972,11 @@ void LuaScriptInterface::registerFunctions()
 	//getFirstItemFromInventory(cid, id/name, <optional> reportError)
 	lua_register(m_luaState, "getFirstItemFromInventory", LuaScriptInterface::luaGetFirstItemFromInventory);
 	
-	//getCreatureConditionInfo(cid, conditionType, conditionId, <optional> subId)
+	//getCreatureConditionInfo(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
 	lua_register(m_luaState, "getCreatureConditionInfo", LuaScriptInterface::luaGetCreatureConditionInfo);
+
+	//getCreatureCondition(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
+	lua_register(m_luaState, "getCreatureCondition", LuaScriptInterface::luaGetCreatureCondition);
 
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
@@ -9325,26 +9328,30 @@ int LuaScriptInterface::luaGetFirstItemFromInventory(lua_State *L)
 
 int LuaScriptInterface::luaGetCreatureConditionInfo(lua_State *L)
 {
-	//getCreatureConditionInfo(cid, conditionType, conditionId, <optional> subId)
-	uint32_t subId = 0;
+	//getCreatureConditionInfo(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
+	ConditionId_t conditionId = CONDITIONID_DEFAULT;
+	if(lua_gettop(L) > 3)
+		conditionId = (ConditionId_t)popNumber(L);
+
+	int subId = 0;
 	if(lua_gettop(L) > 2)
 		subId = popNumber(L);
 
-	ConditionId_t conditionId = (ConditionId_t)popNumber(L);
 	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
 	Creature* creature = env->getCreatureByUID(cid);
-	if(!creature){
+	if(!creature)
+	{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushboolean(L, false);
 		return 1;
 	}
 
 	Condition* condition = creature->getCondition(conditionType, conditionId, subId);
-	if(!condition){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
+	if(!condition)
+	{
 		lua_pushboolean(L, false);
 		return 1;
 	}
@@ -9354,6 +9361,40 @@ int LuaScriptInterface::luaGetCreatureConditionInfo(lua_State *L)
 	setField(L, "endTime", condition->getEndTime());
 	setField(L, "ticks", condition->getTicks());
 	setFieldBool(L, "persistent", condition->isPersistent());
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureCondition(lua_State *L)
+{
+	//getCreatureCondition(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
+	ConditionId_t conditionId = CONDITIONID_DEFAULT;
+	if(lua_gettop(L) > 3)
+		conditionId = (ConditionId_t)popNumber(L);
+
+	int subId = 0;
+	if(lua_gettop(L) > 2)
+		subId = popNumber(L);
+
+	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature)
+	{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Condition* condition = creature->getCondition(conditionType, conditionId, subId);
+	if(!condition)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_pushboolean(L, true);
 	return 1;
 }
 

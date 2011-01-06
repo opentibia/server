@@ -29,10 +29,11 @@
 #include <list>
 
 struct Mount{
-	Mount() : mountId(0), lookType(0), speed(0), isPremium(false), isDefault(false), name("") {}
+	Mount() : mountId(0), lookType(0), speed(0), attackSpeed(0), isPremium(false), isDefault(false), name("") {}
 	uint32_t mountId;
 	uint32_t lookType;
-	uint32_t speed;
+	int32_t speed;
+	int32_t attackSpeed;
 	bool isPremium;
 	bool isDefault;
 	std::string name;

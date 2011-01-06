@@ -514,6 +514,7 @@ protected:
 
 	static int luaGetFirstItemFromInventory(lua_State *L);
 	static int luaGetCreatureConditionInfo(lua_State *L);
+	static int luaGetCreatureCondition(lua_State *L);
 	#ifdef __GUILDWARSLUARELOAD__
 	static int luaDoUpdateGuildWar(lua_State* L);
 	#endif

@@ -61,6 +61,7 @@ Creature::Creature() :
 
 	ridingMount = false;
 	mountSpeed = 0;
+	mountAttackSpeed = 0;
 
 	health     = 1000;
 	healthMax  = 1000;
@@ -371,6 +372,7 @@ void Creature::setCurrentOutfit(Outfit_t outfit)
 		Mount mount;
 		if(Mounts::getInstance()->getMount(outfit.lookMount, mount)){
 			mountSpeed = mount.speed;
+			mountAttackSpeed = mount.attackSpeed;
 		}
 	}
 }

@@ -631,6 +631,15 @@ bool Spell::configureSpell(xmlNodePtr p)
 		isAggressive = (intValue == 1);
 	}
 
+	if(exhaustion == -1){
+		if(isAggressive){
+			exhaustion = g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED);
+		}
+		else{
+			exhaustion = g_config.getNumber(ConfigManager::HEAL_EXHAUSTED);
+		}
+	}
+
 	if(groupExhaustions.empty()){
 		if(isAggressive){
 			groupExhaustions[SPELLGROUP_MELEE] = g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED);
@@ -2301,6 +2310,7 @@ bool RuneSpell::Soulfire(const RuneSpell* spell, Creature* creature, Item* item,
 	if(!hitCreature->addCondition(soulfireCondition)){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		delete soulfireCondition;
 		return false;
 	}
 

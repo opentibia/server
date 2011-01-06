@@ -256,6 +256,7 @@ public:
 	const bool isRidingMount() const {return ridingMount;}
 	void setRidingMount(bool isRiding) {ridingMount = isRiding;}
 	const int32_t getMountSpeed() const {return (ridingMount ? mountSpeed : 0);}
+	const int32_t getMountAttackSpeed() const {return (ridingMount ? mountAttackSpeed : 0);}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
 	ZoneType_t getZone() const {return getTile()->getZone();}
 
@@ -451,6 +452,7 @@ protected:
 	Outfit_t defaultOutfit;
 	bool ridingMount;
 	int32_t mountSpeed;
+	int32_t mountAttackSpeed;
 
 	Position masterPos;
 	int32_t masterRadius;

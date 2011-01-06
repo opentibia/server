@@ -77,6 +77,10 @@ bool Mounts::loadFromXml(const std::string& datadir)
 							mount.speed = intValue;
 						}
 
+						if(readXMLInteger(p, "attackspeed", intValue)){
+							mount.attackSpeed = intValue;
+						}
+
 						mounts[mount.mountId] = mount;
 					}
 					else{
@@ -106,6 +110,7 @@ bool Mounts::reload()
 		++it)
 		{
 			it->second->setSex(it->second->getSex());
+			it->second->setCurrentOutfit(it->second->getCurrentOutfit());
 		}
 	}
 	return result;
@@ -117,7 +122,7 @@ bool Mounts::getMount(uint32_t value, Mount& mount, bool isId)
 		MountMap::iterator it = mounts.find(value);
 		if(it != mounts.end()){
 			mount = it->second;
-			return true
+			return true;
 		}
 	}
 	else{

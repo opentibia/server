@@ -280,7 +280,7 @@ enable_cooldown = true
 -- How many milliseconds (1 sec = 1000) we should wait until the player will be pushed by another player.
 push_interval = 2000
 
---Should monsters be teleported to their spawn after they loss their target?
+--Should monsters walk back to their spawn after they lose target?
 monster_spawn_walkback = true
 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting

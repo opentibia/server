@@ -160,6 +160,7 @@ bool Outfits::reload()
 		++it)
 		{
 			it->second->setSex(it->second->getSex());
+			it->second->setCurrentOutfit(it->second->getCurrentOutfit());
 		}
 	}
 	return result;

@@ -81,6 +81,8 @@ public:
 	uint32_t getManaCost() const {return mType->manaCost;}
 	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
 
+	void doWalkbackToSpawn();
+
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
 	virtual void onAttackedCreature(Creature* target);

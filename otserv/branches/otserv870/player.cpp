@@ -3776,7 +3776,7 @@ void Player::getPathSearchParams(const Creature* creature, FindPathParams& fpp) 
 
 uint32_t Player::getAttackSpeed() const
 {
-	return vocation->getAttackSpeed();
+	return std::max(0U, vocation->getAttackSpeed() - getMountAttackSpeed());
 }
 
 void Player::onAttacking(uint32_t interval)
@@ -4740,7 +4740,7 @@ void Player::genReservedStorageRange()
 
 		storageMap[base_key] = it->first;
 		base_key++;
-		if(base_key > PSTRG_MOUNTSID_RANGE_START + PSTRG_MOUNTS_RANGE_SIZE){
+		if(base_key > PSTRG_MOUNTS_RANGE_START + PSTRG_MOUNTS_RANGE_SIZE){
 			std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 mounts!." << std::endl;
 			break;
 		}
