@@ -119,10 +119,17 @@ void Monster::doWalkbackToSpawn()
 			return;
 		}
 
-		std::list<Direction> listDir;
-		if(g_game.getPathToEx(this, getMasterPos(), listDir, 0, 1, true, true)){
-			hasFollowPath = true;
-			startAutoWalk(listDir);
+		uint32_t dist = std::abs(std::max(getPosition().x-getMasterPos().x, getPosition().y-getMasterPos().y));
+		if(dist > 0){
+			g_game.internalTeleport(this, getMasterPos());
+			semiIdle = false;
+		}
+		else{
+			std::list<Direction> listDir;
+			if(g_game.getPathToEx(this, getMasterPos(), listDir, 0, 0, true, false)){
+				hasFollowPath = true;
+				startAutoWalk(listDir);
+			}
 		}
 	}
 }
@@ -634,7 +641,9 @@ void Monster::updateIdleStatus()
 			for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
 				int diff = std::abs((*it)->getPosition().z - getPosition().z);
 				if (diff < heightMinimum) {
-					hasHeightDifference = diff != 0;
+					if(diff != 0 || !(*it)->isAttackable())
+						hasHeightDifference = true;
+
 					semiIdle = false;
 					break;
 				}
