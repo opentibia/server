@@ -112,28 +112,6 @@ Monster::~Monster()
 #endif
 }
 
-void Monster::doWalkbackToSpawn()
-{
-	if(g_config.getBoolean(ConfigManager::MONSTER_SPAWN_WALKBACK)){
-		if(!semiIdle || hasFollowPath || getMasterPos() == Position(0,0,0) || getPosition() == getMasterPos()){
-			return;
-		}
-
-		uint32_t dist = std::abs(std::max(getPosition().x-getMasterPos().x, getPosition().y-getMasterPos().y));
-		if(dist > 0){
-			g_game.internalTeleport(this, getMasterPos());
-			semiIdle = false;
-		}
-		else{
-			std::list<Direction> listDir;
-			if(g_game.getPathToEx(this, getMasterPos(), listDir, 0, 0, true, false)){
-				hasFollowPath = true;
-				startAutoWalk(listDir);
-			}
-		}
-	}
-}
-
 void Monster::onAttackedCreatureDissapear(bool isLogout)
 {
 #ifdef __DEBUG__
@@ -142,6 +120,9 @@ void Monster::onAttackedCreatureDissapear(bool isLogout)
 
 	attackTicks = 0;
 	extraMeleeAttack = true;
+		if(g_config.getBoolean(ConfigManager::MONSTER_SPAWN_WALKBACK)){
+		g_game.internalTeleport(this, getMasterPos());
+	}
 }
 
 void Monster::onFollowCreatureDissapear(bool isLogout)
@@ -624,7 +605,6 @@ void Monster::updateIdleStatus()
 		heightMinimum = std::max(g_config.getNumber(ConfigManager::HEIGHT_MINIMUM_FOR_IDLE),(int64_t)1);
 
 	bool idle = false;
-	bool hasHeightDifference = false;
 	semiIdle = false;
 	if(conditions.empty()){
 		if(isSummon()){
@@ -639,26 +619,12 @@ void Monster::updateIdleStatus()
 			idle = targetList.empty();
 			semiIdle = !idle;
 			for(CreatureList::iterator it = targetList.begin(); it != targetList.end(); ++it){
-				int diff = std::abs((*it)->getPosition().z - getPosition().z);
-				if (diff < heightMinimum) {
-					if(diff != 0 || !(*it)->isAttackable())
-						hasHeightDifference = true;
-
+				if (std::abs((*it)->getPosition().z - getPosition().z) < heightMinimum) {
 					semiIdle = false;
 					break;
 				}
 			}
 		}
-	}
-
-	static int walkback = -1;
-	if(walkback == -1)
-		walkback = (int)g_config.getBoolean(ConfigManager::MONSTER_SPAWN_WALKBACK);
-
-	if(walkback && !isSummon() && (idle || hasHeightDifference)){
-		semiIdle = true;
-		hasFollowPath = false;
-		return;
 	}
 
 	setIdle(idle);
@@ -734,9 +700,6 @@ void Monster::onThink(uint32_t interval)
 			onThinkTarget(interval);
 			onThinkYell(interval);
 			onThinkDefense(interval);
-		}
-		else if(semiIdle){
-			doWalkbackToSpawn();
 		}
 	}
 }
@@ -1106,13 +1069,7 @@ bool Monster::getNextStep(Direction& dir, uint32_t& flags)
 	}
 
 	bool result = false;
-	if(semiIdle && hasFollowPath){
-		result = Creature::getNextStep(dir, flags);
-		if(result){
-			flags |= FLAG_PATHFINDING;
-		}
-	}
-	else if((!followCreature || !hasFollowPath) && !isSummon()){
+	if((!followCreature || !hasFollowPath) && !isSummon()){
 		if(followCreature){
 			result = getRandomStep(getPosition(), dir);
 		}else{
