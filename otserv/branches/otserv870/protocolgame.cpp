@@ -18,7 +18,9 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
-
+/* server to client unknown bytes
+0xB6 - 2 bytes usage(???)
+*/
 #include "protocolgame.h"
 #include "networkmessage.h"
 #include "outputmessage.h"
@@ -1571,7 +1573,7 @@ void ProtocolGame::sendCreatureShield(const Creature* creature)
 	}
 }
 
-void ProtocolGame::sendCreatureSquare(const Creature* creature, SquareColor_t color)
+void ProtocolGame::sendCreatureSquare(const Creature* creature, uint8_t color)
 {
 	if(canSee(creature)){
 		NetworkMessage_ptr msg = getOutputBuffer();
@@ -1579,7 +1581,7 @@ void ProtocolGame::sendCreatureSquare(const Creature* creature, SquareColor_t co
 			TRACK_MESSAGE(msg);
 			msg->AddByte(0x86);
 			msg->AddU32(creature->getID());
-			msg->AddByte((uint8_t)color);
+			msg->AddByte(color);
 		}
 	}
 }
@@ -2041,6 +2043,19 @@ void ProtocolGame::sendCreatureHealth(const Creature* creature)
 		if(msg){
 			TRACK_MESSAGE(msg);
 			AddCreatureHealth(msg, creature);
+		}
+	}
+}
+
+void ProtocolGame::sendCreatureWalkthrough(const Creature* creature, bool walkthrough)
+{
+	if(canSee(creature)){
+		NetworkMessage_ptr msg = getOutputBuffer();
+		if(msg){
+			TRACK_MESSAGE(msg);
+			msg->AddByte(0x92);
+			msg->AddU32(creature->getID());
+			msg->AddByte(!walkthrough); // isBlocking = !walkthrough
 		}
 	}
 }

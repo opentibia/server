@@ -1052,7 +1052,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			default: break;
 		}
 
-		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
+		s << strElement << " (" << it.attack << " physical + " << elementDamage << " " << strElement << " damage).";
 	}
 
 	if(item && item->getSpecialDescription() != ""){

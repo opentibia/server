@@ -516,8 +516,10 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 	//send to client
 	uint32_t i = 0;
+	bool mayWalkthrough = newTile->hasFlag(TILESTATE_PROTECTIONZONE);
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendCreatureWalkthrough(creature, mayWalkthrough);
 			tmpPlayer->sendCreatureMove(creature, newTile, newPos, this, oldPos, oldStackPosVector[i], teleport);
 			++i;
 		}

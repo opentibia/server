@@ -1070,6 +1070,11 @@ bool Player::canSeeCreature(const Creature* creature) const
 
 bool Player::canWalkthrough(const Creature* creature) const
 {
+	std::vector<uint32_t>::const_iterator it = std::find(forceWalkthrough.begin(), forceWalkthrough.end(), creature->getID());
+	if(it != forceWalkthrough.end()){
+		return true;
+	}
+
 	if(hasFlag(PlayerFlag_CanPassThroughAllCreatures)
 		|| (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag())){
 		return true;
@@ -1080,9 +1085,26 @@ bool Player::canWalkthrough(const Creature* creature) const
 		return false;
 	}
 
+	if(creature->getPlayer() && creature->getTile()
+		&& creature->getTile()->hasFlag(TILESTATE_PROTECTIONZONE)){
+		return true;
+	}
+
 	return (Combat::checkPVPExtraRestrictions(this, creature, true) != RET_NOERROR);
 }
 
+void Player::setWalkthrough(const Creature* creature, bool walkthrough)
+{
+	std::vector<uint32_t>::iterator it = std::find(forceWalkthrough.begin(), forceWalkthrough.end(), creature->getID());
+	if(walkthrough && it == forceWalkthrough.end()){
+		forceWalkthrough.push_back(creature->getID());
+	}
+	else if(!walkthrough && it != forceWalkthrough.end()){
+		forceWalkthrough.erase(it);
+	}
+
+	sendCreatureWalkthrough(creature, !walkthrough ? canWalkthrough(creature) : walkthrough);
+}
 
 bool Player::canBePushedBy(const Player *player) const
 {
@@ -4969,8 +4991,10 @@ void Player::toogleGmInvisible()
 		{
 			if(tmpPlayer != this && !tmpPlayer->canSeeGmInvisible(this))
 			{
-				if(gmInvisible)
+				if(gmInvisible){
+					tmpPlayer->setWalkthrough(this, false);
 					tmpPlayer->sendCreatureDisappear(this, getTile()->getClientIndexOfThing(tmpPlayer, this), true);
+				}
 				else
 					tmpPlayer->sendCreatureAppear(this, getPosition());
 			}

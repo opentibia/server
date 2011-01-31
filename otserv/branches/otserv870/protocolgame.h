@@ -184,6 +184,7 @@ private:
 	void sendMagicEffect(const Position& pos, unsigned char type);
 	void sendAnimatedText(const Position& pos, unsigned char color, std::string text);
 	void sendCreatureHealth(const Creature* creature);
+	void sendCreatureWalkthrough(const Creature* creature, bool walkthrough);
 	void sendSkills();
 	void sendPing();
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
@@ -229,7 +230,7 @@ private:
 	#ifdef __GUILDWARSLUARELOAD__
 	void sendCreatureEmblem(const Creature* creature);
 	#endif
-	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
+	void sendCreatureSquare(const Creature* creature, uint8_t color);
 
 	//tiles
 	void sendAddTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);

@@ -1978,6 +1978,12 @@ void LuaScriptInterface::registerFunctions()
 	//getCreatureCondition(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
 	lua_register(m_luaState, "getCreatureCondition", LuaScriptInterface::luaGetCreatureCondition);
 
+	//doPlayerSetCreatureWalkthrough(cid, uid, walkthrough)
+	lua_register(m_luaState, "doPlayerSetCreatureWalkthrough", LuaScriptInterface::luaDoPlayerSetCreatureWalkthrough);
+
+	//doPlayerSendCreatureSquare(cid, uid, color)
+	lua_register(m_luaState, "doPlayerSendCreatureSquare", LuaScriptInterface::luaDoPlayerSendCreatureSquare);
+
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
@@ -9394,6 +9400,66 @@ int LuaScriptInterface::luaGetCreatureCondition(lua_State *L)
 		return 1;
 	}
 
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSetCreatureWalkthrough(lua_State* L)
+{
+	//doPlayerSetCreatureWalkthrough(cid, uid, walkthrough)
+	bool walkthrough = popBoolean(L);
+	uint32_t uid = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Creature* creature = env->getCreatureByUID(uid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	if(player != creature){
+		player->setWalkthrough(creature, walkthrough);
+		lua_pushboolean(L, true);
+	}
+	else{
+		lua_pushboolean(L, false);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSendCreatureSquare(lua_State* L)
+{
+	//doPlayerSendCreatureSquare(cid, uid, color)
+	uint8_t color = (uint8_t)popNumber(L);
+	uint32_t uid = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Creature* creature = env->getCreatureByUID(uid);
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	player->sendCreatureSquare(creature, color);
 	lua_pushboolean(L, true);
 	return 1;
 }

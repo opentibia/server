@@ -290,6 +290,7 @@ public:
 	virtual bool canSee(const Position& pos) const;
 	virtual bool canSeeCreature(const Creature* creature) const;
 	virtual bool canWalkthrough(const Creature* creature) const;
+	void setWalkthrough(const Creature* creature, bool walkthrough);
 
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
 
@@ -490,7 +491,7 @@ public:
 		{if(client) client->sendCreatureTurn(creature, creature->getTile()->getClientIndexOfThing(this, creature));}
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
 		{if(client) client->sendCreatureSay(creature, type, text);}
-	void sendCreatureSquare(const Creature* creature, SquareColor_t color)
+	void sendCreatureSquare(const Creature* creature, uint8_t color)
 		{if(client) client->sendCreatureSquare(creature, color);}
 	void sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
 		{if(client) client->sendCreatureOutfit(creature, outfit);}
@@ -601,6 +602,8 @@ public:
 		{if(client) client->sendChangeSpeed(creature, newSpeed);}
 	void sendCreatureHealth(const Creature* creature) const
 		{if(client) client->sendCreatureHealth(creature);}
+	void sendCreatureWalkthrough(const Creature* creature, bool walkthrough) const
+		{if(client) client->sendCreatureWalkthrough(creature, walkthrough);}
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
 		{if(client) client->sendDistanceShoot(from, to, type);}
 	void sendHouseWindow(House* house, uint32_t listId) const;
@@ -794,6 +797,7 @@ protected:
 	uint32_t actionTaskEvent;
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
+	std::vector<uint32_t> forceWalkthrough;
 
 	int32_t idleTime;
 	bool idleWarned;

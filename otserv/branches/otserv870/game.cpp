@@ -775,6 +775,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	for(it = list.begin(); it != list.end(); ++it){
 		if((player = (*it)->getPlayer())){
 			if(player->canSeeCreature(creature)){
+				player->setWalkthrough(creature, false);
 				player->sendCreatureDisappear(creature, oldStackPosVector[i], isLogout);
 				++i;
 			}
@@ -4991,10 +4992,11 @@ bool Game::playerMountCreature(uint32_t playerId, bool mount)
 		player->setRidingMount(mount);
 		changeSpeed(player, 0);
 		internalCreatureChangeOutfit(player, player->getCurrentOutfit());
-		}
-		         else{
-                 player->sendCancel("Please wait 2 seconds before mounting again.");
 	}
+	else{
+		player->sendCancel("Please wait 2 seconds before mounting again.");
+	}
+
 	return true;
 }
 
