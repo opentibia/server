@@ -38,7 +38,7 @@
 	</rune>
 	<rune name="adevo mas flam" id="2305" lvl="27" maglv="5" blocktype="solid" charges="2" script="attack/firebomb.lua">
 	</rune>
-	<rune name="adevo res flam" id="2308" lvl="27" maglv="7" needtarget="1" charges="3" script="attack/soulfire.lua">
+	<rune name="adevo res flam" id="2308" lvl="27" maglv="7" needtarget="1" charges="3" function="soulfire">
 	</rune>
 	<rune name="adevo ina" id="2291" lvl="27" maglv="4" aggressive="0" selftarget="1" charges="1" function="chameleon">
 	</rune>

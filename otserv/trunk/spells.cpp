@@ -1904,14 +1904,12 @@ ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId
 //If successful, return a RET_NOERROR
 //If unsuccessful, returns RET_NOTPOSSIBLE, or RET_YOUNEEDAMAGICITEMTOCASTSPELL
 ReturnValue ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId,
-	uint32_t conjureCount, uint32_t reagentId, slots_t slot, bool test /*= false*/)
+	uint32_t conjureCount, uint32_t reagentId, bool test /*= false*/)
 {
 	//If a reagent is needed
 	if(reagentId != 0){
-		//Get the item from the player's inventory slot
-		Item* item = player->getInventoryItem(slot);
-		//If the item exists, and the id is equal to the reagentId
-		if(item && item->getID() == reagentId){
+		//Get the item from the player's inventory
+		if(Item* item = player->getFirstItemById(reagentId)){
 			//If testing, return here
 			if(test){
 				return RET_NOERROR;
@@ -1965,55 +1963,25 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 
 	ReturnValue result = RET_NOERROR;
 	if(spell->getReagentId() != 0){
-		//Test if we can cast the conjure spell on left hand
-		ReturnValue result1 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
-			spell->getReagentId(), SLOT_LEFT, true);
-
-		if(result1 == RET_NOERROR){
+		//Test if we can cast the conjure spell
+		result = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(), spell->getReagentId(), true);
+		if(result == RET_NOERROR){
 			//Check level/mana etc.
 			if(!spell->playerSpellCheck(player)){
 				return false;
 			}
 
-			result1 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
-				spell->getReagentId(), SLOT_LEFT);
-
-			if(result1 == RET_NOERROR){
+			result = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(), spell->getReagentId());
+			if(result == RET_NOERROR){
 				spell->postCastSpell(player, false);
 			}
 		}
 
-		//Check if we can cast the conjure spell on the right hand
-		ReturnValue result2 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
-			spell->getReagentId(), SLOT_RIGHT, true);
-
-		if(result2 == RET_NOERROR){
-			//Check level/mana etc.
-			if(!spell->playerSpellCheck(player)){
-				//Finished the cast, add exhaustion and stuff
-				spell->postCastSpell(player, true, false);
-				return false;
-			}
-
-			result2 = internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
-				spell->getReagentId(), SLOT_RIGHT);
-
-			if(result2 == RET_NOERROR){
-				spell->postCastSpell(player, false);
-			}
-		}
-
-		if(result1 == RET_NOERROR || result2 == RET_NOERROR){
+		if(result == RET_NOERROR){
 			//Finished the cast, add exhaustion and stuff
 			spell->postCastSpell(player, true, false);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
 			return true;
-		}
-
-		result = result1;
-		if((result == RET_NOERROR && result2 != RET_NOERROR) ||
-			(result == RET_YOUNEEDAMAGICITEMTOCASTSPELL && result2 == RET_YOUNEEDTOSPLITYOURSPEARS) ) {
-			result = result2;
 		}
 	}
 	else{
@@ -2159,6 +2127,9 @@ bool RuneSpell::loadFunction(const std::string& functionName)
 	else if(functionName == "convince"){
 		function = Convince;
 	}
+    else if(functionName == "soulfire"){
+        function = Soulfire;
+    }	
 	else{
 		return false;
 	}
@@ -2259,6 +2230,41 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 
 	spell->postCastSpell(player, (uint32_t)manaCost, (uint32_t)spell->getSoulCost(player));
 	g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
+	return true;
+}
+
+bool RuneSpell::Soulfire(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo)
+{
+	Player* player = creature->getPlayer();
+	if(!player){
+		return false;
+	}
+
+	Thing* thing = g_game.internalGetThing(player, posTo, 0, 0, STACKPOS_LOOK);
+	if(!thing){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	Creature* hitCreature = thing->getCreature();
+	if(!hitCreature){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	ConditionDamage* soulfireCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
+	soulfireCondition->setParam(CONDITIONPARAM_SUBID, 1);
+	soulfireCondition->addDamage(std::ceil((player->getLevel()+player->getMagicLevel()) / 3.), 9000, -10);
+	if(!hitCreature->addCondition(soulfireCondition)){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		delete soulfireCondition;
+		return false;
+	}
+
+	spell->postCastSpell(player, true, false);
 	return true;
 }
 

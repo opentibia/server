@@ -39,7 +39,7 @@ public:
 		if(_premEnd < time(NULL)){
 			return 0;
 		}
-		return (uint16_t)std::ceil((double)((_premEnd - time(NULL)) / 86400));
+		return (uint16_t)std::ceil(((double)(_premEnd - time(NULL))) / 86400.);
 	}
 
 	uint32_t number;

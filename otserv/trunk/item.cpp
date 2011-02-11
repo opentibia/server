@@ -53,7 +53,11 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 #endif
 		return NULL;
 	}
-
+	
+	if(it.stackable && !_count){
+		_count = 1;
+	}
+	
 	if(it.id != 0){
 		if(it.isDepot()){
 			newItem = new Depot(_type);
@@ -1048,7 +1052,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			default: break;
 		}
 
-		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
+		 s << strElement << " (" << it.attack << " physical + " << elementDamage << " " << strElement << " damage).";
 	}
 
 	if(item && item->getSpecialDescription() != ""){

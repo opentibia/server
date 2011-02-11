@@ -428,7 +428,7 @@ bool CreatureEvent::executeOnLook(Player* player, Thing* target, uint16_t itemId
 
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
-		desc << creature->getName();
+		desc << player->getName();
 		env->setEventDesc(desc.str());
 		#endif
 

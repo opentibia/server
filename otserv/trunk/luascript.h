@@ -504,6 +504,11 @@ protected:
 	static int luaDoPlayerToogleGmInvisible(lua_State *L);
 	static int luaGetPlayerAccountId(lua_State *L);
 	static int luaDoPlayerAddPremiumDays(lua_State *L);
+	static int luaDoPlayerRemovePremiumDays(lua_State *L);
+
+	static int luaGetFirstItemFromInventory(lua_State *L);
+	static int luaGetCreatureConditionInfo(lua_State *L);
+	static int luaGetCreatureCondition(lua_State *L);
 	#ifdef __GUILDWARSLUARELOAD__
 	static int luaDoUpdateGuildWar(lua_State* L);
 	#endif

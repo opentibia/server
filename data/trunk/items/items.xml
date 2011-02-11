@@ -7752,117 +7752,6 @@
 	<item id="3243" name="wooden floor"/>
 	<item id="3244" name="wooden floor"/>
 	<item id="3245" name="wooden floor"/>
-	<item id="3263" name="jungle grass"/>
-	<item id="3264" name="earth"/>
-	<item id="3265" name="earth"/>
-	<item id="3298" name="jungle grass"/>
-	<item id="3299" name="jungle grass"/>
-	<item id="3300" name="jungle grass"/>
-	<item id="3301" name="jungle grass"/>
-	<item id="3302" name="jungle grass"/>
-	<item id="3303" name="jungle grass"/>
-	<item id="3304" name="jungle grass"/>
-	<item id="3305" name="jungle grass"/>
-	<item id="3306" name="jungle grass"/>
-	<item id="3307" name="jungle grass"/>
-	<item id="3308" name="jungle grass"/>
-	<item id="3309" name="jungle grass"/>
-	<item id="3310" article="a" name="pitfall">
-		<attribute key="floorchange" value="down"/>
-	</item>
-	<item id="3311" article="a" name="pitfall">
-		<attribute key="floorchange" value="down"/>
-		<attribute key="decayTo" value="3310"/>
-		<attribute key="duration" value="60"/>
-	</item>
-	<item id="3312" article="an" name="ant trail"/>
-	<item id="3313" article="an" name="ant trail"/>
-	<item id="3314" article="an" name="ant trail"/>
-	<item id="3315" article="an" name="ant trail"/>
-	<item id="3316" article="an" name="ant trail"/>
-	<item id="3317" article="an" name="ant trail"/>
-	<item id="3318" article="an" name="ant trail"/>
-	<item id="3319" article="an" name="ant trail"/>
-	<item id="3320" article="an" name="ant trail"/>
-	<item id="3321" article="an" name="ant trail"/>
-	<item id="3322" article="an" name="ant trail"/>
-	<item id="3323" article="an" name="ant-hill"/>
-	<item id="3324" article="an" name="earth hole">
-		<attribute key="floorchange" value="down"/>
-	</item>
-	<item id="3325" article="a" name="stone"/>
-	<item id="3326" article="a" name="stone"/>
-	<item id="3327" article="a" name="stone"/>
-	<item id="3328" article="a" name="stone"/>
-	<item id="3329" article="a" name="stone"/>
-	<item id="3330" article="a" name="stone"/>
-	<item id="3331" article="a" name="stone"/>
-	<item id="3332" article="a" name="stone"/>
-	<item id="3333" article="a" name="stone"/>
-	<item id="3334" article="a" name="stone"/>
-	<item id="3335" article="a" name="stone"/>
-	<item id="3336" article="a" name="stone"/>
-	<item id="3337" article="a" name="stone"/>
-	<item id="3338" article="a" name="stone"/>
-	<item id="3339" article="a" name="stone"/>
-	<item id="3340" article="a" name="stone"/>
-	<item id="3341" article="a" name="stone"/>
-	<item id="3342" article="a" name="stone"/>
-	<item id="3343" article="a" name="stone"/>
-	<item id="3344" article="a" name="stone"/>
-	<item id="3345" article="a" name="stone"/>
-	<item id="3346" article="a" name="stone"/>
-	<item id="3347" article="a" name="stone"/>
-	<item id="3348" article="a" name="dried grass roof"/>
-	<item id="3349" article="a" name="dried grass roof"/>
-	<item id="3350" article="a" name="dried grass roof"/>
-	<item id="3351" article="a" name="dried grass roof"/>
-	<item id="3352" article="a" name="dried grass roof"/>
-	<item id="3353" article="a" name="dried grass roof"/>
-	<item id="3354" article="a" name="dried grass roof"/>
-	<item id="3355" article="a" name="dried grass roof"/>
-	<item id="3356" article="a" name="dried grass roof"/>
-	<item id="3357" article="a" name="dried grass roof"/>
-	<item id="3358" article="a" name="dried grass roof"/>
-	<item id="3359" article="a" name="dried grass roof"/>
-	<item id="3360" article="a" name="dried grass roof"/>
-	<item id="3361" article="a" name="stone wall"/>
-	<item id="3362" article="a" name="stone wall"/>
-	<item id="3363" article="a" name="stone wall"/>
-	<item id="3364" article="a" name="stone wall"/>
-	<item id="3365" article="a" name="stone wall"/>
-	<item id="3366" article="a" name="stone wall"/>
-	<item id="3367" article="a" name="stone wall"/>
-	<item id="3368" article="a" name="stone wall"/>
-	<item id="3369" article="a" name="stone wall"/>
-	<item id="3370" article="a" name="stone wall"/>
-	<item id="3371" article="a" name="stone wall"/>
-	<item id="3372" article="a" name="stone wall"/>
-	<item id="3373" article="a" name="stone wall"/>
-	<item id="3374" article="a" name="stone wall"/>
-	<item id="3375" article="a" name="stone wall"/>
-	<item id="3376" article="a" name="stone wall window"/>
-	<item id="3377" article="a" name="stone wall"/>
-	<item id="3378" article="a" name="stone wall"/>
-	<item id="3379" article="a" name="stone wall"/>
-	<item id="3380" article="a" name="stone wall"/>
-	<item id="3381" article="a" name="stone wall"/>
-	<item id="3382" article="a" name="stone wall window"/>
-	<item id="3383" article="a" name="stone wall"/>
-	<item id="3384" article="a" name="stone wall"/>
-	<item id="3385" article="a" name="stone wall"/>
-	<item id="3386" article="a" name="stone wall"/>
-	<item id="3387" article="a" name="stone wall"/>
-	<item id="3388" article="a" name="stone wall"/>
-	<item id="3389" article="a" name="stone wall"/>
-	<item id="3390" article="a" name="stone wall"/>
-	<item id="3391" article="a" name="stone wall"/>
-	<item id="3392" article="a" name="stone wall window"/>
-	<item id="3393" article="an" name="archway"/>
-	<item id="3394" article="an" name="archway"/>
-	<item id="3395" article="an" name="archway"/>
-	<item id="3396" article="an" name="archway"/>
-	<item id="3397" article="a" name="stone wall window"/>
 	<item id="3298" name="jungle grass"/>
 	<item id="3299" name="jungle grass"/>
 	<item id="3300" name="jungle grass"/>
@@ -8429,77 +8318,6 @@
 	<item id="3803" article="a" name="large totem pole"/>
 	<item id="3804" article="a" name="totem pole"/>
 	<item id="3805" article="a" name="carved stone table">
-		<attribute key="rotateTo" value="3806"/>
-	</item>
-	<item id="3737" article="a" name="statue"/>
-	<item id="3738" article="a" name="statue"/>
-	<item id="3739" article="a" name="statue"/>
-	<item id="3740" article="a" name="statue"/>
-	<item id="3741" article="a" name="statue"/>
-	<item id="3742" article="a" name="statue"/>
-	<item id="3743" article="a" name="lantern"/>
-	<item id="3744" article="a" name="lantern"/>
-	<item id="3745" article="a" name="bamboo fence"/>
-	<item id="3746" article="a" name="bamboo fence"/>
-	<item id="3747" article="a" name="bamboo fence"/>
-	<item id="3748" article="a" name="bamboo fence"/>
-	<item id="3749" article="a" name="bamboo fence"/>
-	<item id="3750" article="a" name="bamboo fence"/>
-	<item id="3751" article="a" name="bamboo fence"/>
-	<item id="3752" article="a" name="bamboo fence"/>
-	<item id="3753" article="a" name="bamboo fence"/>
-	<item id="3754" article="a" name="bamboo fence"/>
-	<item id="3755" article="a" name="bamboo fence"/>
-	<item id="3756" article="a" name="bridge"/>
-	<item id="3757" article="a" name="bridge"/>
-	<item id="3758" article="a" name="bridge"/>
-	<item id="3759" article="a" name="bridge"/>
-	<item id="3760" article="a" name="bridge"/>
-	<item id="3761" article="a" name="bridge"/>
-	<item id="3762" article="a" name="bridge"/>
-	<item id="3763" article="a" name="bridge"/>
-	<item id="3764" article="a" name="bridge"/>
-	<item id="3765" article="a" name="bridge"/>
-	<item id="3766" article="a" name="pillar"/>
-	<item id="3767" article="a" name="broken pillar"/>
-	<item id="3768" article="a" name="bridge"/>
-	<item id="3769" article="a" name="bridge"/>
-	<item id="3770" article="a" name="bridge"/>
-	<item id="3771" article="a" name="bridge"/>
-	<item id="3772" article="a" name="bridge"/>
-	<item id="3773" article="a" name="bridge"/>
-	<item id="3774" article="a" name="bridge"/>
-	<item id="3775" article="a" name="bridge"/>
-	<item id="3776" article="a" name="bridge"/>
-	<item id="3777" article="a" name="bridge"/>
-	<item id="3778" article="a" name="bridge"/>
-	<item id="3779" article="a" name="bridge"/>
-	<item id="3780" article="a" name="bridge"/>
-	<item id="3781" article="a" name="bridge"/>
-	<item id="3782" article="a" name="bridge"/>
-	<item id="3783" article="a" name="bridge"/>
-	<item id="3784" article="a" name="bridge"/>
-	<item id="3785" article="a" name="bridge"/>
-	<item id="3786" article="a" name="bridge"/>
-	<item id="3787" article="a" name="bridge"/>
-	<item id="3788" article="a" name="bridge"/>
-	<item id="3789" article="a" name="bridge"/>
-	<item id="3790" article="a" name="bridge"/>
-	<item id="3791" article="a" name="bridge"/>
-	<item id="3792" article="a" name="stone wall"/>
-	<item id="3793" article="a" name="stone wall"/>
-	<item id="3794" article="a" name="bamboo wall"/>
-	<item id="3795" article="a" name="bamboo wall"/>
-	<item id="3796" article="a" name="bamboo wall"/>
-	<item id="3797" article="a" name="bamboo wall"/>
-	<item id="3798" article="a" name="bamboo wall"/>
-	<item id="3799" article="a" name="bamboo wall"/>
-	<item id="3800" article="a" name="bamboo wall"/>
-	<item id="3801" article="a" name="bamboo wall"/>
-	<item id="3802" article="a" name="statue"/>
-	<item id="3803" article="a" name="statue"/>
-	<item id="3804" article="a" name="statue"/>
-	<item id="3805" article="a" name="stone table">
 		<attribute key="rotateTo" value="3806"/>
 	</item>
 	<item id="3806" article="a" name="stone table">
@@ -13593,9 +13411,6 @@
 		<attribute key="fluidSource" value="blood"/>
 	</item>
 	<item id="6082" article="a" name="dead human" editorsuffix=" (Creature)"/>
-	<item id="6083" article="a" name="dead human">
-		<attribute key="containerSize" value="10"/>
-	</item>
 	<item id="6083" article="a" name="dead human" editorsuffix=" (Creature)">
 		<attribute key="containerSize" value="10"/>
 	</item>
@@ -20032,11 +19847,6 @@
 	</item>
 	<item id="8580" article="a" name="sewer grate"/>
 	<item id="8581" article="a" name="Zirella's cart" editorsuffix=" (Tutorial)"/>
-	<item id="8577"/>
-	<item id="8578" name="grass"/>
-	<item id="8579" article="a" name="hole"/>
-	<item id="8580" article="a" name="grate"/>
-	<item id="8581" article="a" name="wooden cart"/>
 	<item id="8582" article="a" name="branch"/>
 	<item id="8583" article="a" name="dead tree"/>
 	<item id="8584" name="Jerom's family necklace">
@@ -20408,9 +20218,6 @@
 	<item id="8813" article="a" name="tree"/>
 	<item id="8814" article="a" name="tree"/>
 	<item id="8815" article="a" name="tree"/>
-	<item id="8816" article="a" name="tree"/>
-	<item id="8817" article="a" name="tree"/>
-	<item id="8818" article="a" name="tree"/>
 	<item id="8816" article="a" name="tree"/>
 	<item id="8817" article="a" name="tree"/>
 	<item id="8818" article="a" name="tree"/>
@@ -21210,7 +21017,7 @@
 	<item id="8974" article="an" name="oracle figurine">
 		<attribute key="weight" value="800"/>
 	</item>
-	<item id="8974" article="an" name="oracle figurine">
+	<item id="8975" article="an" name="oracle figurine">
 		<attribute key="weight" value="800"/>
 		<attribute key="decayTo" value="8974"/>
 		<attribute key="duration" value="3"/>
@@ -22830,6 +22637,8 @@
 		<attribute key="description" value="Wearing these boots reduces the damage gotten from fiery ground."/>
 		<attribute key="weight" value="950"/>
 		<attribute key="armor" value="2"/>
+		<attribute key="absorbpercentfirefield" value="90"/>
+		<attribute key="reduceconditioncount" value="5"/>
 		<attribute key="slotType" value="feet"/>
 		<attribute key="decayTo" value="10022"/>
 		<attribute key="transformDeEquipTo" value="9933"/>

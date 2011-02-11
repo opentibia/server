@@ -292,6 +292,23 @@ public:
 	bool doForceUpdate() const { return forceUpdate;}
 	int32_t getTotalDamage() const;
 
+	int32_t getLength() {
+		int32_t length = 0;
+		for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); it++, length++){}
+		return length;
+	}
+	IntervalInfo popBackDamage() {
+		IntervalInfo info = damageList.back();
+		damageList.pop_back();
+		return info;
+	}
+	IntervalInfo popFrontDamage() {
+		IntervalInfo info = damageList.front();
+		damageList.pop_front();
+		return info;
+	}
+	void clearDamageList() { damageList.clear(); }
+	
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);

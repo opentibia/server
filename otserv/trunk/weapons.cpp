@@ -738,7 +738,7 @@ int32_t WeaponMelee::getElementDamage(const Player* player, const Item* item) co
 int32_t WeaponMelee::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const
 {
 	int32_t attackSkill = player->getWeaponSkill(item);
-	int32_t attackValue = std::max((int32_t)0, ((int32_t)item->getAttack() - elementDamage));
+	int32_t attackValue = std::max(0, item->getAttack());
 	float attackFactor = player->getAttackFactor();
 	int32_t maxValue = Weapons::getMaxWeaponDamage(player->getLevel(), attackSkill, attackValue, attackFactor);
 
@@ -983,7 +983,7 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 void WeaponDistance::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 {
 	if((ammoAction == AMMOACTION_MOVE || ammoAction == AMMOACTION_MOVEBACK) &&
-			breakChance > 0 && random_range(1, 100) < breakChance){
+			breakChance > 0 && random_range(1, 100) <= breakChance){
 		int32_t newCount = std::max(0, item->getItemCount() - 1);
 		g_game.transformItem(item, item->getID(), newCount);
 	}
@@ -1117,6 +1117,15 @@ bool WeaponWand::configureWeapon(const ItemType& it)
 	params.distanceEffect = it.shootType;
 
 	return Weapon::configureWeapon(it);
+}
+
+bool WeaponWand::interruptSwing() const
+{
+	if(!g_config.getBoolean(ConfigManager::WANDS_INTERRUPT_SWING)){
+		return false;
+	}
+
+	return true;
 }
 
 int32_t WeaponWand::getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage /*= false*/) const

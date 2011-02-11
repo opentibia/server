@@ -832,7 +832,7 @@ bool Game::playerMoveThing(uint32_t playerId, const Position& fromPos,
 
 	if(Creature* movingCreature = thing->getCreature()){
 		if(Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition())){
-			SchedulerTask* task = createSchedulerTask(2000,
+			SchedulerTask* task = createSchedulerTask(g_config.getNumber(ConfigManager::PUSH_INTERVAL),
 				boost::bind(&Game::playerMoveCreature, this, player->getID(),
 				movingCreature->getID(), movingCreature->getPosition(), toCylinder->getPosition()));
 			player->setNextActionTask(task);
@@ -880,7 +880,8 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 
 			SchedulerTask* task = createSchedulerTask(1500, boost::bind(&Game::playerMoveCreature, this,
 				playerId, movingCreatureId, movingCreatureOrigPos, toPos));
-			player->setNextWalkActionTask(task);
+			g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
+				this, player->getID(), task)));
 			return true;
 		}
 		else{
@@ -1144,7 +1145,8 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 
 			SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerMoveItem, this,
 				playerId, fromPos, spriteId, fromStackPos, toPos, count));
-			player->setNextWalkActionTask(task);
+			g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
+                this, player->getID(), task)));
 			return true;
 		}
 		else{
@@ -1204,7 +1206,8 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerMoveItem, this,
 					playerId, itemPos, spriteId, itemStackPos, toPos, count));
-				player->setNextWalkActionTask(task);
+				g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
+					this, player->getID(), task)));
 				return true;
 			}
 			else{
@@ -2327,7 +2330,8 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseItemEx, this,
 					playerId, itemPos, itemStackPos, fromSpriteId, toPos, toStackPos, toSpriteId, isHotkey));
-				player->setNextWalkActionTask(task);
+				g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
+					this, player->getID(), task)));
 				return true;
 			}
 			else{
@@ -2397,7 +2401,8 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseItem, this,
 					playerId, pos, stackPos, index, spriteId, isHotkey));
-				player->setNextWalkActionTask(task);
+				g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
+					 this, player->getID(), task)));
 				return true;
 			}
 
@@ -2473,7 +2478,8 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 
 				SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerUseBattleWindow, this,
 					playerId, fromPos, fromStackPos, creatureId, spriteId, isHotkey));
-				player->setNextWalkActionTask(task);
+				g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
+					this, player->getID(), task)));
 				return true;
 			}
 
@@ -2593,7 +2599,8 @@ bool Game::playerRotateItem(uint32_t playerId, const Position& pos, uint8_t stac
 
 			SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerRotateItem, this,
 				playerId, pos, stackPos, spriteId));
-			player->setNextWalkActionTask(task);
+			g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
+				this, player->getID(), task)));
 			return true;
 		}
 		else{
@@ -2727,7 +2734,8 @@ bool Game::playerRequestTrade(uint32_t playerId, const Position& pos, uint8_t st
 
 			SchedulerTask* task = createSchedulerTask(400, boost::bind(&Game::playerRequestTrade, this,
 				playerId, pos, stackPos, tradePlayerId, spriteId));
-			player->setNextWalkActionTask(task);
+			g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
+				this, player->getID(), task)));
 			return true;
 		}
 		else{
@@ -3412,6 +3420,7 @@ bool Game::playerSetFightModes(uint32_t playerId, fightMode_t fightMode, chaseMo
 	if(!player || player->isRemoved())
 		return false;
 
+	player->setLastAttackAsNow();
 	player->setFightMode(fightMode);
 	player->setChaseMode(chaseMode);
 	player->setSafeMode(safeMode);
@@ -4954,6 +4963,15 @@ bool Game::playerReportBug(uint32_t playerId, std::string comment)
 	return false;
 }
 
+bool Game::playerRegisterWalkAction(uint32_t playerId, SchedulerTask* task)
+{
+	Player* player = getPlayerByID(playerId);
+	if(!player || player->isRemoved())
+		return false;
+
+	player->setNextWalkActionTask(task);
+	return true;
+}
 void Game::reloadInfo(reloadTypes_t info)
 {
 	switch(info){
@@ -4985,6 +5003,12 @@ void Game::reloadInfo(reloadTypes_t info)
 			break;
 		case RELOAD_TYPE_CREATURESCRIPTS:
 			g_creatureEvents->reload();
+			break;
+		case RELOAD_TYPE_OUTFITS:
+			Outfits::getInstance()->reload();
+			break;
+		case RELOAD_TYPE_ITEMS:
+			Item::items.reload();
 			break;
 	}
 }

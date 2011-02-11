@@ -170,13 +170,14 @@ void Items::clear()
 
 bool Items::reload()
 {
-	//TODO?
-	/*
-	for (ItemMap::iterator it = items.begin(); it != items.end(); it++){
-		delete it->second->condition;
-	}
-	return loadFromXml(m_datadir);
-	*/
+	clear();
+	/*items.clear();
+	if(!items.size())
+		return false;*/
+
+	if(loadFromOtb(m_datadir))
+		return loadFromXml(m_datadir);
+
 	return false;
 }
 
@@ -1176,6 +1177,31 @@ bool Items::loadFromXml(const std::string& datadir)
 								it.abilities.conditionSuppressions |= CONDITION_PHYSICAL;
 							}
 						}*/
+						else if(asLowerCaseString(strValue) == "absorbpercentfirefield"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.absorbFieldDamage[ITEM_FIREFIELD] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_FIREFIELD+1] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_FIREFIELD_NOT_DECAYING] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_FIREFIELD_NOT_DECAYING+1] = intValue;
+							}
+						}
+						else if(asLowerCaseString(strValue) == "absorbpercentenergyfield"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.absorbFieldDamage[ITEM_ENERGYFIELD] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_ENERGYFIELD_NOT_DECAYING] = intValue;
+							}
+						}
+						else if(asLowerCaseString(strValue) == "absorbpercentpoisonfield"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.absorbFieldDamage[ITEM_POISONFIELD] = intValue;
+								it.abilities.absorbFieldDamage[ITEM_POISONFIELD_NOT_DECAYING] = intValue;
+							}
+						}
+						else if(asLowerCaseString(strValue) == "reduceconditioncount"){
+							if(readXMLInteger(itemAttributesNode, "value", intValue)){
+								it.abilities.conditionCount = intValue;
+							}
+						}
 						else if(asLowerCaseString(strValue) == "field"){
 							it.group = ITEM_GROUP_MAGICFIELD;
 							it.type = ITEM_TYPE_MAGICFIELD;

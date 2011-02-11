@@ -257,7 +257,10 @@ public:
 	Item* getInventoryItem(slots_t slot) const;
 	// As above, but returns NULL if the item can not be weared in that slot (armor in hand for example)
 	Item* getEquippedItem(slots_t slot) const;
-
+	
+    // Returns the first found item with chosen itemid
+    Item* getFirstItemById(uint32_t id) const;
+		 
 	bool isItemAbilityEnabled(slots_t slot) const {return inventoryAbilities[slot];}
 	void setItemAbility(slots_t slot, bool enabled) {inventoryAbilities[slot] = enabled;}
 
@@ -675,6 +678,7 @@ public:
 	bool canDoAction() const {return nextAction <= OTSYS_TIME();}
 	uint32_t getNextActionTime() const;
 	virtual uint32_t getAttackSpeed() const;
+	void setLastAttackAsNow() { lastAttack = OTSYS_TIME(); }
 	int64_t getLastTimeRequestOutfit() const { return lastTimeRequestOutfit; }
 	void setLastTimeRequestOutfitAsNow() { lastTimeRequestOutfit = OTSYS_TIME(); }
 

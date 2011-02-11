@@ -232,6 +232,10 @@ remove_weapon_charges = true
 -- Should exhaustion and action time be checked for using a distance weapon?
 distance_weapon_interrupt_swing = true
 
+-- Wands configuration exhaustion
+-- Should exhaustion and action time be checked for using wands?
+wands_interrupt_swing = true
+ 
 -- fist fighting configuration
 -- How strong should be the attack using bare hands (fist fighting)?
 fist_strength = 7
@@ -267,6 +271,9 @@ min_pvp_level = 0
 -- (experimental code - requires otserv to be compiled with flag __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__)
 min_pvp_level_applies_to_summons = true
 
+-- How many milliseconds (1 sec = 1000) we should wait until the player will be pushed by another player.
+push_interval = 2000
+ 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
 maxmessagebuffer = 4
 

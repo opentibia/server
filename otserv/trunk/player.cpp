@@ -338,6 +338,41 @@ Item* Player::getEquippedItem(slots_t slot) const
 	return NULL;
 }
 
+Item* Player::getFirstItemById(uint32_t id) const
+{
+	Item* tmpItem = NULL;
+	Container* tmpContainer = NULL;
+	std::list<Container*> listContainer;
+	for(int32_t slot = SLOT_FIRST; slot <= SLOT_LAST; slot++){
+		if((tmpItem = getInventoryItem((slots_t)slot))){
+			if(tmpItem->getID() == id){
+				return tmpItem;
+			}
+			else if((tmpContainer = tmpItem->getContainer())){
+				listContainer.push_back(tmpContainer);
+			}
+		}
+	}
+
+	ItemList::const_iterator it;
+	while(!listContainer.empty()){
+		Container* container = listContainer.front();
+		listContainer.pop_front();
+		for(it = container->getItems(); it != container->getEnd(); ++it){
+			if((tmpItem = *it)){
+				if(tmpItem->getID() == id){
+					return tmpItem;
+				}
+				else if((tmpContainer = tmpItem->getContainer())){
+					listContainer.push_back(tmpContainer);
+				}
+			}
+		}
+	}
+	
+	return NULL;
+}
+
 void Player::setConditionSuppressions(uint32_t conditions, bool remove)
 {
 	if(!remove){
@@ -1575,6 +1610,12 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 
 		if(!storedConditionList.empty()){
 			for(ConditionList::const_iterator it = storedConditionList.begin(); it != storedConditionList.end(); ++it){
+				if((*it)->getType() == CONDITION_REGENERATION && (*it)->getSubId() == 0){
+					(*it)->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
+					(*it)->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
+					(*it)->setParam(CONDITIONPARAM_MANAGAIN, vocation->getManaGainAmount());
+					(*it)->setParam(CONDITIONPARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
+				}
 				addCondition(*it);
 			}
 
@@ -2827,6 +2868,11 @@ bool Player::hasCapacity(const Item* item, uint32_t count) const
 ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {
+	Player* self = const_cast<Player*>(this);
+	if(self == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
 	const Item* item = thing->getItem();
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
@@ -2920,6 +2966,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 							}
 						}
 					}
+				if(item->getWeaponType() != WEAPON_NONE && ret == RET_NOERROR){
+					self->setLastAttackAsNow();
+				}
 				}
 			}
 			break;
@@ -2960,6 +3009,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 							}
 						}
 					}
+				if(item->getWeaponType() != WEAPON_NONE && ret == RET_NOERROR){
+					self->setLastAttackAsNow();	
+					}
 				}
 			}
 			break;
@@ -2990,7 +3042,28 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			ret = RET_NOTPOSSIBLE;
 			break;
 	}
-
+	
+	if(ret == RET_BOTHHANDSNEEDTOBEFREE && (index == SLOT_LEFT || index == SLOT_RIGHT)){
+		Item* tmpItem = NULL;
+		Container* tmpContainer = NULL;
+		slots_t setSlot = (slots_t)index;
+		if(inventory[setSlot]){
+			for(int i = SLOT_FIRST; i <= SLOT_LAST; i++){
+				tmpItem = getInventoryItem((slots_t)i);
+				if(tmpItem){
+					tmpContainer = tmpItem->getContainer();
+					if(tmpContainer && (tmpContainer->getItemCount() != tmpContainer->getItemHoldingCount())){
+						self->sendRemoveInventoryItem(setSlot, inventory[setSlot]);
+						self->onRemoveInventoryItem(setSlot, inventory[setSlot]);
+						g_game.internalAddItem(tmpContainer, inventory[setSlot], INDEX_WHEREEVER, FLAG_NOLIMIT);
+						self->inventory[setSlot] = NULL;
+						break;
+					}
+				}
+			}
+		}
+	}	
+	
 	if(ret == RET_NOERROR || ret == RET_NOTENOUGHROOM){
 		//need an exchange with source?
 		if(getInventoryItem((slots_t)index) != NULL){

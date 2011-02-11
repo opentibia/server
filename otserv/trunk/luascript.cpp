@@ -1951,7 +1951,18 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerAddPremiumDays(cid, days)
 	lua_register(m_luaState, "doPlayerAddPremiumDays", LuaScriptInterface::luaDoPlayerAddPremiumDays);
 
+	//doPlayerRemovePremiumDays(cid, days)
+	lua_register(m_luaState, "doPlayerRemovePremiumDays", LuaScriptInterface::luaDoPlayerRemovePremiumDays);
 
+	//getFirstItemFromInventory(cid, id/name, <optional> reportError)
+	lua_register(m_luaState, "getFirstItemFromInventory", LuaScriptInterface::luaGetFirstItemFromInventory);
+	
+	//getCreatureConditionInfo(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
+	lua_register(m_luaState, "getCreatureConditionInfo", LuaScriptInterface::luaGetCreatureConditionInfo);
+
+	//getCreatureCondition(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
+	lua_register(m_luaState, "getCreatureCondition", LuaScriptInterface::luaGetCreatureCondition);
+	
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
@@ -5468,6 +5479,10 @@ int LuaScriptInterface::luaCreateCombatObject(lua_State *L)
 
 bool LuaScriptInterface::getArea(lua_State *L, std::list<uint32_t>& list, uint32_t& rows)
 {
+	if(lua_type(L, -1) != LUA_TTABLE){
+		reportError(__FUNCTION__, "Variable passed to [LuaInterface::getArea] is not a table.");
+		return false;
+	}
 	rows = 0;
 	uint32_t i = 0, j = 0;
 
@@ -7219,8 +7234,15 @@ int LuaScriptInterface::luaGetIPByPlayerName(lua_State *L)
 	//getIPByPlayerName(playerName)
 	std::string name = popString(L);
 
-	if(Player* player = g_game.getPlayerByName(name)){
-		lua_pushnumber(L, player->getIP());
+	if(Player* player = g_game.getPlayerByNameEx(name)){
+		if(player->isOffline()){
+			uint32_t ip;
+			IOPlayer::instance()->getLastIP(ip, player->getGUID());
+			lua_pushnumber(L, ip);
+		}
+		else{
+			lua_pushnumber(L, player->getIP());
+		}
 	}
 	else{
 		lua_pushnumber(L, 0);
@@ -8632,10 +8654,12 @@ int LuaScriptInterface::luaGetAccountBanList(lua_State *L)
 		const Ban& ban = *iter;
 		lua_pushnumber(L, index);
 
-		lua_createtable(L, 8, 0);
+		lua_createtable(L, 9, 0);
 		setField(L, "accountId", ban.value);
-		Account acc = IOAccount::instance()->loadAccount(ban.value, true);
-		setField(L, "accountName", acc.name);
+
+		std::string accountName;
+		IOAccount::instance()->getAccountName(atoi(ban.value.c_str()), accountName);
+		setField(L, "accountName", accountName);
 		setField(L, "added", ban.added);
 		setField(L, "expires", ban.expires);
 		setField(L, "admin", ban.adminId);
@@ -9094,6 +9118,145 @@ int LuaScriptInterface::luaDoPlayerAddPremiumDays(lua_State *L)
 		account.premEnd += (days * 24 * 60 * 60);
 	}
 	IOAccount::instance()->saveAccount(account);
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerRemovePremiumDays(lua_State *L)
+{
+	//doPlayerRemovePremiumDays(cid, days)
+	uint32_t days = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	if(days < 1){
+		lua_pushboolean(L, false);
+		return 1;
+	}
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	std::string accountName;
+	IOAccount::instance()->getAccountName(player->getAccountId(), accountName);
+	Account account =  IOAccount::instance()->loadAccount(accountName, true);
+
+	account.premEnd -= (days * 24 * 60 * 60);
+	if(account.premEnd <= std::time(NULL)){
+		account.premEnd = 0;
+	}
+
+	IOAccount::instance()->saveAccount(account);
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetFirstItemFromInventory(lua_State *L)
+{
+	//getFirstItemFromInventory(cid, id/name, <optional> reportError)
+	bool reporterror = false;
+	if(lua_gettop(L) > 2)
+		reporterror = popBoolean(L);
+
+	bool isname = lua_type(L, -1) == LUA_TSTRING;
+	std::string value = popString(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(!player){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	int32_t id = isname ? Item::items.getItemIdByName(value) : atoi(value.c_str());
+	Item* item = player->getFirstItemById(id);
+	if(!item){
+		if(reporterror)
+			reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_pushnumber(L, env->addThing(item));
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureConditionInfo(lua_State *L)
+{
+	//getCreatureConditionInfo(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
+	ConditionId_t conditionId = CONDITIONID_DEFAULT;
+	if(lua_gettop(L) > 3)
+		conditionId = (ConditionId_t)popNumber(L);
+
+	int subId = 0;
+	if(lua_gettop(L) > 2)
+		subId = popNumber(L);
+
+	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature)
+	{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Condition* condition = creature->getCondition(conditionType, conditionId, subId);
+	if(!condition)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_newtable(L);
+	setField(L, "icons", condition->getIcons());
+	setField(L, "endTime", condition->getEndTime());
+	setField(L, "ticks", condition->getTicks());
+	setFieldBool(L, "persistent", condition->isPersistent());
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureCondition(lua_State *L)
+{
+	//getCreatureCondition(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
+	ConditionId_t conditionId = CONDITIONID_DEFAULT;
+	if(lua_gettop(L) > 3)
+		conditionId = (ConditionId_t)popNumber(L);
+
+	int subId = 0;
+	if(lua_gettop(L) > 2)
+		subId = popNumber(L);
+
+	ConditionType_t conditionType = (ConditionType_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	Creature* creature = env->getCreatureByUID(cid);
+	if(!creature)
+	{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	Condition* condition = creature->getCondition(conditionType, conditionId, subId);
+	if(!condition)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
 	lua_pushboolean(L, true);
 	return 1;
 }
