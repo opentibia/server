@@ -21,6 +21,7 @@
 
 #include "outfit.h"
 #include "tools.h"
+#include "player.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <iostream>
