@@ -448,7 +448,8 @@ bool Items::loadFromXml(const std::string& datadir)
 		xmlFreeDoc(doc);
 		return false;
 	}
-
+	
+	std::map<uint16_t, bool> itemsLoaded;
 	xmlNodePtr itemNode = root->children;
 	while(itemNode){
 		if(xmlStrcmp(itemNode->name,(const xmlChar*)"item") == 0){
@@ -462,7 +463,15 @@ bool Items::loadFromXml(const std::string& datadir)
 					iType->id = id;
 					items.addElement(iType, iType->id);
 				}
+				
+				else if(itemsLoaded[id]){
+					std::cout << std::endl << "Duplicate itemid \"" << intValue << "\"";
+					itemNode = itemNode->next;
+					continue;
+				}
 
+				itemsLoaded[id] = true;
+				
 				ItemType& it = Item::items.getItemType(id);
 
 				if(readXMLString(itemNode, "name", strValue)){

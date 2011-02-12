@@ -149,10 +149,21 @@ bool Outfits::loadFromXml(const std::string& datadir)
 
 bool Outfits::reload()
 {
-        allOutfits.clear();
-        outfitMaps.clear();
-        return loadFromXml(m_datadir);
+	allOutfits.clear();
+	outfitMaps.clear();
+	bool result = loadFromXml(m_datadir);
+	if(result){
+		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
+		it != Player::listPlayer.list.end();
+		++it)
+		{
+			it->second->setSex(it->second->getSex());
+			it->second->setCurrentOutfit(it->second->getCurrentOutfit());
+		}
+	}
+	return result;
 }
+
 
 uint32_t Outfits::getOutfitId(uint32_t lookType)
 {
