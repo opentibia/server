@@ -1,6 +1,6 @@
 local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_BLOCKHIT)
-setCombatParam(combat, COMBAT_PARAM_PZBLOCK, true)
+setCombatParam(combat, COMBAT_PARAM_PZBLOCK, 1)
 
 function onCastSpell(cid, var)
 	local pos = variantToPosition(var)
