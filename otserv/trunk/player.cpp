@@ -4557,6 +4557,7 @@ void Player::checkSkullTicks(int32_t ticks)
 			(skullType == SKULL_BLACK && std::time(NULL) >= lastSkullTime + g_config.getNumber(ConfigManager::BLACK_SKULL_DURATION)) ){
 			lastSkullTime = 0;
 			setSkull(SKULL_NONE);
+			clearAttacked();
 			g_game.updateCreatureSkull(this);
 		}
 	}
