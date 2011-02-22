@@ -4458,7 +4458,11 @@ void Game::internalDecayItem(Item* item)
 	const ItemType& it = Item::items[item->getID()];
 
 	if(it.decayTo != 0){
+		uint16_t aid = item->getActionId();
 		Item* newItem = transformItem(item, it.decayTo);
+		if (aid != 0){
+			newItem->setActionId(aid);
+		}
 		startDecay(newItem);
 	}
 	else{
