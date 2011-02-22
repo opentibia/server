@@ -3,5 +3,6 @@ function onUse(cid, item, frompos, item2, topos)
 	if item.actionid ~= 0 then
 		doSetItemActionId(item.uid, item.actionid)
 	end
+	doDecayItem(item.uid)
 	return true
 end
