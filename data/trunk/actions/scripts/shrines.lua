@@ -26,6 +26,9 @@ function onUse(cid, item, frompos, item2, topos)
 	if(item2.itemid == HOTA_WEAK and item.itemid == SMALL_RUBY) then
 		doRemoveItem(item.uid, 1)
 		doTransformItem(item2.uid, HOTA_FULL)
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
 		doSendMagicEffect(topos, CONST_ME_MAGIC_RED)
 		return true
 	end

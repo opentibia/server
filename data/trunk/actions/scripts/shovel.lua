@@ -9,6 +9,9 @@ local duration = 5 * 60000 -- 5 minutes
 local function __doTransformHole__(parameters)
 	local thing = getTileItemById(parameters.pos, MUD_HOLE)
 	local newItem = doTransformItem(thing.uid, parameters.oldType)
+	if parameters.oldaid ~= 0 and newItem then
+		doSetItemActionId(thing.uid, parameters.oldaid)
+	end	
 end
 
 function onUse(cid, item, frompos, item2, topos)
@@ -22,7 +25,10 @@ function onUse(cid, item, frompos, item2, topos)
 		if (item2.actionid == TUMB_ENTRANCE) then
 			if (math.random(1, 5) == 1) then
 				doTransformItem(item2.uid, MUD_HOLE)
-				addEvent(__doTransformHole__, duration, {oldType = item2.itemid, pos = topos})
+				addEvent(__doTransformHole__, duration, {oldType = item2.itemid, pos = topos, oldaid = item2.actionid})
+				if item2.actionid ~= 0 then
+					doSetItemActionId(item2.uid, item2.actionid)
+				end
 			end
 		elseif (item2.actionid == SCARAB_TILE) then
 			if (math.random(1, 20) == 1) then

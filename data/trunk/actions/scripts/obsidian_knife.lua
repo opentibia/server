@@ -62,6 +62,9 @@ function onUse(cid, item, frompos, item2, topos)
 		doSendMagicEffect(getThingPos(item2.uid), CONST_ME_BLOCKHIT)
 		if random >= 5 then
 			doTransformItem(item2.uid, ICE_CUBE[table.find(ICE_CUBE, item2.itemid) + 1])
+			if item2.actionid ~= 0 then
+				doSetItemActionId(item2.uid, item2.actionid)
+			end
 		else
 			doRemoveItem(item2.uid)
 		end
@@ -85,6 +88,9 @@ function onUse(cid, item, frompos, item2, topos)
 
 	doTransformItem(item2.uid, item2.itemid + 1)
 	doDecayItem(item2.uid)
+	if item2.actionid ~= 0 then
+		doSetItemActionId(item2.uid, item2.actionid)
+	end
 
 	return true
 end

@@ -20,5 +20,7 @@ function onUse(cid, item, frompos, item2, topos)
 	else                                                   -- Locking an already closed door
 		doTransformItem(item2.uid, item2.itemid-1)
 	end
+	doSetItemActionId(item2.uid, item2.actionid)
+
 	return true
 end

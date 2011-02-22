@@ -17,11 +17,9 @@ local ICE_FISHHOLE	=	7236
 local function __doTransformHole__(parameters)
 	local thing = getTileItemById(parameters.pos, MUD_HOLE)
 	local newItem = doTransformItem(thing.uid, parameters.oldType)
-end
-
-local function __doTransformHole2__(parameters)
-	local thing = getTileItemById(parameters.pos, MUD_HOLE2)
-	local newItem = doTransformItem(thing.uid, parameters.oldType)
+	if parameters.oldaid ~= 0 and newItem then
+		doSetItemActionId(thing.uid, parameters.oldaid)
+	end
 end
 
 function onUse(cid, item, frompos, item2, topos)
@@ -74,13 +72,19 @@ function onUse(cid, item, frompos, item2, topos)
 		else
 			doTransformItem(item2.uid, item2.itemid + 1)
 		end
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
 		doDecayItem(item2.uid)
 		return true
 	elseif (item2.itemid == TILE_SAND) then
 		if (item2.actionid == TUMB_ENTRANCE) then
 			if (math.random(1, 5) == 1) then
 				doTransformItem(item2.uid, 489)
-				addEvent(__doTransformHole__, duration, {oldType = item2.itemid, pos = topos})
+				if item2.actionid ~= 0 then
+					doSetItemActionId(item2.uid, item2.actionid)
+				end
+				addEvent(__doTransformHole__, duration, {oldType = item2.itemid, pos = topos, oldaid = item2.actionid})
 			end
 		elseif (item2.actionid == SCARAB_TILE) then
 			if (math.random(1, 20) == 1) then
@@ -111,11 +115,17 @@ function onUse(cid, item, frompos, item2, topos)
 	if(isInArray(ROPE_SPOT, itemGround.itemid) ) then
 		doTransformItem(item2.uid, MUD_HOLE2)
 		doSendMagicEffect(topos, CONST_ME_POFF)
-		addEvent(__doTransformHole2__, duration, {oldType = item2.itemid, pos = topos})
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
+		addEvent(__doTransformHole__, duration, {oldType = item2.itemid, pos = topos, oldaid = item2.actionid})
 		return true
 	end
 	if(item2.itemid == FRAGILE_ICE) then
 		doTransformItem(item2.uid, ICE_FISHHOLE)
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
 		doSendMagicEffect(topos, CONST_ME_BLOCKHIT)
 		return true
 	end
@@ -126,10 +136,16 @@ function onUse(cid, item, frompos, item2, topos)
 		return true
 	elseif (isInArray(JUNGLE_GRASS_TRANSFORM, item2.itemid) ) then
 		doTransformItem(item2.uid, item2.itemid - 1)
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
 		doDecayItem(item2.uid)
 		return true
 	elseif (isInArray(SPIDER_WEB, item2.itemid) ) then
 		doTransformItem(item2.uid, item2.itemid +6)
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
 		doDecayItem(item2.uid)
 		return true
 	end

@@ -24,6 +24,9 @@ function onStepIn(cid, item, pos)
 
 	if (TILE_SNOW[item.itemid] ~= nil) then
 		doTransformItem(item.uid, TILE_SNOW[item.itemid])
+		if item.actionid ~= 0 then
+			doSetItemActionId(item.uid, item.actionid)
+		end
 		doDecayItem(item.uid)
 		return true
 	end

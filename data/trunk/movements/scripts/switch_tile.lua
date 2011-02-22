@@ -1,11 +1,20 @@
 local SWITCHES = { {416, 417}, {426, 425}, {446, 447}, {3216, 3217}, {11062, 11063} }
 
+local function transformItemKeepingAid(item, newid)
+	local ret = doTransformItem(item.uid, newid)
+	if ret and item.actionid ~= 0 then
+		doSetItemActionId(item.uid, item.actionid)
+	end
+	return ret
+end
+
 local function doTransformTile(item)
+	local ret
 	for i, v in pairs(SWITCHES) do
 		if(item.itemid == v[1]) then
-			return doTransformItem(item.uid, v[2])
+			return transformItemKeepingAid(item, v[2])
 		elseif(item.itemid == v[2]) then
-			return doTransformItem(item.uid, v[1])
+			return transformItemKeepingAid(item, v[1])
 		end
 	end
 end
