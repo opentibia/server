@@ -189,29 +189,27 @@ std::list<Item*> MonsterType::createLootItem(const LootBlock& lootBlock)
 
 	std::list<Item*> itemList;
 
-	//if we can't create this item with count of 1 then it doesn't exist in items.otb (let's avoid crash), we don't have to do it in loop because item id is static here.
-	if(!Item::CreateItem(lootBlock.id, 1)){ 
-		return itemList;
-	}	
+
 	
 	while(itemCount > 0){
 		uint16_t n = (uint16_t)std::min(itemCount, (int32_t)100);
-		tmpItem = Item::CreateItem(lootBlock.id, n);
 		itemCount -= n;
+		
+		if(tmpItem = Item::CreateItem(lootBlock.id, n)){
+			if(lootBlock.subType != -1){
+				tmpItem->setSubType(lootBlock.subType);
+			}
 
-		if(lootBlock.subType != -1){
-			tmpItem->setSubType(lootBlock.subType);
+			if(lootBlock.actionId != -1){
+				tmpItem->setActionId(lootBlock.actionId);
+			}
+
+			if(lootBlock.text != ""){
+				tmpItem->setText(lootBlock.text);
+			}
+
+			itemList.push_back(tmpItem);
 		}
-
-		if(lootBlock.actionId != -1){
-			tmpItem->setActionId(lootBlock.actionId);
-		}
-
-		if(lootBlock.text != ""){
-			tmpItem->setText(lootBlock.text);
-		}
-
-		itemList.push_back(tmpItem);
 	}
 
 	return itemList;

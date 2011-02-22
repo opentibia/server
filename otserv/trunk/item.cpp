@@ -817,7 +817,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			}
 			s << ")";
 		}
-
+		
 		if(it.showCharges){
 			if(subType > 1){
 				s << " that has " << (int32_t)subType << " charges left";
@@ -972,6 +972,9 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			s << "Nothing is written on it.";
 		}
 	}
+	else if(it.isLevelDoor() && item && item->getActionId() >= 1000)
+		s << " for level " << item->getActionId() - 1000;
+	
 	else if(it.showCharges){
 		if(subType > 1){
 			s << " that has " << (int32_t)subType << " charges left.";

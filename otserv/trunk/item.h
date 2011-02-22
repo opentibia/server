@@ -349,6 +349,7 @@ public:
 	bool isRoteable() const {const ItemType& it = items[id]; return it.rotable && it.rotateTo;}
 	bool isDoor() const {return items[id].isDoor();}
 	bool isBed() const {return items[id].isBed();}
+	bool isLevelDoor() const {return items[id].isLevelDoor();}
 	bool hasCharges() const {return getCharges() > 0;}
 	bool isSolidForItems() const { return items[id].isSolidForItems(); }
 
