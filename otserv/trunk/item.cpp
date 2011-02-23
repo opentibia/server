@@ -1137,7 +1137,7 @@ bool Item::canDecay()
 		return false;
 	}
 
-	if(getUniqueId() != 0){
+	if(getUniqueId() != 0){ // || getActionId() != 0){
 		return false;
 	}
 
