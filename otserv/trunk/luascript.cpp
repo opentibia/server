@@ -8092,7 +8092,7 @@ int LuaScriptInterface::luaDoPlayerSetDepotLimit(lua_State *L)
 int LuaScriptInterface::luaDoSaveServer(lua_State *L)
 {
 	//doSaveServer(payHouses)
-	bool payHouses = (popNumber(L) > 0);
+	bool payHouses = (int32_t(popNumber(L, true)) > 0);
 	if(!g_game.saveServer(payHouses)){
 		lua_pushboolean(L, false);
 		return 1;
