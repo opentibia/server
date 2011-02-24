@@ -83,9 +83,9 @@ public:
 	//scripting
 	bool executeOnLogin(Player* player);
 	bool executeOnLogout(Player* player);
-	bool executeOnDie(Creature* creature, Item* corpse);
-	bool executeOnKill(Creature* creature, Creature* target, bool lastHit);
-	bool executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
+	void executeOnDie(Creature* creature, Item* corpse);
+	void executeOnKill(Creature* creature, Creature* target, bool lastHit);
+	void executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
 	bool executeOnLook(Player* player, Thing* target, uint16_t itemId);
 	//
 

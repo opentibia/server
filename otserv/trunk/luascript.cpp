@@ -775,7 +775,7 @@ void LuaScriptInterface::executeTimerEvent(uint32_t eventIndex)
 			ScriptEnviroment* env = getScriptEnv();
 			env->setTimerEvent();
 			env->setScriptId(it->second.scriptId, this);
-			callFunction(it->second.parameters.size());
+			callFunction(it->second.parameters.size(), false);
 			releaseScriptEnv();
 		}
 		else{
@@ -809,7 +809,7 @@ int LuaScriptInterface::luaErrorHandler(lua_State *L) {
 	return 1;
 }
 
-bool LuaScriptInterface::callFunction(uint32_t nParams)
+bool LuaScriptInterface::callFunction(uint32_t nParams, bool getReturnValue /*=true*/)
 {
 	bool result = false;
 
@@ -825,11 +825,16 @@ bool LuaScriptInterface::callFunction(uint32_t nParams)
 		result = false;
 	}
 	else {
-		result = (int32_t)LuaScriptInterface::popBoolean(m_luaState);
+		if (getReturnValue){
+			result = (int32_t)LuaScriptInterface::popBoolean(m_luaState);
+		}
 	}
 	lua_remove(m_luaState, error_index);
-
-	if((lua_gettop(m_luaState) + (int)nParams  + 1) != size0){
+	int qtdRet = 1;
+	if (!getReturnValue){
+		qtdRet = 0;
+	}
+	if((lua_gettop(m_luaState) + (int)nParams  + qtdRet) != size0){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 
@@ -980,17 +985,46 @@ void LuaScriptInterface::popPosition(lua_State *L, Position& position, uint32_t&
 	lua_pop(L, 1); //table
 }
 
-bool LuaScriptInterface::popBoolean(lua_State *L)
+bool LuaScriptInterface::popBoolean(lua_State *L, bool acceptIntegers /*=true*/)
 {
+	int tipo = lua_type(L,-1);
+
 	lua_pop(L, 1);
-	return (lua_toboolean(L, 0) != 0);
+
+	if (tipo == LUA_TBOOLEAN){
+		return (lua_toboolean(L, 0) != 0);
+	}
+	else{
+		if(tipo == LUA_TNUMBER && acceptIntegers){
+			return (uint32_t(lua_tonumber(L, 0)) != 0);
+		}
+	else{
+		reportErrorFunc("Error: Expected boolean type parameter.");
+		return false;
+		}
+	}
 }
 
-uint32_t LuaScriptInterface::popNumber(lua_State *L)
+uint32_t LuaScriptInterface::popNumber(lua_State *L, bool acceptBooleans /*=false*/)
 {
+	uint32_t ret = 0;
+	int tipo = lua_type(L,-1);
 	lua_pop(L, 1);
-	return (uint32_t)lua_tonumber(L, 0);
+
+	if (tipo == LUA_TNUMBER){
+		ret = uint32_t(lua_tonumber(L, 0));
+		}
+	else{
+		if ((tipo == LUA_TBOOLEAN) && acceptBooleans){
+			ret = uint32_t((lua_toboolean(L, 0) != 0));
+		}
+		else{
+			reportErrorFunc("Error: Expected boolean type parameter.");
+		}
+	}
+	return ret;
 }
+
 
 double LuaScriptInterface::popFloatNumber(lua_State *L)
 {
@@ -1956,13 +1990,13 @@ void LuaScriptInterface::registerFunctions()
 
 	//getFirstItemFromInventory(cid, id/name, <optional> reportError)
 	lua_register(m_luaState, "getFirstItemFromInventory", LuaScriptInterface::luaGetFirstItemFromInventory);
-	
+
 	//getCreatureConditionInfo(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
 	lua_register(m_luaState, "getCreatureConditionInfo", LuaScriptInterface::luaGetCreatureConditionInfo);
 
 	//getCreatureCondition(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
 	lua_register(m_luaState, "getCreatureCondition", LuaScriptInterface::luaGetCreatureCondition);
-	
+
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
@@ -5664,7 +5698,7 @@ int LuaScriptInterface::luaSetCombatCondition(lua_State *L)
 int LuaScriptInterface::luaSetCombatParam(lua_State *L)
 {
 	//setCombatParam(combat, key, value)
-	uint32_t value = popNumber(L);
+	uint32_t value = popNumber(L, true);
 	CombatParam_t key = (CombatParam_t)popNumber(L);
 	uint32_t combatId = popNumber(L);
 
@@ -5692,7 +5726,7 @@ int LuaScriptInterface::luaSetCombatParam(lua_State *L)
 int LuaScriptInterface::luaSetConditionParam(lua_State *L)
 {
 	//setConditionParam(condition, key, value)
-	int32_t value = (int32_t)popNumber(L);
+	int32_t value = (int32_t)popNumber(L, true);
 	ConditionParam_t key = (ConditionParam_t)popNumber(L);
 	uint32_t conditionId = popNumber(L);
 

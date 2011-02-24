@@ -93,7 +93,7 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 
-	bool executeUseWeapon(Player* player, const LuaVariant& var) const;
+	void executeUseWeapon(Player* player, const LuaVariant& var) const;
 	bool internalUseWeapon(Player* player, Item* item, Creature* target, int32_t damageModifier) const;
 	bool internalUseWeapon(Player* player, Item* item, Tile* tile) const;
 
@@ -178,7 +178,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool configureWeapon(const ItemType& it);
 	virtual bool interruptSwing() const;
-	
+
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
 
 protected:

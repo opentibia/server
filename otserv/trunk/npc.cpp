@@ -2025,7 +2025,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 				NpcScriptInterface::pushState(L, npcState);
 				lua_setglobal(L, "_state");
-				m_scriptInterface->callFunction(paramCount);
+				m_scriptInterface->callFunction(paramCount, false);
 				lua_getglobal(L, "_state");
 				NpcScriptInterface::popState(L, npcState);
 				m_scriptInterface->releaseScriptEnv();
@@ -3631,7 +3631,7 @@ void NpcScript::onCreatureAppear(const Creature* creature)
 
 		m_scriptInterface->pushFunction(m_onCreatureAppear);
 		lua_pushnumber(L, cid);
-		m_scriptInterface->callFunction(1);
+		m_scriptInterface->callFunction(1, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3664,7 +3664,7 @@ void NpcScript::onCreatureDisappear(const Creature* creature)
 
 		m_scriptInterface->pushFunction(m_onCreatureDisappear);
 		lua_pushnumber(L, cid);
-		m_scriptInterface->callFunction(1);
+		m_scriptInterface->callFunction(1, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3699,7 +3699,7 @@ void NpcScript::onCreatureMove(const Creature* creature, const Position& oldPos,
 		lua_pushnumber(L, cid);
 		LuaScriptInterface::pushPosition(L, oldPos, 0);
 		LuaScriptInterface::pushPosition(L, newPos, 0);
-		m_scriptInterface->callFunction(3);
+		m_scriptInterface->callFunction(3, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3733,7 +3733,7 @@ void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, type);
 		lua_pushstring(L, text.c_str());
-		m_scriptInterface->callFunction(3);
+		m_scriptInterface->callFunction(3, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3763,7 +3763,7 @@ void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t i
 		lua_pushnumber(L, amount);
 		lua_pushboolean(L, ignoreCapacity);
 		lua_pushboolean(L, buyWithBackpack);
-		m_scriptInterface->callFunction(6);
+		m_scriptInterface->callFunction(6, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3788,7 +3788,7 @@ void NpcScript::onPlayerCloseChannel(const Player* player)
 		lua_State* L = m_scriptInterface->getLuaState();
 		m_scriptInterface->pushFunction(m_onPlayerCloseChannel);
 		lua_pushnumber(L, cid);
-		m_scriptInterface->callFunction(1);
+		m_scriptInterface->callFunction(1, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3813,7 +3813,7 @@ void NpcScript::onPlayerEndTrade(const Player* player)
 		lua_State* L = m_scriptInterface->getLuaState();
 		m_scriptInterface->pushFunction(m_onPlayerEndTrade);
 		lua_pushnumber(L, cid);
-		m_scriptInterface->callFunction(1);
+		m_scriptInterface->callFunction(1, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3841,7 +3841,7 @@ void NpcScript::onThink()
 		env->setNpc(m_npc);
 
 		m_scriptInterface->pushFunction(m_onThink);
-		m_scriptInterface->callFunction(0);
+		m_scriptInterface->callFunction(0, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{

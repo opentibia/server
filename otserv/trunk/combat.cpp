@@ -1234,7 +1234,7 @@ void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
 		lua_pushnumber(L, cid);
 		m_scriptInterface->pushPosition(L, tile->getPosition(), 0);
 
-		m_scriptInterface->callFunction(2);
+		m_scriptInterface->callFunction(2, false);
 
 		env->resetCallback();
 		m_scriptInterface->releaseScriptEnv();
@@ -1700,7 +1700,7 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 						creature->addCondition(conditionDamage);
 						return;
 					}
-				}				
+				}
 				creature->addCondition(conditionCopy);
 			}
 		}
