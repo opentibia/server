@@ -9,7 +9,7 @@ function onSay(cid, words, param)
 	if townid == nil then
 		houselist = getHouseList()
 	else
-		houselist = getHouseList(townid)
+		houselist = getHouseList(tonumber(townid))
 	end
 
 	local f = 0
@@ -23,5 +23,5 @@ function onSay(cid, words, param)
 	end
 
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "" .. s .. " house" .. (s > 1 and "s" or "") .. " cleaned (" .. f .. " failed)")
-	return true
+	return false
 end
