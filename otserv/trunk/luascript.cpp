@@ -2791,7 +2791,7 @@ int LuaScriptInterface::luaDoSendDefaultCancel(lua_State *L)
 int LuaScriptInterface::luaDoPlayerSetIdleTime(lua_State *L)
 {
 	//doPlayerSetIdleTime(cid, time, warned)
-	bool warned = (popNumber(L) > 0);
+	bool warned = (int32_t(popNumber(L, true)) > 0);
 	uint32_t time = popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -2994,7 +2994,7 @@ int LuaScriptInterface::luaDoPlayerAddSkillTry(lua_State *L)
 
 	bool useMultiplier = false;
 	if(parameters > 3){
-		useMultiplier = (popNumber(L) >= 1);
+		useMultiplier = (popNumber(L, true) >= 1);
 	}
 
 	uint32_t n = popNumber(L);
@@ -3022,7 +3022,7 @@ int LuaScriptInterface::luaDoPlayerAddManaSpent(lua_State *L)
 
 	bool useMultiplier = false;
 	if(parameters > 2){
-		useMultiplier = (popNumber(L) >= 1);
+		useMultiplier = (popNumber(L, true) >= 1);
 	}
 
 	uint32_t mana = popNumber(L);
@@ -5268,10 +5268,10 @@ int LuaScriptInterface::luaDoPlayerAddExp(lua_State *L)
 	bool useMultiplier = false;
 	bool useRate = false;
 	if(parameters > 3){
-		useMultiplier = (popNumber(L) >= 1);
+		useMultiplier = (popNumber(L, true) >= 1);
 	}
 	if(parameters > 2){
-		useRate = (popNumber(L) >= 1);
+		useRate = (popNumber(L, true) >= 1);
 	}
 
 	uint64_t exp = (uint64_t)popNumber(L);
@@ -5304,10 +5304,10 @@ int LuaScriptInterface::luaDoPlayerRemoveExp(lua_State *L)
 	bool useMultiplier = false;
 	bool useRate = false;
 	if(parameters > 3){
-		useMultiplier = (popNumber(L) >= 1);
+		useMultiplier = (popNumber(L, true) >= 1);
 	}
 	if(parameters > 2){
-		useRate = (popNumber(L) >= 1);
+		useRate = (popNumber(L, true) >= 1);
 	}
 
 	uint64_t exp = (uint64_t)popNumber(L);
@@ -7059,7 +7059,7 @@ int LuaScriptInterface::luaDoMoveCreature(lua_State *L)
 	//doMoveCreature(cid, direction, <optional>flags)
 	uint32_t flags = FLAG_NOLIMIT; //default value, to keep compatibility with old scripts
 	int32_t parameters = lua_gettop(L);
-	if (parameters>=3)
+	if (parameters >= 3)
 		flags = popNumber(L);
 	uint32_t direction = popNumber(L);
 	uint32_t cid = popNumber(L);
