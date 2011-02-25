@@ -1019,7 +1019,7 @@ uint32_t LuaScriptInterface::popNumber(lua_State *L, bool acceptBooleans /*=fals
 			ret = uint32_t((lua_toboolean(L, 0) != 0));
 		}
 		else{
-			reportErrorFunc("Error: Expected boolean type parameter.");
+			reportErrorFunc("Error: Expected an integer parameter.");
 		}
 	}
 	return ret;
