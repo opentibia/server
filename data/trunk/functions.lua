@@ -4,8 +4,6 @@ doPlayerRemOutfit = doPlayerRemoveOutfit
 doPlayerRemOutfitEx = doPlayerRemoveOutfitEx
 getThingfromPos = getThingFromPos
 getPlayerBalance = getPlayerAccountBalance
-broadcastMessage = doBroadcastMessage
-broadcastMessageEx = broadcastMessage
 getPlayersByAccountNumber = getPlayerByAccountNumber
 
 function setExperienceRate(cid, value)
@@ -821,6 +819,10 @@ function doBroadcastMessage(message, class)
 	end
 	return true
 end
+
+--for backward compatibility
+broadcastMessage = doBroadcastMessage
+broadcastMessageEx = broadcastMessage
 
 --default is the returned value if the value of input is missing or invalid
 function getBooleanFromString(input, default)
