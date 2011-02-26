@@ -3251,6 +3251,31 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		while(!containerList.empty()){
 			Container* tmpContainer = containerList.front();
 			containerList.pop_front();
+			
+			
+			if(!(autoStack && item->isStackable())){
+				//we need to find first empty container as fast as we can for non-stackable items
+				uint16_t n = tmpContainer->capacity() - tmpContainer->size();
+					while(n){
+						if(tmpContainer->__queryAdd(tmpContainer->capacity() - n, item, item->getItemCount(), flags) == RET_NOERROR){
+							index = tmpContainer->size() + n;
+							*destItem = NULL;
+							return tmpContainer;
+						}
+						n--;
+					}
+				
+				for(uint32_t n = 0; n < tmpContainer->capacity(); ++n){
+					Item* tmpItem = tmpContainer->getItem(n);
+					if(tmpItem){
+						if(Container* subContainer = tmpItem->getContainer()){
+							containerList.push_back(subContainer);
+						}
+					}
+				}
+				
+				continue;
+			}
 
 			for(uint32_t n = 0; n < tmpContainer->capacity(); ++n){
 				Item* tmpItem = tmpContainer->getItem(n);
@@ -3263,26 +3288,15 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 					if(tmpItem == item){
 						continue;
 					}
-
-					if(autoStack && item->isStackable()){
-						//try find an already existing item to stack with
-						if(tmpItem != item && tmpItem->getID() == item->getID() && tmpItem->getItemCount() < 100){
-							index = n;
-							*destItem = tmpItem;
-							return tmpContainer;
-						}
-
-						if(Container* subContainer = tmpItem->getContainer()){
-							containerList.push_back(subContainer);
-						}
+					
+					//try find an already existing item to stack with
+					if(tmpItem != item && tmpItem->getID() == item->getID() && tmpItem->getItemCount() < 100){
+						index = n;
+						*destItem = tmpItem;
+						return tmpContainer;
 					}
-					else if(Container* subContainer = tmpItem->getContainer()){
-						if(subContainer->__queryAdd(INDEX_WHEREEVER, item, item->getItemCount(), flags) == RET_NOERROR){
-							index = INDEX_WHEREEVER;
-							*destItem = NULL;
-							return subContainer;
-						}
 
+					if(Container* subContainer = tmpItem->getContainer()){
 						containerList.push_back(subContainer);
 					}
 				}
@@ -3291,6 +3305,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 					index = n;
 					*destItem = NULL;
 					return tmpContainer;
+					
 				}
 			}
 		}
