@@ -796,7 +796,19 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		else if(it.weaponType != WEAPON_AMMO && it.weaponType != WEAPON_WAND){ // Arrows and Bolts doesn't show atk
 			s << " (";
 			if(it.attack != 0){
-				s << "Atk:" << (int32_t)it.attack;
+				s << "Atk:" << (int32_t)it.attack - it.abilities.elementDamage;
+				
+				if(it.abilities.elementDamage != 0){
+					s << " " << "physical + ";
+					
+					switch(it.abilities.elementType){
+						case COMBAT_ICEDAMAGE: s << it.abilities.elementDamage << " Ice,"; break;
+						case COMBAT_EARTHDAMAGE: s << it.abilities.elementDamage << " Earth,"; break;
+						case COMBAT_FIREDAMAGE: s << it.abilities.elementDamage << " Fire,"; break;
+						case COMBAT_ENERGYDAMAGE: s << it.abilities.elementDamage << " Energy,"; break;
+						default: s << it.abilities.elementDamage << " Unknown,"; break;
+					}
+				}
 			}
 
 			if(it.defense != 0 || it.extraDef != 0){
