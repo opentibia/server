@@ -814,27 +814,30 @@ bool LuaScriptInterface::callFunction(uint32_t nParams, bool getReturnValue /*=t
 	bool result = false;
 
 	int size0 = lua_gettop(m_luaState);
-
-	int error_index = lua_gettop(m_luaState) - nParams;
+	int error_index = size0 - nParams;
 	lua_pushcfunction(m_luaState, luaErrorHandler);
 	lua_insert(m_luaState, error_index);
 
-	int ret = lua_pcall(m_luaState, nParams, 1, error_index);
-	if(ret != 0){
-		LuaScriptInterface::reportError(NULL, LuaScriptInterface::popString(m_luaState));
-		result = false;
-	}
-	else {
-		if (getReturnValue){
-			result = (int32_t)LuaScriptInterface::popBoolean(m_luaState);
-		}
-	}
-	lua_remove(m_luaState, error_index);
 	int qtdRet = 1;
 	if (!getReturnValue){
 		qtdRet = 0;
 	}
-	if((lua_gettop(m_luaState) + (int)nParams  + qtdRet) != size0){
+
+	int ret = lua_pcall(m_luaState, nParams, qtdRet, error_index);
+	if(ret != 0){
+		LuaScriptInterface::reportError(NULL, LuaScriptInterface::popString(m_luaState));
+	}
+
+	if (getReturnValue){
+		result = (int32_t)LuaScriptInterface::popBoolean(m_luaState); //it must be in here even when ret!=0 to clean the stack
+		if(ret != 0){
+			result = false;
+		}
+	}
+
+	lua_remove(m_luaState, error_index);
+
+	if(lua_gettop(m_luaState) + (int)nParams + 1 != size0){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 
