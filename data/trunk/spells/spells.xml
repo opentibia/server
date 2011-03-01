@@ -398,4 +398,9 @@
 	<instant name="Sharpshooter" words="utito tempo san" lvl="60" mana="450" prem="1" selftarget="1" aggressive="0" script="support/sharpshooter.lua">
 		<vocation name="Paladin"/>   <vocation name="Royal Paladin"/>
 	</instant>
+	
+	<!-- Monster Spells -->
+	<instant name="Pythius Curse" prem="0" exhaustion="2000" words="mons_pythius curse" needlearn="1" enabled="1" needtarget="1" casterTargetOrDirection="1" range="7" script="monsterspells/pythius curse.lua" /> 
+	<instant name="Pythius Summon" exhaustion="2000" words="mons_pythius summon" selftarget="1" enabled="1" needlearn="1" script="monsterspells/pythius summon.lua" />
+
 </spells>
