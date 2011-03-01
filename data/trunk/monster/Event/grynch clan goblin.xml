@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Grynch Clan Goblin" nameDescription="a Grynch Clan Goblin" race="blood" experience="4" speed="500" manacost="0">
+	<health now="80" max="80"/>
+	<look type="61" corpse="6002"/>
+	<targetchange interval="5000" chance="0"/>
+	<strategy attack="0" defense="100"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="0"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="11"/>
+		<flag staticattack="0"/>
+		<flag runonhealth="80"/>
+	</flags>
+	<attacks>
+	</attacks>
+	<defenses armor="10" defense="12">
+		<defense name="speed" interval="2000" chance="40" speedchange="1250" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="10">
+		<voice sentence="T'was not me hand in your pocket!"/>
+		<voice sentence="Look! Cool stuff in house. Let's get it!"/>
+		<voice sentence="Uhh! Nobody home!"/>
+		<voice sentence="Me just borrowed it!"/>
+		<voice sentence="Me no steal! Me found it!"/>
+		<voice sentence="Me had it for five minutes. It's family heirloom now!"/>
+		<voice sentence="Nice human won't hurt little, good goblin?"/>
+		<voice sentence="Gimmegimme!"/>
+		<voice sentence="Invite me in you lovely house plx!"/>
+		<voice sentence="Other Goblin stole it!"/>
+		<voice sentence="All presents mine!"/>
+		<voice sentence="Me got ugly ones purse"/>
+		<voice sentence="Free itans plz!"/>
+		<voice sentence="Not me! Not me!"/>
+		<voice sentence="Guys, help me here! Guys? Guys???"/>
+		<voice sentence="That only much dust in me pocket! Honest!"/>
+		<voice sentence="Can me have your stuff?"/>
+		<voice sentence="Halp, Big dumb one is after me!"/>
+		<voice sentence="Uh, So many shiny things!"/>
+		<voice sentence="Utani hur hur hur!"/>
+		<voice sentence="Mee? Stealing? Never!!!"/>
+		<voice sentence="Oh what fun it is to steal a one-horse open sleigh!"/>
+		<voice sentence="Must have it! Must have it!"/>
+		<voice sentence="Where me put me lockpick?"/>
+		<voice sentence="Catch me if you can!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="16" chance="30425" /><!-- gold coin -->
+    <item id="2111" countmax="3" chance="11825" /><!-- snowball -->
+    <item id="2674" countmax="3" chance="7725" /><!-- red apple -->
+    <item id="6497" chance="28325" /><!-- bag -->
+    <item id="2687" countmax="5" chance="4450" /><!-- cookie -->
+    <item id="7909" countmax="4" chance="1450" /><!-- walnut -->
+    <item id="6277" chance="5700" /><!-- lump of cake dough -->
+    <item id="2675" countmax="2" chance="4975" /><!-- orange -->
+    <item id="4873" chance="975" /><!-- explorer brooch -->
+    <item id="5902" chance="975" /><!-- honeycomb -->
+    <item id="2661" chance="975" /><!-- scarf -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2114" chance="1450" /><!-- piggy bank -->
+            <item id="2695" countmax="2" chance="1200" /><!-- egg -->
+            <item id="5894" countmax="3" chance="975" /><!-- bat wing -->
+            <item id="7910" countmax="3" chance="975" /><!-- peanut -->
+            <item id="4839" chance="975" /><!-- bottle -->
+            <item id="5890" countmax="3" chance="975" /><!-- chicken feather -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

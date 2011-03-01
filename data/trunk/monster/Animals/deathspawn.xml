@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<monster name="Deathspawn" namedescription="a deathspawn" race="blood" experience="0" speed="230" manacost="0">
+	<health now="225" max="225"/>
+	<look type="226" head="114" body="98" legs="97" feet="114" corpse="2220"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="0"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag staticattack="0"/>
+		<flag targetdistance="0"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="20"/>
+		<attack name="death" interval="2000" chance="20" range="3" target="1" min="-400" max="-700">
+			<attribute key="shootEffect" value="death"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>	
+		<attack name="energy" interval="2000" chance="20" range="3" target="1" min="-200" max="-450">
+			<attribute key="shootEffect" value="energyball"/>
+			<attribute key="areaEffect" value="energy"/>
+		</attack>			
+	</attacks>
+	<defenses armor="1" defense="5"/>
+		<elements>
+		<element icePercent="15"/>
+		<element firePercent="15"/>
+		<element energyPercent="15"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity death="1"/>
+		<immunity earth="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+</monster>

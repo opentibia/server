@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Ferumbras" nameDescription="Ferumbras" race="venom" experience="12000" speed="390" manacost="0">
+	<health now="35000" max="35000"/>
+	<look type="229" corpse="6078"/>
+	<targetchange interval="2000" chance="10"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="2"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="2500"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="100"/>
+		<attack name="manadrain" interval="2000" chance="15" target="1" min="-500" max="-700">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="20" radius="6" target="0" min="-450" max="-650">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="25" radius="6" target="0" min="-300" max="-500">
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+		<attack name="poisoncondition" interval="2000" chance="20" target="1" min="-420" max="-420">
+			<attribute key="shootEffect" value="poison"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="15" radius="2" target="1" min="-500" max="-700">
+			<attribute key="areaEffect" value="poison"/>
+			<attribute key="shootEffect" value="poison"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="10" radius="4" target="0" min="-900" max="-1100">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="energy" interval="2000" chance="25" radius="2" target="1" min="-100" max="-300">
+			<attribute key="areaEffect" value="energyarea"/>
+			<attribute key="shootEffect" value="energy"/>
+		</attack>
+	</attacks>
+	<defenses armor="100" defense="120">
+		<defense name="invisible" interval="2000" chance="10" duration="5000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="15" speedchange="680" duration="2000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="90"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="3">
+		<summon name="Demon" interval="2000" chance="15" max="3"/>
+	</summons>
+	<voices interval="2000" chance="10">
+		<voice sentence="NOONE WILL STOP ME THIS TIME!" yell="1"/>
+		<voice sentence="THE POWER IS MINE!" yell="1"/>	
+		<voice sentence="I returned from death and you dream about defeating me?"/>
+		<voice sentence="Witness the first seconds of my eternal world domination!" />
+		<voice sentence="Even in my weakened state I will crush you all!"/>
+	</voices>
+	<loot>
+    <item id="9971" countmax="4" chance="29600" /><!-- gold ingot -->
+    <item id="2470" chance="18525" /><!-- golden legs -->
+    <item id="2148" countmax="100" chance="57975" /><!-- gold coin -->
+    <item id="2148" countmax="71" chance="57975" /><!-- gold coin -->
+    <item id="2146" countmax="92" chance="5550" /><!-- small sapphire -->
+    <item id="7382" chance="11975" /><!-- demonrage sword -->
+    <item id="8926" chance="11975" /><!-- demonwing axe -->
+    <item id="8868" chance="15250" /><!-- velvet mantle -->
+    <item id="2542" chance="23450" /><!-- tempest shield -->
+    <item id="5903" chance="100000" /><!-- ferumbras' hat -->
+    <item id="1986" chance="7050" /><!-- red tome -->
+    <item id="8904" chance="15250" /><!-- spellscroll of prophecies -->
+    <item id="5944" countmax="8" chance="7475" /><!-- soul orb -->
+    <item id="7422" chance="8700" /><!-- jade hammer -->
+    <item id="7423" chance="13600" /><!-- skullcrusher -->
+    <item id="7403" chance="20175" /><!-- berserker -->
+    <item id="2514" chance="33300" /><!-- mastermind shield -->
+    <item id="8902" chance="16900" /><!-- spellbook of mind control -->
+    <item id="9970" countmax="86" chance="4250" /><!-- small topaz -->
+    <item id="7896" chance="23450" /><!-- glacier kilt -->
+    <item id="1988" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7417" chance="3775" /><!-- runed sword -->
+            <item id="7405" chance="11975" /><!-- havoc blade -->
+            <item id="2522" chance="15250" /><!-- great shield -->
+            <item id="2147" countmax="96" chance="10275" /><!-- small ruby -->
+            <item id="7414" chance="20175" /><!-- abyss hammer -->
+            <item id="2143" countmax="99" chance="5625" /><!-- white pearl -->
+            <item id="7388" chance="8700" /><!-- vile axe -->
+            <item id="7894" chance="20175" /><!-- magma legs -->
+            <item id="2150" countmax="76" chance="4750" /><!-- small amethyst -->
+            <item id="8903" chance="21800" /><!-- spellbook of lost souls -->
+            <item id="7435" chance="15250" /><!-- impaler -->
+            <item id="7427" chance="11975" /><!-- chaos mace -->
+            <item id="7885" chance="25100" /><!-- terra legs -->
+            <item id="7632" countmax="10" chance="3625" /><!-- giant shimmering pearl -->
+            <item id="8928" chance="8700" /><!-- obsidian truncheon -->
+            <item id="2466" chance="10350" /><!-- golden armor -->
+            <item id="8924" chance="10350" /><!-- hellforged axe -->
+            <item id="7410" chance="8700" /><!-- queen's sceptre -->
+            <item id="2127" chance="20175" /><!-- emerald bangle -->
+            <item id="2472" chance="15250" /><!-- magic plate armor -->
+            <item id="8885" chance="21800" /><!-- divine plate -->
+            <item id="7411" chance="8700" /><!-- ornamented axe -->
+            <item id="7895" chance="13600" /><!-- lightning legs -->
+            <item id="2145" countmax="90" chance="7925" /><!-- small diamond -->
+            <item id="2387" chance="2150" /><!-- double axe -->
+            <item id="2402" chance="2150" /><!-- silver dagger -->
+            <item id="2377" chance="2150" /><!-- two handed sword -->
+            <item id="2178" chance="2150" /><!-- mind stone -->
+            <item id="2539" chance="21800" /><!-- phoenix shield -->
+            <item id="8869" chance="16900" /><!-- greenwood coat -->
+            <item id="8930" chance="3775" /><!-- emerald sword -->
+            <item id="2144" countmax="72" chance="3725" /><!-- black pearl -->
+            <item id="2149" countmax="78" chance="9075" /><!-- small emerald -->
+            <item id="7451" chance="13600" /><!-- shadow sceptre -->
+            <item id="2415" chance="13600" /><!-- great axe -->
+            <item id="7416" chance="2150" /><!-- bloody edge -->
+            <item id="2152" countmax="43" chance="2550" /><!-- platinum coin -->
+            <item id="7418" chance="10350" /><!-- nightmare blade -->
+            <item id="2520" chance="7050" /><!-- demon shield -->
+            <item id="7433" chance="2150" /><!-- ravenwing -->
+            <item id="7407" chance="2150" /><!-- haunted blade -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Demon" nameDescription="a demon" race="blood" experience="25" speed="120" manacost="0">
+	<health now="50" max="50"/>
+	<look type="35" head="0" body="0" legs="0" feet="0" corpse="6002"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="15"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="10" attack="10"/>
+		<attack name="physical" interval="2000" chance="10" range="7" target="1" min="-0" max="-25">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>
+	</attacks>
+	<defenses armor="6" defense="8"/>
+	<elements>
+		<element energyPercent="20"/>
+		<element holyPercent="20"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<loot>
+    <item id="12495" chance="1475" /><!-- goblin ear -->
+    <item id="2379" chance="2000" /><!-- dagger -->
+    <item id="2230" chance="1875" /><!-- bone -->
+    <item id="2461" chance="2075" /><!-- leather helmet -->
+    <item id="2449" chance="5275" /><!-- bone club -->
+    <item id="2406" chance="9075" /><!-- short sword -->
+    <item id="2235" chance="1250" /><!-- mouldy cheese -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2467" chance="3525" /><!-- leather armor -->
+            <item id="2559" chance="11000" /><!-- small axe -->
+            <item id="2667" chance="13500" /><!-- fish -->
+            <item id="2148" countmax="9" chance="27975" /><!-- gold coin -->
+            <item id="1294" chance="15225" /><!-- small stone -->
+        </inside>
+    </item>
+</loot>
+</monster>
