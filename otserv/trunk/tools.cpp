@@ -451,6 +451,7 @@ MagicEffectNames magicEffectNames[] = {
 	{"redshimmer",        NM_ME_MAGIC_BLOOD},
 	{"greenshimmer",      NM_ME_MAGIC_POISON},
 	{"fire",              NM_ME_HITBY_FIRE},
+	{"earth",             NM_ME_POISON},
 	{"greenspark",        NM_ME_POISON},
 	{"mortarea",          NM_ME_MORT_AREA},
 	{"greennote",         NM_ME_SOUND_GREEN},
