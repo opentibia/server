@@ -6704,8 +6704,8 @@ int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 		case VARIANT_TARGETPOSITION:
 		case VARIANT_POSITION:
 			if (Tile* tile = g_game.getMap()->getTile(var.pos)) {
-				if (Thing* thing = tile->getTopVisibleThing(viewer, checkVisibility)) {
-					number = env->addThing(thing);
+				if (Creature *c = tile->getTopVisibleCreature(viewer, checkVisibility)){
+					number = env->addThing(c);
 				}
 			}
 			break;
