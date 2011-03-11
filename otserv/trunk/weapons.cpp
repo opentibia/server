@@ -644,11 +644,6 @@ bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
 		eParams.useCharges = true;
 		Combat::doCombatHealth(player, target, damage, damage, eParams);
 
-		if(g_config.getNumber(ConfigManager::REMOVE_WEAPON_CHARGES))
-		{
-			int32_t newCount = std::max(0, item->getItemCount() - 1);
-			g_game.transformItem(item, item->getID(), newCount);
-		}
 	}
 
 	return true;

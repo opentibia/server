@@ -2256,6 +2256,7 @@ bool RuneSpell::Soulfire(const RuneSpell* spell, Creature* creature, Item* item,
 
 	ConditionDamage* soulfireCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
 	soulfireCondition->setParam(CONDITIONPARAM_SUBID, 1);
+	soulfireCondition->setParam(CONDITIONPARAM_OWNER, player->getID());
 	soulfireCondition->addDamage(std::ceil((player->getLevel()+player->getMagicLevel()) / 3.), 9000, -10);
 	g_game.addDistanceEffect(player->getPosition(), hitCreature->getPosition(), NM_SHOOT_FIRE);
 	hitCreature->addCondition(soulfireCondition);
