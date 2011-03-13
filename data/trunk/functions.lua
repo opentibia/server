@@ -790,9 +790,20 @@ end
 
 function isInArray(array, value, isCaseSensitive)
 	local compareLowerCase = false
-	if type(value) == "string" and not isCaseSensitive then
+	if value ~= nil and type(value) == "string" and not isCaseSensitive then
 		value = string.lower(value)
 		compareLowerCase = true
+	end
+	if array == nil or value == nil then
+		return (array == value, nil)
+	end
+	local t = type(array)
+	if t ~= "table" then
+		if compareLowerCase and t == "string" then
+			return (string.lower(array) == string.lower(value), nil)
+		else
+			return (array == value, nil)
+		end
 	end
 	for k,v in pairs(array) do
 		local newV
