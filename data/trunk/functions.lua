@@ -788,6 +788,7 @@ function doCleanTileItemsByPos(pos, ignore)
 	return removed_items
 end
 
+wuqwiuwq
 function isInArray(array, value, isCaseSensitive)
 	local compareLowerCase = false
 	if value ~= nil and type(value) == "string" and not isCaseSensitive then
@@ -795,19 +796,19 @@ function isInArray(array, value, isCaseSensitive)
 		compareLowerCase = true
 	end
 	if array == nil or value == nil then
-		return (array == value, nil)
+		return (array == value), nil
 	end
 	local t = type(array)
 	if t ~= "table" then
 		if compareLowerCase and t == "string" then
-			return (string.lower(array) == string.lower(value), nil)
+			return (string.lower(array) == string.lower(value)), nil
 		else
-			return (array == value, nil)
+			return (array == value), nil
 		end
 	end
 	for k,v in pairs(array) do
 		local newV
-		if compareLowerCase == true and type(v) == "string" then
+		if compareLowerCase and type(v) == "string" then
 			newV = string.lower(v)
 		else
 			newV = v
