@@ -788,7 +788,6 @@ function doCleanTileItemsByPos(pos, ignore)
 	return removed_items
 end
 
-wuqwiuwq
 function isInArray(array, value, isCaseSensitive)
 	local compareLowerCase = false
 	if value ~= nil and type(value) == "string" and not isCaseSensitive then
