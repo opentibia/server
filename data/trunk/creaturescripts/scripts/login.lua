@@ -69,7 +69,7 @@ function onLogin(cid)
 	]]-- Hoster's premium towns changes according to the map
 
 	--Remove promotion
-	local isPromo = (getPlayerVocation(cid) > 4)
+	local isPromo = (getPlayerVocation(cid) > 4 and isPremium(cid) == false)
 	if(isPromo) then
 		doPlayerSetVocation(cid, getPlayerVocation(cid)-4)
 		doPlayerRemoveSkillLossPercent(cid, -30)
