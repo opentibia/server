@@ -3258,7 +3258,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 				uint16_t n = tmpContainer->capacity() - tmpContainer->size();
 					while(n){
 						if(tmpContainer->__queryAdd(tmpContainer->capacity() - n, item, item->getItemCount(), flags) == RET_NOERROR){
-							index = tmpContainer->size() + n;
+							index = tmpContainer->capacity() - n;
 							*destItem = NULL;
 							return tmpContainer;
 						}
