@@ -1452,7 +1452,7 @@ void LuaScriptInterface::registerFunctions()
 	//doAddContainerItemEx(uid, virtuid)
 	lua_register(m_luaState, "doAddContainerItemEx", LuaScriptInterface::luaAddContainerItemEx);
 
-	//doRelocate(pos, posTo, <optional> moveUnmoveable)
+	//doRelocate(pos, posTo, <optional: default: false> moveUnmoveable, <optional: default: 0> maxAmount)
 	//Moves all objects from pos to posTo
 	lua_register(m_luaState, "doRelocate", LuaScriptInterface::luaDoRelocate);
 
@@ -3323,11 +3323,15 @@ int LuaScriptInterface::luaAddContainerItemEx(lua_State *L)
 
 int LuaScriptInterface::luaDoRelocate(lua_State *L)
 {
-	//doRelocate(pos, posTo, <optional: default: false> moveUnmoveable)
+	//doRelocate(pos, posTo, <optional: default: false> moveUnmoveable, <optional: default: 0> maxAmount)
 	//Moves all objects from pos to posTo
 	int32_t parameters = lua_gettop(L);
 
+	int32_t maxAmount = 0;
 	bool moveUnmoveable = false;
+	if(parameters > 3){
+		maxAmount = popNumber(L);
+	}
 	if(parameters > 2){
 		moveUnmoveable = popBoolean(L);
 	}
@@ -3356,6 +3360,9 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 
 	if(fromTile != toTile){
 		int32_t thingCount = fromTile->getThingCount();
+		if (maxAmount > 0){
+			thingCount = std::min(thingCount, maxAmount);
+		}
 		for(int32_t i = thingCount - 1; i >= 0; --i){
 			Thing* thing = fromTile->__getThing(i);
 			if(thing){
