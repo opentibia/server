@@ -3324,7 +3324,9 @@ int LuaScriptInterface::luaAddContainerItemEx(lua_State *L)
 int LuaScriptInterface::luaDoRelocate(lua_State *L)
 {
 	//doRelocate(pos, posTo, <optional: default: false> moveUnmoveable, <optional: default: 0> maxAmount)
-	//Moves all objects from pos to posTo
+	/*Moves all objects from pos to posTo (limited by the value of maxAmount - so only the first maxAmount items are
+	  relocated even if there are too many items at the tile - it is important to prevent lag if there are too many items)
+	  It also move ALL creatures from pos to posTo (it doesn't matter how many creatures there are in the tile). */
 	int32_t parameters = lua_gettop(L);
 
 	int32_t maxAmount = 0;
@@ -3379,6 +3381,19 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 					}
 					else{
 						g_game.internalTeleport(creature, toPos);
+					}
+				}
+			}
+		}
+		//makes sure that every creature at the tile has been moved even if maxAmount was reached
+		if (thingCount > maxAmount){
+			if (CreatureVector* creatures = (fromTile->getCreatures())){
+				for(CreatureVector::iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
+					if(Position::areInRange<1,1>(fromPos, toPos)){
+						g_game.internalMoveCreature(*cit, fromTile, toTile, FLAG_NOLIMIT);
+					}
+					else{
+						g_game.internalTeleport(*cit, toPos);
 					}
 				}
 			}
