@@ -162,6 +162,7 @@ public:
 		EXPERIENCE_STAGES,
 		PUSH_INTERVAL,
 		WANDS_INTERRUPT_SWING,
+		MOVEITEM_TIME,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

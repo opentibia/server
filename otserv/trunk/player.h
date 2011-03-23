@@ -257,10 +257,10 @@ public:
 	Item* getInventoryItem(slots_t slot) const;
 	// As above, but returns NULL if the item can not be weared in that slot (armor in hand for example)
 	Item* getEquippedItem(slots_t slot) const;
-	
+
     // Returns the first found item with chosen itemid
     Item* getFirstItemById(uint32_t id) const;
-		 
+
 	bool isItemAbilityEnabled(slots_t slot) const {return inventoryAbilities[slot];}
 	void setItemAbility(slots_t slot, bool enabled) {inventoryAbilities[slot] = enabled;}
 
@@ -671,6 +671,9 @@ public:
 	Item* getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen);
 	void setWriteItem(Item* item, uint16_t _maxWriteLen = 0);
 
+	void registerMoveItemAsNow() { lastMoveItem = OTSYS_TIME(); }
+	bool canMoveItem() const;
+
 	House* getEditHouse(uint32_t& _windowTextId, uint32_t& _listId);
 	void setEditHouse(House* house, uint32_t listId = 0);
 
@@ -792,6 +795,8 @@ protected:
 	int64_t last_ping;
 	int64_t last_pong;
 	int64_t nextAction;
+	int64_t lastMoveItem;
+
 
 	bool pzLocked;
 	bool isConnecting;

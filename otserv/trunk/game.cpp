@@ -1065,14 +1065,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 	uint16_t spriteId, uint8_t fromStackPos, const Position& toPos, uint8_t count)
 {
 	Player* player = getPlayerByID(playerId);
-	if(!player || player->isRemoved() || player->hasFlag(PlayerFlag_CannotMoveItems))
-		return false;
-
-	if(!player->canDoAction()){
-		uint32_t delay = player->getNextActionTime();
-		SchedulerTask* task = createSchedulerTask(delay, boost::bind(&Game::playerMoveItem, this,
-			playerId, fromPos, spriteId, fromStackPos, toPos, count));
-		player->setNextActionTask(task);
+	if(!player || player->isRemoved() || player->hasFlag(PlayerFlag_CannotMoveItems) || (!player->canMoveItem())){
 		return false;
 	}
 
@@ -1234,7 +1227,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		player->sendCancelMessage(ret);
 		return false;
 	}
-
+	player->registerMoveItemAsNow();
 	return true;
 }
 

@@ -92,6 +92,7 @@ Creature()
 	lastLoginMs = 0;
 	last_ping = OTSYS_TIME();
 	last_pong = OTSYS_TIME();
+	lastMoveItem = OTSYS_TIME();
 	MessageBufferTicks = 0;
 	MessageBufferCount = 0;
 	nextAction = 0;
@@ -256,6 +257,12 @@ bool Player::isPushable() const
 	return ret;
 }
 
+bool Player::canMoveItem() const
+{
+	int32_t moveItemTime = g_config.getNumber(ConfigManager::MOVEITEM_TIME);
+	return ( (moveItemTime <= 0) || (OTSYS_TIME() - lastMoveItem >= moveItemTime) );
+}
+
 std::string Player::getDescription(int32_t lookDistance) const
 {
 	std::stringstream s;
@@ -369,7 +376,7 @@ Item* Player::getFirstItemById(uint32_t id) const
 			}
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -3010,7 +3017,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 						}
 					}
 				if(item->getWeaponType() != WEAPON_NONE && ret == RET_NOERROR){
-					self->setLastAttackAsNow();	
+					self->setLastAttackAsNow();
 					}
 				}
 			}
@@ -3042,7 +3049,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			ret = RET_NOTPOSSIBLE;
 			break;
 	}
-	
+
 	if(ret == RET_BOTHHANDSNEEDTOBEFREE && (index == SLOT_LEFT || index == SLOT_RIGHT)){
 		Item* tmpItem = NULL;
 		Container* tmpContainer = NULL;
@@ -3062,8 +3069,8 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				}
 			}
 		}
-	}	
-	
+	}
+
 	if(ret == RET_NOERROR || ret == RET_NOTENOUGHROOM){
 		//need an exchange with source?
 		if(getInventoryItem((slots_t)index) != NULL){
@@ -3251,8 +3258,8 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		while(!containerList.empty()){
 			Container* tmpContainer = containerList.front();
 			containerList.pop_front();
-			
-			
+
+
 			if(!(autoStack && item->isStackable())){
 				//we need to find first empty container as fast as we can for non-stackable items
 				uint16_t n = tmpContainer->capacity() - tmpContainer->size();
@@ -3264,7 +3271,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 						}
 						n--;
 					}
-				
+
 				for(uint32_t n = 0; n < tmpContainer->capacity(); ++n){
 					Item* tmpItem = tmpContainer->getItem(n);
 					if(tmpItem){
@@ -3273,7 +3280,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 						}
 					}
 				}
-				
+
 				continue;
 			}
 
@@ -3288,7 +3295,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 					if(tmpItem == item){
 						continue;
 					}
-					
+
 					//try find an already existing item to stack with
 					if(tmpItem != item && tmpItem->getID() == item->getID() && tmpItem->getItemCount() < 100){
 						index = n;
@@ -3305,7 +3312,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 					index = n;
 					*destItem = NULL;
 					return tmpContainer;
-					
+
 				}
 			}
 		}
