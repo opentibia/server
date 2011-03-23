@@ -163,6 +163,7 @@ public:
 		PUSH_INTERVAL,
 		WANDS_INTERRUPT_SWING,
 		MOVEITEM_TIME,
+		MAX_STACK_SIZE,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

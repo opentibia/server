@@ -30,11 +30,13 @@
 #include "mailbox.h"
 #include "combat.h"
 #include "movement.h"
+#include "configmanager.h"
 #include <string>
 #include <iostream>
 
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
+extern ConfigManager g_config;
 
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 Tile& Tile::null_tile = real_null_tile;
@@ -697,8 +699,14 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
 		}
 #endif
-		if(items && items->size() >= 0xFFFF){
-			return RET_NOTPOSSIBLE;
+
+		if(items){
+			int64_t c = g_config.getNumber(ConfigManager::MAX_STACK_SIZE);
+			//acceptable stack sizes should be higher than 100 and <= than 65535
+			uint16_t max_stack_size = uint16_t(std::max(std::min(c, int64_t(0xFFFF)), int64_t(100)));
+			if (items->size() >= max_stack_size){
+				return RET_NOTPOSSIBLE;
+			}
 		}
 
 		if(hasBitSet(FLAG_NOLIMIT, flags)){

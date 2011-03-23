@@ -235,7 +235,10 @@ distance_weapon_interrupt_swing = true
 -- Wands configuration exhaustion
 -- Should exhaustion and action time be checked for using wands?
 wands_interrupt_swing = true
- 
+
+-- How many items can be stacked in a single tile? DO NOT CHANGE IT UNLESS THAT YOU KNOW WHAT YOU ARE DOING
+max_stack_size = 1000
+
 -- fist fighting configuration
 -- How strong should be the attack using bare hands (fist fighting)?
 fist_strength = 7
