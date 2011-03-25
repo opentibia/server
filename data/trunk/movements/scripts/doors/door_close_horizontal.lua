@@ -1,13 +1,18 @@
 function onStepOut(cid, item, topos, frompos)
-	--[[WARNING: if maxAmountOfRealocationItens is set into a very high value, players may be able to abuse  
-                     of a weakness at the engine and cause severe lag at your server --]]
-	local maxAmountOfRealocationItens = 1 --don't change this value until we solve some issues with the engine
 	if(item.actionid == 0) then
 		-- This is not a special door
 		return true
 	end
 
 	local movepos = {x=frompos.x, y=frompos.y+1, z=frompos.z}
+
+	local maxAmountOfRealocationItens = 0 --unlimited
+	if getTileStackItemsSize(frompos) + getTileStackItemsSize(movepos)) < 100 then
+		--If it is a very large stack, we only move creatures to avoid lag issues
+		--As the door itself counts as an item, it is enough to set the parameter to 1 at doRelocate
+		maxAmountOfRealocationItens = 1 
+	end
+
 	doRelocate(frompos, movepos, false, maxAmountOfRealocationItens)
 
 	local field = getTileItemByType(frompos, ITEM_TYPE_MAGICFIELD)
@@ -19,5 +24,6 @@ function onStepOut(cid, item, topos, frompos)
 	if item.actionid ~= 0 then
 		doSetItemActionId(item.uid, item.actionid)
 	end
+
 	return true
 end
