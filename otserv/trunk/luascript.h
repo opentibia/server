@@ -410,6 +410,7 @@ protected:
 	static int luaGetThingFromPos(lua_State *L);
 	static int luaGetThing(lua_State *L);
 	static int luaGetThingPos(lua_State *L);
+	static int luaGetTileStackItemsSize(lua_State *L);
 	static int luaGetTileItemById(lua_State *L);
 	static int luaGetTileItemByType(lua_State *L);
 	static int luaGetTileThingByPos(lua_State *L);

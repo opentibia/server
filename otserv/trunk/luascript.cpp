@@ -1302,6 +1302,9 @@ void LuaScriptInterface::registerFunctions()
 	//getThingPos(uid)
 	lua_register(m_luaState, "getThingPos", LuaScriptInterface::luaGetThingPos);
 
+	//getTileStackItemsSize(pos)
+	lua_register(m_luaState, "getTileStackItemsSize", LuaScriptInterface::luaGetTileStackItemsSize);
+
 	//getTileItemById(pos, itemId, <optional> subType)
 	lua_register(m_luaState, "getTileItemById", LuaScriptInterface::luaGetTileItemById);
 
@@ -4041,6 +4044,30 @@ int LuaScriptInterface::luaGetTileThingByTopOrder(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetTileStackItemsSize(lua_State *L)
+{
+	//getTileStackItemsSize(pos)
+	PositionEx pos;
+	popPosition(L, pos);
+
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(!tile){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
+		lua_pushnil(L);
+		return 1;
+	}
+
+	const TileItemVector* items = tile->getItemList();
+	if (items){
+		lua_pushnumber(L, items->size());
+	}
+	else{
+		lua_pushnumber(L, 0);
+	}
+
+	return 1;
+}
+
 int LuaScriptInterface::luaGetAllCreatures(lua_State *L)
 {
 	//getAllCreatures(pos, <optional> flag)
@@ -4065,6 +4092,7 @@ int LuaScriptInterface::luaGetAllCreatures(lua_State *L)
 
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(!tile){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_TILE_NOT_FOUND));
 		lua_pushnil(L);
 		return 1;
 	}
