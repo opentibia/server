@@ -7,7 +7,7 @@ function onStepOut(cid, item, topos, frompos)
 	local movepos = {x=frompos.x+1, y=frompos.y, z=frompos.z}
 
 	local maxAmountOfRealocationItens = 0 --unlimited
-	if getTileStackItemsSize(frompos) + getTileStackItemsSize(movepos)) < 100 then
+	if getTileStackItemsSize(frompos) + getTileStackItemsSize(movepos)) > 100 then
 		--If it is a very large stack, we only move creatures to avoid lag issues
 		--As the door itself counts as an item, it is enough to set the parameter to 1 at doRelocate
 		maxAmountOfRealocationItens = 1 
