@@ -22788,7 +22788,7 @@
 	<item id="9970" article="a" name="small topaz" plural="small topazs">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="9971" article="a" name="gold ignot" plural="gold ignots">
+	<item id="9971" article="a" name="gold ingot" plural="gold ingots">
 		<attribute key="weight" value="1800"/>
 	</item>
 	<item id="9974" article="a" name="crystal table kit">
