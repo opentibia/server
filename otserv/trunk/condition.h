@@ -308,7 +308,7 @@ public:
 		return info;
 	}
 	void clearDamageList() { damageList.clear(); }
-	
+
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);

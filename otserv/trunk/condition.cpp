@@ -1393,8 +1393,14 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 		return true;
 	}
 
-	CombatType_t combatType = Combat::ConditionToDamageType(conditionType);
 	Creature* attacker = g_game.getCreatureByID(owner);
+
+	if ((owner >= PLAYER_ID_RANGE) && (owner < MONSTER_ID_RANGE) && creature->getPlayer()){ //we shouldn't check attacker because pvp reduction happens even if the creature who owns the condition is dead
+		Combat::doPVPDamageReduction(damage, creature->getPlayer());
+	}
+
+	CombatType_t combatType = Combat::ConditionToDamageType(conditionType);
+
 
 	if(g_game.combatBlockHit(combatType, attacker, creature, damage, false, false)){
 		return false;
@@ -1422,7 +1428,19 @@ bool ConditionDamage::updateCondition(const ConditionDamage* addCondition)
 		return false;
 	}
 
-	if(addCondition->getTotalDamage() < getTotalDamage()){
+	int32_t oldTotDamage = getTotalDamage();
+	int32_t newTotDamage = addCondition->getTotalDamage();
+
+	//TODO: to consider the PVP damage reduction to correctly decide which condition should stay?
+	/*if ((owner >= PLAYER_ID_RANGE) && (owner < MONSTER_ID_RANGE)){ //we shouldn't check attacker because pvp reduction happens even if the creature who owns the condition is dead
+		Combat::doPVPDamageReduction(oldTotDamage, ?);
+	}
+
+	if ((addCondition->owner >= PLAYER_ID_RANGE) && (addCondition->owner < MONSTER_ID_RANGE)){ //we shouldn't check attacker because pvp reduction happens even if the creature who owns the condition is dead
+		Combat::doPVPDamageReduction(newTotDamage, ?);
+	}*/
+
+	if(newTotDamage < oldTotDamage){
 		return false;
 	}
 

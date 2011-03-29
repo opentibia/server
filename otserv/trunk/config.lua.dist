@@ -270,6 +270,12 @@ magic_wall_disappear_on_walk = true
 --players with a level smaller than this number can't be attacked by other players. Set it to to 0 to disable
 min_pvp_level = 0
 
+--how much % of the total damage players actually receive when attacked from other players?
+pvp_damage = 50
+
+--how much % of the total damage black skulled players actually receive when attacked from other players?
+pvp_damage_at_black_skulls = 100
+
 --should pvp restrictions apply to summons too?
 -- (experimental code - requires otserv to be compiled with flag __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__)
 min_pvp_level_applies_to_summons = true

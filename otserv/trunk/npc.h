@@ -471,7 +471,7 @@ public:
 
 	virtual bool isPushable() const { return false;};
 
-	virtual uint32_t idRange(){ return 0x80000000;}
+	virtual uint32_t idRange(){ return NPC_ID_RANGE;}
 	static AutoList<Npc> listNpc;
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}

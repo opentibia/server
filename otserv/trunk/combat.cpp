@@ -651,6 +651,34 @@ CallBack* Combat::getCallback(CallBackParam_t key)
 	return NULL;
 }
 
+void Combat::doPVPDamageReduction(int32_t& healthChange, const Player *target) //static
+{
+	if(healthChange < 0){
+		int64_t factor;
+		#ifdef __SKULLSYSTEM__
+		if (target->getSkull() != SKULL_BLACK)
+			factor = std::max(g_config.getNumber(ConfigManager::PVP_DAMAGE), int64_t(0));
+		else
+			factor = std::max(g_config.getNumber(ConfigManager::PVP_DAMAGE_AT_BLACK_SKULLS), int64_t(0));
+		#else
+		factor = std::max(g_config.getNumber(ConfigManager::PVP_DAMAGE), int64_t(0));
+		#endif
+		healthChange = (healthChange * factor)/100;
+	}
+
+}
+
+void Combat::checkPVPDamageReduction(const Creature* attacker, const Creature* target, int32_t& healthChange) //static
+{
+	if(attacker && attacker->getPlayer() && target->getPlayer() && (attacker != target)){
+		#ifdef __SKULLSYSTEM__
+		Combat::doPVPDamageReduction(healthChange, target->getPlayer());
+		#else
+		Combat::doPVPDamageReduction(healthChange);
+		#endif
+	}
+}
+
 bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	Combat2Var* var = (Combat2Var*)data;
@@ -660,15 +688,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 		return false;
 	}
 
-	if(healthChange < 0){
-		#ifdef __SKULLSYSTEM__
-		if(caster && caster->getPlayer() && target->getPlayer() && target->getPlayer()->getSkull() != SKULL_BLACK){
-		#else
-		if(caster && caster->getPlayer() && target->getPlayer()){
-		#endif
-			healthChange = healthChange/2;
-		}
-	}
+	Combat::checkPVPDamageReduction(caster, target, healthChange);
 
 	bool result = g_game.combatChangeHealth(params.combatType, params.hitEffect, params.hitTextColor, caster, target, healthChange);
 
@@ -685,11 +705,7 @@ bool Combat::CombatManaFunc(Creature* caster, Creature* target, const CombatPara
 	Combat2Var* var = (Combat2Var*)data;
 	int32_t manaChange = random_range(var->minChange, var->maxChange, DISTRO_NORMAL);
 
-	if(manaChange < 0){
-		if(caster && caster->getPlayer() && target->getPlayer()){
-			manaChange = manaChange/2;
-		}
-	}
+	Combat::checkPVPDamageReduction(caster, target, manaChange);
 
 	bool result = g_game.combatChangeMana(caster, target, manaChange);
 
@@ -1654,7 +1670,7 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 				uint32_t ownerId = getOwner();
 				if(ownerId != 0 && purposeful){
 					Creature* owner = g_game.getCreatureByID(ownerId);
-					if(owner){
+					if(owner && (owner != creature)){
 						if(	(OTSYS_TIME() - createTime <= g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)) ||
 								owner->hasBeenAttacked(ownerId)	)
 						{

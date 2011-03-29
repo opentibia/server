@@ -127,7 +127,7 @@ public:
 
 	void setGUID(uint32_t _guid) {guid = _guid;};
 	uint32_t getGUID() const { return guid;};
-	virtual uint32_t idRange(){ return 0x10000000;}
+	virtual uint32_t idRange(){ return PLAYER_ID_RANGE;}
 	static AutoList<Player> listPlayer;
 	void removeList();
 	void addList();

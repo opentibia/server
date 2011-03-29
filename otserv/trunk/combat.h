@@ -299,6 +299,8 @@ public:
 	static ReturnValue checkPVPExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalking);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
+	static void doPVPDamageReduction(int32_t& healthChange, const Player* target);
+	static void checkPVPDamageReduction(const Creature* attacker, const Creature* target, int32_t& healthChange);
 	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
 
 	static void addDistanceEffect(Creature* caster, const Position& fromPos, const Position& toPos,

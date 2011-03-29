@@ -164,6 +164,8 @@ public:
 		WANDS_INTERRUPT_SWING,
 		MOVEITEM_TIME,
 		MAX_STACK_SIZE,
+		PVP_DAMAGE,
+		PVP_DAMAGE_AT_BLACK_SKULLS,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

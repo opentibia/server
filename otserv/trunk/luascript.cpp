@@ -290,7 +290,7 @@ Thing* ScriptEnviroment::getThingByUID(uint32_t uid)
 	if(tmp && !tmp->isRemoved()){
 		return tmp;
 	}
-	if(uid >= 0x10000000){ //is a creature id
+	if(uid >= PLAYER_ID_RANGE){ //is a creature id
 		tmp = g_game.getCreatureByID(uid);
 		if(tmp && !tmp->isRemoved()){
 			m_localMap[uid] = tmp;

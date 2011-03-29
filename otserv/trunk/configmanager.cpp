@@ -206,6 +206,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[PUSH_INTERVAL] = getGlobalNumber(L, "push_interval", 2000);
 	m_confInteger[MOVEITEM_TIME] = getGlobalNumber(L, "move_item_interval", 500);
 	m_confInteger[MAX_STACK_SIZE] = getGlobalNumber(L, "max_stack_size", 1000);
+	m_confInteger[PVP_DAMAGE] = getGlobalNumber(L, "pvp_damage", 50);
+	m_confInteger[PVP_DAMAGE_AT_BLACK_SKULLS] = getGlobalNumber(L, "pvp_damage_at_black_skulls", 100);
 	m_confInteger[WANDS_INTERRUPT_SWING] = getGlobalBoolean(L, "wands_interrupt_swing", true);
 	m_isLoaded = true;
 	return true;
