@@ -796,7 +796,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		else if(it.weaponType != WEAPON_AMMO && it.weaponType != WEAPON_WAND){ // Arrows and Bolts doesn't show atk
 			s << " (";
 			if(it.attack != 0){
-				s << "Atk:" << (int32_t)it.attack - it.abilities.elementDamage;
+				s << "Atk:" << (int32_t)it.attack;
 				
 				if(it.abilities.elementDamage != 0){
 					s << " " << "physical + ";

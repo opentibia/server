@@ -14,6 +14,7 @@ function removeHarmfulConditions(cid)
 			doRemoveCondition(cid, v)
 		end
 	end
+	return true
 end
 
 function onStepIn(cid, item, topos, frompos)
@@ -30,6 +31,7 @@ function onStepIn(cid, item, topos, frompos)
 		removeHarmfulConditions(cid)
 		doSetCreatureOutfit(cid, outfit, -1)
 	end
+	return true
 end
 
 function onStepOut(cid, item, topos, frompos)
@@ -39,4 +41,5 @@ function onStepOut(cid, item, topos, frompos)
 			doRemoveCondition(cid, CONDITION_OUTFIT)
 		end
 	end
+	return true
 end

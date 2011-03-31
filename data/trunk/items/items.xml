@@ -18594,6 +18594,7 @@
 	<item id="7889" article="a" name="lightning pendant">
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
+		<attribute key="charges" value="200"/>
 		<attribute key="absorbPercentEnergy" value="20"/>
 		<attribute key="absorbPercentEarth" value="-10"/>
 		<attribute key="showcharges" value="1"/>

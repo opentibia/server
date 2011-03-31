@@ -92,6 +92,7 @@
 		<vocation name="Knight"/>
 		<vocation name="Elite Knight" showInDescription="0"/>
 	</melee>
+	<melee id="7421" level="65" unproperly="1" function="default"/>
 	<melee id="2451" level="35" unproperly="1" function="default"/>
 	<melee id="7404" level="40" unproperly="1" function="default"/>
 	<melee id="7386" level="40" unproperly="1" function="default"/>
