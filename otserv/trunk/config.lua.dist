@@ -309,6 +309,9 @@ retrytimeout = 5000
 -- how long the player need to wait until the ip is allowed again
 logintimeout = 60 * 1000
 
+-- how deep queryDestination should look for free slots (default -1, infinite)
+player_querydestination_deepness = -1
+
 -- allow clones (multiple logins of the same char)
 allowclones = false
 

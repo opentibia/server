@@ -209,6 +209,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[PVP_DAMAGE] = getGlobalNumber(L, "pvp_damage", 50);
 	m_confInteger[PVP_DAMAGE_AT_BLACK_SKULLS] = getGlobalNumber(L, "pvp_damage_at_black_skulls", 100);
 	m_confInteger[WANDS_INTERRUPT_SWING] = getGlobalBoolean(L, "wands_interrupt_swing", true);
+	m_confInteger[PLAYER_QUERYDESTINATION_DEEPNESS] = getGlobalNumber(L, "player_querydestination_deepness", -1);
 	m_isLoaded = true;
 	return true;
 }

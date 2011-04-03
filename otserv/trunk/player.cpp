@@ -1868,6 +1868,9 @@ void Player::onCreatureMove(const Creature* creature, const Tile* newTile, const
 void Player::onAddContainerItem(const Container* container, const Item* item)
 {
 	checkTradeState(item);
+	if(backpack.first && (const_cast<Container*>(container) != backpack.first || backpack.first->full())){
+		backpack.first = NULL;
+	}
 }
 
 void Player::onUpdateContainerItem(const Container* container, uint8_t slot,
@@ -1884,6 +1887,7 @@ void Player::onUpdateContainerItem(const Container* container, uint8_t slot,
 
 void Player::onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item)
 {
+	backpack.first = NULL;
 	if(tradeState != TRADE_TRANSFER){
 		checkTradeState(item);
 
@@ -3199,120 +3203,123 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count, uint32_t f
 Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 	uint32_t& flags)
 {
-	if(index == 0 /*drop to capacity window*/ || index == INDEX_WHEREEVER){
+	if(!index /*drop to capacity window*/ || index == INDEX_WHEREEVER){
 		*destItem = NULL;
-
 		const Item* item = thing->getItem();
-		if(item == NULL){
+		if(!item){
 			return this;
 		}
 
+		std::list<std::pair<Container*, int32_t> > containers;
+		std::list<std::pair<Cylinder*, int32_t> > freeSlots;
+
 		bool autoStack = !((flags & FLAG_IGNOREAUTOSTACK) == FLAG_IGNOREAUTOSTACK);
-
-		std::list<Container*> containerList;
-		for(uint32_t slotIndex = SLOT_FIRST; slotIndex < SLOT_LAST; ++slotIndex){
-			Item* inventoryItem = inventory[slotIndex];
-
-			if(inventoryItem){
-
-				if(inventoryItem == tradeItem){
+		for(int32_t i = SLOT_FIRST; i < SLOT_LAST; ++i){
+			if(Item* invItem = inventory[i]){
+				if(invItem == item || invItem == tradeItem){
 					continue;
 				}
 
-				if(inventoryItem == item){
-					continue;
+				if(autoStack && item->isStackable() && __queryAdd(i, item, item->getItemCount(), 0)
+					== RET_NOERROR && invItem->getID() == item->getID() && invItem->getItemCount() < 100){
+					*destItem = invItem;
+					index = i;
+					return this;
 				}
 
-				if(autoStack && item->isStackable()){
-					//try find an already existing item to stack with
-					if(__queryAdd(slotIndex, item, item->getItemCount(), 0) == RET_NOERROR){
-						if(inventoryItem->getID() == item->getID() && inventoryItem->getItemCount() < 100){
-							index = slotIndex;
-							*destItem = inventoryItem;
-							return this;
-						}
-					}
-
-					if(Container* subContainer = inventoryItem->getContainer()){
-						containerList.push_back(subContainer);
-					}
-				}
-				else if(Container* subContainer = inventoryItem->getContainer()){
-					if(subContainer->__queryAdd(INDEX_WHEREEVER, item, item->getItemCount(), flags) == RET_NOERROR){
+				if(Container* container = invItem->getContainer()){
+					if(!autoStack && !backpack.first && container->__queryAdd(
+						INDEX_WHEREEVER, item, item->getItemCount(), flags) == RET_NOERROR){
 						index = INDEX_WHEREEVER;
-						*destItem = NULL;
-						return subContainer;
+						backpack = std::make_pair(container, index);
+						return container;
 					}
 
-					containerList.push_back(subContainer);
+					containers.push_back(std::make_pair(container, 0));
 				}
 			}
-			//empty slot
-			else if(__queryAdd(slotIndex, item, item->getItemCount(), flags) == RET_NOERROR){
-				index = slotIndex;
-				*destItem = NULL;
-				return this;
+			else if(!autoStack){
+				if(__queryAdd(i, item, item->getItemCount(), 0) == RET_NOERROR)	{
+					index = i;
+					return this;
+				}
+			}
+			else{
+				freeSlots.push_back(std::make_pair(this, i));
 			}
 		}
 
-		while(!containerList.empty()){
-			Container* tmpContainer = containerList.front();
-			containerList.pop_front();
+		if(backpack.first && backpack.first->__queryAdd(backpack.second, item, item->getItemCount(), flags)){
+			index = backpack.second;
+			return backpack.first;
+		}
 
+		int32_t deepness = g_config.getNumber(ConfigManager::PLAYER_QUERYDESTINATION_DEEPNESS);
+		while(!containers.empty()){
+			Container* tmpContainer = containers.front().first;
+			int32_t level = containers.front().second;
 
-			if(!(autoStack && item->isStackable())){
-				//we need to find first empty container as fast as we can for non-stackable items
-				uint16_t n = tmpContainer->capacity() - tmpContainer->size();
-					while(n){
-						if(tmpContainer->__queryAdd(tmpContainer->capacity() - n, item, item->getItemCount(), flags) == RET_NOERROR){
-							index = tmpContainer->capacity() - n;
-							*destItem = NULL;
-							return tmpContainer;
-						}
-						n--;
-					}
-
-				for(uint32_t n = 0; n < tmpContainer->capacity(); ++n){
-					Item* tmpItem = tmpContainer->getItem(n);
-					if(tmpItem){
-						if(Container* subContainer = tmpItem->getContainer()){
-							containerList.push_back(subContainer);
-						}
-					}
-				}
-
+			containers.pop_front();
+			if(!tmpContainer){
 				continue;
 			}
 
 			for(uint32_t n = 0; n < tmpContainer->capacity(); ++n){
-				Item* tmpItem = tmpContainer->getItem(n);
-
-				if(tmpItem){
-					if(tmpItem == tradeItem){
+				if(Item* tmpItem = tmpContainer->getItem(n)){
+					if(tmpItem == item || tmpItem == tradeItem){
 						continue;
 					}
 
-					if(tmpItem == item){
-						continue;
-					}
-
-					//try find an already existing item to stack with
-					if(tmpItem != item && tmpItem->getID() == item->getID() && tmpItem->getItemCount() < 100){
+					if(autoStack && item->isStackable() && tmpContainer->__queryAdd(n, item, item->getItemCount(),
+						0) == RET_NOERROR && tmpItem->getID() == item->getID() && tmpItem->getItemCount() < 100){
 						index = n;
 						*destItem = tmpItem;
 						return tmpContainer;
 					}
 
-					if(Container* subContainer = tmpItem->getContainer()){
-						containerList.push_back(subContainer);
+					if(Container* container = tmpItem->getContainer()){
+						if(!autoStack && container->__queryAdd(INDEX_WHEREEVER,
+							item, item->getItemCount(), flags) == RET_NOERROR){
+							index = INDEX_WHEREEVER;
+							backpack = std::make_pair(container, index);
+							return container;
+						}
+
+						if(deepness < 0 || level < deepness){
+							containers.push_back(std::make_pair(container, level + 1));
+						}
 					}
 				}
-				//empty slot
-				else if(tmpContainer->__queryAdd(n, item, item->getItemCount(), flags) == RET_NOERROR){
-					index = n;
-					*destItem = NULL;
-					return tmpContainer;
+				else{
+					if(!autoStack){
+						if(tmpContainer->__queryAdd(n, item, item->getItemCount(), 0) == RET_NOERROR){
+							index = n;
+							backpack = std::make_pair(tmpContainer, index);
+							return tmpContainer;
+						}
+					}
+					else{
+						freeSlots.push_back(std::make_pair(tmpContainer, n));
+					}
 
+					break; // one slot to check is definitely enough.
+				}
+			}
+		}
+
+		if(autoStack){
+			while(!freeSlots.empty()){
+				Cylinder* tmpCylinder = freeSlots.front().first;
+				int32_t i = freeSlots.front().second;
+
+				freeSlots.pop_front();
+				if(!tmpCylinder){
+					continue;
+				}
+
+				if(tmpCylinder->__queryAdd(i, item, item->getItemCount(), flags) == RET_NOERROR){
+					index = i;
+					return tmpCylinder;
 				}
 			}
 		}
@@ -3321,18 +3328,17 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 	}
 
 	Thing* destThing = __getThing(index);
-	if(destThing)
+	if(destThing){
 		*destItem = destThing->getItem();
+	}
 
-	Cylinder* subCylinder = dynamic_cast<Cylinder*>(destThing);
-
-	if(subCylinder){
+	if(Cylinder* subCylinder = dynamic_cast<Cylinder*>(destThing)){
 		index = INDEX_WHEREEVER;
 		*destItem = NULL;
 		return subCylinder;
 	}
-	else
-		return this;
+
+	return this;
 }
 
 void Player::__addThing(Thing* thing)

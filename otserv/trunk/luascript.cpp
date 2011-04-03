@@ -1489,7 +1489,7 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerSetSex(cid, sex)
 	lua_register(m_luaState, "doPlayerSetSex", LuaScriptInterface::luaDoPlayerSetSex);
 
-	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype)
+	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype, <optional> ignoreEquipped)
 	lua_register(m_luaState, "doPlayerRemoveItem", LuaScriptInterface::luaDoPlayerRemoveItem);
 
 	//doPlayerAddExp(cid, exp, <optional: default: 0> useRate, <optional: default: 0> useMultiplier)
@@ -2703,8 +2703,13 @@ int LuaScriptInterface::luaDoRemoveItem(lua_State *L)
 
 int LuaScriptInterface::luaDoPlayerRemoveItem(lua_State *L)
 {
-	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype)
+	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype, <optional> ignoreEquipped)
 	int32_t parameters = lua_gettop(L);
+
+	bool ignoreEqquiped = false;
+	if(parameters > 4){
+		ignoreEquipped = popNumber(L);
+	}
 
 	int32_t subType = -1;
 	if(parameters > 3){
@@ -2719,7 +2724,7 @@ int LuaScriptInterface::luaDoPlayerRemoveItem(lua_State *L)
 
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		if(g_game.removeItemOfType(player, itemId, count, subType)){
+		if(g_game.removeItemOfType(player, itemId, count, subType, ignoreEquipped)){
 			lua_pushboolean(L, true);
 		}
 		else{

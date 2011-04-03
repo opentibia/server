@@ -873,6 +873,7 @@ protected:
 
 	StorageMap storageMap;
 	LightInfo itemsLight;
+	std::pair<Container*, int32_t> backpack;
 
 	OutfitMap outfits;
 	bool requestedOutfitWindow;
