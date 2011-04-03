@@ -1216,7 +1216,8 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->amount = 1;
 	state->itemId = 0;
 	state->subType = -1;
-	state->ignore = false;
+	state->ignoreCapacity = false;
+	state->ignoreEquipped = false;
 	state->buyWithBackpack = false;
 	state->spellName = "";
 	state->listName = "";
@@ -1907,7 +1908,8 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "price = " << npcState->price << ',' << std::endl;
 						scriptstream << "level = " << npcState->level << ',' << std::endl;
 						scriptstream << "buywithbackpack = " << npcState->buyWithBackpack << ',' << std::endl;
-						scriptstream << "ignore = " << npcState->ignore << ',' << std::endl;
+						scriptstream << "ignorecapacity = " << npcState->ignoreCapacity << ',' << std::endl;
+						scriptstream << "ignoreequipped = " << npcState->ignoreEquipped << ',' << std::endl;
 						scriptstream << "spellname = \"" << LuaScriptInterface::escapeString(npcState->spellName) << "\"" << ',' << std::endl;
 						scriptstream << "listname = \"" << LuaScriptInterface::escapeString(npcState->listName) << "\"" << ',' << std::endl;
 						scriptstream << "listpname = \"" << LuaScriptInterface::escapeString(npcState->listPluralName) << "\"" << ',' << std::endl;
@@ -2095,7 +2097,7 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->subType = subType;
 			npcState->itemId = itemId;
 			npcState->buyPrice = getListItemPrice(itemId, SHOPEVENT_BUY);
-			npcState->ignore = ignore;
+			npcState->ignoreCapacity = ignore;
 			npcState->buyWithBackpack = buyWithBackpack;
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPBUY, false);
 			processResponse(player, npcState, response);
@@ -2108,7 +2110,7 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->subType = subType;
 			npcState->itemId = itemId;
 			npcState->sellPrice = getListItemPrice(itemId, SHOPEVENT_SELL);
-			npcState->ignore = ignore;
+			npcState->ignoreEquipped = ignore;
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPSELL, false);
 			processResponse(player, npcState, response);
 		}
@@ -3322,8 +3324,9 @@ void NpcScriptInterface::pushState(lua_State *L, NpcState* state)
 	setField(L, "amount", state->amount);
 	setField(L, "itemid", state->itemId);
 	setField(L, "subtype", state->subType);
-	setFieldBool(L, "ignore", state->ignore);
-	setFieldBool(L, "buyWithBackpack", state->buyWithBackpack);
+	setFieldBool(L, "ignorecapacity", state->ignoreCapacity);
+	setFieldBool(L, "ignoreequipped", state->ignoreEquipped);
+	setFieldBool(L, "buywithbackpack", state->buyWithBackpack);
 	setField(L, "topic", state->topic);
 	setField(L, "level", state->level);
 	setField(L, "spellname", state->spellName);
@@ -3350,16 +3353,19 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->amount = getField(L, "amount");
 	state->itemId = getField(L, "itemid");
 	state->subType = getField(L, "subtype");
-	state->ignore = getFieldBool(L, "ignore");
+	state->ignoreCapacity = getFieldBool(L, "ignorecapacity");
+	state->ignoreEquipped = getFieldBool(L, "ignoreequipped");
 	state->buyWithBackpack = getFieldBool(L, "buywithbackpack");
 	state->topic = std::max(getField(L, "topic"), (int32_t)0);
 	state->level = getField(L, "level");
 	state->spellName = getFieldString(L, "spellname");
 	state->listName = getFieldString(L, "listname");
 	state->listPluralName = getFieldString(L, "listpname");
-	bool isIdle = getFieldBool(L, "isidle") || getFieldBool(L, "isIdle");
-	if(isIdle){
+	if(getFieldBool(L, "isidle")){
 		state->focusState = 0;
+	}
+	else{
+		state->focusState = 1;
 	}
 
 	state->scriptVars.n1 = getField(L, "n1");
@@ -3748,7 +3754,7 @@ void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t i
 	if(callback == -1){
 		return;
 	}
-	//"onBuy"(cid, itemid, count, amount, ignore, buywithbackpack)
+	//"onBuy"(cid, itemid, count, amount, "ignore", buywithbackpack)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		env->setScriptId(-1, m_scriptInterface);
