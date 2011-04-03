@@ -1876,8 +1876,15 @@ void Player::onAddContainerItem(const Container* container, const Item* item)
 void Player::onUpdateContainerItem(const Container* container, uint8_t slot,
 	const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType)
 {
-	if(oldItem != newItem){
-		onRemoveContainerItem(container, slot, oldItem);
+	if(tradeState == TRADE_TRANSFER){
+		return;
+	}
+
+	checkTradeState(oldItem);
+	if(oldItem != newItem && tradeItem){
+		if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
+			g_game.internalCloseTrade(this);
+		}
 	}
 
 	if(tradeState != TRADE_TRANSFER){
@@ -1888,13 +1895,14 @@ void Player::onUpdateContainerItem(const Container* container, uint8_t slot,
 void Player::onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item)
 {
 	backpack.first = NULL;
-	if(tradeState != TRADE_TRANSFER){
-		checkTradeState(item);
+	if(tradeState == TRADE_TRANSFER){
+		return;
+	}
 
-		if(tradeItem){
-			if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
-				g_game.internalCloseTrade(this);
-			}
+	checkTradeState(item);
+	if(tradeItem){
+		if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
+			g_game.internalCloseTrade(this);
 		}
 	}
 }
@@ -1932,8 +1940,16 @@ void Player::onAddInventoryItem(slots_t slot, Item* item)
 void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, const ItemType& oldType,
 	Item* newItem, const ItemType& newType)
 {
-	if(oldItem != newItem){
-		onRemoveInventoryItem(slot, oldItem);
+	if(tradeState == TRADE_TRANSFER){
+		return;
+	}
+
+	checkTradeState(oldItem);
+	if(oldItem != newItem && tradeItem){
+		const Container* container = oldItem->getContainer();
+		if(container && container->isHoldingItem(tradeItem)){
+			g_game.internalCloseTrade(this);
+		}
 	}
 
 	if(tradeState != TRADE_TRANSFER){
@@ -1945,14 +1961,16 @@ void Player::onRemoveInventoryItem(slots_t slot, Item* item)
 {
 	//setItemAbility(slot, false);
 
-	if(tradeState != TRADE_TRANSFER){
-		checkTradeState(item);
+	backpack.first = NULL;
+	if(tradeState == TRADE_TRANSFER){
+		return;
+	}
 
-		if(tradeItem){
-			const Container* container = item->getContainer();
-			if(container && container->isHoldingItem(tradeItem)){
-				g_game.internalCloseTrade(this);
-			}
+	checkTradeState(item);
+	if(tradeItem){
+		const Container* container = item->getContainer();
+		if(container && container->isHoldingItem(tradeItem)){
+			g_game.internalCloseTrade(this);
 		}
 	}
 }
@@ -3210,10 +3228,19 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 			return this;
 		}
 
+		bool autoStack = !((flags & FLAG_IGNOREAUTOSTACK) == FLAG_IGNOREAUTOSTACK);
+		if((!autoStack || !item->isStackable()) && backpack.first &&
+			backpack.first->__queryAdd(backpack.second, item, item->getItemCount(), flags)){
+			index = backpack.second;
+			if(backpack.second != INDEX_WHEREEVER){
+				++backpack.second;
+			}
+
+			return backpack.first;
+		}
+
 		std::list<std::pair<Container*, int32_t> > containers;
 		std::list<std::pair<Cylinder*, int32_t> > freeSlots;
-
-		bool autoStack = !((flags & FLAG_IGNOREAUTOSTACK) == FLAG_IGNOREAUTOSTACK);
 		for(int32_t i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			if(Item* invItem = inventory[i]){
 				if(invItem == item || invItem == tradeItem){
@@ -3247,15 +3274,6 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 			else{
 				freeSlots.push_back(std::make_pair(this, i));
 			}
-		}
-
-		if(backpack.first && backpack.first->__queryAdd(backpack.second, item, item->getItemCount(), flags)){
-			index = backpack.second;
-			if(backpack.second != INDEX_WHEREEVER){
-				++backpack.second;
-			}
-
-			return backpack.first;
 		}
 
 		int32_t deepness = g_config.getNumber(ConfigManager::PLAYER_QUERYDESTINATION_DEEPNESS);
