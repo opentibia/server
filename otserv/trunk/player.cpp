@@ -1277,7 +1277,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		break;
 
 	case RET_DEPOTISFULL:
-		sendCancel("You cannot put more items in this depot.");
+		sendCancel("Your depot is full. Remove surplus items before storing new ones.");
 		break;
 
 	case RET_CANNOTUSETHISOBJECT:

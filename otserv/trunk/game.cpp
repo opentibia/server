@@ -877,8 +877,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 		if(getPathToEx(player, movingCreatureOrigPos, listDir, 0, 1, true, true)){
 			g_dispatcher.addTask(createTask(boost::bind(&Game::playerAutoWalk,
 				this, player->getID(), listDir)));
-
-			SchedulerTask* task = createSchedulerTask(1500, boost::bind(&Game::playerMoveCreature, this,
+			SchedulerTask* task = createSchedulerTask(g_config.getNumber(ConfigManager::PUSH_INTERVAL), boost::bind(&Game::playerMoveCreature, this,
 				playerId, movingCreatureId, movingCreatureOrigPos, toPos));
 			g_dispatcher.addTask(createTask(boost::bind(&Game::playerRegisterWalkAction,
 				this, player->getID(), task)));
@@ -1221,7 +1220,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		player->sendCancelMessage(RET_CANNOTTHROW);
 		return false;
 	}
-
+	
 	ReturnValue ret = internalMoveItem(fromCylinder, toCylinder, toIndex, item, count, NULL);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);

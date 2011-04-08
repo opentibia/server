@@ -726,7 +726,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 		}
-
+		
+		const uint32_t itemLimit = g_config.getNumber(hasFlag(TILESTATE_PROTECTIONZONE) ? ConfigManager::PROTECTION_TILE_LIMIT : ConfigManager::TILE_LIMIT);
+		if(itemLimit && getThingCount() > itemLimit)
+			return RET_TILEISFULL;
+			
 		bool hasHangable = false;
 		bool supportHangable = false;
 
@@ -1484,7 +1488,7 @@ void Tile::postRemoveNotification(Thing* thing,  const Cylinder* newParent, int3
 	if(/*isCompleteRemoval &&*/ getThingCount() > 8){
 		onUpdateTile();
 	}
-
+	
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
@@ -1689,6 +1693,7 @@ void Tile::updateTileFlags(Item* item, bool removed)
 		}
 	}
 }
+
 
 bool Tile::isMoveableBlocking() const
 {

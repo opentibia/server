@@ -2706,9 +2706,9 @@ int LuaScriptInterface::luaDoPlayerRemoveItem(lua_State *L)
 	//doPlayerRemoveItem(cid, itemid, count, <optional> subtype, <optional> ignoreEquipped)
 	int32_t parameters = lua_gettop(L);
 
-	bool ignoreEqquiped = false;
+	bool ignoreEquipped = false;
 	if(parameters > 4){
-		ignoreEquipped = popNumber(L);
+		ignoreEquipped = popBoolean(L);
 	}
 
 	int32_t subType = -1;

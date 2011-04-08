@@ -236,8 +236,18 @@ distance_weapon_interrupt_swing = true
 -- Should exhaustion and action time be checked for using wands?
 wands_interrupt_swing = true
 
--- How many items can be stacked in a single tile? DO NOT CHANGE IT UNLESS THAT YOU KNOW WHAT YOU ARE DOING
+-- How many items can be stacked in a single tile (all type of tiles)(client side)? DO NOT CHANGE IT UNLESS THAT YOU KNOW WHAT YOU ARE DOING
 max_stack_size = 1000
+
+-- How many items can be stacked in a normal tile ? (0 = max_stack_size)
+tile_limit = 0
+
+-- How many items can be stacked in a protection zone tile ? (0 = max_stack_size)
+protection_tile_limit = 0
+
+-- How many items can be stacked in a house zone tile ? (0 = max_stack_size)
+house_tile_limit = 0
+
 
 -- fist fighting configuration
 -- How strong should be the attack using bare hands (fist fighting)?

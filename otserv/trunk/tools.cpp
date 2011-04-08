@@ -85,6 +85,12 @@ std::string asUpperCaseString(const std::string& source)
 	return s;
 }
 
+bool booleanString(std::string source)
+{
+	toLowerCaseString(source);
+	return (source == "yes" || source == "true" || atoi(source.c_str()) > 0);
+}
+
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);

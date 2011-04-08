@@ -78,6 +78,7 @@ void toLowerCaseString(std::string& source);
 void toUpperCaseString(std::string& source);
 std::string asLowerCaseString(const std::string& source);
 std::string asUpperCaseString(const std::string& source);
+bool booleanString(std::string source);
 bool utf8ToLatin1(char* intext, std::string& outtext);
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value);
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);

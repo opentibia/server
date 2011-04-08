@@ -458,6 +458,15 @@ struct NpcState{
 	//Do not forget to update pushState/popState if you add more variables
 };
 
+struct Voice
+{
+	bool randomSpectator;
+	SpeakClasses type;
+	uint32_t interval, margin;
+	std::string text;
+};
+
+#define MAX_RAND_RANGE 10000000
 class Npc : public Creature
 {
 public:
@@ -487,7 +496,7 @@ public:
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};
 
-	void doSay(const std::string& text);
+	void doSay(const std::string& text, SpeakClasses type, Player* player);
 	void doSayToPlayer(Player* player, const std::string& text);
 
 	void doMove(Direction dir);
@@ -579,6 +588,7 @@ protected:
 	std::string m_scriptdir;
 	std::string m_filename;
 	uint32_t walkTicks;
+	int64_t lastVoice;
 	bool floorChange;
 	Direction initialLookDir;
 	bool attackable;
@@ -587,6 +597,7 @@ protected:
 	bool hasBusyReply;
 	bool hasScriptedFocus;
 	int32_t talkRadius;
+	int32_t idleInterval;
 	uint32_t idleTimeout;
 	uint64_t lastResponseTime;
 	bool defaultPublic;
@@ -608,6 +619,10 @@ protected:
 
 	typedef std::list<uint32_t> QueueList;
 	QueueList queueList;
+	
+	typedef std::list<Voice> VoiceList;
+	VoiceList voiceList;
+	
 	bool loaded;
 
 	static NpcScriptInterface* m_scriptInterface;
