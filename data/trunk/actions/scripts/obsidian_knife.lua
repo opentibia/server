@@ -70,7 +70,35 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 		return true
 	end
-
+   -- Statues --
+    if (item2.itemid == 11343) then
+        local random2 = math.random(1, 20)
+        if (random2 <= 2) == true then
+            doTransformItem(item2.uid, 11346)
+            doSendMagicEffect(getThingPos(item2.uid), CONST_ME_BLOCKHIT)
+            doSetItemSpecialDescription(item2.uid, "This little figurine of Tibiasula was masterfully sculpted by " .. getCreatureName(cid) .. ".")
+            return true
+        end
+        if (random2 >= 3) == true and not (random2 > 5) then
+            doTransformItem(item2.uid, 11345)
+            doSendMagicEffect(getThingPos(item2.uid), CONST_ME_BLOCKHIT)
+            doSetItemSpecialDescription(item2.uid, "This little figurine made by " ..getCreatureName(cid).. " has some room for improvement.")
+            return true
+        end
+        if (random2 >= 6) == true and not (random2 > 13) then
+            doTransformItem(item2.uid, 11344)
+            doSendMagicEffect(getThingPos(item2.uid), CONST_ME_BLOCKHIT)
+            doSetItemSpecialDescription(item2.uid, "This shoddy work was made by " ..getCreatureName(cid).. ".")
+            return true
+        end
+        if (random2 >= 14) == true and not (random2 > 20) then
+            doSendMagicEffect(getThingPos(item2.uid), CONST_ME_BLOCKHIT)
+            doRemoveItem(item2.uid)
+            return true
+        end
+        return false
+    end
+	 -- End --
 	if (knife[item2.itemid] == nil) then
 		return false
 	end

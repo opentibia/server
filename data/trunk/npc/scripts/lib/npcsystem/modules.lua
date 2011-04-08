@@ -832,7 +832,7 @@ end
 	end
 
 	-- Callback onSell() function. If you wish, you can change certain Npc to use your onSell().
-	function ShopModule:callbackOnSell(cid, itemid, subType, amount)
+	function ShopModule:callbackOnSell(cid, itemid, subType, amount, ignoreEquipped, dummy)
 		if(self.npcHandler.shopItems[itemid] == nil) then
 			print("[Warning - ' .. getCreatureName(getNpcCid()) .. '] [ShopModule.onSell]", "items[itemid] == nil")
 			return false
@@ -852,7 +852,7 @@ end
 		if(subType < 1) then
 			subType = -1
 		end
-		if(doPlayerRemoveItem(cid, itemid, amount, subType) ) then
+		if(doPlayerRemoveItem(cid, itemid, amount, subType, ignoreEquipped)) then
 			local msg = self.npcHandler:getMessage(MESSAGE_ONSELL)
 			msg = self.npcHandler:parseMessage(msg, parseInfo)
 			self.npcHandler:say(msg, cid)

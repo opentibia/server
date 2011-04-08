@@ -392,7 +392,7 @@
 	<moveevent event="DeEquip" itemid="6132" slot="feet" function="onDeEquipItem"/>
 	<moveevent event="Equip" itemid="2640" slot="feet" function="onEquipItem"/>
 	<moveevent event="DeEquip" itemid="2640" slot="feet" function="onDeEquipItem"/>
-	<moveevent event="Equip" itemid="7886" slot="feet" function="onEquipItem">
+	<moveevent event="Equip" itemid="7886" level="35" slot="feet" function="onEquipItem">
 		<vocation name="Sorcerer"/>
 		<vocation name="Master Sorcerer" showInDescription="0"/>
 		<vocation name="Druid"/>
@@ -431,6 +431,13 @@
 		<vocation name="Royal Paladin" showInDescription="0"/>
 	</moveevent>
 	<moveevent event="DeEquip" itemid="12646" slot="feet" function="onDeEquipItem"/>
+	<moveevent event="Equip" itemid="11240" slot="feet" level="70" function="onEquipItem">
+        <vocation name="Knight"/>
+        <vocation name="Elite Knight" showInDescription="0"/>
+        <vocation name="Paladin"/>
+        <vocation name="Royal Paladin" showInDescription="0"/>
+    </moveevent>
+    <moveevent event="DeEquip" itemid="11240" slot="feet" function="onDeEquipItem"/>
 	
 	<!-- Amulets -->
 	<moveevent event="Equip" itemid="2161" slot="necklace" function="onEquipItem"/>
