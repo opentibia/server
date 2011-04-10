@@ -289,7 +289,7 @@ CREATE TABLE "schema_info" (
 	UNIQUE ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 22);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 24);
 
 CREATE TRIGGER "oncreate_players"
 AFTER INSERT
