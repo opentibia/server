@@ -25636,7 +25636,7 @@
 		<attribute key="weight" value="4500"/>
 		<attribute key="armor" value="10"/>
 		<attribute key="slotType" value="body"/>
-		<attribute key="magicpoints" value="5"/>
+		<attribute key="magicpoints" value="2"/>
 		<attribute key="absorbPercentFire" value="5"/>
 	</item>
 	<item id="12644" article="a" name="shield of corruption">
