@@ -19,7 +19,12 @@ CREATE TABLE "groups" (
 	"maxdepotitems" INTEGER NOT NULL,
 	"maxviplist" INTEGER NOT NULL
 );
-INSERT INTO "groups" VALUES (1, 'Player', 0, 0, 0, 2000, 100),(2, 'Tutor', 16777216, 0, 0, 2000, 100),(3, 'Sennior Tutor', 274894684160, 0, 0, 2000, 100),(4, 'Community Manager', 69681547968463, 2, 0, 1000, 100),(5, 'Game Master', 69681547968463, 2, 0, 1000, 100),(6, 'GOD/OWNER', 57171953819640, 3, 0, 2000, 100);
+INSERT INTO "groups" VALUES (1, 'Player', 0, 0, 0, 2000, 100);
+INSERT INTO "groups" VALUES (2, 'Tutor', 16777216, 0, 0, 2000, 100);
+INSERT INTO "groups" VALUES (3, 'Sennior Tutor', 274894684160, 0, 0, 2000, 100);
+INSERT INTO "groups" VALUES (4, 'Community Manager', 69681547968463, 2, 0, 1000, 100);
+INSERT INTO "groups" VALUES (5, 'Game Master', 69681547968463, 2, 0, 1000, 100);
+INSERT INTO "groups" VALUES (6, 'GOD/OWNER', 57171953819640, 3, 0, 2000, 100);
 
 CREATE TABLE "players" (
 	"id" INTEGER PRIMARY KEY NOT NULL,
@@ -284,7 +289,7 @@ CREATE TABLE "schema_info" (
 	UNIQUE ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 24);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 22);
 
 CREATE TRIGGER "oncreate_players"
 AFTER INSERT
