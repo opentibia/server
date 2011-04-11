@@ -588,7 +588,7 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 	*/
 	
 	// different ways for same floor and for different floors
-	return fromPos.z == toPos.z ? checkSightLine(fromPos, toPos) && checkSightLine(toPos, fromPos) : checkSightLine(fromPos, toPos) || checkSightLine(toPos, fromPos);
+	return checkSightLine(fromPos, toPos) && checkSightLine(toPos, fromPos);
 }
 
 const Tile* Map::canWalkTo(const Creature* creature, const Position& pos)
