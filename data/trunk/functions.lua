@@ -890,3 +890,35 @@ function doCopyItem(item, attributes)
 	return getThing(ret)
 end
 
+function isInRange(position, fromPosition, toPosition)
+	return (position.x >= fromPosition.x and position.y >= fromPosition.y and position.z >= fromPosition.z and position.x <= toPosition.x and position.y <= toPosition.y and position.z <= toPosition.z)
+end
+
+function doComparePositions(pos1, pos2)
+    return (pos1.x == pos2.x and pos1.y == pos2.y and pos1.z == pos2.z)
+end
+
+function getItemWeightById(itemid)
+        local uid = doCreateItemEx(itemid, 1)
+        local ret = getItemWeight(uid)
+        return ret
+ end
+ 
+function doPlayerGiveItemContainer(cid, containerid, itemid, amount, subType)
+	for i = 1, amount do
+		local container = doCreateItemEx(containerid, 1)
+		for x = 1, getContainerCapById(containerid) do
+			doAddContainerItem(container, itemid, subType)
+		end
+
+		if(doPlayerAddItemEx(cid, container, true) ~= RETURNVALUE_NOERROR) then
+			return false
+		end
+	end
+
+	return true
+end
+
+function doPlayerBuyItemContainer(cid, containerid, itemid, count, cost, charges)
+	return doPlayerRemoveMoney(cid, cost) and doPlayerGiveItemContainer(cid, containerid, itemid, count, charges)
+end
