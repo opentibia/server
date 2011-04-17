@@ -2,7 +2,7 @@
 <monster name="Mr. Punish" nameDescription="a mr. punish" race="undead" experience="5500" speed="400" manacost="0">
 	<health now="12000" max="12000"/>
 	<look type="234" corpse="6331"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -20,12 +20,12 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="190"  attack="110"/>
-		<attack name="physical" interval="2000" chance="40" range="7" target="1" min="-0" max="-710">
+		<attack name="physical" interval="2000" chance="20" range="7" target="1" min="-0" max="-710">
 			<attribute key="shootEffect" value="throwingknife"/>
 		</attack>
 	</attacks>
 	<defenses armor="64" defense="72">
-		<defense name="healing" interval="2000" chance="25" min="120" max="320">
+		<defense name="healing" interval="2000" chance="20" min="120" max="320">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -43,7 +43,7 @@
 		<immunity drunk="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="I kept my axe sharp, especially for you!"/>
 		<voice sentence="Time for a little torturing practice!"/>
 		<voice sentence="Scream for me!"/>

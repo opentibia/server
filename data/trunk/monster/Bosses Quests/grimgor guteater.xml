@@ -2,7 +2,7 @@
 <monster name="Grimgor Guteater" nameDescription="grimgor guteater" race="blood" experience="670" speed="240" manacost="0">
 	<health now="1155" max="1155"/>
 	<look type="2" corpse="7349"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -39,7 +39,7 @@
 		<immunity invisible="1"/>
 		<immunity fire="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Dont run, You're burning off precious fat."/>
 	</voices>
 </monster>

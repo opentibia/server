@@ -27,14 +27,14 @@
 		<element icePercent="-10"/>
 		<element deathPercent="-8"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Grrrrrrr"/>
 		<voice sentence="Yoooohhuuuu!"/>
 	</voices>
 	<loot>
-    <item id="2671" chance="21225" /><!-- ham -->
-    <item id="5897" countmax="3" chance="1300" /><!-- wolf paw -->
-    <item id="11235" chance="3100" /><!-- warwolf fur -->
+    <item id="2671" chance="22125" /><!-- ham -->
+    <item id="5897" countmax="3" chance="1250" /><!-- wolf paw -->
+    <item id="11235" chance="3450" /><!-- warwolf fur -->
 </loot>
 
 

@@ -2,7 +2,7 @@
 	<monster name="Gnorre Chyllson" nameDescription="gnorre chyllson" race="blood" experience="4000" speed="370" manacost="0">
 	<health now="7100" max="7100"/>
 	<look type="251" head="11" body="9" legs="11" feet="85" addons="1" corpse="7349"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -20,22 +20,22 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="80" attack="50"/>
-		<attack name="lifedrain" interval="2000" chance="10" length="8" spread="0" min="-0" max="-125">
+		<attack name="lifedrain" interval="2000" chance="12" length="8" spread="0" min="-0" max="-125">
 			<attribute key="areaEffect" value="purplenote"/>
 		</attack>
-		<attack name="physical" interval="5000" chance="10" radius="5" range="7" target="1" min="-0" max="-320" drown="20">
+		<attack name="physical" interval="2000" chance="12" radius="5" range="7" target="1" min="-0" max="-320" drown="20">
 			<attribute key="areaEffect" value="bluebubble"/>
 		</attack>
-		<attack name="drown" interval="5000" chance="10" radius="5" range="7" target="1" min="-0" max="-320" drown="20">
+		<attack name="drown" interval="2000" chance="12" radius="5" range="7" target="1" min="-0" max="-320" drown="20">
 			<attribute key="areaEffect" value="bluebubble"/>
 		</attack>
-		<attack name="drown" interval="5000" chance="10" length="8" spread="3" range="7" min="-0" drown="20">
+		<attack name="drown" interval="2000" chance="12" length="8" spread="3" range="7" min="-0" drown="20">
 			<attribute key="areaEffect" value="poff"/>
 		</attack>
-		<attack name="physical" interval="3000" chance="10" radius="3" target="0" min="-0" max="-400">
+		<attack name="physical" interval="2000" chance="12" radius="3" target="0" min="-0" max="-400">
 			<attribute key="areaEffect" value="blackspark"/>
 		</attack>
-		<attack name="physical" interval="5000" chance="10" range="7" radius="3" target="1" min="-0" max="-200">
+		<attack name="physical" interval="2000" chance="12" range="7" radius="3" target="1" min="-0" max="-200">
 			<attribute key="shootEffect" value="snowball"/>
 		</attack>
 	</attacks>
@@ -52,7 +52,7 @@
 		<immunity ice="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="I am like the merciless northwind."/>
 		<voice sentence="Snow will be your death shroud."/>
 		<voice sentence="Feel the wrath of father chyll!"/>

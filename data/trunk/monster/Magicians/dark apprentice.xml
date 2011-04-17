@@ -19,25 +19,25 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="30"/>
-		<attack name="fire" interval="2000" chance="7" range="7" radius="1" target="1" min="-2" max="-26">
+		<attack name="fire" interval="2000" chance="9" range="7" radius="1" target="1" min="-2" max="-26">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="fireattack"/>
 		</attack>	
-		<attack name="energy" interval="2000" chance="10" range="7" target="1" min="-10" max="-20">
+		<attack name="energy" interval="2000" chance="9" range="7" target="1" min="-10" max="-20">
 			<attribute key="shootEffect" value="energyball"/>
 			<attribute key="areaEffect" value="energy"/>
 		</attack>	
-		<attack name="physical" interval="2000" chance="8" range="7" target="1" min="-0" max="-24">
+		<attack name="physical" interval="2000" chance="9" range="7" target="1" min="-0" max="-24">
 			<attribute key="shootEffect" value="smallstone"/>
 		</attack>
-		<attack name="outfit" interval="2000" chance="10" monster="cyclops" duration="5000"/>
+		<attack name="outfit" interval="2000" chance="9" monster="cyclops" duration="5000"/>
 	</attacks>
 	<defenses armor="15" defense="20">
-	<defense name="outfit" interval="2000" chance="10" monster="green frog" duration="5000"/>	
-		<defense name="healing" interval="2000" chance="12" min="50" max="75">
+	<defense name="outfit" interval="2000" chance="9" monster="green frog" duration="5000"/>	
+		<defense name="healing" interval="2000" chance="9" min="50" max="75">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="invisible" interval="2000" chance="6" duration="5000">
+		<defense name="invisible" interval="2000" chance="9" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -47,22 +47,22 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Outch!"/>
 		<voice sentence="Oops, I did it again."/>
 		<voice sentence="From the spirits that I called Sir, deliver me!"/>
 		<voice sentence="I must dispose of my masters enemies!"/>
 	</voices>
 	<loot>
-    <item id="7618" chance="3500" /><!-- health potion -->
-    <item id="2148" countmax="45" chance="39375" /><!-- gold coin -->
-    <item id="2260" countmax="3" chance="5775" /><!-- blank rune -->
-    <item id="7620" chance="3400" /><!-- mana potion -->
+    <item id="2191" chance="2425" /><!-- wand of dragonbreath -->
+    <item id="5934" chance="13700" /><!-- dead frog -->
+    <item id="7618" chance="3725" /><!-- health potion -->
+    <item id="2260" countmax="3" chance="5650" /><!-- blank rune -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2191" chance="2350" /><!-- wand of dragonbreath -->
-            <item id="5934" chance="10650" /><!-- dead frog -->
-            <item id="2188" chance="525" /><!-- wand of decay -->
+            <item id="2148" countmax="45" chance="39075" /><!-- gold coin -->
+            <item id="7620" chance="3375" /><!-- mana potion -->
+            <item id="2188" chance="550" /><!-- wand of decay -->
         </inside>
     </item>
 </loot>

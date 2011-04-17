@@ -2,7 +2,7 @@
 <monster name="Lizard Abomination" nameDescription="lizard abomination" race="blood" experience="1350" speed="220" manacost="0">
 <health now="20000" max="20000"/>
 <look type="364" corpse="8964"/>
-<targetchange interval="2000" chance="10"/>
+<targetchange interval="2000" chance="9"/>
 <strategy attack="100" defense="0"/>
 <flags>
 <flag summonable="0"/>
@@ -19,13 +19,13 @@
 </flags>
 <attacks>
 <attack name="melee" interval="2000" skill="90" attack="110"/>
-		<attack name="earth" interval="2000" chance="40" radius="3" max="-980">
+		<attack name="earth" interval="2000" chance="18" radius="3" max="-980">
 			<attribute key="areaEffect" value="greenspark"/>
 		</attack>	
-		<attack name="lifedrain" interval="2000" chance="50" length="8" spread="0" min="-200" max="-300">
+		<attack name="lifedrain" interval="2000" chance="18" length="8" spread="0" min="-200" max="-300">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>	
-		<attack name="speed" interval="2000" chance="20" radius="3" speedchange="-800">
+		<attack name="speed" interval="2000" chance="18" radius="3" speedchange="-800">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>	
 </attacks>
@@ -40,7 +40,7 @@
 <immunity earth="1"/>
 <immunity invisibility="1"/>
 </immunities>
-<voices interval="2000" chance="10">
+<voices interval="2000" chance="9">
 		<voice sentence="NOOOO! NOW YOU HERETICS WILL FACE MY GODLY WRATH!" yell="1"/>
 		<voice sentence="RAAARRRR! I WILL DEVOL YOU!" yell="1"/>
 		<voice sentence="I WILL MAKE YOU ZHEE!" yell="1"/>

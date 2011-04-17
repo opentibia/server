@@ -19,20 +19,20 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="55" attack="80"/>
-		<attack name="death" interval="2000" chance="15" range="7" target="1" min="-400" max="-450">
+		<attack name="death" interval="2000" chance="16" range="7" target="1" min="-400" max="-450">
 			<attribute key="shootEffect" value="death"/>
 			<attribute key="areaEffect" value="mortarea"/>
 		</attack>	
-		<attack name="drunk" interval="2000" chance="13" range="7">
+		<attack name="drunk" interval="2000" chance="16" range="7">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="fireattack"/>
 		</attack>
 	</attacks>
 	<defenses armor="25" defense="20">
-		<defense name="invisible" interval="2000" chance="12">
+		<defense name="invisible" interval="2000" chance="25">
 			<attribute key="areaEffect" value="blueshimmer"/>											
 		</defense>	
-		<defense name="healing" interval="2000" chance="25" min="345" max="445">
+		<defense name="healing" interval="2000" chance="16" min="345" max="445">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -49,7 +49,7 @@
 		<immunity physical="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Oh my, you forgot to put your pants on!"/>
 		<voice sentence="Weeheeheeheehee!"/>
 		<voice sentence="Its nothing but a dream!"/>

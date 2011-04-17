@@ -28,21 +28,21 @@
 		<element energyPercent="-15"/>
 		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Brrrr"/>
 		<voice sentence="Broar!"/>
 	</voices>
 	<loot>
-    <item id="2245" chance="9825" /><!-- twigs -->
-    <item id="2148" countmax="12" chance="28425" /><!-- gold coin -->
-    <item id="2512" chance="15300" /><!-- wooden shield -->
-    <item id="2389" chance="20075" /><!-- spear -->
+    <item id="2245" chance="9900" /><!-- twigs -->
+    <item id="2148" countmax="12" chance="28375" /><!-- gold coin -->
+    <item id="2512" chance="15475" /><!-- wooden shield -->
+    <item id="2389" chance="20025" /><!-- spear -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2667" chance="16900" /><!-- fish -->
-            <item id="2384" chance="16125" /><!-- rapier -->
-            <item id="2651" chance="9900" /><!-- coat -->
-            <item id="10565" chance="2400" /><!-- frosty ear of a troll -->
+            <item id="2667" chance="16750" /><!-- fish -->
+            <item id="2384" chance="16300" /><!-- rapier -->
+            <item id="2651" chance="9750" /><!-- coat -->
+            <item id="10565" chance="2350" /><!-- frosty ear of a troll -->
         </inside>
     </item>
 </loot>

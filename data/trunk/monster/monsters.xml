@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monsters>
-	<!-- To check -->
 	<monster name="Lizard Gate Guardian" file="lizard gate guardian.xml"/>
-	<monster name="Lizard Noble" file="lizard noble.xml"/>
-	<monster name="Lizard Magistratus" file="lizard magistratus.xml"/>
+
 	<!-- Animals -->
 	<monster name="Azure Frog" file="Animals/azure frog.xml"/>
 	<monster name="Badger" file="Animals/badger.xml"/>
@@ -11,6 +9,7 @@
 	<monster name="Bear" file="Animals/bear.xml"/>
 	<monster name="Black Sheep" file="Animals/black sheep.xml"/>
 	<monster name="Blood Crab" file="Animals/blood crab.xml"/>
+	<monster name="Boar" file="Animals/boar.xml"/>
 	<monster name="Bug" file="Animals/bug.xml"/>
 	<monster name="Brimstone Bug" file="Animals/brimstone bug.xml"/>
 	<monster name="Cat" file="Animals/cat.xml"/>
@@ -43,6 +42,7 @@
 	<monster name="Sheep" file="Animals/sheep.xml"/>
 	<monster name="Silver Rabbit" file="Animals/silver rabbit.xml"/>
 	<monster name="Skunk" file="Animals/skunk.xml"/>
+	<monster name="Stampor" file="Animals/stampor.xml"/>
 	<monster name="Squirrel" file="Animals/squirrel.xml"/>
 	<monster name="Terror Bird" file="Animals/terror bird.xml"/>
 	<monster name="Thornback Tortoise" file="Animals/thornback tortoise.xml"/>
@@ -92,8 +92,10 @@
 	
 	<!-- Beholders -->
 	<monster name="Bonelord" file="Beholders/bonelord.xml"/>
+	<monster name="Beholder" file="Beholders/bonelord.xml"/>
 	<monster name="Braindeath" file="Beholders/braindeath.xml"/>
 	<monster name="Elder Bonelord" file="Beholders/elder bonelord.xml"/>
+	<monster name="Elder Beholder" file="Beholders/elder bonelord.xml"/>
 	<monster name="Gazer" file="Beholders/gazer.xml"/>
 
 	<!-- Bosses -->
@@ -101,13 +103,14 @@
 	<monster name="Apprentice Sheng" file="Bosses/apprentice sheng.xml"/>
 	<monster name="Ashmunrah" file="Bosses/ashmunrah.xml"/>
 	<monster name="Brutus Bloodbeard" file="Bosses/brutus bloodbeard.xml"/>
-	<monster name="Chizzoron the Distorter" file="Bosses/Chizzoron the Distorter.xml"/>
+	<monster name="Chizzoron the Distorter" file="Bosses/chizzoron the distorter.xml"/>
 	<monster name="Countess Sorrow" file="Bosses/countess sorrow.xml"/>
 	<monster name="Deadeye Devious" file="Bosses/deadeye devious.xml"/>
 	<monster name="Demodras" file="Bosses/demodras.xml"/>
 	<monster name="Dipthrah" file="Bosses/dipthrah.xml"/>
 	<monster name="Dire Penguin" file="Bosses/dire penguin.xml"/>
 	<monster name="Dracola" file="Bosses/dracola.xml"/>
+	<monster name="Draptor" file="Bosses/draptor.xml"/>
 	<monster name="Earth Overlord" file="Bosses/earth overlord.xml"/>
 	<monster name="Energy Overlord" file="Bosses/energy overlord.xml"/>
 	<monster name="Ferumbras" file="Bosses/ferumbras.xml"/>
@@ -294,11 +297,12 @@
 	<monster name="Elf Scout" file="Elves/elf scout.xml"/>
 
 	<!-- Event -->
+	<monster name="Demon (Goblin)" file="Event/demon (goblin).xml"/>
 	<monster name="Dryad" file="Event/dryad.xml"/>
 	<monster name="Grynch Clan Goblin" file="Event/grynch clan goblin.xml"/>
+	<monster name="The Halloween Hare" file="Event/the halloween hare.xml"/>
+	<monster name="Training Monk" file="Event/training monk.xml"/>
 	<monster name="Undead Jester" file="Event/undead jester.xml"/>
-	<monster name="Demon (Goblin)" file="Event/goblin.xml"/>
-	<monster name="Training Monk" file="event/training monk.xml"/>
 
 	<!-- Goblins -->
 	<monster name="Goblin" file="Goblins/goblin.xml"/>
@@ -353,8 +357,11 @@
 	<monster name="Lizard Abomination" file="Lizards/lizard abomination.xml"/>
 	<monster name="Lizard Chosen" file="Lizards/lizard chosen.xml"/>
 	<monster name="Lizard Dragon Priest" file="Lizards/lizard dragon priest.xml"/>
+	<monster name="Lizard Gate Guardian" file="Lizards/lizard gate guardian.xml"/>
 	<monster name="Lizard High Guard" file="Lizards/lizard high guard.xml"/>
 	<monster name="Lizard Legionnaire" file="Lizards/lizard legionnaire.xml"/>
+	<monster name="Lizard Noble" file="Lizards/lizard noble.xml"/>
+	<monster name="Lizard Magistratus" file="Lizards/lizard magistratus.xml"/>
 	<monster name="Lizard Sentinel" file="Lizards/lizard sentinel.xml"/>
 	<monster name="Lizard Snakecharmer" file="Lizards/lizard snakecharmer.xml"/>
 	<monster name="Lizard Templar" file="Lizards/lizard templar.xml"/>

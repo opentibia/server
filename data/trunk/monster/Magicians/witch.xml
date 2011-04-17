@@ -19,16 +19,16 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="10" attack="20"/>
-		<attack name="fire" interval="2000" chance="20" range="7" target="1" min="-30" max="-77">
+		<attack name="fire" interval="2000" chance="18" range="7" target="1" min="-30" max="-77">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>	
-		<attack name="firefield" interval="2000" chance="15" range="7" radius="1" target="1">
+		<attack name="firefield" interval="2000" chance="18" range="7" radius="1" target="1">
 			<attribute key="shootEffect" value="fire"/>
 		</attack>
 	</attacks>
 	<defenses armor="8" defense="12">
-			<defense name="outfit" interval="2000" chance="12" monster="green frog"/>
+			<defense name="outfit" interval="2000" chance="18" monster="green frog"/>
 	</defenses>
 	<elements>
 		<element earthPercent="20"/>
@@ -39,26 +39,26 @@
 		<immunity invisible="1"/>
 		<immunity energy="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Horax pokti! Hihihihi!"/>
 		<voice sentence="Herba budinia ex!"/>
 	</voices>
 	<loot>
-    <item id="10570" chance="675" /><!-- witch hat -->
-    <item id="2405" chance="33150" /><!-- sickle -->
-    <item id="2800" chance="9800" /><!-- star herb -->
-    <item id="2654" chance="41650" /><!-- cape -->
-    <item id="2687" countmax="8" chance="17375" /><!-- cookie -->
-    <item id="2643" chance="41875" /><!-- leather boots -->
-    <item id="2651" chance="17500" /><!-- coat -->
+    <item id="10570" chance="700" /><!-- witch hat -->
+    <item id="2405" chance="31700" /><!-- sickle -->
+    <item id="2800" chance="9850" /><!-- star herb -->
+    <item id="2654" chance="39800" /><!-- cape -->
+    <item id="2687" countmax="8" chance="17475" /><!-- cookie -->
+    <item id="2643" chance="39875" /><!-- leather boots -->
+    <item id="2651" chance="16675" /><!-- coat -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2199" chance="3050" /><!-- garlic necklace -->
-            <item id="2129" chance="10100" /><!-- wolf tooth chain -->
-            <item id="10569" chance="5850" /><!-- witch broom -->
-            <item id="2148" countmax="38" chance="6225" /><!-- gold coin -->
-            <item id="2402" chance="1200" /><!-- silver dagger -->
-            <item id="2185" chance="1650" /><!-- necrotic rod -->
+            <item id="2199" chance="2975" /><!-- garlic necklace -->
+            <item id="2129" chance="10050" /><!-- wolf tooth chain -->
+            <item id="10569" chance="6200" /><!-- witch broom -->
+            <item id="2148" countmax="38" chance="7150" /><!-- gold coin -->
+            <item id="2402" chance="1175" /><!-- silver dagger -->
+            <item id="2185" chance="1600" /><!-- necrotic rod -->
         </inside>
     </item>
 </loot>

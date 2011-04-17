@@ -2,7 +2,7 @@
 <monster name="The Dreadorian" nameDescription="The Dreadorian" race="blood" experience="4000" speed="250" manacost="0">
 	<health now="9000" max="9000"/>
 	<look type="234" corpse="6328"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -21,7 +21,7 @@
 		<attack name="melee" interval="2000" skill="64" attack="100"/>
 	</attacks>
 	<defenses armor="25" defense="35">
-		<defense name="healing" interval="2000" chance="50" min="100" max="150">
+		<defense name="healing" interval="2000" chance="25" min="100" max="150">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>

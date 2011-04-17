@@ -27,14 +27,14 @@
 	<immunities>
 		<immunity earth="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Grrrr"/>
 		<voice sentence="Groar"/>
 	</voices>
 	<loot>
-    <item id="2671" countmax="2" chance="39850" /><!-- ham -->
-    <item id="2666" countmax="4" chance="74275" /><!-- meat -->
-	<item id="12401" chance="11500" /><!-- bamboo stick -->
+    <item id="2671" countmax="2" chance="36050" /><!-- ham -->
+    <item id="2666" countmax="4" chance="72725" /><!-- meat -->
+    <item id="12401" chance="2725" /><!-- bamboo stick -->
 </loot>
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Draken Spellweaver" nameDescription="a draken spellweaver" race="blood" experience="2600" speed="240" manacost="0">
     <health now="5000" max="5000"/>
-    <look type="340" corpse="11310"/>
+    <look type="340" corpse="11317"/>
 	<targetchange interval="5000" chance="8"/>
     <strategy attack="100" defense="0"/>
     <flags>
@@ -19,24 +19,24 @@
      </flags>
 <attacks>
 <attack name="melee" interval="2000" skill="70" attack="50"/>
-<attack name="fire" interval="2000" chance="15" range="7" radius="1" target="1" max="-250">
+<attack name="fire" interval="2000" chance="14" range="7" radius="1" target="1" max="-250">
 <attribute key="shootEffect" value="fire"/>
 <attribute key="areaEffect" value="firearea"/>
 </attack>
-	<attack name="fire" interval="2000" chance="20" length="4" spread="3" max="-480">
+	<attack name="fire" interval="2000" chance="14" length="4" spread="3" max="-480">
 <attribute key="shootEffect" value="explosion"/>
 <attribute key="areaEffect" value="explosion"/>
 	  </attack>
-	<attack name="energy" interval="2000" chance="13" range="7" target="1" max="-300">
+	<attack name="energy" interval="2000" chance="14" range="7" target="1" max="-300">
 	  <attribute key="shootEffect" value="energyball"/>
 	  <attribute key="areaEffect" value="energy"/>
 	  </attack>
-	  <attack name="earth" interval="2000" chance="6" target="0" radius="6" min="-200" max="-380">
+	  <attack name="earth" interval="2000" chance="14" target="0" radius="6" min="-200" max="-380">
 			<attribute key="areaEffect" value="poff"/>
 		</attack>
 </attacks>
 	<defenses armor="25" defense="25">
-	<defense name="invisible" interval="2000" chance="10">
+	<defense name="invisible" interval="2000" chance="22">
 	<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -53,22 +53,22 @@
 <immunity invisible="1"/>
 </immunities>
 <loot>
-    <item id="11356" chance="1325" /><!-- zaoan robe -->
+    <item id="11356" chance="1300" /><!-- zaoan robe -->
+    <item id="8871" chance="1375" /><!-- focus cape -->
+    <item id="2147" countmax="5" chance="1775" /><!-- small ruby -->
+    <item id="11303" chance="2525" /><!-- zaoan shoes -->
+    <item id="2123" chance="1000" /><!-- ring of the sky -->
+    <item id="11314" chance="15775" /><!-- weaver's wandtip -->
     <item id="2152" countmax="5" chance="6600" /><!-- platinum coin -->
-    <item id="2148" countmax="100" chance="41300" /><!-- gold coin -->
-    <item id="2148" countmax="98" chance="41300" /><!-- gold coin -->
-    <item id="2147" countmax="5" chance="1725" /><!-- small ruby -->
-    <item id="11355" chance="1275" /><!-- spellweaver's robe -->
-    <item id="8871" chance="1450" /><!-- focus cape -->
-    <item id="2666" chance="30400" /><!-- meat -->
-    <item id="11303" chance="2550" /><!-- zaoan shoes -->
+    <item id="2187" chance="2225" /><!-- wand of inferno -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2187" chance="2225" /><!-- wand of inferno -->
-            <item id="11308" chance="15525" /><!-- weaver's wandtip -->
-            <item id="11304" chance="1450" /><!-- zaoan legs -->
-            <item id="7590" chance="2500" /><!-- great mana potion -->
-            <item id="2123" chance="950" /><!-- ring of the sky -->
+            <item id="11355" chance="1325" /><!-- spellweaver's robe -->
+            <item id="2666" chance="30850" /><!-- meat -->
+            <item id="7590" chance="2525" /><!-- great mana potion -->
+            <item id="2148" countmax="100" chance="41175" /><!-- gold coin -->
+            <item id="2148" countmax="99" chance="41175" /><!-- gold coin -->
+            <item id="11304" chance="1425" /><!-- zaoan legs -->
         </inside>
     </item>
 </loot>

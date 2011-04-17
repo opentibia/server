@@ -19,15 +19,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="120" attack="160"/>
-		<attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-780">
+		<attack name="physical" interval="2000" chance="30" range="7" min="-0" max="-780">
 		<attribute key="shootEffect" value="largerock"/>
 		</attack>
 	</attacks>
 	<defenses armor="15" defense="15">
-		<defense name="speed" interval="2000" chance="15" speedchange="850" duration="5000">
+		<defense name="speed" interval="2000" chance="30" speedchange="850" duration="5000">
 		<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
-		<defense name="healing" interval="2000" chance="10" min="350" max="550">
+		<defense name="healing" interval="2000" chance="30" min="350" max="550">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -49,20 +49,20 @@
 		<voice sentence="GRRRRRR!" yell="1"/>
 	</voices>
 	<loot>
-    <item id="2671" chance="79750" /><!-- ham -->
-    <item id="2148" countmax="100" chance="40875" /><!-- gold coin -->
-    <item id="2148" countmax="89" chance="40875" /><!-- gold coin -->
-    <item id="6558" countmax="4" chance="20625" /><!-- concentrated demonic blood -->
-    <item id="5944" chance="34700" /><!-- soul orb -->
-    <item id="7590" chance="10300" /><!-- great mana potion -->
-    <item id="6500" countmax="3" chance="45025" /><!-- demonic essence -->
-    <item id="9810" chance="10000" /><!-- rusty armor -->
+    <item id="2671" chance="79575" /><!-- ham -->
+    <item id="2148" countmax="100" chance="40800" /><!-- gold coin -->
+    <item id="2148" countmax="89" chance="40800" /><!-- gold coin -->
+    <item id="6558" countmax="4" chance="20500" /><!-- concentrated demonic blood -->
+    <item id="5944" chance="34650" /><!-- soul orb -->
+    <item id="7590" chance="10450" /><!-- great mana potion -->
+    <item id="6500" countmax="3" chance="45000" /><!-- demonic essence -->
+    <item id="9810" chance="9950" /><!-- rusty armor -->
     <item id="7365" countmax="5" chance="1700" /><!-- onyx arrow -->
-    <item id="7591" chance="10200" /><!-- great health potion -->
+    <item id="7591" chance="10250" /><!-- great health potion -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2152" countmax="4" chance="4100" /><!-- platinum coin -->
-            <item id="9971" chance="5250" /><!-- gold ingot -->
+            <item id="2152" countmax="4" chance="4075" /><!-- platinum coin -->
+            <item id="9971" chance="5325" /><!-- gold ingot -->
             <item id="7368" countmax="2" chance="1175" /><!-- assassin star -->
             <item id="2514" chance="800" /><!-- mastermind shield -->
             <item id="2452" chance="600" /><!-- heavy mace -->

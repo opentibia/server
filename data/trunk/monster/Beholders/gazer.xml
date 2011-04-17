@@ -2,7 +2,7 @@
 <monster name="Gazer" nameDescription="a gazer" race="venom" experience="90" speed="240" manacost="0">
 	<health now="120" max="120"/>
 	<look type="109" corpse="6036"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,10 +19,10 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="10" attack="15"/>
-		<attack name="lifedrain" interval="2000" chance="25" range="7" min="-25" max="-35">
+		<attack name="lifedrain" interval="2000" chance="20" range="7" min="-25" max="-35">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
-		<attack name="manadrain" interval="2000" chance="25" range="7" min="-10" max="-35">
+		<attack name="manadrain" interval="2000" chance="20" range="7" min="-10" max="-35">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
 	</attacks>
@@ -37,7 +37,7 @@
 		<immunity invisible="1"/>
 		<immunity earth="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Mommy!?"/>
 		<voice sentence="Buuuuhaaaahhaaaaa!"/>
 		<voice sentence="Me need mana!"/>

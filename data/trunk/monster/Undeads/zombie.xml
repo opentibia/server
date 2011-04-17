@@ -19,11 +19,11 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="42" attack="50"/>
-		<attack name="manadrain" interval="2000" chance="13" range="1" min="-14" max="-23"/>
-		<attack name="lifedrain" interval="2000" chance="15" range="7" target="1" min="-15" max="-24">
+		<attack name="manadrain" interval="2000" chance="18" range="1" min="-14" max="-23"/>
+		<attack name="lifedrain" interval="2000" chance="18" range="7" target="1" min="-15" max="-24">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
-		<attack name="death" interval="2000" chance="10" range="7" target="1" min="-30" max="-49">
+		<attack name="death" interval="2000" chance="18" range="7" target="1" min="-30" max="-49">
 			<attribute key="shootEffect" value="death"/>
 			<attribute key="areaEffect" value="mortarea"/>
 		</attack>
@@ -40,24 +40,24 @@
 		<immunity lifedrain="1"/>
 		<immunity paralyze="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Mst.... klll...."/>
 		<voice sentence="Whrrrr... ssss.... mmm.... grrrrl"/>
 		<voice sentence="Dnnnt... cmmm... clsrrr...."/>
 		<voice sentence="Httt.... hmnnsss..."/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="65" chance="28875" /><!-- gold coin -->
+    <item id="2148" countmax="65" chance="28900" /><!-- gold coin -->
     <item id="2460" chance="11150" /><!-- brass helmet -->
     <item id="2457" chance="5700" /><!-- steel helmet -->
-    <item id="2398" chance="9325" /><!-- mace -->
+    <item id="2398" chance="9300" /><!-- mace -->
     <item id="10576" chance="11225" /><!-- half-eaten brain -->
-    <item id="2417" chance="7850" /><!-- battle hammer -->
+    <item id="2417" chance="7875" /><!-- battle hammer -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="9808" chance="7225" /><!-- rusty armor -->
+            <item id="9808" chance="7200" /><!-- rusty armor -->
             <item id="7620" chance="1325" /><!-- mana potion -->
-            <item id="2381" chance="4850" /><!-- halberd -->
+            <item id="2381" chance="4825" /><!-- halberd -->
             <item id="2168" chance="1600" /><!-- life ring -->
             <item id="2657" chance="1150" /><!-- simple dress -->
         </inside>

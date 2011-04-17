@@ -19,14 +19,14 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="30"/>
-		<attack name="drunk" interval="2000" chance="10" range="7" target="1"/>
-		<attack name="energy" interval="2000" chance="15" range="7" target="1" min="-10" max="-30">
+		<attack name="drunk" interval="2000" chance="16" range="7" target="1"/>
+		<attack name="energy" interval="2000" chance="16" range="7" target="1" min="-10" max="-30">
 			<attribute key="shootEffect" value="energyball"/>
 			<attribute key="areaEffect" value="energy"/>
 		</attack>
 	</attacks>
 	<defenses armor="10" defense="10">
-			<defense name="healing" interval="2000" chance="10" min="10" max="20">
+			<defense name="healing" interval="2000" chance="16" min="10" max="20">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>		
 	</defenses>
@@ -41,13 +41,13 @@
 		<element holyPercent="65"/>
 	</elements>
 	<summons maxSummons="3">
-		<summon name="Mercury Blob" interval="2000" chance="5" max="3"/>
+		<summon name="Mercury Blob" interval="2000" chance="16" max="3"/>
 	</summons>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Crackle"/>
 	</voices>
 	<loot>
-    <item id="9966" chance="17275" /><!-- glob of mercury -->
+    <item id="9966" chance="17350" /><!-- glob of mercury -->
 </loot>
 
 

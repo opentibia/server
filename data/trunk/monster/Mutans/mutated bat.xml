@@ -19,22 +19,22 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="60" attack="50" poison="120"/>
-		<attack name="poison" interval="2000" chance="12" range="7" min="70" max="-180">
+		<attack name="poison" interval="2000" chance="14" range="7" min="70" max="-180">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="drown" interval="2000" chance="8" range="10" target="1" radius="3" min="-30" max="-90">
+		<attack name="drown" interval="2000" chance="14" range="10" target="1" radius="3" min="-30" max="-90">
 			<attribute key="areaEffect" value="whitenote"/>
 		</attack>
-		<attack name="drown" interval="2000" chance="8" range="6" lenth="8" spread="3" min="-20" max="-260">
+		<attack name="drown" interval="2000" chance="14" range="6" lenth="8" spread="3" min="-20" max="-260">
 			<attribute key="areaEffect" value="purplenote"/>
 		</attack>
-		<attack name="poisoncondition" interval="2000" chance="8" length="8" spread="3" min="-240" max="-240">
+		<attack name="poisoncondition" interval="2000" chance="14" length="8" spread="3" min="-240" max="-240">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
 	</attacks>
 	<defenses armor="30" defense="30">
-			<defense name="healing" interval="2000" chance="10" min="80" max="100">
+			<defense name="healing" interval="2000" chance="14" min="80" max="100">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>	
 	</defenses>
@@ -45,23 +45,23 @@
 		<immunity invisible="1"/>
 		<immunity drunk="1"/>
 	</immunities>
-	<voices interval="2500" chance="10">
+	<voices interval="2500" chance="9">
 	</voices>
 	<loot>
-    <item id="2148" countmax="100" chance="37700" /><!-- gold coin -->
-    <item id="2148" countmax="30" chance="37700" /><!-- gold coin -->
-    <item id="2800" chance="5600" /><!-- star herb -->
-    <item id="9809" countmax="2" chance="6900" /><!-- rusty armor -->
-    <item id="2513" chance="8300" /><!-- battle shield -->
-    <item id="2425" chance="7400" /><!-- obsidian lance -->
-    <item id="5894" countmax="3" chance="4450" /><!-- bat wing -->
-    <item id="10579" chance="5600" /><!-- mutated bat ear -->
+    <item id="2148" countmax="100" chance="37625" /><!-- gold coin -->
+    <item id="2148" countmax="30" chance="37625" /><!-- gold coin -->
+    <item id="2800" chance="5550" /><!-- star herb -->
+    <item id="9809" countmax="2" chance="6875" /><!-- rusty armor -->
+    <item id="2513" chance="8225" /><!-- battle shield -->
+    <item id="2425" chance="7375" /><!-- obsidian lance -->
+    <item id="5894" countmax="3" chance="4475" /><!-- bat wing -->
+    <item id="10579" chance="5675" /><!-- mutated bat ear -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="2167" chance="1375" /><!-- energy ring -->
             <item id="2150" countmax="2" chance="850" /><!-- small amethyst -->
             <item id="2144" countmax="3" chance="1100" /><!-- black pearl -->
-            <item id="10016" chance="600" /><!-- batwing hat -->
+            <item id="10016" chance="575" /><!-- batwing hat -->
             <item id="7386" chance="575" /><!-- mercenary sword -->
             <item id="2529" chance="600" /><!-- black shield -->
         </inside>

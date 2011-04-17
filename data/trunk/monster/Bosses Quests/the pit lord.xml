@@ -20,15 +20,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="85" attack="80"/>
-		<attack name="physical" interval="4000" chance="20" min="-0" max="-205">
+		<attack name="physical" interval="2000" chance="18" min="-0" max="-205">
 			<attribute key="shootEffect" value="largerock"/>
 		</attack>
 	</attacks>
 	<defenses armor="46" defense="44">
-		<defense name="speed" interval="6000" chance="10" duration="2500" speedchange="500">
+		<defense name="speed" interval="2000" chance="18" duration="2500" speedchange="500">
 			<attribute key="areaEffect" value="greenspark"/>
 		</defense>
-		<defense name="healing" interval="6000" chance="65" min="50" max="100">
+		<defense name="healing" interval="2000" chance="18" min="50" max="100">
 			<attribute key="areaEffect" value="redspark"/>
 		</defense>
 	</defenses>
@@ -43,7 +43,7 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="I'LL GET YOU ALL!" yell="1"/>
 		<voice sentence="I won't let you escape!"/>
 		<voice sentence="I'll crush you beneath my feet!"/>

@@ -2,7 +2,7 @@
 <monster name="Elephant" nameDescription="a elephant" race="blood" experience="160" speed="190" manacost="500">
 	<health now="320" max="320"/>
 	<look type="211" corpse="6052"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="1"/>
@@ -26,15 +26,15 @@
 		<element icePercent="20"/>
 		<element energyPercent="-10"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Hooooot-Toooooot!"/>
 		<voice sentence="Tooooot!"/>
 		<voice sentence="Troooooot!"/>
 	</voices>
 	<loot>
-    <item id="2666" countmax="4" chance="42525" /><!-- meat -->
-    <item id="2671" countmax="3" chance="29900" /><!-- ham -->
-    <item id="8614" countmax="2" chance="1275" /><!-- tusk -->
+    <item id="2666" countmax="4" chance="42725" /><!-- meat -->
+    <item id="2671" countmax="3" chance="29650" /><!-- ham -->
+    <item id="8614" countmax="2" chance="1325" /><!-- tusk -->
     <item id="3973" chance="550" /><!-- tusk shield -->
 </loot>
 

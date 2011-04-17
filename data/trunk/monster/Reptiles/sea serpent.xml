@@ -18,25 +18,25 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="100"/>
-		<attack name="earth" interval="2000" chance="9" length="8" spread="3" min="-60" max="-300">
+		<attack name="earth" interval="2000" chance="14" length="8" spread="3" min="-60" max="-300">
 			<attribute key="areaEffect" value="bigplants"/>
 		</attack>
-		<attack name="ice" interval="2000" chance="7" length="9" spread="3" min="-100" max="-300">
+		<attack name="ice" interval="2000" chance="14" length="9" spread="3" min="-100" max="-300">
 			<attribute key="areaEffect" value="icearea"/>
 		</attack>
-		<attack name="drown" interval="2000" chance="11" radius="4" target="1" min="-120" max="-120">
+		<attack name="drown" interval="2000" chance="14" radius="4" target="1" min="-120" max="-120">
 			<attribute key="areaEffect" value="bluebubble"/>
 		</attack>
 	</attacks>
 	<defenses armor="16" defense="25">
-		<defense name="healing" interval="2000" chance="25" min="290" max="350">
+		<defense name="healing" interval="2000" chance="14" min="290" max="350">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="10" speedchange="700" duration="5000">
+		<defense name="speed" interval="2000" chance="14" speedchange="700" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>	
 	</defenses>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="CHHHRRRR"/>
 		<voice sentence="HISSSS"/>
 	</voices>
@@ -55,25 +55,25 @@
     <item id="2148" countmax="100" chance="38400" /><!-- gold coin -->
     <item id="2148" countmax="100" chance="38400" /><!-- gold coin -->
     <item id="2148" countmax="39" chance="38400" /><!-- gold coin -->
-    <item id="2165" chance="950" /><!-- stealth ring -->
-    <item id="2672" chance="60975" /><!-- dragon ham -->
+    <item id="2165" chance="975" /><!-- stealth ring -->
+    <item id="2672" chance="61000" /><!-- dragon ham -->
     <item id="2146" countmax="3" chance="3125" /><!-- small sapphire -->
-    <item id="7588" chance="5450" /><!-- strong health potion -->
+    <item id="7588" chance="5400" /><!-- strong health potion -->
     <item id="10583" chance="10600" /><!-- sea serpent scale -->
-    <item id="2647" chance="7750" /><!-- plate legs -->
+    <item id="2647" chance="7775" /><!-- plate legs -->
     <item id="7589" chance="4500" /><!-- strong mana potion -->
     <item id="2409" chance="4450" /><!-- serpent sword -->
     <item id="7888" chance="1400" /><!-- glacier amulet -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="8911" chance="1600" /><!-- northwind rod -->
-            <item id="8870" chance="3500" /><!-- spirit cloak -->
-            <item id="7590" chance="1500" /><!-- great mana potion -->
-            <item id="8871" chance="925" /><!-- focus cape -->
-            <item id="7896" chance="925" /><!-- glacier kilt -->
+            <item id="8870" chance="3550" /><!-- spirit cloak -->
+            <item id="7590" chance="1525" /><!-- great mana potion -->
+            <item id="8871" chance="900" /><!-- focus cape -->
+            <item id="7896" chance="900" /><!-- glacier kilt -->
             <item id="2214" chance="1800" /><!-- ring of healing -->
             <item id="8878" chance="575" /><!-- crystalline armor -->
-            <item id="10220" chance="600" /><!-- leviathan's amulet -->
+            <item id="10220" chance="625" /><!-- leviathan's amulet -->
         </inside>
     </item>
 </loot>

@@ -20,7 +20,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="25" attack="20"/>
-		<attack name="physical" interval="2000" chance="30" range="7" target="1" min="-0" max="-45">
+		<attack name="physical" interval="2000" chance="25" range="7" target="1" min="-0" max="-45">
 			<attribute key="shootEffect" value="smallstone"/>
 		</attack>
 	</attacks>
@@ -34,8 +34,8 @@
 	<immunities>
 		<immunity ice="1"/>
 	</immunities>
-	<voices interval="2000" chance="5">
-		<voice sentence="Chikuva!!"/>
+	<voices interval="2000" chance="9">
+		<voice sentence="Chikuva!"/>
 		<voice sentence="Jinuma jamjam!"/>
 		<voice sentence="Suvituka siq chuqua!"/>
 		<voice sentence="Kiyosa sipaju!"/>

@@ -19,27 +19,27 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="100"/>
-		<attack name="speed" interval="2000" chance="6" range="7" speedchange="-600" duration="5000">
+		<attack name="speed" interval="2000" chance="9" range="7" speedchange="-600" duration="5000">
 		</attack>			
-		<attack name="earth" interval="2000" chance="7" length="8" spread="3" min="-0" max="-500">
+		<attack name="earth" interval="2000" chance="9" length="8" spread="3" min="-0" max="-500">
 			<attribute key="areaEffect" value="smallplants"/>
 		</attack>	
 		<attack name="lifedrain" interval="2000" chance="9" length="8" spread="0" min="-0" max="-500">
 			<attribute key="areaEffect" value="rednote"/>
 		</attack>	
-		<attack name="poison" interval="2000" chance="12" range="1" min="-0" max="-300">
+		<attack name="poison" interval="2000" chance="9" range="1" min="-0" max="-300">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="outfit" interval="2000" chance="11" range="7" item="3976" duration="4000">
+		<attack name="outfit" interval="2000" chance="9" range="7" item="3976" duration="4000">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</attack>
 	</attacks>
 	<defenses armor="18" defense="25">
-		<defense name="healing" interval="2000" chance="10" min="250" max="400">
+		<defense name="healing" interval="2000" chance="9" min="250" max="400">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="8" speedchange="320" duration="5000">
+		<defense name="speed" interval="2000" chance="9" speedchange="320" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -53,7 +53,7 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Sssssouls for the one"/>
 		<voice sentence="HISSSS" yell="1"/>
 		<voice sentence="Tsssse one will risssse again"/>
@@ -65,27 +65,27 @@
     <item id="2148" countmax="45" chance="36650" /><!-- gold coin -->
     <item id="2168" chance="6450" /><!-- life ring -->
     <item id="2167" chance="6425" /><!-- energy ring -->
-    <item id="2146" chance="12600" /><!-- small sapphire -->
-    <item id="2796" chance="18225" /><!-- green mushroom -->
-    <item id="2547" chance="6300" /><!-- power bolt -->
-    <item id="7590" chance="2475" /><!-- great mana potion -->
-    <item id="10611" chance="15250" /><!-- snake skin -->
-    <item id="2487" chance="1000" /><!-- crown armor -->
+    <item id="2146" chance="12550" /><!-- small sapphire -->
+    <item id="2796" chance="18200" /><!-- green mushroom -->
+    <item id="2547" chance="6325" /><!-- power bolt -->
+    <item id="7590" chance="2500" /><!-- great mana potion -->
+    <item id="10611" chance="15325" /><!-- snake skin -->
+    <item id="2487" chance="975" /><!-- crown armor -->
     <item id="2475" chance="1050" /><!-- warrior helmet -->
-    <item id="2177" chance="1300" /><!-- life crystal -->
+    <item id="2177" chance="1275" /><!-- life crystal -->
     <item id="7386" chance="2450" /><!-- mercenary sword -->
-    <item id="2033" chance="3550" /><!-- golden mug -->
+    <item id="2033" chance="3575" /><!-- golden mug -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2479" chance="1150" /><!-- strange helmet -->
-            <item id="2182" chance="1550" /><!-- snakebite rod -->
+            <item id="2479" chance="1125" /><!-- strange helmet -->
+            <item id="2182" chance="1575" /><!-- snakebite rod -->
             <item id="4842" chance="1025" /><!-- old parchment -->
             <item id="11230" chance="1575" /><!-- winged tail -->
             <item id="7456" chance="1300" /><!-- noble axe -->
             <item id="2498" chance="625" /><!-- royal helmet -->
             <item id="8902" chance="575" /><!-- spellbook of mind control -->
             <item id="3971" chance="700" /><!-- charmer's tiara -->
-            <item id="2528" chance="1300" /><!-- tower shield -->
+            <item id="2528" chance="1325" /><!-- tower shield -->
             <item id="8880" chance="600" /><!-- swamplair armor -->
         </inside>
     </item>

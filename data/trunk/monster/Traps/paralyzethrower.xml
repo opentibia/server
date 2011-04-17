@@ -18,10 +18,10 @@
     <flag hidehealth="1"/>
   </flags>
   <attacks>
-		<attack name="manadrain" interval="2000" radius="4" target="0" min="-60" max="-230">
+		<attack name="manadrain" interval="2000" chance="20" radius="4" target="0" min="-60" max="-230">
 			<attribute key="areaEffect" value="poff"/>
     </attack>
-	 <attack name="paralyze" interval="2000" chance="40" target="1">
+	 <attack name="paralyze" interval="2000" chance="20" target="1">
 	 <attribute key="areaEffect" value="poff"/>
 	 </attack>
   </attacks>
@@ -35,7 +35,6 @@
     <immunity holy="1"/>
     <immunity death="1"/>
     <immunity lifedrain="1"/>
-    <immunity manadrain="1"/>
     <immunity paralyze="1"/>
     <immunity drunk="1"/>
     <immunity outfit="1"/>

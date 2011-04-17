@@ -2,7 +2,7 @@
 <monster name="Tirecz" nameDescription="Tirecz" race="blood" experience="6000" speed="220" manacost="0">
 <health now="25000" max="25000"/>
 <look type="334" corpse="11103"/>
-<targetchange interval="2000" chance="10"/>
+<targetchange interval="2000" chance="9"/>
 <strategy attack="100" defense="0"/>
 <flags>
 <flag summonable="0"/>
@@ -19,21 +19,21 @@
 </flags>
 <attacks>
 <attack name="melee" interval="2000" skill="72" attack="100"/>
-<attack name="invisible" interval="2000" chance="25" range="7" radius="1" target="1">
+<attack name="invisible" interval="2000" chance="12" range="7" radius="1" target="1">
 <attribute key="shootEffect" value="fire"/>
 <attribute key="areaEffect" value="firearea"/>
 </attack>
-<attack name="fire" interval="2000" chance="25" lenght="8" spread="3" min="-0" max="-360">
+<attack name="fire" interval="2000" chance="12" lenght="8" spread="3" min="-0" max="-360">
 <attribute key="shootEffect" value="fire"/>
 <attribute key="areaEffect" value="firearea"/>
 </attack>
-<attack name="physical" interval="2000" chance="10" radius="3" target="0" min="-0" max="-190">
+<attack name="physical" interval="2000" chance="12" radius="3" target="0" min="-0" max="-190">
 <attribute key="areaEffect" value="yellowspark"/>
 </attack>
-<attack name="energy" interval="3000" chance="30" length="8" spread="0" min="-0" max="-245">
+<attack name="energy" interval="3000" chance="12" length="8" spread="0" min="-0" max="-245">
 <attribute key="areaEffect" value="energy"/>
 </attack>
-<attack name="physical" interval="2000" chance="15" radius="7" target="0" min="-200" max="-300">
+<attack name="physical" interval="2000" chance="12" radius="7" target="0" min="-200" max="-300">
 <attribute key="areaEffect" value="redspark"/>
 </attack>
 </attacks>
@@ -50,7 +50,7 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-<voices interval="2000" chance="10">
+<voices interval="2000" chance="9">
 <voice sentence="Hissss!"/>
 </voices>
 </monster>

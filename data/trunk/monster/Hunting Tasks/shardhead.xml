@@ -20,11 +20,11 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="100" attack="50"/>
-		<attack name="ice" interval="2000" chance="15" range="7" target="1" min="-0" max="-90">
+		<attack name="ice" interval="2000" chance="20" range="7" target="1" min="-0" max="-90">
 			<attribute key="shootEffect" value="ice"/>
 			<attribute key="areaEffect" value="iceattack"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="12" length="8" spread="0" speedchange="-360" duration="5000">
+		<attack name="speed" interval="2000" chance="20" length="8" spread="0" speedchange="-360" duration="5000">
 		<attribute key="areaEffect" value="icearea"/>
 		</attack>	
 	</attacks>

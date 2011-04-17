@@ -26,15 +26,15 @@
 		<element icePercent="-10"/>
 		<element deathPercent="-5"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Grrrr"/>
 		<voice sentence="Groar"/>
 	</voices>
 	<loot>
-    <item id="2666" chance="40050" /><!-- meat -->
-    <item id="2671" chance="20200" /><!-- ham -->
+    <item id="2666" chance="39550" /><!-- meat -->
+    <item id="2671" chance="20100" /><!-- ham -->
     <item id="5896" countmax="3" chance="2350" /><!-- bear paw -->
-    <item id="5902" chance="1275" /><!-- honeycomb -->
+    <item id="5902" chance="1225" /><!-- honeycomb -->
 </loot>
 
 

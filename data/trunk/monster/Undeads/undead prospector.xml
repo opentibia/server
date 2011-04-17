@@ -21,7 +21,7 @@
 		<attack name="melee" interval="2000" skill="40" attack="28"/>
 	</attacks>
 	<defenses armor="8" defense="17">
-		<defense name="healing" interval="2000" chance="15" min="5" max="15">
+		<defense name="healing" interval="2000" chance="25" min="5" max="15">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -38,13 +38,13 @@
 		<immunity invisible="1"/>
 	</immunities>
 	<loot>
-    <item id="3976" countmax="6" chance="46325" /><!-- worm -->
-    <item id="2148" countmax="29" chance="38150" /><!-- gold coin -->
-    <item id="2403" chance="33825" /><!-- knife -->
+    <item id="3976" countmax="6" chance="54675" /><!-- worm -->
+    <item id="2148" countmax="29" chance="41875" /><!-- gold coin -->
+    <item id="2403" chance="31750" /><!-- knife -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2050" chance="58825" /><!-- torch -->
-            <item id="2460" chance="17175" /><!-- brass helmet -->
+            <item id="2050" chance="56750" /><!-- torch -->
+            <item id="2460" chance="19250" /><!-- brass helmet -->
         </inside>
     </item>
 </loot>

@@ -27,23 +27,23 @@
 		<element earthPercent="-10"/>
 		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Grow truk grrrr."/>
 		<voice sentence="Trak grrrr brik."/>
 		<voice sentence="Alk!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="15" chance="34075" /><!-- gold coin -->
-    <item id="2666" chance="16575" /><!-- meat -->
-    <item id="2464" chance="7875" /><!-- chain armor -->
+    <item id="2148" countmax="15" chance="34375" /><!-- gold coin -->
+    <item id="2666" chance="16300" /><!-- meat -->
+    <item id="2464" chance="7775" /><!-- chain armor -->
     <item id="12436" chance="1725" /><!-- skull belt -->
-    <item id="11113" chance="1300" /><!-- orc tooth -->
-    <item id="12435" chance="4400" /><!-- orc leather -->
+    <item id="11113" chance="1275" /><!-- orc tooth -->
+    <item id="12435" chance="4550" /><!-- orc leather -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="12409" chance="10200" /><!-- broken helmet -->
-            <item id="2530" chance="975" /><!-- copper shield -->
-            <item id="2411" chance="550" /><!-- poison dagger -->
+            <item id="12409" chance="10550" /><!-- broken helmet -->
+            <item id="2530" chance="950" /><!-- copper shield -->
+            <item id="2411" chance="575" /><!-- poison dagger -->
         </inside>
     </item>
 </loot>

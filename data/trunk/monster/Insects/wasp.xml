@@ -31,7 +31,7 @@
 		<voice sentence="Bssssss"/>
 	</voices>
 	<loot>
-    <item id="5902" countmax="3" chance="3575" /><!-- honeycomb -->
+    <item id="5902" countmax="3" chance="3550" /><!-- honeycomb -->
 </loot>
 
 

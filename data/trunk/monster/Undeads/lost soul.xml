@@ -19,10 +19,10 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="60" attack="120"/>
-		<attack name="speed" interval="2000" chance="15" radius="5" target="0" speedchange="-600">
+		<attack name="speed" interval="2000" chance="20" radius="5" target="0" speedchange="-600">
 			<attribute key="areaEffect" value="mortarea"/>
 		</attack>
-		<attack name="death" interval="2000" chance="15" length="8" spread="0" max="-210">
+		<attack name="death" interval="2000" chance="20" length="8" spread="0" max="-210">
 			<attribute key="areaEffect" value="mortarea"/>
 		</attack>
 	</attacks>
@@ -44,29 +44,29 @@
 		<voice sentence="Mouuuurn meeee!"/>
 	</voices>
 	<loot>
-    <item id="2483" chance="10225" /><!-- scale armor -->
+    <item id="2483" chance="10150" /><!-- scale armor -->
     <item id="6300" chance="1475" /><!-- death ring -->
-    <item id="11233" chance="28500" /><!-- unholy bone -->
-    <item id="2197" chance="3000" /><!-- stone skin amulet -->
-    <item id="7413" chance="1350" /><!-- titan axe -->
-    <item id="7590" chance="10000" /><!-- great mana potion -->
+    <item id="11233" chance="28600" /><!-- unholy bone -->
+    <item id="2197" chance="2950" /><!-- stone skin amulet -->
+    <item id="7413" chance="1300" /><!-- titan axe -->
+    <item id="7590" chance="10175" /><!-- great mana potion -->
     <item id="5944" chance="6800" /><!-- soul orb -->
-    <item id="2260" chance="35450" /><!-- blank rune -->
-    <item id="2457" chance="10300" /><!-- steel helmet -->
+    <item id="2260" chance="35475" /><!-- blank rune -->
+    <item id="2457" chance="10325" /><!-- steel helmet -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="9810" countmax="2" chance="6375" /><!-- rusty armor -->
-            <item id="2463" chance="11000" /><!-- plate armor -->
-            <item id="2148" countmax="100" chance="42550" /><!-- gold coin -->
-            <item id="2148" countmax="100" chance="42550" /><!-- gold coin -->
-            <item id="2148" countmax="100" chance="42550" /><!-- gold coin -->
-            <item id="2148" countmax="13" chance="42550" /><!-- gold coin -->
+            <item id="9810" countmax="2" chance="6325" /><!-- rusty armor -->
+            <item id="2463" chance="10950" /><!-- plate armor -->
+            <item id="2148" countmax="100" chance="42475" /><!-- gold coin -->
+            <item id="2148" countmax="100" chance="42475" /><!-- gold coin -->
+            <item id="2148" countmax="100" chance="42475" /><!-- gold coin -->
+            <item id="2148" countmax="13" chance="42475" /><!-- gold coin -->
             <item id="2152" countmax="3" chance="4425" /><!-- platinum coin -->
-            <item id="6500" countmax="3" chance="6500" /><!-- demonic essence -->
+            <item id="6500" countmax="3" chance="6525" /><!-- demonic essence -->
             <item id="2133" chance="1475" /><!-- ruby necklace -->
-            <item id="5806" chance="5850" /><!-- silver goblet -->
-            <item id="6524" chance="1675" /><!-- skeleton decoration -->
-            <item id="2436" chance="1150" /><!-- skull staff -->
+            <item id="5806" chance="5900" /><!-- silver goblet -->
+            <item id="6524" chance="1625" /><!-- skeleton decoration -->
+            <item id="2436" chance="1125" /><!-- skull staff -->
         </inside>
     </item>
 </loot>

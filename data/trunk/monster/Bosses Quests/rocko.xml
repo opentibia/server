@@ -2,7 +2,7 @@
 <monster name="Rocko" nameDescription="Rocko" race="blood" experience="3400" speed="180" manacost="590">
 	<health now="10000" max="10000"/>
 	<look type="67" corpse="6005"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -22,7 +22,7 @@
 		<attack name="poison" interval="2000" chance="20" length="8" spread="0" min="-0" max="-125">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="physical" interval="2000" chance="10" length="8" spread="0" min="-0" max="-411">
+		<attack name="physical" interval="2000" chance="20" length="8" spread="0" min="-0" max="-411">
 			<attribute key="areaEffect" value="groundshaker"/>
 		</attack>	
 	</attacks>

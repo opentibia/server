@@ -20,11 +20,7 @@
 	</flags>
 	<defenses armor="0" defense="0"/>
 	<loot>
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="8710" chance="100000" /><!-- cockroach leg -->
-        </inside>
-    </item>
+    <item id="8710" chance="100000" /><!-- cockroach leg -->
 </loot>
 
 

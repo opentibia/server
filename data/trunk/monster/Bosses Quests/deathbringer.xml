@@ -2,7 +2,7 @@
 <monster name="Deathbringer" nameDescription="Deathbringer" race="undead" experience="5100" speed="300" manacost="0">
 	<health now="10000" max="10000"/>
 	<look type="231" corpse="7349"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,28 +19,27 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="155" poison="200"/>
-		<attack name="fire" interval="1000" chance="0" range="7" radius="4" target="1" min="-80" max="-120">
-			<attribute key="shootEffect" value="fire"/>
-			<attribute key="areaEffect" value="redspark"/>
-		</attack>
-		<attack name="poison" interval="4000" chance="15" target="1" radius="4" min="-0" max="-200">
+		<attack name="poison" interval="2000" chance="9" target="1" range="7" radius="4" min="-0" max="-200">
 			<attribute key="areaEffect" value="poison"/>
-		</attack>
-		<attack name="physical" interval="4000" chance="15" target="1" radius="4" min="0" max="-400">
+		</attack>	
+		<attack name="poisoncondition" interval="2000" chance="9" target="1" range="7" radius="4" min="-200" max="-200">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>	
+		<attack name="physical" interval="2000" chance="9" target="1" radius="4" min="0" max="-380">
 			<attribute key="areaEffect" value="redspark"/>
-		</attack>
-		<attack name="drowncondition" interval="3500" chance="10" length="8" spread="3">
+		</attack>		
+		<attack name="drowncondition" interval="2000" chance="9" length="8" spread="3">
 			<attribute key="areaEffect" value="poff"/>
-		</attack>
-		<attack name="lifedrain" interval="6000" chance="10" range="7" length="8" spread="3" min="-80" max="-600">
+		</attack>		
+		<attack name="earth" interval="2000" chance="9" length="8" spread="3">
+			<attribute key="areaEffect" value="eartharea"/>
+		</attack>	
+		<attack name="lifedrain" interval="2000" chance="9" length="8" spread="3" max="-595">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
-		<attack name="death" interval="5000" chance="10" range="7" min="-0" max="-400">
+		<attack name="death" interval="2000" chance="9" range="7" target="1" max="-400">
 			<attribute key="shootEffect" value="death"/>
-			<attribute key="areaEffect" value="mortarea"/>
-		<attack name="earth" interval="1000" chance="100" length="8" spread="3">
-			<attribute key="areaEffect" value="earth"/>
-		</attack>
+			<attribute key="areaEffect" value="mortarea"/>	
 		</attack>
 	</attacks>
 	<defenses armor="15" defense="15"/>
@@ -56,7 +55,7 @@
 		<immunity earth="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="YOU FOOLS WILL PAY!" yell="1"/>
 		<voice sentence="YOU ALL WILL DIE!!" yell="1"/>
 		<voice sentence="DEATH, DESTRUCTION!" yell="1"/>

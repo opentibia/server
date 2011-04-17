@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="60" attack="20"/>
-		<attack name="physical" interval="2000" chance="15" range="7" min="-0" max="-60">
+		<attack name="physical" interval="2000" chance="25" range="7" min="-0" max="-60">
 			<attribute key="shootEffect" value="bolt"/>
 		</attack>
 	</attacks>
@@ -29,23 +29,23 @@
 		<element firePercent="-5"/>
 		<element deathPercent="-5"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Hail Durin!"/>
 	</voices>
 	<loot>
     <item id="2481" chance="12025" /><!-- soldier helmet -->
     <item id="2787" countmax="2" chance="30775" /><!-- white mushroom -->
-    <item id="2554" chance="10525" /><!-- shovel -->
-    <item id="2464" chance="7475" /><!-- chain armor -->
-    <item id="2148" countmax="12" chance="16000" /><!-- gold coin -->
+    <item id="2554" chance="10400" /><!-- shovel -->
+    <item id="2464" chance="7500" /><!-- chain armor -->
+    <item id="2148" countmax="12" chance="16025" /><!-- gold coin -->
     <item id="2543" countmax="7" chance="22975" /><!-- bolt -->
-    <item id="2525" chance="3600" /><!-- dwarven shield -->
+    <item id="2525" chance="3550" /><!-- dwarven shield -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2455" chance="3675" /><!-- crossbow -->
+            <item id="2455" chance="3650" /><!-- crossbow -->
             <item id="7363" countmax="3" chance="3125" /><!-- piercing bolt -->
-            <item id="2378" chance="2800" /><!-- battle axe -->
-            <item id="2208" chance="575" /><!-- axe ring -->
+            <item id="2378" chance="2825" /><!-- battle axe -->
+            <item id="2208" chance="600" /><!-- axe ring -->
             <item id="5880" countmax="3" chance="825" /><!-- iron ore -->
         </inside>
     </item>

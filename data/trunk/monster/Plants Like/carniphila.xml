@@ -19,15 +19,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="50" poison="100"/>
-		<attack name="poison" interval="2000" chance="13" range="7" min="-60" max="-95">
+		<attack name="poison" interval="2000" chance="18" range="7" min="-60" max="-95">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="10" range="7" speedchange="-850" duration="30000">
+		<attack name="speed" interval="2000" chance="18" range="7" speedchange="-850" duration="30000">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="greenspark"/>
 		</attack>
-		<attack name="earth" interval="2000" chance="12" radius="3" target="0" min="-40" max="-130">
+		<attack name="earth" interval="2000" chance="18" radius="3" target="0" min="-40" max="-130">
 			<attribute key="areaEffect" value="carniphila"/>
 		</attack>
 	</attacks>
@@ -42,15 +42,15 @@
 		<immunity earth="1"/>
 	</immunities>
 	<loot>
-    <item id="2804" chance="1300" /><!-- shadow herb -->
-    <item id="2148" countmax="40" chance="37325" /><!-- gold coin -->
-    <item id="11217" chance="4575" /><!-- carniphila seeds -->
-    <item id="2686" chance="1700" /><!-- corncob -->
+    <item id="7732" chance="1100" /><!-- seeds -->
+    <item id="2792" chance="8750" /><!-- dark mushroom -->
+    <item id="2804" chance="1500" /><!-- shadow herb -->
+    <item id="2148" countmax="40" chance="36875" /><!-- gold coin -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2802" countmax="2" chance="925" /><!-- sling herb -->
-            <item id="2792" chance="8475" /><!-- dark mushroom -->
-            <item id="7732" chance="1025" /><!-- seeds -->
+            <item id="11217" chance="4425" /><!-- carniphila seeds -->
+            <item id="2686" chance="1700" /><!-- corncob -->
+            <item id="2802" countmax="2" chance="875" /><!-- sling herb -->
         </inside>
     </item>
 </loot>

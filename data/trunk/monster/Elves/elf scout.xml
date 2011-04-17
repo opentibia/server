@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="20" attack="20"/>
-		<attack name="physical" interval="2000" chance="10" range="7" target="1" min="-0" max="-80">
+		<attack name="physical" interval="2000" chance="25" range="7" target="1" min="-0" max="-80">
 			<attribute key="shootEffect" value="arrow"/>
 		</attack>
 	</attacks>
@@ -31,7 +31,7 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Tha'shi Ab'Dendriel!"/>
 		<voice sentence="Feel the sting of my arrows!"/>
 		<voice sentence="Thy blood will quench the soil's thirst!"/>
@@ -40,17 +40,18 @@
 	</voices>
 	<loot>
     <item id="2545" countmax="4" chance="9275" /><!-- poison arrow -->
-    <item id="12420" chance="10250" /><!-- elven scouting glass -->
-    <item id="10552" chance="5400" /><!-- elvish talisman -->
-    <item id="2544" countmax="12" chance="18475" /><!-- arrow -->
-    <item id="2148" countmax="25" chance="39025" /><!-- gold coin -->
-    <item id="2681" chance="17800" /><!-- grapes -->
+    <item id="12420" chance="10400" /><!-- elven scouting glass -->
+    <item id="10552" chance="5250" /><!-- elvish talisman -->
+    <item id="2544" countmax="12" chance="18175" /><!-- arrow -->
+    <item id="2148" countmax="25" chance="38875" /><!-- gold coin -->
+    <item id="2681" chance="17700" /><!-- grapes -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2456" chance="4700" /><!-- bow -->
-            <item id="2031" chance="1775" /><!-- waterskin -->
+            <item id="2456" chance="5000" /><!-- bow -->
+            <item id="2031" chance="1800" /><!-- waterskin -->
             <item id="2642" chance="1400" /><!-- sandals -->
             <item id="5921" chance="1325" /><!-- heaven blossom -->
+            <item id="7438" chance="575" /><!-- elvish bow -->
         </inside>
     </item>
 </loot>

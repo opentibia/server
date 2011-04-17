@@ -19,20 +19,20 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="80" poison="100"/>
-		<attack name="lifedrain" interval="2000" chance="15" radius="3" target="0" min="-25" max="-45">
+		<attack name="lifedrain" interval="2000" chance="12" radius="3" target="0" min="-25" max="-45">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>		
-		<attack name="poison" interval="1000" chance="10" range="7" min="-50" max="-90">
+		<attack name="poison" interval="1000" chance="12" range="7" min="-50" max="-90">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="poisoncondition" interval="2000" chance="13" radius="3" target="0" min="-60" max="-60">
+		<attack name="poisoncondition" interval="2000" chance="12" radius="3" target="0" min="-60" max="-60">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="poisoncondition" interval="2000" chance="11" length="8" spread="0" min="-80" max="-80">
+		<attack name="poisoncondition" interval="2000" chance="12" length="8" spread="0" min="-80" max="-80">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<defense name="speed" interval="2000" chance="10" speedchange="290" duration="5000">
+		<defense name="speed" interval="2000" chance="12" speedchange="290" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>		
 	</attacks>
@@ -52,21 +52,21 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Cccchhhhhhhhh!"/>
 		<voice sentence="Knooorrrrr!"/>
 	</voices>
 	<loot>
-    <item id="2463" chance="8350" /><!-- plate armor -->
-    <item id="2229" chance="20850" /><!-- skull -->
-    <item id="2148" countmax="90" chance="15375" /><!-- gold coin -->
-    <item id="2230" chance="49925" /><!-- bone -->
-    <item id="11194" chance="10575" /><!-- bony tail -->
+    <item id="2463" chance="8375" /><!-- plate armor -->
+    <item id="2229" chance="20825" /><!-- skull -->
+    <item id="2148" countmax="90" chance="15350" /><!-- gold coin -->
+    <item id="2230" chance="49875" /><!-- bone -->
+    <item id="11194" chance="10625" /><!-- bony tail -->
     <item id="2541" chance="2425" /><!-- bone shield -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="2449" chance="5400" /><!-- bone club -->
-            <item id="2796" chance="2000" /><!-- green mushroom -->
+            <item id="2796" chance="1975" /><!-- green mushroom -->
             <item id="5925" countmax="3" chance="1550" /><!-- hardened bone -->
             <item id="7618" chance="975" /><!-- health potion -->
         </inside>

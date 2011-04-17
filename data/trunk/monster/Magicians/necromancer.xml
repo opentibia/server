@@ -19,17 +19,17 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="40" poison="160"/>
-		<attack name="death" interval="2000" chance="15" range="1" target="1" min="-10" max="-120">
+		<attack name="death" interval="2000" chance="12" range="1" target="1" min="-10" max="-120">
 			<attribute key="shootEffect" value="death"/>
 			<attribute key="areaEffect" value="mortarea"/>
 		</attack>	
-		<attack name="poison" interval="2000" chance="13" range="7" min="-35" max="-95">
+		<attack name="poison" interval="2000" chance="12" range="7" min="-35" max="-95">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="poison"/>
 		</attack>		
 	</attacks>
 	<defenses armor="20" defense="20">
-		<defense name="healing" interval="2000" chance="20" min="48" max="68">
+		<defense name="healing" interval="2000" chance="12" min="48" max="68">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -47,28 +47,28 @@
 		
 	</immunities>
 	<summons maxSummons="2">
-		<summon name="Ghoul" interval="1000" chance="17" max="2"/>
-		<summon name="Ghost" interval="1000" chance="15" max="2"/>
-		<summon name="Mummy" interval="1000" chance="13" max="2"/>
+		<summon name="Ghoul" interval="2000" chance="12" max="2"/>
+		<summon name="Ghost" interval="2000" chance="12" max="2"/>
+		<summon name="Mummy" interval="2000" chance="12" max="2"/>
 	</summons>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Your corpse will be mine!"/>
 		<voice sentence="Taste the sweetness of death!"/>
 	</voices>
 	<loot>
-    <item id="2796" chance="2050" /><!-- green mushroom -->
-    <item id="12431" chance="1525" /><!-- necromantic robe -->
     <item id="11237" chance="10175" /><!-- book of necromantic rituals -->
-    <item id="2148" countmax="90" chance="15775" /><!-- gold coin -->
+    <item id="2663" chance="1000" /><!-- mystic turban -->
     <item id="2545" countmax="5" chance="9375" /><!-- poison arrow -->
+    <item id="2796" chance="1975" /><!-- green mushroom -->
+    <item id="2148" countmax="90" chance="16075" /><!-- gold coin -->
+    <item id="12431" chance="1525" /><!-- necromantic robe -->
     <item id="2195" chance="800" /><!-- boots of haste -->
-    <item id="7589" chance="1000" /><!-- strong mana potion -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2663" chance="1000" /><!-- mystic turban -->
-            <item id="2436" chance="575" /><!-- skull staff -->
-            <item id="2423" chance="825" /><!-- clerical mace -->
-            <item id="8901" chance="625" /><!-- spellbook of warding -->
+            <item id="7589" chance="950" /><!-- strong mana potion -->
+            <item id="2436" chance="600" /><!-- skull staff -->
+            <item id="2423" chance="875" /><!-- clerical mace -->
+            <item id="8901" chance="600" /><!-- spellbook of warding -->
             <item id="7456" chance="525" /><!-- noble axe -->
         </inside>
     </item>

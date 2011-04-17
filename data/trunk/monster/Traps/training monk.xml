@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <monster name="Training Monk" nameDescription="a training monk" race="blood" experience="0" speed="0" manacost="0">
-    <health now="100000" max="100000"/>
+    <health now="10000" max="10000"/>
     <look type="57" head="20" body="30" legs="40" feet="50" corpse="3128"/>
     <targetchange interval="1000" chance="0"/>
     <strategy attack="100" defense="0"/>
@@ -19,10 +19,10 @@
       <flag runonhealth="0"/>
     </flags>
     <attacks>
-      <attack name="melee" interval="1200" attack="1" skill="60"/>
+      <attack name="melee" interval="2000" attack="1" skill="60"/>
     </attacks>
     <defenses armor="0" defense="0">
-      <defense name="healing" interval="10000" chance="100" min="100000" max="100000"/>
+      <defense name="healing" interval="2000" chance="25" min="750" max="1250"/>
     </defenses>
     <immunities>
       <immunity invisible="1"/>

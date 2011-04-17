@@ -18,7 +18,7 @@
     </flags> 
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="60"/>
-		<attack name="lifedrain" interval="200" chance="20" range="5" radius="1" target="1" min="0" max="50">
+		<attack name="lifedrain" interval="2000" chance="25" range="5" radius="1" target="1" min="0" max="50">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
 	</attacks>
@@ -32,7 +32,7 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Death where are you?"/>
 	</voices>
 </monster>

@@ -20,7 +20,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="20"/>
-		<attack name="physical" interval="2000" chance="40" range="7" radius="1" target="1" min="-0" max="-60">
+		<attack name="physical" interval="2000" chance="25" range="7" radius="1" target="1" min="-0" max="-60">
 			<attribute key="shootEffect" value="whirlwindaxe"/>
 		</attack>
 	</attacks>
@@ -35,7 +35,7 @@
 	<immunities>
 		<immunity paralyze="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="I will regain my honor with your blood!"/>
 		<voice sentence="Surrender is not option!"/>
 		<voice sentence="Its you or me!"/>

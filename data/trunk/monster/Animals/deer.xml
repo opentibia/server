@@ -2,7 +2,7 @@
 <monster name="Deer" nameDescription="a deer" race="blood" experience="0" speed="196" manacost="260">
 	<health now="25" max="25"/>
 	<look type="31" corpse="5970"/>
-	<targetchange interval="2000" chance="20"/>
+	<targetchange interval="2000" chance="16"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="1"/>
@@ -33,9 +33,9 @@
 		<immunity invisible="0"/>
 	</immunities>
 	<loot>
-    <item id="2671" countmax="2" chance="51000" /><!-- ham -->
-    <item id="2666" countmax="4" chance="79700" /><!-- meat -->
-    <item id="11214" chance="1375" /><!-- antlers -->
+    <item id="2671" countmax="2" chance="50775" /><!-- ham -->
+    <item id="2666" countmax="4" chance="79925" /><!-- meat -->
+    <item id="11214" chance="1475" /><!-- antlers -->
 </loot>
 
 

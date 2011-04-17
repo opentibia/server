@@ -20,25 +20,25 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="45" attack="40"/>
-		<attack name="earth" interval="2000" chance="10" range="9" target="1" radius="2" min="-95" max="-170">
+		<attack name="earth" interval="2000" chance="12" range="9" target="1" radius="2" min="-95" max="-170">
 			<attribute key="areaEffect" value="stones"/>
 		</attack>
-		<attack name="poison" interval="2000" chance="11" target="1" range="7"  min="-99" max="-145">
+		<attack name="poison" interval="2000" chance="12" target="1" range="7"  min="-99" max="-145">
 			<attribute key="shootEffect" value="smallearth"/>
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="poisoncondition" interval="2000" chance="9" range="7" target="1" min="-200" max="-200">
+		<attack name="poisoncondition" interval="2000" chance="12" range="7" target="1" min="-200" max="-200">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
 		<attack name="poisoncondition" interval="2000" chance="12" length="6" spread="0" min="-320" max="-320">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="10" range="8" speedchange="-220" duration="5000">
+		<attack name="speed" interval="2000" chance="9" range="19" speedchange="-220" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>	
 	</attacks>
 	<defenses armor="30" defense="30">
-		<defense name="healing" interval="2000" chance="5" min="115" max="155">
+		<defense name="healing" interval="2000" chance="12" min="115" max="155">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>	
 	</defenses>
@@ -56,19 +56,21 @@
 		<immunity ice="1"/>
 	</immunities>
 	<loot>
-    <item id="2145" countmax="2" chance="2450" /><!-- small diamond -->
-    <item id="11216" chance="38850" /><!-- lump of earth -->
-    <item id="2148" countmax="100" chance="36650" /><!-- gold coin -->
-    <item id="2148" countmax="80" chance="36650" /><!-- gold coin -->
-    <item id="1294" countmax="10" chance="17825" /><!-- small stone -->
-    <item id="9809" chance="6800" /><!-- rusty armor -->
-    <item id="2197" chance="1475" /><!-- stone skin amulet -->
+    <item id="1294" countmax="10" chance="15250" /><!-- small stone -->
+    <item id="11222" chance="37475" /><!-- lump of earth -->
+    <item id="2213" chance="3300" /><!-- dwarven ring -->
+    <item id="2148" countmax="100" chance="30625" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="30625" /><!-- gold coin -->
+    <item id="2148" countmax="27" chance="30625" /><!-- gold coin -->
+    <item id="2145" countmax="2" chance="5100" /><!-- small diamond -->
+    <item id="9809" chance="6725" /><!-- rusty armor -->
+    <item id="9970" countmax="2" chance="4100" /><!-- small topaz -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="9970" countmax="2" chance="4375" /><!-- small topaz -->
-            <item id="11339" chance="1475" /><!-- clay lump -->
-            <item id="2213" chance="3400" /><!-- dwarven ring -->
-            <item id="2200" chance="2450" /><!-- protection amulet -->
+            <item id="2200" chance="3400" /><!-- protection amulet -->
+            <item id="7387" chance="925" /><!-- diamond sceptre -->
+            <item id="2197" chance="925" /><!-- stone skin amulet -->
+            <item id="7887" chance="700" /><!-- terra amulet -->
         </inside>
     </item>
 </loot>

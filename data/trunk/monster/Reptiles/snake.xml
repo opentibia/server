@@ -29,7 +29,7 @@
 	<immunities>
 	<immunity earth="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Zzzzzzt"/>
 	</voices>
 </monster>

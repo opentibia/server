@@ -2,7 +2,7 @@
 <monster name="Orchid Frog" nameDescription="a orchid frog" race="blood" experience="20" speed="230" manacost="305">
 	<health now="60" max="60"/>
 	<look type="226" head="109" body="14" legs="109" feet="114" corpse="6079"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -25,17 +25,13 @@
 		<element icePercent="15"/>
 		<element firePercent="-10"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Ribbit, Ribbit!"/>
 		<voice sentence="Ribbit!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="10" chance="29375" /><!-- gold coin -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="3976" chance="13700" /><!-- worm -->
-        </inside>
-    </item>
+    <item id="2148" countmax="10" chance="31300" /><!-- gold coin -->
+    <item id="3976" chance="13175" /><!-- worm -->
 </loot>
 
 

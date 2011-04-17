@@ -27,23 +27,23 @@
 		<element earthPercent="-10"/>
 		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Grak brrretz!"/>
 		<voice sentence="Grow truk grrrrr."/>
 		<voice sentence="Prek tars, dekklep zurk."/>
 	</voices>
 	<loot>
-    <item id="2484" chance="7400" /><!-- studded armor -->
-    <item id="2526" chance="8250" /><!-- studded shield -->
-    <item id="2385" chance="5850" /><!-- sabre -->
+    <item id="2148" countmax="14" chance="45500" /><!-- gold coin -->
+    <item id="2484" chance="7325" /><!-- studded armor -->
+    <item id="2526" chance="8625" /><!-- studded shield -->
+    <item id="2385" chance="6025" /><!-- sabre -->
     <item id="2666" chance="12050" /><!-- meat -->
-    <item id="2148" countmax="14" chance="45225" /><!-- gold coin -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2482" chance="4650" /><!-- studded helmet -->
-            <item id="2386" chance="5150" /><!-- axe -->
-            <item id="12435" chance="1350" /><!-- orc leather -->
-            <item id="11113" chance="675" /><!-- orc tooth -->
+            <item id="2482" chance="4400" /><!-- studded helmet -->
+            <item id="2386" chance="4900" /><!-- axe -->
+            <item id="12435" chance="1300" /><!-- orc leather -->
+            <item id="11113" chance="650" /><!-- orc tooth -->
         </inside>
     </item>
 </loot>

@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="40"/>
-		<attack name="lifedrain" interval="2000" chance="15" range="7" min="-20" max="-45">
+		<attack name="lifedrain" interval="2000" chance="25" range="7" min="-20" max="-45">
 		<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
 	</attacks>
@@ -32,23 +32,23 @@
 		<immunity drown="1"/>
 		<immunity paralyze="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Huh!"/>
 		<voice sentence="Shhhhhh"/>
 		<voice sentence="Buuuuuh"/>
 	</voices>
 	<loot>
-    <item id="2404" chance="7900" /><!-- combat knife -->
-    <item id="2804" chance="15700" /><!-- shadow herb -->
-    <item id="2394" chance="11000" /><!-- morning star -->
-    <item id="1962" chance="2125" /><!-- book -->
-    <item id="5909" countmax="3" chance="2550" /><!-- white piece of cloth -->
+    <item id="2404" chance="7725" /><!-- combat knife -->
+    <item id="2804" chance="15400" /><!-- shadow herb -->
+    <item id="2394" chance="11200" /><!-- morning star -->
+    <item id="1962" chance="2000" /><!-- book -->
+    <item id="5909" countmax="3" chance="2400" /><!-- white piece of cloth -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2654" chance="9850" /><!-- cape -->
-            <item id="2532" chance="1300" /><!-- ancient shield -->
-            <item id="10607" chance="2275" /><!-- ghostly tissue -->
-            <item id="2165" chance="700" /><!-- stealth ring -->
+            <item id="2654" chance="9650" /><!-- cape -->
+            <item id="2532" chance="1275" /><!-- ancient shield -->
+            <item id="10607" chance="2300" /><!-- ghostly tissue -->
+            <item id="2165" chance="750" /><!-- stealth ring -->
         </inside>
     </item>
 </loot>

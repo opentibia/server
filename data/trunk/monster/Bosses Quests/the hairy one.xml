@@ -18,7 +18,7 @@
 		<element energyPercent="5"/>
 		<element icePercent="-10"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Hugah!"/>
 		<voice sentence="Ungh! Ungh!"/>
 	</voices>

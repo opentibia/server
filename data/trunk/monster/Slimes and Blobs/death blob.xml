@@ -19,12 +19,12 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="50"/>
-		<attack name="death" interval="2000" change="15" target="0" radius="4" min="-35" max="-60">
+		<attack name="death" interval="2000" change="30" target="0" radius="4" min="-35" max="-60">
 			<attribute key="areaEffect" value="poff"/>
 		</attack>
 	</attacks>
 	<defenses armor="10" defense="10">
-		<defense name="healing" interval="2000" chance="10" min="10" max="30">
+		<defense name="healing" interval="2000" chance="18" min="10" max="30">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>		
 	</defenses>
@@ -40,10 +40,10 @@
 		<immunity earth="1"/>
 	</immunities>
 	<summons maxSummons="3">
-		<summon name="Death Blob" interval="2000" chance="5" max="3"/>
+		<summon name="Death Blob" interval="2000" chance="18" max="3"/>
 	</summons>
 	<loot>
-    <item id="9968" chance="13350" /><!-- glob of tar -->
+    <item id="9968" chance="13425" /><!-- glob of tar -->
 </loot>
 
 

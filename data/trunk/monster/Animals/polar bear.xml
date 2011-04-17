@@ -27,13 +27,13 @@
 		<element deathPercent="-10"/>
 		<element energyPercent="-5"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="GROARRR!" yell="1"/>
 	</voices>
 	<loot>
-    <item id="2671" countmax="2" chance="51650" /><!-- ham -->
+    <item id="2671" countmax="2" chance="51700" /><!-- ham -->
     <item id="2666" countmax="4" chance="50525" /><!-- meat -->
-    <item id="10567" chance="1400" /><!-- polar bear paw -->
+    <item id="10567" chance="1425" /><!-- polar bear paw -->
 </loot>
 
 

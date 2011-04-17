@@ -27,23 +27,23 @@
 		<element icePercent="-10"/>
 		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Kirll Karrrl!"/>
 		<voice sentence="Kaplar!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="20" chance="32700" /><!-- gold coin -->
-    <item id="12428" countmax="2" chance="5850" /><!-- minotaur horn -->
-    <item id="2464" chance="3275" /><!-- chain armor -->
-    <item id="2465" chance="4800" /><!-- brass armor -->
-    <item id="2513" chance="2300" /><!-- battle shield -->
-    <item id="5878" countmax="3" chance="1075" /><!-- minotaur leather -->
+    <item id="2148" countmax="20" chance="32625" /><!-- gold coin -->
+    <item id="12428" countmax="2" chance="5925" /><!-- minotaur horn -->
+    <item id="2464" chance="3125" /><!-- chain armor -->
+    <item id="2465" chance="4525" /><!-- brass armor -->
+    <item id="2513" chance="2250" /><!-- battle shield -->
+    <item id="5878" countmax="3" chance="1025" /><!-- minotaur leather -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2387" chance="875" /><!-- double axe -->
-            <item id="7618" chance="975" /><!-- health potion -->
-            <item id="2580" chance="1350" /><!-- fishing rod -->
-            <item id="1898" chance="800" /><!-- minotaur trophy -->
+            <item id="2387" chance="850" /><!-- double axe -->
+            <item id="7618" chance="950" /><!-- health potion -->
+            <item id="2580" chance="1300" /><!-- fishing rod -->
+            <item id="1898" chance="750" /><!-- minotaur trophy -->
         </inside>
     </item>
 </loot>

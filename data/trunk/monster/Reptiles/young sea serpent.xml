@@ -19,21 +19,21 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="25" attack="80"/>
-		<attack name="earth" interval="2000" chance="9" length="8" spread="3" min="-10" max="-250">
+		<attack name="earth" interval="2000" chance="14" length="8" spread="3" min="-10" max="-250">
 			<attribute key="areaEffect" value="bigplants"/>
 		</attack>
-		<attack name="ice" interval="2000" chance="7" length="9" spread="3" min="-80" max="-250">
+		<attack name="ice" interval="2000" chance="14" length="9" spread="3" min="-80" max="-250">
 			<attribute key="areaEffect" value="icearea"/>
 		</attack>
-		<attack name="drowncondition" interval="2000" chance="8" radius="4" target="1" max="-100">
+		<attack name="drowncondition" interval="2000" chance="14" radius="4" target="1" max="-100">
 			<attribute key="areaEffect" value="bluebubble"/>
 		</attack>
 	</attacks>
 	<defenses armor="16" defense="20">
-		<defense name="healing" interval="2000" chance="25" min="90" max="120">
+		<defense name="healing" interval="2000" chance="14" min="90" max="120">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-				<defense name="speed" interval="2000" chance="10" speedchange="700" duration="5000">
+				<defense name="speed" interval="2000" chance="14" speedchange="700" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -48,17 +48,17 @@
 	<immunity earth="1"/>
 	<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="CHHHRRRR"/>
 		<voice sentence="HISSSS"/>
 	</voices>	
 	<loot>
-    <item id="2417" chance="5650" /><!-- battle hammer -->
-    <item id="7588" chance="5500" /><!-- strong health potion -->
+    <item id="2417" chance="5675" /><!-- battle hammer -->
+    <item id="7588" chance="5525" /><!-- strong health potion -->
     <item id="7589" chance="4400" /><!-- strong mana potion -->
     <item id="10583" chance="5450" /><!-- sea serpent scale -->
     <item id="2394" chance="40000" /><!-- morning star -->
-    <item id="2378" chance="8325" /><!-- battle axe -->
+    <item id="2378" chance="8300" /><!-- battle axe -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="9809" countmax="2" chance="4500" /><!-- rusty armor -->

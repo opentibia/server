@@ -18,18 +18,18 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="10" attack="15"/>
-		<attack name="drunk" interval="2000" chance="7" range="7" target="1" duration="10000">
+		<attack name="drunk" interval="2000" chance="16" range="7" target="1" duration="10000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
-		<attack name="physical" interval="2000" chance="10" range="7" target="1" min="-0" max="-30">
+		<attack name="physical" interval="2000" chance="16" range="7" target="1" min="-0" max="-30">
 			<attribute key="shootEffect" value="throwingknife"/>
 		</attack>
 	</attacks>
 	<defenses armor="1">
-		<defense name="invisible" interval="2000" chance="8" duration="3000">
+		<defense name="invisible" interval="2000" chance="16" duration="3000">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="12" speedchange="370" duration="5000">
+		<defense name="speed" interval="2000" chance="16" speedchange="370" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>			
 	</defenses>
@@ -39,23 +39,23 @@
 		<element holyPercent="20"/>
 		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Goblin Powahhh!"/>
 	</voices>
 	<loot>
-    <item id="2467" chance="7350" /><!-- leather armor -->
-    <item id="2148" countmax="9" chance="28050" /><!-- gold coin -->
-    <item id="2230" chance="8725" /><!-- bone -->
-    <item id="2235" chance="10100" /><!-- mouldy cheese -->
-    <item id="2406" chance="11450" /><!-- short sword -->
-    <item id="2379" chance="23800" /><!-- dagger -->
+    <item id="2449" chance="5000" /><!-- bone club -->
+    <item id="2467" chance="8250" /><!-- leather armor -->
+    <item id="2559" chance="13000" /><!-- small axe -->
+    <item id="2235" chance="7250" /><!-- mouldy cheese -->
+    <item id="2461" chance="11250" /><!-- leather helmet -->
+    <item id="2148" countmax="9" chance="25400" /><!-- gold coin -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="1294" countmax="3" chance="3700" /><!-- small stone -->
-            <item id="2667" chance="11450" /><!-- fish -->
-            <item id="2559" chance="15575" /><!-- small axe -->
-            <item id="2449" chance="3250" /><!-- bone club -->
-            <item id="2461" chance="7350" /><!-- leather helmet -->
+            <item id="2379" chance="18500" /><!-- dagger -->
+            <item id="1294" countmax="3" chance="7575" /><!-- small stone -->
+            <item id="2667" chance="15250" /><!-- fish -->
+            <item id="2230" chance="10750" /><!-- bone -->
+            <item id="2406" chance="9500" /><!-- short sword -->
         </inside>
     </item>
 </loot>

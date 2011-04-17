@@ -2,7 +2,7 @@
 <monster name="Azerus" nameDescription="azerus" race="blood" experience="6000" speed="320" manacost="0"> 
     <health now="7500" max="7500"/> 
     <look type="309" head="19" body="96" legs="21" feet="81" corpse="9738"/> 
-    <targetchange interval="2000" chance="10"/> 
+    <targetchange interval="2000" chance="9"/> 
     <strategy attack="100" defense="0"/> 
     <flags> 
         <flag summonable="0"/> 
@@ -22,22 +22,22 @@
 	</script> 
     <attacks> 
         <attack name="melee" interval="2000" skill="110" attack="150"/>		
-        <attack name="manadrain" interval="2000" chance="15" range="7" max="-3800"> 
+        <attack name="manadrain" interval="2000" chance="14" range="7" max="-3800"> 
             <attribute key="areaEffect" value="blueshimmer"/> 
         </attack> 
-        <attack name="death" interval="2000" chance="20" range="7" min="-0" max="-524"> 
+        <attack name="death" interval="2000" chance="14" range="7" min="-0" max="-524"> 
                   <attribute key="shootEffect" value="suddendeath"/> 
                 <attribute key="areaEffect" value="mortarea"/> 
           </attack> 		
-		<attack name="fire" interval="2000" chance="18" range="7" target="1" max="-1050">
+		<attack name="fire" interval="2000" chance="14" range="7" target="1" max="-1050">
 			<attribute key="areaEffect" value="fireattack"/>
 		</attack>	
 </attacks>		
-    <defenses armor="50" defense="50">																					
-		<defense name="healing" interval="2000" chance="25" min="500" max="1000">
+    <defenses armor="50" defense="50">																						
+		<defense name="healing" interval="2000" chance="14" min="500" max="1000">
 			<attribute key="areaEffect" value="blueshimmer"/>
-		</defense>		
-		</defenses>	
+		</defense>	
+</defenses>
  <elements>
 <element earthPercent="15"/>
 <element holyPercent="15"/>
@@ -51,9 +51,9 @@
 <immunity paralyze="1"/>
 </immunities>
   <summons maxSummons="5"> 
-    <summon name="War Golem" speed="2000" chance="10" max="5"/> 
+    <summon name="War Golem" speed="2000" chance="14" max="5"/> 
   </summons> 
-    <voices interval="2000" chance="10"> 
+    <voices interval="2000" chance="9"> 
         <voice sentence="The ultimate will finally consume this unworthy existence!" /> 
         <voice sentence="My masters and I will tear down barriers and join the ultimate in its realm!" /> 
 		<voice sentence="The power of the Yalahari will all be mine!" /> 

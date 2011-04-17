@@ -19,10 +19,10 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="28" poison="80"/>
-		<attack name="speed" interval="2000" chance="10" range="7" speedchange="-600">
+		<attack name="speed" interval="2000" chance="20" range="7" speedchange="-600">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
-		<attack name="death" interval="2000" chance="15" range="7" target="1" min="-30" max="-40">
+		<attack name="death" interval="2000" chance="20" range="7" target="1" min="-30" max="-40">
 			<attribute key="shootEffect" value="death"/>
 			<attribute key="areaEffect" value="mortarea"/>
 		</attack>	
@@ -39,7 +39,7 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="I will ssswallow your sssoul!"/>
 		<voice sentence="Mort ulhegh dakh visss."/>
 		<voice sentence="Flesssh to dussst!"/>
@@ -48,21 +48,21 @@
 		<voice sentence="Yohag Sssetham!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="80" chance="20975" /><!-- gold coin -->
-    <item id="12422" chance="12650" /><!-- flask of embalming fluid -->
-    <item id="2529" chance="675" /><!-- black shield -->
-    <item id="2162" chance="6950" /><!-- magic light wand -->
-    <item id="5914" countmax="3" chance="1650" /><!-- yellow piece of cloth -->
-    <item id="2124" chance="2650" /><!-- crystal ring -->
-    <item id="3976" countmax="3" chance="11475" /><!-- worm -->
+    <item id="2148" countmax="80" chance="21200" /><!-- gold coin -->
+    <item id="12422" chance="12075" /><!-- flask of embalming fluid -->
+    <item id="2162" chance="6500" /><!-- magic light wand -->
+    <item id="3976" countmax="3" chance="12200" /><!-- worm -->
+    <item id="10566" chance="10800" /><!-- gauze bandage -->
+    <item id="2134" chance="4250" /><!-- silver brooch -->
+    <item id="2161" chance="5775" /><!-- strange talisman -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2134" chance="3900" /><!-- silver brooch -->
-            <item id="2161" chance="6200" /><!-- strange talisman -->
-            <item id="10566" chance="10425" /><!-- gauze bandage -->
-            <item id="2144" chance="1650" /><!-- black pearl -->
-            <item id="2170" chance="750" /><!-- silver amulet -->
-            <item id="2411" chance="825" /><!-- poison dagger -->
+            <item id="5914" countmax="3" chance="1475" /><!-- yellow piece of cloth -->
+            <item id="2411" chance="1050" /><!-- poison dagger -->
+            <item id="2124" chance="2400" /><!-- crystal ring -->
+            <item id="2529" chance="750" /><!-- black shield -->
+            <item id="2144" chance="1525" /><!-- black pearl -->
+            <item id="2170" chance="700" /><!-- silver amulet -->
         </inside>
     </item>
 </loot>

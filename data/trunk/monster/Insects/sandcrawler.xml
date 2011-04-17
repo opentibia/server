@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Sandcrawler" nameDescription="a sandcrawler" race="venom" experience="20" speed="220" manacost="0">
 <health now="30" max="30"/>
-<look type="350" corpse="11354"/>
-<targetchange interval="5000" chance="12"/>
+<look type="350" corpse="11360"/>
+<targetchange interval="5000" chance="10"/>
 <strategy attack="100" defense="0"/>
 <flags>
 <flag summonable="1"/>
@@ -24,11 +24,11 @@
 <elements>
 <element firePercent="-10"/>
 </elements>
-<voices interval="5000" chance="10">
+<voices interval="5000" chance="9">
 <voice sentence="Chrk chrk!"/>
 </voices>
 <loot>
     <item id="2148" countmax="6" chance="20725" /><!-- gold coin -->
-    <item id="11373" chance="2275" /><!-- sandcrawler shell -->
+    <item id="11373" chance="2325" /><!-- sandcrawler shell -->
 </loot>
 </monster>

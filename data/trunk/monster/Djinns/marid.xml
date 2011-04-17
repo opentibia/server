@@ -19,28 +19,28 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="30"/>
-		<attack name="lifedrain" interval="2000" chance="13" range="7" min="-0" max="-90">
+		<attack name="lifedrain" interval="2000" chance="9" range="7" min="-0" max="-90">
 			<attribute key="shootEffect" value="suddendeath"/>
 		</attack>
-		<attack name="energy" interval="2000" chance="12" radius="3" target="0" min="-30" max="-90">
+		<attack name="energy" interval="2000" chance="9" radius="3" target="0" min="-30" max="-90">
 			<attribute key="areaEffect" value="energyarea"/>
 		</attack>
-		<attack name="drunk" interval="2000" chance="10" range="7" target="1">
+		<attack name="drunk" interval="2000" chance="9" range="7" target="1">
 			<attribute key="shootEffect" value="energy"/>
 			<attribute key="areaEffect" value="energyarea"/>
 		</attack>
-		<attack name="energycondition" interval="2000" chance="8" radius="3" target="1" min="-500" max="-500">
+		<attack name="energycondition" interval="2000" chance="9" radius="3" target="1" min="-500" max="-500">
 			<attribute key="areaEffect" value="energy"/>
 		</attack>
 		<attack name="speed" interval="2000" chance="9" range="7" target="1" speedchange="-650">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
-		<attack name="energy" interval="2000" chance="7" range="7" target="1" min="-100" max="-250">
+		<attack name="energy" interval="2000" chance="9" range="7" target="1" min="-100" max="-250">
 			<attribute key="shootEffect" value="energy"/>
 		</attack>
 	</attacks>
 	<defenses armor="22" defense="15">
-		<defense name="healing" interval="2000" chance="15" min="50" max="80">
+		<defense name="healing" interval="2000" chance="9" min="50" max="80">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -57,34 +57,35 @@
 		<immunity invisible="1"/>
 	</immunities>
 	<summons maxSummons="2">
-		<summon name="blue djinn" interval="2000" chance="15" max="2"/>
+		<summon name="blue djinn" interval="2000" chance="9" max="2"/>
 	</summons>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Simsalabim"/>
 		<voice sentence="Feel the power of my magic, tiny mortal!"/>
 		<voice sentence="Wishes can come true."/>
 		<voice sentence="Djinns will soon again be the greatest!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="100" chance="44600" /><!-- gold coin -->
-    <item id="2148" countmax="27" chance="44600" /><!-- gold coin -->
-    <item id="2677" countmax="25" chance="12375" /><!-- blueberry -->
-    <item id="12387" chance="7775" /><!-- jewelled belt -->
-    <item id="2146" chance="6650" /><!-- small sapphire -->
-    <item id="2183" chance="1250" /><!-- hailstorm rod -->
-    <item id="7589" chance="9900" /><!-- strong mana potion -->
-    <item id="7378" countmax="3" chance="12325" /><!-- royal spear -->
-    <item id="7732" chance="2125" /><!-- seeds -->
-    <item id="1870" chance="3375" /><!-- blue tapestry -->
+    <item id="2148" countmax="100" chance="45000" /><!-- gold coin -->
+    <item id="2148" countmax="28" chance="45000" /><!-- gold coin -->
+    <item id="2677" countmax="25" chance="13025" /><!-- blueberry -->
+    <item id="12426" chance="8175" /><!-- jewelled belt -->
+    <item id="2146" chance="7150" /><!-- small sapphire -->
+    <item id="2183" chance="1425" /><!-- hailstorm rod -->
+    <item id="7589" chance="10675" /><!-- strong mana potion -->
+    <item id="7378" countmax="3" chance="11875" /><!-- royal spear -->
+    <item id="7732" chance="2550" /><!-- seeds -->
+    <item id="1870" chance="3175" /><!-- blue tapestry -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2442" chance="5750" /><!-- heavy machete -->
-            <item id="5912" countmax="3" chance="3375" /><!-- blue piece of cloth -->
-            <item id="7900" chance="1250" /><!-- magma monocle -->
-            <item id="2374" chance="625" /><!-- wooden flute -->
-            <item id="12403" chance="1000" /><!-- noble turban -->
-            <item id="2158" chance="750" /><!-- blue gem -->
-            <item id="2663" chance="625" /><!-- mystic turban -->
+            <item id="2442" chance="5025" /><!-- heavy machete -->
+            <item id="5912" countmax="3" chance="3750" /><!-- blue piece of cloth -->
+            <item id="7900" chance="1425" /><!-- magma monocle -->
+            <item id="2374" chance="700" /><!-- wooden flute -->
+            <item id="12442" chance="1050" /><!-- noble turban -->
+            <item id="2158" chance="700" /><!-- blue gem -->
+            <item id="2663" chance="700" /><!-- mystic turban -->
+            <item id="2062" chance="600" /><!-- small oil lamp -->
         </inside>
     </item>
 </loot>

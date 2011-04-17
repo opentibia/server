@@ -2,7 +2,7 @@
 <monster name="Heoni" nameDescription="heoni" race="blood" experience="515" speed="300" manacost="0">
 	<health now="795" max="795"/>
 	<look type="239" corpse="6302"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,18 +19,18 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="40" poison="480"/>
-		<attack name="poisoncondition" interval="2000" chance="15" length="8" spread="3" min="-20" max="-240">
+		<attack name="poisoncondition" interval="2000" chance="16" length="8" spread="3" min="-20" max="-240">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="drunk" interval="2000" chance="13" length="8" spread="3" duration="25000">
+		<attack name="drunk" interval="2000" chance="16" length="8" spread="3" duration="25000">
 			<attribute key="areaEffect" value="whitenote"/>
 		</attack>
 	</attacks>
 	<defenses armor="25" defense="18">
-		<defense name="healing" interval="2000" chance="11" min="76" max="84">
+		<defense name="healing" interval="2000" chance="16" min="76" max="84">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="10" speedchange="290" duration="5000">
+		<defense name="speed" interval="2000" chance="16" speedchange="290" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>	
 	</defenses>
@@ -42,7 +42,7 @@
 		<immunity drunk="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Shriiiek"/>
 	</voices>
 

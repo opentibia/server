@@ -2,7 +2,7 @@
 <monster name="Tiger" nameDescription="a tiger" race="blood" experience="40" speed="200" manacost="420">
 	<health now="75" max="75"/>
 	<look type="125" corpse="6051"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="1"/>
@@ -18,10 +18,10 @@
 		<flag runonhealth="0"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="1500" skill="30" attack="20"/>
+		<attack name="melee" interval="2000" skill="30" attack="20"/>
 	</attacks>
 	<defenses armor="5" defense="15">
-		<defense name="speed" interval="1000" chance="12" speedchange="567" duration="3000">
+		<defense name="speed" interval="2000" chance="25" speedchange="567" duration="3000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -29,12 +29,8 @@
 		<element deathPercent="-5"/>
 	</elements>
 	<loot>
-    <item id="2666" countmax="3" chance="35500" /><!-- meat -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="11204" chance="11875" /><!-- striped fur -->
-        </inside>
-    </item>
+    <item id="2666" countmax="3" chance="33375" /><!-- meat -->
+    <item id="11210" chance="11000" /><!-- striped fur -->
 </loot>
 
 

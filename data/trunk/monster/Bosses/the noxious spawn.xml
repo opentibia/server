@@ -2,7 +2,7 @@
 <monster name="The Noxious spawn" nameDescription="the noxious spawn" race="venom" experience="6000" speed="234" manacost="0">
 	<health now="9500" max="9500"/>
 	<look type="220" corpse="4323"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,25 +19,25 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="100"/>
-		<attack name="poison" interval="2000" chance="25" length="8" spread="3" min="-0" max="-550">
+		<attack name="poison" interval="2000" chance="12" length="8" spread="3" min="-0" max="-550">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="lifedrain" interval="2000" chance="25" length="8" spread="0" min="-0" max="-550">
+		<attack name="lifedrain" interval="2000" chance="12" length="8" spread="0" min="-0" max="-550">
 			<attribute key="areaEffect" value="rednote"/>
 		</attack>
-		<attack name="outfit" interval="2000" chance="25" range="7" item="3976" duration="4000">
+		<attack name="outfit" interval="2000" chance="12" range="7" item="3976" duration="4000">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="20" range="7" radius="4" target="1" speedchange="-360" duration="120000">
+		<attack name="speed" interval="2000" chance="12" range="7" radius="4" target="1" speedchange="-360" duration="120000">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="greenbubble"/>
 		</attack>
 	</attacks>
 	<defenses armor="18" defense="25">
-		<defense name="healing" interval="1000" chance="17" min="400" max="600">
+		<defense name="healing" interval="1000" chance="12" min="400" max="600">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="15" speedchange="378" duration="2000">
+		<defense name="speed" interval="2000" chance="12" speedchange="378" duration="2000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -51,21 +51,21 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="I bring you deathhhh, mortalssss."/>
 	</voices>
 	<loot>
-    <item id="7590" countmax="4" chance="33700" /><!-- great mana potion -->
-    <item id="2152" countmax="5" chance="52950" /><!-- platinum coin -->
-    <item id="7456" chance="36575" /><!-- noble axe -->
-    <item id="7368" countmax="95" chance="13700" /><!-- assassin star -->
-    <item id="10309" chance="31650" /><!-- claw of 'the noxious spawn' -->
+    <item id="7590" countmax="4" chance="34100" /><!-- great mana potion -->
+    <item id="2152" countmax="5" chance="49400" /><!-- platinum coin -->
+    <item id="7456" chance="36050" /><!-- noble axe -->
+    <item id="7368" countmax="95" chance="14975" /><!-- assassin star -->
+    <item id="10309" chance="33825" /><!-- claw of 'the noxious spawn' -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2205" chance="31650" /><!-- life ring -->
-            <item id="2547" countmax="29" chance="35550" /><!-- power bolt -->
-            <item id="7386" chance="26725" /><!-- mercenary sword -->
-            <item id="2796" chance="10350" /><!-- green mushroom -->
+            <item id="2168" chance="29400" /><!-- life ring -->
+            <item id="2547" countmax="29" chance="31425" /><!-- power bolt -->
+            <item id="7386" chance="27175" /><!-- mercenary sword -->
+            <item id="2796" chance="12725" /><!-- green mushroom -->
         </inside>
     </item>
 </loot>

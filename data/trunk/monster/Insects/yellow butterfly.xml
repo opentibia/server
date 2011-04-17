@@ -2,7 +2,7 @@
 <monster name="Butterfly" nameDescription="a butterfly" race="venom" experience="0" speed="300" manacost="0">
 	<health now="2" max="2"/>
 	<look type="10" corpse="4313"/>
-	<targetchange interval="5000" chance="20"/>
+	<targetchange interval="5000" chance="16"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>

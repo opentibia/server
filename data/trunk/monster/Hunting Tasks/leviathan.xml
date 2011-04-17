@@ -18,18 +18,18 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="90" attack="100"/>
-		<attack name="earth" interval="2000" chance="9" length="8" spread="3" min="-130" max="-460">
+		<attack name="earth" interval="2000" chance="16" length="8" spread="3" min="-130" max="-460">
 			<attribute key="areaEffect" value="bigplants"/>
 		</attack>
-		<attack name="ice" interval="2000" chance="7" length="9" spread="3" min="-365" max="-495">
+		<attack name="ice" interval="2000" chance="16" length="9" spread="3" min="-365" max="-495">
 			<attribute key="areaEffect" value="icearea"/>
 		</attack>
-		<attack name="drown" interval="2000" chance="11" radius="4" target="1" min="-120" max="-120">
+		<attack name="drown" interval="2000" chance="16" radius="4" target="1" min="-120" max="-120">
 			<attribute key="areaEffect" value="bluebubble"/>
 		</attack>
 	</attacks>
 	<defenses armor="16" defense="25">
-		<defense name="healing" interval="2000" chance="25" min="200" max="250">
+		<defense name="healing" interval="2000" chance="16" min="200" max="250">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -56,16 +56,17 @@
 	</immunities>
 	<loot>
     <item id="10529" chance="100000" /><!-- sea serpent trophy -->
-    <item id="2152" countmax="5" chance="60225" /><!-- platinum coin -->
-    <item id="9811" chance="89075" /><!-- rusty legs -->
-    <item id="2146" countmax="5" chance="23350" /><!-- small sapphire -->
+    <item id="2152" countmax="7" chance="43350" /><!-- platinum coin -->
+    <item id="9811" chance="85550" /><!-- rusty legs -->
+    <item id="2146" countmax="5" chance="26925" /><!-- small sapphire -->
+    <item id="9808" chance="83250" /><!-- rusty armor -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="9808" chance="83350" /><!-- rusty armor -->
             <item id="10220" chance="100000" /><!-- leviathan's amulet -->
-            <item id="7428" chance="53350" /><!-- bonebreaker -->
-            <item id="7589" chance="60500" /><!-- strong mana potion -->
-            <item id="10521" chance="13350" /><!-- moon backpack -->
+            <item id="7428" chance="53375" /><!-- bonebreaker -->
+            <item id="7589" chance="55675" /><!-- strong mana potion -->
+            <item id="10521" chance="13150" /><!-- moon backpack -->
+            <item id="8887" chance="1650" /><!-- frozen plate -->
         </inside>
     </item>
 </loot>

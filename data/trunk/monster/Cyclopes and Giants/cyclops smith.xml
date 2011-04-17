@@ -18,10 +18,10 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="50"/>
-		<attack name="physical" interval="2000" chance="10" range="7" min="-0" max="-70">
+		<attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-70">
 			<attribute key="shootEffect" value="whirlwindclub"/>
 		</attack>
-		<attack name="drunk" interval="2000" chance="10" range="7" target="1" duration="15000">
+		<attack name="drunk" interval="2000" chance="20" range="7" target="1" duration="15000">
 			<attribute key="areaEffect" value="stun"/>
 		</attack>	
 	</attacks>
@@ -33,24 +33,24 @@
 		<element earthPercent="-10"/>
 		<element deathPercent="-5"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Outis emoi g' onoma."/>
 		<voice sentence="Whack da humy!"/>
 		<voice sentence="Ai humy phary ty kaynon"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="70" chance="32050" /><!-- gold coin -->
-    <item id="2666" chance="50950" /><!-- meat -->
-    <item id="10574" chance="9450" /><!-- cyclops toe -->
-    <item id="2442" chance="2750" /><!-- heavy machete -->
-    <item id="2378" chance="5600" /><!-- battle axe -->
+    <item id="2148" countmax="70" chance="31975" /><!-- gold coin -->
+    <item id="2666" chance="51025" /><!-- meat -->
+    <item id="10574" chance="9400" /><!-- cyclops toe -->
+    <item id="2442" chance="2825" /><!-- heavy machete -->
+    <item id="2378" chance="5650" /><!-- battle axe -->
     <item id="2417" chance="5200" /><!-- battle hammer -->
     <item id="2513" chance="6950" /><!-- battle shield -->
-    <item id="2387" chance="1350" /><!-- double axe -->
+    <item id="2387" chance="1400" /><!-- double axe -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2510" chance="2625" /><!-- plate shield -->
-            <item id="7452" chance="625" /><!-- spiked squelcher -->
+            <item id="2510" chance="2575" /><!-- plate shield -->
+            <item id="7452" chance="600" /><!-- spiked squelcher -->
             <item id="7588" chance="1025" /><!-- strong health potion -->
             <item id="1892" chance="650" /><!-- cyclops trophy -->
             <item id="2490" chance="675" /><!-- dark helmet -->

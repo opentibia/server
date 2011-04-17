@@ -2,7 +2,7 @@
 <monster name="Parrot" nameDescription="a parrot" race="blood" experience="0" speed="320" manacost="250">
 	<health now="25" max="25"/>
 	<look type="217" corpse="6056"/>
-	<targetchange interval="2000" chance="20"/>
+	<targetchange interval="2000" chance="16"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="1"/>
@@ -21,7 +21,7 @@
 		<attack name="melee" interval="2000" skill="10" attack="5"/>
 	</attacks>
 	<defenses armor="2" defense="6"/>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="You advanshed, you advanshed!"/>	
 		<voice sentence="Neeeewbiiieee!"/>	
 		<voice sentence="Screeech!"/>	

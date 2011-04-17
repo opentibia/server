@@ -19,15 +19,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="90" attack="100"/>
-		<attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-781">
+		<attack name="physical" interval="2000" chance="30" range="7" min="-0" max="-781">
 			<attribute key="shootEffect" value="throwingknife"/>
 		</attack>
-		<attack name="skills" interval="2000" chance="20" range="7" length="8" target="3" shielding="-1">
+		<attack name="skills" interval="2000" chance="30" range="7" length="8" target="3" shielding="-1">
 			<attribute key="areaEffect" value="rednote"/>
 		</attack>
 	</attacks>
 	<defenses armor="25" defense="35">
-		<defense name="healing" interval="2000" chance="10" min="75" max="125">
+		<defense name="healing" interval="2000" chance="30" min="75" max="125">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -42,7 +42,7 @@
 		<immunity invisible="1"/>
 		<immunity fire="1"/>
 	</immunities>
-	<voices interval="3000" chance="10">
+	<voices interval="3000" chance="9">
 		<voice sentence="You like it, don't you?"/>
 		<voice sentence="The torturer is in!"/>
 		<voice sentence="It's party time!"/>
@@ -51,26 +51,26 @@
 	</voices>
 	<loot>
     <item id="2558" chance="2350" /><!-- saw -->
-    <item id="5944" chance="12700" /><!-- soul orb -->
-    <item id="7368" countmax="2" chance="1675" /><!-- assassin star -->
-    <item id="2152" countmax="6" chance="6325" /><!-- platinum coin -->
-    <item id="2671" chance="65300" /><!-- ham -->
-    <item id="2148" countmax="100" chance="37550" /><!-- gold coin -->
-    <item id="2148" countmax="100" chance="37550" /><!-- gold coin -->
-    <item id="2148" countmax="55" chance="37550" /><!-- gold coin -->
-    <item id="7591" chance="10550" /><!-- great health potion -->
+    <item id="5944" chance="12825" /><!-- soul orb -->
+    <item id="7368" countmax="2" chance="1725" /><!-- assassin star -->
+    <item id="2152" countmax="6" chance="6275" /><!-- platinum coin -->
+    <item id="2671" chance="65750" /><!-- ham -->
+    <item id="2148" countmax="100" chance="36650" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="36650" /><!-- gold coin -->
+    <item id="2148" countmax="62" chance="36650" /><!-- gold coin -->
+    <item id="7591" chance="10700" /><!-- great health potion -->
     <item id="6558" countmax="3" chance="23475" /><!-- concentrated demonic blood -->
-    <item id="6500" countmax="3" chance="7350" /><!-- demonic essence -->
+    <item id="6500" countmax="3" chance="7400" /><!-- demonic essence -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2645" chance="5800" /><!-- steel boots -->
-            <item id="7388" chance="875" /><!-- vile axe -->
-            <item id="5022" countmax="2" chance="1250" /><!-- orichalcum pearl -->
-            <item id="6300" chance="2575" /><!-- death ring -->
-            <item id="5480" chance="1275" /><!-- cat's paw -->
-            <item id="5801" chance="1525" /><!-- jewelled backpack -->
+            <item id="2645" chance="5825" /><!-- steel boots -->
+            <item id="7388" chance="825" /><!-- vile axe -->
+            <item id="5022" countmax="2" chance="1300" /><!-- orichalcum pearl -->
+            <item id="6300" chance="2675" /><!-- death ring -->
+            <item id="5480" chance="1250" /><!-- cat's paw -->
+            <item id="5801" chance="1425" /><!-- jewelled backpack -->
             <item id="7412" chance="1450" /><!-- butcher's axe -->
-            <item id="2470" chance="750" /><!-- golden legs -->
+            <item id="2470" chance="725" /><!-- golden legs -->
         </inside>
     </item>
 </loot>

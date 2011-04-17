@@ -2,7 +2,7 @@
 <monster name="Man in the Cave" nameDescription="man in the cave" race="blood" experience="770" speed="226" manacost="0">
 	<health now="485" max="485"/>
 	<look type="128" head="95" body="116" legs="95" feet="114" addons="1" corpse="6080"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,15 +19,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="30"/>
-		<attack name="physical" interval="2000" chance="40" range="7" min="-0" max="-95">
+		<attack name="physical" interval="2000" chance="16" range="7" min="-0" max="-95">
 			<attribute key="shootEffect" value="smallstone"/>
 		</attack>
 	</attacks>
 	<defenses armor="14" defense="10">
-	<defense name="healing" interval="2000" chance="35" min="25" max="75">
+	<defense name="healing" interval="2000" chance="16" min="25" max="75">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-	<defense name="speed" interval="2000" chance="30" speedchange="400" duration="6000">
+	<defense name="speed" interval="2000" chance="16" speedchange="400" duration="6000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -38,14 +38,14 @@
 		<immunity drunk="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="THE MONKS ARE MINE" yell="1"/>
 		<voice sentence="I will rope you up! All of you!"/>
 		<voice sentence="You have been roped up!"/>
 		<voice sentence="A MIC to rule them all!"/>
 	</voices>
 	<summons maxSummons="4">
-		<summon name="Monk" interval="2000" chance="20" max="4"/>
+		<summon name="Monk" interval="2000" chance="16" max="4"/>
 	</summons>
 	<loot>
 		<item id="2148" countmax="27" chance="100000"/><!-- gold coin -->

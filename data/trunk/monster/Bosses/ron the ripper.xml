@@ -20,19 +20,19 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="90" attack="50"/>
-		<attack name="lifedrain" interval="2000" chance="10" range="7" target="1" min="-0" max="-0">
+		<attack name="lifedrain" interval="2000" chance="18" range="7" target="1" min="-0" max="-0">
 			<attribute key="areaEffect" value="whitenote"/>
 		</attack>	
-		<attack name="physical" interval="2000" chance="15" min="-0" max="-160">
+		<attack name="physical" interval="2000" chance="18" min="-0" max="-160">
 			<attribute key="shootEffect" value="throwingknife"/>
 		</attack>
 	</attacks>
 	<defenses armor="35" defense="50">
-		<defense name="healing" interval="2000" chance="10" min="125" max="175">
+		<defense name="healing" interval="2000" chance="18" min="125" max="175">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Muahaha!"/>
 	</voices>
 	<loot>

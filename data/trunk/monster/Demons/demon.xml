@@ -2,7 +2,7 @@
 <monster name="Demon" nameDescription="a demon" race="fire" experience="6000" speed="280" manacost="0">
 	<health now="8200" max="8200"/>
 	<look type="35" corpse="5995"/>
-	<targetchange interval="5000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,36 +19,36 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="80" attack="100"/>
-		<attack name="manadrain" interval="2000" chance="15" range="7" min="-0" max="-120"/>
-		<attack name="fire" interval="2000" chance="15" range="7" radius="7" target="1" min="-150" max="-250">
+		<attack name="manadrain" interval="2000" chance="10" range="7" min="-0" max="-120"/>
+		<attack name="fire" interval="2000" chance="10"  range="7" radius="7" target="1" min="-150" max="-250">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="energy" interval="2000" chance="15" length="8" spread="0" min="-300" max="-460">
-			<attribute key="areaEffect" value="purpleenergy"/>
-		</attack>
-		<attack name="energy" interval="2000" chance="20" range="3" radius="1" target="1" min="-210" max="-300">
+		<attack name="energy" interval="2000" chance="10"  range="1" radius="1" target="1" min="-210" max="-300">
 			<attribute key="shootEffect" value="energy"/>
 			<attribute key="areaEffect" value="energy"/>
 		</attack>		
-		<attack name="firefield" interval="2000" chance="10" range="7" radius="1" target="1">
+		<attack name="firefield" interval="2000" chance="10"  range="7" radius="1" target="1">
 			<attribute key="shootEffect" value="fire"/>
+		</attack>		
+		<attack name="energy" interval="2000"  chance="10"  length="8" spread="0" min="-300" max="-460">
+			<attribute key="areaEffect" value="purpleenergy"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="10" range="7" speedchange="-220" duration="5000">
+		<attack name="speed" interval="2000" chance="10"  range="7" speedchange="-220" duration="5000">
 		<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
 	</attacks>
 	<defenses armor="30" defense="30">
-		<defense name="healing" interval="2000" chance="10" min="120" max="280">
+		<defense name="healing" interval="2000" chance="10"  min="120" max="280">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="5" speedchange="360" duration="20000">
+		<defense name="speed" interval="2000" chance="10" speedchange="360" duration="20000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
 	<elements>
 		<element physicalPercent="25"/>
-		<element earthpercent="40"/>
+		<element earthPercent="40"/>
 		<element energyPercent="50"/>
 		<element deathPercent="20"/>
 		<element icePercent="-12"/>
@@ -61,9 +61,9 @@
 		<immunity fire="1"/>
 	</immunities>
 	<summons maxSummons="1">
-		<summon name="fire elemental" interval="2000" chance="10" max="1"/>
+		<summon name="fire elemental" interval="2000" chance="9" max="1"/>
 	</summons>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="MUHAHAHAHA!" yell="1"/>
 		<voice sentence="I SMELL FEEEEEAAAR!" yell="1"/>
 		<voice sentence="CHAMEK ATH UTHUL ARAK!" yell="1"/>
@@ -71,30 +71,30 @@
 		<voice sentence="Your soul will be mine!" yell="0"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="100" chance="43675" /><!-- gold coin -->
-    <item id="2148" countmax="100" chance="43675" /><!-- gold coin -->
-    <item id="2152" chance="70575" /><!-- platinum coin -->
-    <item id="2432" chance="4675" /><!-- fire axe -->
-    <item id="2795" countmax="6" chance="12000" /><!-- fire mushroom -->
-    <item id="2387" chance="19850" /><!-- double axe -->
-    <item id="2179" chance="1675" /><!-- gold ring -->
-    <item id="7590" countmax="3" chance="10675" /><!-- great mana potion -->
-    <item id="2171" chance="1250" /><!-- platinum amulet -->
-    <item id="2149" chance="10625" /><!-- small emerald -->
-    <item id="2176" chance="3375" /><!-- orb -->
-    <item id="7368" countmax="5" chance="3625" /><!-- assassin star -->
-    <item id="2151" chance="3800" /><!-- talon -->
-    <item id="2418" chance="2100" /><!-- golden sickle -->
-    <item id="2165" chance="1950" /><!-- stealth ring -->
-    <item id="8473" countmax="3" chance="13850" /><!-- ultimate health potion -->
+    <item id="2148" countmax="100" chance="43600" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="43600" /><!-- gold coin -->
+    <item id="2152" chance="70650" /><!-- platinum coin -->
+    <item id="2432" chance="4600" /><!-- fire axe -->
+    <item id="2795" countmax="6" chance="12050" /><!-- fire mushroom -->
+    <item id="2387" chance="19900" /><!-- double axe -->
+    <item id="2179" chance="1650" /><!-- gold ring -->
+    <item id="7590" countmax="3" chance="10550" /><!-- great mana potion -->
+    <item id="2171" chance="1225" /><!-- platinum amulet -->
+    <item id="2149" chance="10700" /><!-- small emerald -->
+    <item id="2176" chance="3450" /><!-- orb -->
+    <item id="7368" countmax="5" chance="3550" /><!-- assassin star -->
+    <item id="2151" chance="3750" /><!-- talon -->
+    <item id="2418" chance="2025" /><!-- golden sickle -->
+    <item id="2165" chance="1925" /><!-- stealth ring -->
+    <item id="8473" countmax="3" chance="13900" /><!-- ultimate health potion -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="2396" chance="1100" /><!-- ice rapier -->
-            <item id="2393" chance="2350" /><!-- giant sword -->
-            <item id="2520" chance="1250" /><!-- demon shield -->
+            <item id="2393" chance="2325" /><!-- giant sword -->
+            <item id="2520" chance="1275" /><!-- demon shield -->
             <item id="2462" chance="1650" /><!-- devil helmet -->
             <item id="2214" chance="975" /><!-- ring of healing -->
-            <item id="5954" chance="1100" /><!-- demon horn -->
+            <item id="5954" chance="1050" /><!-- demon horn -->
             <item id="2514" chance="1050" /><!-- mastermind shield -->
             <item id="1982" chance="1750" /><!-- purple tome -->
             <item id="2470" chance="950" /><!-- golden legs -->

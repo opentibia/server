@@ -2,7 +2,7 @@
 <monster name="Massive Energy Elemental" nameDescription="a massive energy elemental" race="undead" experience="950" speed="300" manacost="0">
 	<health now="1100" max="1100"/>
 	<look type="290" corpse="8966"/>
-	<targetchange interval="20000" chance="15"/>
+	<targetchange interval="20000" chance="12"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -20,21 +20,21 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="65" attack="60"/>
-		<attack name="energy" interval="2000" chance="8" range="7" radius="2" target="1" min="-270" max="-420">
+		<attack name="energy" interval="2000" chance="16" range="7" radius="2" target="1" min="-270" max="-420">
 			<attribute key="shootEffect" value="energy"/>
 			<attribute key="areaEffect" value="purpleenergy"/>
 		</attack>
-		<attack name="energy" interval="2000" chance="11" range="3" target="1" min="-175" max="-205">
+		<attack name="energy" interval="2000" chance="16" range="3" target="1" min="-175" max="-205">
 		    <attribute key="shootEffect" value="energy"/>
 			<attribute key="areaEffect" value="energyarea"/>
 		</attack>
-		<attack name="energycondition" interval="2000" chance="7" range="7" target="1" min="-250" max="-250">
+		<attack name="energycondition" interval="2000" chance="16" range="7" target="1" min="-250" max="-250">
 			<attribute key="shootEffect" value="energy"/>
 			<atttribute key="areaEffect" value="yellowenergy"/>
 		</attack>
 	</attacks>
 	<defenses armor="30" defense="30">
-		<defense name="healing" interval="2000" chance="15" min="85" max="135">
+		<defense name="healing" interval="2000" chance="16" min="85" max="135">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>

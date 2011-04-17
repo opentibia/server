@@ -29,7 +29,7 @@
 		<immunity drunk="0"/>
 		<immunity invisible="0"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Wuff wuff"/>
 	</voices>
 </monster>

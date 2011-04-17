@@ -20,27 +20,27 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="45" attack="40"/>
-		<attack name="poison" interval="2000" chance="10" range="7" target="1" min="-72" max="-105">
+		<attack name="poison" interval="2000" chance="12" range="7" target="1" min="-72" max="-105">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="poison"/>	
 		</attack>
-		<attack name="physical" interval="2000" chance="8" range="7" target="1" radius="3" min="-25" max="-195">
+		<attack name="physical" interval="2000" chance="12" range="7" target="1" radius="3" min="-25" max="-195">
 			<attribute key="shootEffect" value="largerock"/>
 			<attribute key="areaEffect" value="plantattack"/>
 		</attack>
-		<attack name="poisoncondition" interval="2000" chance="7" length="6" spread="0" min="-200" max="-260">
+		<attack name="poisoncondition" interval="2000" chance="12" length="6" spread="0" min="-200" max="-260">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
 		<attack name="poisoncondition" interval="2000" chance="12" target="1" range="7" min="-100" max="-140">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="20" range="7" target="1" speedchange="-330" duration="5000">
+		<attack name="speed" interval="2000" chance="12" range="7" target="1" speedchange="-330" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
 	</attacks>
 	<defenses armor="30" defense="30">
-		<defense name="healing" interval="2000" chance="10" min="50" max="80">
+		<defense name="healing" interval="2000" chance="12" min="50" max="80">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>	
 	</defenses>
@@ -58,17 +58,17 @@
 		<immunity energy="1"/>
 	</immunities>
 	<loot>
-    <item id="11222" chance="20275" /><!-- lump of earth -->
+    <item id="11222" chance="20350" /><!-- lump of earth -->
     <item id="2148" countmax="100" chance="36850" /><!-- gold coin -->
     <item id="2148" countmax="30" chance="36850" /><!-- gold coin -->
-    <item id="7850" countmax="30" chance="10100" /><!-- earth arrow -->
-    <item id="2260" chance="10100" /><!-- blank rune -->
-    <item id="7589" chance="2500" /><!-- strong mana potion -->
+    <item id="7850" countmax="30" chance="10075" /><!-- earth arrow -->
+    <item id="2260" chance="10125" /><!-- blank rune -->
+    <item id="7589" chance="2475" /><!-- strong mana potion -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="9808" chance="5400" /><!-- rusty armor -->
-            <item id="1294" countmax="10" chance="5950" /><!-- small stone -->
-            <item id="9970" chance="1050" /><!-- small topaz -->
+            <item id="1294" countmax="10" chance="6000" /><!-- small stone -->
+            <item id="9970" chance="1025" /><!-- small topaz -->
         </inside>
     </item>
 </loot>

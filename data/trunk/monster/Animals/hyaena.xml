@@ -2,7 +2,7 @@
 <monster name="Hyaena" nameDescription="a hyaena" race="blood" experience="20" speed="196" manacost="275">
 	<health now="60" max="60"/>
 	<look type="94" corpse="6026"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="1"/>
@@ -21,13 +21,13 @@
 		<attack name="melee" interval="2000" skill="10" attack="20"/>
 	</attacks>
 	<defenses armor="1" defense="3"/>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Grrrrrr"/>
 		<voice sentence="Hou hou hou!"/>
 	</voices>
 	<loot>
-    <item id="3976" countmax="3" chance="34250" /><!-- worm -->
-    <item id="2666" countmax="2" chance="40075" /><!-- meat -->
+    <item id="3976" countmax="3" chance="34350" /><!-- worm -->
+    <item id="2666" countmax="2" chance="39900" /><!-- meat -->
 </loot>
 
 

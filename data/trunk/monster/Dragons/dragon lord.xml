@@ -19,19 +19,19 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="90" attack="44"/>
-		<attack name="fire" interval="2000" chance="11" range="7" radius="4" target="1" min="-100" max="-200">
+		<attack name="fire" interval="2000" chance="16" range="7" radius="4" target="1" min="-100" max="-200">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="9" length="8" spread="3" min="-150" max="-250">
+		<attack name="fire" interval="2000" chance="16" length="8" spread="3" min="-150" max="-250">
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="firefield" interval="2000" chance="5" range="7" radius="4" target="1">
+		<attack name="firefield" interval="2000" chance="16" range="7" radius="4" target="1">
 			<attribute key="shootEffect" value="fire"/>
 		</attack>
 	</attacks>
 	<defenses armor="22" defense="35">
-		<defense name="healing" interval="2000" chance="15" min="60" max="100">
+		<defense name="healing" interval="2000" chance="16" min="60" max="100">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -45,7 +45,7 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="ZCHHHHH" yell="1"/>
 		<voice sentence="YOU WILL BURN!" yell="1"/>
 	</voices>
@@ -53,16 +53,16 @@
     <item id="2148" countmax="100" chance="33475" /><!-- gold coin -->
     <item id="2148" countmax="100" chance="33475" /><!-- gold coin -->
     <item id="2148" countmax="45" chance="33475" /><!-- gold coin -->
-    <item id="2672" chance="77400" /><!-- dragon ham -->
-    <item id="2796" chance="12475" /><!-- green mushroom -->
+    <item id="2672" chance="77450" /><!-- dragon ham -->
+    <item id="2796" chance="12500" /><!-- green mushroom -->
     <item id="2146" chance="5500" /><!-- small sapphire -->
-    <item id="5882" countmax="3" chance="2475" /><!-- red dragon scale -->
+    <item id="5882" countmax="3" chance="2450" /><!-- red dragon scale -->
     <item id="2547" countmax="7" chance="4250" /><!-- power bolt -->
     <item id="2167" chance="5475" /><!-- energy ring -->
     <item id="7402" chance="600" /><!-- dragon slayer -->
     <item id="7378" countmax="3" chance="6500" /><!-- royal spear -->
     <item id="1976" chance="9525" /><!-- book -->
-    <item id="2033" chance="3525" /><!-- golden mug -->
+    <item id="2033" chance="3550" /><!-- golden mug -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="2177" chance="1050" /><!-- life crystal -->

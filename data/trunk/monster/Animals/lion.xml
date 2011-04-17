@@ -2,7 +2,7 @@
 <monster name="Lion" nameDescription="a lion" race="blood" experience="30" speed="190" manacost="320">
 	<health now="80" max="80"/>
 	<look type="41" corpse="5986"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="1"/>
@@ -27,13 +27,13 @@
 		<element icePercent="-15"/>
 		<element deathPercent="-8"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Groarrrr!"/>
 	</voices>
 	<loot>
-    <item id="2666" countmax="4" chance="49250" /><!-- meat -->
-    <item id="2671" countmax="2" chance="20375" /><!-- ham -->
-    <item id="10607" chance="1375" /><!-- lion's mane -->
+    <item id="2666" countmax="4" chance="48825" /><!-- meat -->
+    <item id="2671" countmax="2" chance="20150" /><!-- ham -->
+    <item id="10608" chance="1300" /><!-- lion's mane -->
 </loot>
 
 

@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="28"/>
-		<attack name="lifedrain" interval="2000" chance="15" range="7" min="-15" max="-27"/>
+		<attack name="lifedrain" interval="2000" chance="20" range="7" min="-15" max="-27"/>
 	</attacks>
 	<defenses armor="8" defense="17">
 		<defense name="healing" interval="2000" chance="20" min="5" max="15">
@@ -39,20 +39,20 @@
 		<immunity invisible="1"/>
 	</immunities>
 	<loot>
-    <item id="3976" countmax="2" chance="7100" /><!-- worm -->
-    <item id="11208" chance="15925" /><!-- rotten piece of cloth -->
-    <item id="2050" chance="5525" /><!-- torch -->
-    <item id="2148" countmax="30" chance="36525" /><!-- gold coin -->
-    <item id="12423" chance="4750" /><!-- ghoul snack -->
-    <item id="2229" chance="750" /><!-- skull -->
+    <item id="3976" countmax="2" chance="7250" /><!-- worm -->
+    <item id="11208" chance="15750" /><!-- rotten piece of cloth -->
+    <item id="2050" chance="5350" /><!-- torch -->
+    <item id="2148" countmax="30" chance="36200" /><!-- gold coin -->
+    <item id="12423" chance="4925" /><!-- ghoul snack -->
+    <item id="2229" chance="725" /><!-- skull -->
     <item id="5913" countmax="3" chance="1300" /><!-- brown piece of cloth -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="2403" chance="525" /><!-- knife -->
             <item id="2483" chance="1400" /><!-- scale armor -->
             <item id="2473" chance="1225" /><!-- viking helmet -->
-            <item id="2168" chance="725" /><!-- life ring -->
-            <item id="12440" chance="1425" /><!-- pile of grave earth -->
+            <item id="2168" chance="800" /><!-- life ring -->
+            <item id="12440" chance="1500" /><!-- pile of grave earth -->
         </inside>
     </item>
 </loot>

@@ -26,15 +26,15 @@
 		<element holyPercent="-20"/>
 	</elements>
 	<loot>
-    <item id="2148" countmax="25" chance="26625" /><!-- gold coin -->
-    <item id="10558" chance="5050" /><!-- spooky blue eye -->
-    <item id="2230" chance="6550" /><!-- bone -->
-    <item id="2231" chance="5350" /><!-- big bone -->
+    <item id="2148" countmax="25" chance="26575" /><!-- gold coin -->
+    <item id="10559" chance="5075" /><!-- spooky blue eye -->
+    <item id="2230" chance="6450" /><!-- bone -->
+    <item id="2231" chance="5225" /><!-- big bone -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2229" chance="4875" /><!-- skull -->
-            <item id="2406" chance="1300" /><!-- short sword -->
-            <item id="2449" chance="1425" /><!-- bone club -->
+            <item id="2229" chance="4975" /><!-- skull -->
+            <item id="2406" chance="1250" /><!-- short sword -->
+            <item id="2449" chance="1550" /><!-- bone club -->
             <item id="2376" chance="1200" /><!-- sword -->
         </inside>
     </item>

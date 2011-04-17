@@ -24,11 +24,11 @@
 	<elements>
 		<element earthPercent="-5"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Flap! Flap!"/>
 	</voices>
 	<loot>
-    <item id="5894" countmax="3" chance="1700" /><!-- bat wing -->
+    <item id="5894" countmax="3" chance="1625" /><!-- bat wing -->
 </loot>
 
 

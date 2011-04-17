@@ -15,22 +15,22 @@
 		<flag staticattack="15"/>
 		<flag lightlevel="0"/>
 		<flag lightcolor="0"/>
-		<flag targetdistance="7"/>
+		<flag targetdistance="1"/>
 		<flag runonhealth="30"/>
 	</flags>
 	<attacks>
-		<attack name="lifedrain" interval="2000" change="15" range="7" max="-7">
+		<attack name="lifedrain" interval="2000" change="25" range="7" max="-7">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
 	</attacks>
 	<defenses armor="10" defense="15">
-		<defense name="speed" interval="2000" chance="12" speedchange="310">
+		<defense name="speed" interval="2000" chance="16" speedchange="310">
 			<attribute key="areaEffect" value="greenshimmer"/>
 		</defense>
-		<defense name="healing" interval="2000" chance="13" min="8" max="16">
+		<defense name="healing" interval="2000" chance="16" min="8" max="16">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="Invisible" interval="2000" chance="10">
+		<defense name="Invisible" interval="2000" chance="25">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -48,7 +48,7 @@
 		<voice sentence="Tsshh"/>
 	</voices>
 	<loot>
-    <item id="10521" chance="575" /><!-- moon backpack -->
+    <item id="10521" chance="550" /><!-- moon backpack -->
 </loot>
 
 

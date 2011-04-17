@@ -34,7 +34,7 @@
 		<immunity drunk="1"/>
 		<immunity paralyze="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="You will become my trophy."/>
 		<voice sentence="Fight harder, coward."/>
 		<voice sentence="Show that you are a worthy opponent."/>

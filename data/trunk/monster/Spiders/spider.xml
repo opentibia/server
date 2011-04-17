@@ -25,8 +25,8 @@
 		<element firePercent="-20"/>
 	</elements>
 	<loot>
-    <item id="2148" countmax="5" chance="21550" /><!-- gold coin -->
-    <item id="8859" chance="1500" /><!-- spider fangs -->
+    <item id="2148" countmax="5" chance="21600" /><!-- gold coin -->
+    <item id="8859" chance="1450" /><!-- spider fangs -->
 </loot>
 
 

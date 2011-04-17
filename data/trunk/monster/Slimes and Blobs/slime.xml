@@ -30,6 +30,6 @@
 		<immunity earth="1"/>
 	</immunities>
 	<summons maxSummons="3">
-		<summon name="Slime Summon" interval="2000" chance="10" max="3"/>
+		<summon name="Slime Summon" interval="2000" chance="25" max="3"/>
 	</summons>
 </monster>

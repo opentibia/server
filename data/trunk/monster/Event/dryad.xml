@@ -19,23 +19,23 @@
   </flags>
   <attacks>
     <attack name="melee" interval="2000" skill="20" attack="20"/>
-    <attack name="earth" interval="2000" chance="18" range="7" min="-20" max="-35">
+    <attack name="earth" interval="2000" chance="14" range="7" min="-20" max="-35">
 		<attribute key="shootEffect" value="earth"/>
 		<attribute key="areaEffect" value="bigplants"/>
     </attack>
-	<attack name="speed" interval="2000" chance="15" range="7" speedchange="-220" duration="5000">
+	<attack name="speed" interval="2000" chance="14" range="7" speedchange="-220" duration="5000">
 		<attribute key="shootEffect" value="energyball"/>
 		<attribute key="areaEffect" value="energyarea"/>
 		</attack>	
-		<attack name="drunk" interval="2000" chance="15" range="7" target="1" duration="7500">
+		<attack name="drunk" interval="2000" chance="14" range="7" target="1" duration="7500">
 			<attribute key="areaEffect" value="hearts"/>
 		</attack>	
   </attacks>
   <defenses armor="8" defense="10">
-		<defense name="invisible" interval="2000" chance="30" duration="5000">
+		<defense name="invisible" interval="2000" chance="14" duration="5000">
 			<attribute key="areaEffect" value="blueshimmer"/>											
 		</defense>
-		<defense name="healing" interval="2000" chance="50" min="5" max="25">
+		<defense name="healing" interval="2000" chance="14" min="5" max="25">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>	
 	</defenses>
@@ -49,7 +49,7 @@
     <immunity earth="1"/>
     <immunity invisible="1"/>
   </immunities>
-  <voices interval="5000" chance="10">
+  <voices interval="5000" chance="9">
     <voice sentence="You will not live to tell anyone!"/>
 	<voice sentence="You are my game today!"/>
   </voices>

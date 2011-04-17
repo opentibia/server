@@ -25,7 +25,7 @@
 		<element icePercent="-5"/>
 		<element physicalPercent="-5"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="You won't pass me."/>
 		<voice sentence="I have travelled far to fight here."/>
 	</voices>

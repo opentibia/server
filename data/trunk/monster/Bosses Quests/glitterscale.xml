@@ -2,7 +2,7 @@
 <monster name="Glitterscale" nameDescription="glitterscale" race="blood" experience="700" speed="180" manacost="0">
 	<health now="1000" max="1000"/>
 	<look type="34" corpse="5973"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,10 +19,10 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="40"/>
-		<attack name="fire" interval="2000" chance="8" length="8" spread="3" min="-90" max="-180">
+		<attack name="fire" interval="2000" chance="20" length="8" spread="3" min="-90" max="-180">
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="12" range="7" radius="4" target="1" min="-70" max="-120">
+		<attack name="fire" interval="2000" chance="20" range="7" radius="4" target="1" min="-70" max="-120">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>

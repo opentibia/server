@@ -18,7 +18,7 @@
     </flags> 
 	<attacks>
 		<attack name="melee" interval="2000" skill="20" attack="40"/>
-		<attack name="physical" interval="2000" chance="20" range="5" radius="1" target="1" min="0" max="-40">
+		<attack name="physical" interval="2000" chance="25" range="5" radius="1" target="1" min="0" max="-40">
 			<attribute key="shootEffect" value="piercingbolt"/>
 		</attack>
 	</attacks>
@@ -30,7 +30,7 @@
 		<element physicalPercent="5"/>
 		<element earthPercent="-10"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Flee, coward!"/>
 		<voice sentence="You will lose!"/>
 		<voice sentence="Yeehaawh"/>

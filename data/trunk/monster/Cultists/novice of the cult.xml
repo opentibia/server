@@ -19,12 +19,12 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="55" attack="20" poison="10"/>
-		<attack name="lifedrain" interval="2000" chance="15" range="7" target="1" min="-20" max="-80">
+		<attack name="lifedrain" interval="2000" chance="18" range="7" target="1" min="-20" max="-80">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
 	</attacks>
 	<defenses armor="15" defense="10">
-		<defense name="healing" interval="2000" chance="17" min="30" max="50">
+		<defense name="healing" interval="2000" chance="18" min="30" max="50">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -38,28 +38,28 @@
 		<element deathPercent="-8"/>
 	</elements>
 	<summons maxSummons="1">
-		<summon name="Chicken" interval="2000" chance="20" max="1"/>
+		<summon name="Chicken" interval="2000" chance="18" max="1"/>
 	</summons>
-	<voices interval="5000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Fear us!"/>
-		<voice sentence="You will not tell anyone what you have seen."/>
+		<voice sentence="You will not tell anyone what you have seen!"/>
 		<voice sentence="Your curiosity will be punished!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="40" chance="13650" /><!-- gold coin -->
-    <item id="2398" chance="3725" /><!-- mace -->
-    <item id="2145" chance="725" /><!-- small diamond -->
-    <item id="2661" chance="3650" /><!-- scarf -->
-    <item id="10556" chance="1575" /><!-- cultish robe -->
-    <item id="6087" chance="1650" /><!-- music sheet -->
+    <item id="2148" countmax="40" chance="13725" /><!-- gold coin -->
+    <item id="2398" chance="3600" /><!-- mace -->
+    <item id="2145" chance="700" /><!-- small diamond -->
+    <item id="2661" chance="3725" /><!-- scarf -->
+    <item id="10556" chance="1600" /><!-- cultish robe -->
+    <item id="6087" chance="1625" /><!-- music sheet -->
     <item id="6533" chance="1125" /><!-- book -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2213" chance="950" /><!-- dwarven ring -->
+            <item id="2213" chance="925" /><!-- dwarven ring -->
             <item id="2199" chance="950" /><!-- garlic necklace -->
             <item id="2190" chance="1100" /><!-- wand of vortex -->
-            <item id="5810" chance="975" /><!-- pirate voodoo doll -->
-            <item id="12448" chance="2400" /><!-- rope belt -->
+            <item id="5810" chance="950" /><!-- pirate voodoo doll -->
+            <item id="12448" chance="2525" /><!-- rope belt -->
         </inside>
     </item>
 </loot>

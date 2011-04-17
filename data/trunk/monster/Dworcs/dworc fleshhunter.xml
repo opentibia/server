@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="15" attack="20" poison="20"/>
-		<attack name="physical" interval="1000" chance="15" range="7" min="-5" max="-15">
+		<attack name="physical" interval="2000" chance="25" range="7" min="-5" max="-15">
 			<attribute key="shootEffect" value="throwingknife"/>
 		</attack>
 	</attacks>
@@ -32,7 +32,7 @@
 		<immunities>
 		<immunity earth="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Grak brrretz!"/>
 		<voice sentence="Grow truk grrrrr."/>
 		<voice sentence="Prek tars, dekklep zurk."/>

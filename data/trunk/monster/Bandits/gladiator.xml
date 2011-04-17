@@ -21,7 +21,7 @@
 		<attack name="melee" interval="2000" skill="50" attack="30"/>
 	</attacks>
 	<defenses armor="20" defense="22">
-		<defense name="speed" interval="2000" chance="20" speedchange="215" duration="5000">
+		<defense name="speed" interval="2000" chance="25" speedchange="215" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -30,25 +30,25 @@
 		<element physicalPercent="5"/>
 		<element deathPercent="-5"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="You are no match for me!"/>
 		<voice sentence="Feel my prowess"/>
 		<voice sentence="Fight!"/>
 		<voice sentence="Take this!"/>
 	</voices>
 	<loot>
-    <item id="2510" chance="9675" /><!-- plate shield -->
-    <item id="2398" chance="10900" /><!-- mace -->
-    <item id="2458" chance="5300" /><!-- chain helmet -->
-    <item id="2148" countmax="28" chance="18300" /><!-- gold coin -->
-    <item id="2376" chance="11725" /><!-- sword -->
-    <item id="2666" chance="20900" /><!-- meat -->
+    <item id="2510" chance="9700" /><!-- plate shield -->
+    <item id="2398" chance="10975" /><!-- mace -->
+    <item id="2458" chance="5175" /><!-- chain helmet -->
+    <item id="2148" countmax="28" chance="18125" /><!-- gold coin -->
+    <item id="2376" chance="11875" /><!-- sword -->
+    <item id="2666" chance="21150" /><!-- meat -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2465" chance="2075" /><!-- brass armor -->
-            <item id="2509" chance="1500" /><!-- steel shield -->
+            <item id="2465" chance="2200" /><!-- brass armor -->
+            <item id="2509" chance="1475" /><!-- steel shield -->
             <item id="2459" chance="750" /><!-- iron helmet -->
-            <item id="8872" chance="1075" /><!-- belted cape -->
+            <item id="8872" chance="1050" /><!-- belted cape -->
         </inside>
     </item>
 </loot>

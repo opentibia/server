@@ -28,15 +28,15 @@
 		<element firePercent="-10"/>
 	</elements>
 	<loot>
-    <item id="2148" countmax="30" chance="31325" /><!-- gold coin -->
-    <item id="6131" chance="775" /><!-- tortoise shield -->
-    <item id="5678" countmax="2" chance="1175" /><!-- tortoise egg -->
-    <item id="2667" chance="5475" /><!-- fish -->
+    <item id="2148" countmax="30" chance="31575" /><!-- gold coin -->
+    <item id="6131" chance="800" /><!-- tortoise shield -->
+    <item id="5678" countmax="2" chance="1200" /><!-- tortoise egg -->
+    <item id="2667" chance="5450" /><!-- fish -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2510" chance="3550" /><!-- plate shield -->
+            <item id="2510" chance="3425" /><!-- plate shield -->
             <item id="2417" chance="1300" /><!-- battle hammer -->
-            <item id="5899" countmax="3" chance="1550" /><!-- turtle shell -->
+            <item id="5899" countmax="3" chance="1575" /><!-- turtle shell -->
         </inside>
     </item>
 </loot>

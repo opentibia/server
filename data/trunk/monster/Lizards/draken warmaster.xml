@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Draken Warmaster" nameDescription="a draken warmaster" race="blood" experience="2400" speed="220" manacost="0">
 <health now="4150" max="4150"/>
-<look type="334" corpse="11103"/>
+<look type="334" corpse="11107"/>
 <targetchange interval="5000" chance="8"/>
 <strategy attack="100" defense="0"/>
 <flags>
@@ -19,7 +19,7 @@
 </flags>
 <attacks>
 <attack name="melee" interval="2000" skill="90" attack="50"/>
-<attack name="fire" interval="2000" chance="20" length="4" spread="3" max="-480">
+<attack name="fire" interval="2000" chance="25" length="4" spread="3" max="-480">
 <attribute key="shootEffect" value="explosion"/>
 <attribute key="areaEffect" value="explosion"/>
 </attack>
@@ -35,27 +35,27 @@
 <immunities>
 <immunity fire="1"/>
 <immunity earth="1"/>
-<immunity invisibility="1"/>
+<immunity invisible="1"/>
 </immunities>
 <loot>
+    <item id="11303" chance="2500" /><!-- zaoan shoes -->
     <item id="11301" chance="1350" /><!-- zaoan armor -->
-    <item id="7591" countmax="3" chance="3850" /><!-- great health potion -->
-    <item id="2528" chance="2425" /><!-- tower shield -->
-    <item id="2152" countmax="5" chance="30625" /><!-- platinum coin -->
+    <item id="8473" chance="4400" /><!-- ultimate health potion -->
+    <item id="11304" chance="1400" /><!-- zaoan legs -->
+    <item id="2147" countmax="5" chance="1425" /><!-- small ruby -->
+    <item id="11305" chance="1200" /><!-- drakinata -->
     <item id="11323" chance="8225" /><!-- zaoan halberd -->
-    <item id="11321" chance="12475" /><!-- bone shoulderplate -->
-    <item id="8473" chance="4350" /><!-- ultimate health potion -->
-    <item id="11322" chance="7300" /><!-- warmaster's wristguards -->
+    <item id="2528" chance="2450" /><!-- tower shield -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2666" chance="30300" /><!-- meat -->
-            <item id="2148" countmax="100" chance="41000" /><!-- gold coin -->
-            <item id="2148" countmax="100" chance="41000" /><!-- gold coin -->
-            <item id="11304" chance="1350" /><!-- zaoan legs -->
-            <item id="11303" chance="2500" /><!-- zaoan shoes -->
+            <item id="7591" countmax="3" chance="3875" /><!-- great health potion -->
+            <item id="11321" chance="12500" /><!-- bone shoulderplate -->
+            <item id="2666" chance="30350" /><!-- meat -->
+            <item id="11322" chance="7375" /><!-- warmaster's wristguards -->
+            <item id="2152" countmax="5" chance="30675" /><!-- platinum coin -->
+            <item id="2148" countmax="100" chance="40975" /><!-- gold coin -->
+            <item id="2148" countmax="100" chance="40975" /><!-- gold coin -->
             <item id="2123" chance="700" /><!-- ring of the sky -->
-            <item id="2147" countmax="5" chance="1425" /><!-- small ruby -->
-            <item id="11305" chance="1175" /><!-- drakinata -->
         </inside>
     </item>
 </loot>

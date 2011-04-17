@@ -31,8 +31,8 @@
 		<immunity earth="1"/>
 	</immunities>
 	<loot>
-    <item id="2666" chance="14850" /><!-- meat -->
-    <item id="2148" countmax="15" chance="35350" /><!-- gold coin -->
+    <item id="2666" chance="14900" /><!-- meat -->
+    <item id="2148" countmax="15" chance="35400" /><!-- gold coin -->
 </loot>
 
 

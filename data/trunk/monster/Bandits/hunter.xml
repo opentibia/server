@@ -2,7 +2,7 @@
 <monster name="Hunter" nameDescription="a hunter" race="blood" experience="150" speed="210" manacost="530">
 	<health now="150" max="150"/>
 	<look type="129" head="95" body="116" legs="121" feet="115" corpse="6080"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="10" attack="20"/>
-		<attack name="physical" interval="2000" chance="40" range="7" min="-0" max="-100">
+		<attack name="physical" interval="2000" chance="25" range="7" min="-0" max="-100">
 			<attribute key="shootEffect" value="arrow"/>
 		</attack>
 	</attacks>
@@ -28,31 +28,31 @@
 		<element holyPercent="20"/>
 		<element physicalPercent="-5"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Guess who we're hunting, hahaha!"/>
 		<voice sentence="Guess who we are hunting!"/>
 		<voice sentence="Bullseye!"/>
 		<voice sentence="You'll make a nice trophy!"/>
 	</voices>
 	<loot>
-    <item id="2544" countmax="22" chance="29725" /><!-- arrow -->
-    <item id="12386" chance="11275" /><!-- hunter's quiver -->
-    <item id="2456" chance="6875" /><!-- bow -->
-    <item id="2675" countmax="2" chance="14475" /><!-- orange -->
-    <item id="2465" chance="5000" /><!-- brass armor -->
-    <item id="2201" chance="3125" /><!-- dragon necklace -->
-    <item id="1890" chance="800" /><!-- deer trophy -->
+    <item id="2544" countmax="22" chance="30075" /><!-- arrow -->
+    <item id="2675" countmax="2" chance="14425" /><!-- orange -->
+    <item id="2050" chance="3575" /><!-- torch -->
+    <item id="2201" chance="3300" /><!-- dragon necklace -->
+    <item id="12425" chance="11250" /><!-- hunter's quiver -->
+    <item id="2456" chance="6200" /><!-- bow -->
+    <item id="2465" chance="4925" /><!-- brass armor -->
+    <item id="1890" chance="950" /><!-- deer trophy -->
     <item id="2690" countmax="2" chance="9125" /><!-- roll -->
-    <item id="2050" chance="3425" /><!-- torch -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2460" chance="5625" /><!-- brass helmet -->
-            <item id="2545" countmax="4" chance="3575" /><!-- poison arrow -->
-            <item id="2546" countmax="3" chance="3300" /><!-- burst arrow -->
-            <item id="1884" chance="800" /><!-- wolf trophy -->
-            <item id="2147" chance="800" /><!-- small ruby -->
-            <item id="5875" chance="925" /><!-- sniper gloves -->
-            <item id="5907" chance="700" /><!-- slingshot -->
+            <item id="2460" chance="6200" /><!-- brass helmet -->
+            <item id="2545" countmax="4" chance="3450" /><!-- poison arrow -->
+            <item id="2546" countmax="3" chance="3625" /><!-- burst arrow -->
+            <item id="1884" chance="950" /><!-- wolf trophy -->
+            <item id="2147" chance="850" /><!-- small ruby -->
+            <item id="5875" chance="950" /><!-- sniper gloves -->
+            <item id="5907" chance="675" /><!-- slingshot -->
         </inside>
     </item>
 </loot>

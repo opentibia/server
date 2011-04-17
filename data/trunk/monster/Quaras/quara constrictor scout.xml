@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="55" attack="40"/>
-		<attack name="lifedrain" interval="2000" chance="15" radius="3" target="0" max="-80">
+		<attack name="lifedrain" interval="2000" chance="25" radius="3" target="0" max="-80">
 			<attribute key="areaEffect" value="blackspark"/>
 		</attack>
 	</attacks>
@@ -34,12 +34,12 @@
 		<immunity ice="1"/>
 	</immunities>
 	<loot>
-    <item id="2397" chance="5150" /><!-- longsword -->
-    <item id="2465" chance="2400" /><!-- brass armor -->
-    <item id="2148" countmax="40" chance="25625" /><!-- gold coin -->
+    <item id="2397" chance="5175" /><!-- longsword -->
+    <item id="2465" chance="2350" /><!-- brass armor -->
+    <item id="2148" countmax="40" chance="25850" /><!-- gold coin -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="12443" chance="7650" /><!-- quara tentacle -->
+            <item id="12443" chance="7550" /><!-- quara tentacle -->
             <item id="5895" countmax="3" chance="925" /><!-- fish fin -->
             <item id="2150" chance="750" /><!-- small amethyst -->
         </inside>

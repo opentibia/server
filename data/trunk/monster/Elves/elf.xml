@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="10" attack="15"/>
-		<attack name="physical" interval="2000" chance="10" range="7" target="1" min="-0" max="-25">
+		<attack name="physical" interval="2000" chance="25" range="7" target="1" min="-0" max="-25">
 			<attribute key="shootEffect" value="arrow"/>
 		</attack>
 	</attacks>
@@ -31,7 +31,7 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Ulathil beia Thratha!"/>
 		<voice sentence="Bahaha aka!"/>
 		<voice sentence="You are not welcome here."/>
@@ -39,18 +39,18 @@
 		<voice sentence="Death to the defilers!"/>
 	</voices>
 	<loot>
-    <item id="2544" countmax="3" chance="5575" /><!-- arrow -->
-    <item id="8839" countmax="2" chance="16950" /><!-- plum -->
-    <item id="2148" countmax="30" chance="25825" /><!-- gold coin -->
-    <item id="2484" chance="10350" /><!-- studded armor -->
-    <item id="2482" chance="16350" /><!-- studded helmet -->
-    <item id="2510" chance="9450" /><!-- plate shield -->
+    <item id="2544" countmax="3" chance="5700" /><!-- arrow -->
+    <item id="8839" countmax="2" chance="17250" /><!-- plum -->
+    <item id="2148" countmax="30" chance="25800" /><!-- gold coin -->
+    <item id="2484" chance="10475" /><!-- studded armor -->
+    <item id="2482" chance="16300" /><!-- studded helmet -->
+    <item id="2510" chance="9475" /><!-- plate shield -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2643" chance="12300" /><!-- leather boots -->
-            <item id="2397" chance="13000" /><!-- longsword -->
-            <item id="10552" chance="2975" /><!-- elvish talisman -->
-            <item id="5921" countmax="3" chance="1425" /><!-- heaven blossom -->
+            <item id="2643" chance="12175" /><!-- leather boots -->
+            <item id="2397" chance="13075" /><!-- longsword -->
+            <item id="10552" chance="3000" /><!-- elvish talisman -->
+            <item id="5921" countmax="3" chance="1400" /><!-- heaven blossom -->
         </inside>
     </item>
 </loot>

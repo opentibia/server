@@ -19,25 +19,25 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="90" attack="100"/>
-		<attack name="firefield" interval="2000" chance="10" target="0" radius="3"/>
-		<attack name="fire" interval="2000" chance="13" range="1" target="1" min="-100" max="-800">
+		<attack name="firefield" interval="2000" chance="9" target="0" radius="3"/>
+		<attack name="fire" interval="2000" chance="9" range="1" target="1" min="-100" max="-800">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="fireattack"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="20" range="7" radius="6" target="1" min="-100" max="-800">
+		<attack name="fire" interval="2000" chance="9" range="7" radius="6" target="1" min="-100" max="-800">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="30" length="5"	spread="2" target="1" min="-0" max="-0">
+		<attack name="fire" interval="2000" chance="9" length="5"	spread="2" target="1" min="-0" max="-0">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
 	</attacks>
 	<defenses armor="15" defense="15">
-		<defense name="healing" interval="2000" chance="20" min="175" max="500">
+		<defense name="healing" interval="2000" chance="9" min="175" max="500">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="15" speedchange="624" duration="2000">
+		<defense name="speed" interval="2000" chance="9" speedchange="624" duration="2000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -53,9 +53,9 @@
 		<immunity invisible="1"/>
 	</immunities>
 	<summons maxSummons="2">
-		<summon name="diabolic imp" interval="2000" chance="20" max="2"/>
+		<summon name="diabolic imp" interval="2000" chance="9" max="2"/>
 	</summons>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Poke! Poke!"/>
 		<voice sentence="Let me tickle you with my trident!"/>
 	</voices>

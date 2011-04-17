@@ -2,7 +2,7 @@
 <monster name="Doomhowl" nameDescription="Doomhowl" experience="3750" speed="320" race="blood" manacost="0">
 	<health now="8500" max="8500"/>
 	<strategy attack="100" defense="0"/>
-	<targetchange speed="2000" chance="10"/>
+	<targetchange speed="2000" chance="9"/>
 	<look type="308" corpse="6080"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,15 +19,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" chance="100" skill="70" attack="100"/>
-		<attack name="physical" interval="2000" chance="50" radius="3" target="0" min="-0" max="-645">
+		<attack name="physical" interval="2000" chance="18" radius="3" target="0" min="-0" max="-645">
 			<attribute key="areaEffect" value="redspark"/>
 		</attack>
-		<attack name="physical" interval="4000" chance="20" radius="0">
-			<attribute key="areaEffect" value="rednote"/>
+		<attack name="physical" interval="2000" chance="18" radius="0">
+			<attribute key="areaEffect" value="greennote"/>
 		</attack>
 	</attacks>
 	<defenses armor="50" defense="55">
-		<defense name="speed" interval="2000" chance="10" speedchange="390" duration="6000">
+		<defense name="speed" interval="2000" chance="18" speedchange="390" duration="6000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>

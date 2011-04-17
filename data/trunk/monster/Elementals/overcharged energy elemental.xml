@@ -2,7 +2,7 @@
 <monster name="Overcharged Energy Elemental" nameDescription="an orvercharged energy elemental" race="undead" experience="1300" speed="300" manacost="0">
 	<health now="1750" max="1750"/>
 	<look type="290" corpse="8966"/>
-	<targetchange interval="20000" chance="15"/>
+	<targetchange interval="20000" chance="12"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -20,15 +20,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="80"/>
-		<attack name="energy" interval="2000" chance="10" target="1" range="7" min="-150" max="-420">
+		<attack name="energy" interval="2000" chance="18" target="1" range="7" min="-150" max="-420">
 			<attribute key="shootEffect" value="energy"/>
 			<attribute key="areaEffect" value="purpleenergy"/>
 		</attack>
-		<attack name="energy" interval="2000" chance="15" target="1" range="3" min="-100" max="-250">
+		<attack name="energy" interval="2000" chance="18" target="1" range="3" min="-100" max="-250">
 			<attribute key="shootEffect" value="energy"/>
 			<attribute key="areaEffect" value="energyarea"/>
 		</attack>
-		<attack name="energycondition" interval="2000" chance="12" range="7" target="1" min="-100" max="-100">
+		<attack name="energycondition" interval="2000" chance="18" range="7" target="1" min="-100" max="-100">
 			<attribute key="shootEffect" value="energy"/>
 			<atttribute key="areaEffect" value="yellowenergy"/>
 		</attack>

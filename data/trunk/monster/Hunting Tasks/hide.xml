@@ -22,7 +22,7 @@
 
 	</attacks>
 	<defenses armor="25" defense="40">
-		<defense name="speed" interval="2000" chance="10" speedchange="340" duration="5000">
+		<defense name="speed" interval="2000" chance="25" speedchange="340" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -39,14 +39,13 @@
 		<immunity earth="1"/>
 	</immunities>
 	<loot>
-    <item id="2152" countmax="5" chance="41675" /><!-- platinum coin -->
-    <item id="5879" chance="62175" /><!-- spider silk -->
-    <item id="7903" chance="46325" /><!-- terra hood -->
+    <item id="2152" countmax="5" chance="41075" /><!-- platinum coin -->
+    <item id="7903" chance="43750" /><!-- terra hood -->
+    <item id="2457" chance="63625" /><!-- steel helmet -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2457" chance="62175" /><!-- steel helmet -->
-            <item id="2477" chance="53000" /><!-- knight legs -->
-            <item id="2169" chance="38000" /><!-- time ring -->
+            <item id="2477" chance="50850" /><!-- knight legs -->
+            <item id="2169" chance="38100" /><!-- time ring -->
         </inside>
     </item>
 </loot>

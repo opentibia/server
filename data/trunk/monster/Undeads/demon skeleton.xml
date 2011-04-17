@@ -19,7 +19,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="64" attack="50"/>
-		<attack name="death" interval="2000" chance="15" range="3" min="-30" max="-50">
+		<attack name="death" interval="2000" chance="25" range="3" min="-30" max="-50">
 			<attribute key="shootEffect" value="death"/>
 			<attribute key="areaEffect" value="mortarea"/>
 		</attack>
@@ -35,19 +35,19 @@
 		<immunity earth="1"/>
 	</immunities>
 	<loot>
-    <item id="2050" chance="36650" /><!-- torch -->
+    <item id="2050" chance="33475" /><!-- torch -->
     <item id="2148" countmax="45" chance="18325" /><!-- gold coin -->
-    <item id="2513" chance="1450" /><!-- battle shield -->
-    <item id="10564" chance="5425" /><!-- demonic skeletal hand -->
+    <item id="2513" chance="1475" /><!-- battle shield -->
+    <item id="10564" chance="5450" /><!-- demonic skeletal hand -->
     <item id="2417" chance="3325" /><!-- battle hammer -->
     <item id="2399" countmax="3" chance="6950" /><!-- throwing star -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2459" chance="2700" /><!-- iron helmet -->
+            <item id="2459" chance="2650" /><!-- iron helmet -->
             <item id="2194" chance="775" /><!-- mysterious fetish -->
             <item id="7620" chance="1150" /><!-- mana potion -->
-            <item id="2178" chance="675" /><!-- mind stone -->
-            <item id="2515" chance="575" /><!-- guardian shield -->
+            <item id="2178" chance="700" /><!-- mind stone -->
+            <item id="2515" chance="600" /><!-- guardian shield -->
         </inside>
     </item>
 </loot>

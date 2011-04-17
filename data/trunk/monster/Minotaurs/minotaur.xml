@@ -27,22 +27,22 @@
 		<element icePercent="-10"/>
 		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Kaplar!"/>
 	</voices>
 	<loot>
-    <item id="2398" chance="12850" /><!-- mace -->
-    <item id="2464" chance="11750" /><!-- chain armor -->
-    <item id="2148" countmax="25" chance="20925" /><!-- gold coin -->
-    <item id="12428" countmax="2" chance="1675" /><!-- minotaur horn -->
-    <item id="2460" chance="9775" /><!-- brass helmet -->
-    <item id="2666" chance="5500" /><!-- meat -->
-    <item id="2376" chance="5500" /><!-- sword -->
+    <item id="2398" chance="13225" /><!-- mace -->
+    <item id="2464" chance="11650" /><!-- chain armor -->
+    <item id="2148" countmax="25" chance="20825" /><!-- gold coin -->
+    <item id="2386" chance="4175" /><!-- axe -->
+    <item id="12428" countmax="2" chance="1700" /><!-- minotaur horn -->
+    <item id="2460" chance="9600" /><!-- brass helmet -->
+    <item id="2666" chance="5325" /><!-- meat -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2510" chance="20000" /><!-- plate shield -->
+            <item id="2376" chance="5450" /><!-- sword -->
+            <item id="2510" chance="20325" /><!-- plate shield -->
             <item id="5878" countmax="3" chance="1400" /><!-- minotaur leather -->
-            <item id="2386" chance="3950" /><!-- axe -->
             <item id="2554" chance="750" /><!-- shovel -->
             <item id="2172" chance="550" /><!-- bronze amulet -->
         </inside>

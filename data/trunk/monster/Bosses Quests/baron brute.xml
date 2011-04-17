@@ -2,7 +2,7 @@
 <monster name="Baron Brute" nameDescription="Baron Brute" race="blood" experience="3000" speed="290" manacost="0">
 	<health now="5000" max="5000"/>
 	<look type="2" corpse="6008"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -32,7 +32,7 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Mash'n!"/>
 	</voices>
 </monster>

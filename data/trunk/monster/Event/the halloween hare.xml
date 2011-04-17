@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<monster name="The Halloween Hare" nameDescription="the halloween hare" race="undead" experience="0" speed="500" manacost="0"> 
+  <health now="3" max="3"/> 
+  <look type="74" head="0" body="0" legs="0" feet="0" corpse="6569"/> 
+  <targetchange interval="2000" chance="40"/> 
+  <strategy attack="100" defense="0"/> 
+  <flags> 
+    <flag summonable="0"/> 
+    <flag attackable="0"/> 
+    <flag hostile="1"/> 
+    <flag illusionable="0"/> 
+    <flag convinceable="0"/> 
+    <flag pushable="0"/> 
+    <flag canpushitems="1"/> 
+    <flag canpushcreatures="0"/> 
+    <flag targetdistance="4"/> 
+    <flag staticattack="90"/> 
+    <flag runonhealth="0"/> 
+  </flags> 
+  <attacks> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="witch" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="ghost" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  item="2097" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="skeleton" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="vampire" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="mummy" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="Spectre" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="Blightwalker" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="Dark Torturer" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="Pirate Skeleton" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+    <attack name="outfit" interval="2000" chance="16" range="5" radius="5"  monster="Phantasm" duration="6000000"> 
+      <attribute key="shootEffect" value="suddendeath"/> 
+      <attribute key="areaEffect" value="poff"/> 
+    </attack> 
+
+  </attacks> 
+  <defenses armor="999" defense="999"> 
+  </defenses> 
+  <immunities> 
+    <immunity physical="1"/> 
+    <immunity energy="1"/> 
+    <immunity fire="1"/> 
+    <immunity poison="1"/> 
+    <immunity lifedrain="1"/> 
+    <immunity paralyze="1"/> 
+    <immunity outfit="1"/> 
+    <immunity drunk="1"/> 
+    <immunity invisible="1"/> 
+    <immunity ice="1"/> 
+    <immunity death="1"/> 
+    <immunity holy="1"/> 
+  </immunities> 
+</monster>

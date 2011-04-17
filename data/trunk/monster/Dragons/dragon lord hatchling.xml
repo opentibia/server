@@ -19,23 +19,23 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="45"/>
-		<attack name="fire" interval="2000" chance="5" length="8" spread="3" min="-90" max="-125">
+		<attack name="fire" interval="2000" chance="14" length="8" spread="3" min="-90" max="-125">
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="firefield" interval="2000" chance="5" range="7" radius="3" target="1">
+		<attack name="firefield" interval="2000" chance="14" range="7" radius="3" target="1">
 			<attribute key="shootEffect" value="fire"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="5" range="7" radius="4" target="1" min="-55" max="-105">
+		<attack name="fire" interval="2000" chance="14" range="7" radius="4" target="1" min="-55" max="-105">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="5" range="7" target="1">
+		<attack name="fire" interval="2000" chance="14" range="7" target="1">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
 	</attacks>
 	<defenses armor="25" defense="38">
-		<defense name="healing" interval="5000" chance="20" min="25" max="50">
+		<defense name="healing" interval="2000" chance="14" min="25" max="50">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -49,15 +49,15 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Fchu?" yell="0"/>
 		<voice sentence="Rooawwrr"/>
 	</voices>
 	<loot>
     <item id="2148" countmax="100" chance="20325" /><!-- gold coin -->
     <item id="2148" countmax="69" chance="20325" /><!-- gold coin -->
-    <item id="2672" chance="68325" /><!-- dragon ham -->
-    <item id="2796" chance="950" /><!-- green mushroom -->
+    <item id="2672" chance="68700" /><!-- dragon ham -->
+    <item id="2796" chance="925" /><!-- green mushroom -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="7620" chance="1000" /><!-- mana potion -->

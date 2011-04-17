@@ -19,15 +19,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="60"/>
-		<attack name="physical" interval="2000" chance="15" length="5" spread="3" min="-0" max="-200">
+		<attack name="physical" interval="2000" chance="18" length="5" spread="3" min="-0" max="-200">
 			<attribute key="areaEffect" value="redspark"/>
 		</attack>
 	</attacks>
 	<defenses armor="30" defense="30">
-		<defense name="invisible" interval="2000" chance="12" duration="2000">
+		<defense name="invisible" interval="2000" chance="18" duration="2000">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="healing" interval="2000" chance="14" min="75" max="125">
+		<defense name="healing" interval="2000" chance="18" min="75" max="125">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -43,24 +43,24 @@
 		<immunity drunk="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2500" chance="10">
+	<voices interval="2500" chance="9">
 		<voice sentence="GRAAARRRRRR"/>
 		<voice sentence="CHHHHHHHHHHH"/>
 	</voices>
 	<loot>
     <item id="2148" countmax="100" chance="44625" /><!-- gold coin -->
     <item id="2148" countmax="5" chance="44625" /><!-- gold coin -->
-    <item id="2666" chance="31225" /><!-- meat -->
-    <item id="11210" chance="11100" /><!-- striped fur -->
-    <item id="2168" chance="5850" /><!-- life ring -->
-    <item id="9959" chance="1750" /><!-- silky tapestry -->
+    <item id="2666" chance="31325" /><!-- meat -->
+    <item id="11210" chance="11175" /><!-- striped fur -->
+    <item id="2168" chance="5975" /><!-- life ring -->
+    <item id="9959" chance="1700" /><!-- silky tapestry -->
     <item id="7454" chance="1500" /><!-- glorious axe -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="11228" chance="3975" /><!-- sabretooth -->
-            <item id="7436" chance="900" /><!-- angelic axe -->
-            <item id="2515" chance="950" /><!-- guardian shield -->
-            <item id="7588" chance="1625" /><!-- strong health potion -->
+            <item id="7436" chance="925" /><!-- angelic axe -->
+            <item id="2515" chance="925" /><!-- guardian shield -->
+            <item id="7588" chance="1600" /><!-- strong health potion -->
         </inside>
     </item>
 </loot>

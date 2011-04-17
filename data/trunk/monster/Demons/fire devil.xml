@@ -19,11 +19,11 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="10" attack="35"/>
-		<attack name="fire" interval="2000" chance="15" range="7" radius="4" target="1" min="-60" max="-95">
+		<attack name="fire" interval="2000" chance="35" range="7" radius="4" target="1" min="-60" max="-95">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="25" range="7" radius="2" target="1" min="-18" max="-50">
+		<attack name="fire" interval="2000" chance="35" range="7" radius="2" target="1" min="-18" max="-50">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="fireattack"/>
 		</attack>
@@ -40,22 +40,22 @@
 	<immunities>
 		<immunity fire="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Hot, eh?"/>
 		<voice sentence="Hell, oh hell!"/>
 	</voices>
 	<loot>
-    <item id="12469" chance="21800" /><!-- small pitchfork -->
-    <item id="2260" chance="10400" /><!-- blank rune -->
-    <item id="2387" chance="2250" /><!-- double axe -->
-    <item id="2050" countmax="2" chance="1375" /><!-- torch -->
-    <item id="2568" chance="1475" /><!-- cleaver -->
+    <item id="2515" chance="1125" /><!-- guardian shield -->
+    <item id="12469" chance="21325" /><!-- small pitchfork -->
+    <item id="2260" chance="11100" /><!-- blank rune -->
+    <item id="2387" chance="2225" /><!-- double axe -->
+    <item id="2050" countmax="2" chance="1450" /><!-- torch -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2419" chance="5275" /><!-- scimitar -->
-            <item id="2185" chance="925" /><!-- necrotic rod -->
-            <item id="2150" chance="725" /><!-- small amethyst -->
-            <item id="2515" chance="1050" /><!-- guardian shield -->
+            <item id="2568" chance="1600" /><!-- cleaver -->
+            <item id="2419" chance="5400" /><!-- scimitar -->
+            <item id="2185" chance="950" /><!-- necrotic rod -->
+            <item id="2150" chance="675" /><!-- small amethyst -->
         </inside>
     </item>
 </loot>

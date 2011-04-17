@@ -18,10 +18,10 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="40"/>
-		<attack name="physical" interval="2000" chance="10" target="0" radius="4" min="-0" max="-35">
+		<attack name="physical" interval="2000" chance="20" target="0" radius="4" min="-0" max="-35">
 			<attribute key="areaEffect" value="groundshaker"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="5" target="1" speedchange="-260">
+		<attack name="speed" interval="2000" chance="20" target="1" speedchange="-260">
 			<attribute key="areaEffect" value="stones"/>
 		</attack>
 	</attacks>
@@ -35,7 +35,7 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Grrrrrr"/>
 	</voices>
 	<loot>

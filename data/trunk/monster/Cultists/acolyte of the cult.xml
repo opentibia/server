@@ -19,15 +19,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="30" attack="50" poison="40"/>
-		<attack name="lifedrain" interval="2000" chance="15" range="7" target="1" min="-60" max="-120">
+		<attack name="lifedrain" interval="2000" chance="16" range="7" target="1" min="-60" max="-120">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>		
-		<attack name="drunk" interval="2000" chance="15" range="7" target="1" duration="5000">
+		<attack name="drunk" interval="2000" chance="16" range="7" target="1" duration="5000">
 			<attribute key="areaEffect" value="stun"/>
 		</attack>	
 	</attacks>
 	<defenses armor="10" defense="20">
-		<defense name="healing" interval="2000" chance="17" min="40" max="60">
+		<defense name="healing" interval="2000" chance="16" min="40" max="60">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -43,22 +43,24 @@
 		<immunity earth="1"/>
 	</immunities>
 	<summons maxSummons="2">
-		<summon name="Skeleton" interval="2000" chance="10" max="2"/>
+		<summon name="Skeleton" interval="2000" chance="16" max="2"/>
 	</summons>
-	<voices interval="5000" chance="10">
-		<voice sentence="Praise voodoo!"/>
+	<voices interval="2000" chance="9">
+		<voice sentence="Praise the voodoo!"/>
+		<voice sentence="Power to the cult!"/>
+		<voice sentence="Feel the power of the cult!"/>
 	</voices>
 	<loot>
+    <item id="12448" chance="10875" /><!-- rope belt -->
+    <item id="10556" chance="8450" /><!-- cultish robe -->
     <item id="2148" countmax="40" chance="23975" /><!-- gold coin -->
-    <item id="10556" chance="8425" /><!-- cultish robe -->
     <item id="6088" chance="1025" /><!-- music sheet -->
-    <item id="2394" chance="5425" /><!-- morning star -->
+    <item id="2394" chance="5450" /><!-- morning star -->
     <item id="12411" chance="625" /><!-- cultish symbol -->
     <item id="6533" chance="1300" /><!-- book -->
-    <item id="12608" chance="550" /><!-- broken key ring -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="12448" chance="10900" /><!-- rope belt -->
+            <item id="12608" chance="550" /><!-- broken key ring -->
             <item id="2149" chance="950" /><!-- small emerald -->
             <item id="5810" chance="1475" /><!-- pirate voodoo doll -->
             <item id="2201" chance="1500" /><!-- dragon necklace -->

@@ -24,15 +24,15 @@
 	<elements>
 		<element firePercent="-10"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Meeeeep!"/>
 		<voice sentence="Meep!"/>
 	</voices>
 	<loot>
-    <item id="2696" chance="30000" /><!-- cheese -->
-    <item id="2148" countmax="2" chance="63475" /><!-- gold coin -->
-    <item id="3976" countmax="2" chance="7950" /><!-- worm -->
-    <item id="2687" chance="1550" /><!-- cookie -->
+    <item id="2696" chance="29850" /><!-- cheese -->
+    <item id="2148" countmax="2" chance="63525" /><!-- gold coin -->
+    <item id="3976" countmax="2" chance="8025" /><!-- worm -->
+    <item id="2687" chance="1600" /><!-- cookie -->
 </loot>
 
 

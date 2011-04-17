@@ -2,7 +2,7 @@
 <monster name="Spirit of Fire" nameDescription="the spirit of fire" race="blood" experience="950" speed="220" manacost="0">
 	<health now="2300" max="2300"/>
 	<look type="242" corpse="7349"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,13 +19,13 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="100"/>
-		<attack name="firefield" interval="1000" chance="15" range="7" radius="3" target="1">
+		<attack name="firefield" interval="2000" chance="18" range="7" radius="3" target="1">
 			<attribute key="shootEffect" value="fire"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="5" range="7" min="-0" max="-300">
+		<attack name="fire" interval="2000" chance="18" range="7" min="-0" max="-300">
 			<attribute key="shootEffect" value="fire"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="30" radius="7" target="0" min="-120" max="-250">
+		<attack name="fire" interval="2000" chance="18" radius="7" target="0" min="-120" max="-250">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
 	</attacks>
@@ -39,7 +39,7 @@
 		<immunity invisible="1"/>
 		<immunity fire="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Feel the heat."/>
 	</voices>
 </monster>

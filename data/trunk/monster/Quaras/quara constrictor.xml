@@ -19,13 +19,13 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="50" poison="20"/>
-		<attack name="lifedrain" interval="2000" chance="11" radius="3" target="0" min="-50" max="-90">
+		<attack name="lifedrain" interval="2000" chance="18" radius="3" target="0" min="-50" max="-90">
 			<attribute key="areaEffect" value="blackspark"/>
 		</attack>
-		<attack name="ice" interval="2000" chance="12" range="7" min="-40" max="-70" target="0" radius="4">
+		<attack name="ice" interval="2000" chance="18" range="7" min="-40" max="-70" target="0" radius="4">
 			<attribute key="areaEffect" value="iceattack"/>
 		</attack> 	
-		<attack name="energycondition" interval="2000" chance="10" min="-75" max="-75" range="1" target="1">
+		<attack name="energycondition" interval="2000" chance="18" min="-75" max="-75" range="1" target="1">
 			<attribute key="shootEffect" value="energy"/>
 		</attack>
 	</attacks>
@@ -41,22 +41,22 @@
 		<immunity fire="1"/>
 		<immunity ice="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Gaaahhh!"/>
 		<voice sentence="Gluh! Gluh!"/>
 		<voice sentence="Tssss!"/>
 		<voice sentence="Boohaa!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="100" chance="30150" /><!-- gold coin -->
-    <item id="2670" chance="6225" /><!-- shrimp -->
-    <item id="2397" chance="5650" /><!-- longsword -->
-    <item id="12443" chance="10600" /><!-- quara tentacle -->
+    <item id="2148" countmax="100" chance="30350" /><!-- gold coin -->
+    <item id="5895" countmax="3" chance="950" /><!-- fish fin -->
+    <item id="2465" chance="2775" /><!-- brass armor -->
+    <item id="2150" chance="775" /><!-- small amethyst -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2150" chance="750" /><!-- small amethyst -->
-            <item id="5895" countmax="3" chance="950" /><!-- fish fin -->
-            <item id="2465" chance="2725" /><!-- brass armor -->
+            <item id="2397" chance="5525" /><!-- longsword -->
+            <item id="2670" chance="6025" /><!-- shrimp -->
+            <item id="12443" chance="10425" /><!-- quara tentacle -->
         </inside>
     </item>
 </loot>

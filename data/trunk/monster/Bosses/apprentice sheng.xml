@@ -2,7 +2,7 @@
 <monster name="Apprentice Sheng" nameDescription="apprentice sheng" race="blood" experience="100" speed="170" manacost="0">
 	<health now="95" max="95"/>
 	<look type="23" corpse="5981"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -19,23 +19,23 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="10" attack="10"/>
-		<attack name="energy" interval="1000" chance="10" range="7" min="-15" max="-25">
+		<attack name="energy" interval="2000" chance="16" range="7" min="-15" max="-25">
 			<attribute key="shootEffect" value="energyball"/>
 			<attribute key="areaEffect" value="energyarea"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="10" range="7" radius="1" target="1" min="-15" max="-45">
+		<attack name="fire" interval="2000" chance="16" range="7" radius="1" target="1" min="-15" max="-45">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="energyfield" interval="2000" chance="10" range="7" radius="1" target="1">
+		<attack name="energyfield" interval="2000" chance="16" range="7" radius="1" target="1">
 			<attribute key="shootEffect" value="energy"/>
 		</attack>
 	</attacks>
 	<defenses armor="12" defense="13"/>
 	<summons maxSummons="2">
-		<summon name="Hyena" interval="2000" chance="100" max="2"/>
+		<summon name="Hyena" interval="2000" chance="16" max="2"/>
 	</summons>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="I will protect the secrets of my master!"/>
 		<voice sentence="This isle will become ours alone!"/>
 		<voice sentence="You already know too much."/>

@@ -2,7 +2,7 @@
 <monster name="Countess Sorrow" nameDescription="a countess sorrow" race="undead" experience="13000" speed="400" manacost="0">
 	<health now="6500" max="6500"/>
 	<look type="360" head="20" corpse="6344"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -28,15 +28,15 @@
 		<attack name="lifedrain" interval="2000" chance="10" radius="3" min="-100" max="-390">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
-		<attack name="manadrain" interval="1000" chance="25" range="7" target="1" radius="3" min="-40" max="-65">
+		<attack name="manadrain" interval="1000" chance="10" range="7" target="1" radius="3" min="-40" max="-65">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</attack>
 	</attacks>
 	<defenses armor="25" defense="20">
-		<defense name="healing" interval="2000" chance="20" min="400" max="720">
+		<defense name="healing" interval="2000" chance="10" min="400" max="720">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="invisible" interval="2000" chance="10">
+		<defense name="invisible" interval="2000" chance="12">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 		<defense name="speed" interval="2000" chance="10" speedchange="696" duration="2000">
@@ -59,7 +59,7 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="I'm so sorry ... for youuu!"/>
 	</voices>
 	<loot>

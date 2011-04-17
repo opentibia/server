@@ -21,7 +21,7 @@
 		<attack name="melee" interval="2000" skill="40" attack="80"/>
 	</attacks>
 	<defenses armor="15" defense="12">
-		<defense name="speed" interval="2000" chance="15" speedchange="290" duration="6000">
+		<defense name="speed" interval="2000" chance="25" speedchange="290" duration="6000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -31,22 +31,22 @@
 		<element earthPercent="-10"/>
 		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="KRAK ORRRRRRK!" yell="1"/>
 	</voices>
 	<loot>
-    <item id="12435" chance="4650" /><!-- orc leather -->
-    <item id="3965" chance="4650" /><!-- hunting spear -->
-    <item id="2381" chance="6975" /><!-- halberd -->
-    <item id="12433" chance="9275" /><!-- orcish gear -->
-    <item id="2148" countmax="12" chance="30925" /><!-- gold coin -->
-    <item id="2378" chance="6300" /><!-- battle axe -->
+    <item id="12435" chance="4525" /><!-- orc leather -->
+    <item id="3965" chance="4725" /><!-- hunting spear -->
+    <item id="2381" chance="7100" /><!-- halberd -->
+    <item id="12433" chance="9500" /><!-- orcish gear -->
+    <item id="2148" countmax="12" chance="31000" /><!-- gold coin -->
+    <item id="2378" chance="6475" /><!-- battle axe -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2671" chance="11025" /><!-- ham -->
-            <item id="2044" chance="1250" /><!-- lamp -->
-            <item id="11113" chance="3300" /><!-- orc tooth -->
-            <item id="2464" chance="1800" /><!-- chain armor -->
+            <item id="2671" chance="11275" /><!-- ham -->
+            <item id="2044" chance="1200" /><!-- lamp -->
+            <item id="11113" chance="3350" /><!-- orc tooth -->
+            <item id="2464" chance="1675" /><!-- chain armor -->
         </inside>
     </item>
 </loot>

@@ -29,9 +29,9 @@
 		<element physicalPercent="-5"/>
 	</elements>
 	<loot>
-    <item id="2671" chance="40100" /><!-- ham -->
-    <item id="2148" countmax="10" chance="27850" /><!-- gold coin -->
-    <item id="11196" chance="19650" /><!-- piece of crocodile leather -->
+    <item id="2671" chance="40075" /><!-- ham -->
+    <item id="2148" countmax="10" chance="27775" /><!-- gold coin -->
+    <item id="11196" chance="19800" /><!-- piece of crocodile leather -->
     <item id="3982" chance="625" /><!-- crocodile boots -->
 </loot>
 

@@ -26,24 +26,25 @@
 		<element earthPercent="-10"/>
 		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Meee maity!"/>
 		<voice sentence="Grrrr"/>
 		<voice sentence="Whaaaz up!?"/>
 		<voice sentence="Gruntz!"/>
 	</voices>
 	<loot>
-    <item id="2389" chance="26050" /><!-- spear -->
-    <item id="2148" countmax="12" chance="35125" /><!-- gold coin -->
-    <item id="2643" chance="11925" /><!-- leather boots -->
-    <item id="2666" chance="14625" /><!-- meat -->
-	<item id="12471" chance="1775" /><!-- trollroot -->
+    <item id="2544" countmax="5" chance="2775" /><!-- arrow -->
+    <item id="2389" chance="22775" /><!-- spear -->
+    <item id="2643" chance="14050" /><!-- leather boots -->
+    <item id="2148" countmax="12" chance="35875" /><!-- gold coin -->
+    <item id="2448" chance="4425" /><!-- studded club -->
+    <item id="2666" chance="12300" /><!-- meat -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2512" chance="16425" /><!-- wooden shield -->
-            <item id="2544" countmax="5" chance="3875" /><!-- arrow -->
-            <item id="10605" chance="3650" /><!-- bunch of troll hair -->
-            <item id="2448" chance="5875" /><!-- studded club -->
+            <item id="2512" chance="4875" /><!-- wooden shield -->
+            <item id="10606" chance="4425" /><!-- bunch of troll hair -->
+            <item id="2170" chance="950" /><!-- silver amulet -->
+            <item id="12471" chance="950" /><!-- trollroot -->
         </inside>
     </item>
 </loot>

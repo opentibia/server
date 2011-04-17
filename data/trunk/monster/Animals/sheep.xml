@@ -2,7 +2,7 @@
 <monster name="Sheep" nameDescription="a sheep" race="blood" experience="0" speed="116" manacost="250">
 	<health now="20" max="20"/>
 	<look type="14" corpse="5991"/>
-	<targetchange interval="2000" chance="20"/>
+	<targetchange interval="2000" chance="16"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="1"/>
@@ -21,12 +21,12 @@
 	<elements>
 		<element firePercent="-10"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Maeh"/>
 	</voices>
 	<loot>
-    <item id="2666" countmax="4" chance="66700" /><!-- meat -->
-    <item id="11236" chance="2300" /><!-- wool -->
+    <item id="2666" countmax="4" chance="67125" /><!-- meat -->
+    <item id="11236" chance="2250" /><!-- wool -->
 </loot>
 
 

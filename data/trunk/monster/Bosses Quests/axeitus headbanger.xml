@@ -23,7 +23,7 @@
 		</attack>
 	</attacks>
 	<defenses armor="15" defense="17">
-		<defense name="speed" interval="2000" chance="15" speedchange="260" duration="5000">
+		<defense name="speed" interval="2000" chance="20" speedchange="260" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -32,7 +32,7 @@
 		<element earthPercent="-10"/>
 		<element deathPercent="-5"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Hicks!"/>
 		<voice sentence="Stand still! Both of you! *hicks*"/>
 		<voice sentence="This victory will earn me a casket of beer."/>

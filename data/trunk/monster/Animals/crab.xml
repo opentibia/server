@@ -30,9 +30,9 @@
 		<immunity earth="1"/>
 	</immunities>
 	<loot>
-    <item id="2667" chance="21150" /><!-- fish -->
-    <item id="2148" countmax="10" chance="46300" /><!-- gold coin -->
-    <item id="11189" chance="20100" /><!-- crab pincers -->
+    <item id="2667" chance="21000" /><!-- fish -->
+    <item id="2148" countmax="10" chance="46275" /><!-- gold coin -->
+    <item id="11189" chance="20200" /><!-- crab pincers -->
 </loot>
 
 

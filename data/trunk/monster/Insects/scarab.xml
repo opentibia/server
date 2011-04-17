@@ -19,16 +19,16 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="65" attack="20"/>
-		<attack name="poisonfield" interval="2000" chance="15" radius="1" target="0">
+		<attack name="poisonfield" interval="2000" chance="18" radius="1" target="0">
 			<attribute key="areaEffect" value="poff"/>
 		</attack>
-		<attack name="poison" interval="2000" chance="12" range="3" target="1" min="-0" max="-35">
+		<attack name="poison" interval="2000" chance="18" range="3" target="1" min="-0" max="-35">
 			<attribute key="shootEffect" value="poison"/>
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
 	</attacks>
 	<defenses armor="12" defense="15">
-		<defense name="speed" interval="2000" chance="5" speedchange="250" duration="4000">
+		<defense name="speed" interval="2000" chance="18" speedchange="250" duration="4000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
@@ -43,8 +43,8 @@
 		<immunity earth="1"/>
 	</immunities>
 	<loot>
-    <item id="2159" chance="1575" /><!-- scarab coin -->
-    <item id="10558" chance="4900" /><!-- piece of scarab shell -->
+    <item id="2159" chance="1550" /><!-- scarab coin -->
+    <item id="10558" chance="4850" /><!-- piece of scarab shell -->
     <item id="2148" countmax="52" chance="27550" /><!-- gold coin -->
     <item id="2666" countmax="2" chance="40475" /><!-- meat -->
     <item id="1987" chance="100000"><!-- bag -->

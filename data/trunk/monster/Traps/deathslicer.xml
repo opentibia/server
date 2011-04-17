@@ -19,10 +19,10 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="190" attack="50"/>
-		<attack name="energy" interval="2000" chance="12" radius="3" target="0" min="-200" max="-400">
+		<attack name="energy" interval="2000" chance="20" radius="3" target="0" min="-200" max="-400">
 			<attribute key="areaEffect" value="yellowspark"/>
 		</attack>
-		<attack name="energy" interval="2000" chance="15" length="8" spread="0" min="-100" max="-200">
+		<attack name="energy" interval="2000" chance="20" length="8" spread="0" min="-100" max="-200">
 			<attribute key="areaEffect" value="yellowspark"/>
 		</attack>
 	</attacks>
@@ -36,7 +36,6 @@
 		<immunity holy="1"/>
 		<immunity death="1"/>
 		<immunity lifedrain="1"/>
-		<immunity manadrain="1"/>
 		<immunity paralyze="1"/>
 		<immunity drunk="1"/>
 		<immunity outfit="1"/>

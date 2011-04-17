@@ -19,11 +19,15 @@
       <flag runonhealth="0"/>
     </flags>
     <attacks>
-       <attack name="melee" interval="1200" attack="1" skill="60"/>
- 	<attack name="mass healing" interval="2000" chance="100" target="0" min="100000" max="100000"/>
+    <attack name="melee" interval="2000" attack="1" skill="60"/>
+ 	<attack name="mass healing" interval="2000" chance="20" target="0" min="10000" max="10000">
+	<attribute key="areaEffect" value="blueshimmer"/>
+	</attack>
     </attacks>
     <defenses armor="0" defense="0">
-      <defense name="healing" interval="10000" chance="100" min="100000" max="100000"/>
+      <defense name="healing" interval="2000" chance="20" min="10000" max="10000">
+	  <attribute key="areaEffect" value="blueshimmer"/>
+	  </defense>
     </defenses>
     <immunities>
       <immunity invisible="1"/>

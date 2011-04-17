@@ -2,7 +2,7 @@
 	<monster name="Ice Overlord" nameDescription="an ice overlord" race="undead" experience="2800" speed="390" manacost="0">
 	<health now="4000" max="4000"/>
 	<look type="11" corpse="8965"/>
-	<targetchange interval="20000" chance="15"/>
+	<targetchange interval="20000" chance="12"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -20,22 +20,22 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="70" attack="100"/>
-		<attack name="ice" interval="2000" chance="20" range="7" spread="0" min="-700" max="-1000">
+		<attack name="ice" interval="2000" chance="14" range="7" spread="0" min="-700" max="-1000">
 			<attribute key="areaEffect" value="icearea"/>
 		</attack>
-		<attack name="poisoncondition" interval="2000" chance="30" range="3" target="1" min="-160" max="-720">
+		<attack name="poisoncondition" interval="2000" chance="14" range="3" target="1" min="-160" max="-720">
 			<attribute key="shootEffect" value="smallice"/>
 			<attribute key="areaEffect" value="iceattack"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="20" radius="6" target="0" speedchange="-800" duration="5000">
+		<attack name="speed" interval="2000" chance="14" radius="6" target="0" speedchange="-800" duration="5000">
 			<attribute key="areaEffect" value="icetornado"/>
 		</attack>
-		<attack name="ice" interval="2000" chance="35" target="0" radius="1">
+		<attack name="ice" interval="2000" chance="14" target="0" radius="1">
 			<attribute key="areaEffect" value="icetornado"/>
 		</attack>
 	</attacks>
 	<defenses armor="30" defense="30">
-		<defense name="healing" interval="2000" chance="15" min="90" max="150">
+		<defense name="healing" interval="2000" chance="14" min="90" max="150">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -54,14 +54,10 @@
 		<immunity drown="1"/>
 	</immunities>
 	<loot>
-    <item id="2152" countmax="3" chance="35050" /><!-- platinum coin -->
+    <item id="2152" countmax="3" chance="34725" /><!-- platinum coin -->
     <item id="8300" chance="100000" /><!-- flawless ice crystal -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="2148" countmax="74" chance="35225" /><!-- gold coin -->
-            <item id="8878" chance="950" /><!-- crystalline armor -->
-        </inside>
-    </item>
+    <item id="2148" countmax="74" chance="35375" /><!-- gold coin -->
+    <item id="8878" chance="950" /><!-- crystalline armor -->
 </loot>
 
 

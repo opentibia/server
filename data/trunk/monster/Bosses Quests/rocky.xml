@@ -2,7 +2,7 @@
 <monster name="Rocky" nameDescription="rocky" race="undead" experience="190" speed="170">
 	<health now="390" max="390"/>
 	<look type="95" corpse="7349"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag pushable="0"/>
@@ -14,7 +14,7 @@
 		<attack name="melee" interval="2000" skill="30" attack="40"/>
 	</attacks>
 	<defenses armor="30" defense="30">
-		<defense name="healing" interval="2000" chance="20" min="15" max="35">
+		<defense name="healing" interval="2000" chance="25" min="15" max="35">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -28,7 +28,7 @@
 		<immunity earth="1"/>
 		<immunity holy="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Another little gladiator!"/>
 		<voice sentence="Come into my embrace."/>
 	</voices>

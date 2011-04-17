@@ -35,10 +35,10 @@
 		<immunity invisible="0"/>
 	</immunities>
 	<loot>
-    <item id="2148" countmax="45" chance="18675" /><!-- gold coin -->
-    <item id="11192" chance="10875" /><!-- carrion worm fang -->
-    <item id="3976" countmax="2" chance="2150" /><!-- worm -->
-    <item id="2666" countmax="2" chance="10200" /><!-- meat -->
+    <item id="2148" countmax="45" chance="18575" /><!-- gold coin -->
+    <item id="11192" chance="10700" /><!-- carrion worm fang -->
+    <item id="3976" countmax="2" chance="2075" /><!-- worm -->
+    <item id="2666" countmax="2" chance="10125" /><!-- meat -->
 </loot>
 
 

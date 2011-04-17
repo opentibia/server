@@ -25,7 +25,7 @@
 		<element earthPercent="15"/>
 		<element firePercent="-5"/>
 	</elements>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Grrrr"/>
 		<voice sentence="Groar!"/>
 		<voice sentence="Me strong! Me ate spinach!"/>

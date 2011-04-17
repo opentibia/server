@@ -35,12 +35,12 @@
 <immunity invisible="1"/>
 </immunities>
 <loot>
-    <item id="2148" countmax="60" chance="31575" /><!-- gold coin -->
+    <item id="2148" countmax="60" chance="31600" /><!-- gold coin -->
     <item id="1294" countmax="10" chance="16900" /><!-- small stone -->
-    <item id="11227" chance="1000" /><!-- shiny stone -->
+    <item id="11227" chance="975" /><!-- shiny stone -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="10549" chance="5625" /><!-- ancient stone -->
+            <item id="10549" chance="5600" /><!-- ancient stone -->
         </inside>
     </item>
 </loot>

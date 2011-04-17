@@ -30,21 +30,21 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Hail Durin!"/>
 	</voices>
 	<loot>
     <item id="2787" countmax="2" chance="41800" /><!-- white mushroom -->
-    <item id="2643" chance="40050" /><!-- leather boots -->
+    <item id="2643" chance="40025" /><!-- leather boots -->
     <item id="2148" countmax="30" chance="21350" /><!-- gold coin -->
     <item id="2387" chance="1100" /><!-- double axe -->
     <item id="2483" chance="9600" /><!-- scale armor -->
-    <item id="2513" chance="6475" /><!-- battle shield -->
+    <item id="2513" chance="6450" /><!-- battle shield -->
     <item id="2417" chance="4550" /><!-- battle hammer -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2457" chance="1950" /><!-- steel helmet -->
-            <item id="5880" countmax="3" chance="900" /><!-- iron ore -->
+            <item id="2457" chance="1925" /><!-- steel helmet -->
+            <item id="5880" countmax="3" chance="925" /><!-- iron ore -->
             <item id="7618" chance="1000" /><!-- health potion -->
             <item id="2208" chance="650" /><!-- axe ring -->
             <item id="2150" chance="575" /><!-- small amethyst -->

@@ -19,18 +19,18 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="50" attack="40" poison="480"/>
-		<attack name="poisoncondition" interval="2000" chance="15" length="8" spread="3" min="-20" max="-240">
+		<attack name="poisoncondition" interval="2000" chance="16" length="8" spread="3" min="-20" max="-240">
 			<attribute key="areaEffect" value="poison"/>
 		</attack>
-		<attack name="drunk" interval="2000" chance="13" length="8" spread="3" duration="25000">
+		<attack name="drunk" interval="2000" chance="16" length="8" spread="3" duration="25000">
 			<attribute key="areaEffect" value="whitenote"/>
 		</attack>
 	</attacks>
 	<defenses armor="25" defense="18">
-		<defense name="healing" interval="2000" chance="11" min="76" max="84">
+		<defense name="healing" interval="2000" chance="16" min="76" max="84">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="10" speedchange="290" duration="5000">
+		<defense name="speed" interval="2000" chance="16" speedchange="290" duration="5000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>	
 	</defenses>
@@ -43,20 +43,20 @@
 		<immunity invisible="1"/>
 		<immunity earth="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Shriiiek"/>
 	</voices>
 	<loot>
-    <item id="2672" countmax="3" chance="61350" /><!-- dragon ham -->
+    <item id="2672" countmax="3" chance="61100" /><!-- dragon ham -->
     <item id="2148" countmax="63" chance="21200" /><!-- gold coin -->
     <item id="2187" chance="1325" /><!-- wand of inferno -->
-    <item id="2547" chance="3800" /><!-- power bolt -->
-    <item id="10561" chance="4400" /><!-- wyvern talisman -->
+    <item id="2547" chance="3950" /><!-- power bolt -->
+    <item id="10561" chance="4525" /><!-- wyvern talisman -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="2127" chance="900" /><!-- emerald bangle -->
-            <item id="2146" chance="1100" /><!-- small sapphire -->
-            <item id="7588" chance="1050" /><!-- strong health potion -->
+            <item id="2146" chance="1075" /><!-- small sapphire -->
+            <item id="7588" chance="1075" /><!-- strong health potion -->
             <item id="7408" chance="750" /><!-- wyvern fang -->
         </inside>
     </item>

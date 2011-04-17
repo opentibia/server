@@ -32,19 +32,19 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Gnarrr!"/>
 	</voices>
 	<loot>
-    <item id="2145" chance="1450" /><!-- small diamond -->
-    <item id="2483" chance="1800" /><!-- scale armor -->
-    <item id="5895" countmax="3" chance="1275" /><!-- fish fin -->
+    <item id="2145" chance="1500" /><!-- small diamond -->
+    <item id="2483" chance="1825" /><!-- scale armor -->
+    <item id="5895" countmax="3" chance="1250" /><!-- fish fin -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2148" countmax="100" chance="28825" /><!-- gold coin -->
-            <item id="2148" countmax="10" chance="28825" /><!-- gold coin -->
-            <item id="2387" chance="1400" /><!-- double axe -->
-            <item id="12447" chance="3700" /><!-- quara bone -->
+            <item id="2148" countmax="100" chance="28775" /><!-- gold coin -->
+            <item id="2148" countmax="10" chance="28775" /><!-- gold coin -->
+            <item id="2387" chance="1375" /><!-- double axe -->
+            <item id="12447" chance="3725" /><!-- quara bone -->
         </inside>
     </item>
 </loot>

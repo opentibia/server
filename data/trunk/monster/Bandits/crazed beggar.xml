@@ -25,10 +25,10 @@
 		<element physicalPercent="10"/>
 		<element energyPercent="20"/>
 		<element holyPercent="10"/>
-		<element earth="-10"/>
-		<element death="-10"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-10"/>
 	</elements>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="Hehehe!"/>
 		<voice sentence="Raahhh!"/>
 		<voice sentence="You are one of THEM! Die!"/>
@@ -38,22 +38,22 @@
 		<voice sentence="Gimme money!"/>
 	</voices>
 	<loot>
-    <item id="2567" chance="9850" /><!-- wooden spoon -->
-    <item id="2148" countmax="9" chance="49600" /><!-- gold coin -->
-    <item id="2237" chance="62600" /><!-- dirty cape -->
-    <item id="2690" chance="19600" /><!-- roll -->
-    <item id="2666" countmax="2" chance="9750" /><!-- meat -->
-    <item id="2556" chance="10050" /><!-- wooden hammer -->
-    <item id="2570" chance="5600" /><!-- rolling pin -->
+    <item id="2567" chance="9775" /><!-- wooden spoon -->
+    <item id="2148" countmax="9" chance="49550" /><!-- gold coin -->
+    <item id="2237" chance="62650" /><!-- dirty cape -->
+    <item id="2690" chance="19800" /><!-- roll -->
+    <item id="2666" countmax="2" chance="9700" /><!-- meat -->
+    <item id="2556" chance="10150" /><!-- wooden hammer -->
+    <item id="2570" chance="5500" /><!-- rolling pin -->
     <item id="2744" chance="4950" /><!-- red rose -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="1681" chance="900" /><!-- small blue pillow -->
-            <item id="5553" chance="800" /><!-- rum flask -->
-            <item id="2072" chance="800" /><!-- lute -->
-            <item id="9808" chance="1175" /><!-- rusty armor -->
-            <item id="2802" chance="900" /><!-- sling herb -->
-            <item id="6091" chance="800" /><!-- very noble-looking watch -->
+            <item id="1681" chance="850" /><!-- small blue pillow -->
+            <item id="5553" chance="850" /><!-- rum flask -->
+            <item id="2072" chance="775" /><!-- lute -->
+            <item id="9808" chance="1150" /><!-- rusty armor -->
+            <item id="2802" chance="850" /><!-- sling herb -->
+            <item id="6091" chance="775" /><!-- very noble-looking watch -->
             <item id="2213" chance="600" /><!-- dwarven ring -->
         </inside>
     </item>

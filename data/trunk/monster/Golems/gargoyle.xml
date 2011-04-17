@@ -21,7 +21,7 @@
 		<attack name="melee" interval="2000" skill="55" attack="20"/>
 	</attacks>
 	<defenses armor="26" defense="20">
-		<defense name="healing" interval="2000" chance="15" min="30" max="60">
+		<defense name="healing" interval="2000" chance="25" min="30" max="60">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -34,7 +34,7 @@
 		<immunity lifedrain="1"/>
 		<immunity earth="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Harrrr Harrrr!"/>
 		<voice sentence="Stone sweet stone."/>
 		<voice sentence="Feel my claws, softskin."/>
@@ -42,19 +42,19 @@
 		<voice sentence="There is a stone in your shoe!"/>
 	</voices>
 	<loot>
-    <item id="11195" chance="10275" /><!-- stone wing -->
+    <item id="11195" chance="10300" /><!-- stone wing -->
     <item id="2394" chance="1650" /><!-- morning star -->
-    <item id="2513" chance="2175" /><!-- battle shield -->
-    <item id="2148" countmax="30" chance="27100" /><!-- gold coin -->
-    <item id="2209" chance="600" /><!-- club ring -->
-    <item id="8838" countmax="2" chance="4175" /><!-- potato -->
+    <item id="2513" chance="2150" /><!-- battle shield -->
+    <item id="2148" countmax="30" chance="26975" /><!-- gold coin -->
+    <item id="8838" countmax="2" chance="4200" /><!-- potato -->
     <item id="1294" countmax="10" chance="8900" /><!-- small stone -->
+    <item id="2489" chance="675" /><!-- dark armor -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="2680" countmax="5" chance="1075" /><!-- strawberry -->
-            <item id="2489" chance="675" /><!-- dark armor -->
-            <item id="11227" chance="775" /><!-- shiny stone -->
-            <item id="2129" chance="725" /><!-- wolf tooth chain -->
+            <item id="2209" chance="625" /><!-- club ring -->
+            <item id="2680" countmax="5" chance="1100" /><!-- strawberry -->
+            <item id="11227" chance="800" /><!-- shiny stone -->
+            <item id="2129" chance="750" /><!-- wolf tooth chain -->
             <item id="2457" chance="675" /><!-- steel helmet -->
         </inside>
     </item>

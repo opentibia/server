@@ -2,7 +2,7 @@
 <monster name="Snake God Essence" nameDescription="snake god essence" race="blood" experience="1350" speed="300" manacost="0">
 	<health now="20000" max="20000"/>
 	<look type="356" corpse="8964"/>
-	<targetchange interval="2000" chance="10"/>
+	<targetchange interval="2000" chance="9"/>
 	<strategy attack="100" defense="0"/>
 	<flags>
 		<flag summonable="0"/>
@@ -18,10 +18,10 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="90" attack="160"/>
-		<attack name="lifedrain" interval="2000" chance="40" length="8" spread="0" max="-300">
+		<attack name="lifedrain" interval="2000" chance="20" length="8" spread="0" max="-300">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>	
-		<attack name="earth" interval="2000" chance="50" radius="6"  min="-150" max="-270">
+		<attack name="earth" interval="2000" chance="20" radius="6"  min="-150" max="-270">
 			<attribute key="areaEffect" value="greenshimmer"/>
 		</attack>
 	</attacks>
@@ -37,7 +37,7 @@
 	<immunity invisible="1"/>
 	<immunity paralyze="1"/>
 	</immunities>
-	<voices interval="2000" chance="10">
+	<voices interval="2000" chance="9">
 		<voice sentence="AHHH ZHE POWER..." yell="1"/>
 		<voice sentence="ZHE TIME OF ZHE SNAKE HAZ COME!" yell="1"/>
 	</voices>

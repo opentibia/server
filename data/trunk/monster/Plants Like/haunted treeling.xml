@@ -19,18 +19,18 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="40" attack="60"/>
-		<attack name="manadrain" interval="2000" chance="13" min="-9" radius="3" max="-100" range="1">
+		<attack name="manadrain" interval="2000" chance="16" min="-9" radius="3" max="-100" range="1">
 			<attribute key="shootEffect" value="death"/>
 			<attribute key="areaEffect" value="redshimmer"/>
 		</attack>
-		<attack name="speed" interval="2000" chance="11" length="8" spread="0" speedchange="-600">
+		<attack name="speed" interval="2000" chance="16" length="8" spread="0" speedchange="-600">
 			<attribute key="areaEffect" value="smallplants"/>
 		</attack> 
-		<attack name="earth" interval="2000" chance="12" range="7" target="1" max="-70">
+		<attack name="earth" interval="2000" chance="16" range="7" target="1" max="-70">
 			<attribute key="areaEffect" value="carniphila"/>
 			<attribute key="shootEffect" value="earth"/>
 		</attack>	
-		<attack name="stone shower" interval="2000" chance="10" min="55" max="-100"/> 
+		<attack name="stone shower" interval="2000" chance="16" min="55" max="-100"/> 
 	</attacks>
 	<defenses armor="50" defense="55"/>
 	<elements>
@@ -44,18 +44,18 @@
 		<immunity invisible="1"/>
 	</immunities>
 	<loot>
-    <item id="2148" countmax="95" chance="35275" /><!-- gold coin -->
-    <item id="2250" chance="30350" /><!-- wooden trash -->
-    <item id="7618" chance="5625" /><!-- health potion -->
+    <item id="2148" countmax="95" chance="35250" /><!-- gold coin -->
+    <item id="2250" chance="30375" /><!-- wooden trash -->
+    <item id="7618" chance="5600" /><!-- health potion -->
     <item id="2787" countmax="2" chance="4350" /><!-- white mushroom -->
     <item id="2790" chance="2550" /><!-- orange mushroom -->
-    <item id="2788" chance="8400" /><!-- red mushroom -->
+    <item id="2788" chance="8300" /><!-- red mushroom -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
             <item id="7588" chance="1850" /><!-- strong health potion -->
-            <item id="2149" chance="1100" /><!-- small emerald -->
+            <item id="2149" chance="1075" /><!-- small emerald -->
             <item id="2213" chance="1100" /><!-- dwarven ring -->
-            <item id="7443" chance="575" /><!-- bullseye potion -->
+            <item id="7443" chance="600" /><!-- bullseye potion -->
         </inside>
     </item>
 </loot>

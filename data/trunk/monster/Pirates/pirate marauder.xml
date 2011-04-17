@@ -20,7 +20,7 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="60" attack="40"/>
-		<attack name="physical" interval="2000" chance="15" range="7" min="-0" max="-40">
+		<attack name="physical" interval="2000" chance="25" range="7" min="-0" max="-40">
 			<attribute key="shootEffect" value="spear"/>
 		</attack>
 	</attacks>
@@ -35,23 +35,23 @@
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="10">
+	<voices interval="5000" chance="9">
 		<voice sentence="Plundeeeeer!"/>
 		<voice sentence="Give up!"/>
 		<voice sentence="Hiyaa!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="40" chance="30900" /><!-- gold coin -->
+    <item id="2148" countmax="40" chance="30875" /><!-- gold coin -->
     <item id="5927" chance="1025" /><!-- pirate bag -->
-    <item id="2050" chance="10425" /><!-- torch -->
-    <item id="2464" chance="3425" /><!-- chain armor -->
+    <item id="2050" chance="10400" /><!-- torch -->
+    <item id="2464" chance="3450" /><!-- chain armor -->
     <item id="11219" chance="10750" /><!-- compass -->
     <item id="6097" countmax="3" chance="975" /><!-- hook -->
-    <item id="2389" countmax="2" chance="4125" /><!-- spear -->
-    <item id="5706" chance="1475" /><!-- treasure map -->
+    <item id="2389" countmax="2" chance="4100" /><!-- spear -->
+    <item id="5706" chance="1500" /><!-- treasure map -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="6126" chance="1075" /><!-- peg leg -->
+            <item id="6126" chance="1050" /><!-- peg leg -->
             <item id="2510" chance="5525" /><!-- plate shield -->
             <item id="5917" chance="1500" /><!-- bandana -->
             <item id="5553" chance="575" /><!-- rum flask -->

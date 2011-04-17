@@ -19,20 +19,20 @@
 </flags>
 <attacks>
 <attack name="melee" interval="2000" skill="65" attack="80"/>
-<attack name="poison" interval="2000" chance="25" range="1" target="1" min="-115" max="-350">
+<attack name="poison" interval="2000" chance="16" range="1" target="1" min="-115" max="-350">
 <attribute key="shootEffect" value="poison"/>
 <attribute key="areaEffect" value="poison"/>
 </attack>
-<attack name="physical" interval="2000" change="15" range="7" target="1" min="10" max="55">
+<attack name="physical" interval="2000" change="25" range="7" target="1" min="10" max="55">
 <attribute key="shootEffect" value="whirlwindaxe"/>
 </attack>
-<attack name="poison" interval="2000" chance="20" range="7" target="1" min="-10" max="-20">
+<attack name="poison" interval="2000" chance="16" range="7" target="1" min="-10" max="-20">
 <attribute key="shootEffect" value="poison"/>
 <attribute key="areaEffect" value="poison"/>
 </attack>
 </attacks>
 	<defenses armor="45" defense="35">
-		<defense name="healing" interval="2000" chance="18" min="200" max="400">
+		<defense name="healing" interval="2000" chance="16" min="200" max="400">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
@@ -50,19 +50,18 @@
 <loot>
     <item id="2148" countmax="100" chance="27300" /><!-- gold coin -->
     <item id="2148" countmax="66" chance="27300" /><!-- gold coin -->
-    <item id="11200" chance="100000" /><!-- red lantern -->
-    <item id="11311" chance="100000" /><!-- zaogun shoulderplates -->
+    <item id="11206" chance="100000" /><!-- red lantern -->
     <item id="11303" chance="3650" /><!-- zaoan shoes -->
     <item id="2149" countmax="10" chance="6625" /><!-- small emerald -->
-    <item id="11324" chance="11750" /><!-- zaogun flag -->
+    <item id="11330" chance="11750" /><!-- zaogun flag -->
+    <item id="7588" chance="3375" /><!-- strong health potion -->
     <item id="1987" chance="100000"><!-- bag -->
         <inside>
-            <item id="7588" chance="3375" /><!-- strong health potion -->
             <item id="5881" chance="1300" /><!-- lizard scale -->
             <item id="7591" chance="1300" /><!-- great health potion -->
-            <item id="11298" chance="3125" /><!-- zaoan legs -->
+            <item id="11304" chance="3125" /><!-- zaoan legs -->
             <item id="5876" chance="2325" /><!-- lizard leather -->
-            <item id="11295" chance="1550" /><!-- zaoan armor -->
+            <item id="11301" chance="1550" /><!-- zaoan armor -->
         </inside>
     </item>
 </loot>

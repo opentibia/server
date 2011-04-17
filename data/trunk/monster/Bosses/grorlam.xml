@@ -19,15 +19,15 @@
 	</flags>
 	<attacks>
 		<attack name="melee" interval="2000" skill="70" attack="75"/>
-		<attack name="physical" interval="2000" chance="40" range="7" min="-50" max="-200">
+		<attack name="physical" interval="2000" chance="18" range="7" min="-50" max="-200">
 			<attribute key="shootEffect" value="largerock"/>
 		</attack>
 	</attacks>
 	<defenses armor="15" defense="25">
-		<defense name="healing" interval="2000" chance="40" min="200" max="400">
+		<defense name="healing" interval="2000" chance="18" min="200" max="400">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="20" speedchange="270" duration="6000">
+		<defense name="speed" interval="2000" chance="18" speedchange="270" duration="6000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
