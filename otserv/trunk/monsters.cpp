@@ -195,7 +195,7 @@ std::list<Item*> MonsterType::createLootItem(const LootBlock& lootBlock)
 		uint16_t n = (uint16_t)std::min(itemCount, (int32_t)100);
 		itemCount -= n;
 		
-		if(tmpItem = Item::CreateItem(lootBlock.id, n)){
+		if((tmpItem = Item::CreateItem(lootBlock.id, n))){
 			if(lootBlock.subType != -1){
 				tmpItem->setSubType(lootBlock.subType);
 			}

@@ -1552,22 +1552,29 @@ uint16_t ConditionDamage::getIcons() const
 void ConditionDamage::generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list)
 {
 	amount = std::abs(amount);
+	start = std::abs(start);
+
+	if (start >= amount){
+		list.push_back(start);
+		return;
+	}
+
+	int32_t med;
 	int32_t sum = 0;
-	int32_t med = 0;
 	float x1, x2;
 
 	for(int32_t i = start; i > 0; --i){
 		int32_t n = start + 1 - i;
 		med = (n * amount) / start;
 
-		do{
+		x1 = std::fabs(1.0 - (((float)sum) + i) / med);
+		x2 = std::fabs(1.0 - (((float)sum) / med));
+		while(x1 < x2){
 			sum += i;
 			list.push_back(i);
-
 			x1 = std::fabs(1.0 - (((float)sum) + i) / med);
 			x2 = std::fabs(1.0 - (((float)sum) / med));
-
-		}while(x1 < x2);
+		}
 	}
 }
 
