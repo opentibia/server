@@ -243,9 +243,6 @@ bool TalkAction::loadFunction(const std::string& functionName)
 	else if(asLowerCaseString(functionName) == "forceraid"){
 		function = forceRaid;
 	}
-	else if(asLowerCaseString(functionName) == "gminvisible"){
-		function = gmInvisible;
-	}
 	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	else if(asLowerCaseString(functionName) == "serverdiagnostic"){
 		function = serverDiag;
@@ -466,19 +463,5 @@ bool TalkAction::forceRaid(Player* player, const std::string& words, const std::
 	}
 
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Raid started.");
-	return true;
-}
-
-bool TalkAction::gmInvisible(Player* player, const std::string& words, const std::string& param)
-{
-	if(!player)
-		return false;
-
-	player->toogleGmInvisible();
-	if(player->isGmInvisible())
-		player->sendTextMessage(MSG_INFO_DESCR, "You are now invisible.");
-	else
-		player->sendTextMessage(MSG_INFO_DESCR, "You are now visible.");
-
 	return true;
 }

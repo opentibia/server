@@ -4045,7 +4045,7 @@ void Game::changeLight(const Creature* creature)
 bool Game::combatBlockHit(CombatType_t combatType, Creature* attacker, Creature* target,
 	int32_t& healthChange, bool checkDefense, bool checkArmor)
 {
-	if(target->getPlayer() && target->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)){
+	if(target->getPlayer() && target->getPlayer()->hasSomeInvisibilityFlag()){
 		return true;
 	}
 

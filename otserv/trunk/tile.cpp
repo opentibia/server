@@ -721,7 +721,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 		if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				if((!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)) && item->isBlocking(*cit)){
+				if((!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasSomeInvisibilityFlag()) && item->isBlocking(*cit)){
 					return RET_NOTENOUGHROOM;
 				}
 			}
