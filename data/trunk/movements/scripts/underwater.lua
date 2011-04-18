@@ -7,7 +7,7 @@ function onStepIn(cid, item, pos)
 		return true
 	end
 
-	if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false) then
+	if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false and isGmInvisible(cid) == false) then
 		doSendMagicEffect(pos, CONST_ME_BUBBLES)
 	end
 

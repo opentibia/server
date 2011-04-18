@@ -25,7 +25,7 @@ function onLogin(cid)
 
 	doPlayerSendTextMessage(cid, MESSAGE_STATUS_DEFAULT, str)
 
-	if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false) then
+	if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false and isGmInvisible(cid) == false) then
 		doSendMagicEffect(playerPos, CONST_ME_TELEPORT)
 	end
 

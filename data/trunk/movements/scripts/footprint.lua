@@ -18,7 +18,7 @@ local TILE_SNOW = {
 
 
 function onStepIn(cid, item, pos)
-	if (isPlayer(cid) and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) ) then
+	if (isPlayer(cid) and getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN == true and isGmInvisible(cid) == true)) then
 		return true
 	end
 

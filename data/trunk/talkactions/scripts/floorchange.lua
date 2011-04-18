@@ -27,7 +27,7 @@ function onSay(cid, words, param)
 	end
 
 	if(doTeleportThing(cid, newPos) and nfloors > 0) then
-		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false) then
+		if(getPlayerFlagValue(cid, PLAYERFLAG_CANNOTBESEEN) == false and isGmInvisible(cid) == false) then
 			doSendMagicEffect(oldPos, CONST_ME_POFF)
 			doSendMagicEffect(newPos, CONST_ME_TELEPORT)
 		end
