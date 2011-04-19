@@ -300,6 +300,7 @@ protected:
 };
 
 inline void QTreeLeafNode::addCreature(Creature* c) {
+       	assert(c != NULL);
 	creature_list.push_back(c);
 }
 
