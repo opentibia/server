@@ -252,7 +252,7 @@ public:
 	bool getPathMatching(const Creature* creature, std::list<Direction>& dirList,
 		const FrozenPathingConditionCall& pathCondition, const FindPathParams& fpp);
 
-	
+
 	// Waypoints on the map
 	Waypoints waypoints;
 
@@ -300,7 +300,7 @@ protected:
 };
 
 inline void QTreeLeafNode::addCreature(Creature* c) {
-       	assert(c != NULL);
+	assert(c != NULL);
 	creature_list.push_back(c);
 }
 
