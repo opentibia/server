@@ -4987,14 +4987,16 @@ bool Game::playerMountCreature(uint32_t playerId, bool mount)
 		player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
 	else if(!player->hasMounts() || !player->getCurrentOutfit().lookMount)
 		player->sendOutfitWindow();
-	else if((OTSYS_TIME() - player->getLastTimeMounted()) >= 2000){
+	else if((OTSYS_TIME() - player->getLastTimeMounted()) >= g_config.getNumber(ConfigManager::MOUNT_TIME)){ 
 		player->setLastTimeMountedAsNow();
 		player->setRidingMount(mount);
 		changeSpeed(player, 0);
 		internalCreatureChangeOutfit(player, player->getCurrentOutfit());
 	}
 	else{
-		player->sendCancel("Please wait 2 seconds before mounting again.");
+		std::stringstream ss;
+        ss << "Please wait " << (g_config.getNumber(ConfigManager::MOUNT_TIME) / 1000) << " seconds before mounting again.";
+        player->sendCancel(ss.str()); 
 	}
 
 	return true;

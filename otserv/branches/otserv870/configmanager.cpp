@@ -208,6 +208,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[PUSH_INTERVAL] = getGlobalNumber(L, "push_interval", 2000);
 	m_confInteger[WANDS_INTERRUPT_SWING] = getGlobalBoolean(L, "wands_interrupt_swing", true);
 	m_confInteger[MONSTER_SPAWN_WALKBACK] = getGlobalBoolean(L, "monster_spawn_walkback", true);
+	m_confInteger[MOUNT_TIME] = getGlobalNumber(L, "mount_time", 2000);
+	m_confInteger[DISMOUNT_IN_PZ] = getGlobalBoolean(L, "dismount_player_in_pz", true);  
 	m_isLoaded = true;
 	return true;
 }

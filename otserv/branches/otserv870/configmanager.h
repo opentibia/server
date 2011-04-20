@@ -165,6 +165,8 @@ public:
 		PUSH_INTERVAL,
 		WANDS_INTERRUPT_SWING,
 		MONSTER_SPAWN_WALKBACK,
+		MOUNT_TIME,
+		DISMOUNT_IN_PZ,  
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

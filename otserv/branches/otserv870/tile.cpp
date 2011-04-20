@@ -30,11 +30,13 @@
 #include "mailbox.h"
 #include "combat.h"
 #include "movement.h"
+#include "configmanager.h"
 #include <string>
 #include <iostream>
 
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
+extern ConfigManager g_config;
 
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 Tile& Tile::null_tile = real_null_tile;
@@ -484,11 +486,13 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 	}
 
 	//dismount
-	if(creature->isRidingMount() && newTile->hasFlag(TILESTATE_PROTECTIONZONE)){
-		creature->setRidingMount(false);
-		g_game.changeSpeed(creature, 0);
-		g_game.internalCreatureChangeOutfit(creature, creature->getCurrentOutfit());
-	}
+    if(g_config.getBoolean(ConfigManager::DISMOUNT_IN_PZ)){
+        if(creature->isRidingMount() && newTile->hasFlag(TILESTATE_PROTECTIONZONE)){
+            creature->setRidingMount(false);
+            g_game.changeSpeed(creature, 0);
+            g_game.internalCreatureChangeOutfit(creature, creature->getCurrentOutfit());
+        }
+    }  
 
 	//remove the creature
 	__removeThing(creature, 0);

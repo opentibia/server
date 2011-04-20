@@ -274,6 +274,12 @@ min_pvp_level_applies_to_summons = true
 --Enable mounts?
 enable_mounts = true
 
+--Mount time
+mount_time = 2000
+
+--Should players be dismounted in protection zone ?
+dismount_player_in_pz = true
+
 --Enable spellcooldown?
 enable_cooldown = true
 
