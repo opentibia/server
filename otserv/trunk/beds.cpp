@@ -121,7 +121,11 @@ bool BedItem::canUse(Player* player)
 		if(house->getHouseAccessLevel(player) != HOUSE_OWNER){
 
 			Player* sleeper = g_game.getPlayerByGuidEx(sleeperGUID);
-
+			
+			if(!sleeper){	// happens when player was deleted from database but is still sleeping in the bed
+				return true;
+			}
+			
 			bool result = false;
 			// compares house access of the kicker (player) to the sleeper
 			// kicker can only kick if he has greater or equal access to the house
