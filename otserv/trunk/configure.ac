@@ -145,7 +145,13 @@ AC_CHECK_LIB(boost_date_time-gcc-mt, main, , [
 			AC_MSG_ERROR("Linking against boost::date-time library failed.")])
 	])
 ])
-
+AC_CHECK_LIB(boost_filesystem-gcc-mt, main, , [
+	AC_CHECK_LIB(boost_filesystem-mt, main, , [
+		AC_CHECK_LIB(boost_filesystem, main, , [
+			AC_MSG_ERROR("Linking against boost::filesystem library failed.")
+		])
+	])
+])
 #check boost asio
 AC_CHECK_HEADERS([boost/asio.hpp], ,[AC_MSG_ERROR("boost::asio header not found.")])
 

@@ -948,10 +948,6 @@ uint32_t MoveEvent::DeEquipItem(MoveEvent* moveEvent, Player* player, Item* item
 
 uint32_t MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& fromPos, const Position& toPos)
 {
-	//totally invisible players shouldn't call for onStep events
-	if (creature->getPlayer() && creature->getPlayer()->hasSomeInvisibilityFlag()){
-		return 1;
-	}
 
 	if(m_scripted){
 		return executeStep(creature, item, fromPos, toPos);

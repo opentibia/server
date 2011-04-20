@@ -1,6 +1,6 @@
 function onStepIn(cid, item, pos)
 	if (isInArray(TRAP_OFF, item.itemid) ) then
-		if (isPlayer(cid) ) then
+		if (isPlayer(cid) and getPlayerFlagValue (cid, PLAYERFLAG_CANNOTBESEEN) == false and isGmInvisible(cid) == false) then
 			doTargetCombatHealth(0, cid, COMBAT_PHYSICALDAMAGE, -50, -100, CONST_ME_NONE)
 			doTransformItem(item.uid, item.itemid + 1)
 			if item.actionid ~= 0 then
