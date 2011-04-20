@@ -116,6 +116,10 @@ AC_CHECK_FUNCS([floor ftime gethostbyname gethostname memset pow sqrt strcasecmp
 AM_PATH_XML2(2.6.5, , AC_MSG_ERROR([you need libxml2 >= 2.6.5 to compile otserv!]))
 LIBS="$LIBS $XML_LIBS"
 
+#check pthread
+AC_CHECK_HEADERS(pthread.h,, [AC_MSG_ERROR([pthread.h required])])
+AC_CHECK_LIB(pthread, pthread_create, ,[AC_MSG_ERROR("Linking against pthread failed.")])
+
 #check GMP
 AC_CHECK_HEADERS([gmp.h], ,[AC_MSG_ERROR("GMP header not found.")])
 AC_CHECK_LIB(gmp, __gmpz_init2, ,[AC_MSG_ERROR("Linking against GMP failed.")])
