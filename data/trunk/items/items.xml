@@ -7764,8 +7764,14 @@
 	<item id="3307" name="jungle grass"/>
 	<item id="3308" name="jungle grass"/>
 	<item id="3309" name="jungle grass"/>
-	<item id="3310" article="a" name="mud stain"/>
-	<item id="3311" article="a" name="pitfall"/>
+    <item id="3310" article="a" name="pitfall"> 	 
+		<attribute key="floorchange" value="down"/> 	 
+	</item> 	 
+	<item id="3311" article="a" name="pitfall"> 	 
+		<attribute key="floorchange" value="down"/> 	 
+		<attribute key="decayTo" value="3310"/> 	 
+		<attribute key="duration" value="60"/> 	 
+	</item>
 	<item id="3312" article="an" name="ant trail"/>
 	<item id="3313" article="an" name="ant trail"/>
 	<item id="3314" article="an" name="ant trail"/>
@@ -7778,7 +7784,9 @@
 	<item id="3321" article="an" name="ant trail"/>
 	<item id="3322" article="an" name="ant trail"/>
 	<item id="3323" article="an" name="anthill"/>
-	<item id="3324" article="a" name="pitfall"/>
+	<item id="3324" article="an" name="earth hole"> 	 
+		<attribute key="floorchange" value="down"/> 	 
+	</item>
 	<item id="3325" article="a" name="rock"/>
 	<item id="3326" article="a" name="rock"/>
 	<item id="3327" article="a" name="rock"/>
