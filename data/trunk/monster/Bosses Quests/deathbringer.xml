@@ -32,7 +32,7 @@
 			<attribute key="areaEffect" value="poff"/>
 		</attack>		
 		<attack name="earth" interval="2000" chance="9" length="8" spread="3">
-			<attribute key="areaEffect" value="eartharea"/>
+			<attribute key="areaEffect" value="poison"/>
 		</attack>	
 		<attack name="lifedrain" interval="2000" chance="9" length="8" spread="3" max="-595">
 			<attribute key="areaEffect" value="redshimmer"/>

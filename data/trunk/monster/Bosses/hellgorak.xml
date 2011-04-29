@@ -17,9 +17,6 @@
 		<flag staticattack="85"/>
 		<flag runonhealth="0"/>
 	</flags>
-			<script>
-<event name="Inquisition"/>
-</script>
 	<attacks>
 		<attack name="melee" interval="2000" skill="130" attack="115"/>
 		<attack name="energy" interval="2000" chance="16" length="8" spread="0" max="-850">
