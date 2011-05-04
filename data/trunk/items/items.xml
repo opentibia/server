@@ -17231,11 +17231,11 @@
 		<attribute key="weight" value="80"/>
 	</item>
 	<item id="7634" article="an" name="empty potion flask">
-		<attribute key="weight" value="150"/>
+		<attribute key="weight" value="160"/>
 		<attribute key="description" value="Return it to a potion store for your deposit."/>
 	</item>
 	<item id="7635" article="an" name="empty potion flask">
-		<attribute key="weight" value="160"/>
+		<attribute key="weight" value="180"/>
 		<attribute key="description" value="Return it to a potion store for your deposit."/>
 	</item>
 	<item id="7636" article="an" name="empty potion flask">
