@@ -827,11 +827,9 @@ bool LuaScriptInterface::callFunction(uint32_t nParams, bool getReturnValue /*=t
 	if(ret != 0){
 		LuaScriptInterface::reportError(NULL, LuaScriptInterface::popString(m_luaState));
 	}
-
-	if (getReturnValue){
-		result = (int32_t)LuaScriptInterface::popBoolean(m_luaState); //it must be in here even when ret!=0 to clean the stack
-		if(ret != 0){
-			result = false;
+	else{
+		if (getReturnValue){
+			result = (int32_t)popBoolean(m_luaState);
 		}
 	}
 
@@ -839,6 +837,9 @@ bool LuaScriptInterface::callFunction(uint32_t nParams, bool getReturnValue /*=t
 
 	if(lua_gettop(m_luaState) + (int)nParams + 1 != size0){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+		std::cout << "Warning! stack size change: " << lua_gettop(m_luaState) + (int)nParams + 1 - size0 << std::endl;
+		std::cout << "ret:" << ret << " getReturnValue:" << getReturnValue << std::endl;
+		assert(false);
 	}
 
 	return result;
