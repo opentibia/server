@@ -1003,7 +1003,9 @@ bool LuaScriptInterface::popBoolean(lua_State *L, bool acceptIntegers /*=true*/)
 			return (uint32_t(lua_tonumber(L, 0)) != 0);
 		}
 	else{
+	if(g_config.getNumber(ConfigManager::LUA_EXCEPTED_TYPE_ERRORS_ENABLED)){
 		reportErrorFunc("Error: Expected boolean type parameter.");
+		}
 		return false;
 		}
 	}
@@ -1023,7 +1025,9 @@ uint32_t LuaScriptInterface::popNumber(lua_State *L, bool acceptBooleans /*=fals
 			ret = uint32_t((lua_toboolean(L, 0) != 0));
 		}
 		else{
+		if(g_config.getNumber(ConfigManager::LUA_EXCEPTED_TYPE_ERRORS_ENABLED)){
 			reportErrorFunc("Error: Expected an integer parameter.");
+			}
 		}
 	}
 	return ret;

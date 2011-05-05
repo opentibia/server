@@ -213,6 +213,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[TILE_LIMIT] = getGlobalNumber(L, "tile_limit", 0);
 	m_confInteger[PROTECTION_TILE_LIMIT] = getGlobalNumber(L, "protection_tile_limit", 0);
 	m_confInteger[HOUSE_TILE_LIMIT]	= getGlobalNumber(L, "house_tile_limit", 0);
+	m_confInteger[LUA_EXCEPTED_TYPE_ERRORS_ENABLED]	= getGlobalBoolean(L, "lua_excepted_type_errors_enabled", true);
 	m_isLoaded = true;
 	return true;
 }
