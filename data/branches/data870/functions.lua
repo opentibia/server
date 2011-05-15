@@ -4,8 +4,6 @@ doPlayerRemOutfit = doPlayerRemoveOutfit
 doPlayerRemOutfitEx = doPlayerRemoveOutfitEx
 getThingfromPos = getThingFromPos
 getPlayerBalance = getPlayerAccountBalance
-broadcastMessage = doBroadcastMessage
-broadcastMessageEx = broadcastMessage
 getPlayersByAccountNumber = getPlayerByAccountNumber
 
 function setExperienceRate(cid, value)
@@ -792,13 +790,24 @@ end
 
 function isInArray(array, value, isCaseSensitive)
 	local compareLowerCase = false
-	if type(value) == "string" and not isCaseSensitive then
+	if value ~= nil and type(value) == "string" and not isCaseSensitive then
 		value = string.lower(value)
 		compareLowerCase = true
 	end
+	if array == nil or value == nil then
+		return (array == value), nil
+	end
+	local t = type(array)
+	if t ~= "table" then
+		if compareLowerCase and t == "string" then
+			return (string.lower(array) == string.lower(value)), nil
+		else
+			return (array == value), nil
+		end
+	end
 	for k,v in pairs(array) do
 		local newV
-		if compareLowerCase == true and type(v) == "string" then
+		if compareLowerCase and type(v) == "string" then
 			newV = string.lower(v)
 		else
 			newV = v
@@ -821,6 +830,10 @@ function doBroadcastMessage(message, class)
 	end
 	return true
 end
+
+--for backward compatibility
+broadcastMessage = doBroadcastMessage
+broadcastMessageEx = broadcastMessage
 
 --default is the returned value if the value of input is missing or invalid
 function getBooleanFromString(input, default)
@@ -853,4 +866,59 @@ end
 
 function isNumber(str)
 	return tonumber(str) ~= nil
+end
+
+function doCopyItem(item, attributes)
+	local attributes = attributes or false
+
+	local ret = doCreateItemEx(item.itemid, item.type)
+	if(attributes) then
+		if(item.actionid > 0) then
+			doSetItemActionId(ret, item.actionid)
+		end
+	end
+
+	if(isContainer(item.uid)) then
+		for i = (getContainerSize(item.uid) - 1), 0, -1 do
+			local tmp = getContainerItem(item.uid, i)
+			if(tmp.itemid > 0) then
+				doAddContainerItemEx(ret, doCopyItem(tmp, true).uid)
+			end
+		end
+	end
+
+	return getThing(ret)
+end
+
+function isInRange(position, fromPosition, toPosition)
+	return (position.x >= fromPosition.x and position.y >= fromPosition.y and position.z >= fromPosition.z and position.x <= toPosition.x and position.y <= toPosition.y and position.z <= toPosition.z)
+end
+
+function doComparePositions(pos1, pos2)
+    return (pos1.x == pos2.x and pos1.y == pos2.y and pos1.z == pos2.z)
+end
+
+function getItemWeightById(itemid)
+        local uid = doCreateItemEx(itemid, 1)
+        local ret = getItemWeight(uid)
+        return ret
+ end
+ 
+function doPlayerGiveItemContainer(cid, containerid, itemid, amount, subType)
+	for i = 1, amount do
+		local container = doCreateItemEx(containerid, 1)
+		for x = 1, getContainerCapById(containerid) do
+			doAddContainerItem(container, itemid, subType)
+		end
+
+		if(doPlayerAddItemEx(cid, container, true) ~= RETURNVALUE_NOERROR) then
+			return false
+		end
+	end
+
+	return true
+end
+
+function doPlayerBuyItemContainer(cid, containerid, itemid, count, cost, charges)
+	return doPlayerRemoveMoney(cid, cost) and doPlayerGiveItemContainer(cid, containerid, itemid, count, charges)
 end

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Deadeye Devious" nameDescription="Deadeye Devious" race="blood" experience="500" speed="234" manacost="0">
+	<health now="1450" max="1450"/>
+	<look type="151" head="115" body="76" legs="35" feet="117" addons="2" corpse="6080"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="50"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="3"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="60"/>
+		<attack name="physical" interval="2000" chance="20" min="-40" max="-160">
+			<attribute key="shootEffect" value="throwingknife"/>
+		</attack>
+	</attacks>
+	<defenses armor="35" defense="50">
+		<defense name="healing" interval="2000" chance="20" min="50" max="150">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Let's kill 'em"/>
+		<voice sentence="Arrrgh!"/>
+		<voice sentence="You'll never take me alive!"/>
+		<voice sentence="You won't get me alive!"/>
+	</voices>
+	<loot>
+    <item id="2463" chance="100000" /><!-- plate armor -->
+    <item id="2148" countmax="88" chance="64050" /><!-- gold coin -->
+    <item id="6102" chance="100000" /><!-- deadeye devious' eye patch -->
+    <item id="2476" chance="21925" /><!-- knight armor -->
+    <item id="2229" countmax="2" chance="71925" /><!-- skull -->
+    <item id="2666" chance="21925" /><!-- meat -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2145" chance="14800" /><!-- small diamond -->
+            <item id="2379" chance="21925" /><!-- dagger -->
+            <item id="7591" chance="7650" /><!-- great health potion -->
+            <item id="5926" chance="7650" /><!-- pirate backpack -->
+            <item id="10103" chance="14800" /><!-- very old piece of paper -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+</monster>

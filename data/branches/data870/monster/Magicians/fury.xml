@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Fury" nameDescription="a fury" race="blood" experience="4000" speed="460" manacost="0">
+	<health now="4100" max="4100"/>
+	<look type="149" head="94" body="77" legs="96" feet="0" addons="3" corpse="6081"/>
+	<targetchange interval="5000" chance="25"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="95"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="80" attack="113"/>
+		<attack name="death" interval="2000" chance="10" range="7" target="1" min="-0" max="-250">
+			<attribute key="shootEffect" value="death"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="10" range="7" speedchange="-440" duration="5000">
+			<attribute key="shootEffect" value="death"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>	
+		<attack name="lifedrain" interval="2000" chance="10" target="0" radius="3" min="-0" max="-300">
+			<attribute key="areaEffect" value="blackspark"/>
+		</attack>		
+		<attack name="fire" interval="2000" chance="10" length="5" spread="3" min="-200" max="-300">
+			<attribute key="areaEffect" value="explosionarea"/>
+		</attack>	
+		<attack name="death" interval="2000" chance="10" length="8" spread="0" min="-0" max="-700">
+			<attribute key="areaEffect" value="redspark"/>
+		</attack>			
+		<attack name="death" interval="2000" chance="10" range="7" radius="4" target="0" min="-0" max="-300">
+			<attribute key="areaEffect" value="redspark"/>
+		</attack>
+		<attack name="skills" interval="2000" chance="10" target="0" radius="4" shielding="-1">
+			<attribute key="areaEffect" value="yellownote"/>
+		</attack>
+	</attacks>
+	<defenses armor="20" defense="20">
+		<defense name="speed" interval="2000" chance="10" speedchange="360" duration="2000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element icePercent="30"/>
+		<element holyPercent="30"/>
+		<element deathPercent="-10"/>
+		<element energyPercent="-10"/>
+		<element earthPercent="-10"/>
+		<element physicalPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity fire="1"/>
+	</immunities>
+	<voices interval="3000" chance="30">
+		<voice sentence="Ahhhhrrrr!"/>
+		<voice sentence="Waaaaah!"/>
+		<voice sentence="Carnage!"/>
+	</voices>
+	<loot>
+    <item id="5944" chance="20300" /><!-- soul orb -->
+    <item id="2148" countmax="100" chance="40025" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="40025" /><!-- gold coin -->
+    <item id="2148" countmax="66" chance="40025" /><!-- gold coin -->
+    <item id="6558" countmax="3" chance="23300" /><!-- concentrated demonic blood -->
+    <item id="2181" chance="18450" /><!-- terra rod -->
+    <item id="5911" chance="4750" /><!-- red piece of cloth -->
+    <item id="2152" countmax="4" chance="2225" /><!-- platinum coin -->
+    <item id="6500" countmax="3" chance="22775" /><!-- demonic essence -->
+    <item id="7591" chance="11300" /><!-- great health potion -->
+    <item id="8844" countmax="4" chance="16925" /><!-- jalapeno pepper -->
+    <item id="2150" countmax="3" chance="6175" /><!-- small amethyst -->
+    <item id="7404" chance="1325" /><!-- assassin dagger -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="9813" chance="11075" /><!-- rusty legs -->
+            <item id="7456" chance="2475" /><!-- noble axe -->
+            <item id="2645" chance="1250" /><!-- steel boots -->
+            <item id="5022" countmax="4" chance="1375" /><!-- orichalcum pearl -->
+            <item id="6300" chance="650" /><!-- death ring -->
+            <item id="2124" chance="800" /><!-- crystal ring -->
+            <item id="7368" chance="700" /><!-- assassin star -->
+            <item id="2470" chance="525" /><!-- golden legs -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Blistering Fire Elemental" nameDescription="a blistering fire elemental" race="fire" experience="1300" speed="230" manacost="0">
+	<health now="1500" max="1500"/>
+	<look type="242" corpse="8964"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="60" attack="100"/>
+		<attack name="fire" interval="2000" chance="16" length="7" spread="3" min="-0" max="-605"/>
+		<attack name="firecondition" interval="2000" chance="16" radius="6" target="0" min="-170" max="-170">
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+		<attack name="firefield" interval="2000" chance="16" range="7" radius="3" target="1">
+			<attribute key="shootEffect" value="fire"/>
+		</attack>
+		<attack name="firefield" interval="2000" chance="16" range="7" radius="3" target="0">
+			<attribute key="shootEffect" value="fire"/>
+		</attack>
+	</attacks>
+	<defenses armor="20" defense="20"/>
+	<elements>
+		<element icePercent="-15"/>
+		<element earthPercent="50"/>
+		<element deathPercent="40"/>
+		<element energyPercent="20"/>
+		<element physicalPercent="25"/>
+	</elements>	
+	<immunities>
+		<immunity fire="1"/>
+		<immunity holy="1"/>
+	</immunities>
+	<loot>
+    <item id="2148" countmax="100" chance="28225" /><!-- gold coin -->
+    <item id="2148" countmax="76" chance="28225" /><!-- gold coin -->
+    <item id="2147" countmax="2" chance="4225" /><!-- small ruby -->
+    <item id="10553" chance="9275" /><!-- fiery heart -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="8299" chance="8750" /><!-- glimmering soil -->
+            <item id="8921" chance="900" /><!-- wand of draconia -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

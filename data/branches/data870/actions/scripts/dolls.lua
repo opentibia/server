@@ -51,6 +51,10 @@ function onUse(cid, item, frompos, item2, topos)
 
 	doPlayerSay(cid, sound, TALKTYPE_ORANGE_1)
 	doTransformItem(item.uid, USED_DOLLS[item.itemid])
+	if item.actionid ~= 0 then
+		doSetItemActionId(item.uid, item.actionid)
+	end
+
 	doDecayItem(item.uid)
 
 	return true

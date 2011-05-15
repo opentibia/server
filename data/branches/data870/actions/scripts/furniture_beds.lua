@@ -61,8 +61,16 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 
 		if newBed ~= LUA_NULL then
-			doTransformItem(getThingFromPos(basePos).uid, newBed[1])
-			doTransformItem(getThingFromPos(nextPos).uid, newBed[2])
+			local i = getThingFromPos(basePos)
+			doTransformItem(i.uid, newBed[1])
+			if i.actionid ~= 0 then
+				doSetItemActionId(i.uid, i.actionid)
+			end
+			i = getThingFromPos(nextPos).uid
+			doTransformItem(i.uid, newBed[2])
+			if i.actionid ~= 0 then
+				doSetItemActionId(i.uid, i.actionid)
+			end
 
 			doSendMagicEffect(frompos, CONST_ME_POFF)
 			doSendMagicEffect(topos, CONST_ME_POFF)

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Gozzler" nameDescription="a gozzler" race="blood" experience="180" speed="260" manacost="800">
+	<health now="240" max="240"/>
+	<look type="313" corpse="9938"/>
+	<targetchange interval="4000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="45" attack="40"/>
+		<attack name="lifedrain" interval="2000" chance="30" range="7" min="-30" max="-135">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="20" defense="20">
+		<defense name="healing" interval="2000" chance="30" min="42" max="68">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="30" speedchange="320" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element deathPercent="50"/>
+		<element holyPercent="50"/>
+		<element physicalPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="3500" chance="9">
+		<voice sentence="Huhuhuhuuu!"/>
+		<voice sentence="Let the fun begin!"/>
+		<voice sentence="Yihahaha!"/>
+		<voice sentence="I'll bite you! Nyehehehehe!"/>
+	</voices>
+	<loot>
+    <item id="2385" chance="8500" /><!-- sabre -->
+    <item id="2015" chance="9500" /><!-- brown flask -->
+    <item id="2148" countmax="70" chance="29950" /><!-- gold coin -->
+    <item id="2378" chance="3350" /><!-- battle axe -->
+    <item id="2394" chance="5500" /><!-- morning star -->
+    <item id="2510" chance="10400" /><!-- plate shield -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2423" chance="1250" /><!-- clerical mace -->
+            <item id="2146" chance="850" /><!-- small sapphire -->
+            <item id="2213" chance="650" /><!-- dwarven ring -->
+            <item id="2409" chance="775" /><!-- serpent sword -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

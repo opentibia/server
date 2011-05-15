@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<monster name="Barbarian Headsplitter" nameDescription="a barbarian headsplitter" race="blood" experience="85" speed="168" manacost="450">
+	<health now="100" max="100"/>
+	<look type="253" head="115" body="105" legs="119" feet="132" corpse="6080"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="70"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="20"/>
+		<attack name="physical" interval="2000" chance="25" range="7" radius="1" target="1" min="-0" max="-60">
+			<attribute key="shootEffect" value="whirlwindaxe"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="30"/>
+	<elements>
+		<element icePercent="50"/>
+		<element holyPercent="20"/>
+		<element energyPercent="20"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="I will regain my honor with your blood!"/>
+		<voice sentence="Surrender is not option!"/>
+		<voice sentence="Its you or me!"/>
+		<voice sentence="Die! Die! Die!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="30" chance="39275" /><!-- gold coin -->
+    <item id="2050" chance="61100" /><!-- torch -->
+    <item id="2460" chance="20700" /><!-- brass helmet -->
+    <item id="2483" chance="4650" /><!-- scale armor -->
+    <item id="2473" chance="5150" /><!-- viking helmet -->
+    <item id="2403" chance="15450" /><!-- knife -->
+    <item id="7618" chance="1025" /><!-- health potion -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2168" chance="775" /><!-- life ring -->
+            <item id="2229" chance="3850" /><!-- skull -->
+            <item id="7461" chance="600" /><!-- krimhorn helmet -->
+            <item id="5913" countmax="3" chance="1450" /><!-- brown piece of cloth -->
+            <item id="7457" chance="575" /><!-- fur boots -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

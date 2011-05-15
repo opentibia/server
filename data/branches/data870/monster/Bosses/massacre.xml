@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Massacre" nameDescription="the massacre" race="blood" experience="20000" speed="430" manacost="0">
+	<health now="32000" max="32000"/>
+	<look type="244" corpse="6336"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="190" attack="170"/>
+		<attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-1100">
+			<attribute key="shootEffect" value="largerock"/>
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="15">
+		<defense name="speed" interval="2000" chance="20" speedchange="790">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>	
+	</defenses>	
+	<elements>
+		<element firePercent="50"/>
+		<element energyPercent="-7"/>
+		<element earthPercent="30"/>
+		<element icePercent="10"/>
+		<element holyPercent="-3"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity outfit="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="HATE! HATE! KILL! KILL!" yell="1"/>
+		<voice sentence="GRRAAARRRHH!" yell="1"/>
+		<voice sentence="GRRRR!" yell="1"/>
+	</voices>
+	<loot>
+    <item id="2221" chance="46450" /><!-- old twig -->
+    <item id="2176" chance="8600" /><!-- orb -->
+    <item id="2231" chance="8600" /><!-- big bone -->
+    <item id="6540" chance="100000" /><!-- piece of massacre's shell -->
+    <item id="2666" chance="92400" /><!-- meat -->
+    <item id="5022" countmax="7" chance="41425" /><!-- orichalcum pearl -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2152" countmax="6" chance="31575" /><!-- platinum coin -->
+            <item id="5944" chance="89700" /><!-- soul orb -->
+            <item id="6500" chance="100000" /><!-- demonic essence -->
+            <item id="2148" countmax="100" chance="63950" /><!-- gold coin -->
+            <item id="2148" countmax="22" chance="63950" /><!-- gold coin -->
+            <item id="7590" chance="5900" /><!-- great mana potion -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="The Imperor" nameDescription="the imperor" race="fire" experience="8000" speed="234" manacost="0">
+	<health now="15000" max="15000"/>
+	<look type="237" corpse="8635"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="90" attack="100"/>
+		<attack name="firefield" interval="2000" chance="9" target="0" radius="3"/>
+		<attack name="fire" interval="2000" chance="9" range="1" target="1" min="-100" max="-800">
+			<attribute key="shootEffect" value="fire"/>
+			<attribute key="areaEffect" value="fireattack"/>
+		</attack>
+		<attack name="fire" interval="2000" chance="9" range="7" radius="6" target="1" min="-100" max="-800">
+			<attribute key="shootEffect" value="fire"/>
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+		<attack name="fire" interval="2000" chance="9" length="5"	spread="2" target="1" min="-0" max="-0">
+			<attribute key="shootEffect" value="fire"/>
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="15">
+		<defense name="healing" interval="2000" chance="9" min="175" max="500">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="9" speedchange="624" duration="2000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="50"/>
+	</elements>
+	<immunities>
+		<immunity fire="1"/>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity outfit="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="diabolic imp" interval="2000" chance="9" max="2"/>
+	</summons>
+	<voices interval="2000" chance="9">
+		<voice sentence="Poke! Poke!"/>
+		<voice sentence="Let me tickle you with my trident!"/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="79" chance="100000"/><!-- gold coin -->
+		<item id="2050" chance="15000"/><!-- torch -->
+		<item id="6558" chance="2222"/><!-- concentrated demonic blood -->
+		<item id="2260" chance="18000"/><!-- blank rune -->
+		<item id="6534" chance="100000"/><!-- the imperor's trident -->
+		<item id="6300" chance="999"/><!-- death ring -->
+		<item id="2465" chance="6577"/><!-- brass armor -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2548" chance="20000"/><!-- pitchfork -->
+				<item id="6529" countmax="5" chance="5000"/><!-- infernal bolts -->
+				<item id="2465" chance="6577"/><!-- brass armor -->
+				<item id="2185" chance="833"/><!-- volcanic rod -->
+				<item id="2464" chance="7887"/><!-- chain armor -->
+				<item id="5944" chance="5666"/><!-- soul orb -->
+				<item id="7899" chance="2000"/><!-- magma coat -->
+				<item id="7900" chance="2000"/><!-- magma monocle -->
+				<item id="7891" chance="2000"/><!-- magma boots -->
+				<item id="6500" countmax="1" chance="7777"/><!-- demonic essence -->
+				<item id="2150" countmax="1" chance="8888"/><!-- small amethyst -->
+				<item id="2165" chance="4555"/><!-- stealth ring -->
+			</inside>
+		</item>
+	</loot>
+</monster>

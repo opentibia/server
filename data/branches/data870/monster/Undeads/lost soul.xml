@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Lost Soul" nameDescription="a lost soul" race="undead" experience="4000" speed="250" manacost="0">
+	<health now="5800" max="5800"/>
+	<look type="232" corpse="6310"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="60" attack="120"/>
+		<attack name="speed" interval="2000" chance="20" radius="5" target="0" speedchange="-600">
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="death" interval="2000" chance="20" length="8" spread="0" max="-210">
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="35"/>
+	<elements>
+		<element icePercent="50"/>
+		<element energyPercent="10"/>
+		<element holyPercent="-25"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity fire="1"/>
+		<immunity earth="1"/>
+		<immunity death="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="30">
+		<voice sentence="Forgive Meeeee!"/>
+		<voice sentence="Mouuuurn meeee!"/>
+	</voices>
+	<loot>
+    <item id="2483" chance="10150" /><!-- scale armor -->
+    <item id="6300" chance="1475" /><!-- death ring -->
+    <item id="11233" chance="28600" /><!-- unholy bone -->
+    <item id="2197" chance="2950" /><!-- stone skin amulet -->
+    <item id="7413" chance="1300" /><!-- titan axe -->
+    <item id="7590" chance="10175" /><!-- great mana potion -->
+    <item id="5944" chance="6800" /><!-- soul orb -->
+    <item id="2260" chance="35475" /><!-- blank rune -->
+    <item id="2457" chance="10325" /><!-- steel helmet -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="9810" countmax="2" chance="6325" /><!-- rusty armor -->
+            <item id="2463" chance="10950" /><!-- plate armor -->
+            <item id="2148" countmax="100" chance="42475" /><!-- gold coin -->
+            <item id="2148" countmax="100" chance="42475" /><!-- gold coin -->
+            <item id="2148" countmax="100" chance="42475" /><!-- gold coin -->
+            <item id="2148" countmax="13" chance="42475" /><!-- gold coin -->
+            <item id="2152" countmax="3" chance="4425" /><!-- platinum coin -->
+            <item id="6500" countmax="3" chance="6525" /><!-- demonic essence -->
+            <item id="2133" chance="1475" /><!-- ruby necklace -->
+            <item id="5806" chance="5900" /><!-- silver goblet -->
+            <item id="6524" chance="1625" /><!-- skeleton decoration -->
+            <item id="2436" chance="1125" /><!-- skull staff -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

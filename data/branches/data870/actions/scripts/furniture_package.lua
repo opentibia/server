@@ -7,6 +7,9 @@ function onUse(cid, item, frompos, item2, topos)
 		doPlayerSendCancel(cid, "You must open the construction kit in your house.")
 	else
 		doTransformItem(item.uid, CONSTRUCTIONS[item.itemid])
+		if item.actionid ~= 0 then
+			doSetItemActionId(item.uid, item.actionid)
+		end
 		doSendMagicEffect(frompos, CONST_ME_POFF)
 	end
 	

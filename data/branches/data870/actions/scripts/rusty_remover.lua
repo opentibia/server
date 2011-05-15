@@ -38,6 +38,9 @@ function onUse(cid, item, frompos, item2, topos)
 	else
 		local revealedItem = rustyItems[item2.itemid][math.random(#rustyItems[item2.itemid])]
 		doTransformItem(item2.uid, revealedItem)
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
 		doPlayerSendTextMessage(cid, MESSAGE_INFO_DESCR, "You removed the rust, revealing a " .. getItemName(revealedItem) )
 	end
 

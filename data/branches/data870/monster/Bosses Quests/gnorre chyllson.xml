@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<monster name="Gnorre Chyllson" nameDescription="gnorre chyllson" race="blood" experience="4000" speed="370" manacost="0">
+	<health now="7100" max="7100"/>
+	<look type="251" head="11" body="9" legs="11" feet="85" addons="1" corpse="7349"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="80" attack="50"/>
+		<attack name="lifedrain" interval="2000" chance="12" length="8" spread="0" min="-0" max="-125">
+			<attribute key="areaEffect" value="purplenote"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="12" radius="5" range="7" target="1" min="-0" max="-320" drown="20">
+			<attribute key="areaEffect" value="bluebubble"/>
+		</attack>
+		<attack name="drown" interval="2000" chance="12" radius="5" range="7" target="1" min="-0" max="-320" drown="20">
+			<attribute key="areaEffect" value="bluebubble"/>
+		</attack>
+		<attack name="drown" interval="2000" chance="12" length="8" spread="3" range="7" min="-0" drown="20">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="12" radius="3" target="0" min="-0" max="-400">
+			<attribute key="areaEffect" value="blackspark"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="12" range="7" radius="3" target="1" min="-0" max="-200">
+			<attribute key="shootEffect" value="snowball"/>
+		</attack>
+	</attacks>
+	<defenses armor="51" defense="52"/>
+	<elements>
+		<element earthPercent="90"/>
+		<element holyPercent="30"/>
+		<element energyPercent="-10"/>
+		<element physicalPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity fire="1"/>
+		<immunity ice="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="I am like the merciless northwind."/>
+		<voice sentence="Snow will be your death shroud."/>
+		<voice sentence="Feel the wrath of father chyll!"/>
+	</voices>
+</monster>

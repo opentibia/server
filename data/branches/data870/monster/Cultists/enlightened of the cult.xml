@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Enlightened of the Cult" nameDescription="a enlightened of the cult" race="blood" experience="500" speed="220" manacost="0">
+	<health now="700" max="700"/>
+	<look type="193" corpse="6080"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag staticattack="50"/>
+		<flag targetdistance="5"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="50" poison="80"/>
+		<attack name="lifedrain" interval="2000" chance="10" range="3" target="1" min="-70" max="-185">
+			<attribute key="shootEffect" value="smallholy"/>
+			<attribute key="areaEffect" value="holydamage"/>
+		</attack>
+		<attack name="drunk" interval="2000" chance="10" range="7" target="1" duration="20000">
+			<attribute key="areaEffect" value="stun"/>
+		</attack>
+		<attack name="physical" interval="3000" chance="10" range="7" radius="1" target="1" min="-70" max="-185">
+			<attribute key="shootEffect" value="energy"/>
+			<attribute key="areaEffect" value="energyarea"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="10" range="7" speedchange="-220" duration="5000">
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="20">
+		<defense name="invisible" interval="2000" chance="10" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="healing" interval="2000" chance="10" min="30" max="50">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element holyPercent="20"/>
+		<element icePercent="20"/>
+		<element physicalPercent="-5"/>
+		<element energyPercent="-5"/>
+		<element deathPercent="-6"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="Crypt Shambler" interval="2000" chance="10" max="2"/>
+		<summon name="Ghost" interval="2000" chance="10" max="2"/>
+	</summons>
+	<voices interval="2000" chance="9">
+		<voice sentence="Praise to my master Urgith!"/>
+		<voice sentence="You will rise as my servant!"/>
+		<voice sentence="Praise to my masters! Long live the triangle!"/>
+		<voice sentence="You will die in the name of the triangle!"/>
+	</voices>
+	<loot>
+    <item id="2436" chance="850" /><!-- skull staff -->
+    <item id="7589" chance="1400" /><!-- strong mana potion -->
+    <item id="6533" chance="1450" /><!-- book -->
+    <item id="10555" chance="10900" /><!-- cultish mask -->
+    <item id="2148" countmax="70" chance="23150" /><!-- gold coin -->
+    <item id="2167" chance="1075" /><!-- energy ring -->
+    <item id="5810" chance="850" /><!-- pirate voodoo doll -->
+    <item id="2200" chance="1550" /><!-- protection amulet -->
+    <item id="12411" chance="1450" /><!-- cultish symbol -->
+    <item id="2146" chance="1050" /><!-- small sapphire -->
+    <item id="5669" chance="600" /><!-- mysterious voodoo skull -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="6090" chance="1050" /><!-- music sheet -->
+            <item id="2171" chance="625" /><!-- platinum amulet -->
+            <item id="2187" chance="725" /><!-- wand of inferno -->
+            <item id="5801" chance="625" /><!-- jewelled backpack -->
+            <item id="7426" chance="525" /><!-- amber staff -->
+            <item id="2114" chance="600" /><!-- piggy bank -->
+            <item id="12608" chance="575" /><!-- broken key ring -->
+            <item id="2656" chance="625" /><!-- blue robe -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

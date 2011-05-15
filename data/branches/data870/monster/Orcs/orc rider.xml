@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Orc Rider" nameDescription="a orc rider" race="blood" experience="110" speed="340" manacost="490">
+	<health now="180" max="180"/>
+	<look type="4" corpse="6010"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="40"/>
+	</attacks>
+	<defenses armor="9" defense="20">
+		<defense name="speed" interval="2000" chance="25" speedchange="900" duration="6000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="20"/>
+		<element holyPercent="10"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<voices interval="5000" chance="9">
+		<voice sentence="Grrrrrrr"/>
+		<voice sentence="Orc arga Huummmak!"/>
+	</voices>
+	<loot>
+    <item id="2428" chance="7200" /><!-- orcish axe -->
+    <item id="11235" chance="11400" /><!-- warwolf fur -->
+    <item id="2666" countmax="3" chance="26450" /><!-- meat -->
+    <item id="2148" countmax="74" chance="4100" /><!-- gold coin -->
+    <item id="12435" chance="9350" /><!-- orc leather -->
+    <item id="2483" chance="1450" /><!-- scale armor -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2050" chance="2300" /><!-- torch -->
+            <item id="2129" chance="9825" /><!-- wolf tooth chain -->
+            <item id="11113" chance="3000" /><!-- orc tooth -->
+            <item id="2513" chance="1450" /><!-- battle shield -->
+            <item id="2425" chance="1225" /><!-- obsidian lance -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -10,6 +10,9 @@ function onUse(cid, item, frompos, item2, topos)
 		doRemoveItem(item2.uid)
 	elseif item.itemid == KNIFE and item2.itemid == PUMPKIN then
 		doTransformItem(item2.uid, PUMPKINHEAD_LIGHT_OFF)
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
 	else
 		return false
 	end

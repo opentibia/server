@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Mammoth" nameDescription="a mammoth" race="blood" experience="160" speed="190" manacost="500">
+	<health now="320" max="320"/>
+	<look type="199" corpse="6074"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag staticattack="90"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="45" attack="40"/>
+	</attacks>
+	<defenses armor="40" defense="57"/>
+	<elements>
+		<element earthPercent="20"/>
+		<element icePercent="20"/>
+		<element physicalPercent="20"/>
+		<element firePercent="-10"/>
+	</elements>
+	<voices interval="2000" chance="9">
+		<voice sentence="Troooooot!"/>
+		<voice sentence="Hooooot-Toooooot!"/>
+		<voice sentence="Tooooot!"/>
+	</voices>
+	<loot>
+    <item id="2671" countmax="3" chance="27375" /><!-- ham -->
+    <item id="11224" chance="2425" /><!-- thick fur -->
+    <item id="2148" countmax="20" chance="16225" /><!-- gold coin -->
+    <item id="11238" countmax="2" chance="4625" /><!-- mammoth tusk -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7432" chance="950" /><!-- furry club -->
+            <item id="2666" chance="26775" /><!-- meat -->
+            <item id="3973" chance="550" /><!-- tusk shield -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

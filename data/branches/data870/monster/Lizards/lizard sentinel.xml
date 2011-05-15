@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Lizard Sentinel" nameDescription="a lizard sentinel" race="blood" experience="110" speed="240" manacost="560">
+	<health now="265" max="265"/>
+	<look type="114" corpse="6040"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="10"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="20" attack="30"/>
+		<attack name="physical" interval="2000" chance="25" range="7" min="-0" max="-70">
+			<attribute key="shootEffect" value="spear"/>
+		</attack>
+	</attacks>
+	<defenses armor="17" defense="14"/>
+	<elements>
+		<element energyPercent="10"/>
+		<element icePercent="20"/>
+		<element firePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity earth="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Tssss!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="53" chance="30100" /><!-- gold coin -->
+    <item id="2483" chance="9250" /><!-- scale armor -->
+    <item id="2464" chance="9625" /><!-- chain armor -->
+    <item id="3965" chance="5875" /><!-- hunting spear -->
+    <item id="2389" countmax="3" chance="6875" /><!-- spear -->
+    <item id="5876" chance="1900" /><!-- lizard leather -->
+    <item id="2425" chance="1575" /><!-- obsidian lance -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2381" chance="1100" /><!-- halberd -->
+            <item id="2145" chance="725" /><!-- small diamond -->
+            <item id="7618" chance="1100" /><!-- health potion -->
+            <item id="5881" countmax="3" chance="1525" /><!-- lizard scale -->
+            <item id="3974" chance="975" /><!-- sentinel shield -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

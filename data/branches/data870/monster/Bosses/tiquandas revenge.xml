@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Tiquandas Revenge" nameDescription="a tiquandas revenge" race="venom" experience="2635" speed="440" manacost="0">
+	<health now="2400" max="2400"/>
+	<look type="120" corpse="6047"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="400"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="70" attack="55" poison="180"/>
+		<attack name="poison" interval="2000" chance="14" range="7" min="-0" max="-440">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="14" range="7" target="1" speedchange="-850" duration="30000">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="greenspark"/>
+		</attack>
+		<attack name="earth" interval="2000" chance="14" radius="3" target="0" min="-0" max="-250">
+			<attribute key="areaEffect" value="plantattack"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="31">
+		<defense name="ultimate healing" interval="2000" chance="14" min="600" max="800"/>
+		<defense name="speed" interval="2000" chance="14" speedchange="800" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>	
+	</defenses>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity earth="1"/>
+	</immunities>
+	<loot>
+    <item id="2666" chance="70500" /><!-- meat -->
+    <item id="5015" chance="100000" /><!-- mandrake -->
+    <item id="2671" chance="53000" /><!-- ham -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7732" countmax="2" chance="51750" /><!-- seeds -->
+            <item id="2148" countmax="99" chance="46450" /><!-- gold coin -->
+            <item id="2792" countmax="5" chance="11500" /><!-- dark mushroom -->
+            <item id="2747" chance="3000" /><!-- grave flower -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

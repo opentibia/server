@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Omruc" nameDescription="a omruc" race="undead" experience="2950" speed="310" manacost="0">
+	<health now="4300" max="4300"/>
+	<look type="90" corpse="6025"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="60" poison="60"/>
+		<attack name="physical" interval="2000" chance="9" min="-0" max="-500">
+			<attribute key="shootEffect" value="arrow"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="9" min="-100" max="-500">
+			<attribute key="shootEffect" value="poisonarrow"/>
+		</attack>
+		<attack name="fire" interval="2000" chance="9" range="3" min="-100" max="-500">
+			<attribute key="shootEffect" value="burstarrow"/>
+			<attribute key="areaEffect" value="explosionarea"/>
+		</attack>	
+		<attack name="speed" interval="2000" chance="9" range="7" target="1" speedchange="-220" duration="5000">
+		</attack>				
+	</attacks>
+	<defenses armor="20" defense="35">
+		<defense name="healing" interval="2000" chance="9" min="400" max="460">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="9" duration="8000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="20"/>
+		<element earthPercent="20"/>
+		<element energyPercent="-5"/>
+		<element icePercent="-5"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity death="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="4">
+		<summon name="Stalker" interval="2000" chance="14"/>
+	</summons>
+	<voices interval="2000" chance="9">
+		<voice sentence="Now chhhou shhhee me ... Now chhhou don't."/>
+		<voice sentence="Chhhhou are marked ashhh my prey."/>
+		<voice sentence="Psssst, I am over chhhere."/>
+		<voice sentence="Catchhhh me if chhhou can."/>
+		<voice sentence="Die!"/>
+	</voices>
+	<loot>
+    <item id="7591" chance="26425" /><!-- great health potion -->
+    <item id="2148" countmax="100" chance="44950" /><!-- gold coin -->
+    <item id="2148" countmax="41" chance="44950" /><!-- gold coin -->
+    <item id="2674" countmax="2" chance="57900" /><!-- red apple -->
+    <item id="2545" countmax="20" chance="35125" /><!-- poison arrow -->
+    <item id="2352" chance="100000" /><!-- crystal arrow -->
+    <item id="2544" countmax="25" chance="8050" /><!-- arrow -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2546" countmax="14" chance="26150" /><!-- burst arrow -->
+            <item id="7365" countmax="6" chance="16550" /><!-- onyx arrow -->
+            <item id="2165" chance="11600" /><!-- stealth ring -->
+            <item id="2547" countmax="2" chance="7900" /><!-- power bolt -->
+            <item id="2145" countmax="3" chance="10375" /><!-- small diamond -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

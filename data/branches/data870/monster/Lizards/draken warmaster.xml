@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Draken Warmaster" nameDescription="a draken warmaster" race="blood" experience="2400" speed="220" manacost="0">
+<health now="4150" max="4150"/>
+<look type="334" corpse="11107"/>
+<targetchange interval="5000" chance="8"/>
+<strategy attack="100" defense="0"/>
+<flags>
+<flag summonable="0"/>
+<flag attackable="1"/>
+<flag hostile="1"/>
+<flag illusionable="1"/>
+<flag convinceable="0"/>
+<flag pushable="0"/>
+<flag canpushitems="1"/>
+<flag canpushcreatures="0"/>
+<flag targetdistance="1"/>
+<flag staticattack="90"/>
+<flag runonhealth="0"/>
+</flags>
+<attacks>
+<attack name="melee" interval="2000" skill="90" attack="50"/>
+<attack name="fire" interval="2000" chance="25" length="4" spread="3" max="-480">
+<attribute key="shootEffect" value="explosion"/>
+<attribute key="areaEffect" value="explosion"/>
+</attack>
+</attacks>
+<defenses armor="16" defense="19"/>
+<elements>
+<element physicalPercent="5"/>
+<element holyPercent="5"/>
+<element deathPercent="50"/>
+<element energyPercent="5"/>
+<element icePercent="-5"/>
+</elements>
+<immunities>
+<immunity fire="1"/>
+<immunity earth="1"/>
+<immunity invisible="1"/>
+</immunities>
+<loot>
+    <item id="11303" chance="2500" /><!-- zaoan shoes -->
+    <item id="11301" chance="1350" /><!-- zaoan armor -->
+    <item id="8473" chance="4400" /><!-- ultimate health potion -->
+    <item id="11304" chance="1400" /><!-- zaoan legs -->
+    <item id="2147" countmax="5" chance="1425" /><!-- small ruby -->
+    <item id="11305" chance="1200" /><!-- drakinata -->
+    <item id="11323" chance="8225" /><!-- zaoan halberd -->
+    <item id="2528" chance="2450" /><!-- tower shield -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7591" countmax="3" chance="3875" /><!-- great health potion -->
+            <item id="11321" chance="12500" /><!-- bone shoulderplate -->
+            <item id="2666" chance="30350" /><!-- meat -->
+            <item id="11322" chance="7375" /><!-- warmaster's wristguards -->
+            <item id="2152" countmax="5" chance="30675" /><!-- platinum coin -->
+            <item id="2148" countmax="100" chance="40975" /><!-- gold coin -->
+            <item id="2148" countmax="100" chance="40975" /><!-- gold coin -->
+            <item id="2123" chance="700" /><!-- ring of the sky -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

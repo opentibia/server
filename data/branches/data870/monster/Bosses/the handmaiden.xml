@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="The Handmaiden" nameDescription="the handmaiden" race="blood" experience="10000" speed="450" manacost="0">
+	<health now="14500" max="14500"/>
+	<look type="230" corpse="6312"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="70"/>
+		<flag runonhealth="3100"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="90" attack="150" poison="600"/>
+		<attack name="lifedrain" interval="2000" chance="14" range="7" target="1" min="-0" max="-1270">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>	
+		<attack name="manadrain" interval="2000" chance="14" range="7" target="1" min="-0" max="-860">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</attack>
+		<attack name="drunk" interval="2000" chance="14" radius="5" target="1">
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="35">
+		<defense name="speed" interval="2000" chance="14" speedchange="380" duration="8000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="14" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="20"/>
+		<element holyPercent="-18"/>
+		<element icePercent="20"/>
+	</elements>
+	<immunities>
+		<immunity fire="1"/>
+		<immunity death="1"/>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity outfit="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<loot>
+    <item id="2521" chance="17900" /><!-- dark shield -->
+    <item id="2152" countmax="5" chance="10925" /><!-- platinum coin -->
+    <item id="2225" chance="74400" /><!-- piece of iron -->
+    <item id="2656" chance="9200" /><!-- blue robe -->
+    <item id="2645" chance="26600" /><!-- steel boots -->
+    <item id="2176" chance="9200" /><!-- orb -->
+    <item id="2165" chance="13550" /><!-- stealth ring -->
+    <item id="6539" chance="100000" /><!-- the handmaiden's protector -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="5944" chance="91800" /><!-- soul orb -->
+            <item id="2146" countmax="3" chance="6300" /><!-- small sapphire -->
+            <item id="2166" chance="17900" /><!-- power ring -->
+            <item id="2231" chance="61375" /><!-- big bone -->
+            <item id="6500" chance="100000" /><!-- demonic essence -->
+            <item id="2148" countmax="100" chance="46200" /><!-- gold coin -->
+            <item id="2148" countmax="43" chance="46200" /><!-- gold coin -->
+            <item id="2167" chance="9200" /><!-- energy ring -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

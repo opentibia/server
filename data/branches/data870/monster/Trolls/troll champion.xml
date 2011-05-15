@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Troll Champion" nameDescription="a troll champion" race="blood" experience="40" speed="120" manacost="350">
+	<health now="75" max="75"/>
+	<look type="281" corpse="7926"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="20"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="25" attack="20"/>
+	</attacks>
+	<defenses armor="6" defense="8"/>
+	<elements>
+		<element energyPercent="15"/>
+		<element holyPercent="10"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<voices interval="5000" chance="9">
+		<voice sentence="Meee maity!"/>
+		<voice sentence="Grrrr"/>
+		<voice sentence="Whaaaz up!?"/>
+		<voice sentence="Gruntz!"/>
+	</voices>
+	<loot>
+    <item id="2544" countmax="5" chance="2775" /><!-- arrow -->
+    <item id="2389" chance="22775" /><!-- spear -->
+    <item id="2643" chance="14050" /><!-- leather boots -->
+    <item id="2148" countmax="12" chance="35875" /><!-- gold coin -->
+    <item id="2448" chance="4425" /><!-- studded club -->
+    <item id="2666" chance="12300" /><!-- meat -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2512" chance="4875" /><!-- wooden shield -->
+            <item id="10606" chance="4425" /><!-- bunch of troll hair -->
+            <item id="2170" chance="950" /><!-- silver amulet -->
+            <item id="12471" chance="950" /><!-- trollroot -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

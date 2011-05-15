@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="dryad" nameDescription="a dryad" race="blood" experience="190" speed="215" manacost="0">
+  <health now="310" max="310"/>
+  <look type="137" head="95" body="116" legs="121" feet="115" addons="3" corpse="6080"/>
+  <targetchange interval="2000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+   <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="0"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="10"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="20" attack="20"/>
+    <attack name="earth" interval="2000" chance="14" range="7" min="-20" max="-35">
+		<attribute key="shootEffect" value="earth"/>
+		<attribute key="areaEffect" value="bigplants"/>
+    </attack>
+	<attack name="speed" interval="2000" chance="14" range="7" speedchange="-220" duration="5000">
+		<attribute key="shootEffect" value="energyball"/>
+		<attribute key="areaEffect" value="energyarea"/>
+		</attack>	
+		<attack name="drunk" interval="2000" chance="14" range="7" target="1" duration="7500">
+			<attribute key="areaEffect" value="hearts"/>
+		</attack>	
+  </attacks>
+  <defenses armor="8" defense="10">
+		<defense name="invisible" interval="2000" chance="14" duration="5000">
+			<attribute key="areaEffect" value="blueshimmer"/>											
+		</defense>
+		<defense name="healing" interval="2000" chance="14" min="5" max="25">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>	
+	</defenses>
+	<elements>
+		<element energyPercent="30"/>
+		<element icePercent="5"/>
+		<element physicalPercent="-10"/>
+		<element firePercent="-20"/>
+	</elements>
+  <immunities>
+    <immunity earth="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <voices interval="5000" chance="9">
+    <voice sentence="You will not live to tell anyone!"/>
+	<voice sentence="You are my game today!"/>
+  </voices>
+  <loot>
+    <item id="2148" countmax="30" chance="20100" /><!-- gold coin -->
+    <item id="2787" countmax="2" chance="41400" /><!-- white mushroom -->
+    <item id="7732" chance="9650" /><!-- seeds -->
+    <item id="9927" chance="1525" /><!-- flower wreath -->
+    <item id="9931" chance="1400" /><!-- coconut shoes -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="9928" chance="1600" /><!-- leaf legs -->
+            <item id="2790" countmax="2" chance="1000" /><!-- orange mushroom -->
+            <item id="9929" chance="1475" /><!-- flower dress -->
+            <item id="2150" chance="625" /><!-- small amethyst -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+</monster>

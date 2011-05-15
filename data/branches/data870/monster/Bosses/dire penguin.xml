@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<monster name="Dire Penguin" nameDescription="dire penguin" race="blood" experience="119" speed="156" manacost="0">
+	<health now="173" max="173"/>
+	<look type="250" corpse="7334"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="40"/>
+		<attack name="physical" interval="2000" chance="20" target="0" radius="4" min="-0" max="-35">
+			<attribute key="areaEffect" value="groundshaker"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="20" target="1" speedchange="-260">
+			<attribute key="areaEffect" value="stones"/>
+		</attack>
+	</attacks>
+	<elements>
+		<element energyPercent="-5"/>
+		<element earthPercent="50"/>
+		<element firePercent="50"/>
+		<element icePercent="50"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Grrrrrr"/>
+	</voices>
+	<loot>
+		<item id="2148" countmax="10" chance="18000"/><!-- gold coin -->
+		<item id="2667" countmax="4" chance="8000"/><!-- fish -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+		<item id="7159" chance="7000"/><!-- green perch -->
+		<item id="7158" chance="8000"/><!-- rainbow trout -->
+		<item id="2434"  chance="500"/><!-- dragon hammer -->
+			</inside>
+		</item>
+	</loot>
+</monster>

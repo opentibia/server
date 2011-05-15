@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Wyrm" nameDescription="a wyrm" race="blood" experience="1450" speed="300" manacost="0">
+	<health now="1825" max="1825"/>
+	<look type="291" corpse="8941"/>
+	<targetchange interval="60000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="90"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="350"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="110"/>
+		<attack name="energy" interval="2000" chance="12" length="5" spread="2" min="-130" max="-200">
+			<attribute key="areaEffect" value="purpleenergy"/>
+		</attack>
+		<attack name="energy" interval="2000" chance="12" radius="3" min="-100" max="-220">
+			<attribute key="areaEffect" value="yellowenergy"/>
+		</attack>
+		<attack name="energy" interval="2000" chance="12" range="7" target="1" min="-100" max="-125">
+			<attribute key="shootEffect" value="energyball"/>
+			<attribute key="areaEffect" value="energy"/>
+		</attack>	
+		<attack name="lifedrain" interval="2000" chance="12" length="4" spread="0" min="-98" max="-145">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>		
+		<attack name="physical" interval="2000" chance="12" radius="1" target="0">
+			<attribute key="areaEffect" value="yellownote"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="31">
+		<defense name="healing" interval="2000" chance="12" min="160" max="200">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="20"/>
+		<element earthPercent="75"/>
+		<element icePercent="-5"/>
+		<element deathPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity energy="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity lifedrain="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="GRRR!"/>
+		<voice sentence="GROOOOAAAAAAAAR!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="30525" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="30525" /><!-- gold coin -->
+    <item id="2148" countmax="32" chance="30525" /><!-- gold coin -->
+    <item id="2672" countmax="3" chance="35500" /><!-- dragon ham -->
+    <item id="7588" chance="20850" /><!-- strong health potion -->
+    <item id="10582" chance="15125" /><!-- wyrm scale -->
+    <item id="2546" countmax="10" chance="4875" /><!-- burst arrow -->
+    <item id="7589" chance="15650" /><!-- strong mana potion -->
+    <item id="2455" chance="6600" /><!-- crossbow -->
+    <item id="8873" chance="850" /><!-- hibiscus dress -->
+    <item id="8871" chance="1650" /><!-- focus cape -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="8921" chance="1375" /><!-- wand of draconia -->
+            <item id="8920" chance="900" /><!-- wand of starstorm -->
+            <item id="7889" chance="1250" /><!-- lightning pendant -->
+            <item id="2145" countmax="3" chance="1025" /><!-- small diamond -->
+            <item id="7430" chance="575" /><!-- dragonbone staff -->
+            <item id="10221" chance="625" /><!-- shockwave amulet -->
+            <item id="8855" chance="575" /><!-- composite hornbow -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -6,7 +6,7 @@ setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, false)
 
 local condition = createConditionObject(CONDITION_REGENERATION)
 setConditionParam(condition, CONDITION_PARAM_SUBID, 1)
-setConditionParam(condition, CONDITION_PARAM_BUFF_SPELL, true)
+setConditionParam(condition, CONDITION_PARAM_BUFF_SPELL, 1)
 setConditionParam(condition, CONDITION_PARAM_TICKS, 2 * 60 * 1000)
 setConditionParam(condition, CONDITION_PARAM_HEALTHGAIN, 20)
 setConditionParam(condition, CONDITION_PARAM_HEALTHTICKS, 2000)

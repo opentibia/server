@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="The Hag" nameDescription="the hag" race="blood" experience="510" speed="205">
+	<health now="955" max="955"/>
+	<look type="264" head="78" body="97" legs="95" feet="95" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag targetdistance="5"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="40"/>
+		<attack name="drunk" interval="2000" chance="14" range="5" radius="1" target="1" duration="5000"/>
+		<attack name="speed" interval="2000" chance="14" radius="1" target="1" range="5" duration="5000" speed="-220">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="24" defense="25">
+		<defense name="healing" interval="2000" chance="14" min="50" max="75">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="14" duration="8000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="30"/>
+		<element icePercent="20"/>
+		<element energyPercent="10"/>
+		<element deathPercent="-10"/>
+		<element earthPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+<summons maxSummons="2">
+		<summon name="Ghost" interval="2000" chance="22"/>
+		<summon name="Crypt Shambler" interval="2000" chance="22"/>
+	</summons>
+	<voices interval="2000" chance="9">
+		<voice sentence="If you think I am to old to fight then you're wrong."/>
+		<voice sentence="I've forgotten more things then you have ever learned!"/>
+		<voice sentence="Let me teach you a few things youngster!"/>
+		<voice sentence="I'll teach you respect for the old!"/>
+	</voices>
+</monster>

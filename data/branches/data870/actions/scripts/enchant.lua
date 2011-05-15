@@ -42,6 +42,10 @@ function onUse(cid, item, frompos, item2, topos)
 		return false
 	end
 
+	if item2.actionid ~= 0 then
+		doSetItemActionId(item2.uid, item2.actionid)
+	end
+
 	doDecayItem(item2.uid)
 	return true
 

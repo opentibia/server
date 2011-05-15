@@ -485,7 +485,7 @@ if(NpcHandler == nil) then
 				if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then
 					for cid, talkDelay in pairs(self.talkDelay) do
 						if(talkDelay.time ~= nil and talkDelay.message ~= nil and os.time() >= talkDelay.time) then
-							self:say(talkDelay.message, cid)
+							self:say(talkDelay.message, cid, talkDelay.publicize, false)
 							self.talkDelay[cid] = nil
 						end
 					end
@@ -595,10 +595,10 @@ if(NpcHandler == nil) then
 
 	-- Makes the npc represented by this instance of NpcHandler say something.
 	--	This implements the currently set type of talkdelay.
-	--	shallDelay is a boolean value. If it is false, the message is not delayed. Default value is false.
+	--	shallDelay is a boolean value. If it is false, the message is not delayed. Default value is true.
 	function NpcHandler:say(message, focus, publicize, shallDelay)
 		if(shallDelay == nil) then
-			shallDelay = false
+			shallDelay = true
 		end
 		if(NPCHANDLER_TALKDELAY == TALKDELAY_NONE or shallDelay == false) then
 			if(NPCHANDLER_CONVBEHAVIOR ~= CONVERSATION_DEFAULT) then

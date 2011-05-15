@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Latrivan" nameDescription="a latrivan" race="fire" experience="10000" speed="390" manacost="0">
+	<health now="25000" max="25000"/>
+	<look type="12" head="120" body="128" legs="121" feet="111" corpse="6068"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="80" defense="20"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="85"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="10" attack="1"/>
+		<attack name="fire" interval="2000" chance="16" length="7" spread="3" min="-50" max="-850">
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+		<attack name="fire" interval="2000" chance="16" length="7" spread="0" min="-50" max="-250">
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+		<attack name="death" interval="2000" chance="16" range="3" min="-50" max="-600">
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="earth" interval="2000" chance="16" target="0" radius="1" min="-50" max="-165">
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>
+	</attacks>
+	<defenses armor="35" defense="45"/>
+	<elements>
+		<element icePercent="30"/>
+		<element energyPercent="30"/>
+		<element earthPercent="-5"/>
+		<element firePercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity death="1"/>
+		<immunity invisible="1"/>
+		<immunity lifedrain="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="I might reward you for killing my brother ~ with a swift dead!"/>
+		<voice sentence="Colateral damage is so fun!"/>
+		<voice sentence="Golgordan you fool!"/>
+		<voice sentence="We are the brothers of fear!"/>
+	</voices>
+	<loot>
+    <item id="2150" countmax="20" chance="9250" /><!-- small amethyst -->
+    <item id="2148" countmax="100" chance="49350" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="49350" /><!-- gold coin -->
+    <item id="2148" countmax="82" chance="49350" /><!-- gold coin -->
+    <item id="2179" chance="18750" /><!-- gold ring -->
+    <item id="2432" chance="10925" /><!-- fire axe -->
+    <item id="7591" chance="30925" /><!-- great health potion -->
+    <item id="2197" chance="12675" /><!-- stone skin amulet -->
+    <item id="2214" chance="23100" /><!-- ring of healing -->
+    <item id="2387" chance="21375" /><!-- double axe -->
+    <item id="2178" chance="3100" /><!-- mind stone -->
+    <item id="2162" chance="28325" /><!-- magic light wand -->
+    <item id="2143" countmax="12" chance="8900" /><!-- white pearl -->
+    <item id="9971" chance="10925" /><!-- gold ingot -->
+    <item id="1988" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2149" countmax="10" chance="10325" /><!-- small emerald -->
+            <item id="6300" chance="14400" /><!-- death ring -->
+            <item id="2144" countmax="15" chance="7000" /><!-- black pearl -->
+            <item id="2146" countmax="10" chance="8925" /><!-- small sapphire -->
+            <item id="2164" chance="5725" /><!-- might ring -->
+            <item id="2402" chance="13550" /><!-- silver dagger -->
+            <item id="2165" chance="19625" /><!-- stealth ring -->
+            <item id="6500" chance="10075" /><!-- demonic essence -->
+            <item id="2396" chance="5725" /><!-- ice rapier -->
+            <item id="2195" chance="7450" /><!-- boots of haste -->
+            <item id="2145" countmax="5" chance="3975" /><!-- small diamond -->
+            <item id="2393" chance="8325" /><!-- giant sword -->
+            <item id="2185" chance="3975" /><!-- necrotic rod -->
+            <item id="2170" chance="17900" /><!-- silver amulet -->
+            <item id="2167" chance="8325" /><!-- energy ring -->
+            <item id="7365" countmax="7" chance="2375" /><!-- onyx arrow -->
+            <item id="2520" chance="5725" /><!-- demon shield -->
+            <item id="2192" chance="3975" /><!-- crystal ball -->
+            <item id="7368" countmax="7" chance="2475" /><!-- assassin star -->
+            <item id="2462" chance="6600" /><!-- devil helmet -->
+            <item id="2436" chance="4850" /><!-- skull staff -->
+            <item id="2200" chance="3975" /><!-- protection amulet -->
+            <item id="2158" chance="1375" /><!-- blue gem -->
+            <item id="2186" chance="2250" /><!-- moonlight rod -->
+            <item id="2182" chance="1375" /><!-- snakebite rod -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

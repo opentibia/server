@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Ashmunrah" nameDescription="an ashmunrah" race="undead" experience="3100" speed="430" manacost="0">
+	<health now="5000" max="5000"/>
+	<look type="87" corpse="6031"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="90" attack="200" poison="140"/>
+		<attack name="physical" interval="2000" chance="12" range="1" min="-120" max="-700">
+			<attribute key="shootEffect" value="death"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="12" spread="3" length="8" min="-120" max="-715">
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>	
+	</attacks>
+	<defenses armor="25" defense="30">
+		<defense name="healing" interval="2000" chance="12" min="250" max="500">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="12" duration="2000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="12" monster="ancient scarab" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="25"/>
+		<element holyPercent="-10"/>
+		<element energyPercent="20"/>
+		<element icePercent="20"/>
+		<element firePercent="-5"/>
+		<element physicalPercent="10"/>
+	</elements>
+	<immunities>
+		<immunity death="1"/>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="5">
+		<summon name="Ancient Scarab" interval="2000" chance="12" max="2"/>
+		<summon name="Green Djinn" interval="2000" chance="12" max="3"/>
+	</summons>
+	<voices interval="2000" chance="9">
+		<voice sentence="No mortal or undead will steal my secrets!"/>
+		<voice sentence="Ahhhh all those long years."/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="35100" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="35100" /><!-- gold coin -->
+    <item id="2148" countmax="43" chance="35100" /><!-- gold coin -->
+    <item id="2134" chance="4625" /><!-- silver brooch -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7590" chance="12900" /><!-- great mana potion -->
+            <item id="2164" chance="5450" /><!-- might ring -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

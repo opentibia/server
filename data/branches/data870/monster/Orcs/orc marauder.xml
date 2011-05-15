@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Orc Marauder" nameDescription="a orc marauder" race="blood" experience="215" speed="390" manacost="0">
+	<health now="185" max="185"/>
+	<look type="342" corpse="11254"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="490"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="70"/>
+		<attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-80">
+			<attribute key="shootEffect" value="arrow"/>
+		</attack>
+	</attacks>
+	<defenses armor="20" defense="45">
+		<defense name="speed" interval="2000" chance="20" speedchange="350" duration="4000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="20"/>
+		<element holyPercent="10"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Grrrrrr"/>
+	</voices>
+	<loot>
+    <item id="11113" chance="3525" /><!-- orc tooth -->
+    <item id="12407" chance="5575" /><!-- broken crossbow -->
+    <item id="12435" chance="5125" /><!-- orc leather -->
+    <item id="2456" chance="6050" /><!-- bow -->
+    <item id="2148" countmax="88" chance="8575" /><!-- gold coin -->
+    <item id="11324" chance="11450" /><!-- shaggy tail -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2666" chance="24175" /><!-- meat -->
+            <item id="2455" chance="700" /><!-- crossbow -->
+            <item id="2425" chance="1625" /><!-- obsidian lance -->
+            <item id="2428" chance="1550" /><!-- orcish axe -->
+            <item id="8857" chance="575" /><!-- silkweaver bow -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

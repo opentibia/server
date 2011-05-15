@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="The Keeper" nameDescription="the keeper" race="venom" experience="3205" speed="240" manacost="0">
+	<health now="25000" max="25000"/>
+	<look type="220" corpse="4323"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="100"/>
+		<attack name="speed" interval="2000" chance="9" range="7" speedchange="-600" duration="5000">
+		</attack>			
+		<attack name="earth" interval="2000" chance="9" length="8" spread="3" min="-0" max="-510">
+			<attribute key="areaEffect" value="smallplants"/>
+		</attack>	
+		<attack name="lifedrain" interval="2000" chance="9" length="8" spread="0" min="-0" max="-500">
+			<attribute key="areaEffect" value="rednote"/>
+		</attack>	
+		<attack name="poison" interval="2000" chance="9" range="1" min="-0" max="-350">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="outfit" interval="2000" chance="9" range="7" item="3976" duration="4000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="18" defense="25">
+		<defense name="healing" interval="2000" chance="9" min="250" max="400">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="9" speedchange="520" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element deathPercent="50"/>
+		<element icePercent="20"/>
+		<element firePercent="-10"/>
+		<element energyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity earth="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<loot>
+    <item id="12284" chance="100000" /><!-- the tail of the keeper -->
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

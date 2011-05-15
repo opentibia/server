@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Barbarian Skullhunter" nameDescription="a barbarian skullhunter" race="blood" experience="135" speed="188" manacost="450">
+	<health now="85" max="85"/>
+	<look type="254" head="0" body="77" legs="77" feet="114" corpse="6080"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="70"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="20" attack="40"/>
+	</attacks>
+	<defenses armor="30" defense="30"/>
+	<elements>
+		<element icePercent="50"/>
+		<element holyPercent="10"/>
+		<element energyPercent="20"/>
+		<element physicalPercent="10"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity drunk="1"/>
+		<immunity paralyze="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="You will become my trophy."/>
+		<voice sentence="Fight harder, coward."/>
+		<voice sentence="Show that you are a worthy opponent."/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="30" chance="38875" /><!-- gold coin -->
+    <item id="2403" chance="15025" /><!-- knife -->
+    <item id="2460" chance="21525" /><!-- brass helmet -->
+    <item id="2050" chance="60750" /><!-- torch -->
+    <item id="2229" chance="3750" /><!-- skull -->
+    <item id="2473" chance="8425" /><!-- viking helmet -->
+    <item id="2483" chance="4250" /><!-- scale armor -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7618" chance="1225" /><!-- health potion -->
+            <item id="7449" chance="625" /><!-- crystal sword -->
+            <item id="5913" countmax="3" chance="975" /><!-- brown piece of cloth -->
+            <item id="7462" chance="625" /><!-- ragnir helmet -->
+            <item id="2168" chance="650" /><!-- life ring -->
+            <item id="7457" chance="625" /><!-- fur boots -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Dworc Fleshhunter" nameDescription="a dworc fleshhunter" race="blood" experience="40" speed="240" manacost="300">
+	<health now="85" max="85"/>
+	<look type="215" corpse="6058"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="8"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="15" attack="20" poison="20"/>
+		<attack name="physical" interval="2000" chance="25" range="7" min="-5" max="-15">
+			<attribute key="shootEffect" value="throwingknife"/>
+		</attack>
+	</attacks>
+	<defenses armor="3" defense="8"/>
+	<elements>
+		<element deathPercent="-13"/>
+		<element firePercent="-8"/>
+		<element icePercent="-10"/>
+	</elements>
+		<immunities>
+		<immunity earth="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Grak brrretz!"/>
+		<voice sentence="Grow truk grrrrr."/>
+		<voice sentence="Prek tars, dekklep zurk."/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="13" chance="40875" /><!-- gold coin -->
+    <item id="2568" chance="8725" /><!-- cleaver -->
+    <item id="2229" countmax="3" chance="2400" /><!-- skull -->
+    <item id="3965" chance="2375" /><!-- hunting spear -->
+    <item id="2050" chance="5950" /><!-- torch -->
+    <item id="2467" chance="11475" /><!-- leather armor -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2411" chance="2325" /><!-- poison dagger -->
+            <item id="3967" chance="1025" /><!-- tribal mask -->
+            <item id="2541" chance="1775" /><!-- bone shield -->
+            <item id="3964" chance="625" /><!-- ripper lance -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

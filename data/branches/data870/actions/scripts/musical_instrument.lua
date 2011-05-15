@@ -21,6 +21,9 @@ function onUse(cid, item, frompos, item2, topos)
 		doCreatureSay(cid, "TOOOOOOT!", TALKTYPE_ORANGE_1)
 		doSendMagicEffect(frompos, CONST_ME_SOUND_BLUE)
 		doDecayItem(item.uid)
+		if item.actionid ~= 0 then
+			doSetItemActionId(item.uid, item.actionid)
+		end
 	elseif (item.itemid == CORNUCOPIA) then
 		for i = 1, 11 do
 			doPlayerAddItem(cid, 2681)

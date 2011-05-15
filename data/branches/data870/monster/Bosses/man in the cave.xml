@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Man in the Cave" nameDescription="man in the cave" race="blood" experience="770" speed="226" manacost="0">
+	<health now="485" max="485"/>
+	<look type="128" head="95" body="116" legs="95" feet="114" addons="1" corpse="6080"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="30"/>
+		<attack name="physical" interval="2000" chance="16" range="7" min="-0" max="-95">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>
+	</attacks>
+	<defenses armor="14" defense="10">
+	<defense name="healing" interval="2000" chance="16" min="25" max="75">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	<defense name="speed" interval="2000" chance="16" speedchange="400" duration="6000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity outfit="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="THE MONKS ARE MINE" yell="1"/>
+		<voice sentence="I will rope you up! All of you!"/>
+		<voice sentence="You have been roped up!"/>
+		<voice sentence="A MIC to rule them all!"/>
+	</voices>
+	<summons maxSummons="4">
+		<summon name="Monk" interval="2000" chance="16" max="4"/>
+	</summons>
+	<loot>
+		<item id="2148" countmax="27" chance="100000"/><!-- gold coin -->
+		<item id="2120" chance="20000"/><!-- rope -->
+		<item id="2120" chance="6666"/><!-- rope -->
+		<item id="2120" chance="3333"/><!-- rope -->
+		<item id="2691" chance="4000"/><!-- brown bread -->
+		<item id="5913" chance="2000"/><!-- brown piece of cloth -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="7290" chance="4000"/><!-- shard -->
+				<item id="7463" chance="6666"/><!-- mammoth fur cape -->
+				<item id="7386" chance="6666"/><!-- mercenary sword -->
+				<item id="7458" chance="1000"/><!-- fur cap -->
+				<item id="2173" chance="500"/><!-- amulet of loss -->
+			</inside>
+		</item>
+	</loot>
+</monster>

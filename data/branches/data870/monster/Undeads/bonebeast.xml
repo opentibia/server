@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Bonebeast" nameDescription="a bonebeast" race="undead" experience="580" speed="210" manacost="0">
+	<health now="515" max="515"/>
+	<look type="101" corpse="6030"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="80" poison="100"/>
+		<attack name="lifedrain" interval="2000" chance="12" radius="3" target="0" min="-25" max="-45">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>		
+		<attack name="poison" interval="1000" chance="12" range="7" min="-50" max="-90">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="poisoncondition" interval="2000" chance="12" radius="3" target="0" min="-60" max="-60">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="poisoncondition" interval="2000" chance="12" length="8" spread="0" min="-80" max="-80">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<defense name="speed" interval="2000" chance="12" speedchange="290" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>		
+	</attacks>
+	<defenses armor="20" defense="35">
+		<defense name="healing" interval="2000" chance="12" min="30" max="60">
+			<attribute key="areaEffect" value="greenshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="-10"/>
+		<element holyPercent="-25"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="1"/>
+		<immunity death="1"/>
+		<immunity earth="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Cccchhhhhhhhh!"/>
+		<voice sentence="Knooorrrrr!"/>
+	</voices>
+	<loot>
+    <item id="2463" chance="8375" /><!-- plate armor -->
+    <item id="2229" chance="20825" /><!-- skull -->
+    <item id="2148" countmax="90" chance="15350" /><!-- gold coin -->
+    <item id="2230" chance="49875" /><!-- bone -->
+    <item id="11194" chance="10625" /><!-- bony tail -->
+    <item id="2541" chance="2425" /><!-- bone shield -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2449" chance="5400" /><!-- bone club -->
+            <item id="2796" chance="1975" /><!-- green mushroom -->
+            <item id="5925" countmax="3" chance="1550" /><!-- hardened bone -->
+            <item id="7618" chance="975" /><!-- health potion -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

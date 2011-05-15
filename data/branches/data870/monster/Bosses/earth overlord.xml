@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Earth Overlord" nameDescription="an earth overlord" race="undead" experience="2800" speed="330" manacost="0">
+	<health now="4000" max="4000"/>
+	<look type="285" corpse="8933"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="80"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="1"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="90" attack="80"/>
+		<attack name="earth" interval="2000" chance="18" length="7" spread="0" min="0" max="-900">
+			<attribute key="areaEffect" value="groundshaker"/>
+		</attack>
+		<attack name="poisoncondition" interval="2000" chance="18" radius="6" min="-500" max="-500">
+			<attribute key="areaEffect" value="bigplants"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="18" range="7" speedchange="-750" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="30"/>
+	<elements>
+		<element deathPercent="20"/>
+		<element physicalPercent="50"/>
+		<element icePercent="20"/>
+		<element firePercent="-25"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity earth="1"/>
+		<immunity energy="1"/>
+		<immunity holy="1"/>
+	</immunities>
+	<loot>
+    <item id="2152" countmax="3" chance="34425" /><!-- platinum coin -->
+    <item id="8305" chance="100000" /><!-- mother soil -->
+    <item id="2148" countmax="75" chance="36250" /><!-- gold coin -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7884" chance="1225" /><!-- terra mantle -->
+            <item id="11227" chance="10350" /><!-- shiny stone -->
+            <item id="11222" chance="45475" /><!-- lump of earth -->
+            <item id="8880" chance="675" /><!-- swamplair armor -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

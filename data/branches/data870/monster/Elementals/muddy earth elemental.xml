@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Muddy Earth Elemental" nameDescription="a muddy earth elemental" race="undead" experience="450" speed="260" manacost="0">
+	<health now="650" max="650"/>
+	<look type="301" corpse="8933"/>
+	<targetchange interval="20000" chance="50"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="80"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="1"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="80"/>
+		<attack name="physical" interval="2000" chance="12" range="7" target="1" radius="3" min="-0" max="-180">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="poisoncondition" interval="2000" chance="12" length="6" spread="0" min="-20" max="-540">
+			<attribute key="areaEffect" value="bigplants"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="12" target="1" range="7"  min="-70" max="-110">
+			<attribute key="shootEffect" value="smallearth"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="poisoncondition" interval="2000" chance="12" range="7" target="1" min="-200" max="-200">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="12" range="8" speedchange="-220" duration="5000">
+			<attribute key="areaEffect" value="smallplants"/>
+		</attack>	
+	</attacks>
+	<defenses armor="30" defense="30">
+	<defense name="healing" interval="2000" chance="12" min="50" max="80">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>	
+	</defenses>
+	<elements>
+		<element deathPercent="40"/>
+		<element icePercent="20"/>
+		<element physicalPercent="35"/>
+		<element energyPercent="85"/>
+		<element firePercent="-15"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity earth="1"/>
+		<immunity holy="1"/>
+	</immunities>
+	<loot>
+    <item id="8298" chance="4450" /><!-- natural soil -->
+    <item id="11222" chance="20550" /><!-- lump of earth -->
+    <item id="1294" countmax="5" chance="24625" /><!-- small stone -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2148" countmax="100" chance="24775" /><!-- gold coin -->
+            <item id="2148" countmax="30" chance="24775" /><!-- gold coin -->
+            <item id="2244" chance="20025" /><!-- some leaves -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

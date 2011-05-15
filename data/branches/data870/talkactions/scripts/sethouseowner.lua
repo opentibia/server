@@ -1,7 +1,7 @@
 function onSay(cid, words, param)
 	local playerPos = getPlayerPosition(cid)
 	local house = House.getHouseByPos(playerPos)
-	if house ~= LUA_NULL then
+	if house ~= nil then
 		if param == "" then
 			house:setOwner(0)
 		else

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Morguthis" nameDescription="a morguthis" race="undead" experience="3000" speed="430" manacost="0">
+	<health now="4800" max="4800"/>
+	<look type="90" corpse="6025"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="90" attack="200"/>
+		<attack name="physical" interval="2000" chance="9" radius="3" target="0" min="-300" max="-500">
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="9" radius="3" target="0" min="-350" max="-450">
+			<attribute key="areaEffect" value="blackspark"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="9" range="7" speedchange="-650" duration="50000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="35" defense="25">
+		<defense name="healing" interval="2000" chance="9" min="50" max="100">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="9" duration="4000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="9" speedchange="642" duration="2000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element icePercent="20"/>
+		<element firePercent="20"/>
+		<element energyPercent="20"/>
+		<element earthPercent="-10"/>
+		<element holyPercent="-20"/>
+	</elements>
+	<immunities>
+		<immunity death="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="3">
+		<summon name="Hero" interval="2000" chance="9" max="3"/>
+	</summons>
+	<voices interval="2000" chance="9">
+		<voice sentence="Vengeance!"/>
+		<voice sentence="You will make a fine trophy."/>
+		<voice sentence="Come and fight me, cowards!"/>
+		<voice sentence="I am the supreme warrior!"/>
+		<voice sentence="Let me hear the music of battle."/>
+		<voice sentence="Anotherone to bite the dust!"/>
+	</voices>
+	<loot>
+    <item id="7591" chance="15125" /><!-- great health potion -->
+    <item id="2148" countmax="100" chance="38475" /><!-- gold coin -->
+    <item id="2148" countmax="62" chance="38475" /><!-- gold coin -->
+    <item id="2350" chance="100000" /><!-- sword hilt -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7368" countmax="3" chance="11075" /><!-- assassin star -->
+            <item id="2430" chance="2950" /><!-- knight axe -->
+            <item id="2144" chance="7825" /><!-- black pearl -->
+            <item id="2197" chance="7825" /><!-- stone skin amulet -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

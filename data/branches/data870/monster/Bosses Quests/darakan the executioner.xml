@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Darakan the Executioner" nameDescription="darakan the executioner" race="blood" experience="1600" speed="205" manacost="0">
+	<health now="3500" max="3500"/>
+	<look type="255" head="78" body="114" legs="114" feet="114" corpse="7349"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="70"/>
+		<attack name="physical" interval="2000" chance="20" min="-70" max="-130">
+			<attribute key="shootEffect" value="spear"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="31">
+		<defense name="healing" interval="2000" chance="20" min="20" max="50">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="30"/>
+		<element icePercent="20"/>
+		<element holyPercent="10"/>
+		<element deathPercent="-5"/>
+		<element firePercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="5">
+		<voice sentence="FIGHT LIKE A BARBARIAN!" yell="1"/>
+		<voice sentence="VICTORY IS MINE!" yell="1"/>
+		<voice sentence="I AM your father!"/>
+		<voice sentence="To be the man you have to beat the man!"/>
+	</voices>
+</monster>

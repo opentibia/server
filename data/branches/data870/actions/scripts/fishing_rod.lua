@@ -114,6 +114,9 @@ function onUse(cid, item, frompos, item2, topos)
 		end
 		doSendMagicEffect(topos, CONST_ME_WATERSPLASH)
 		doTransformItem(item2.uid, item2.itemid + 1)
+		if item2.actionid ~= 0 then
+			doSetItemActionId(item2.uid, item2.actionid)
+		end
 		return true
 	end
 
@@ -137,7 +140,6 @@ function onUse(cid, item, frompos, item2, topos)
 				end
 				doPlayerAddSkillTry(cid, CONST_SKILL_FISHING, 1)
 				doTransformItem(item2.uid, item2.itemid + 9)
-				doDecayItem(item2.uid)
 				hasFished = true;
 			end
 			doPlayerAddSkillTry(cid, CONST_SKILL_FISHING, 1)

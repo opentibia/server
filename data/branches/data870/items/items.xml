@@ -3359,7 +3359,7 @@
 	<item id="2234" article="a" name="broken sword">
 		<attribute key="weight" value="3500"/>
 	</item>
-	<item id="2235" article="a" name="moldy cheese">
+	<item id="2235" article="a" name="mouldy cheese">
 		<attribute key="weight" value="400"/>
 	</item>
 	<item id="2236" article="a" name="torn book">
@@ -3386,7 +3386,7 @@
 	<item id="2243" name="rubbish">
 		<attribute key="weight" value="60"/>
 	</item>
-	<item id="2244" name="leaves">
+	<item id="2244" name="some leaves">
 		<attribute key="weight" value="80"/>
 	</item>
 	<item id="2245" name="twigs">
@@ -7764,8 +7764,14 @@
 	<item id="3307" name="jungle grass"/>
 	<item id="3308" name="jungle grass"/>
 	<item id="3309" name="jungle grass"/>
-	<item id="3310" article="a" name="mud stain"/>
-	<item id="3311" article="a" name="pitfall"/>
+    <item id="3310" article="a" name="pitfall"> 	 
+		<attribute key="floorchange" value="down"/> 	 
+	</item> 	 
+	<item id="3311" article="a" name="pitfall"> 	 
+		<attribute key="floorchange" value="down"/> 	 
+		<attribute key="decayTo" value="3310"/> 	 
+		<attribute key="duration" value="60"/> 	 
+	</item>
 	<item id="3312" article="an" name="ant trail"/>
 	<item id="3313" article="an" name="ant trail"/>
 	<item id="3314" article="an" name="ant trail"/>
@@ -7778,7 +7784,9 @@
 	<item id="3321" article="an" name="ant trail"/>
 	<item id="3322" article="an" name="ant trail"/>
 	<item id="3323" article="an" name="anthill"/>
-	<item id="3324" article="a" name="pitfall"/>
+	<item id="3324" article="an" name="earth hole"> 	 
+		<attribute key="floorchange" value="down"/> 	 
+	</item>
 	<item id="3325" article="a" name="rock"/>
 	<item id="3326" article="a" name="rock"/>
 	<item id="3327" article="a" name="rock"/>
@@ -13821,10 +13829,10 @@
 	<item id="6268" name="tendrils"/>
 	<item id="6269" name="tendrils"/>
 	<item id="6270" name="tendrils"/>
-	<item id="6271" name="leaves"/>
-	<item id="6272" name="leaves"/>
-	<item id="6273" name="leaves"/>
-	<item id="6274" name="leaves"/>
+	<item id="6271" name="some leaves"/>
+	<item id="6272" name="some leaves"/>
+	<item id="6273" name="some leaves"/>
+	<item id="6274" name="some leaves"/>
 	<item id="6275" article="a" name="tree archway"/>
 	<item id="6276" article="an" name="archway" editorsuffix=" (Needs recheck)"/>
 	<item id="6277" article="a" name="lump of cake dough" plural="lumps of cake dough">
@@ -17098,19 +17106,19 @@
 		<attribute key="description" value="It contains Ahmet's stolen property."/>
 	</item>
 	<item id="7588" article="a" name="strong health potion">
-		<attribute key="weight" value="200"/>
+		<attribute key="weight" value="290"/>
 		<attribute key="description" value="This potion can only be consumed by paladins and knights of level 50 or higher."/>
 	</item>
 	<item id="7589" article="a" name="strong mana potion">
-		<attribute key="weight" value="200"/>
+		<attribute key="weight" value="290"/>
 		<attribute key="description" value="This potion can only be consumed by sorcerers, druids and paladins of level 50 or higher."/>
 	</item>
 	<item id="7590" article="a" name="great mana potion">
-		<attribute key="weight" value="220"/>
+		<attribute key="weight" value="310"/>
 		<attribute key="description" value="This potion can only be consumed by sorcerers and druids of level 80 or higher."/>
 	</item>
 	<item id="7591" article="a" name="great health potion">
-		<attribute key="weight" value="220"/>
+		<attribute key="weight" value="310"/>
 		<attribute key="description" value="This potion can only be consumed by knights of level 80 or higher."/>
 	</item>
 	<item id="7592" name="linen"/>
@@ -17140,11 +17148,11 @@
 	<item id="7616" article="a" name="tent"/>
 	<item id="7617" name="linen"/>
 	<item id="7618" article="a" name="health potion">
-		<attribute key="weight" value="180"/>
+		<attribute key="weight" value="270"/>
 	</item>
 	<item id="7619" name="linen"/>
 	<item id="7620" article="a" name="mana potion">
-		<attribute key="weight" value="180"/>
+		<attribute key="weight" value="270"/>
 	</item>
 	<item id="7621" article="a" name="dead dragon hatchling" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="15"/>
@@ -17223,15 +17231,15 @@
 		<attribute key="weight" value="80"/>
 	</item>
 	<item id="7634" article="an" name="empty potion flask">
-		<attribute key="weight" value="180"/>
+		<attribute key="weight" value="160"/>
 		<attribute key="description" value="Return it to a potion store for your deposit."/>
 	</item>
 	<item id="7635" article="an" name="empty potion flask">
-		<attribute key="weight" value="200"/>
+		<attribute key="weight" value="180"/>
 		<attribute key="description" value="Return it to a potion store for your deposit."/>
 	</item>
 	<item id="7636" article="an" name="empty potion flask">
-		<attribute key="weight" value="170"/>
+		<attribute key="weight" value="150"/>
 		<attribute key="description" value="Return it to a potion store for your deposit."/>
 	</item>
 	<item id="7637" article="a" name="dead cat" editorsuffix=" (Unmoveable)">
@@ -18594,6 +18602,7 @@
 	<item id="7889" article="a" name="lightning pendant">
 		<attribute key="weight" value="500"/>
 		<attribute key="slotType" value="necklace"/>
+		<attribute key="charges" value="200"/>
 		<attribute key="absorbPercentEnergy" value="20"/>
 		<attribute key="absorbPercentEarth" value="-10"/>
 		<attribute key="showcharges" value="1"/>
@@ -19664,15 +19673,15 @@
 	<item id="8470" name="earth"/>
 	<item id="8471" name="earth"/>
 	<item id="8472" article="a" name="great spirit potion">
-		<attribute key="weight" value="220"/>
+		<attribute key="weight" value="310"/>
 		<attribute key="description" value="This potion can only be consumed by paladins of level 80 or higher."/>
 	</item>
 	<item id="8473" article="an" name="ultimate health potion">
-		<attribute key="weight" value="220"/>
+		<attribute key="weight" value="310"/>
 		<attribute key="description" value="This potion can only be consumed by knights of level 130 or higher."/>
 	</item>
 	<item id="8474" article="an" name="antidote potion">
-		<attribute key="weight" value="175"/>
+		<attribute key="weight" value="265"/>
 	</item>
 	<item id="8475" article="a" name="stone wall"/>
 	<item id="8476" article="a" name="stone wall"/>
@@ -20050,7 +20059,7 @@
 		<attribute key="weight" value="1300"/>
 	</item>
 	<item id="8704" article="a" name="small health potion">
-		<attribute key="weight" value="175"/>
+		<attribute key="weight" value="265"/>
 	</item>
 	<item id="8705" name="balloons"/>
 	<item id="8706" name="balloons"/>
@@ -20615,15 +20624,16 @@
 		<attribute key="defense" value="30"/>
 		<attribute key="weaponType" value="shield"/>
 	</item>
-	<item id="8906" article="a" name="fiery rainbow shield">
-		<attribute key="description" value="It has been temporarily imbued with fire magic and boosts your shielding skill."/>
-		<attribute key="weight" value="6900"/>
-		<attribute key="defense" value="36"/>
-		<attribute key="weaponType" value="shield"/>
-		<attribute key="duration" value="1200"/>
-		<attribute key="decayTo" value="8905"/>
-		<attribute key="skillShield" value="3"/>
-	</item>
+    <item id="8906" article="a" name="fiery rainbow shield">
+        <attribute key="description" value="It has been temporarily imbued with fire magic and boosts your shielding skill."/>
+        <attribute key="weight" value="6900"/>
+        <attribute key="defense" value="36"/>
+        <attribute key="extradef" value="3"/>
+        <attribute key="weaponType" value="shield"/>
+        <attribute key="duration" value="1200"/>
+        <attribute key="decayTo" value="8905"/>
+        <attribute key="skillShield" value="3"/>
+    </item>
 	<item id="8907" article="an" name="icy rainbow shield">
 		<attribute key="description" value="It has been temporarily imbued with ice magic and has a greatly increased shielding value."/>
 		<attribute key="weight" value="6900"/>
@@ -22788,7 +22798,7 @@
 	<item id="9970" article="a" name="small topaz" plural="small topazs">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="9971" article="a" name="gold ignot" plural="gold ignots">
+	<item id="9971" article="a" name="gold ingot" plural="gold ingots">
 		<attribute key="weight" value="1800"/>
 	</item>
 	<item id="9974" article="a" name="crystal table kit">
@@ -24759,14 +24769,19 @@
 	</item>
 	<item id="11339" article="a" name="clay lump">
 	</item>
-	<item id="11343" article="a" name="piece of marble rock">
-	</item>
-	<item id="11344" article="a" name="marble statue">
-	</item>
-	<item id="11345" article="a" name="marble statue">
-	</item>
-	<item id="11346" article="a" name="marble statue">
-	</item>
+    <item id="11343" article="a" name="piece of marble rock">
+        <attribute key="description" value="It seems just perfect to try and create something out of it with a sharp obsidian knife."/>
+        <attribute key="weight" value="1000"/>
+    </item>
+    <item id="11344" article="a" name="rough marble statue">
+        <attribute key="weight" value="1000"/>
+    </item>
+    <item id="11345" article="a" name="marble statue">
+        <attribute key="weight" value="1000"/>
+    </item>
+    <item id="11346" article="a" name="beautiful marble statue">
+        <attribute key="weight" value="1000"/>
+    </item>
 	<item id="11347" article="a" name="dead terramite" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="11348"/>
@@ -25629,7 +25644,7 @@
 		<attribute key="weight" value="4500"/>
 		<attribute key="armor" value="10"/>
 		<attribute key="slotType" value="body"/>
-		<attribute key="magicpoints" value="5"/>
+		<attribute key="magicpoints" value="2"/>
 		<attribute key="absorbPercentFire" value="5"/>
 	</item>
 	<item id="12644" article="a" name="shield of corruption">

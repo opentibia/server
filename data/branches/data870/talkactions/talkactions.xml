@@ -22,7 +22,7 @@
 	<talkaction words="/kick" access="3" filter="first word" script="kickplayer.lua"/>
 	<talkaction words="/reload" access="3" filter="first word" script="reload.lua"/>
 	<talkaction words="/ban" access="3" filter="first word" script="banmanager.lua"/>
-
+	
 	<!-- Gamemasters -->
 	<talkaction words="/up" access="2" filter="first word" script="floorchange.lua"/>
 	<talkaction words="/down" access="2" filter="first word" script="floorchange.lua"/>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="The Masked Marauder" nameDescription="the masked marauder" race="blood" experience="3500" speed="250" manacost="0">
+	<health now="6800" max="6800"/>
+	<look type="234" corpse="7349"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="78"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="70" attack="160"/>
+		<attack name="physical" interval="2000" chance="18" min="-0" max="-230">
+			<attribute key="shootEffect" value="throwingknife"/>
+		</attack>
+		<attack name="melee" interval="2000" chance="18" length="3" spread="2" min="-0" max="-105">
+			<attribute key="areaEffect" value="rednote"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="35">
+		<defense name="healing" interval="2000" chance="18" min="75" max="125">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="30"/>
+		<element deathPercent="10"/>
+		<element holyPercent="-5"/>
+		<element earthPercent="90"/>
+		<element icePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity fire="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Didn't you leave your house door open?"/>
+		<voice sentence="Oops, your shoelaces are open!"/>
+		<voice sentence="Look! It's Ferumbras behind you!"/>
+		<voice sentence="Stop! I give up!"/>
+	</voices>
+</monster>
