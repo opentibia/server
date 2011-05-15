@@ -51,6 +51,8 @@ CREATE TABLE `players` (
 	`looklegs` INT UNSIGNED NOT NULL DEFAULT 10,
 	`looktype` INT UNSIGNED NOT NULL DEFAULT 136,
 	`lookaddons` INT UNSIGNED NOT NULL DEFAULT 0,
+	`lookmount` INT UNSIGNED NOT NULL DEFAULT 0,
+	`ridingmount` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
 	`posx` INT NOT NULL DEFAULT 0,
 	`posy` INT NOT NULL DEFAULT 0,
 	`posz` INT NOT NULL DEFAULT 0,
@@ -345,7 +347,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 24);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 25);
 
 DELIMITER |
 
