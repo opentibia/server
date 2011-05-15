@@ -128,7 +128,7 @@ public:
 
 	void setGUID(uint32_t _guid) {guid = _guid;};
 	uint32_t getGUID() const { return guid;};
-	virtual uint32_t idRange(){ return 0x10000000;}
+	virtual uint32_t idRange(){ return PLAYER_ID_RANGE;}
 	static AutoList<Player> listPlayer;
 	void removeList();
 	void addList();
@@ -258,8 +258,9 @@ public:
 	Item* getInventoryItem(slots_t slot) const;
 	// As above, but returns NULL if the item can not be weared in that slot (armor in hand for example)
 	Item* getEquippedItem(slots_t slot) const;
-	// Returns the first found item with chosen itemid
-	Item* getFirstItemById(uint32_t id) const;
+
+    // Returns the first found item with chosen itemid
+    Item* getFirstItemById(uint32_t id) const;
 
 	bool isItemAbilityEnabled(slots_t slot) const {return inventoryAbilities[slot];}
 	void setItemAbility(slots_t slot, bool enabled) {inventoryAbilities[slot] = enabled;}
@@ -291,7 +292,7 @@ public:
 	virtual bool canSeeCreature(const Creature* creature) const;
 	virtual bool canWalkthrough(const Creature* creature) const;
 	void setWalkthrough(const Creature* creature, bool walkthrough);
-
+	
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
 
 	//safe-trade functions
@@ -680,6 +681,9 @@ public:
 	Item* getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen);
 	void setWriteItem(Item* item, uint16_t _maxWriteLen = 0);
 
+	void registerMoveItemAsNow() { lastMoveItem = OTSYS_TIME(); }
+	bool canMoveItem() const;
+
 	House* getEditHouse(uint32_t& _windowTextId, uint32_t& _listId);
 	void setEditHouse(House* house, uint32_t listId = 0);
 
@@ -692,8 +696,8 @@ public:
 	void setLastTimeRequestOutfitAsNow() { lastTimeRequestOutfit = OTSYS_TIME(); }
 
 	int64_t getLastTimeMounted() const { return lastTimeMounted; }
-	void setLastTimeMountedAsNow() { lastTimeMounted = OTSYS_TIME(); }
-
+	void setLastTimeMountedAsNow() { lastTimeMounted = OTSYS_TIME(); }	
+	
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
@@ -719,7 +723,7 @@ public:
 	//spell exhaustion
 	void setExhaustion(uint16_t spellId, uint32_t exhaustion) {exhaustionMap[spellId] = int64_t(exhaustion) + OTSYS_TIME();}
 	bool hasExhaustion(uint16_t spellId) {return (exhaustionMap[spellId] > OTSYS_TIME());}
-
+	
 	//depots
 	DepotMap depots;
 	uint32_t maxDepotLimit;
@@ -798,18 +802,20 @@ protected:
 	uint32_t walkTaskEvent;
 	SchedulerTask* walkTask;
 	std::vector<uint32_t> forceWalkthrough;
-
+	
 	int32_t idleTime;
 	bool idleWarned;
 	int64_t lastTimeRequestOutfit;
 	int64_t lastTimeMounted;
-
+	
 	double inventoryWeight;
 	double capacity;
 
 	int64_t last_ping;
 	int64_t last_pong;
 	int64_t nextAction;
+	int64_t lastMoveItem;
+
 
 	bool pzLocked;
 	bool isConnecting;
@@ -820,8 +826,8 @@ protected:
 	uint64_t lastAttack;
 	int32_t shootRange;
 
-	std::map<uint16_t, int64_t> exhaustionMap;
-
+	std::map<uint16_t, int64_t> exhaustionMap;	
+	
 	chaseMode_t chaseMode;
 	fightMode_t fightMode;
 	bool safeMode;
@@ -888,6 +894,7 @@ protected:
 
 	StorageMap storageMap;
 	LightInfo itemsLight;
+	std::pair<Container*, int32_t> backpack;
 
 	OutfitMap outfits;
 	MountMap mounts;

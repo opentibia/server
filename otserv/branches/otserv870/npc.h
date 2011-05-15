@@ -96,7 +96,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos){};
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
-		uint8_t count, uint8_t amount, bool ignoreCapacity = false, bool buyWithBackpack = false){};
+		uint8_t count, uint8_t amount, bool ignore = false, bool buyWithBackpack = false){};
 	virtual void onPlayerCloseChannel(const Player* player){};
 	virtual void onPlayerEndTrade(const Player* player){};
 	virtual void onThink(){};
@@ -120,7 +120,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
-		uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack);
+		uint8_t count, uint8_t amount, bool ignore, bool buyWithBackpack);
 	virtual void onPlayerCloseChannel(const Player* player);
 	virtual void onPlayerEndTrade(const Player* player);
 	virtual void onThink();
@@ -441,6 +441,7 @@ struct NpcState{
 	int32_t itemId;
 	int32_t subType;
 	bool ignoreCapacity;
+	bool ignoreEquipped;
 	bool buyWithBackpack;
 	std::string spellName;
 	std::string listName;
@@ -457,6 +458,15 @@ struct NpcState{
 	//Do not forget to update pushState/popState if you add more variables
 };
 
+struct Voice
+{
+	bool randomSpectator;
+	SpeakClasses type;
+	uint32_t interval, margin;
+	std::string text;
+};
+
+#define MAX_RAND_RANGE 10000000
 class Npc : public Creature
 {
 public:
@@ -471,7 +481,7 @@ public:
 
 	virtual bool isPushable() const { return false;};
 
-	virtual uint32_t idRange(){ return 0x80000000;}
+	virtual uint32_t idRange(){ return NPC_ID_RANGE;}
 	static AutoList<Npc> listNpc;
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}
@@ -486,7 +496,7 @@ public:
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};
 
-	void doSay(const std::string& text);
+	void doSay(const std::string& text, SpeakClasses type, Player* player);
 	void doSayToPlayer(Player* player, const std::string& text);
 
 	void doMove(Direction dir);
@@ -501,7 +511,7 @@ public:
 
 	void onPlayerCloseChannel(const Player* player);
 	void onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
-		uint8_t count, uint8_t amount, bool ignoreCapacity = false, bool buyWithBackpack = false);
+		uint8_t count, uint8_t amount, bool ignore = false, bool buyWithBackpack = false);
 	void onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCallback);
 
 	void turnToCreature(Creature* creature);
@@ -578,6 +588,7 @@ protected:
 	std::string m_scriptdir;
 	std::string m_filename;
 	uint32_t walkTicks;
+	int64_t lastVoice;
 	bool floorChange;
 	Direction initialLookDir;
 	bool attackable;
@@ -586,6 +597,7 @@ protected:
 	bool hasBusyReply;
 	bool hasScriptedFocus;
 	int32_t talkRadius;
+	int32_t idleInterval;
 	uint32_t idleTimeout;
 	uint64_t lastResponseTime;
 	bool defaultPublic;
@@ -607,6 +619,10 @@ protected:
 
 	typedef std::list<uint32_t> QueueList;
 	QueueList queueList;
+	
+	typedef std::list<Voice> VoiceList;
+	VoiceList voiceList;
+	
 	bool loaded;
 
 	static NpcScriptInterface* m_scriptInterface;

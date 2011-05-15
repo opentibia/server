@@ -72,10 +72,10 @@ bool BaseEvents::loadFromXml(const std::string& datadir)
 						bool success = true;
 						std::string scriptfile;
 						if(readXMLString(p, "script", scriptfile)){
-							if(!event->checkScript(m_datadir, scriptsName, "/scripts/" + scriptfile)){
+							/*if(!event->checkScript(m_datadir, scriptsName, "/scripts/" + scriptfile)){
 								success = false;
 							}
-							else
+							else*/
 							if(!event->loadScript(m_datadir + scriptsName + "/scripts/" + scriptfile)){
 								success = false;
 							}
@@ -92,6 +92,7 @@ bool BaseEvents::loadFromXml(const std::string& datadir)
 						if(success){
 							if(!registerEvent(event, p)){
 								success = false;
+								delete event;
 							}
 						}
 						else{

@@ -59,20 +59,17 @@ std::string Mission::getDescription(Player* player)
 		return desc;
 	}
 
-	uint32_t current = endValue;
-	while(current >= startValue){
+	for(int32_t current = endValue; current >= (int32_t)startValue; --current){
 		player->getStorageValue(storageID, value);
-		if(value == (int32_t)current){
+		if(value == current){
 			StateList::const_iterator sit = state.find(current);
 			if(sit != state.end())
 				return sit->second->getMissionDescription();
 		}
-
-		current--;
 	}
-
 	return "An error has occurred, please contact a gamemaster.";
 }
+
 
 bool Mission::isStarted(Player* player) const
 {

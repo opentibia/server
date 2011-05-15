@@ -74,13 +74,13 @@ inline int32_t swap_int32(int32_t x)
 	return (int32_t)swap_uint32((uint32_t)x);
 }
 
-inline float swap_float32(float x)
+/*inline float swap_float32(float x)
 {
 	uint32_t ui = *((uint32_t *)(void *)&x);
 	ui = swap_uint32(ui);
 
 	return *((float *)(void *)&ui);
-}
+}*/
 
 void replaceString(std::string& str, const std::string sought, const std::string replacement);
 void trim_right(std::string& source, const std::string& t = "\n\t ");
@@ -90,6 +90,7 @@ void toLowerCaseString(std::string& source);
 void toUpperCaseString(std::string& source);
 std::string asLowerCaseString(const std::string& source);
 std::string asUpperCaseString(const std::string& source);
+bool booleanString(std::string source);
 bool utf8ToLatin1(char* intext, std::string& outtext);
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value);
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);

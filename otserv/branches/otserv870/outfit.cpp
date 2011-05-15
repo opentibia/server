@@ -145,7 +145,6 @@ bool Outfits::loadFromXml(const std::string& datadir)
 		}
 		xmlFreeDoc(doc);
 	}
-
 	return true;
 }
 
@@ -165,6 +164,7 @@ bool Outfits::reload()
 	}
 	return result;
 }
+
 
 uint32_t Outfits::getOutfitId(uint32_t lookType)
 {

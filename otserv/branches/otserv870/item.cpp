@@ -797,6 +797,18 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			s << " (";
 			if(it.attack != 0){
 				s << "Atk:" << (int32_t)it.attack;
+				
+				if(it.abilities.elementDamage != 0){
+					s << " " << "physical + ";
+					
+					switch(it.abilities.elementType){
+						case COMBAT_ICEDAMAGE: s << it.abilities.elementDamage << " Ice,"; break;
+						case COMBAT_EARTHDAMAGE: s << it.abilities.elementDamage << " Earth,"; break;
+						case COMBAT_FIREDAMAGE: s << it.abilities.elementDamage << " Fire,"; break;
+						case COMBAT_ENERGYDAMAGE: s << it.abilities.elementDamage << " Energy,"; break;
+						default: s << it.abilities.elementDamage << " Unknown,"; break;
+					}
+				}
 			}
 
 			if(it.defense != 0 || it.extraDef != 0){
@@ -972,6 +984,9 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			s << "Nothing is written on it.";
 		}
 	}
+	else if(it.isLevelDoor() && item && item->getActionId() >= 1000)
+		s << " for level " << item->getActionId() - 1000;
+
 	else if(it.showCharges){
 		if(subType > 1){
 			s << " that has " << (int32_t)subType << " charges left.";
@@ -1038,21 +1053,6 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		if(weight > 0){
 			s << std::endl << getWeightDescription(it, weight);
 		}
-	}
-
-	if(it.abilities.elementType != COMBAT_NONE && it.charges != 0){
-		s << " It is temporarily enchanted with ";
-		std::string strElement = "";
-		int32_t elementDamage = it.abilities.elementDamage;
-		switch(it.abilities.elementType){
-			case COMBAT_ICEDAMAGE: strElement = "ice"; break;
-			case COMBAT_EARTHDAMAGE: strElement = "earth"; break;
-			case COMBAT_FIREDAMAGE: strElement = "fire"; break;
-			case COMBAT_ENERGYDAMAGE: strElement = "energy"; break;
-			default: break;
-		}
-
-		s << strElement << " (" << it.attack << " physical + " << elementDamage << " " << strElement << " damage).";
 	}
 
 	if(item && item->getSpecialDescription() != ""){
@@ -1134,7 +1134,7 @@ bool Item::canDecay()
 		return false;
 	}
 
-	if(getUniqueId() != 0 || getActionId() != 0){
+	if(getUniqueId() != 0){
 		return false;
 	}
 

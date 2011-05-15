@@ -93,17 +93,11 @@ public:
 	}
 
 	bool operator==(const Position p)  const {
-		if(p.x==x && p.y==y && p.z ==z)
-			return true;
-		else
-			return false;
+		return (p.x == x && p.y == y && p.z == z);
 	}
 
 	bool operator!=(const Position p)  const {
-		if(p.x==x && p.y==y && p.z ==z)
-			return false;
-		else
-			return true;
+		return !(*this == p);
 	}
 
 	Position operator-(const Position p1){
@@ -138,17 +132,11 @@ public:
 	int32_t stackpos;
 
 	bool operator==(const PositionEx p)  const {
-		if(p.x==x && p.y==y && p.z ==z && p.stackpos == stackpos)
-			return true;
-		else
-			return false;
+		return (p.x == x && p.y == y && p.z == z && p.stackpos == stackpos);
 	}
 
 	bool operator!=(const PositionEx p)  const {
-		if(p.x==x && p.y==y && p.z ==z && p.stackpos != stackpos)
-			return false;
-		else
-			return true;
+		return !(*this == p);
 	}
 
 };

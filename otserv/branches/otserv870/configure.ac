@@ -116,6 +116,10 @@ AC_CHECK_FUNCS([floor ftime gethostbyname gethostname memset pow sqrt strcasecmp
 AM_PATH_XML2(2.6.5, , AC_MSG_ERROR([you need libxml2 >= 2.6.5 to compile otserv!]))
 LIBS="$LIBS $XML_LIBS"
 
+#check pthread
+AC_CHECK_HEADERS(pthread.h,, [AC_MSG_ERROR([pthread.h required])])
+AC_CHECK_LIB(pthread, pthread_create, ,[AC_MSG_ERROR("Linking against pthread failed.")])
+
 #check GMP
 AC_CHECK_HEADERS([gmp.h], ,[AC_MSG_ERROR("GMP header not found.")])
 AC_CHECK_LIB(gmp, __gmpz_init2, ,[AC_MSG_ERROR("Linking against GMP failed.")])
@@ -145,7 +149,13 @@ AC_CHECK_LIB(boost_date_time-gcc-mt, main, , [
 			AC_MSG_ERROR("Linking against boost::date-time library failed.")])
 	])
 ])
-
+AC_CHECK_LIB(boost_filesystem-gcc-mt, main, , [
+	AC_CHECK_LIB(boost_filesystem-mt, main, , [
+		AC_CHECK_LIB(boost_filesystem, main, , [
+			AC_MSG_ERROR("Linking against boost::filesystem library failed.")
+		])
+	])
+])
 #check boost asio
 AC_CHECK_HEADERS([boost/asio.hpp], ,[AC_MSG_ERROR("boost::asio header not found.")])
 

@@ -573,7 +573,7 @@ int32_t Weapon::getManaCost(const Player* player) const
 	return 0;
 }
 
-bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
+void Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 {
 	//onUseWeapon(cid, var)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -596,14 +596,11 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 		lua_pushnumber(L, cid);
 		m_scriptInterface->pushVariant(L, var);
 
-		bool result = m_scriptInterface->callFunction(2);
+		m_scriptInterface->callFunction(2, false);
 		m_scriptInterface->releaseScriptEnv();
-
-		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. Weapon::executeUseWeapon" << std::endl;
-		return false;
 	}
 }
 
@@ -647,11 +644,6 @@ bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
 		eParams.useCharges = true;
 		Combat::doCombatHealth(player, target, damage, damage, eParams);
 
-		if(g_config.getNumber(ConfigManager::REMOVE_WEAPON_CHARGES))
-		{
-			int32_t newCount = std::max(0, item->getItemCount() - 1);
-			g_game.transformItem(item, item->getID(), newCount);
-		}
 	}
 
 	return true;

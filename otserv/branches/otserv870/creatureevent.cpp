@@ -313,7 +313,7 @@ bool CreatureEvent::executeOnLogout(Player* player)
 	}
 }
 
-bool CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
+void CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 {
 	//onDie(cid, corpse)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -337,18 +337,15 @@ bool CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, corpseid);
 
-		bool result = m_scriptInterface->callFunction(2);
+		m_scriptInterface->callFunction(2, false);
 		m_scriptInterface->releaseScriptEnv();
-
-		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnDie" << std::endl;
-		return 0;
 	}
 }
 
-bool CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool lastHit)
+void CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool lastHit)
 {
 	//onKill(cid, target, lasthit)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -373,18 +370,15 @@ bool CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool las
 		lua_pushnumber(L, targetId);
 		lua_pushboolean(L, (lastHit ? true : false) );
 
-		bool result = m_scriptInterface->callFunction(3);
+		m_scriptInterface->callFunction(3, false);
 		m_scriptInterface->releaseScriptEnv();
-
-		return result;
 	}
 	else{
 		std::cout << "[Error] __ENABLE_SERVER_DIAGNOSTIC__Call stack overflow. CreatureEvent::executeOnKill" << std::endl;
-		return 0;
 	}
 }
 
-bool CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
+void CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
 {
 	//onAdvance(cid, type, oldlevel, newlevel)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -409,14 +403,12 @@ bool CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t
 		lua_pushnumber(L, oldLevel);
 		lua_pushnumber(L, newLevel);
 
-		bool result = m_scriptInterface->callFunction(4);
+		m_scriptInterface->callFunction(4, false);
 		m_scriptInterface->releaseScriptEnv();
 
-		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnAdvance" << std::endl;
-		return 0;
 	}
 }
 

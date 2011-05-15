@@ -540,111 +540,35 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool 
 
 bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 {
-	Position start = fromPos;
-	Position end = toPos;
-
-	int32_t x, y, z;
-	int32_t dx, dy, dz;
-	int32_t sx, sy, sz;
-	int32_t ey, ez;
-
-	dx = abs(start.x - end.x);
-	dy = abs(start.y - end.y);
-	dz = abs(start.z - end.z);
-
-	int32_t max = dx, dir = 0;
-	if(dy > max){
-		max = dy;
-		dir = 1;
+	if(Position::areInRange<1,1,15>(fromPos, toPos)){
+		return true;
 	}
-	if(dz > max){
-		max = dz;
-		dir = 2;
-	}
+	
+	int16_t mx = fromPos.x < toPos.x ? 1 : fromPos.x == toPos.x ? 0 : -1;
+	int16_t my = fromPos.y < toPos.y ? 1 : fromPos.y == toPos.y ? 0 : -1;
 
-	switch(dir){
-		case 0:
-			//x -> x
-			//y -> y
-			//z -> z
-			break;
-		case 1:
-			//x -> y
-			//y -> x
-			//z -> z
-			std::swap(start.x, start.y);
-			std::swap(end.x, end.y);
-			std::swap(dx, dy);
-			break;
-		case 2:
-			//x -> z
-			//y -> y
-			//z -> x
-			std::swap(start.x, start.z);
-			std::swap(end.x, end.z);
-			std::swap(dx, dz);
-			break;
-	}
+	Position currentPos(fromPos.x, fromPos.y, fromPos.z);
+	int32_t A = toPos.y - fromPos.y;
+	int32_t B = fromPos.x - toPos.x;
+	int32_t C = -(A*toPos.x + B*toPos.y);
 
-	sx = ((start.x < end.x) ? 1 : -1);
-	sy = ((start.y < end.y) ? 1 : -1);
-	sz = ((start.z < end.z) ? 1 : -1);
+	while( !Position::areInRange<1,1,15>(currentPos, toPos) ){
+		int32_t move_hor = std::abs( A*(currentPos.x+mx) + B*(currentPos.y) + C );
+		int32_t move_ver = std::abs( A*(currentPos.x) + B*(currentPos.y+my) + C );
+		int32_t move_cross = std::abs( A*(currentPos.x+mx) + B*(currentPos.y+my) + C );
 
-	ey = 0, ez = 0;
-	x = start.x;
-	y = start.y;
-	z = start.z;
-
-	int32_t lastrx = 0, lastry = 0, lastrz = 0;
-
-	for( ; x != end.x + sx; x += sx){
-		int32_t rx, ry, rz;
-		switch(dir){
-		case 1:
-			rx = y; ry = x; rz = z;
-			break;
-		case 2:
-			rx = z; ry = y; rz = x;
-			break;
-		default: //0
-			rx = x; ry = y; rz = z;
-			break;
+		if( currentPos.x != toPos.x && (currentPos.y == toPos.y || move_ver > move_hor || move_ver > move_cross) ){
+			currentPos.x += mx;
 		}
 
-		if(lastrx == 0 && lastry == 0 && lastrz == 0){
-			//first time initialization
-			lastrx = rx; lastry = ry; lastrz = rz;
+		if( currentPos.y != toPos.y && (currentPos.x == toPos.x || move_hor > move_ver || move_hor > move_cross) ){
+			currentPos.y += my;
 		}
 
-		if(	lastrz != rz ||
-			( !(toPos.x == rx && toPos.y == ry && toPos.z == rz) &&
-			  !(fromPos.x == rx && fromPos.y == ry && fromPos.z == rz) ) ){
-
-			if(lastrz != rz){
-				if(const_cast<Map*>(this)->getTile(lastrx, lastry, std::min(lastrz, rz))){
-					return false;
-				}
-			}
-			lastrx = rx; lastry = ry; lastrz = rz;
-
-			const Tile* tile = const_cast<Map*>(this)->getTile(rx, ry, rz);
-			if(tile){
-				if(tile->hasProperty(BLOCKPROJECTILE)){
-					return false;
-				}
-			}
-		}
-
-		ey += dy;
-		ez += dz;
-		if(2*ey >= dx){
-			y  += sy;
-			ey -= dx;
-		}
-		if(2*ez >= dx){
-			z  += sz;
-			ez -= dx;
-
+		const Tile* tile = const_cast<Map*>(this)->getTile(currentPos.x, currentPos.y, currentPos.z);
+		
+		if(tile && tile->hasProperty(BLOCKPROJECTILE)){
+			return false;
 		}
 	}
 
@@ -658,9 +582,13 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 	}
 
 	// Cast two converging rays and see if either yields a result.
-	return
-		checkSightLine(fromPos, toPos) ||
+	/*return
+		checkSightLine(fromPos, toPos) &&
 		checkSightLine(toPos, fromPos);
+	*/
+	
+	// different ways for same floor and for different floors
+	return checkSightLine(fromPos, toPos) && checkSightLine(toPos, fromPos);
 }
 
 const Tile* Map::canWalkTo(const Creature* creature, const Position& pos)

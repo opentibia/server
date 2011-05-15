@@ -85,6 +85,12 @@ std::string asUpperCaseString(const std::string& source)
 	return s;
 }
 
+bool booleanString(std::string source)
+{
+	toLowerCaseString(source);
+	return (source == "yes" || source == "true" || atoi(source.c_str()) > 0);
+}
+
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
@@ -451,6 +457,7 @@ MagicEffectNames magicEffectNames[] = {
 	{"redshimmer",        NM_ME_MAGIC_BLOOD},
 	{"greenshimmer",      NM_ME_MAGIC_POISON},
 	{"fire",              NM_ME_HITBY_FIRE},
+	{"earth",             NM_ME_POISON},
 	{"greenspark",        NM_ME_POISON},
 	{"mortarea",          NM_ME_MORT_AREA},
 	{"greennote",         NM_ME_SOUND_GREEN},

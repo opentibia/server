@@ -203,10 +203,19 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	#endif
 	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 3);
 	m_confInteger[EXPERIENCE_STAGES] = getGlobalBoolean(L, "experience_stages", false);
+	m_confInteger[PUSH_INTERVAL] = getGlobalNumber(L, "push_interval", 2000);
+	m_confInteger[MOVEITEM_TIME] = getGlobalNumber(L, "move_item_interval", 500);
+	m_confInteger[MAX_STACK_SIZE] = getGlobalNumber(L, "max_stack_size", 1000);
+	m_confInteger[PVP_DAMAGE] = getGlobalNumber(L, "pvp_damage", 50);
+	m_confInteger[PVP_DAMAGE_AT_BLACK_SKULLS] = getGlobalNumber(L, "pvp_damage_at_black_skulls", 100);
+	m_confInteger[WANDS_INTERRUPT_SWING] = getGlobalBoolean(L, "wands_interrupt_swing", true);
+	m_confInteger[PLAYER_QUERYDESTINATION_DEEPNESS] = getGlobalNumber(L, "player_querydestination_deepness", -1);
+	m_confInteger[TILE_LIMIT] = getGlobalNumber(L, "tile_limit", 0);
+	m_confInteger[PROTECTION_TILE_LIMIT] = getGlobalNumber(L, "protection_tile_limit", 0);
+	m_confInteger[HOUSE_TILE_LIMIT]	= getGlobalNumber(L, "house_tile_limit", 0);
+	m_confInteger[LUA_EXCEPTED_TYPE_ERRORS_ENABLED]	= getGlobalBoolean(L, "lua_excepted_type_errors_enabled", true);
 	m_confInteger[ENABLE_COOLDOWN] = getGlobalBoolean(L, "enable_cooldown", true);
 	m_confInteger[ENABLE_MOUNTS] = getGlobalBoolean(L, "enable_mounts", true);
-	m_confInteger[PUSH_INTERVAL] = getGlobalNumber(L, "push_interval", 2000);
-	m_confInteger[WANDS_INTERRUPT_SWING] = getGlobalBoolean(L, "wands_interrupt_swing", true);
 	m_confInteger[MONSTER_SPAWN_WALKBACK] = getGlobalBoolean(L, "monster_spawn_walkback", true);
 	m_confInteger[MOUNT_TIME] = getGlobalNumber(L, "mount_time", 2000);
 	m_confInteger[DISMOUNT_IN_PZ] = getGlobalBoolean(L, "dismount_player_in_pz", true);  

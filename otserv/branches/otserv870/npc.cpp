@@ -132,6 +132,8 @@ void Npc::reset()
 	hasUsedIdleReply = false;
 	talkRadius = 4;
 	idleTimeout = 0;
+	idleInterval = 5 * 60;
+	lastVoice = OTSYS_TIME();
 	lastResponseTime = OTSYS_TIME();
 	defaultPublic = true;
 
@@ -153,6 +155,7 @@ void Npc::reset()
 	itemListMap.clear();
 	responseScriptMap.clear();
 	shopPlayerList.clear();
+	voiceList.clear();
 }
 
 void Npc::reload()
@@ -270,7 +273,7 @@ bool Npc::loadFromXml(const std::string& filename)
 					if(readXMLInteger(p, "addons", intValue)){
 						defaultOutfit.lookAddons = intValue;
 					}
-
+					
 					if(readXMLInteger(p, "mount", intValue)){
 						defaultOutfit.lookMount = intValue;
 					}
@@ -296,6 +299,42 @@ bool Npc::loadFromXml(const std::string& filename)
 					pchild = pchild->next;
 				}
 			}
+					else if(!xmlStrcmp(p->name, (const xmlChar*)"voices"))
+		{
+			for(xmlNodePtr q = p->children; q != NULL; q = q->next)
+			{
+				if(!xmlStrcmp(q->name, (const xmlChar*)"voice"))
+				{
+					if(!readXMLString(q, "text", strValue))
+						continue;
+
+					Voice voice;
+					voice.text = strValue;
+					if(readXMLInteger(q, "interval2", intValue))
+						voice.interval = intValue;
+					else
+						voice.interval = 60;
+
+					if(readXMLInteger(q, "margin", intValue))
+						voice.margin = intValue;
+					else
+						voice.margin = 0;
+
+					voice.type = SPEAK_SAY;
+					if(readXMLInteger(q, "type", intValue))
+						voice.type = (SpeakClasses)intValue;
+					else if(readXMLString(q, "yell", strValue) && booleanString(strValue))
+						voice.type = SPEAK_YELL;
+
+					if(readXMLString(q, "randomspectator", strValue) || readXMLString(q, "randomSpectator", strValue))
+						voice.randomSpectator = booleanString(strValue);
+					else
+						voice.randomSpectator = false;
+
+					voiceList.push_back(voice);
+				}
+			}
+		}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"interaction") == 0){
 				if(readXMLInteger(p, "talkradius", intValue)){
 					talkRadius = intValue;
@@ -303,6 +342,10 @@ bool Npc::loadFromXml(const std::string& filename)
 
 				if(readXMLInteger(p, "idletime", intValue) || readXMLInteger(p, "idletimeout", intValue)){
 					idleTimeout = intValue;
+				}
+
+				if(readXMLInteger(p, "idleinterval", intValue)){
+					idleInterval = intValue;
 				}
 
 				if(readXMLInteger(p, "defaultpublic", intValue)){
@@ -1230,6 +1273,7 @@ NpcState* Npc::getState(const Player* player, bool makeNew /*= true*/)
 	state->itemId = 0;
 	state->subType = -1;
 	state->ignoreCapacity = false;
+	state->ignoreEquipped = false;
 	state->buyWithBackpack = false;
 	state->spellName = "";
 	state->listName = "";
@@ -1474,7 +1518,49 @@ void Npc::onThink(uint32_t interval)
 	if(m_npcEventHandler){
 		m_npcEventHandler->onThink();
 	}
+	
+	std::vector<Player*> list;
+	Player* tmpPlayer = NULL;
 
+	const SpectatorVec& tmpList = g_game.getSpectators(getPosition());
+	if(tmpList.size()) //loop only if there's at least one spectator
+	{
+		for(SpectatorVec::const_iterator it = tmpList.begin(); it != tmpList.end(); ++it)
+		{
+			if((tmpPlayer = (*it)->getPlayer()) && !tmpPlayer->isRemoved())
+				list.push_back(tmpPlayer);
+		}
+	}
+
+	if(list.size()) //loop only if there's at least one player
+	{
+		int64_t now = OTSYS_TIME();
+		for(VoiceList::iterator it = voiceList.begin(); it != voiceList.end(); ++it)
+		{
+			if(now < (lastVoice + it->margin))
+				continue;
+
+			if((uint32_t)(MAX_RAND_RANGE / it->interval) < (uint32_t)random_range(0, MAX_RAND_RANGE))
+				continue;
+
+			tmpPlayer = NULL;
+			if(it->randomSpectator)
+			{
+				size_t random = random_range(0, (int32_t)list.size());
+				if(random < list.size()) //1 slot chance to make it public
+					tmpPlayer = list[random];
+			}
+
+			doSay(it->text, it->type, tmpPlayer);
+			lastVoice = now;
+			break;
+		}
+	}
+
+	bool idleResponse = false;
+	if((uint32_t)(MAX_RAND_RANGE / idleInterval) >= (uint32_t)random_range(0, MAX_RAND_RANGE))
+		idleResponse = true;
+		
 	if (getTimeSinceLastMove() >= walkTicks)
 		addEventWalk();
 
@@ -1921,6 +2007,7 @@ void Npc::processResponse(Player* player, NpcState* npcState, const NpcResponse*
 						scriptstream << "level = " << npcState->level << ',' << std::endl;
 						scriptstream << "buywithbackpack = " << npcState->buyWithBackpack << ',' << std::endl;
 						scriptstream << "ignorecapacity = " << npcState->ignoreCapacity << ',' << std::endl;
+						scriptstream << "ignoreequipped = " << npcState->ignoreEquipped << ',' << std::endl;
 						scriptstream << "spellname = \"" << LuaScriptInterface::escapeString(npcState->spellName) << "\"" << ',' << std::endl;
 						scriptstream << "listname = \"" << LuaScriptInterface::escapeString(npcState->listName) << "\"" << ',' << std::endl;
 						scriptstream << "listpname = \"" << LuaScriptInterface::escapeString(npcState->listPluralName) << "\"" << ',' << std::endl;
@@ -1988,7 +2075,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 		std::string responseString = formatResponse(player, npcState, response);
 		if(!responseString.empty()){
 			if(response->publicize()){
-				doSay(responseString);
+				doSay(responseString, SPEAK_PRIVATE_NP, player);
 			}
 			else{
 				doSayToPlayer(player, responseString);
@@ -2038,7 +2125,7 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 
 				NpcScriptInterface::pushState(L, npcState);
 				lua_setglobal(L, "_state");
-				m_scriptInterface->callFunction(paramCount);
+				m_scriptInterface->callFunction(paramCount, false);
 				lua_getglobal(L, "_state");
 				NpcScriptInterface::popState(L, npcState);
 				m_scriptInterface->releaseScriptEnv();
@@ -2050,9 +2137,20 @@ void Npc::executeResponse(Player* player, NpcState* npcState, const NpcResponse*
 	}
 }
 
-void Npc::doSay(const std::string& text)
+void Npc::doSay(const std::string& text, SpeakClasses type, Player* player)
 {
-	g_game.internalCreatureSay(this, SPEAK_SAY, text);
+	if(!player)
+	{
+		std::string tmp = text;
+		replaceString(tmp, "{", "");
+		replaceString(tmp, "}", "");
+		g_game.internalCreatureSay(this, type, tmp);
+	}
+	else
+	{
+		player->sendCreatureSay(this, type, text);
+		player->onCreatureSay(this, type, text);
+	}
 }
 
 void Npc::doSayToPlayer(Player* player, const std::string& text)
@@ -2093,7 +2191,7 @@ uint32_t Npc::getListItemPrice(uint16_t itemId, ShopEvent_t type)
 }
 
 void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
-		uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
+		uint8_t count, uint8_t amount, bool ignore, bool buyWithBackpack)
 {
 	int8_t subType = -1;
 	const ItemType& it = Item::items[itemId];
@@ -2108,7 +2206,7 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->subType = subType;
 			npcState->itemId = itemId;
 			npcState->buyPrice = getListItemPrice(itemId, SHOPEVENT_BUY);
-			npcState->ignoreCapacity = ignoreCapacity;
+			npcState->ignoreCapacity = ignore;
 			npcState->buyWithBackpack = buyWithBackpack;
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPBUY, false);
 			processResponse(player, npcState, response);
@@ -2121,13 +2219,14 @@ void Npc::onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint
 			npcState->subType = subType;
 			npcState->itemId = itemId;
 			npcState->sellPrice = getListItemPrice(itemId, SHOPEVENT_SELL);
+			npcState->ignoreEquipped = ignore;
 			const NpcResponse* response = getResponse(player, npcState, EVENT_PLAYER_SHOPSELL, false);
 			processResponse(player, npcState, response);
 		}
 	}
 
 	if(m_npcEventHandler){
-		m_npcEventHandler->onPlayerTrade(player, callback, itemId, count, amount, ignoreCapacity, buyWithBackpack);
+		m_npcEventHandler->onPlayerTrade(player, callback, itemId, count, amount, ignore, buyWithBackpack);
 	}
 
 	player->sendSaleItemList();
@@ -3076,7 +3175,7 @@ int NpcScriptInterface::luaActionSay(lua_State* L)
 
 	if(npc){
 		if(publicize){
-			npc->doSay(text);
+			npc->doSay(text, SPEAK_SAY, NULL);
 		}
 		else{
 			npc->doSayToPlayer(player, text);
@@ -3335,7 +3434,8 @@ void NpcScriptInterface::pushState(lua_State *L, NpcState* state)
 	setField(L, "itemid", state->itemId);
 	setField(L, "subtype", state->subType);
 	setFieldBool(L, "ignorecapacity", state->ignoreCapacity);
-	setFieldBool(L, "buyWithBackpack", state->buyWithBackpack);
+	setFieldBool(L, "ignoreequipped", state->ignoreEquipped);
+	setFieldBool(L, "buywithbackpack", state->buyWithBackpack);
 	setField(L, "topic", state->topic);
 	setField(L, "level", state->level);
 	setField(L, "spellname", state->spellName);
@@ -3363,15 +3463,18 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->itemId = getField(L, "itemid");
 	state->subType = getField(L, "subtype");
 	state->ignoreCapacity = getFieldBool(L, "ignorecapacity");
+	state->ignoreEquipped = getFieldBool(L, "ignoreequipped");
 	state->buyWithBackpack = getFieldBool(L, "buywithbackpack");
 	state->topic = std::max(getField(L, "topic"), (int32_t)0);
 	state->level = getField(L, "level");
 	state->spellName = getFieldString(L, "spellname");
 	state->listName = getFieldString(L, "listname");
 	state->listPluralName = getFieldString(L, "listpname");
-	bool isIdle = getFieldBool(L, "isidle") || getFieldBool(L, "isIdle");
-	if(isIdle){
+	if(getFieldBool(L, "isidle")){
 		state->focusState = 0;
+	}
+	else{
+		state->focusState = 1;
 	}
 
 	state->scriptVars.n1 = getField(L, "n1");
@@ -3644,7 +3747,7 @@ void NpcScript::onCreatureAppear(const Creature* creature)
 
 		m_scriptInterface->pushFunction(m_onCreatureAppear);
 		lua_pushnumber(L, cid);
-		m_scriptInterface->callFunction(1);
+		m_scriptInterface->callFunction(1, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3677,7 +3780,7 @@ void NpcScript::onCreatureDisappear(const Creature* creature)
 
 		m_scriptInterface->pushFunction(m_onCreatureDisappear);
 		lua_pushnumber(L, cid);
-		m_scriptInterface->callFunction(1);
+		m_scriptInterface->callFunction(1, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3712,7 +3815,7 @@ void NpcScript::onCreatureMove(const Creature* creature, const Position& oldPos,
 		lua_pushnumber(L, cid);
 		LuaScriptInterface::pushPosition(L, oldPos, 0);
 		LuaScriptInterface::pushPosition(L, newPos, 0);
-		m_scriptInterface->callFunction(3);
+		m_scriptInterface->callFunction(3, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3746,7 +3849,7 @@ void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, type);
 		lua_pushstring(L, text.c_str());
-		m_scriptInterface->callFunction(3);
+		m_scriptInterface->callFunction(3, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3755,12 +3858,12 @@ void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const
 }
 
 void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
-	uint8_t count, uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
+	uint8_t count, uint8_t amount, bool ignore, bool buyWithBackpack)
 {
 	if(callback == -1){
 		return;
 	}
-	//"onBuy"(cid, itemid, count, amount, ignorecapacity, buywithbackpack)
+	//"onBuy"(cid, itemid, count, amount, "ignore", buywithbackpack)
 	if(m_scriptInterface->reserveScriptEnv()){
 		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		env->setScriptId(-1, m_scriptInterface);
@@ -3774,9 +3877,9 @@ void NpcScript::onPlayerTrade(const Player* player, int32_t callback, uint16_t i
 		lua_pushnumber(L, itemid);
 		lua_pushnumber(L, count);
 		lua_pushnumber(L, amount);
-		lua_pushboolean(L, ignoreCapacity);
+		lua_pushboolean(L, ignore);
 		lua_pushboolean(L, buyWithBackpack);
-		m_scriptInterface->callFunction(6);
+		m_scriptInterface->callFunction(6, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3801,7 +3904,7 @@ void NpcScript::onPlayerCloseChannel(const Player* player)
 		lua_State* L = m_scriptInterface->getLuaState();
 		m_scriptInterface->pushFunction(m_onPlayerCloseChannel);
 		lua_pushnumber(L, cid);
-		m_scriptInterface->callFunction(1);
+		m_scriptInterface->callFunction(1, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3826,7 +3929,7 @@ void NpcScript::onPlayerEndTrade(const Player* player)
 		lua_State* L = m_scriptInterface->getLuaState();
 		m_scriptInterface->pushFunction(m_onPlayerEndTrade);
 		lua_pushnumber(L, cid);
-		m_scriptInterface->callFunction(1);
+		m_scriptInterface->callFunction(1, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{
@@ -3854,7 +3957,7 @@ void NpcScript::onThink()
 		env->setNpc(m_npc);
 
 		m_scriptInterface->pushFunction(m_onThink);
-		m_scriptInterface->callFunction(0);
+		m_scriptInterface->callFunction(0, false);
 		m_scriptInterface->releaseScriptEnv();
 	}
 	else{

@@ -31,11 +31,13 @@
 #include "combat.h"
 #include "movement.h"
 #include "configmanager.h"
+#include "configmanager.h"
 #include <string>
 #include <iostream>
 
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
+extern ConfigManager g_config;
 extern ConfigManager g_config;
 
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
@@ -710,8 +712,14 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
 		}
 #endif
-		if(items && items->size() >= 0xFFFF){
-			return RET_NOTPOSSIBLE;
+
+		if(items){
+			int64_t c = g_config.getNumber(ConfigManager::MAX_STACK_SIZE);
+			//acceptable stack sizes should be higher than 100 and <= than 65535
+			uint16_t max_stack_size = uint16_t(std::max(std::min(c, int64_t(0xFFFF)), int64_t(100)));
+			if (items->size() >= max_stack_size){
+				return RET_NOTPOSSIBLE;
+			}
 		}
 
 		if(hasBitSet(FLAG_NOLIMIT, flags)){
@@ -726,12 +734,16 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 		if(creatures && !creatures->empty() && !hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
 			for(CreatureVector::const_iterator cit = creatures->begin(); cit != creatures->end(); ++cit){
-				if((!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen)) && item->isBlocking(*cit)){
+				if((!(*cit)->getPlayer() || !(*cit)->getPlayer()->hasSomeInvisibilityFlag()) && item->isBlocking(*cit)){
 					return RET_NOTENOUGHROOM;
 				}
 			}
 		}
-
+		
+		const uint32_t itemLimit = g_config.getNumber(hasFlag(TILESTATE_PROTECTIONZONE) ? ConfigManager::PROTECTION_TILE_LIMIT : ConfigManager::TILE_LIMIT);
+		if(itemLimit && getThingCount() > itemLimit)
+			return RET_TILEISFULL;
+			
 		bool hasHangable = false;
 		bool supportHangable = false;
 
@@ -1489,7 +1501,7 @@ void Tile::postRemoveNotification(Thing* thing,  const Cylinder* newParent, int3
 	if(/*isCompleteRemoval &&*/ getThingCount() > 8){
 		onUpdateTile();
 	}
-
+	
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
@@ -1694,6 +1706,7 @@ void Tile::updateTileFlags(Item* item, bool removed)
 		}
 	}
 }
+
 
 bool Tile::isMoveableBlocking() const
 {

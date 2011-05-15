@@ -1396,8 +1396,14 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 		return true;
 	}
 
-	CombatType_t combatType = Combat::ConditionToDamageType(conditionType);
 	Creature* attacker = g_game.getCreatureByID(owner);
+
+	if ((owner >= PLAYER_ID_RANGE) && (owner < MONSTER_ID_RANGE) && creature->getPlayer()){ //we shouldn't check attacker because pvp reduction happens even if the creature who owns the condition is dead
+		Combat::doPVPDamageReduction(damage, creature->getPlayer());
+	}
+
+	CombatType_t combatType = Combat::ConditionToDamageType(conditionType);
+
 
 	if(g_game.combatBlockHit(combatType, attacker, creature, damage, false, false)){
 		return false;
@@ -1425,7 +1431,19 @@ bool ConditionDamage::updateCondition(const ConditionDamage* addCondition)
 		return false;
 	}
 
-	if(addCondition->getTotalDamage() < getTotalDamage()){
+	int32_t oldTotDamage = getTotalDamage();
+	int32_t newTotDamage = addCondition->getTotalDamage();
+
+	//TODO: to consider the PVP damage reduction to correctly decide which condition should stay?
+	/*if ((owner >= PLAYER_ID_RANGE) && (owner < MONSTER_ID_RANGE)){ //we shouldn't check attacker because pvp reduction happens even if the creature who owns the condition is dead
+		Combat::doPVPDamageReduction(oldTotDamage, ?);
+	}
+
+	if ((addCondition->owner >= PLAYER_ID_RANGE) && (addCondition->owner < MONSTER_ID_RANGE)){ //we shouldn't check attacker because pvp reduction happens even if the creature who owns the condition is dead
+		Combat::doPVPDamageReduction(newTotDamage, ?);
+	}*/
+
+	if(newTotDamage < oldTotDamage){
 		return false;
 	}
 
@@ -1529,8 +1547,8 @@ uint16_t ConditionDamage::getIcons() const
 
 		case CONDITION_BLEEDING:
 			icons |= ICON_BLEEDING;
-			break;
-
+			break;	
+		
 		default:
 			break;
 	}
@@ -1541,22 +1559,29 @@ uint16_t ConditionDamage::getIcons() const
 void ConditionDamage::generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list)
 {
 	amount = std::abs(amount);
+	start = std::abs(start);
+
+	if (start >= amount){
+		list.push_back(start);
+		return;
+	}
+
+	int32_t med;
 	int32_t sum = 0;
-	int32_t med = 0;
 	float x1, x2;
 
 	for(int32_t i = start; i > 0; --i){
 		int32_t n = start + 1 - i;
 		med = (n * amount) / start;
 
-		do{
+		x1 = std::fabs(1.0 - (((float)sum) + i) / med);
+		x2 = std::fabs(1.0 - (((float)sum) / med));
+		while(x1 < x2){
 			sum += i;
 			list.push_back(i);
-
 			x1 = std::fabs(1.0 - (((float)sum) + i) / med);
 			x2 = std::fabs(1.0 - (((float)sum) / med));
-
-		}while(x1 < x2);
+		}
 	}
 }
 
