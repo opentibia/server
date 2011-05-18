@@ -398,4 +398,11 @@
 	<instant name="Sharpshooter" icon="135" words="utito tempo san" lvl="60" mana="450" prem="1" selftarget="1" aggressive="0" script="support/sharpshooter.lua">
 		<vocation name="Paladin"/>   <vocation name="Royal Paladin"/>
 	</instant>
+		
+	<!-- Monster Spells -->
+	<instant name="Pythius Curse" prem="0" exhaustion="2000" words="mons_pythius curse" needlearn="1" enabled="1" needtarget="1" casterTargetOrDirection="1" range="7" script="monsterspells/pythius curse.lua" /> 
+	<instant name="Pythius Summon" exhaustion="2000" words="mons_pythius summon" selftarget="1" enabled="1" needlearn="1" script="monsterspells/pythius summon.lua" />
+	<instant name="Stampor Skills" exhaustion="2000" words="mons_stampor skills" selftarget="1" enabled="1" needlearn="1" script="monsterspells/stampor skills.lua" />
+	<instant name="Brutetamer Skills" exhaustion="2000" words="mons_brutetamer skills" selftarget="1" enabled="1" needlearn="1" script="monsterspells/brutetamer skills.lua" />
+	<instant name="Madareth Skills" exhaustion="2000" words="mons_madareth skills" selftarget="1" enabled="1" needlearn="1" script="monsterspells/madareth skills.lua" />
 </spells>
