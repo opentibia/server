@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 <spells>
+	<!-- 8.7 spells (Here we need help from the community , This is an example of 8.7 spell called Annihilation that's exactly how the spells should be made.) -->
+    <instant name="Annihilation" words="exori gran ico" lvl="110" mana="300" prem="1" needweapon="1" icon="62" exhaustion="30000" groupicons="1" groupexhaustions="4000" needlearn="0" needtarget="1" script="attack/annihilation.lua">
+        <vocation name="Knight"/>
+        <vocation name="Elite Knight"/>
+    </instant>
 	<!-- House Spells -->
 	<instant name="House Guest List" icon="71" words="aleta sio" enabled="1" function="editHouseGuest"></instant>
 	<instant name="House Subowner List" icon="72" words="aleta som" enabled="1" function="editHouseSubOwner"></instant>
