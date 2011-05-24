@@ -2445,9 +2445,13 @@
 	</item>
 	<item id="2006" article="a" name="vial">
 		<attribute key="weight" value="180"/>
+		<attribute key="decayTo" value="11396"/>
+		<attribute key="duration" value="1"/>
 	</item>
 	<item id="2007" article="a" name="blue bottle">
 		<attribute key="weight" value="250"/>
+		<attribute key="decayTo" value="11397"/>
+		<attribute key="duration" value="1"/>
 	</item>
 	<item id="2008" article="a" name="vase">
 		<attribute key="weight" value="940"/>
@@ -2474,6 +2478,8 @@
 	</item>
 	<item id="2014" article="a" name="jug">
 		<attribute key="weight" value="750"/>
+		<attribute key="decayTo" value="11398"/>
+		<attribute key="duration" value="1"/>
 	</item>
 	<item id="2015" article="a" name="beer bottle">
 		<attribute key="weight" value="250"/>
@@ -2521,6 +2527,8 @@
 	<item id="2030" article="a" name="pool"/>
 	<item id="2031" article="a" name="waterskin">
 		<attribute key="weight" value="700"/>
+		<attribute key="decayTo" value="11399"/>
+		<attribute key="duration" value="1"/>
 	</item>
 	<item id="2032" article="a" name="bowl">
 		<attribute key="weight" value="380"/>
@@ -24943,6 +24951,18 @@
 		<attribute key="description" value="It is rumoured to bring you good luck! Luck sponsored by TibiaLottery."/>
 		<attribute key="weight" value="150"/>
 		<attribute key="slotType" value="necklace"/>
+	</item>
+	<item id="11396" article="a" name="vial">
+		<attribute key="weight" value="180"/>
+	</item>
+	<item id="11397" article="a" name="blue bottle">
+		<attribute key="weight" value="250"/>
+	</item>
+	<item id="11398" article="a" name="jug">
+		<attribute key="weight" value="750"/>
+	</item>
+	<item id="11399" article="a" name="waterskin">
+		<attribute key="weight" value="700"/>
 	</item>
 	<item id="11793" article="a" name="skull pillar"/>
 	<item id="11794" article="a" name="skull pillar"/>
