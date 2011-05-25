@@ -24954,15 +24954,19 @@
 	</item>
 	<item id="11396" article="a" name="vial">
 		<attribute key="weight" value="180"/>
+		<attribute key="pickupable" value="1"/>
 	</item>
 	<item id="11397" article="a" name="blue bottle">
 		<attribute key="weight" value="250"/>
+		<attribute key="pickupable" value="1"/>
 	</item>
 	<item id="11398" article="a" name="jug">
 		<attribute key="weight" value="750"/>
+		<attribute key="pickupable" value="1"/>
 	</item>
 	<item id="11399" article="a" name="waterskin">
 		<attribute key="weight" value="700"/>
+		<attribute key="pickupable" value="1"/>
 	</item>
 	<item id="11793" article="a" name="skull pillar"/>
 	<item id="11794" article="a" name="skull pillar"/>
