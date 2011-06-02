@@ -2471,7 +2471,6 @@ int LuaScriptInterface::luaGetPlayerByNameWildcard(lua_State *L)
 		lua_pushnumber(L, cid);
 	}
 	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushboolean(L, false);
 	}
 	return 1;
