@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -37,7 +37,7 @@ Container::Container(uint16_t _type) : Item(_type)
 Container::~Container()
 {
 	//std::cout << "Container destructor " << this << std::endl;
-	for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){		
+	for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
 		(*cit)->setParent(NULL);
 		(*cit)->releaseThing2();
 	}
@@ -103,7 +103,7 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 			if(type == OTBM_ITEM){
 				PropStream itemPropStream;
 				f.getProps(nodeItem, itemPropStream);
-				
+
 				Item* item = Item::CreateItem(itemPropStream);
 				if(!item){
 					return false;
@@ -112,7 +112,7 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 				if(!item->unserializeItemNode(f, nodeItem, itemPropStream)){
 					return false;
 				}
-				
+
 				addItem(item);
 				total_weight += item->getWeight();
 				if(Container* parent_container = getParentContainer()) {
@@ -124,7 +124,7 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 
 			nodeItem = f.getNextNode(nodeItem, type);
 		}
-		
+
 		return true;
 	}
 
@@ -157,7 +157,7 @@ std::ostringstream& Container::getContentDescription(std::ostringstream& os) con
 	for(ContainerIterator cit = evil->begin(); cit != evil->end(); ++cit)
 	{
 		Item* i = *cit;
-			
+
 		if(firstitem)
 			firstitem = false;
 		else
@@ -174,7 +174,7 @@ std::ostringstream& Container::getContentDescription(std::ostringstream& os) con
 
 Item* Container::getItem(uint32_t index)
 {
-	size_t n = 0;			
+	size_t n = 0;
 	for (ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
 		if(n == index)
 			return *cit;
@@ -308,7 +308,7 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		}
 		cylinder = cylinder->getParent();
 	}
-	
+
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
 
 	if(index == INDEX_WHEREEVER && !skipLimit){
@@ -342,7 +342,7 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 
 	if(item->isStackable()){
 		uint32_t n = 0;
-		
+
 		if(index == INDEX_WHEREEVER){
 			//Iterate through every item and check how much free stackable slots there is.
 			uint32_t slotIndex = 0;
@@ -417,14 +417,14 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 	if(index == 254 /*move up*/){
 		index = INDEX_WHEREEVER;
 		*destItem = NULL;
-		
+
 		Container* parentContainer = dynamic_cast<Container*>(getParent());
 		if(parentContainer)
 			return parentContainer;
 
 		return this;
 	}
-	
+
 	if(index == 255 /*add wherever*/){
 		index = INDEX_WHEREEVER;
 		*destItem = NULL;
@@ -479,7 +479,7 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 			return subCylinder;
 		}
 	}
-	
+
 	return this;
 }
 
@@ -498,7 +498,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 	Item* item = thing->getItem();
-	
+
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__addThing] item == NULL" << std::endl;
@@ -552,7 +552,7 @@ void Container::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 
 	const ItemType& oldType = Item::items[item->getID()];
 	const ItemType& newType = Item::items[itemId];
-	
+
 	const double old_weight = item->getWeight();
 
 	item->setID(itemId);
@@ -597,7 +597,7 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
-	
+
 	total_weight -= (*cit)->getWeight();
 	total_weight += item->getWeight();
 
@@ -743,22 +743,22 @@ Thing* Container::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Container::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Container::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postAddNotification(thing, oldParent, index, LINK_TOPPARENT);
+		topParent->postAddNotification(thing, oldParent, index, LINK_TOPPARENT, isNewItem);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
 			if(topParent->getParent()){
-				topParent->getParent()->postAddNotification(thing, oldParent, index, LINK_NEAR);
+				topParent->getParent()->postAddNotification(thing, oldParent, index, LINK_NEAR, isNewItem);
 			}
 		}
 		else{
-			topParent->postAddNotification(thing, oldParent, index, LINK_PARENT);
+			topParent->postAddNotification(thing, oldParent, index, LINK_PARENT, isNewItem);
 		}
 	}
 }

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -47,8 +47,8 @@ ReturnValue Mailbox::__queryAdd(int32_t index, const Thing* thing, uint32_t coun
 			return RET_NOERROR;
 		}
 	}
-	
-	return RET_NOTPOSSIBLE;	
+
+	return RET_NOTPOSSIBLE;
 }
 
 ReturnValue Mailbox::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
@@ -98,9 +98,9 @@ void Mailbox::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-void Mailbox::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Mailbox::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
-	getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT);
+	getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT, isNewItem);
 }
 
 void Mailbox::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
@@ -115,7 +115,7 @@ bool Mailbox::sendItemTo(const std::string& name, uint32_t depotId, Item* item)
 	if(!IOPlayer::instance()->getGuidByName(guid, dbname)){
 		return false;
 	}
-	
+
 	Player* player = g_game.getPlayerByNameEx(name);
 	if(!player){
 		return false;
@@ -172,7 +172,7 @@ bool Mailbox::getDepotId(const std::string& strTown, uint32_t& depotId)
 	else{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -188,11 +188,11 @@ bool Mailbox::getRepicient(Item* item, std::string& name, uint32_t& depotId)
 			for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); ++cit){
 				if((*cit)->getID() == ITEM_LABEL){
 					item = (*cit);
-					
+
 					if(item->getText() != ""){
-						break;	
-					}  
-				} 
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -241,6 +241,6 @@ bool Mailbox::canSend(const Item* item)
 	if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
 		return true;
 	}
-	
+
 	return false;
 }

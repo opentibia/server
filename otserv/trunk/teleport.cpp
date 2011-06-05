@@ -124,7 +124,7 @@ void Teleport::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-void Teleport::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Teleport::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
 	getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT);
 }

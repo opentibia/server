@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -35,7 +35,7 @@ public:
 	ContainerIterator();
 	ContainerIterator(const ContainerIterator& rhs);
 	~ContainerIterator();
-	
+
 	ContainerIterator& operator=(const ContainerIterator& rhs);
 	bool operator==(const ContainerIterator& rhs);
 	bool operator!=(const ContainerIterator& rhs);
@@ -43,10 +43,10 @@ public:
 	ContainerIterator operator++(int);
 	Item* operator*();
 	Item* operator->();
-	
+
 protected:
 	ContainerIterator(Container* super);
-	
+
 	Container* super;
 	std::queue<Container*> over;
 	ItemList::iterator cur;
@@ -123,7 +123,7 @@ public:
 	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(Thing* thing,  const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Thing* thing,  const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER, bool isNewItem = true);
 	virtual void postRemoveNotification(Thing* thing,  const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	virtual void __internalAddThing(Thing* thing);

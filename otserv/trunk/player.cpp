@@ -3606,9 +3606,9 @@ Thing* Player::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
-	if(link == LINK_OWNER){
+	if(link == LINK_OWNER && isNewItem){
 		//calling movement scripts
 		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index);
 	}
@@ -3659,7 +3659,7 @@ void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_
 
 void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	if(link == LINK_OWNER){
+	if(link == LINK_OWNER && isCompleteRemoval){
 		//calling movement scripts
 		g_moveEvents->onPlayerDeEquip(this, thing->getItem(), (slots_t)index, isCompleteRemoval);
 	}

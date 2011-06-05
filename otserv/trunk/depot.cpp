@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -43,7 +43,7 @@ Attr_ReadValue Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 		if(!propStream.GET_UINT16(_depotId)){
 			return ATTR_READ_ERROR;
 		}
-		
+
 		setDepotId(_depotId);
 		return ATTR_READ_CONTINUE;
 	}
@@ -60,7 +60,7 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	}
 
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
-	
+
 	if(!skipLimit){
 		int addCount = 0;
 
@@ -91,10 +91,10 @@ ReturnValue Depot::__queryMaxCount(int32_t index, const Thing* thing, uint32_t c
 	return Container::__queryMaxCount(index, thing, count, maxQueryCount, flags);
 }
 
-void Depot::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Depot::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
 	if(getParent() != NULL){
-		getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT);
+		getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT, isNewItem);
 	}
 }
 

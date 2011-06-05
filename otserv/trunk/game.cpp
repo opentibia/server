@@ -1220,7 +1220,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		player->sendCancelMessage(RET_CANNOTTHROW);
 		return false;
 	}
-	
+
 	ReturnValue ret = internalMoveItem(fromCylinder, toCylinder, toIndex, item, count, NULL);
 	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
@@ -1908,6 +1908,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 			cylinder->postRemoveNotification(item, cylinder, itemIndex, false);
 			uint16_t itemId = item->getID();
 			int32_t count = item->getSubType();
+			bool isNewItem = true;
 
 			if(curType.id != newType.id){
 				if(newType.group != curType.group){
@@ -1916,13 +1917,16 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 
 				itemId = newId;
 			}
+			else{
+				isNewItem = false;
+			}
 
 			if(newCount != -1 && newType.hasSubType()){
 				count = newCount;
 			}
 
 			cylinder->__updateThing(item, itemId, count);
-			cylinder->postAddNotification(item, cylinder, itemIndex);
+			cylinder->postAddNotification(item, cylinder, itemIndex, LINK_OWNER, isNewItem);
 			return item;
 		}
 	}
