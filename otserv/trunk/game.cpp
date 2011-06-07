@@ -4499,21 +4499,16 @@ void Game::checkDecay()
 
 		int32_t dur = item->getDuration();
 
-		if(dur <= 0) {
+		if(dur <= (EVENT_DECAYINTERVAL-1)/2) {
 			it = decayItems[bucket].erase(it);
 			internalDecayItem(item);
 			FreeThing(item);
 		}
-		else if(dur < EVENT_DECAYINTERVAL*EVENT_DECAY_BUCKETS)
+		else if(dur <= EVENT_DECAYINTERVAL*(EVENT_DECAY_BUCKETS - 1) + (EVENT_DECAYINTERVAL-1)/2)
 		{
 			it = decayItems[bucket].erase(it);
-			size_t new_bucket = (bucket + ((dur + EVENT_DECAYINTERVAL/2) / 1000)) % EVENT_DECAY_BUCKETS;
-			if(new_bucket == bucket) {
-				internalDecayItem(item);
-				FreeThing(item);
-			} else {
-				decayItems[new_bucket].push_back(item);
-			}
+			size_t new_bucket = (bucket + ((dur + EVENT_DECAYINTERVAL/2) / EVENT_DECAYINTERVAL)) % EVENT_DECAY_BUCKETS;
+			decayItems[new_bucket].push_back(item);
 		}
 		else{
 			++it;
