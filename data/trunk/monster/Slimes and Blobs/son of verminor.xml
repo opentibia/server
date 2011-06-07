@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monster name="Son of Verminor" nameDescription="a son of verminor" race="venom" experience="5900" speed="120" manacost="0">
 	<health now="8500" max="8500"/>
-	<look type="19" corpse="1496"/>
+	<look type="19" corpse="8062"/>
 	<targetchange interval="5000" chance="8"/>
 	<strategy attack="100" defense="0"/>
 	<flags>

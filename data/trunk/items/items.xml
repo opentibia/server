@@ -19029,7 +19029,7 @@
 	<item id="8059" article="a" name="sanctified grave"/>
 	<item id="8060" editorsuffix=" (Blank)"/>
 	<item id="8061" editorsuffix=" (Blank)"/>
-	<item id="8062" article="a" name="poison field" editorsuffix=" (Slime Corpse)">
+	<item id="8062" article="a" name="poison gas" editorsuffix=" (Slime Corpse)">
 		<attribute key="type" value="magicfield"/>
 		<attribute key="replaceable" value="0"/>
 		<attribute key="field" value="poison">
