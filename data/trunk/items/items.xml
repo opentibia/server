@@ -12602,14 +12602,14 @@
 	<item id="5960" article="a" name="dead troll" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="7"/>
 		<attribute key="decayTo" value="3067"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
 	<item id="5961" article="a" name="dead spider" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2807"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="venom"/>
 		<attribute key="fluidSource" value="slime"/>
 	</item>
