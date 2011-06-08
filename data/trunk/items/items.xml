@@ -19030,15 +19030,8 @@
 	<item id="8060" editorsuffix=" (Blank)"/>
 	<item id="8061" editorsuffix=" (Blank)"/>
 	<item id="8062" article="a" name="poison gas" editorsuffix=" (Slime Corpse)">
-		<attribute key="type" value="magicfield"/>
-		<attribute key="replaceable" value="0"/>
-		<attribute key="field" value="poison">
-			<attribute key="ticks" value="7"/>
-			<attribute key="start" value="5"/>
-			<attribute key="damage" value="5"/>
-			<attribute key="decayTo" value="1490"/>
-			<attribute key="duration" value="10"/>
-		</attribute>
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="2"/>
 	</item>
 	<item id="8063" editorsuffix=" (Blank)"/>
 	<item id="8064" editorsuffix=" (Blank)"/>
