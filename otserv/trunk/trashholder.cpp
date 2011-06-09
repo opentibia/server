@@ -66,7 +66,7 @@ void TrashHolder::__addThing(Thing* thing)
 void TrashHolder::__addThing(int32_t index, Thing* thing)
 {
 	if(Item* item = thing->getItem()){
-		if(item != this){
+		if(item != this && (item->isPickupable() || item->isPushable() || item->isMoveable())){
 			g_game.internalRemoveItem(item);
 			if(effect != NM_ME_NONE){
 				g_game.addMagicEffect(getPosition(), effect);

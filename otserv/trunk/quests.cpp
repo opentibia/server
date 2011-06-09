@@ -49,25 +49,30 @@ Mission::~Mission()
 std::string Mission::getDescription(Player* player)
 {
 	int32_t value;
+	MissionState *lastState = 0;
+ 
 	player->getStorageValue(storageID, value);
 	if(mainState != NULL){
-		std::stringstream s;
-		s << value;
-
-		std::string desc = mainState->getMissionDescription();
-		replaceString(desc, "|STATE|", s.str());
-		return desc;
+		lastState = mainState;
 	}
-
-	for(int32_t current = endValue; current >= (int32_t)startValue; --current){
-		player->getStorageValue(storageID, value);
-		if(value == current){
-			StateList::const_iterator sit = state.find(current);
-			if(sit != state.end())
-				return sit->second->getMissionDescription();
+	else{
+		StateList::iterator it;
+		for(int32_t i = startValue; i <= value; ++i){
+			it = state.find(i);
+			if(it != state.end()){
+				lastState = it->second;
+			}
 		}
 	}
-	return "An error has occurred, please contact a gamemaster.";
+ 
+	if(!lastState)
+		return "An error has occurred, please contact a gamemaster.";
+ 
+	std::stringstream s;
+	s << value;
+	std::string desc = lastState->getMissionDescription();
+	replaceString(desc, "|STATE|", s.str());
+	return desc;
 }
 
 
