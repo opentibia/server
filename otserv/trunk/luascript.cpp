@@ -2008,6 +2008,12 @@ void LuaScriptInterface::registerFunctions()
 	//getCreatureCondition(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
 	lua_register(m_luaState, "getCreatureCondition", LuaScriptInterface::luaGetCreatureCondition);
 
+	//getPlayerStamina(cid)
+	lua_register(m_luaState, "getPlayerStamina", LuaScriptInterface::luaGetPlayerStamina);
+	
+	//doPlayerSetStamina(cid, minutes)
+	lua_register(m_luaState, "doPlayerSetStamina", LuaScriptInterface::luaDoPlayerSetStamina);	
+	
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
@@ -2211,6 +2217,11 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			lua_pushnumber(L, player->getAccountId());
 			return 1;
 		}
+		case PlayerInfoStamina:
+		{
+			lua_pushnumber(L, const_cast<Player*>(player)->getStaminaMinutes());
+			return 1;
+		}
 		default:
 		{
 			std::string error_str = "Unknown player info. info = " + info;
@@ -2359,6 +2370,11 @@ int LuaScriptInterface::luaIsGmInvisible(lua_State *L)
 int LuaScriptInterface::luaGetPlayerAccountId(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoAccountId);
+}
+
+int LuaScriptInterface::luaGetPlayerStamina(lua_State* L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoStamina);
 }
 //
 
@@ -9354,6 +9370,27 @@ int LuaScriptInterface::luaGetCreatureCondition(lua_State *L)
 	}
 
 	lua_pushboolean(L, true);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoPlayerSetStamina(lua_State* L)
+{
+	//doPlayerSetStamina(cid, minutes)
+	uint32_t minutes = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	if(Player* player = env->getPlayerByUID(popNumber(L)))
+	{
+		player->setStaminaMinutes(minutes);
+		player->sendStats();
+		lua_pushboolean(L, true);
+	}
+	else
+	{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+	}
+
 	return 1;
 }
 

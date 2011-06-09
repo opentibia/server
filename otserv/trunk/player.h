@@ -98,6 +98,8 @@ typedef std::list<Party*> PartyList;
 
 #define PLAYER_MAX_SPEED 1500
 #define PLAYER_MIN_SPEED 10
+#define STAMINA_MULTIPLIER (60 * 1000)
+
 const int32_t MAX_STAMINA = 42 * 60 * 60 * 1000;
 const int32_t MAX_STAMINA_MINUTES = MAX_STAMINA / 60000;
 
@@ -706,7 +708,8 @@ public:
 	int32_t getStaminaMinutes();
 	int32_t getStamina() {return stamina;}
 	int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
-
+	void setStaminaMinutes(uint32_t value) {addStamina((int64_t)(value * STAMINA_MULTIPLIER));}
+	
 	//depots
 	DepotMap depots;
 	uint32_t maxDepotLimit;
