@@ -4658,10 +4658,11 @@ void Game::cleanup()
 
 	for(DecayList::iterator it = toDecayItems.begin(); it != toDecayItems.end(); ++it){
 		int32_t dur = (*it)->getDuration();
-		if(dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
+		if(dur > EVENT_DECAYINTERVAL * (EVENT_DECAY_BUCKETS - 1) + (EVENT_DECAYINTERVAL - 1)/2){
 			decayItems[last_bucket].push_back(*it);
-		} else {
-			decayItems[(last_bucket + 1 + (*it)->getDuration() / 1000) % EVENT_DECAY_BUCKETS].push_back(*it);
+		}
+		else{
+			decayItems[(last_bucket + 1 + ((*it)->getDuration() + EVENT_DECAYINTERVAL/2) / EVENT_DECAYINTERVAL) % EVENT_DECAY_BUCKETS].push_back(*it);
 		}
 	}
 
