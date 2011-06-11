@@ -129,22 +129,22 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 	virtual void __startDecaying();
-
+	virtual uint32_t getTotalAmountOfItemsInside() const { return amountOfItems; } //includes the item itself
 private:
 	void onAddContainerItem(Item* item);
 	void onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemType& oldType,
 		Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(uint32_t index, Item* item);
-
+	void updateAmountOfItems(int32_t diff);
+	const Container* getParentContainer() const;
 	Container* getParentContainer();
 	void updateItemWeight(double diff);
-
-
 protected:
 	std::ostringstream& getContentDescription(std::ostringstream& os) const;
 
 	uint32_t maxSize;
 	double total_weight;
+	uint32_t amountOfItems;
 	ItemList itemlist;
 	uint32_t serializationCount;
 

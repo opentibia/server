@@ -4438,7 +4438,7 @@ void Game::startDecay(Item* item)
 		}
 
 		int32_t dur = item->getDuration();
-		if(dur > 0){
+		if(dur > (EVENT_DECAYINTERVAL-1)/2 ){
 			item->useThing2();
 			item->setDecaying(DECAYING_TRUE);
 			toDecayItems.push_back(item);

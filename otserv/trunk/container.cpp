@@ -23,14 +23,18 @@
 #include "iomapotbm.h"
 #include "game.h"
 #include "player.h"
+#include "configmanager.h"
 
 extern Game g_game;
+extern ConfigManager g_config;
+
 
 Container::Container(uint16_t _type) : Item(_type)
 {
 	//std::cout << "Container constructor " << this << std::endl;
 	maxSize = items[_type].maxItems;
 	total_weight = 0.0;
+	amountOfItems = 1;
 	serializationCount = 0;
 }
 
@@ -64,6 +68,18 @@ Container* Container::getParentContainer()
 
 	return NULL;
 }
+
+const Container* Container::getParentContainer() const
+{
+	if(const Thing* thing = getParent()) {
+		if(const Item* item = thing->getItem()) {
+			return item->getContainer();
+		}
+	}
+
+	return NULL;
+}
+
 
 void Container::addItem(Item* item)
 {
@@ -114,9 +130,11 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 				}
 
 				addItem(item);
+				updateAmountOfItems(item->getTotalAmountOfItemsInside());
 				total_weight += item->getWeight();
 				if(Container* parent_container = getParentContainer()) {
 					parent_container->updateItemWeight(item->getWeight());
+
 				}
 			}
 			else /*unknown type*/
@@ -129,6 +147,14 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 	}
 
 	return false;
+}
+
+void Container::updateAmountOfItems(int32_t diff)
+{
+	amountOfItems += diff;
+	if(Container* parent_container = getParentContainer()){
+		parent_container->updateAmountOfItems(diff);
+	}
 }
 
 void Container::updateItemWeight(double diff)
@@ -307,6 +333,17 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 			return RET_THISISIMPOSSIBLE;
 		}
 		cylinder = cylinder->getParent();
+	}
+
+	const Container* c = this;
+	int32_t max_amount_inside = g_config.getNumber(ConfigManager::MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS);
+	if (max_amount_inside > 0){
+		do {
+			if ((c->getTotalAmountOfItemsInside() + thing->getTotalAmountOfItemsInside()) > (uint32_t) max_amount_inside + 1)
+				return RET_CONTAINERHASTOMANYITEMS;
+			c = c->getParentContainer();
+		}
+		while(c);
 	}
 
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
@@ -519,6 +556,8 @@ void Container::__addThing(int32_t index, Thing* thing)
 
 	item->setParent(this);
 	itemlist.push_front(item);
+	updateAmountOfItems(item->getTotalAmountOfItemsInside());
+
 	total_weight += item->getWeight();
 	if(Container* parent_container = getParentContainer()) {
 		parent_container->updateItemWeight(item->getWeight());
@@ -598,6 +637,8 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
+	updateAmountOfItems(int32_t(int64_t(item->getTotalAmountOfItemsInside()) - (*cit)->getTotalAmountOfItemsInside()));
+
 	total_weight -= (*cit)->getWeight();
 	total_weight += item->getWeight();
 
@@ -650,7 +691,9 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 
 	if(item->isStackable() && count != item->getItemCount()){
 		uint8_t newCount = (uint8_t)std::max((int32_t)0, (int32_t)(item->getItemCount() - count));
-
+		if(newCount == 0){
+			updateAmountOfItems(-item->getTotalAmountOfItemsInside());
+		}
 		const double old_weight = -item->getWeight();
 		item->setItemCount(newCount);
 		const double diff_weight = old_weight + item->getWeight();
@@ -673,7 +716,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 			}
 			onRemoveContainerItem(index, item);
 		}
-
+		updateAmountOfItems(-item->getTotalAmountOfItemsInside());
 		total_weight -= item->getWeight();
 		item->setParent(NULL);
 		itemlist.erase(cit);
@@ -813,7 +856,7 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 
 	item->setParent(this);
 	itemlist.push_front(item);
-
+	updateAmountOfItems(item->getTotalAmountOfItemsInside());
 	total_weight += item->getWeight();
 	if(Container* parent_container = getParentContainer()) {
 		parent_container->updateItemWeight(item->getWeight());

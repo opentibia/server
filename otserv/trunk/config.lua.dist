@@ -236,6 +236,10 @@ distance_weapon_interrupt_swing = true
 -- Should exhaustion and action time be checked for using wands?
 wands_interrupt_swing = true
 
+-- maximum amount of items inside of a container (including the items inside of any container inside of it)
+-- Use 0 for infinite
+max_amount_items_inside_containers = 5000
+
 -- How many items can be stacked in a single tile (all type of tiles)(client side)? DO NOT CHANGE IT UNLESS THAT YOU KNOW WHAT YOU ARE DOING
 max_stack_size = 1000
 

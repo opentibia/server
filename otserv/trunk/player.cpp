@@ -1187,6 +1187,10 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 void Player::sendCancelMessage(ReturnValue message) const
 {
 	switch(message){
+	case RET_CONTAINERHASTOMANYITEMS:
+		sendCancel("It would exceed the maximum amount of items inside of some container.");
+		break;
+
 	case RET_DESTINATIONOUTOFREACH:
 		sendCancel("Destination is out of reach.");
 		break;

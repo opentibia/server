@@ -93,7 +93,8 @@ enum ReturnValue{
 	RET_NOTREQUIREDPROFESSION = 63,
 	RET_NOTREQUIREDLEVEL = 64,
 	RET_NEEDPREMIUMTOEQUIPITEM = 65,
-	RET_TILEISFULL = 66
+	RET_TILEISFULL = 66,
+	RET_CONTAINERHASTOMANYITEMS = 67
 };
 
 class Tile;
@@ -144,7 +145,7 @@ public:
 	virtual const Creature* getCreature() const {return NULL;};
 
 	virtual bool isRemoved() const;
-
+	virtual uint32_t getTotalAmountOfItemsInside() const { return 1; } //includes the item itself
 private:
 	Cylinder* parent;
 	int32_t useCount;
