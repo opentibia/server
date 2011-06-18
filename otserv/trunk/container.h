@@ -130,6 +130,8 @@ public:
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 	virtual void __startDecaying();
 	virtual uint32_t getTotalAmountOfItemsInside() const { return amountOfItems; } //includes the item itself
+	uint16_t getDeepness() const { return deepness; }
+	void setDeepness(uint16_t newDeepness) { deepness = newDeepness; }
 private:
 	void onAddContainerItem(Item* item);
 	void onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemType& oldType,
@@ -144,7 +146,8 @@ protected:
 
 	uint32_t maxSize;
 	double total_weight;
-	uint32_t amountOfItems;
+	uint16_t deepness; //how deep is this container inside of another container (chain of containers)
+	uint32_t amountOfItems; //amount of items inside of this container, including itself and items inside of containers inside of this
 	ItemList itemlist;
 	uint32_t serializationCount;
 

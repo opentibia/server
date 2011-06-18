@@ -1292,6 +1292,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	}
 
 	if(ret != RET_NOERROR){
+
 		return ret;
 	}
 

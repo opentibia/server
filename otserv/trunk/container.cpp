@@ -35,6 +35,7 @@ Container::Container(uint16_t _type) : Item(_type)
 	maxSize = items[_type].maxItems;
 	total_weight = 0.0;
 	amountOfItems = 1;
+	deepness = 0;
 	serializationCount = 0;
 }
 
@@ -130,6 +131,17 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 				}
 
 				addItem(item);
+
+				//deepness
+				if (item->getContainer()){
+					if (getParentContainer())
+						item->getContainer()->setDeepness(getDeepness() + 1);
+					else{ //we only update deepness when a container get inside of another, so it means that deepness is not updated
+						setDeepness(1);
+						item->getContainer()->setDeepness(2);
+					}
+				}
+
 				updateAmountOfItems(item->getTotalAmountOfItemsInside());
 				total_weight += item->getWeight();
 				if(Container* parent_container = getParentContainer()) {
@@ -335,6 +347,32 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		cylinder = cylinder->getParent();
 	}
 
+	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
+
+	if(index == INDEX_WHEREEVER && !skipLimit){
+		if(size() >= capacity())
+			return RET_CONTAINERNOTENOUGHROOM;
+	}
+
+	const Cylinder* topParent = getTopParent();
+	if(topParent != this){
+		ReturnValue ret = topParent->__queryAdd(INDEX_WHEREEVER, item, count, flags | FLAG_CHILDISOWNER);
+		if (ret != RET_NOERROR){
+			return ret;
+		}
+	}
+
+	int32_t maxDeepness = g_config.getNumber(ConfigManager::MAX_DEEPNESS_OF_CHAIN_OF_CONTAINERS);
+	if (maxDeepness > 0){
+		if (item->getContainer() && getParentContainer()){ //only containers inside of other containers have a deepness updated
+			if (getDeepness() + 1 > maxDeepness){
+				return RET_CONTAINERHASTOMANYCONTAINERS;
+			}
+		}
+	}
+
+	/* the return value of RET_CONTAINERHASTOMANYITEMS and RET_CONTAINERHASTOMANYCONTAINERS
+	   should be sent ONLY if there weren't any other error */
 	const Container* c = this;
 	int32_t max_amount_inside = g_config.getNumber(ConfigManager::MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS);
 	if (max_amount_inside > 0){
@@ -346,19 +384,7 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		while(c);
 	}
 
-	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
-
-	if(index == INDEX_WHEREEVER && !skipLimit){
-		if(size() >= capacity())
-			return RET_CONTAINERNOTENOUGHROOM;
-	}
-
-	const Cylinder* topParent = getTopParent();
-	if(topParent != this){
-		return topParent->__queryAdd(INDEX_WHEREEVER, item, count, flags | FLAG_CHILDISOWNER);
-	}
-	else
-		return RET_NOERROR;
+	return RET_NOERROR;
 }
 
 ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
@@ -559,8 +585,18 @@ void Container::__addThing(int32_t index, Thing* thing)
 	updateAmountOfItems(item->getTotalAmountOfItemsInside());
 
 	total_weight += item->getWeight();
-	if(Container* parent_container = getParentContainer()) {
+	Container* parent_container = getParentContainer();
+	if(parent_container) {
 		parent_container->updateItemWeight(item->getWeight());
+	}
+
+	if (item->getContainer()){
+		if (parent_container)
+			item->getContainer()->setDeepness(getDeepness() + 1);
+		else{ //we only update deepness when a container get inside of another, so it means that deepness is not updated
+			setDeepness(1);
+			item->getContainer()->setDeepness(2);
+		}
 	}
 
 	//send change to client
@@ -603,6 +639,17 @@ void Container::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 		parent_container->updateItemWeight(diff_weight);
 	}
 
+	//deepness
+	if (item->getContainer()){
+		if (getParentContainer()){
+			item->getContainer()->setDeepness(getDeepness() + 1);
+		}
+		else{ //we only update deepness when a container get inside of another, so it means that deepness is not updated
+			setDeepness(1);
+			item->getContainer()->setDeepness(2);
+		}
+	}
+
 	//send change to client
 	if(getParent()){
 		onUpdateContainerItem(index, item, oldType, item, newType);
@@ -638,6 +685,16 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 	}
 
 	updateAmountOfItems(int32_t(int64_t(item->getTotalAmountOfItemsInside()) - (*cit)->getTotalAmountOfItemsInside()));
+
+	if ((!(*cit)->getContainer()) && item->getContainer()){
+		if (getParentContainer()){
+			item->getContainer()->setDeepness(getDeepness() + 1);
+		}
+		else{ //we only update deepness when a container get inside of another, so it means that deepness is not updated
+			setDeepness(1);
+			item->getContainer()->setDeepness(2);
+		}
+	}
 
 	total_weight -= (*cit)->getWeight();
 	total_weight += item->getWeight();
@@ -712,7 +769,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 		//send change to client
 		if(getParent()){
 			if(Container* parent_container = getParentContainer()) {
-				parent_container->updateItemWeight(-item->getWeight());\
+				parent_container->updateItemWeight(-item->getWeight());
 			}
 			onRemoveContainerItem(index, item);
 		}
@@ -856,10 +913,22 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 
 	item->setParent(this);
 	itemlist.push_front(item);
+
 	updateAmountOfItems(item->getTotalAmountOfItemsInside());
+
 	total_weight += item->getWeight();
-	if(Container* parent_container = getParentContainer()) {
+	Container* parent_container = getParentContainer();
+	if(parent_container){
 		parent_container->updateItemWeight(item->getWeight());
+	}
+
+	if (item->getContainer()){
+		if (parent_container)
+			item->getContainer()->setDeepness(getDeepness() + 1);
+		else{ //we only update deepness when a container gets inside of another, so it means that deepness is not updated
+			setDeepness(1);
+			item->getContainer()->setDeepness(2);
+		}
 	}
 }
 
