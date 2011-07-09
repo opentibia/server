@@ -84,6 +84,8 @@ Creature()
 	defenseTicks = 0;
 	yellTicks = 0;
 	extraMeleeAttack = false;
+	timeOfLastHit = 0;
+	hadRecentBattleVar = false;
 
 	strDescription = mType->nameDescription;
 	toLowerCaseString(strDescription);
@@ -651,8 +653,11 @@ void Monster::onEndCondition(ConditionType_t type, bool lastCondition)
 	updateIdleStatus();
 }
 
+
 void Monster::onThink(uint32_t interval)
 {
+	updateHadRecentBattleVar();
+
 	Creature::onThink(interval);
 
 	if(despawn()){
@@ -1431,7 +1436,21 @@ void Monster::changeHealth(int32_t healthChange)
 	//In case a player with ignore flag set attacks the monster
 	setIdle(false);
 	semiIdle = false;
+
+	if(healthChange < 0){
+		timeOfLastHit = OTSYS_TIME();
+		updateHadRecentBattleVar();
+		}
 	Creature::changeHealth(healthChange);
+}
+
+void Monster::updateHadRecentBattleVar()
+{
+	bool newRecentBattleVar = ((timeOfLastHit > 0) && OTSYS_TIME() < timeOfLastHit + 30000);
+	if(newRecentBattleVar != hadRecentBattleVar){
+		hadRecentBattleVar = newRecentBattleVar;
+		updateMapCache();
+	}
 }
 
 bool Monster::challengeCreature(Creature* creature)
