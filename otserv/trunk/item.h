@@ -365,7 +365,7 @@ public:
 
 	// get the number of items
 	uint16_t getItemCount() const {return count;}
-	void setItemCount(uint8_t n) {count = n;}
+	void setItemCount(uint8_t n) {if(n < 1) n = 1; count = n;}
 
 	static uint32_t countByType(const Item* i, int32_t subType);
 
