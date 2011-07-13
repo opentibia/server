@@ -243,6 +243,9 @@ max_amount_items_inside_containers = 5000
 --maximal length for chains of containers (i.e, a container inside of a container which is inside of a container...)
 max_deepness_of_chain_of_containers = 500
 
+--should OTServ bind only global IP address ?
+bind_only_global_address = false
+
 -- How many items can be stacked in a single tile (all type of tiles)(client side)? DO NOT CHANGE IT UNLESS THAT YOU KNOW WHAT YOU ARE DOING
 max_stack_size = 1000
 

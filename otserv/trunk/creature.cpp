@@ -854,13 +854,14 @@ Item* Creature::dropCorpse()
 	Item* corpse = createCorpse();
 	if(corpse){
 		g_game.internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
-		dropLoot(corpse->getContainer());
 		g_game.startDecay(corpse);
 	}
 
 	//scripting event - onDie
 	this->onDieEvent(corpse);
-
+	if(corpse)
+		dropLoot(corpse->getContainer());
+		
 	return corpse;
 }
 

@@ -147,20 +147,28 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 {
 	InstantSpell* instant = dynamic_cast<InstantSpell*>(event);
 	RuneSpell* rune = dynamic_cast<RuneSpell*>(event);
-	if(!instant && !rune)
-		return false;
 
 	if(instant){
+		if(instants.find(instant->getWords()) != instants.end())
+		{
+			std::cout << "[Warning - Spells::registerEvent] Duplicate registered instant spell with words: " << instant->getWords() << std::endl;
+			return false;
+		}
+
 		instants[instant->getWords()] = instant;
+		return true;
 	}
 	else if(rune){
-		runes[rune->getRuneItemId()] = rune;
-	}
-	else{
-		return false;
-	}
+		if(runes.find(rune->getRuneItemId()) != runes.end())
+		{
+			std::cout << "[Warning - Spells::registerEvent] Duplicate registered rune with id: " << rune->getRuneItemId() << std::endl;
+			return false;
+		}
 
-	return true;
+		runes[rune->getRuneItemId()] = rune;
+		return true;
+	}
+	return false;
 }
 
 bool BaseSpell::internalExecuteCastSpell(Event *event, Creature* creature, const LuaVariant& var, bool &result)

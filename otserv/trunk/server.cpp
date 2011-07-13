@@ -25,13 +25,14 @@
 
 #include "server.h"
 #include "scheduler.h"
+#include "configmanager.h"
 #include "connection.h"
 #include "outputmessage.h"
 #include "ban.h"
 #include "logger.h"
 
 extern BanManager g_bans;
-
+extern ConfigManager g_config;
 
 bool ServicePort::m_logError = true;
 
@@ -265,9 +266,16 @@ void ServicePort::open(uint16_t port)
 	m_pendingStart = false;
 
 	try{
-		m_acceptor = new boost::asio::ip::tcp::acceptor(m_io_service, boost::asio::ip::tcp::endpoint(
-			boost::asio::ip::address(boost::asio::ip::address_v4(INADDR_ANY)), m_serverPort));
-
+		if(g_config.getNumber(ConfigManager::BIND_ONLY_GLOBAL_ADDRESS))
+		{
+			m_acceptor = new boost::asio::ip::tcp::acceptor(m_io_service, boost::asio::ip::tcp::endpoint(
+				boost::asio::ip::address(boost::asio::ip::address_v4::from_string(g_config.getString(ConfigManager::IP))), m_serverPort));
+		}
+		else
+		{
+			m_acceptor = new boost::asio::ip::tcp::acceptor(m_io_service, boost::asio::ip::tcp::endpoint(
+				boost::asio::ip::address(boost::asio::ip::address_v4(INADDR_ANY)), m_serverPort));
+		}	
 		accept();
 	}
 	catch(boost::system::system_error& e){

@@ -742,6 +742,9 @@ std::string playerSexSubjectString(PlayerSex_t sex)
 #define MOD_ADLER 65521
 uint32_t adlerChecksum(uint8_t *data, int32_t len)
 {
+	if(len > NETWORKMESSAGE_MAXSIZE)
+		return 0;
+		
 	if(len < 0){
 		std::cout << "[Error] adlerChecksum. len < 0" << std::endl;
 		return 0;
