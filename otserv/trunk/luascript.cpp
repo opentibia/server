@@ -728,7 +728,7 @@ bool LuaScriptInterface::initState()
 	if(loadFile(std::string(datadir + "global.lua")) == -1){
 		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << datadir << "global.lua." << std::endl;
 	}
-
+	
 	lua_newtable(m_luaState);
 	lua_setfield(m_luaState, LUA_REGISTRYINDEX, "EVENTS");
 
@@ -2013,6 +2013,9 @@ void LuaScriptInterface::registerFunctions()
 	
 	//doPlayerSetStamina(cid, minutes)
 	lua_register(m_luaState, "doPlayerSetStamina", LuaScriptInterface::luaDoPlayerSetStamina);	
+	
+	//getPlayerModes(cid)
+	lua_register(m_luaState, "getPlayerModes", LuaScriptInterface::luaGetPlayerModes);
 	
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
@@ -9391,6 +9394,26 @@ int LuaScriptInterface::luaDoPlayerSetStamina(lua_State* L)
 		lua_pushboolean(L, false);
 	}
 
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerModes(lua_State* L)
+{
+	//getPlayerModes(cid)
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(popNumber(L));
+	if(!player)
+	{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_newtable(L);
+	setField(L, "chase", player->getChaseMode());
+	setField(L, "fight", player->getFightMode());
+	setField(L, "safe", player->hasSafeMode());
 	return 1;
 }
 

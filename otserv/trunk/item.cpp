@@ -1085,7 +1085,7 @@ std::string Item::getXRayDescription() const
 		ret << "Action ID: " << actionId << std::endl;
 	if(uniqueId > 0)
 		ret << "Unique ID: " << uniqueId << std::endl;
-	#ifndef __DEBUG__XXXXXX
+	#ifdef __DEBUG__
 	if (getContainer())
 		ret << "There are " << getContainer()->getTotalAmountOfItemsInside() - 1 << " things inside of this." << std::endl;
 	#endif

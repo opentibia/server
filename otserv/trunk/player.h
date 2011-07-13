@@ -345,7 +345,9 @@ public:
 	void setIdleTime(uint32_t value, bool warned){idleTime = value; idleWarned = warned;}
 
 	void setChaseMode(chaseMode_t mode);
+	chaseMode_t getChaseMode() const {return chaseMode;}
 	void setFightMode(fightMode_t mode);
+	fightMode_t getFightMode() const {return fightMode;}
 	void setSafeMode(bool _safeMode) {safeMode = _safeMode;}
 	bool hasSafeMode() const {return safeMode;}
 	uint16_t getIcons() const;

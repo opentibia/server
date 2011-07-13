@@ -513,7 +513,7 @@ protected:
 	static int luaGetCreatureCondition(lua_State *L);
 	static int luaDoPlayerSetStamina(lua_State* L);
 	static int luaGetPlayerStamina(lua_State* L);
-	
+	static int luaGetPlayerModes(lua_State* L);
 	#ifdef __GUILDWARSLUARELOAD__
 	static int luaDoUpdateGuildWar(lua_State* L);
 	#endif
