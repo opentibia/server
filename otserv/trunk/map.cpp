@@ -540,39 +540,50 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool 
 
 bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 {
-	if(Position::areInRange<1,1,15>(fromPos, toPos)){
+	if(Position::areInRange<0,0,15>(fromPos, toPos)){
 		return true;
 	}
 	
-	const int8_t mx = fromPos.x < toPos.x ? 1 : fromPos.x == toPos.x ? 0 : -1;
-	const int8_t my = fromPos.y < toPos.y ? 1 : fromPos.y == toPos.y ? 0 : -1;
-	const uint8_t ftz = std::min(fromPos.z, toPos.z);
+	Position start(fromPos.z > toPos.z ? toPos : fromPos);
+	Position destination(fromPos.z > toPos.z ? fromPos : toPos);
+	
+	const int8_t mx = start.x < destination.x ? 1 : start.x == destination.x ? 0 : -1;
+	const int8_t my = start.y < destination.y ? 1 : start.y == destination.y ? 0 : -1;
 
-	Position currentPos(fromPos.x, fromPos.y, fromPos.z);
-	int32_t A = toPos.y - fromPos.y;
-	int32_t B = fromPos.x - toPos.x;
-	int32_t C = -(A*toPos.x + B*toPos.y);
+	int32_t A = destination.y - start.y;
+	int32_t B = start.x - destination.x;
+	int32_t C = -(A*destination.x + B*destination.y);
+	
+	while(!Position::areInRange<0,0,15>(start, destination)){
+		int32_t move_hor = std::abs( A*(start.x+mx) + B*(start.y) + C );
+		int32_t move_ver = std::abs( A*(start.x) + B*(start.y+my) + C );
+		int32_t move_cross = std::abs( A*(start.x+mx) + B*(start.y+my) + C );
 
-	while( !Position::areInRange<1,1,15>(currentPos, toPos) ){
-		int32_t move_hor = std::abs( A*(currentPos.x+mx) + B*(currentPos.y) + C );
-		int32_t move_ver = std::abs( A*(currentPos.x) + B*(currentPos.y+my) + C );
-		int32_t move_cross = std::abs( A*(currentPos.x+mx) + B*(currentPos.y+my) + C );
-
-		if(currentPos.y != toPos.y && (currentPos.x == toPos.x || move_hor > move_ver || move_hor > move_cross)){
-			currentPos.y += my;
+		if(start.y != destination.y && (start.x == destination.x || move_hor > move_ver || move_hor > move_cross)){
+			start.y += my;
 		}
 		
-		if(currentPos.x != toPos.x && (currentPos.y == toPos.y || move_ver > move_hor || move_ver > move_cross)){
-			currentPos.x += mx;
+		if(start.x != destination.x && (start.y == destination.y || move_ver > move_hor || move_ver > move_cross)){
+			start.x += mx;
 		}
 
-		const Tile* tile = const_cast<Map*>(this)->getTile(currentPos.x, currentPos.y, ftz);
+		const Tile* tile = const_cast<Map*>(this)->getTile(start.x, start.y, start.z);
 		
 		if(tile && tile->hasProperty(BLOCKPROJECTILE)){
 			return false;
 		}
 	}
-
+	
+	const int8_t mz = start.z < destination.z ? 1 : start.z == destination.z ? 0 : -1;
+	while(start.z != destination.z){ // now we need to perform a jump between floors to see if everything is clear (literally)
+		const Tile* tile = const_cast<Map*>(this)->getTile(start.x, start.y, start.z);
+		if(tile && tile->getThingCount() > 0){
+			return false;
+		}
+		
+		start.z += mz;
+	}
+	
 	return true;
 }
 
