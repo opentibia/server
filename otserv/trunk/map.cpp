@@ -574,14 +574,13 @@ bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 		}
 	}
 	
-	const int8_t mz = start.z < destination.z ? 1 : start.z == destination.z ? 0 : -1;
 	while(start.z != destination.z){ // now we need to perform a jump between floors to see if everything is clear (literally)
 		const Tile* tile = const_cast<Map*>(this)->getTile(start.x, start.y, start.z);
 		if(tile && tile->getThingCount() > 0){
 			return false;
 		}
 		
-		start.z += mz;
+		start.z++;
 	}
 	
 	return true;
