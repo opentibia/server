@@ -167,6 +167,8 @@ public:
 	virtual std::string getXRayDescription() const;
 	virtual std::string getDescription(int32_t lookDistance) const;
 
+	virtual const CreatureType_t getType() const = 0;
+	
 	void setID(){this->id = auto_id | this->idRange();}
 	void setRemoved() {isInternalRemoved = true;}
 

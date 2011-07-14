@@ -126,6 +126,8 @@ public:
 	virtual const std::string& getNameDescription() const {return name;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 
+	virtual const CreatureType_t getType() const {return CREATURETYPE_PLAYER;}
+	
 	void setGUID(uint32_t _guid) {guid = _guid;};
 	uint32_t getGUID() const { return guid;};
 	virtual uint32_t idRange(){ return PLAYER_ID_RANGE;}
@@ -193,6 +195,7 @@ public:
 	uint32_t getAccountId() const {return accountId;}
 	uint32_t getLevel() const {return level;}
 	uint32_t getMagicLevel() const {return getPlayerInfo(PLAYERINFO_MAGICLEVEL);}
+	uint32_t getBaseMagicLevel() const {return magLevel;}
 	int16_t getAccessLevel() const {return accessLevel;}
 	int16_t getViolationLevel() const {return violationLevel;}
 	std::string getGroupName() const {return groupName;}
@@ -265,6 +268,8 @@ public:
 	bool isItemAbilityEnabled(slots_t slot) const {return inventoryAbilities[slot];}
 	void setItemAbility(slots_t slot, bool enabled) {inventoryAbilities[slot] = enabled;}
 
+	int32_t getBaseSkill(skills_t skill) const {return skills[skill][SKILL_LEVEL];}
+	
 	int32_t getVarSkill(skills_t skill) const {return varSkills[skill];}
 	void setVarSkill(skills_t skill, int32_t modifier) {varSkills[skill] += modifier;}
 
@@ -478,6 +483,9 @@ public:
 	void sendUpdateTile(const Tile* tile, const Position& pos)
 		{if(client) client->sendUpdateTile(tile, pos);}
 
+	void sendChannelEvent(uint16_t channelId, const std::string& playerName, ChannelEvent_t channelEvent)
+		{if(client) client->sendChannelEvent(channelId, playerName, channelEvent);}	
+		
 	void sendCreatureAppear(const Creature* creature, const Position& pos)
 		{if(client) client->sendAddCreature(creature, pos, creature->getTile()->getClientIndexOfThing(this, creature));}
 	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
@@ -590,8 +598,6 @@ public:
 	void onRemoveInventoryItem(slots_t slot, Item* item);
 
 	//other send messages
-	void sendAnimatedText(const Position& pos, unsigned char color, std::string text) const
-		{if(client) client->sendAnimatedText(pos,color,text);}
 	void sendCancel(const std::string& msg) const
 		{if(client) client->sendCancel(msg);}
 	void sendCancelMessage(ReturnValue message) const;
@@ -628,8 +634,8 @@ public:
 	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time = 0) const
 		{if(client) client->sendToChannel(creature, type, text, channelId, time);}
 	// new: shop window
-	void sendShop()
-		{if(client){client->sendShop(shopItemList);}}
+	void sendShop(Npc* npc) const
+		{if(client){client->sendShop(npc, shopItemList);}}
 	void sendSaleItemList() const
 		{if(client) client->sendSaleItemList(shopItemList);}
 	void sendCloseShop() const
@@ -648,6 +654,16 @@ public:
 		{if(client) client->sendOutfitWindow();}
 	void sendSpellCooldown(uint16_t spellId, uint32_t cooldown, bool isGroup)
 		{if(client) client->sendSpellCooldown(spellId, cooldown, isGroup);}
+		
+	void sendDamageMessage(MessageClasses mclass, const std::string& message, const Position& pos,
+			uint32_t primaryDamage = 0, TextColor_t primaryColor = TEXTCOLOR_NONE,
+			uint32_t secondaryDamage = 0, TextColor_t secondaryColor = TEXTCOLOR_NONE)
+		{if(client) client->sendDamageMessage(mclass, message, pos, primaryDamage, primaryColor, secondaryDamage, secondaryColor);}
+	void sendHealMessage(MessageClasses mclass, const std::string& message, const Position& pos, uint32_t heal, TextColor_t color)
+		{if(client) client->sendHealMessage(mclass, message, pos, heal, color);}
+	void sendExperienceMessage(MessageClasses mclass, const std::string& message, const Position& pos, uint32_t exp, TextColor_t color)
+		{if(client) client->sendExperienceMessage(mclass, message, pos, exp, color);}		
+	
 	void sendCloseContainer(uint32_t cid)
 		{if(client) client->sendCloseContainer(cid);}
 	void sendChannel(uint16_t channelId, const std::string& channelName)
@@ -701,7 +717,7 @@ public:
 	void learnInstantSpell(const std::string& name);
 	bool hasLearnedInstantSpell(const std::string& name) const;
 	void stopWalk();
-	void openShopWindow(const std::list<ShopInfo>& shop);
+	void openShopWindow(Npc* npc, const std::list<ShopInfo>& shop);
 	void closeShopWindow(bool sendCloseShopWindow = true);
 	void updateSaleShopList(uint32_t itemId);
 	bool hasShopItemForSale(uint32_t itemId, uint8_t subType);
@@ -878,7 +894,6 @@ protected:
 	int32_t purchaseCallback;
 	int32_t saleCallback;
 	std::list<ShopInfo> shopItemList;
-
 	//party variables
 	Party* party;
 	PartyList invitePartyList;

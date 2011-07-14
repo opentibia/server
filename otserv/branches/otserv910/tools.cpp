@@ -843,3 +843,15 @@ std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end)
 	}
 }
 
+std::string ucfirst(std::string str)
+{
+	for(uint32_t i = 0; i < str.length(); ++i)
+	{
+		if(str[i] != ' ')
+		{
+			str[i] = upchar(str[i]);
+			break;
+		}
+	}
+	return str;
+}

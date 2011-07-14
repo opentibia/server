@@ -871,13 +871,15 @@ Item* Creature::dropCorpse()
 	Item* corpse = createCorpse();
 	if(corpse){
 		g_game.internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
-		dropLoot(corpse->getContainer());
 		g_game.startDecay(corpse);
 	}
 
 	//scripting event - onDie
 	this->onDieEvent(corpse);
-
+	
+	if(corpse)
+		dropLoot(corpse->getContainer());
+		
 	return corpse;
 }
 
@@ -1374,18 +1376,56 @@ void Creature::onGainExperience(uint64_t gainExp, bool fromMonster)
 			}
 		}
 
-		std::stringstream strExp;
-		strExp << gainExp;
-		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
+
+		std::stringstream ssExp;
+		ssExp << getNameDescription() << " gained " << gainExp << " experience points.";
+		std::string strExp = ssExp.str();
+
+		const Position& targetPos = getPosition();
+		const SpectatorVec& list = g_game.getSpectators(targetPos);
+		Player* tmpPlayer = NULL;
+		for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it)
+		{
+			if((tmpPlayer = (*it)->getPlayer()))
+			{
+				if(tmpPlayer == getPlayer())
+				{
+					std::stringstream ss;
+					ss << "You gained " << gainExp << " experience points.";
+					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE, ss.str(), targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+				}
+				else
+					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE_OTHERS, strExp, targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+			}
+		}
 	}
 }
 
 void Creature::onGainSharedExperience(uint64_t gainExp, bool fromMonster)
 {
-	if(gainExp > 0){
-		std::stringstream strExp;
-		strExp << gainExp;
-		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
+	if(gainExp > 0)
+	{
+		std::stringstream ssExp;
+		ssExp << getNameDescription() << " gained " << gainExp << " experience points.";
+		std::string strExp = ssExp.str();
+
+		const Position& targetPos = getPosition();
+		const SpectatorVec& list = g_game.getSpectators(targetPos);
+		Player* tmpPlayer = NULL;
+		for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it)
+		{
+			if((tmpPlayer = (*it)->getPlayer()))
+			{
+				if(tmpPlayer == getPlayer())
+				{
+					std::stringstream ss;
+					ss << "You gained " << gainExp << " experience points.";
+					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE, ss.str(), targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+				}
+				else
+					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE_OTHERS, strExp, targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+			}
+		}
 	}
 }
 

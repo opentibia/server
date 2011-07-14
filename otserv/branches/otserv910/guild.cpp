@@ -355,24 +355,28 @@ void Guilds::broadcastKill(uint32_t guildId, Player* player, const DeathList& ki
 		std::stringstream msg;
 		msg << "Opponent " << player->getName() << " of the " << enemy->getName() << " was killed by " << kmsg <<
 			". The new score is " << frags << ":" << enemyFrags << " frags (limit " << it->second.fragLimit << ").";
-		guild->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
 
+		guild->broadcastMessage(SPEAK_CHANNEL_R1, msg.str());
+		
 		msg.str("");
 		msg << "Guild member " << player->getName() << " was killed by " << kmsg << " of the " << guild->getName() <<
 			". The new score is " << enemyFrags << ":" << frags << " frags (limit " << it->second.fragLimit << ").";
-		enemy->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
+		enemy->broadcastMessage(SPEAK_CHANNEL_R1, msg.str());
 
 		if(it->second.finished){
 			msg.str("");
 			msg << "Congratulations! You have won the war against " << enemy->getName() <<
 				" with " << frags << " frags.";
-			guild->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
+			guild->broadcastMessage(SPEAK_CHANNEL_R1, msg.str());
 
 			msg.str("");
 			msg << "You have lost the war against " << guild->getName() <<
 				". They have reached the limit of " << frags << " frags.";
-			enemy->broadcastMessage(SPEAK_CHANNEL_W, msg.str());
+			enemy->broadcastMessage(SPEAK_CHANNEL_R1, msg.str());
+			
+
 		}
+		
 	}
 }
 
@@ -491,6 +495,7 @@ void Guild::broadcastMessage(SpeakClasses type, const std::string& msg) const
 		channel->sendInfo(type, msg);
 	}
 }
+
 
 uint32_t Guild::isEnemy(uint32_t guildId) const
 {

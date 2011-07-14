@@ -119,6 +119,7 @@ private:
 	void parseTextWindow(NetworkMessage& msg);
 	void parseHouseWindow(NetworkMessage& msg);
 
+	void parseRuleViolationReport(NetworkMessage& msg);
 	//shop methods
 	void parseLookInShop(NetworkMessage& msg);
 	void parsePlayerPurchase(NetworkMessage& msg);
@@ -167,6 +168,7 @@ private:
 	void parseDebug(NetworkMessage& msg);
 
 	//Send functions
+	void sendChannelEvent(uint16_t channelId, const std::string& playerName, ChannelEvent_t channelEvent);
 	void sendClosePrivate(uint16_t channelId);
 	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName);
 
@@ -182,7 +184,6 @@ private:
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
 	void sendMagicEffect(const Position& pos, unsigned char type);
-	void sendAnimatedText(const Position& pos, unsigned char color, std::string text);
 	void sendCreatureHealth(const Creature* creature);
 	void sendCreatureWalkthrough(const Creature* creature, bool walkthrough);
 	void sendSkills();
@@ -198,7 +199,7 @@ private:
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
 
-	void sendShop(const std::list<ShopInfo>& shop);
+	void sendShop(Npc* npc, const std::list<ShopInfo>& shop);
 	void sendCloseShop();
 	void sendPlayerCash(uint32_t amount);
 	void sendSaleItemList(const std::list<ShopInfo>& shop);
@@ -255,7 +256,14 @@ private:
 	void sendAddInventoryItem(slots_t slot, const Item* item);
 	void sendUpdateInventoryItem(slots_t slot, const Item* item);
 	void sendRemoveInventoryItem(slots_t slot);
-
+	
+	//messages
+	void sendDamageMessage(MessageClasses mclass, const std::string& message, const Position& pos,
+		uint32_t primaryDamage = 0, TextColor_t primaryColor = TEXTCOLOR_NONE,
+		uint32_t secondaryDamage = 0, TextColor_t secondaryColor = TEXTCOLOR_NONE);
+	void sendHealMessage(MessageClasses mclass, const std::string& message, const Position& pos, uint32_t heal, TextColor_t color);
+	void sendExperienceMessage(MessageClasses mclass, const std::string& message, const Position& pos, uint32_t exp, TextColor_t color);
+	
 	//Help functions
 
 	// translate a tile to clientreadable format
@@ -271,7 +279,6 @@ private:
 
 	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
 	void AddTextMessage(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message);
-	void AddAnimatedText(NetworkMessage_ptr msg,const Position& pos, unsigned char color, const std::string& text);
 	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, unsigned char type);
 	void AddDistanceShoot(NetworkMessage_ptr msg,const Position& from, const Position& to, uint8_t type);
 	void AddCreature(NetworkMessage_ptr msg,const Creature* creature, bool known, uint32_t remove);

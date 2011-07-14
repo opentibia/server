@@ -114,30 +114,42 @@
 		<list type="female" looktype="366" name="Wayfarer"/>
 		<list type="male" looktype="367" name="Wayfarer"/>
 	</outfit>
-
+	
 	<outfit id="24" default="0">
 		<list type="female" looktype="329" name="Wedding"/>
 		<list type="male" looktype="328" name="Wedding"/>
 	</outfit>
+	
+	<outfit id="25" default="0">
+		<list type="female" looktype="430" name="Afflicated"/>
+		<list type="male" looktype="431" name="Afflicated"/>
+	</outfit>
+	
+	<outfit id="26" default="0">
+		<list type="female" looktype="432" name="Elementalist"/>
+		<list type="male" looktype="433" name="Elementalist"/>
+	</outfit>
 
-	<outfit id="25">
+	<outfit id="27">
 		<list type="femalegod" looktype="75" name="Gamemaster"/>
 		<list type="malegod" looktype="75" name="Gamemaster"/>
 		<list type="femalegm" looktype="75" name="Gamemaster"/>
 		<list type="malegm" looktype="75" name="Gamemaster"/>
 	</outfit>
 
-	<outfit id="26">
+	<outfit id="28">
 		<list type="femalegod" looktype="266" name="Community Manager"/>
 		<list type="malegod" looktype="266" name="Community Manager"/>
 		<list type="femalecm" looktype="266" name="Community Manager"/>
 		<list type="malecm" looktype="266" name="Community Manager"/>
 	</outfit>
 
-	<outfit id="27">
+	<outfit id="29">
 		<list type="femalegod" looktype="302" name="God"/>
 		<list type="malegod" looktype="302" name="God"/>
 		<list type="femalecm" looktype="302" name="God"/>
 		<list type="malecm" looktype="302" name="God"/>
 	</outfit>
+	
+
 </outfits>

@@ -15,4 +15,13 @@ if you type attackspeed="-500" you will have to wait 0.5 secs MORE before you ca
    <mount id="10" looktype="377" name="Rapid Boar" attackspeed="0" premium="1" default="0" speed="20"/>
    <mount id="11" looktype="378" name="Stampor" attackspeed="0" premium="1" default="0" speed="20"/>
    <mount id="12" looktype="379" name="Undead Cavebear" attackspeed="0" default="0" premium="1" speed="20"/>
+   <mount id="13" looktype="387" name="Mule" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="14" looktype="388" name="Tiger Slug" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="15" looktype="389" name="Uniwheel" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="16" looktype="390" name="Crystal Wolf" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="17" looktype="392" name="War Horse" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="18" looktype="401" name="Kingly Deer" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="19" looktype="402" name="Tamed Panda" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="20" looktype="405" name="Dromedary" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="21" looktype="406" name="Sandstone Scorpion" attackspeed="0" default="0" premium="1" speed="20" />
 </mounts>

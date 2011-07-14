@@ -44,7 +44,7 @@ function onSay(cid, words, param)
 		doReloadInfo(RELOAD_TYPE_ITEMS)
 		param = "items"
 	elseif param == "globalevent" or param == "globalevents" then
-		doReloadInfo(RELOAD_TYPE_GLOBAL_EVENTS)
+		doReloadInfo(RELOAD_TYPE_GLOBALEVENTS)
 		param = "globalevents"
 	else
 		param = ""

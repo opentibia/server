@@ -181,6 +181,7 @@ public:
 	bool           isHangable;
 	bool           allowDistRead;
 	bool           lookThrough;
+	bool			isAnimation;
 	uint16_t       speed;
 	int32_t        decayTo;
 	uint32_t       decayTime;

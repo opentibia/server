@@ -644,7 +644,10 @@ uint16_t Player::getIcons() const
 	if(getTile()->getZone() == ZONE_PROTECTION){
 		icons |= ICON_PZ;
 	}
-
+	
+    if(!getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT, 0)){
+		icons |= ICON_HUNGRY;
+	}
 	return icons;
 }
 
@@ -970,8 +973,8 @@ void Player::dropLoot(Container* corpse)
 		itemLoss = 0;
 		backpackLoss = 0;
 	}
-
-	if(itemLoss > 0 || backpackLoss > 0){
+	
+	if(getVocationId() != 0 && itemLoss > 0 || backpackLoss > 0){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
 			if(item){
@@ -1824,10 +1827,10 @@ void Player::onCreatureDisappear(const Creature* creature, bool isLogout)
 	}
 }
 
-void Player::openShopWindow(const std::list<ShopInfo>& shop)
+void Player::openShopWindow(Npc* npc, const std::list<ShopInfo>& shop)
 {
 	shopItemList = shop;
-	sendShop();
+	sendShop(npc);
 	sendSaleItemList();
 }
 
@@ -2147,20 +2150,6 @@ void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t da
 
 	sendStats();
 
-	std::stringstream ss;
-	if(damage == 1) {
-		ss << "You lose 1 hitpoint";
-	}
-	else
-		ss << "You lose " << damage << " hitpoints";
-
-	if(attacker){
-		ss << " due to an attack by " << attacker->getNameDescription();
-	}
-
-	ss << ".";
-
-	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
 void Player::drainMana(Creature* attacker, int32_t points)
@@ -2169,15 +2158,6 @@ void Player::drainMana(Creature* attacker, int32_t points)
 
 	sendStats();
 
-	std::stringstream ss;
-	if(attacker){
-		ss << "You lose " << points << " mana blocking an attack by " << attacker->getNameDescription() << ".";
-	}
-	else{
-		ss << "You lose " << points << " mana.";
-	}
-
-	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
 void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
@@ -2232,6 +2212,8 @@ void Player::addExperience(uint64_t exp)
 
 	if(prevLevel != newLevel){
 		level = newLevel;
+		health = healthMax;
+		mana = manaMax;
 		updateBaseSpeed();
 
 		int32_t newSpeed = getBaseSpeed();
@@ -2986,8 +2968,17 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			break;
 		case SLOT_RIGHT:
 			if(item->getSlotPosition() & SLOTP_RIGHT){
+				if(g_config.getNumber(ConfigManager::TIBIA_SLOTS))
+				{
+					if(!item->isWeapon() || (item->getWeaponType() != WEAPON_SHIELD))
+						ret = RET_NOTPOSSIBLE;
+					else if(inventory[SLOT_LEFT] && inventory[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND)
+						ret = RET_DROPTWOHANDEDITEM;
+					else
+						ret = RET_NOERROR;
+				}
 				//check if we already carry an item in the other hand
-				if(item->getSlotPosition() & SLOTP_TWO_HAND){
+				else if(item->getSlotPosition() & SLOTP_TWO_HAND){
 					if(inventory[SLOT_LEFT] && inventory[SLOT_LEFT] != item){
 						ret = RET_BOTHHANDSNEEDTOBEFREE;
 					}
@@ -3029,8 +3020,17 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			break;
 		case SLOT_LEFT:
 			if(item->getSlotPosition() & SLOTP_LEFT){
+				if(g_config.getNumber(ConfigManager::TIBIA_SLOTS))
+				{
+					if(!item->isWeapon() || item->getWeaponType() == WEAPON_SHIELD)
+						ret = RET_NOTPOSSIBLE;
+					else if(inventory[SLOT_RIGHT] && item->getSlotPosition() & SLOTP_TWO_HAND)
+						ret = RET_BOTHHANDSNEEDTOBEFREE;
+					else
+						ret = RET_NOERROR;
+				}
 				//check if we already carry an item in the other hand
-				if(item->getSlotPosition() & SLOTP_TWO_HAND){
+				else if(item->getSlotPosition() & SLOTP_TWO_HAND){
 					if(inventory[SLOT_RIGHT] && inventory[SLOT_RIGHT] != item){
 						ret = RET_BOTHHANDSNEEDTOBEFREE;
 					}
@@ -3083,9 +3083,12 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				ret = RET_NOERROR;
 			break;
 		case SLOT_AMMO:
-			if(item->getSlotPosition() & SLOTP_AMMO)
+			if((g_config.getNumber(ConfigManager::TIBIA_SLOTS)) && item->getWeaponType() != WEAPON_AMMO)
+				ret = RET_NOTPOSSIBLE;
+			else if(item->getSlotPosition() & SLOTP_AMMO)
 				ret = RET_NOERROR;
 			break;
+			
 		case SLOT_WHEREEVER:
 			ret = RET_NOTENOUGHROOM;
 			break;
@@ -4185,9 +4188,6 @@ void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 		}
 	}
 
-	std::stringstream ss;
-	ss << "You deal " << points << " damage to " << target->getNameDescription() << ".";
-	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
 void Player::onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points)

@@ -134,5 +134,6 @@ uint32_t adlerChecksum(uint8_t *data, int32_t len);
 void showTime(std::stringstream& str, uint32_t time);
 uint32_t parseTime(const std::string& time);
 std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end);
+std::string ucfirst(std::string);
 
 #endif

@@ -495,6 +495,8 @@ public:
 
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};
+	
+	virtual const CreatureType_t getType() const {return CREATURETYPE_NPC;}
 
 	void doSay(const std::string& text, SpeakClasses type, Player* player);
 	void doSayToPlayer(Player* player, const std::string& text);

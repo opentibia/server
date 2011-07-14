@@ -120,6 +120,8 @@ void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 		uint32_t fluidIndex = count % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
+	if(it.isAnimation)
+		AddByte(0xFE); // random phase (0xFF for async)
 }
 
 void NetworkMessage::AddItem(const Item* item)
@@ -135,6 +137,8 @@ void NetworkMessage::AddItem(const Item* item)
 		uint32_t fluidIndex = item->getSubType() % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
+	if(it.isAnimation)
+		AddByte(0xFE); // random phase (0xFF for async)
 }
 
 void NetworkMessage::AddItemId(const Item *item){

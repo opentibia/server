@@ -31,15 +31,19 @@ class Player;
 class Party;
 
 typedef std::map<uint32_t, Player*> UsersMap;
+typedef std::map<uint32_t, Player*> InvitedMap;
 
 enum ChannelID {
 	CHANNEL_GUILD          = 0x00,
-	CHANNEL_RULE_REP       = 0x03,
-	CHANNEL_ADVERTISE      = 0x04,
-	CHANNEL_ADVERTISE_ROOK = 0x05,
-	CHANNEL_HELP           = 0x06,
-	CHANNEL_WORLD_CHAT     = 0x07,
-	CHANNEL_PARTY          = 0x08,
+	CHANNEL_PARTY          = 0x01,
+	CHANNEL_TUTOR	       = 0x02,	//unsupported yet just const
+	CHANNEL_WORLD_CHAT     = 0x03, 
+	CHANNEL_GAMEMASTER 	   = 0x04,
+	CHANNEL_ADVERTISE      = 0x05,
+	CHANNEL_ADVERTISE_ROOK = 0x06,
+	CHANNEL_HELP           = 0x07,
+	
+	CHANNEL_RULE_REP 	   = 0xFFFF, //to complete removal
 	CHANNEL_PRIVATE        = 0xFFFF
 };
 
@@ -53,6 +57,7 @@ public:
 	bool removeUser(Player* player, bool sendCloseChannel = false);
 
 	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time = 0);
+
 	bool sendInfo(SpeakClasses type, const std::string& text, uint32_t time = 0);
 
 	const std::string& getName() const { return m_name; }
@@ -86,9 +91,8 @@ public:
 
 	void closeChannel();
 
-protected:
-	typedef std::map<uint32_t, Player*> InvitedMap;
-
+	const InvitedMap& getInvitedUsers() {return m_invites;}
+	protected:
 	InvitedMap m_invites;
 	uint32_t m_owner;
 };
