@@ -142,13 +142,17 @@ void Game::setGameState(GameState_t newState)
 					ConfigManager::DATA_DIRECTORY) + "quests.xml");
 
 				loadGameState();
+				#ifdef __GLOBALEVENTS__
 				g_globalEvents->startup();
+				#endif
 				break;
 			}
 
 			case GAME_STATE_SHUTDOWN:
 			{
+				#ifdef __GLOBALEVENTS__
 				g_globalEvents->execute(GLOBALEVENT_SHUTDOWN);
+				#endif
 				//kick all players that are still online
 				AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 				while(it != Player::listPlayer.list.end()){

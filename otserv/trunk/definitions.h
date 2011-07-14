@@ -39,6 +39,11 @@
 	#define SINGLE_SQL_DRIVER
 #endif
 
+//This is an code fully tested and shouldn't cause weird errors but marked it under flag for easier removing.
+#ifndef __GLOBALEVENTS__
+	#define __GLOBALEVENTS__
+#endif
+
 #ifdef __USE_MYSQL__
 	#ifdef SINGLE_SQL_DRIVER
 		#define MULTI_SQL_DRIVERS

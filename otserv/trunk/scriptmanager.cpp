@@ -115,6 +115,7 @@ bool ScriptingManager::loadScriptSystems()
 	}
 	std::cout << "[done]" << std::endl;
 	
+	#ifdef __GLOBALEVENTS__
 	//load global events
 	std::cout << ":: Loading GlobalEvents ...";
 	if(!g_globalEvents->loadFromXml(datadir)){
@@ -122,6 +123,7 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
-
+	#endif
+	
 	return true;
 }
