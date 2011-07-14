@@ -121,6 +121,7 @@ enum passwordType_t{
 //Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
 
+ #define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)

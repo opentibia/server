@@ -205,7 +205,7 @@ bool Map::placeCreature(const Position& centerPos, Creature* creature, bool exte
 	bool foundTile = false;
 	bool placeInPZ = false;
 
-	if(tile){
+	if(tile && !extendedPos){
 		placeInPZ = tile->hasFlag(TILESTATE_PROTECTIONZONE);
 
 		ReturnValue ret = tile->__queryAdd(0, creature, 1, FLAG_IGNOREBLOCKITEM);
@@ -486,7 +486,7 @@ const SpectatorVec& Map::getSpectators(const Position& centerPos)
 				minRangeZ = 0;
 				maxRangeZ = 7;
 			}
-			
+
 			getSpectatorsInternal(list, centerPos, false,
 				minRangeX, maxRangeX,
 				minRangeY, maxRangeY,
@@ -543,17 +543,17 @@ bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 	if(Position::areInRange<0,0,15>(fromPos, toPos)){
 		return true;
 	}
-	
+
 	Position start(fromPos.z > toPos.z ? toPos : fromPos);
 	Position destination(fromPos.z > toPos.z ? fromPos : toPos);
-	
+
 	const int8_t mx = start.x < destination.x ? 1 : start.x == destination.x ? 0 : -1;
 	const int8_t my = start.y < destination.y ? 1 : start.y == destination.y ? 0 : -1;
 
 	int32_t A = destination.y - start.y;
 	int32_t B = start.x - destination.x;
 	int32_t C = -(A*destination.x + B*destination.y);
-	
+
 	while(!Position::areInRange<0,0,15>(start, destination)){
 		int32_t move_hor = std::abs( A*(start.x+mx) + B*(start.y) + C );
 		int32_t move_ver = std::abs( A*(start.x) + B*(start.y+my) + C );
@@ -562,27 +562,27 @@ bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 		if(start.y != destination.y && (start.x == destination.x || move_hor > move_ver || move_hor > move_cross)){
 			start.y += my;
 		}
-		
+
 		if(start.x != destination.x && (start.y == destination.y || move_ver > move_hor || move_ver > move_cross)){
 			start.x += mx;
 		}
 
 		const Tile* tile = const_cast<Map*>(this)->getTile(start.x, start.y, start.z);
-		
+
 		if(tile && tile->hasProperty(BLOCKPROJECTILE)){
 			return false;
 		}
 	}
-	
+
 	while(start.z != destination.z){ // now we need to perform a jump between floors to see if everything is clear (literally)
 		const Tile* tile = const_cast<Map*>(this)->getTile(start.x, start.y, start.z);
 		if(tile && tile->getThingCount() > 0){
 			return false;
 		}
-		
+
 		start.z++;
 	}
-	
+
 	return true;
 }
 
@@ -591,7 +591,7 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 	if(floorCheck && fromPos.z != toPos.z){
 		return false;
 	}
-	
+
 	return checkSightLine(fromPos, toPos) || checkSightLine(toPos, fromPos);
 }
 
@@ -807,7 +807,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 
 	const Tile* tile = NULL;
 	AStarNode* found = NULL;
-	
+
 	while(fpp.maxSearchDist != -1 || nodes.countClosedNodes() < 100){
 		AStarNode* n = nodes.getBestNode();
 		if(!n){
@@ -819,7 +819,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 			dirList.clear();
 			return false; //no path found
 		}
-		
+
 		if(pathCondition(startPos, Position(n->x, n->y, startPos.z), fpp, bestMatch)){
 			found = n;
 			endPos = Position(n->x, n->y, startPos.z);
@@ -888,20 +888,20 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 
 		nodes.closeNode(n);
 	}
-	
+
 	int32_t prevx = endPos.x;
 	int32_t prevy = endPos.y;
 	int32_t dx, dy;
-	
+
 	if(!found){
 		return false;
 	}
-	
+
 	found = found->parent;
 	while(found){
 		pos.x = found->x;
 		pos.y = found->y;
-		
+
 		dx = pos.x - prevx;
 		dy = pos.y - prevy;
 
