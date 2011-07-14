@@ -323,7 +323,6 @@ struct ShopInfo{
 		sellPrice = _sellPrice;
 	};
 };
-typedef std::list<ShopInfo> ShopInfoList;
 enum reloadTypes_t {
 	RELOAD_TYPE_ACTIONS = 0,
 	RELOAD_TYPE_MONSTERS = 1,

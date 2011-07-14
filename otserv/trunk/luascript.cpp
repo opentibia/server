@@ -1905,7 +1905,7 @@ void LuaScriptInterface::registerFunctions()
 	//getIPByPlayerName(name)
 	lua_register(m_luaState, "getIPByPlayerName", LuaScriptInterface::luaGetIPByPlayerName);
 
-	//getPlayersByIPNumber(ip[, mask = 0xFFFFFFFF])
+	//getPlayersByIPNumber(ip)
 	lua_register(m_luaState, "getPlayersByIPAddress", LuaScriptInterface::luaGetPlayersByIPAddress);
 
 	//getDataDir()
@@ -7367,12 +7367,9 @@ int LuaScriptInterface::luaGetIPByPlayerName(lua_State *L)
 
 int LuaScriptInterface::luaGetPlayersByIPAddress(lua_State *L)
 {
-	//getPlayersByIPAddress(ip[, mask])
+	//getPlayersByIPAddress(ip)
 	int parameters = lua_gettop(L);
 
-	uint32_t mask = 0xFFFFFFFF;
-	if(parameters > 1)
-		mask = (uint32_t)popNumber(L);
 	uint32_t ip = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
