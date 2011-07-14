@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Svoren the Mad" nameDescription="svoren the mad" race="blood" experience="3000" speed="180" manacost="0">
+	<health now="6300" max="6300"/>
+	<look type="254" head="80" body="99" legs="118" feet="38" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="60" attack="150" poison="200"/>
+		<attack name="physical" interval="2000" chance="14" radius="2" target="1" range="7" min="-0" max="-130">
+			<attribute key="areaEffect" value="whitenote"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="14" radius="2" target="1" range="7" speedchange="-220" duration="20000">
+			<attribute key="areaEffect" value="whitenote"/>
+		</attack>
+		<attack name="poisonfield" interval="2000" chance="14" range="7" radius="3" target="1">
+			<attribute key="shootEffect" value="poison"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="14" radius="2" spread="2" min="-0" max="-190">
+			<attribute key="areaEffect" value="whitenote"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="27">
+		<defense name="speed" interval="2000" chance="14" speedchange="250" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element holyPercent="50"/>
+		<element physicalPercent="-5"/>
+		<element deathPercent="-20"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity ice="1"/>
+		<immunity energy="1"/>
+		<immunity earth="1"/>
+		<immunity fire="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="NO mommy NO. Leave me alone!"/>
+		<voice sentence="Not that tower again!"/>
+		<voice sentence="The cat has grown some horns!"/>
+		<voice sentence="What was I doing here again?"/>
+		<voice sentence="Are we there soon mommy?"/>
+	</voices>
+</monster>

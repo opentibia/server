@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<monster name="Dworc Venomsniper" namedescription="a dworc venomsniper" race="blood" experience="35" speed="240" manacost="300">
+	<health now="80" max="80"/>
+	<look type="216" corpse="6059"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="15"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="10" attack="15"/>
+		<attack name="poisoncondition" interval="2000" chance="25" range="7" target="1" min="-40" max="-40">
+			<attribute key="shooteffect" value="poison"/>
+		</attack>
+	</attacks>
+	<defenses armor="3" defense="15"/>
+	<elements>
+		<element holyPercent="15"/>
+		<element firePercent="-13"/>
+		<element deathPercent="-8"/>
+		<element icePercent="-13"/>
+	</elements>
+	<immunities>
+		<immunity earth="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="grak brrretz!"/>
+		<voice sentence="grow truk grrrrr."/>
+		<voice sentence="prek tars, dekklep zurk."/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="13" chance="41200" /><!-- gold coin -->
+    <item id="2467" chance="10275" /><!-- leather armor -->
+    <item id="2410" countmax="2" chance="6925" /><!-- throwing knife -->
+    <item id="2545" countmax="3" chance="3400" /><!-- poison arrow -->
+    <item id="2229" countmax="2" chance="1350" /><!-- skull -->
+    <item id="3967" chance="975" /><!-- tribal mask -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2050" chance="5550" /><!-- torch -->
+            <item id="2411" chance="2275" /><!-- poison dagger -->
+            <item id="3983" chance="550" /><!-- bast skirt -->
+            <item id="7732" chance="675" /><!-- seeds -->
+            <item id="2172" chance="600" /><!-- bronze amulet -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

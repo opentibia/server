@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Dreadbeast" nameDescription="a dreadbeast" race="undead" experience="250" speed="210" manacost="800">
+  <health now="795" max="795"/>
+  <look type="101" head="20" body="30" legs="40" feet="50" corpse="6030"/>
+  <targetchange interval="5000" chance="8"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="1"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="1"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" skill="30" attack="25" poison="20"/>
+    <attack name="drown" interval="2000" chance="18" range="7" target="1" min="-70" max="-90">
+      <attribute key="areaEffect" value="bluebubble"/>
+      <attribute key="shootEffect" value="ice"/>
+    </attack>
+    <attack name="lifedrain" interval="2000" chance="18" radius="3" max="80">
+      <attribute key="areaEffect" value="redshimmer"/>
+    </attack>
+    </attacks>
+  <defenses armor="20" defense="35">
+  		<defense name="healing" interval="2000" chance="18" min="60" max="100">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+      <elements>
+        <element physicalPercent="30"/>
+        <element firePercent="55"/>
+        <element energyPercent="15"/>
+        <element icePercent="35"/>
+        <element drownPercent="75"/>
+        <element holyPercent="-85"/>
+    </elements>
+  <immunities>
+    <immunity death="1"/>
+    <immunity earth="1"/>
+    <immunity lifedrain="1"/>
+    <immunity paralyze="1"/>
+    <immunity invisible="1"/>
+  </immunities>
+  <loot>
+    <item id="2230" chance="9100" /><!-- bone -->
+    <item id="2148" countmax="90" chance="3400" /><!-- gold coin -->
+    <item id="2229" chance="1525" /><!-- skull -->
+    <item id="5925" countmax="3" chance="700" /><!-- hardened bone -->
+    <item id="2231" chance="2225" /><!-- big bone -->
+    <item id="7618" chance="650" /><!-- health potion -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2463" chance="2150" /><!-- plate armor -->
+            <item id="2449" chance="1700" /><!-- bone club -->
+            <item id="2541" chance="850" /><!-- bone shield -->
+            <item id="2796" chance="825" /><!-- green mushroom -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

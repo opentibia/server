@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Behemoth" nameDescription="a behemoth" race="blood" experience="2500" speed="280" manacost="0">
+	<health now="4000" max="4000"/>
+	<look type="55" corpse="5999"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="80" attack="100"/>
+		<attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-200">
+			<attribute key="shootEffect" value="largerock"/>
+		</attack>
+	</attacks>
+	<defenses armor="40" defense="45">
+		<defense name="speed" interval="2000" chance="20" speedchange="290" duration="4000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="80"/>
+		<element holyPercent="30"/>
+		<element firePercent="30"/>
+		<element energyPercent="10"/>
+		<element physicalPercent="10"/>
+		<element icePercent="-10"/>
+		<element deathPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="You're so little!"/>
+		<voice sentence="Human flesh - delicious!"/>
+		<voice sentence="Crush the intruders!" yell="1"/>
+	</voices>
+	<loot>
+    <item id="2666" chance="31325" /><!-- meat -->
+    <item id="2148" countmax="100" chance="30075" /><!-- gold coin -->
+    <item id="2148" countmax="40" chance="30075" /><!-- gold coin -->
+    <item id="2645" chance="1000" /><!-- steel boots -->
+    <item id="7368" countmax="2" chance="8025" /><!-- assassin star -->
+    <item id="2387" chance="5300" /><!-- double axe -->
+    <item id="2231" chance="1250" /><!-- big bone -->
+    <item id="2377" chance="4525" /><!-- two handed sword -->
+    <item id="2489" chance="3475" /><!-- dark armor -->
+    <item id="5893" countmax="3" chance="1500" /><!-- perfect behemoth fang -->
+    <item id="2553" chance="1250" /><!-- pick -->
+    <item id="12403" chance="5100" /><!-- battle stone -->
+    <item id="2463" chance="2750" /><!-- plate armor -->
+    <item id="2393" chance="1450" /><!-- giant sword -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2150" countmax="2" chance="3500" /><!-- small amethyst -->
+            <item id="7413" chance="575" /><!-- titan axe -->
+            <item id="2174" chance="1250" /><!-- strange symbol -->
+            <item id="5930" chance="975" /><!-- behemoth claw -->
+            <item id="2023" chance="675" /><!-- amphora -->
+            <item id="7396" chance="550" /><!-- behemoth trophy -->
+            <item id="7591" chance="1300" /><!-- great health potion -->
+            <item id="2454" chance="575" /><!-- war axe -->
+            <item id="2125" chance="800" /><!-- crystal necklace -->
+            <item id="2416" chance="550" /><!-- crowbar -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

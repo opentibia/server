@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<talkactions>
+	<!-- Gods -->
+	<talkaction words="/i" access="3" filter="first word" script="createitembyid.lua"/>
+	<talkaction words="/ifr" access="3" filter="first word" script="createitembyidfront.lua"/>
+	<talkaction words="/n" access="3" filter="first word" script="createitembyname.lua"/>
+	<talkaction words="/nfr" access="3" filter="first word" script="createitembynamefront.lua"/>
+	<talkaction words="/a" access="3" filter="first word" script="teleportntiles.lua"/>
+	<talkaction words="/goto" access="3" filter="first word" script="teleportto.lua"/>
+	<talkaction words="/owner" access="3" filter="first word" script="sethouseowner.lua"/>
+	<talkaction words="/save" access="3" script="saveserver.lua"/>
+	<talkaction words="/cleanhouses" access="3" filter="first word" script="housecleaning.lua"/>
+	<talkaction words="/raid" access="3" filter="first word" function="forceRaid"/>
+	<talkaction words="/s" access="3" filter="first word" function="placeNpc"/>
+	<talkaction words="/openserver" access="3" filter="first word" script="openserver.lua"/>
+	<talkaction words="/closeserver" access="3" filter="first word" script="closeserver.lua"/>
+	<talkaction words="/shutdown" access="3" filter="first word" script="shutdown.lua"/>
+	<talkaction words="/serverdiag" access="3" filter="first word" function="serverDiagnostic"/>
+	<talkaction words="/c" access="3" filter="first word" script="teleporthere.lua"/>
+	<talkaction words="/m" access="3" filter="first word" script="placemonster.lua"/>
+	<talkaction words="/r" access="3" filter="first word" script="removething.lua"/>
+	<talkaction words="/kick" access="3" filter="first word" script="kickplayer.lua"/>
+	<talkaction words="/reload" access="3" filter="first word" script="reload.lua"/>
+	<talkaction words="/ban" access="3" filter="first word" script="banmanager.lua"/>
+	
+	<!-- Gamemasters -->
+	<talkaction words="/up" access="2" filter="first word" script="floorchange.lua"/>
+	<talkaction words="/down" access="2" filter="first word" script="floorchange.lua"/>
+	<talkaction words="/t" access="2" script="teleportmasterpos.lua"/>
+	<talkaction words="/town" access="2" filter="first word" script="teleporttotown.lua"/>
+	<talkaction words="/summon" access="2" filter="first word" script="placesummon.lua"/>
+	<talkaction words="/refreshmap" access="2" filter="first word" script="refreshmap.lua"/>
+	<talkaction words="/bc" access="2" filter="first word" script="broadcastclass.lua"/>
+	<talkaction words="/invisible" access="2" filter="first word" script="gminvisible.lua"/>
+	<talkaction words="/info" access="2" filter="first word" script="getinfo.lua"/>
+	<talkaction words="/z" access="2" filter="first word" script="testeffect.lua"/> 	 
+	<talkaction words="/zt" access="2" filter="first word" script="testtutorial.lua"/>
+
+	<!-- Tutors -->
+	<talkaction words="/serverinfo" access="1" script="serverinfo.lua"/>
+	<talkaction words="/getonline" access="1" filter="first word" script="accessonlinelist.lua"/>
+	<talkaction words="/gethouse" access="1" filter="first word" script="gethouse.lua"/>
+
+	<!-- Players -->
+	<talkaction words="!sellhouse" access="0" function="sellHouse"/>
+	<talkaction words="!buyhouse" access="0" script="buyhouse.lua"/>
+	<talkaction words="!leavehouse" access="0" script="leavehouse.lua"/>
+	<talkaction words="!houseinfo" access="0" script="houseinfo.lua"/>
+	<talkaction words="!online" access="0" script="onlinelist.lua"/>
+	<talkaction words="!frags" access="0" script="frags.lua"/>
+</talkactions>

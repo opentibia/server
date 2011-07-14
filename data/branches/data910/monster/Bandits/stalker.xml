@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Stalker" nameDescription="a stalker" race="blood" experience="90" speed="260" manacost="0">
+	<health now="120" max="120"/>
+	<look type="128" head="95" body="116" legs="95" feet="114" corpse="6080"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="60" attack="20"/>
+		<attack name="lifedrain" interval="2000" chance="20" range="7" min="-20" max="-30">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="14" defense="10">
+		<defense name="invisible" interval="2000" chance="20" duration="5000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<loot>
+    <item id="2425" chance="1675" /><!-- obsidian lance -->
+    <item id="2412" chance="1175" /><!-- katana -->
+    <item id="12430" chance="2625" /><!-- miraculum -->
+    <item id="2511" chance="5900" /><!-- brass shield -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2260" chance="9050" /><!-- blank rune -->
+            <item id="2410" countmax="2" chance="8200" /><!-- throwing knife -->
+            <item id="2148" countmax="8" chance="8050" /><!-- gold coin -->
+            <item id="2478" chance="3300" /><!-- brass legs -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

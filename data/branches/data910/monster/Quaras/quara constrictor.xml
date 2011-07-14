@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Quara Constrictor" nameDescription="a quara constrictor" race="blood" experience="250" speed="520" manacost="670">
+	<health now="450" max="450"/>
+	<look type="46" corpse="6065"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag staticattack="90"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="50" poison="20"/>
+		<attack name="lifedrain" interval="2000" chance="18" radius="3" target="0" min="-50" max="-90">
+			<attribute key="areaEffect" value="blackspark"/>
+		</attack>
+		<attack name="ice" interval="2000" chance="18" range="7" min="-40" max="-70" target="0" radius="4">
+			<attribute key="areaEffect" value="iceattack"/>
+		</attack> 	
+		<attack name="energycondition" interval="2000" chance="18" min="-75" max="-75" range="1" target="1">
+			<attribute key="shootEffect" value="energy"/>
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="15"/>
+	<elements>
+		<element earthPercent="-10"/>
+		<element energyPercent="-25"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity drown="1"/>
+		<immunity fire="1"/>
+		<immunity ice="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Gaaahhh!"/>
+		<voice sentence="Gluh! Gluh!"/>
+		<voice sentence="Tssss!"/>
+		<voice sentence="Boohaa!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="30350" /><!-- gold coin -->
+    <item id="5895" countmax="3" chance="950" /><!-- fish fin -->
+    <item id="2465" chance="2775" /><!-- brass armor -->
+    <item id="2150" chance="775" /><!-- small amethyst -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2397" chance="5525" /><!-- longsword -->
+            <item id="2670" chance="6025" /><!-- shrimp -->
+            <item id="12443" chance="10425" /><!-- quara tentacle -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

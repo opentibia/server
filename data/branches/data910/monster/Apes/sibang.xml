@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Sibang" nameDescription="a sibang" race="blood" experience="105" speed="214" manacost="0">
+	<health now="225" max="225"/>
+	<look type="118" corpse="6045"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="10" attack="40"/>
+		<attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-55">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="12">
+		<defense name="speed" interval="2000" chance="20" speedchange="306" duration="3000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="25"/>
+		<element holyPercent="10"/>
+		<element icePercent="-15"/>
+		<element deathPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="0"/>
+		<immunity paralyze="0"/>
+		<immunity outfit="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Eeeeek! Eeeeek"/>
+		<voice sentence="Huh! Huh! Huh!"/>
+		<voice sentence="Ahhuuaaa!"/>
+	</voices>
+	<loot>
+    <item id="2675" countmax="5" chance="12475" /><!-- orange -->
+    <item id="1294" countmax="3" chance="21075" /><!-- small stone -->
+    <item id="12467" chance="5275" /><!-- banana sash -->
+    <item id="2148" countmax="35" chance="32250" /><!-- gold coin -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2676" countmax="11" chance="4825" /><!-- banana -->
+            <item id="5883" countmax="3" chance="1750" /><!-- ape fur -->
+            <item id="2678" countmax="3" chance="1825" /><!-- coconut -->
+            <item id="2682" chance="1450" /><!-- melon -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

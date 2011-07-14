@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Spirit of Earth" nameDescription="the spirit of earth" race="undead" experience="800" speed="180" manacost="0">
+	<health now="1285" max="1285"/>
+	<look type="67" corpse="7349"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="78"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="60"/>
+		<attack name="physical" interval="2000" chance="14" range="7" min="-0" max="-135">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="14" range="7" radius="1" target="1" speedchange="-220" duration="5000">
+			<attribute key="areaEffect" value="sleep"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="14" length="5" spread="6" min="-0" max="-170">
+			<attribute key="areaEffect" value="groundshaker"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="14" radius="3" target="0" min="-0" max="-160">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="poisoncondition" interval="2000" chance="14" spread="0" length="6" poison="220">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>	
+	</attacks>
+	<defenses armor="30" defense="32"/>
+	<elements>
+		<element energyPercent="50"/>
+		<element deathPercent="30"/>
+		<element firePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity earth="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Show your strengh ... or perish."/>
+	</voices>
+</monster>

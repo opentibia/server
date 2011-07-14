@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Barbarian Bloodwalker" nameDescription="a barbarian bloodwalker" race="blood" experience="195" speed="236" manacost="590">
+	<health now="305" max="305"/>
+	<look type="255" head="114" body="132" legs="132" feet="132" corpse="6080"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="80"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="80"/>
+	</attacks>
+	<defenses armor="15" defense="15">
+		<defense name="speed" interval="2000" chance="25" speedchange="245" duration="40000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element physicalPercent="10"/>
+		<element holyPercent="20"/>
+		<element energyPercent="10"/>
+		<element icePercent="50"/>
+		<element deathPercent="-10"/>
+		<element earthPercent="-5"/>
+	</elements>
+	<voices interval="2000" chance="16">
+		<voice sentence="YAAAHEEE!" yell="1"/>
+		<voice sentence="SLAUGHTER!" yell="1"/>
+		<voice sentence="CARNAGE!" yell="1"/>
+		<voice sentence="You can run but you can't hide"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="12" chance="30875" /><!-- gold coin -->
+    <item id="2458" chance="11425" /><!-- chain helmet -->
+    <item id="2464" chance="10125" /><!-- chain armor -->
+    <item id="2378" chance="6650" /><!-- battle axe -->
+    <item id="2671" chance="8200" /><!-- ham -->
+    <item id="2044" chance="9000" /><!-- lamp -->
+    <item id="2381" chance="7525" /><!-- halberd -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7290" chance="750" /><!-- shard -->
+            <item id="5911" countmax="3" chance="1300" /><!-- red piece of cloth -->
+            <item id="7618" chance="1725" /><!-- health potion -->
+            <item id="3962" chance="750" /><!-- beastslayer axe -->
+            <item id="7457" chance="675" /><!-- fur boots -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

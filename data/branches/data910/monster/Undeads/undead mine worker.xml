@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Undead Mine Worker" nameDescription="a undead mine worker" race="undead" experience="45" speed="154" manacost="0">
+	<health now="65" max="65"/>
+	<look type="33" corpse="5972"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="15" attack="16"/>
+		<attack name="lifedrain" interval="2000" chance="25" range="7" min="-7" max="-13"/>
+	</attacks>
+	<defenses armor="2" defense="9"/>
+	<elements>
+		<element holyPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity death="1"/>
+	</immunities>
+	<loot>
+    <item id="2148" countmax="9" chance="39975" /><!-- gold coin -->
+    <item id="2230" chance="47875" /><!-- bone -->
+    <item id="2789" chance="5750" /><!-- brown mushroom -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2787" countmax="3" chance="6650" /><!-- white mushroom -->
+            <item id="2398" chance="26825" /><!-- mace -->
+            <item id="2376" chance="3125" /><!-- sword -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

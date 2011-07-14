@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Rift Worm" nameDescription="a rift worm" race="blood" experience="1950" speed="136" manacost="0">
+	<health now="2800" max="2800"/>
+	<look type="295" corpse="0"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="0"/>
+		<flag staticattack="50"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="70" attack="40"/>
+		<attack name="manadrain" interval="2000" chance="20" range="7" min="-500" max="-1000"/>
+	</attacks>
+	<defenses armor="30" defense="40">
+		<defense name="invisible" interval="2000" chance="33">
+			<attribute key="areaEffect" value="groundshaker"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element holyPercent="-5"/>
+		<element firePercent="-5"/>
+		<element physicalPercent="-5"/>
+		<element icePercent="-5"/>
+		<element earthPercent="30"/>
+		<element deathPercent="5"/>
+		<element energyPercent="10"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+</monster>
+

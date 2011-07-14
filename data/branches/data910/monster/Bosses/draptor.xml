@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Draptor" nameDescription="a draptor" race="blood" experience="2400" speed="500" manacost="0">
+	<health now="3000" max="3000"/>
+	<look type="382" corpse="13247"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="90"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="300"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="60"/>
+		<attack name="energy" interval="2000" chance="22" radius="3" min="-130" max="-260">
+			<attribute key="areaEffect" value="yellowenergy"/>
+		</attack>
+		<attack name="energy" interval="2000" chance="22" range="7" target="1" min="-200" max="-300">
+			<attribute key="shootEffect" value="energyball"/>
+			<attribute key="areaEffect" value="energy"/>
+		</attack>	
+		<attack name="fire" interval="2000" chance="22" length="8" spread="3" min="-200" max="-300">
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>	
+	</attacks>
+	<defenses armor="30" defense="31">
+		<defense name="healing" interval="2000" chance="22" min="250" max="350">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="22" speedchange="360" duration="20000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<loot>
+    <item id="2148" countmax="100" chance="42625" /><!-- gold coin -->
+    <item id="2148" countmax="80" chance="42625" /><!-- gold coin -->
+    <item id="7589" chance="16625" /><!-- strong mana potion -->
+    <item id="7588" chance="19850" /><!-- strong health potion -->
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

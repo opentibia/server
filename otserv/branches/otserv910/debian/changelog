@@ -1,0 +1,5 @@
+otserv (0.6.3.SVN-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Ivan Vucica <ivucica@gmail.com>  Tue, 24 Mar 2009 18:52:48 +0100

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Pirate Corsair" nameDescription="a pirate corsair" race="blood" experience="350" speed="230" manacost="775">
+	<health now="675" max="675"/>
+	<look type="98" corpse="6080"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag staticattack="90"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="75" attack="40"/>
+		<attack name="physical" interval="2000" chance="20" range="7" max="-150">
+			<attribute key="shootEffect" value="throwingstar"/>
+		</attack>
+		<attack name="melee" interval="2000" chance="20" target="0" min="-0" max="-0">
+			<attribute key="areaEffect" value="rednote"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="20"/>
+	<elements>
+		<element earthPercent="20"/>
+		<element holyPercent="10"/>
+		<element deathPercent="-5"/>
+		<element icePercent="5"/>
+		<element firePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Give up!"/>
+		<voice sentence="Hiyaa!"/>
+		<voice sentence="Plundeeeeer!"/>
+	</voices>
+	<loot>
+    <item id="2399" countmax="12" chance="4875" /><!-- throwing star -->
+    <item id="5553" chance="575" /><!-- rum flask -->
+    <item id="2148" countmax="88" chance="18725" /><!-- gold coin -->
+    <item id="2385" chance="10300" /><!-- sabre -->
+    <item id="11219" chance="10600" /><!-- compass -->
+    <item id="2521" chance="1825" /><!-- dark shield -->
+    <item id="6126" chance="925" /><!-- peg leg -->
+    <item id="5462" chance="775" /><!-- pirate boots -->
+    <item id="6097" countmax="3" chance="1075" /><!-- hook -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2489" chance="2350" /><!-- dark armor -->
+            <item id="5926" chance="1400" /><!-- pirate backpack -->
+            <item id="7588" chance="1250" /><!-- strong health potion -->
+            <item id="6098" chance="1025" /><!-- eye patch -->
+            <item id="6096" chance="1250" /><!-- pirate hat -->
+            <item id="5812" chance="650" /><!-- skull candle -->
+            <item id="2114" chance="700" /><!-- piggy bank -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

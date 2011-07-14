@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Pirate Cutthroat" nameDescription="a pirate cutthroat" race="blood" experience="175" speed="230" manacost="495">
+	<health now="325" max="325"/>
+	<look type="96" corpse="6080"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag staticattack="90"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="75" attack="40" poison="80"/>
+		<attack name="fire" interval="200" chance="25" range="1" radius="1" target="1" min="-0" max="-95">
+			<attribute key="areaEffect" value="explosion"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="23"/>
+	<elements>
+		<element earthPercent="10"/>
+		<element holyPercent="20"/>
+		<element deathPercent="-5"/>
+		<element firePercent="-5"/>
+		<element icePercent="5"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Give up!"/>
+		<voice sentence="Hiyaa!"/>
+		<voice sentence="Plundeeeeer!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="50" chance="32175" /><!-- gold coin -->
+    <item id="5710" chance="2550" /><!-- light shovel -->
+    <item id="11219" chance="10400" /><!-- compass -->
+    <item id="5927" chance="1600" /><!-- pirate bag -->
+    <item id="2509" chance="3425" /><!-- steel shield -->
+    <item id="5706" chance="1375" /><!-- treasure map -->
+    <item id="2483" chance="3350" /><!-- scale armor -->
+    <item id="6098" chance="1050" /><!-- eye patch -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="5918" chance="1500" /><!-- pirate knee breeches -->
+            <item id="6126" chance="975" /><!-- peg leg -->
+            <item id="6097" countmax="3" chance="1075" /><!-- hook -->
+            <item id="5553" chance="625" /><!-- rum flask -->
+            <item id="5792" chance="550" /><!-- dice -->
+            <item id="10103" chance="500" /><!-- very old piece of paper -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Madareth" nameDescription="madareth" race="fire" experience="10000" speed="330" manacost="0">
+	<health now="75000" max="75000"/>
+	<look type="12" head="77" body="116" legs="82" feet="79" corpse="6068"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="85"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="200" attack="180"/>
+		<attack name="energy" interval="2000" chance="14" range="3" target="1" min="-180" max="-860">
+			<attribute key="areaEffect" value="purpleenergy"/>
+		</attack>
+		<attack name="death" interval="2000" chance="14" length="8" spread="0" min="-600" max="-850">
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="madareth skills" interval="2000" chance="14" >
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="manadrain" interval="2000" chance="14" target="1" spread="1" min="-250" max="-850">
+			<attribute key="areaEffect" value="energyarea"/>
+		</attack>
+		<attack name="manadrain" interval="2000" chance="14" range="7" target="1" radius="5" min="-0" max="-225">
+			<attribute key="areaEffect" value="energyarea"/>
+		</attack>
+	</attacks>
+	<defenses armor="48" defense="46"/>
+	<elements>
+		<element icePercent="25"/>
+		<element firePercent="-10"/>
+		<element deathPercent="95"/>
+	</elements>
+	<immunities>
+		<immunity energy="1"/>
+		<immunity invisible="1"/>
+		<immunity paralyze="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="I am going to play with yourself!"/>
+		<voice sentence="Feel my wrath!"/>
+		<voice sentence="No one matches my battle prowess!"/>
+		<voice sentence="You will all die!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="45875" /><!-- gold coin -->
+    <item id="2148" countmax="54" chance="45875" /><!-- gold coin -->
+    <item id="9811" chance="43550" /><!-- rusty legs -->
+    <item id="5954" countmax="2" chance="12525" /><!-- demon horn -->
+    <item id="9808" chance="72650" /><!-- rusty armor -->
+    <item id="7443" chance="28350" /><!-- bullseye potion -->
+    <item id="2183" chance="23275" /><!-- hailstorm rod -->
+    <item id="7404" chance="13150" /><!-- assassin dagger -->
+    <item id="2169" chance="6825" /><!-- time ring -->
+    <item id="7591" chance="32150" /><!-- great health potion -->
+    <item id="2152" countmax="30" chance="16650" /><!-- platinum coin -->
+    <item id="8473" chance="19500" /><!-- ultimate health potion -->
+    <item id="7440" chance="32150" /><!-- mastermind potion -->
+    <item id="2396" chance="18225" /><!-- ice rapier -->
+    <item id="1988" chance="100000"><!-- bag -->
+        <inside>
+            <item id="6300" chance="22025" /><!-- death ring -->
+            <item id="6500" chance="8100" /><!-- demonic essence -->
+            <item id="8912" chance="14425" /><!-- springsprout rod -->
+            <item id="8472" chance="30875" /><!-- great spirit potion -->
+            <item id="7439" chance="25825" /><!-- berserk potion -->
+            <item id="2071" chance="14425" /><!-- lyre -->
+            <item id="8910" chance="22025" /><!-- underworld rod -->
+            <item id="2207" chance="10625" /><!-- sword ring -->
+            <item id="2072" chance="9350" /><!-- lute -->
+            <item id="2214" chance="14425" /><!-- ring of healing -->
+            <item id="3953" chance="14425" /><!-- war drum -->
+            <item id="2187" chance="13150" /><!-- wand of inferno -->
+            <item id="2377" chance="18225" /><!-- two handed sword -->
+            <item id="7386" chance="10625" /><!-- mercenary sword -->
+            <item id="2208" chance="9350" /><!-- axe ring -->
+            <item id="7590" chance="19500" /><!-- great mana potion -->
+            <item id="7449" chance="11900" /><!-- crystal sword -->
+            <item id="8920" chance="13150" /><!-- wand of starstorm -->
+            <item id="2168" chance="16950" /><!-- life ring -->
+            <item id="7407" chance="9350" /><!-- haunted blade -->
+            <item id="2213" chance="10625" /><!-- dwarven ring -->
+            <item id="7383" chance="8100" /><!-- relic sword -->
+            <item id="3952" chance="4300" /><!-- didgeridoo -->
+            <item id="7416" chance="13150" /><!-- bloody edge -->
+            <item id="2374" chance="6825" /><!-- wooden flute -->
+            <item id="3957" chance="4300" /><!-- war horn -->
+            <item id="2209" chance="6825" /><!-- club ring -->
+            <item id="8922" chance="8100" /><!-- wand of voodoo -->
+            <item id="7418" chance="1775" /><!-- nightmare blade -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

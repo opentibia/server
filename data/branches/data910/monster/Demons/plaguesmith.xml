@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Plaguesmith" nameDescription="a plaguesmith" race="blood" experience="4500" speed="340" manacost="0">
+	<health now="8250" max="8250"/>
+	<look type="247" corpse="6516"/>
+	<targetchange interval="5000" chance="16"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="500"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="1500" skill="90" attack="100" poison="200"/>
+		<attack name="speed" interval="2000" chance="22" range="7" target="1" speedchange="-200" duration="20000">
+			<attribute key="areaEffect" value="greenshimmer"/>
+		</attack>
+		<attack name="earth" interval="2000" chance="22" range="7" radius="4" target="0" min="-60" max="-110">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="22" length="3" spread="2" min="-100" max="-350">
+			<attribute key="areaEffect" value="greenbubble"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="25">
+		<defense name="healing" interval="2000" chance="22" min="175" max="225">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="4000" chance="22" speedchange="440" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="30"/>
+		<element icePercent="20"/>
+		<element deathPercent="10"/>
+		<element energyPercent="-10"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity earth="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="3000" chance="30">
+		<voice sentence="You are looking a bit feverish today!"/>
+		<voice sentence="You don't look that good!"/>
+		<voice sentence="Hachoo!"/>
+		<voice sentence="Cough Cough!"/>
+	</voices>
+	<loot>
+    <item id="7365" countmax="4" chance="5575" /><!-- onyx arrow -->
+    <item id="2150" countmax="3" chance="3900" /><!-- small amethyst -->
+    <item id="2394" chance="30900" /><!-- morning star -->
+    <item id="2148" countmax="100" chance="43250" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="43250" /><!-- gold coin -->
+    <item id="2148" countmax="70" chance="43250" /><!-- gold coin -->
+    <item id="2237" chance="60375" /><!-- dirty cape -->
+    <item id="2509" chance="20350" /><!-- steel shield -->
+    <item id="5944" chance="12625" /><!-- soul orb -->
+    <item id="2225" chance="20925" /><!-- piece of iron -->
+    <item id="2209" chance="5700" /><!-- club ring -->
+    <item id="2152" countmax="2" chance="6325" /><!-- platinum coin -->
+    <item id="2127" chance="925" /><!-- emerald bangle -->
+    <item id="6500" countmax="3" chance="9500" /><!-- demonic essence -->
+    <item id="2377" chance="20125" /><!-- two handed sword -->
+    <item id="9810" chance="8500" /><!-- rusty armor -->
+    <item id="7591" chance="10475" /><!-- great health potion -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2417" chance="20300" /><!-- battle hammer -->
+            <item id="2235" chance="49950" /><!-- mouldy cheese -->
+            <item id="5888" chance="1500" /><!-- piece of hell steel -->
+            <item id="2477" chance="7575" /><!-- knight legs -->
+            <item id="2391" chance="2350" /><!-- war hammer -->
+            <item id="2645" chance="1775" /><!-- steel boots -->
+            <item id="2134" chance="2475" /><!-- silver brooch -->
+            <item id="2208" chance="5350" /><!-- axe ring -->
+            <item id="5889" chance="1475" /><!-- piece of draconian steel -->
+            <item id="2444" chance="1250" /><!-- hammer of wrath -->
+            <item id="5887" chance="1500" /><!-- piece of royal steel -->
+            <item id="3957" chance="625" /><!-- war horn -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

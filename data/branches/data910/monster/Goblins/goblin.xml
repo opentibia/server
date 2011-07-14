@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Goblin" nameDescription="a goblin" race="blood" experience="25" speed="200" manacost="290">
+	<health now="50" max="50"/>
+	<look type="61" corpse="6002"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="15"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="10" attack="10"/>
+		<attack name="physical" interval="2000" chance="25" range="7" target="1" min="-0" max="-25">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>
+	</attacks>
+	<defenses armor="6" defense="8"/>
+	<elements>
+		<element energyPercent="20"/>
+		<element holyPercent="20"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<voices interval="5000" chance="9">
+		<voice sentence="Me have him!"/>
+		<voice sentence="Zig Zag! Gobo attack!"/>
+		<voice sentence="Help! Goblinkiller!"/>
+		<voice sentence="Bugga! Bugga!"/>
+		<voice sentence="Me green, me mean!"/>
+	</voices>
+	<loot>
+    <item id="12495" chance="1525" /><!-- goblin ear -->
+    <item id="2379" chance="2075" /><!-- dagger -->
+    <item id="2230" chance="1800" /><!-- bone -->
+    <item id="2461" chance="2100" /><!-- leather helmet -->
+    <item id="2449" chance="5100" /><!-- bone club -->
+    <item id="2406" chance="9350" /><!-- short sword -->
+    <item id="2235" chance="1175" /><!-- mouldy cheese -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2467" chance="3400" /><!-- leather armor -->
+            <item id="2559" chance="11025" /><!-- small axe -->
+            <item id="2667" chance="13650" /><!-- fish -->
+            <item id="2148" countmax="9" chance="28550" /><!-- gold coin -->
+            <item id="1294" chance="15650" /><!-- small stone -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

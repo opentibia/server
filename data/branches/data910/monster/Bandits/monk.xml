@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Monk" nameDescription="a monk" race="blood" experience="200" speed="240" manacost="600">
+	<health now="240" max="240"/>
+	<look type="57" corpse="6080"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="70"/>
+	</attacks>
+	<defenses armor="20" defense="22">
+		<defense name="healing" interval="2000" chance="20" min="30" max="50">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="20" speedchange="320" duration="3000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element holyPercent="50"/>
+		<element deathPercent="50"/>
+		<element physicalPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Repent Heretic!"/>
+		<voice sentence="A prayer to the almighty one!"/>
+		<voice sentence="I will punish the sinners!"/>
+	</voices>
+	<loot>
+    <item id="12448" chance="4300" /><!-- rope belt -->
+    <item id="2689" chance="20200" /><!-- bread -->
+    <item id="10563" chance="6175" /><!-- book of prayers -->
+    <item id="2148" countmax="18" chance="8325" /><!-- gold coin -->
+    <item id="2044" chance="1825" /><!-- lamp -->
+    <item id="2193" chance="2650" /><!-- ankh -->
+    <item id="2401" chance="750" /><!-- staff -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="1949" chance="2475" /><!-- scroll -->
+            <item id="2015" chance="1250" /><!-- brown flask -->
+            <item id="12449" chance="1575" /><!-- safety pin -->
+            <item id="2177" chance="1150" /><!-- life crystal -->
+            <item id="2166" chance="575" /><!-- power ring -->
+            <item id="2642" chance="1500" /><!-- sandals -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Nightmare" nameDescription="a nightmare" race="blood" experience="2150" speed="380" manacost="0">
+	<health now="2700" max="2700"/>
+	<look type="245" corpse="6340"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="2000" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="250"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="50"/>
+		<attack name="death" interval="2000" chance="25" range="7" target="1" min="-130" max="-170">
+			<attribute key="shootEffect" value="death"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="25" range="7" radius="4" target="1" min="-250" max="-400">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="20">
+		<defense name="healing" interval="2000" chance="25" min="255" max="315">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="25" speedchange="450" duration="6000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="20"/>
+		<element energyPercent="20"/>
+		<element icePercent="10"/>
+		<element holyPercent="-25"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity death="1"/>
+		<immunity earth="1"/>
+		<immunity lifedrain="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Close your eyes... I want to show you something!"/>
+		<voice sentence="I will haunt you forever!"/>
+		<voice sentence="I will make you scream!"/>
+		<voice sentence="Pffffrrrrrrrrrrrr."/>
+		<voice sentence="Take a ride with me."/>
+		<voice sentence="Weeeheeheeeheee!"/>
+	</voices>
+	<loot>
+    <item id="2547" countmax="4" chance="6650" /><!-- power bolt -->
+    <item id="2671" chance="30300" /><!-- ham -->
+    <item id="11229" chance="10475" /><!-- scythe leg -->
+    <item id="11223" chance="15650" /><!-- essence of a bad dream -->
+    <item id="5944" chance="21425" /><!-- soul orb -->
+    <item id="6558" countmax="2" chance="15400" /><!-- concentrated demonic blood -->
+    <item id="6500" countmax="3" chance="10800" /><!-- demonic essence -->
+    <item id="2148" countmax="100" chance="41250" /><!-- gold coin -->
+    <item id="2148" countmax="55" chance="41250" /><!-- gold coin -->
+    <item id="6300" chance="1675" /><!-- death ring -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2152" countmax="3" chance="2075" /><!-- platinum coin -->
+            <item id="6524" chance="850" /><!-- skeleton decoration -->
+            <item id="2477" chance="1475" /><!-- knight legs -->
+            <item id="2532" chance="1475" /><!-- ancient shield -->
+            <item id="2195" chance="775" /><!-- boots of haste -->
+            <item id="2454" chance="600" /><!-- war axe -->
+            <item id="5669" chance="600" /><!-- mysterious voodoo skull -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

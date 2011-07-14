@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Scorn of the Emperor" nameDescription="scorn of the emperor" race="undead" experience="250" speed="410" manacost="0">
+<health now="78000" max="78000"/>
+<look type="351" corpse="11356"/>
+<targetchange interval="2000" chance="10"/>
+<strategy attack="100" defense="0"/>
+<flags>
+	<flag summonable="0"/>
+	<flag attackable="1"/>
+	<flag hostile="1"/>
+	<flag illusionable="0"/>
+	<flag convinceable="0"/>
+	<flag pushable="0"/>
+	<flag canpushitems="1"/>
+	<flag canpushcreatures="1"/>
+	<flag targetdistance="1"/>
+	<flag staticattack="90"/>
+	<flag runonhealth="0"/>
+	</flags>
+		<attacks>
+			<attack name="melee" interval="2000" skill="130" attack="100"/>
+			<attack name="emperor summon" interval="2000" chance="15" target="0"/>
+			<attack name="manadrain" interval="2000" chance="15" radius="5" target="0" min="-150" max="-250"/>
+			<attack name="physical" interval="2000" chance="15" range="7" target="1" min="-50" max="-300">
+				<attribute key="shootEffect" value="suddendeath"/>
+				<attribute key="areaEffect" value="mortarea"/>
+			</attack>			
+			<attack name="poisoncondition" interval="2000" chance="15" target="1" range="7" min="-200" max="-300">
+				<attribute key="shootEffect" value="poison"/>
+				<attribute key="areaEffect" value="poison"/>
+			</attack>
+			<attack name="physical" interval="2000" chance="15" radius="5" target="0">
+			<attribute key="areaEffect" value="purplenote"/>
+			</attack>
+			<attack name="energy" interval="2000" chance="15" length="8" spread="3" min="-200" max="-600">
+			<attribute key="areaEffect" value="purpleenergy"/>
+			</attack>
+		</attacks>
+		<defenses armor="45" defense="35"/>
+		<elements>
+		<element firePercent="10"/>
+		<element icePercent="50"/>
+		<element physicalPercent="-10"/>
+		<element holyPercent="-15"/>
+		<element energyPercent="-10"/>
+		</elements>
+		<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity death="1"/>
+		<immunity earth="1"/>
+		</immunities>
+</monster>

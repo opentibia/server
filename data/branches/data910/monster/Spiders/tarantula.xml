@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Tarantula" nameDescription="a tarantula" race="venom" experience="120" speed="280" manacost="485">
+	<health now="225" max="225"/>
+	<look type="219" corpse="6060"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="45" poison="40"/>
+		<attack name="earth" interval="2000" chance="20" range="3">
+			<attribute key="shootEffect" value="earth"/>
+			<attribute key="areaEffect" value="Carniphila"/>
+	</attack>
+	</attacks>
+	<defenses armor="15" defense="17">
+		<defense name="speed" interval="2000" chance="20" speedchange="340" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="10"/>
+		<element firePercent="-15"/>
+		<element icePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity outfit="1"/>
+		<immunity earth="1"/>
+		<immunity drunk="1"/>
+	</immunities>
+	<loot>
+    <item id="2148" countmax="40" chance="21975" /><!-- gold coin -->
+    <item id="11198" chance="10425" /><!-- tarantula egg -->
+    <item id="2478" chance="3650" /><!-- brass legs -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2457" chance="1625" /><!-- steel helmet -->
+            <item id="2510" chance="2525" /><!-- plate shield -->
+            <item id="2169" chance="600" /><!-- time ring -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

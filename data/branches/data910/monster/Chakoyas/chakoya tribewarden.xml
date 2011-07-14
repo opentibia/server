@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Chakoya Tribewarden" nameDescription="a chakoya tribewarden" race="blood" experience="40" speed="270" manacost="305">
+	<health now="68" max="68"/>
+	<look type="259" corpse="7320"/>
+	<targetchange interval="60000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="50"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="20" attack="20"/>
+	</attacks>
+	<defenses armor="30" defense="30"/>
+	<elements>
+		<element firePercent="25"/>
+		<element holyPercent="10"/>
+		<element energyPercent="-15"/>
+		<element deathPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity ice="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Quisavu tukavi!"/>
+		<voice sentence="Si siyoqua jamjam!"/>
+		<voice sentence="Achuq! jinuma!"/>
+		<voice sentence="Si ji jusipa!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="20" chance="21450" /><!-- gold coin -->
+    <item id="2667" chance="20100" /><!-- fish -->
+    <item id="7158" chance="675" /><!-- rainbow trout -->
+    <item id="2406" chance="4550" /><!-- short sword -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2541" chance="1600" /><!-- bone shield -->
+            <item id="7159" chance="775" /><!-- green perch -->
+            <item id="7381" chance="775" /><!-- mammoth whopper -->
+            <item id="2669" chance="600" /><!-- northern pike -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

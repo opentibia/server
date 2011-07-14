@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Bog Raider" nameDescription="a bog raider" race="venom" experience="800" speed="300" manacost="0">
+	<health now="1300" max="1300"/>
+	<look type="299" corpse="8951"/>
+	<targetchange interval="6000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="15"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="1"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="59" attack="60" poison="80"/>
+		<attack name="lifedrain" interval="2000" chance="14" min="-90" max="-140" range="7" target="1">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="14" radius="3" target="0" min="-100" max="-175">
+			<attribute key="shootEffect" value="smallearth"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="14" min="-69" max="-110" range="7" target="1">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="14" range="7" target="1" speedchange="-220" duration="5000">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="smallplants"/>
+		</attack>
+	</attacks>
+	<defenses armor="10" defense="15">
+		<defense name="healing" interval="2000" chance="14" min="65" max="95">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="-10"/>
+		<element earthPercent="30"/>
+		<element icePercent="-5"/>
+		<element physicalPercent="-5"/>
+		<element holyPercent="-5"/>
+		<element deathPercent="5"/>
+		<element firePercent="85"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="5">
+		<voice sentence="Tchhh!"/>
+		<voice sentence="Slurp!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="35775" /><!-- gold coin -->
+    <item id="2148" countmax="5" chance="35775" /><!-- gold coin -->
+    <item id="10584" chance="10525" /><!-- boggy dreads -->
+    <item id="7591" chance="2275" /><!-- great health potion -->
+    <item id="8912" chance="1625" /><!-- springsprout rod -->
+    <item id="8472" chance="2625" /><!-- great spirit potion -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2647" chance="2550" /><!-- plate legs -->
+            <item id="8473" chance="1225" /><!-- ultimate health potion -->
+            <item id="8872" chance="1025" /><!-- belted cape -->
+            <item id="8891" chance="600" /><!-- paladin armor -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

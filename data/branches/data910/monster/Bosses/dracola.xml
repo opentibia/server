@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Dracola" nameDescription="a dracola" race="undead" experience="11000" speed="410" manacost="0">
+	<health now="16200" max="16200"/>
+	<look type="231" corpse="6307"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="1"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="190" attack="70"/>
+		<attack name="lifedrain" interval="2000" chance="10" length="8" spread="3" min="-300" max="-1000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="10" length="8" spread="3" min="-200" max="-755">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="10" length="8" spread="3">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="physical" interval="3000" chance="10" range="3" min="-50" max="-750">
+			<attribute key="shootEffect" value="suddendeath"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="fire" interval="2000" chance="10" range="7" target="1" min="-200" max="-870">
+			<attribute key="shootEffect" value="fire"/>
+			<attribute key="areaEffect" value="redspark"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="10" range="7" min="-50" max="-175">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="manadrain" interval="2000" chance="10" target="1" range="7" min="-50" max="-250">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="40" defense="39">
+		<defense name="healing" interval="2000" chance="10" min="500" max="1000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element holyPercent="-18"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity death="1"/>
+		<immunity fire="1"/>
+		<immunity ice="1"/>
+		<immunity earth="1"/>
+		<immunity drown="1"/>
+	</immunities>
+	<voices interval="2000" chance="5">
+		<voice sentence="DEATH CAN'T STOP MY HUNGER!" yell="1"/>
+		<voice sentence="Your new name is breakfast"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="51500" /><!-- gold coin -->
+    <item id="2148" countmax="53" chance="51500" /><!-- gold coin -->
+    <item id="6546" chance="100000" /><!-- dracola's eye -->
+    <item id="6500" chance="95750" /><!-- demonic essence -->
+    <item id="2177" chance="57650" /><!-- life crystal -->
+    <item id="7420" chance="24300" /><!-- reaper's axe -->
+    <item id="5944" chance="95750" /><!-- soul orb -->
+    <item id="2152" countmax="4" chance="35025" /><!-- platinum coin -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2489" chance="29075" /><!-- dark armor -->
+            <item id="2146" countmax="2" chance="10025" /><!-- small sapphire -->
+            <item id="5925" chance="33825" /><!-- hardened bone -->
+            <item id="7590" chance="19550" /><!-- great mana potion -->
+            <item id="5741" chance="14800" /><!-- skull helmet -->
+            <item id="7591" chance="5250" /><!-- great health potion -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

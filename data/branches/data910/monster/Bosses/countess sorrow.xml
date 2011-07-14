@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Countess Sorrow" nameDescription="a countess sorrow" race="undead" experience="13000" speed="400" manacost="0">
+	<health now="6500" max="6500"/>
+	<look type="360" head="20" corpse="6344"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="100" attack="150" poison="880"/>
+		<attack name="lifedrain" interval="2000" chance="10" target="1" range="7" min="-100" max="-885">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="10" target="1" range="7" radius="3" min="-100" max="-695">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="10" radius="3" min="-100" max="-390">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="manadrain" interval="1000" chance="10" range="7" target="1" radius="3" min="-40" max="-65">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="20">
+		<defense name="healing" interval="2000" chance="10" min="400" max="720">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="12">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="10" speedchange="696" duration="2000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<summons maxSummons="3">
+		<summon name="Phantasm" interval="2000" chance="10" max="3"/>
+	</summons>
+	<elements>
+		<element energyPercent="10"/>
+		<element icePercent="50"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity physical="1"/>
+		<immunity death="1"/>
+		<immunity earth="1"/>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="I'm so sorry ... for youuu!"/>
+	</voices>
+	<loot>
+    <item id="2200" chance="46650" /><!-- protection amulet -->
+    <item id="2656" chance="23575" /><!-- blue robe -->
+    <item id="2424" chance="15875" /><!-- silver mace -->
+    <item id="7590" chance="23575" /><!-- great mana potion -->
+    <item id="2152" countmax="3" chance="23575" /><!-- platinum coin -->
+    <item id="5944" chance="100000" /><!-- soul orb -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2165" chance="31275" /><!-- stealth ring -->
+            <item id="2238" chance="46650" /><!-- worn leather boots -->
+            <item id="6536" chance="100000" /><!-- countess sorrow's frozen tear -->
+            <item id="6500" chance="100000" /><!-- demonic essence -->
+            <item id="2647" chance="38950" /><!-- plate legs -->
+            <item id="2148" countmax="100" chance="58800" /><!-- gold coin -->
+            <item id="2148" countmax="45" chance="58800" /><!-- gold coin -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Mimic" nameDescription="a mimic" race="blood" experience="0" speed="170" manacost="0">
+	<health now="30" max="30"/>
+	<look type="92" corpse="1740"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="0" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="5"/>
+		<flag staticattack="0"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<defenses armor="50" defense="55">
+		<defense name="speed" interval="2000" chance="9" speedchange="200" duration="20000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="9" item="2160" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="9" monster="Ashmunrah" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="9" monster="Thalas" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="9" item="2114" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="5676" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="2390" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="2112" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="11138" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="2343" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" monster="Demon" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="2471" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="2495" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="2469" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+			<defense name="outfit" interval="2000" chance="9" item="11249" duration="6000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+</monster>

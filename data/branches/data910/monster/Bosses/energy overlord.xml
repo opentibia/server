@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Energy Overlord" nameDescription="an energy overlord" race="undead" experience="2800" speed="290" manacost="0">
+	<health now="4000" max="4000"/>
+	<look type="290" corpse="8966"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="85"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="80"/>
+		<attack name="energy" interval="2000" chance="16" length="7" spread="0" min="0" max="-800">
+			<attribute key="areaEffect" value="purpleenergy"/>
+		</attack>
+		<attack name="energy" interval="2000" chance="16" range="3" target="1" min="0" max="-200">
+			<attribute key="areaEffect" value="purpleenergy"/>
+		</attack>
+		<attack name="earth" interval="2000" chance="16" radius="5" target="0" min="-50" max="-200">
+			<attribute key="areaEffect" value="bigplants"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="16" range="7" speedchange="-750" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="40" defense="40"/>
+	<elements>
+		<element physicalPercent="50"/>
+		<element deathPercent="20"/>
+		<element icePercent="20"/>
+		<element firePercent="20"/>
+		<element earthPercent="-25"/>
+	</elements>
+	<immunities>
+		<immunity energy="1"/>
+		<immunity holy="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<loot>
+    <item id="2148" countmax="74" chance="35850" /><!-- gold coin -->
+    <item id="2152" countmax="3" chance="40500" /><!-- platinum coin -->
+    <item id="8306" chance="100000" /><!-- pure energy -->
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Chakoya Toolshaper" nameDescription="a chakoya toolshaper" race="blood" experience="40" speed="270" manacost="355">
+	<health now="80" max="80"/>
+	<look type="259" corpse="7320"/>
+	<targetchange interval="60000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="1"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="50"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="25" attack="20"/>
+		<attack name="physical" interval="2000" chance="25" range="7" target="1" min="-0" max="-45">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="30"/>
+	<elements>
+		<element firePercent="40"/>
+		<element holyPercent="10"/>
+		<element energyPercent="-15"/>
+		<element deathPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity ice="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Chikuva!"/>
+		<voice sentence="Jinuma jamjam!"/>
+		<voice sentence="Suvituka siq chuqua!"/>
+		<voice sentence="Kiyosa sipaju!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="20" chance="22975" /><!-- gold coin -->
+    <item id="2667" countmax="2" chance="17850" /><!-- fish -->
+    <item id="2398" chance="4350" /><!-- mace -->
+    <item id="2553" chance="2125" /><!-- pick -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7441" chance="800" /><!-- ice cube -->
+            <item id="2541" chance="1600" /><!-- bone shield -->
+            <item id="7159" chance="700" /><!-- green perch -->
+            <item id="7381" chance="600" /><!-- mammoth whopper -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Pythius The Rotten" nameDescription="Pythius the rotten" race="undead" experience="7000" speed="300" manacost="0">
+  <health now="9000" max="9000"/>
+  <look type="231" corpse="0"/>
+  <targetchange interval="2000" chance="9"/>
+  <strategy attack="100" defense="0"/>
+  <flags>
+    <flag summonable="0"/>
+    <flag attackable="1"/>
+    <flag hostile="1"/>
+    <flag illusionable="0"/>
+    <flag convinceable="0"/>
+    <flag pushable="0"/>
+    <flag canpushitems="1"/>
+    <flag canpushcreatures="1"/>
+    <flag targetdistance="1"/>
+    <flag staticattack="90"/>
+    <flag runonhealth="0"/>
+  </flags>
+  <attacks>
+    <attack name="melee" interval="2000" min="0" max="-400"/>
+    <attack name="lifedrain" interval="2000" chance="10" range="7" radius="4" target="1" min="-165" max="-200">
+      <attribute key="shootEffect" value="fire"/>
+      <attribute key="areaEffect" value="redspark"/>
+    </attack>
+    <attack name="physical" interval="2500" chance="10" range="7" min="-0" max="-200">
+      <attribute key="shootEffect" value="suddendeath"/>
+      <attribute key="areaEffect" value="mortarea"/>
+    </attack>
+    <attack name="earth" interval="2000" chance="10" range="7" radius="4" target="1" min="-55" max="-155">
+      <attribute key="shootEffect" value="poison"/>
+      <attribute key="areaEffect" value="poison"/>
+    </attack>
+    <attack name="earth" interval="2000" chance="10" length="8" min="-333" max="-418">
+      <attribute key="areaEffect" value="poison"/>
+    </attack>
+    <attack name="manadrain" interval="2000" chance="10" radius="4" target="1" min="-85" max="-110">
+      <attribute key="shootEffect" value="energy"/>
+      <attribute key="areaEffect" value="energy"/>
+    </attack>
+    <attack name="speed" interval="2000" chance="10" range="7" target="1" speedchange="-650">
+      <attribute key="shootEffect" value="ice"/>
+      <attribute key="areaEffect" value="iceattack"/>
+    </attack>
+    <attack name="pythius curse" interval="2000" chance="10" range="4" target="1"/>
+    <attack name="pythius summon" interval="5000" chance="10" target="0"/>
+  </attacks>
+  <defenses armor="40" defense="45">
+  </defenses>
+  
+  <immunities>
+    <immunity paralyze="1"/>
+    <immunity invisible="1"/>
+    <immunity lifedrain="1"/>
+    <immunity death="1"/>
+    <immunity energy="1"/>
+    <immunity earth="1"/>
+  </immunities>
+  <voices interval="2000" chance="9">
+    <voice sentence="YOU'LL NEVER GET MY TREASURE!" yell="1"/>
+	<voice sentence="MINIONS, MEET YOUR NEW BROTHER!" yell="1"/>
+	<voice sentence="YOU WILL REGRET THAT YOU ARE BORN!" yell="1"/>
+	<voice sentence="YOU MADE A HUGE WASTE!" yell="1"/>
+  </voices>
+</monster>

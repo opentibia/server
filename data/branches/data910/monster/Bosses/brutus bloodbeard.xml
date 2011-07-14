@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Brutus Bloodbeard" nameDescription="Brutus Bloodbeard" race="blood" experience="500" speed="240" manacost="0">
+	<health now="1200" max="1200"/>
+	<look type="98" corpse="6080"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="50"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="50"/>
+		<attack name="physical" interval="2000" chance="20" range="7" min="-0" max="-100">
+			<attribute key="shootEffect" value="throwingknife"/>
+		</attack>
+		<attack name="drunk" interval="2000" chance="20" range="7" spread="3" length="6">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+	</attacks>
+	<defenses armor="35" defense="50"/>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<loot>
+    <item id="2666" chance="18675" /><!-- meat -->
+    <item id="2148" countmax="100" chance="52950" /><!-- gold coin -->
+    <item id="6099" chance="100000" /><!-- brutus bloodbeard's hat -->
+    <item id="2476" chance="18675" /><!-- knight armor -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2379" chance="45950" /><!-- dagger -->
+            <item id="2229" countmax="2" chance="64125" /><!-- skull -->
+            <item id="2463" chance="27775" /><!-- plate armor -->
+            <item id="10103" chance="18675" /><!-- very old piece of paper -->
+        </inside>
+    </item>
+</loot>
+
+</monster>

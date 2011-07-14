@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Nightstalker" nameDescription="a nightstalker" experience="500" speed="260" race="undead">
+	<health now="700" max="700"/>
+	<strategy attack="100" defense="0"/>
+	<targetchange speed="0" chance="8"/>
+	<look type="320" corpse="9915"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/> 
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="30" poison="80"/>
+		<attack name="speed" interval="3000" chance="22" range="7" target="1" duration="30000" speedchange="-100">
+			<attribute key="areaEffect" value="sleep"/>
+		</attack>
+		<attack name="holy" interval="2000" chance="22" range="7" radius="1" target="1" min="-60" max="-170">
+			<attribute key="shootEffect" value="smallholy"/>
+			<attribute key="areaEffect" value="holyarea"/>
+		</attack>
+	</attacks>
+	<defenses armor="10" defense="10">
+		<defense name="speed" interval="2000" chance="22" speedchange="305" duration="8000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="22" duration="5000">
+			<attribute key="areaEffect" value="yellowbubble"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="22" monster="werewolf" duration="5000">
+			<attribute key="areaEffect" value="bigclouds"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="22" monster="vampire lord" duration="5000">
+			<attribute key="areaEffect" value="bigclouds"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="22" monster="grim reaper" duration="5000">
+			<attribute key="areaEffect" value="bigclouds"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="22" monster="tarantula" duration="5000">
+			<attribute key="areaEffect" value="bigclouds"/>
+		</defense>
+		<defense name="outfit" interval="2000" chance="22" monster="ferumbras" duration="5000">
+			<attribute key="areaEffect" value="bigclouds"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element physicalPercent="-5"/>
+		<element energyPercent="-5"/>
+		<element deathPercent="-5"/>
+		<element icePercent="20"/>
+		<element holyPercent="20"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/> 
+	</immunities> 
+	<voices speed="5000" chance="9">
+		<voice sentence="The sunlight is so depressing." yell="1"/>
+		<voice sentence="Come with me, my child." yell="1"/>
+		<voice sentence="I've been in the shadow under your bed last night." yell="1"/>
+		<voice sentence="You never know what hides in the night."/>
+		<voice sentence="I remember your face - and I know where you sleep"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="34600" /><!-- gold coin -->
+    <item id="2148" countmax="9" chance="34600" /><!-- gold coin -->
+    <item id="2804" chance="5125" /><!-- shadow herb -->
+    <item id="8870" chance="1050" /><!-- spirit cloak -->
+    <item id="7589" chance="2075" /><!-- strong mana potion -->
+    <item id="2200" chance="1575" /><!-- protection amulet -->
+    <item id="2195" chance="600" /><!-- boots of haste -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2124" chance="1400" /><!-- crystal ring -->
+            <item id="9942" chance="650" /><!-- crystal of balance -->
+            <item id="7407" chance="775" /><!-- haunted blade -->
+            <item id="2171" chance="750" /><!-- platinum amulet -->
+            <item id="7427" chance="575" /><!-- chaos mace -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Damaged Worker Golem" nameDescription="a damaged worker golem" race="energy" experience="95" speed="270" manacost="0">
+	<health now="260" max="260"/>
+	<look type="304" corpse="9801"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="15"/>	
+		<attack name="physical" interval="2000" chance="20" range="7" target="1" min="-0" max="-45">
+			<attribute key="shootEffect" value="smallstone"/>
+		</attack>		
+	</attacks>
+	<defenses armor="40" defense="45">
+		<defense name="healing" interval="2000" chance="20" min="11" max="41">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="50"/>
+		<element holyPercent="50"/>
+		<element energyPercent="-5"/>
+		<element physicalPercent="10"/>
+		<element icePercent="10"/>
+		<element deathPercent="10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity paralyze="1"/>
+	</immunities>
+	<voices interval="2500" chance="9">
+		<voice sentence="Klonk klonk klonk"/>
+		<voice sentence="Failure! Failire!"/>
+		<voice sentence="Good morning citizen. How may I serve you?"/>
+		<voice sentence="Target identified: Rat! Termination initiated!"/>
+	</voices>
+	<loot>
+    <item id="9808" chance="10325" /><!-- rusty armor -->
+    <item id="2148" countmax="88" chance="18200" /><!-- gold coin -->
+    <item id="8309" chance="1450" /><!-- nail -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="5880" countmax="3" chance="900" /><!-- iron ore -->
+            <item id="10572" chance="625" /><!-- gear crystal -->
+            <item id="2207" chance="1050" /><!-- sword ring -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

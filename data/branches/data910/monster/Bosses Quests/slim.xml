@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Slim" nameDescription="slim" race="undead" experience="580" speed="200" manacost="0">
+	<health now="1025" max="1025"/>
+	<look type="101" corpse="7349"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="50" poison="60"/>
+		<attack name="physical" interval="2000" chance="16" min="-10" max="-50">
+			<attribute key="areaEffect" value="blackSpark"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="16" radius="3" target="0" min="-0" max="-55">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="16" radius="3" target="0" min="-0" max="-55">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="poison" interval="2000" chance="16" min="-0" max="-55">
+			<attribute key="shootEffect" value="poison"/>
+		</attack>
+	</attacks>
+	<defenses armor="36" defense="38"/>
+	<elements>
+		<element physicalPercent="-20"/>
+		<element firePercent="-10"/>
+		<element holyPercent="-20"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity death="1"/>
+		<immunity earth="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="Zhroozzzzs."/>
+	</voices>
+</monster>

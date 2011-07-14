@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Elf" nameDescription="a elf" race="blood" experience="42" speed="220" manacost="320">
+	<health now="100" max="100"/>
+	<look type="62" corpse="6003"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="10" attack="15"/>
+		<attack name="physical" interval="2000" chance="25" range="7" target="1" min="-0" max="-25">
+			<attribute key="shootEffect" value="arrow"/>
+		</attack>
+	</attacks>
+	<defenses armor="6" defense="12"/>
+	<elements>
+		<element holyPercent="20"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Ulathil beia Thratha!"/>
+		<voice sentence="Bahaha aka!"/>
+		<voice sentence="You are not welcome here."/>
+		<voice sentence="Flee as long as you can."/>
+		<voice sentence="Death to the defilers!"/>
+	</voices>
+	<loot>
+    <item id="2544" countmax="3" chance="5700" /><!-- arrow -->
+    <item id="8839" countmax="2" chance="17250" /><!-- plum -->
+    <item id="2148" countmax="30" chance="25800" /><!-- gold coin -->
+    <item id="2484" chance="10475" /><!-- studded armor -->
+    <item id="2482" chance="16300" /><!-- studded helmet -->
+    <item id="2510" chance="9475" /><!-- plate shield -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2643" chance="12175" /><!-- leather boots -->
+            <item id="2397" chance="13075" /><!-- longsword -->
+            <item id="10552" chance="3000" /><!-- elvish talisman -->
+            <item id="5921" countmax="3" chance="1400" /><!-- heaven blossom -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

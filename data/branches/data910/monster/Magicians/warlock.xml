@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Warlock" nameDescription="a warlock" race="blood" experience="4000" speed="220" manacost="0">
+	<health now="3500" max="3500"/>
+	<look type="130" head="19" body="71" legs="128" feet="128" addons="1" corpse="6080"/>
+	<targetchange interval="5000" chance="30"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="800"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="42" attack="50"/>
+		<attack name="fire" interval="2000" chance="10" range="7" radius="3" target="1" min="-0" max="-180">
+			<attribute key="shootEffect" value="burstarrow"/>
+			<attribute key="areaEffect" value="firearea"/>
+		</attack>	
+		<attack name="firefield" interval="2000" chance="10" range="7" radius="2" target="1">
+			<attribute key="shootEffect" value="fire"/>
+		</attack>	
+		<attack name="energy" interval="2000" chance="10" range="7" target="1" min="-90" max="-170">
+			<attribute key="shootEffect" value="energyball"/>
+			<attribute key="areaEffect" value="energy"/>
+		</attack>		
+		<attack name="energy" interval="2000" chance="10" length="8" spread="0" min="-150" max="-210">
+			<attribute key="areaEffect" value="bigclouds"/>
+		</attack>	
+		<attack name="manadrain" interval="2000" chance="10" range="7" min="-0" max="-110">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</attack>	
+		<attack name="speed" interval="2000" chance="10" range="7" speedchange="-600">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>	
+	</attacks>
+	<defenses armor="25" defense="30">
+		<defense name="healing" interval="2000" chance="10" min="300" max="400">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="12">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="95"/>
+		<element holyPercent="-8"/>
+		<element physicalPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity fire="1"/>
+		<immunity energy="1"/>
+		<immunity ice="1"/>
+	</immunities>
+	<summons maxSummons="1">
+		<summon name="stone golem" interval="2000" chance="9" max="1"/>
+	</summons>
+	<voices interval="5000" chance="9">
+		<voice sentence="Learn the secret of our magic! YOUR death!"/>
+		<voice sentence="Even a rat is a better mage than you."/>
+		<voice sentence="We don't like intruders!"/>
+	</voices>
+	<loot>
+    <item id="7898" chance="1475" /><!-- lightning robe -->
+    <item id="2146" chance="1875" /><!-- small sapphire -->
+    <item id="2600" chance="1600" /><!-- inkwell -->
+    <item id="2151" chance="1600" /><!-- talon -->
+    <item id="2656" chance="2125" /><!-- blue robe -->
+    <item id="2167" chance="2425" /><!-- energy ring -->
+    <item id="2792" chance="3450" /><!-- dark mushroom -->
+    <item id="2047" chance="1800" /><!-- candlestick -->
+    <item id="2123" chance="1000" /><!-- ring of the sky -->
+    <item id="2124" chance="1200" /><!-- crystal ring -->
+    <item id="12410" chance="1025" /><!-- luminous orb -->
+    <item id="7590" chance="5475" /><!-- great mana potion -->
+    <item id="1986" chance="825" /><!-- red tome -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2411" chance="8125" /><!-- poison dagger -->
+            <item id="2436" chance="6450" /><!-- skull staff -->
+            <item id="7368" countmax="4" chance="2625" /><!-- assassin star -->
+            <item id="2178" chance="2700" /><!-- mind stone -->
+            <item id="7591" chance="5500" /><!-- great health potion -->
+            <item id="2679" countmax="4" chance="12625" /><!-- cherry -->
+            <item id="2689" chance="10000" /><!-- bread -->
+            <item id="2148" countmax="80" chance="15325" /><!-- gold coin -->
+            <item id="2466" chance="725" /><!-- golden armor -->
+            <item id="2197" chance="900" /><!-- stone skin amulet -->
+            <item id="2114" chance="600" /><!-- piggy bank -->
+        </inside>
+    </item>
+</loot>
+</monster>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- attackspeed="reducement or adjustment in attackspeed"
+if you type attackspeed="-500" you will have to wait 0.5 secs MORE before you can attack
+-->
+<mounts>
+   <mount id="1" looktype="368" name="Widow Queen" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="2" looktype="369" name="Racing Bird" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="3" looktype="370" name="War Bear" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="4" looktype="371" name="Black Sheep" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="5" looktype="372" name="Midnight Panther" attackspeed="0" default="0" premium="1" speed="20"/>
+   <mount id="6" looktype="373" name="Draptor" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="7" looktype="374" name="Titanica" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="8" looktype="375" name="Tin Lizzard" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="9" looktype="376" name="Blazebringer" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="10" looktype="377" name="Rapid Boar" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="11" looktype="378" name="Stampor" attackspeed="0" premium="1" default="0" speed="20"/>
+   <mount id="12" looktype="379" name="Undead Cavebear" attackspeed="0" default="0" premium="1" speed="20"/>
+</mounts>

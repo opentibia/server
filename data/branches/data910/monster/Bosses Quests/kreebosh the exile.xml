@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Kreebosh the Exile" nameDescription="kreebosh the exile" race="blood" experience="350" speed="270">
+	<health now="888" max="888"/>
+	<look type="103" corpse="7349"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag runonhealth="50"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="50"/>
+		<attack name="fire" interval="2000" chance="9" radius="3" min="0" max="-120">
+			<attribute key="areaEffect" value="energy"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="9" radius="1" target="1" range="5" duration="5000" speed="-220">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="9" range="7" min="-0" max="-100">
+			<attribute key="shootEffect" value="suddendeath"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="energy" interval="2000" chance="9" range="7" min="-0" max="-200">
+			<attribute key="shootEffect" value="energy"/>
+		</attack>
+		<attack name="drunk" interval="2000" chance="9" range="7" radius="1" target="1" duration="30000"/>
+		<attack name="outfit" interval="2000" chance="9" range="7" radius="1" target="1" duration="60000" monster="Rat">
+			<attribute key="areaEffect" value="greenshimmer"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="40"/>
+	<elements>
+		<element energyPercent="60"/>
+		<element earthPercent="10"/>
+		<element icePercent="-10"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="green djinn" interval="2000" chance="9" max="2"/>
+	</summons>
+	<voices interval="2000" chance="9">
+		<voice sentence="I bet you wish you weren't here."/>
+	</voices>
+</monster>

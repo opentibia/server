@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Betrayed Wraith" nameDescription="a betrayed wraith" race="blood" experience="3500" speed="310" manacost="0">
+	<health now="4200" max="4200"/>
+	<look type="233" corpse="6316"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="250"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="80" attack="100"/>
+		<attack name="skills" interval="2000" chance="14" length="8" spread="3" distance="-5">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="14" range="1" target="1" speedchange="-600" duration="3000">
+			<attribute key="shootEffect" value="death"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="15">
+		<defense name="healing" interval="2000" chance="14" min="400" max="440">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+		<defense name="invisible" interval="2000" chance="22">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+		<defense name="speed" interval="2000" chance="14" speedchange="360" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element icePercent="50"/>
+		<element holyPercent="-25"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity fire="1"/>
+		<immunity earth="1"/>
+		<immunity death="1"/>
+		<immunity energy="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Rrrah!"/>
+		<voice sentence="Gnarr!"/>
+		<voice sentence="Tcharrr!"/>
+	</voices>
+	<loot>
+    <item id="2417" chance="5250" /><!-- battle hammer -->
+    <item id="6558" chance="40150" /><!-- concentrated demonic blood -->
+    <item id="2387" chance="31950" /><!-- double axe -->
+    <item id="2148" countmax="100" chance="44200" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="44200" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="44200" /><!-- gold coin -->
+    <item id="2148" countmax="18" chance="44200" /><!-- gold coin -->
+    <item id="11233" chance="19800" /><!-- unholy bone -->
+    <item id="2152" countmax="4" chance="6525" /><!-- platinum coin -->
+    <item id="2383" chance="5100" /><!-- spike sword -->
+    <item id="5944" chance="9225" /><!-- soul orb -->
+    <item id="7364" countmax="5" chance="5650" /><!-- sniper arrow -->
+    <item id="6500" countmax="3" chance="6200" /><!-- demonic essence -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="5022" countmax="2" chance="5100" /><!-- orichalcum pearl -->
+            <item id="2145" chance="10075" /><!-- small diamond -->
+            <item id="7590" chance="1425" /><!-- great mana potion -->
+            <item id="5741" chance="1200" /><!-- skull helmet -->
+            <item id="7365" chance="650" /><!-- onyx arrow -->
+            <item id="7416" chance="725" /><!-- bloody edge -->
+            <item id="6300" chance="575" /><!-- death ring -->
+            <item id="5799" chance="725" /><!-- golden figurine -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

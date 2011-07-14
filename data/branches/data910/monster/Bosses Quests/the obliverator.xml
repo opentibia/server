@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="The Obliverator" nameDescription="the obliverator" race="fire" experience="6000" speed="280" manacost="0">
+	<health now="9500" max="9500"/>
+	<look type="35" corpse="7349"/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="90" attack="140"/>
+		<attack name="manadrain" interval="2000" chance="14" range="7" min="-0" max="-120"/>
+		<attack name="firefield" interval="2000" chance="14" range="7" radius="1" target="1">
+			<attribute key="shootEffect" value="fire"/>
+		</attack>
+		<attack name="fire" interval="2000" chance="14" range="5" radius="4" target="1" min="-0" max="-305">
+			<attribute key="areaEffect" value="firearea"/>
+			<attribute key="shootEffect" value="fire"/>
+		</attack>
+		<attack name="energy" interval="2000" chance="14" length="8" spread="0" min="-300" max="-460">
+			<attribute key="areaEffect" value="purpleenergy"/>
+		</attack>
+	</attacks>
+	<defenses armor="40" defense="45">
+	</defenses>
+	<elements>
+		<element earthPercent="40"/>
+		<element energyPercent="50"/>
+		<element deathPercent="20"/>
+		<element holyPercent="-10"/>
+		<element icePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity fire="1"/>
+	</immunities>
+	<summons maxSummons="4">
+		<summon name="fire elemental" interval="2000" chance="14" max="4"/>
+	</summons>
+	<voices interval="2000" chance="9">
+		<voice sentence="NO ONE WILL BEAT ME!" yell="1"/>
+	</voices>
+</monster>

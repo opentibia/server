@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Deathbringer" nameDescription="Deathbringer" race="undead" experience="5100" speed="300" manacost="0">
+	<health now="10000" max="10000"/>
+	<look type="231" corpse="7349"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="78"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="155" poison="200"/>
+		<attack name="poison" interval="2000" chance="9" target="1" range="7" radius="4" min="-0" max="-200">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>	
+		<attack name="poisoncondition" interval="2000" chance="9" target="1" range="7" radius="4" min="-200" max="-200">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>	
+		<attack name="physical" interval="2000" chance="9" target="1" radius="4" min="0" max="-380">
+			<attribute key="areaEffect" value="redspark"/>
+		</attack>		
+		<attack name="drowncondition" interval="2000" chance="9" length="8" spread="3">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>		
+		<attack name="earth" interval="2000" chance="9" length="8" spread="3">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>	
+		<attack name="lifedrain" interval="2000" chance="9" length="8" spread="3" max="-595">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>
+		<attack name="death" interval="2000" chance="9" range="7" target="1" max="-400">
+			<attribute key="shootEffect" value="death"/>
+			<attribute key="areaEffect" value="mortarea"/>	
+		</attack>
+	</attacks>
+	<defenses armor="15" defense="15"/>
+	<elements>
+		<element holyPercent="-20"/>
+		<element energyPercent="-20"/>
+		<element physicalPercent="10"/>
+	</elements>
+	<immunities>
+		<immunity fire="1"/>
+		<immunity ice="1"/>
+		<immunity death="1"/>
+		<immunity earth="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="YOU FOOLS WILL PAY!" yell="1"/>
+		<voice sentence="YOU ALL WILL DIE!!" yell="1"/>
+		<voice sentence="DEATH, DESTRUCTION!" yell="1"/>
+		<voice sentence="I will eat your soul!"/>
+	</voices>
+</monster>

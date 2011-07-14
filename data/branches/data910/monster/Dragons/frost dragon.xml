@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Frost Dragon" nameDescription="a frost dragon" race="undead" experience="2100" speed="260" manacost="0">
+	<health now="1800" max="1800"/>
+	<look type="248" corpse="7091"/>
+	<targetchange interval="5000" chance="6"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="250"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="100" attack="40"/>
+		<attack name="physical" interval="2000" chance="9" range="7" target="1" min="-0" max="-200">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="9" length="8" spread="3" min="-0" max="-380">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="9" length="8" spread="3" speedchange="-720" duration="5000">
+			<attribute key="areaEffect" value="icearea"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="9" radius="4" target="1" speedchange="-500" duration="5000">
+			<attribute key="shootEffect" value="ice"/>
+			<attribute key="areaEffect" value="icearea"/>
+		</attack>
+		<attack name="ice" interval="2000" chance="9" radius="4" target="1" min="-0" max="-240">
+			<attribute key="shootEffect" value="ice"/>
+			<attribute key="areaEffect" value="icearea"/>
+		</attack>
+		<attack name="ice" interval="2000" chance="9" radius="3" target="0" min="-0" max="-120">
+			<attribute key="areaEffect" value="icearea"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="9" radius="3" target="0" speedchange="-500" duration="5000">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+		<defense name="speed" interval="2000" chance="9" speedchange="360" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>	
+	</attacks>
+	<defenses armor="22" defense="35">
+		<defense name="healing" interval="2000" chance="9" min="175" max="225">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element deathPercent="10"/>
+		<element physicalPercent="15"/>
+	</elements>
+	<immunities>
+		<immunity fire="1"/>
+		<immunity ice="1"/>
+		<immunity earth="1"/>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="YOU WILL FREEZE!" yell="1"/>
+		<voice sentence="ZCHHHHH!" yell="1"/>
+		<voice sentence="I am so cool" yell="1"/>
+		<voice sentence="Chill out!." yell="1"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="33575" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="33575" /><!-- gold coin -->
+    <item id="2148" countmax="45" chance="33575" /><!-- gold coin -->
+    <item id="2672" countmax="5" chance="77600" /><!-- dragon ham -->
+    <item id="2547" countmax="6" chance="4025" /><!-- power bolt -->
+    <item id="2033" chance="3475" /><!-- golden mug -->
+    <item id="2167" chance="5650" /><!-- energy ring -->
+    <item id="2146" chance="5475" /><!-- small sapphire -->
+    <item id="2796" chance="12550" /><!-- green mushroom -->
+    <item id="7441" chance="4575" /><!-- ice cube -->
+    <item id="1976" chance="9500" /><!-- book -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2177" chance="1075" /><!-- life crystal -->
+            <item id="2492" chance="625" /><!-- dragon scale mail -->
+            <item id="7290" chance="1000" /><!-- shard -->
+            <item id="2528" chance="800" /><!-- tower shield -->
+            <item id="2396" chance="800" /><!-- ice rapier -->
+            <item id="2479" chance="925" /><!-- strange helmet -->
+            <item id="7402" chance="600" /><!-- dragon slayer -->
+            <item id="2498" chance="700" /><!-- royal helmet -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

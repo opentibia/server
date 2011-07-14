@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Mr. Punish" nameDescription="a mr. punish" race="undead" experience="5500" speed="400" manacost="0">
+	<health now="12000" max="12000"/>
+	<look type="234" corpse="6331"/>
+	<targetchange interval="2000" chance="9"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="50"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="2000"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="190"  attack="110"/>
+		<attack name="physical" interval="2000" chance="20" range="7" target="1" min="-0" max="-710">
+			<attribute key="shootEffect" value="throwingknife"/>
+		</attack>
+	</attacks>
+	<defenses armor="64" defense="72">
+		<defense name="healing" interval="2000" chance="20" min="120" max="320">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element deathPercent="-10"/>
+		<element earthPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity energy="1"/>
+		<immunity fire="1"/>
+		<immunity ice="1"/>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity outfit="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="I kept my axe sharp, especially for you!"/>
+		<voice sentence="Time for a little torturing practice!"/>
+		<voice sentence="Scream for me!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="48000" /><!-- gold coin -->
+    <item id="2148" countmax="7" chance="48000" /><!-- gold coin -->
+    <item id="6500" chance="100000" /><!-- demonic essence -->
+    <item id="5801" chance="13000" /><!-- key ring -->
+    <item id="9971" chance="42175" /><!-- gold ingot -->
+    <item id="2387" chance="33825" /><!-- double axe -->
+    <item id="5944" chance="100000" /><!-- soul orb -->
+    <item id="6537" chance="100000" /><!-- mr. punish's handcuffs -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2152" countmax="4" chance="14050" /><!-- platinum coin -->
+            <item id="7368" countmax="4" chance="6750" /><!-- assassin star -->
+            <item id="6492" chance="17175" /><!-- bat decoration -->
+            <item id="7590" chance="13000" /><!-- great mana potion -->
+            <item id="5480" chance="29675" /><!-- cat's paw -->
+            <item id="6300" chance="4675" /><!-- death ring -->
+            <item id="7591" chance="4675" /><!-- great health potion -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

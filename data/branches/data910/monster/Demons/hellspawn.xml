@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Hellspawn" nameDescription="a hellspawn" experience="2550" speed="300" race="blood" manacost="0">
+	<health now="3500" max="3500"/>
+	<strategy attack="100" defense="0"/>
+	<targetchange speed="0" chance="8"/>
+	<look type="322" corpse="9923"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="60" attack="100"/>
+		<attack name="soulfire" interval="2000" chance="30"/> 
+		<attack name="fire" interval="2000" chance="30" range="7" target="1" min="-150" max="-170">
+			<attribute key="shootEffect" value="fire"/>
+			<attribute key="areaEffect" value="fireattack"/>
+		</attack>	
+	</attacks>	
+	<defenses armor="50" defense="55">
+		<defense name="speed" interval="2000" chance="30" speedchange="380" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element physicalPercent="10"/>
+		<element energyPercent="10"/>
+		<element earthPercent="80"/>
+		<element firePercent="40"/>
+		<element deathPercent="-5"/>
+		<element icePercent="-10"/>
+		<element holyPercent="30"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/> 
+	</immunities> 
+	<voices speed="5000" chance="9">		
+		<voice sentence="Your fragile bones are like toothpicks to me." yell="0"/>		
+		<voice sentence="You little weasel will not live to see another day." yell="0"/>		
+		<voice sentence="I'm just a messenger of what's yet to come." yell="0"/>
+		<voice sentence="HRAAAAAAAAAAAAAAAARRRR!" yell="1"/>
+		<voice sentence="I'm taking you down with me!"/>
+	</voices>	 
+	<loot>
+    <item id="2475" chance="2475" /><!-- warrior helmet -->
+    <item id="2477" chance="3625" /><!-- knight legs -->
+    <item id="9809" countmax="2" chance="2200" /><!-- rusty armor -->
+    <item id="9948" chance="600" /><!-- dracoyle statue -->
+    <item id="7452" chance="1325" /><!-- spiked squelcher -->
+    <item id="7439" chance="1525" /><!-- berserk potion -->
+    <item id="8473" chance="10600" /><!-- ultimate health potion -->
+    <item id="6500" countmax="3" chance="10675" /><!-- demonic essence -->
+    <item id="7368" countmax="2" chance="8200" /><!-- assassin star -->
+    <item id="2788" countmax="2" chance="6425" /><!-- red mushroom -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2394" chance="10375" /><!-- morning star -->
+            <item id="9970" countmax="3" chance="4625" /><!-- small topaz -->
+            <item id="11221" chance="20500" /><!-- hellspawn tail -->
+            <item id="7591" chance="40550" /><!-- great health potion -->
+            <item id="2513" chance="10550" /><!-- battle shield -->
+            <item id="2148" countmax="100" chance="39600" /><!-- gold coin -->
+            <item id="2148" countmax="100" chance="39600" /><!-- gold coin -->
+            <item id="2148" countmax="34" chance="39600" /><!-- gold coin -->
+            <item id="9969" chance="700" /><!-- black skull -->
+            <item id="7421" chance="600" /><!-- onyx flail -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Rift Scythe" nameDescription="a rift scythe" race="undead" experience="2000" speed="370" manacost="0">
+	<health now="3600" max="3600"/>
+	<look type="300" corpse="0"/>
+	<targetchange interval="5000" chance="9"/>
+	<strategy attack="80" defense="20"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="85"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="135" attack="135"/>
+		<attack name="death" interval="2000" chance="18" lenght="8" spread="0" min="-490" max="-720">
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>
+		<attack name="fire" interval="2000" chance="18" range="7" spread="4" min="-225" max="-275">
+			<attribute key="shootEffect" value="fire"/>
+			<attribute key="areaEffect" value="explosionarea"/>
+		</attack>
+	</attacks>
+	<defenses armor="30" defense="30">
+		<defense name="healing" interval="2000" chance="18" min="320" max="400">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="-10"/>
+		<element earthPercent="40"/>
+		<element icePercent="65"/>
+		<element holyPercent="-10"/>
+		<element physicalPercent="-5"/>
+		<element deathPercent="80"/>
+		<element firePercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity lifedrain="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+</monster>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Jagged Earth Elemental" nameDescription="a jagged earth elemental" race="undead" experience="1300" speed="280" manacost="0">
+	<health now="1500" max="1500"/>
+	<look type="285" corpse="8933"/>
+	<targetchange interval="20000" chance="50"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="80"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="1"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="90" attack="60"/>
+		<attack name="poisoncondition" interval="2000" chance="14" length="6" spread="0" min="-200" max="-320">
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="earth" interval="2000" chance="14" range="9" target="1" radius="2" min="-100" max="-250">
+			<attribute key="areaEffect" value="stones"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="14" range="8" speedchange="-220" duration="5000">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</attack>	
+		<attack name="poison" interval="2000" chance="14" target="1" range="7"  min="-0" max="-200">
+			<attribute key="shootEffect" value="smallearth"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+	</attacks>
+	<defenses armor="25" defense="25">
+	<defense name="healing" interval="2000" chance="14" min="125" max="175">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>	
+	</defenses>
+	<elements>
+		<element deathPercent="45"/>
+		<element icePercent="20"/>
+		<element energyPercent="85"/>
+		<element physicalPercent="45"/>
+		<element firePercent="-15"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity earth="1"/>
+		<immunity holy="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Stomp STOMP"/>
+	</voices>
+	<loot>
+    <item id="5880" countmax="3" chance="975" /><!-- iron ore -->
+    <item id="7732" chance="2325" /><!-- seeds -->
+    <item id="2149" countmax="2" chance="4275" /><!-- small emerald -->
+    <item id="8298" chance="8125" /><!-- natural soil -->
+    <item id="1294" countmax="10" chance="14425" /><!-- small stone -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2245" chance="20700" /><!-- twigs -->
+            <item id="11222" chance="51100" /><!-- lump of earth -->
+            <item id="2148" countmax="100" chance="27400" /><!-- gold coin -->
+            <item id="2148" countmax="78" chance="27400" /><!-- gold coin -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Werewolf" nameDescription="a werewolf" experience="1450" speed="320" race="blood" manacost="0">
+	<health now="1955" max="1955"/>
+	<strategy attack="100" defense="0"/>
+	<targetchange speed="2000" chance="9"/>
+	<look type="308" corpse="6080"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="100"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" chance="100" skill="90" attack="70"/>
+		<attack name="outfit" interval="2000" chance="14" range="7" monster="werewolf" duration="5000">
+			<attribute key="areaeffect" value="bluenote"/>
+		</attack>
+		<attack name="lifedrain" interval="2000" chance="14" spread="3" min="-0" max="-165">
+			<attribute key="areaEffect" value="rednote"/>
+		</attack>
+	</attacks>
+	<defenses armor="50" defense="55">
+		<defense name="speed" interval="2000" chance="14" speedchange="450" duration="5000">
+			<attribute key="areaEffect" value="purplenote"/>
+		</defense>
+		<defense name="healing" interval="2000" chance="14" min="175" max="225">
+			<attribute key="areaEffect" value="greenshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element energyPercent="15"/>
+		<element earthPercent="75"/>
+		<element firePercent="-5"/>
+		<element deathPercent="55"/>
+		<element icePercent="-10"/>
+		<element holyPercent="-5"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/> 
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="war wolf" interval="2000" chance="14" max="2"/>
+		<attribute key="areaEffect" value="whitenote"/>
+	</summons>
+	<voices speed="2000" chance="9">
+		<voice sentence="BLOOD!" yell="1"/>
+		<voice sentence="HRAAAAAAAAAARRRRRR!" yell="1"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="35300" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="35300" /><!-- gold coin -->
+    <item id="2148" countmax="24" chance="35300" /><!-- gold coin -->
+    <item id="2381" chance="3525" /><!-- halberd -->
+    <item id="2789" chance="7425" /><!-- brown mushroom -->
+    <item id="2805" chance="5650" /><!-- troll green -->
+    <item id="9809" chance="8225" /><!-- rusty armor -->
+    <item id="2510" chance="11500" /><!-- plate shield -->
+    <item id="7439" chance="1475" /><!-- berserk potion -->
+    <item id="11234" chance="10975" /><!-- werewolf fur -->
+    <item id="7588" chance="6150" /><!-- strong health potion -->
+    <item id="2197" chance="1375" /><!-- stone skin amulet -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="8473" chance="2800" /><!-- ultimate health potion -->
+            <item id="2171" chance="1350" /><!-- platinum amulet -->
+            <item id="2438" chance="1175" /><!-- epee -->
+            <item id="2169" chance="1025" /><!-- time ring -->
+            <item id="5897" countmax="3" chance="4900" /><!-- wolf paw -->
+            <item id="7419" chance="575" /><!-- dreaded cleaver -->
+            <item id="7383" chance="900" /><!-- relic sword -->
+            <item id="7428" chance="700" /><!-- bonebreaker -->
+        </inside>
+    </item>
+</loot>
+
+
+
+</monster>

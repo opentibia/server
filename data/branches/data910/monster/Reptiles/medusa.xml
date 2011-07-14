@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Medusa" nameDescription="a medusa" race="blood" experience="4050" speed="240" manacost="0">
+	<health now="4500" max="4500"/>
+	<look type="330" corpse="10524"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="275"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="50" attack="100" poison="840"/>
+		<attack name="lifedrain" interval="2000" chance="14" count="5" range="7" target="1" min="-21" max="-200">
+			<attribute key="areaEffect" value="carniphila"/>
+			<attribute key="shootEffect" value="earth"/>
+		</attack>	
+		<attack name="earth" interval="2000" chance="14" length="8" spread="3" min="-250" max="-350">
+			<attribute key="areaEffect" value="smallplants"/>
+		</attack>	
+		<attack name="speed" interval="2000" chance="14" radius="5" target="0" speedchange="-600">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>	
+		<attack name="outfit" interval="2000" chance="14" range="7" item="3976" duration="4000">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</attack>		
+	</attacks>
+	<defenses armor="25" defense="25">
+		<defense name="healing" interval="2000" chance="14" min="400" max="500">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element icePercent="20"/>
+		<element firePercent="-10"/>
+		<element energyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity earth="1"/>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="You will ssuch a fine ssstatue!"/>
+		<voice sentence="There isss no chhhanccce of esscape"/>
+		<voice sentence="Are you tired or why are you moving thhat sslow"/>
+	</voices>
+	<loot>
+    <item id="2149" countmax="4" chance="3000" /><!-- small emerald -->
+    <item id="7887" chance="4200" /><!-- terra amulet -->
+    <item id="8473" countmax="2" chance="7900" /><!-- ultimate health potion -->
+    <item id="2536" chance="3600" /><!-- medusa shield -->
+    <item id="7590" countmax="2" chance="8100" /><!-- great mana potion -->
+    <item id="11226" chance="10250" /><!-- strand of medusa hair -->
+    <item id="2152" countmax="6" chance="43400" /><!-- platinum coin -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2148" countmax="100" chance="47075" /><!-- gold coin -->
+            <item id="2148" countmax="90" chance="47075" /><!-- gold coin -->
+            <item id="7885" chance="1025" /><!-- terra legs -->
+            <item id="7413" chance="1725" /><!-- titan axe -->
+            <item id="7884" chance="1300" /><!-- terra mantle -->
+            <item id="10219" chance="1550" /><!-- sacred tree amulet -->
+            <item id="2476" chance="2475" /><!-- knight armor -->
+            <item id="9810" chance="725" /><!-- rusty armor -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

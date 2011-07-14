@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Dwarf Geomancer" nameDescription="a dwarf geomancer" race="blood" experience="265" speed="200" manacost="0">
+	<health now="380" max="380"/>
+	<look type="66" corpse="6015"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="150"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="50"/>
+		<attack name="poison" interval="2000" chance="18" range="7" radius="4" target="1" min="-50" max="-110">
+			<attribute key="shootEffect" value="earth"/>
+			<attribute key="areaEffect" value="plantattack"/>
+		</attack>
+		<attack name="manadrain" interval="2000" chance="18" range="7" target="1" min="-50" max="-80"/>
+	</attacks>
+	<defenses armor="15" defense="15">
+		<defense name="healing" interval="2000" chance="18" min="23" max="53">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="20"/>
+		<element firePercent="60"/>
+		<element energyPercent="10"/>
+		<element holyPercent="10"/>
+		<element icePercent="-5"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Hail Durin!"/>
+		<voice sentence="Earth is the strongest element."/>
+		<voice sentence="Dust to dust."/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="45" chance="37600" /><!-- gold coin -->
+    <item id="2787" countmax="2" chance="40700" /><!-- white mushroom -->
+    <item id="2673" chance="23775" /><!-- pear -->
+    <item id="2260" chance="30650" /><!-- blank rune -->
+    <item id="12414" chance="6850" /><!-- geomancer's robe -->
+    <item id="2213" chance="2100" /><!-- dwarven ring -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2162" chance="15850" /><!-- magic light wand -->
+            <item id="12419" chance="3675" /><!-- geomancer's staff -->
+            <item id="2146" chance="1550" /><!-- small sapphire -->
+            <item id="2175" chance="1025" /><!-- spellbook -->
+            <item id="5880" chance="1025" /><!-- iron ore -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+</monster>

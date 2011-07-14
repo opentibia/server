@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Blightwalker" nameDescription="a blightwalker" race="undead" experience="5850" speed="240" manacost="0">
+	<health now="8900" max="8900"/>
+	<look type="246" corpse="6354"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="88" attack="100"/>
+		<attack name="earth" interval="2000" chance="16" range="7" target="1" min="-225" max="-405">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="drunk" interval="2000" chance="16" radius="3" target="0">
+			<attribute key="areaEffect" value="stun"/>
+		</attack>
+		<attack name="earth" interval="2000" chance="16" range="7" target="1" max="-0">
+			<attribute key="areaEffect" value="greenspark"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="16" range="7" target="1" speedchange="-600">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>	
+	</attacks>
+	<defenses armor="15" defense="15"/>
+	<elements>
+		<element firePercent="50"/>
+		<element energyPercent="20"/>
+		<element icePercent="50"/>
+		<element physicalPercent="-10"/>
+		<element holyPercent="-30"/>
+	</elements>
+	<immunities>
+		<immunity paralyze="1"/>
+		<immunity invisible="1"/>
+		<immunity lifedrain="1"/>
+		<immunity earth="1"/>
+		<immunity death="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="I can see you decaying!"/>
+		<voice sentence="Let me taste your mortality!"/>
+	</voices>
+	<loot>
+    <item id="2694" chance="60025" /><!-- bunch of wheat -->
+    <item id="2148" countmax="100" chance="41300" /><!-- gold coin -->
+    <item id="2148" countmax="100" chance="41300" /><!-- gold coin -->
+    <item id="2148" countmax="71" chance="41300" /><!-- gold coin -->
+    <item id="5944" chance="26075" /><!-- soul orb -->
+    <item id="10605" chance="10625" /><!-- bundle of cursed straw -->
+    <item id="9810" chance="8200" /><!-- rusty armor -->
+    <item id="6500" chance="30800" /><!-- demonic essence -->
+    <item id="2545" countmax="12" chance="4200" /><!-- poison arrow -->
+    <item id="2260" countmax="2" chance="19875" /><!-- blank rune -->
+    <item id="7884" chance="1150" /><!-- terra mantle -->
+    <item id="7591" chance="9900" /><!-- great health potion -->
+    <item id="2550" chance="3750" /><!-- scythe -->
+    <item id="2183" chance="8350" /><!-- hailstorm rod -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7732" chance="2375" /><!-- seeds -->
+            <item id="7885" chance="1925" /><!-- terra legs -->
+            <item id="2199" chance="1650" /><!-- garlic necklace -->
+            <item id="2436" chance="1325" /><!-- skull staff -->
+            <item id="2179" chance="1550" /><!-- gold ring -->
+            <item id="6300" chance="675" /><!-- death ring -->
+            <item id="2173" chance="775" /><!-- amulet of loss -->
+            <item id="9971" chance="600" /><!-- gold ingot -->
+            <item id="2418" chance="600" /><!-- golden sickle -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

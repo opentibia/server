@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Priestess" nameDescription="a priestess" race="blood" experience="420" speed="220" manacost="0">
+	<health now="390" max="390"/>
+	<look type="58" corpse="6081"/>
+	<targetchange interval="5000" chance="8"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="4"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="65" attack="20" poison="250"/>
+		<attack name="death" interval="2000" chance="14" range="9" target="1" min="-0" max="-120">
+			<attribute key="shootEffect" value="death"/>
+			<attribute key="areaEffect" value="mortarea"/>
+		</attack>	
+		<attack name="poisoncondition" interval="2000" chance="14" range="7" min="-100" max="-100">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="manadrain" interval="2000" chance="14" range="7" min="-0" max="-170">
+			<attribute key="areaEffect" value="redshimmer"/>
+	</attack>
+	</attacks>
+	<defenses armor="10" defense="19">
+		<defense name="healing" interval="2000" chance="14" min="34" max="56">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element firePercent="40"/>
+		<element earthPercent="70"/>
+		<element deathPercent="10"/>
+		<element physicalPercent="-10"/>
+		<element holyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+	</immunities>
+	<summons maxSummons="2">
+		<summon name="ghoul" interval="2000" chance="14" max="2"/>
+	</summons>
+	<voices interval="5000" chance="9">
+		<voice sentence="Your energy is mine."/>
+		<voice sentence="Now, your life has come to an end, hahahha!"/>
+		<voice sentence="Throw the soul on the altar!"/>
+	</voices>
+	<loot>
+    <item id="2760" chance="12600" /><!-- goat grass -->
+    <item id="1962" chance="4500" /><!-- book -->
+    <item id="2802" chance="14450" /><!-- sling herb -->
+    <item id="2192" chance="1825" /><!-- crystal ball -->
+    <item id="2423" chance="2000" /><!-- clerical mace -->
+    <item id="11220" chance="10100" /><!-- dark rosary -->
+    <item id="10562" chance="5425" /><!-- black hood -->
+    <item id="2803" chance="6375" /><!-- powder herb -->
+    <item id="2151" chance="1400" /><!-- talon -->
+    <item id="2125" chance="1225" /><!-- crystal necklace -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="2674" countmax="2" chance="6075" /><!-- red apple -->
+            <item id="7620" chance="1550" /><!-- mana potion -->
+            <item id="2791" chance="3875" /><!-- wood mushroom -->
+            <item id="2374" chance="1900" /><!-- wooden flute -->
+            <item id="2183" chance="1350" /><!-- hailstorm rod -->
+            <item id="2114" chance="600" /><!-- piggy bank -->
+            <item id="2529" chance="675" /><!-- black shield -->
+            <item id="10556" chance="1650" /><!-- cultish robe -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

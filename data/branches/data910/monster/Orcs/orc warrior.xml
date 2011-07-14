@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Orc Warrior" nameDescription="a orc warrior" race="blood" experience="50" speed="190" manacost="360">
+	<health now="125" max="125"/>
+	<look type="7" corpse="5979"/>
+	<targetchange interval="2000" chance="0"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="1"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="1"/>
+		<flag pushable="1"/>
+		<flag canpushitems="0"/>
+		<flag canpushcreatures="0"/>
+		<flag targetdistance="1"/>
+		<flag staticattack="90"/>
+		<flag runonhealth="10"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="30" attack="30"/>
+	</attacks>
+	<defenses armor="8" defense="14"/>
+	<elements>
+		<element energyPercent="30"/>
+		<element holyPercent="10"/>
+		<element earthPercent="-10"/>
+		<element deathPercent="-10"/>
+	</elements>
+	<voices interval="5000" chance="9">
+		<voice sentence="Grow truk grrrr."/>
+		<voice sentence="Trak grrrr brik."/>
+		<voice sentence="Alk!"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="15" chance="34375" /><!-- gold coin -->
+    <item id="2666" chance="16300" /><!-- meat -->
+    <item id="2464" chance="7775" /><!-- chain armor -->
+    <item id="12436" chance="1725" /><!-- skull belt -->
+    <item id="11113" chance="1275" /><!-- orc tooth -->
+    <item id="12435" chance="4550" /><!-- orc leather -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="12409" chance="10550" /><!-- broken helmet -->
+            <item id="2530" chance="950" /><!-- copper shield -->
+            <item id="2411" chance="575" /><!-- poison dagger -->
+        </inside>
+    </item>
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>

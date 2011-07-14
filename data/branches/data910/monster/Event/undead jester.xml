@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Undead Jester" nameDescription="a Undead Jester" race="blood" experience="5" speed="904" manacost="0">
+	<health now="355" max="355"/>
+	<look type="273" head="114" body="0" legs="114" feet="0" addons="3" corpse="6080"/>/>
+	<targetchange interval="2000" chance="5"/>
+	<strategy attack="70" defense="20"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag canpushcreatures="1"/>
+		<flag targetdistance="3"/>
+        <flag staticattack="90"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" attack="10" skill="3"/>
+    <attack name="drunk" interval="2000" chance="14" range="7" target="1" duration="20000">
+      <attribute key="shootEffect" value="cake"/>
+      <attribute key="areaEffect" value="cake"/>
+    </attack>
+	<attack name="speed" interval="2000" chance="14" length="8" spread="3" speedchange="-500" duration="5000">
+		<attribute key="areaEffect" value="rednote"/>
+		</attack>	
+	</attacks>
+	<defenses armor="17" defense="15">
+		<defense name="invisible" interval="2000" chance="14" duration="5000">
+			<attribute key="areaEffect" value="mortarea"/>
+		</defense>
+		<defense name="healing" interval="2000" chance="14" min="37" max="47">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>		
+	</defenses>
+	<immunities>
+		<immunity physical="0"/>
+		<immunity energy="0"/>
+		<immunity fire="0"/>
+		<immunity poison="0"/>
+		<immunity lifedrain="0"/>
+		<immunity paralyze="0"/>
+		<immunity outfit="1"/>
+		<immunity drunk="1"/>
+		<immunity invisible="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="AHUHAUHAUHUA"/>
+		<voice sentence="Fun for cry!!"/>
+		<voice sentence="What a why?"/>
+	</voices>
+  <summons maxSummons="4">
+    <summon name="cave rat" interval="2000" chance="14" max="4"/>
+  </summons>
+	<loot>
+    <item id="2667" chance="61050" /><!-- fish -->
+    <item id="5911" chance="1250" /><!-- red piece of cloth -->
+    <item id="5913" chance="2450" /><!-- brown piece of cloth -->
+    <item id="9696" chance="6375" /><!-- part of a jester doll -->
+    <item id="5909" countmax="3" chance="1475" /><!-- white piece of cloth -->
+    <item id="5914" chance="1725" /><!-- yellow piece of cloth -->
+    <item id="7159" chance="750" /><!-- green perch -->
+    <item id="1987" chance="100000"><!-- bag -->
+        <inside>
+            <item id="7158" chance="1000" /><!-- rainbow trout -->
+            <item id="5910" chance="1250" /><!-- green piece of cloth -->
+            <item id="5912" chance="1475" /><!-- blue piece of cloth -->
+        </inside>
+    </item>
+</loot>
+</monster>

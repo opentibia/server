@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Webster" nameDescription="a webster" race="undead" experience="1200" speed="290" manacost="0">
+	<health now="1750" max="1750"/>
+	<look type="263" corpse="7349"/>
+	<targetchange interval="2000" chance="16"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="1"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="78"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="0"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="100"/>
+		<attack name="poisoncondition" interval="2000" chance="16" radius="1" target="1" range="7" poison="120">
+			<attribute key="shootEffect" value="energy"/>
+			<attribute key="areaEffect" value="energyarea"/>
+		</attack>
+		<attack name="physical" interval="2000" chance="16" radius="1" target="1" range="7" min="-0" max="-60">
+			<attribute key="shootEffect" value="poison"/>
+			<attribute key="areaEffect" value="poison"/>
+		</attack>
+		<attack name="speed" interval="2000" chance="16" radius="4" target="1" range="7" duration="20000" speedchange="-360">
+			<attribute key="areaEffect" value="poff"/>
+		</attack>
+	</attacks>
+	<defenses armor="29" defense="34">
+		<defense name="speed" interval="2000" chance="16" duration="2500" speedchange="500">
+			<attribute key="areaEffect" value="redshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element earthPercent="20"/>
+		<element holyPercent="10"/>
+		<element deathPercent="10"/>
+		<element energyPercent="-10"/>
+	</elements>
+	<immunities>
+		<immunity invisible="1"/>
+		<immunity fire="1"/>
+		<immunity ice="1"/>
+	</immunities>
+	<voices interval="2000" chance="9">
+		<voice sentence="You are lost."/>
+		<voice sentence="Come my little morsel."/>
+		<voice sentence="So tasty!"/>
+		<voice sentence="I'll get you!"/>
+	</voices>
+</monster>

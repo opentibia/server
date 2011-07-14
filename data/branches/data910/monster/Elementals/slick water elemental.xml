@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<monster name="Slick Water Elemental" nameDescription="a slick water elemental" race="undead" experience="450" speed="280" manacost="0">
+	<health now="550" max="550"/>
+	<look type="286" corpse="8965"/>
+	<targetchange interval="20000" chance="12"/>
+	<strategy attack="100" defense="0"/>
+	<flags>
+		<flag summonable="0"/>
+		<flag attackable="1"/>
+		<flag hostile="1"/>
+		<flag illusionable="0"/>
+		<flag convinceable="0"/>
+		<flag pushable="0"/>
+		<flag canpushitems="1"/>
+		<flag staticattack="85"/>
+		<flag lightlevel="0"/>
+		<flag lightcolor="0"/>
+		<flag targetdistance="1"/>
+		<flag runonhealth="1"/>
+	</flags>
+	<attacks>
+		<attack name="melee" interval="2000" skill="40" attack="70"/>
+		<attack name="ice" interval="1000" chance="16" range="6" target="1" min="-180" max="-235">
+			<attribute key="shootEffect" value="snowball"/>
+		</attack>
+		<attack name="ice" interval="2000" chance="16" range="7" min="-80" max="-120">
+			<attribute key="shootEffect" value="ice"/>
+			<attribute key="areaEffect" value="icearea"/>
+		</attack> 	
+		<attack name="poisoncondition" interval="2000" chance="16" radius="6" target="0" min="-20" max="-460">
+			<attribute key="areaEffect" value="poison"/>
+		</attack> 			
+	</attacks>
+	<defenses armor="30" defense="30">
+		<defense name="healing" interval="2000" chance="16" min="40" max="70">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
+	<elements>
+		<element physicalPercent="30"/>
+		<element holyPercent="40"/>
+		<element deathPercent="50"/>
+	</elements>
+	<immunities>
+		<immunity ice="1"/>
+		<immunity fire="1"/>
+		<immunity earth="1"/>
+		<immunity drown="1"/>
+		<immunity invisible="1"/>
+		<immunity paralyze="1"/>
+	</immunities>
+	<voices interval="5000" chance="9">
+		<voice sentence="Blubb"/>
+		<voice sentence="Splipsh Splash"/>
+	</voices>
+	<loot>
+    <item id="2148" countmax="100" chance="25725" /><!-- gold coin -->
+    <item id="2148" countmax="26" chance="25725" /><!-- gold coin -->
+    <item id="7839" countmax="3" chance="2225" /><!-- shiver arrow -->
+    <item id="8302" chance="6150" /><!-- iced soil -->
+</loot>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</monster>
