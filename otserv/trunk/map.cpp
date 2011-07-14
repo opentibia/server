@@ -592,7 +592,7 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos, bool floo
 		return false;
 	}
 
-	return checkSightLine(fromPos, toPos) || checkSightLine(toPos, fromPos);
+	return checkSightLine(fromPos, toPos);
 }
 
 const Tile* Map::canWalkTo(const Creature* creature, const Position& pos)
