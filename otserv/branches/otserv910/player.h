@@ -99,6 +99,7 @@ typedef std::list<Party*> PartyList;
 
 #define PLAYER_MAX_SPEED 1500
 #define PLAYER_MIN_SPEED 10
+#define STAMINA_MULTIPLIER (60 * 1000)
 const int32_t MAX_STAMINA = 42 * 60 * 60 * 1000;
 const int32_t MAX_STAMINA_MINUTES = MAX_STAMINA / 60000;
 
@@ -350,7 +351,9 @@ public:
 	void setIdleTime(uint32_t value, bool warned){idleTime = value; idleWarned = warned;}
 
 	void setChaseMode(chaseMode_t mode);
+	chaseMode_t getChaseMode() const {return chaseMode;}
 	void setFightMode(fightMode_t mode);
+	fightMode_t getFightMode() const {return fightMode;}
 	void setSafeMode(bool _safeMode) {safeMode = _safeMode;}
 	bool hasSafeMode() const {return safeMode;}
 	uint16_t getIcons() const;
@@ -691,7 +694,7 @@ public:
 	virtual void onThink(uint32_t interval);
 	virtual void onAttacking(uint32_t interval);
 
-	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER, bool isNewItem = true);
 	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	Item* getWriteItem(uint32_t& _windowTextId, uint16_t& _maxWriteLen);
@@ -735,7 +738,8 @@ public:
 	int32_t getStaminaMinutes();
 	int32_t getStamina() {return stamina;}
 	int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
-
+	void setStaminaMinutes(uint32_t value) {addStamina((int64_t)(value * STAMINA_MULTIPLIER));}
+	
 	//spell exhaustion
 	void setExhaustion(uint16_t spellId, uint32_t exhaustion) {exhaustionMap[spellId] = int64_t(exhaustion) + OTSYS_TIME();}
 	bool hasExhaustion(uint16_t spellId) {return (exhaustionMap[spellId] > OTSYS_TIME());}

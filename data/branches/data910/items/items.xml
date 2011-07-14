@@ -2445,9 +2445,13 @@
 	</item>
 	<item id="2006" article="a" name="vial">
 		<attribute key="weight" value="180"/>
+		<attribute key="decayTo" value="11396"/>
+		<attribute key="duration" value="1"/>
 	</item>
 	<item id="2007" article="a" name="blue bottle">
 		<attribute key="weight" value="250"/>
+		<attribute key="decayTo" value="11397"/>
+		<attribute key="duration" value="1"/>
 	</item>
 	<item id="2008" article="a" name="vase">
 		<attribute key="weight" value="940"/>
@@ -2474,6 +2478,8 @@
 	</item>
 	<item id="2014" article="a" name="jug">
 		<attribute key="weight" value="750"/>
+		<attribute key="decayTo" value="11398"/>
+		<attribute key="duration" value="1"/>
 	</item>
 	<item id="2015" article="a" name="beer bottle">
 		<attribute key="weight" value="250"/>
@@ -2521,6 +2527,8 @@
 	<item id="2030" article="a" name="pool"/>
 	<item id="2031" article="a" name="waterskin">
 		<attribute key="weight" value="700"/>
+		<attribute key="decayTo" value="11399"/>
+		<attribute key="duration" value="1"/>
 	</item>
 	<item id="2032" article="a" name="bowl">
 		<attribute key="weight" value="380"/>
@@ -12594,14 +12602,14 @@
 	<item id="5960" article="a" name="dead troll" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="7"/>
 		<attribute key="decayTo" value="3067"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="blood"/>
 		<attribute key="fluidSource" value="blood"/>
 	</item>
 	<item id="5961" article="a" name="dead spider" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="6"/>
 		<attribute key="decayTo" value="2807"/>
-		<attribute key="duration" value="600"/>
+		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="venom"/>
 		<attribute key="fluidSource" value="slime"/>
 	</item>
@@ -19021,16 +19029,9 @@
 	<item id="8059" article="a" name="sanctified grave"/>
 	<item id="8060" editorsuffix=" (Blank)"/>
 	<item id="8061" editorsuffix=" (Blank)"/>
-	<item id="8062" article="a" name="poison field" editorsuffix=" (Slime Corpse)">
-		<attribute key="type" value="magicfield"/>
-		<attribute key="replaceable" value="0"/>
-		<attribute key="field" value="poison">
-			<attribute key="ticks" value="7"/>
-			<attribute key="start" value="5"/>
-			<attribute key="damage" value="5"/>
-			<attribute key="decayTo" value="1490"/>
-			<attribute key="duration" value="10"/>
-		</attribute>
+	<item id="8062" article="a" name="poison gas" editorsuffix=" (Slime Corpse)">
+		<attribute key="decayTo" value="0"/>
+		<attribute key="duration" value="2"/>
 	</item>
 	<item id="8063" editorsuffix=" (Blank)"/>
 	<item id="8064" editorsuffix=" (Blank)"/>
@@ -24943,6 +24944,22 @@
 		<attribute key="description" value="It is rumoured to bring you good luck! Luck sponsored by TibiaLottery."/>
 		<attribute key="weight" value="150"/>
 		<attribute key="slotType" value="necklace"/>
+	</item>
+	<item id="11396" article="a" name="vial">
+		<attribute key="weight" value="180"/>
+		<attribute key="pickupable" value="1"/>
+	</item>
+	<item id="11397" article="a" name="blue bottle">
+		<attribute key="weight" value="250"/>
+		<attribute key="pickupable" value="1"/>
+	</item>
+	<item id="11398" article="a" name="jug">
+		<attribute key="weight" value="750"/>
+		<attribute key="pickupable" value="1"/>
+	</item>
+	<item id="11399" article="a" name="waterskin">
+		<attribute key="weight" value="700"/>
+		<attribute key="pickupable" value="1"/>
 	</item>
 	<item id="11793" article="a" name="skull pillar"/>
 	<item id="11794" article="a" name="skull pillar"/>

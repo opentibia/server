@@ -25,6 +25,7 @@
 #include "definitions.h"
 #include "tile.h"
 #include "monsters.h"
+#include "otsystem.h"
 
 class Creature;
 class Game;
@@ -118,6 +119,8 @@ public:
 	const CreatureList& getTargetList() {return targetList;}
 	const CreatureList& getFriendList() {return friendList;}
 
+	void updateHadRecentBattleVar();
+	bool hadRecentBattle() const { return hadRecentBattleVar; }
 	bool isTarget(Creature* creature);
 	bool getIdleStatus() const { return isIdle;}
 	bool isFleeing() const {return getHealth() <= mType->runAwayHealth;}
@@ -145,6 +148,8 @@ private:
 	bool isIdle;
 	bool extraMeleeAttack;
 	bool semiIdle;
+	bool hadRecentBattleVar;
+	int64_t timeOfLastHit;
 
 	Spawn* spawn;
 	bool isMasterInRange;

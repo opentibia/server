@@ -1926,7 +1926,7 @@ void LuaScriptInterface::registerFunctions()
 	//getIPByPlayerName(name)
 	lua_register(m_luaState, "getIPByPlayerName", LuaScriptInterface::luaGetIPByPlayerName);
 
-	//getPlayersByIPNumber(ip[, mask = 0xFFFFFFFF])
+	//getPlayersByIPNumber(ip)
 	lua_register(m_luaState, "getPlayersByIPAddress", LuaScriptInterface::luaGetPlayersByIPAddress);
 
 	//getDataDir()
@@ -2029,6 +2029,15 @@ void LuaScriptInterface::registerFunctions()
 	//getCreatureCondition(cid, conditionType, <optional: default: 0> subId, <optional: default: CONDITIONID_DEFAULT> conditionId)
 	lua_register(m_luaState, "getCreatureCondition", LuaScriptInterface::luaGetCreatureCondition);
 
+	//getPlayerStamina(cid)
+	lua_register(m_luaState, "getPlayerStamina", LuaScriptInterface::luaGetPlayerStamina);
+	
+	//doPlayerSetStamina(cid, minutes)
+	lua_register(m_luaState, "doPlayerSetStamina", LuaScriptInterface::luaDoPlayerSetStamina);	
+	
+	//getPlayerModes(cid)
+	lua_register(m_luaState, "getPlayerModes", LuaScriptInterface::luaGetPlayerModes);
+	
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
@@ -2232,6 +2241,11 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			lua_pushnumber(L, player->getAccountId());
 			return 1;
 		}
+		case PlayerInfoStamina:
+		{
+			lua_pushnumber(L, const_cast<Player*>(player)->getStaminaMinutes());
+			return 1;
+		}
 		default:
 		{
 			std::string error_str = "Unknown player info. info = " + info;
@@ -2381,6 +2395,11 @@ int LuaScriptInterface::luaGetPlayerAccountId(lua_State *L)
 {
 	return internalGetPlayerInfo(L, PlayerInfoAccountId);
 }
+
+int LuaScriptInterface::luaGetPlayerStamina(lua_State* L)
+{
+	return internalGetPlayerInfo(L, PlayerInfoStamina);
+}
 //
 
 int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
@@ -2473,7 +2492,6 @@ int LuaScriptInterface::luaGetPlayerFlagValue(lua_State *L)
 		}
 	}
 	else{
-		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushboolean(L, false);
 	}
 	return 1;
@@ -7364,12 +7382,9 @@ int LuaScriptInterface::luaGetIPByPlayerName(lua_State *L)
 
 int LuaScriptInterface::luaGetPlayersByIPAddress(lua_State *L)
 {
-	//getPlayersByIPAddress(ip[, mask])
+	//getPlayersByIPAddress(ip)
 	int parameters = lua_gettop(L);
 
-	uint32_t mask = 0xFFFFFFFF;
-	if(parameters > 1)
-		mask = (uint32_t)popNumber(L);
 	uint32_t ip = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -9549,6 +9564,46 @@ int LuaScriptInterface::luaGetCreatureCondition(lua_State *L)
 	}
 
 	lua_pushboolean(L, true);
+	return 1;
+}
+int LuaScriptInterface::luaDoPlayerSetStamina(lua_State* L)
+{
+	//doPlayerSetStamina(cid, minutes)
+	uint32_t minutes = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	if(Player* player = env->getPlayerByUID(popNumber(L)))
+	{
+		player->setStaminaMinutes(minutes);
+		player->sendStats();
+		lua_pushboolean(L, true);
+	}
+	else
+	{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerModes(lua_State* L)
+{
+	//getPlayerModes(cid)
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(popNumber(L));
+	if(!player)
+	{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_newtable(L);
+	setField(L, "chase", player->getChaseMode());
+	setField(L, "fight", player->getFightMode());
+	setField(L, "safe", player->hasSafeMode());
 	return 1;
 }
 

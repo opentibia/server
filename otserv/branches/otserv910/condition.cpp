@@ -1561,8 +1561,10 @@ void ConditionDamage::generateDamageList(int32_t amount, int32_t start, std::lis
 	amount = std::abs(amount);
 	start = std::abs(start);
 
-	if (start >= amount){
-		list.push_back(start);
+	list.push_back(start);
+	amount -= start;
+
+	if (amount <= 0){
 		return;
 	}
 

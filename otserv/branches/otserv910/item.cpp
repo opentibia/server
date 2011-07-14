@@ -797,10 +797,10 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			s << " (";
 			if(it.attack != 0){
 				s << "Atk:" << (int32_t)it.attack;
-				
+
 				if(it.abilities.elementDamage != 0){
 					s << " " << "physical + ";
-					
+
 					switch(it.abilities.elementType){
 						case COMBAT_ICEDAMAGE: s << it.abilities.elementDamage << " Ice,"; break;
 						case COMBAT_EARTHDAMAGE: s << it.abilities.elementDamage << " Earth,"; break;
@@ -1085,6 +1085,10 @@ std::string Item::getXRayDescription() const
 		ret << "Action ID: " << actionId << std::endl;
 	if(uniqueId > 0)
 		ret << "Unique ID: " << uniqueId << std::endl;
+	#ifdef __DEBUG__
+	if (getContainer())
+		ret << "There are " << getContainer()->getTotalAmountOfItemsInside() - 1 << " things inside of this." << std::endl;
+	#endif
 	ret << Thing::getXRayDescription();
 	return ret.str();
 }

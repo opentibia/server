@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -35,7 +35,7 @@ public:
 	ContainerIterator();
 	ContainerIterator(const ContainerIterator& rhs);
 	~ContainerIterator();
-	
+
 	ContainerIterator& operator=(const ContainerIterator& rhs);
 	bool operator==(const ContainerIterator& rhs);
 	bool operator!=(const ContainerIterator& rhs);
@@ -43,10 +43,10 @@ public:
 	ContainerIterator operator++(int);
 	Item* operator*();
 	Item* operator->();
-	
+
 protected:
 	ContainerIterator(Container* super);
-	
+
 	Container* super;
 	std::queue<Container*> over;
 	ItemList::iterator cur;
@@ -123,28 +123,31 @@ public:
 	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(Thing* thing,  const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Thing* thing,  const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER, bool isNewItem = true);
 	virtual void postRemoveNotification(Thing* thing,  const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 	virtual void __startDecaying();
-
+	virtual uint32_t getTotalAmountOfItemsInside() const { return amountOfItems; } //includes the item itself
+	uint16_t getDeepness() const { return deepness; }
+	void setDeepness(uint16_t newDeepness) { deepness = newDeepness; }
 private:
 	void onAddContainerItem(Item* item);
 	void onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemType& oldType,
 		Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(uint32_t index, Item* item);
-
+	void updateAmountOfItems(int32_t diff);
+	const Container* getParentContainer() const;
 	Container* getParentContainer();
 	void updateItemWeight(double diff);
-
-
 protected:
 	std::ostringstream& getContentDescription(std::ostringstream& os) const;
 
 	uint32_t maxSize;
 	double total_weight;
+	uint16_t deepness; //how deep is this container inside of another container (chain of containers)
+	uint32_t amountOfItems; //amount of items inside of this container, including itself and items inside of containers inside of this
 	ItemList itemlist;
 	uint32_t serializationCount;
 

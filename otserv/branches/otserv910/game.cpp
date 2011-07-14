@@ -24,6 +24,7 @@
 #include "tasks.h"
 #include "items.h"
 #include "creature.h"
+#include "globalevent.h"
 #include "player.h"
 #include "monster.h"
 #include "tile.h"
@@ -61,6 +62,7 @@ extern Monsters g_monsters;
 extern MoveEvents* g_moveEvents;
 extern Npcs g_npcs;
 extern CreatureEvents* g_creatureEvents;
+extern GlobalEvents* g_globalEvents;
 
 Game::Game()
 {
@@ -140,11 +142,17 @@ void Game::setGameState(GameState_t newState)
 					ConfigManager::DATA_DIRECTORY) + "quests.xml");
 
 				loadGameState();
+				#ifdef __GLOBALEVENTS__
+				g_globalEvents->startup();
+				#endif
 				break;
 			}
 
 			case GAME_STATE_SHUTDOWN:
 			{
+				#ifdef __GLOBALEVENTS__
+				g_globalEvents->execute(GLOBALEVENT_SHUTDOWN);
+				#endif
 				//kick all players that are still online
 				AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 				while(it != Player::listPlayer.list.end()){
@@ -1909,7 +1917,8 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 			cylinder->postRemoveNotification(item, cylinder, itemIndex, false);
 			uint16_t itemId = item->getID();
 			int32_t count = item->getSubType();
-
+			bool isNewItem = true;
+			
 			if(curType.id != newType.id){
 				if(newType.group != curType.group){
 					item->setDefaultSubtype();
@@ -1917,13 +1926,15 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 
 				itemId = newId;
 			}
-
+			else{
+				isNewItem = false;
+			}
 			if(newCount != -1 && newType.hasSubType()){
 				count = newCount;
 			}
 
 			cylinder->__updateThing(item, itemId, count);
-			cylinder->postAddNotification(item, cylinder, itemIndex);
+			cylinder->postAddNotification(item, cylinder, itemIndex, LINK_OWNER, isNewItem);
 			return item;
 		}
 	}
@@ -4580,7 +4591,7 @@ void Game::startDecay(Item* item)
 		}
 
 		int32_t dur = item->getDuration();
-		if(dur > 0){
+		if(dur > (EVENT_DECAYINTERVAL-1)/2 ){
 			item->useThing2();
 			item->setDecaying(DECAYING_TRUE);
 			toDecayItems.push_back(item);
@@ -4641,21 +4652,15 @@ void Game::checkDecay()
 
 		int32_t dur = item->getDuration();
 
-		if(dur <= 0) {
+		if(dur <= (EVENT_DECAYINTERVAL-1)/2) {
 			it = decayItems[bucket].erase(it);
 			internalDecayItem(item);
 			FreeThing(item);
 		}
-		else if(dur < EVENT_DECAYINTERVAL*EVENT_DECAY_BUCKETS)
+		else if(dur <= EVENT_DECAYINTERVAL*(EVENT_DECAY_BUCKETS - 1) + (EVENT_DECAYINTERVAL-1)/2)
 		{
-			it = decayItems[bucket].erase(it);
-			size_t new_bucket = (bucket + ((dur + EVENT_DECAYINTERVAL/2) / 1000)) % EVENT_DECAY_BUCKETS;
-			if(new_bucket == bucket) {
-				internalDecayItem(item);
-				FreeThing(item);
-			} else {
-				decayItems[new_bucket].push_back(item);
-			}
+			size_t new_bucket = (bucket + ((dur + EVENT_DECAYINTERVAL/2) / EVENT_DECAYINTERVAL)) % EVENT_DECAY_BUCKETS;
+			decayItems[new_bucket].push_back(item);
 		}
 		else{
 			++it;
@@ -4805,10 +4810,11 @@ void Game::cleanup()
 
 	for(DecayList::iterator it = toDecayItems.begin(); it != toDecayItems.end(); ++it){
 		int32_t dur = (*it)->getDuration();
-		if(dur >= EVENT_DECAYINTERVAL * EVENT_DECAY_BUCKETS) {
+		if(dur > EVENT_DECAYINTERVAL * (EVENT_DECAY_BUCKETS - 1) + (EVENT_DECAYINTERVAL - 1)/2){
 			decayItems[last_bucket].push_back(*it);
-		} else {
-			decayItems[(last_bucket + 1 + (*it)->getDuration() / 1000) % EVENT_DECAY_BUCKETS].push_back(*it);
+		} 	
+		else{
+			decayItems[(last_bucket + 1 + ((*it)->getDuration() + EVENT_DECAYINTERVAL/2) / EVENT_DECAYINTERVAL) % EVENT_DECAY_BUCKETS].push_back(*it);
 		}
 	}
 
@@ -5179,6 +5185,9 @@ void Game::reloadInfo(reloadTypes_t info)
 			break;
 		case RELOAD_TYPE_ITEMS:
 			Item::items.reload();
+			break;
+		case RELOAD_TYPE_GLOBALEVENTS:	
+			g_globalEvents->reload();
 			break;
 	}
 }

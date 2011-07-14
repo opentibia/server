@@ -1,4 +1,5 @@
-local ITEM_SUGAR_CANE 			=	5466
+local ITEM_SUGAR_CANE =	5466
+local ITEM_SUGAR_CANE_BURNED = 5465
 
 function onUse(cid, item, frompos, item2, topos)
 	if (item2.itemid == ITEM_SUGAR_CANE) then

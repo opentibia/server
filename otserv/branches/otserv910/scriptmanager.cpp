@@ -28,6 +28,7 @@
 #include "movement.h"
 #include "weapons.h"
 #include "creatureevent.h"
+#include "globalevent.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
@@ -37,6 +38,7 @@ Spells* g_spells = NULL;
 MoveEvents* g_moveEvents = NULL;
 Weapons* g_weapons = NULL;
 CreatureEvents* g_creatureEvents = NULL;
+GlobalEvents* g_globalEvents = NULL;
 
 extern ConfigManager g_config;
 extern void ErrorMessage(const char* message) ;
@@ -49,6 +51,7 @@ ScriptingManager::ScriptingManager()
 	g_talkactions = new TalkActions();
 	g_moveEvents = new MoveEvents();
 	g_creatureEvents = new CreatureEvents();
+	g_globalEvents = new GlobalEvents();
 }
 
 ScriptingManager::~ScriptingManager()
@@ -111,6 +114,16 @@ bool ScriptingManager::loadScriptSystems()
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
-
+	
+	#ifdef __GLOBALEVENTS__
+	//load global events
+	std::cout << ":: Loading GlobalEvents ...";
+	if(!g_globalEvents->loadFromXml(datadir)){
+		ErrorMessage("Unable to load GlobalEvents!");
+		return false;
+	}
+	std::cout << "[done]" << std::endl;
+	#endif
+	
 	return true;
 }

@@ -220,6 +220,9 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[MOUNT_TIME] = getGlobalNumber(L, "mount_time", 2000);
 	m_confInteger[DISMOUNT_IN_PZ] = getGlobalBoolean(L, "dismount_player_in_pz", true);  
 	m_confInteger[TIBIA_SLOTS] = getGlobalBoolean(L, "tibia_slots", true);  
+	m_confInteger[MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS] = getGlobalNumber(L, "max_amount_items_inside_containers", 5000);
+	m_confInteger[MAX_DEEPNESS_OF_CHAIN_OF_CONTAINERS] = getGlobalNumber(L, "max_deepness_of_chain_of_containers", 500);
+	m_confInteger[BIND_ONLY_GLOBAL_ADDRESS]	= getGlobalBoolean(L, "bind_only_global_address", false);
 	m_isLoaded = true;
 	return true;
 }

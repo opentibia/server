@@ -222,7 +222,8 @@ enum PlayerInfo_t{
 	PlayerInfoLastLogin,
 	PlayerInfoIp,
 	PlayerInfoGmInvisible,
-	PlayerInfoAccountId
+	PlayerInfoAccountId,
+	PlayerInfoStamina
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -516,6 +517,9 @@ protected:
 	static int luaGetFirstItemFromInventory(lua_State *L);
 	static int luaGetCreatureConditionInfo(lua_State *L);
 	static int luaGetCreatureCondition(lua_State *L);
+	static int luaDoPlayerSetStamina(lua_State* L);
+	static int luaGetPlayerStamina(lua_State* L);
+	static int luaGetPlayerModes(lua_State* L);
 	static int luaDoPlayerSetCreatureWalkthrough(lua_State *L);
 
 	static int luaDoPlayerSendCreatureSquare(lua_State *L);

@@ -93,7 +93,9 @@ enum ReturnValue{
 	RET_NOTREQUIREDPROFESSION = 63,
 	RET_NOTREQUIREDLEVEL = 64,
 	RET_NEEDPREMIUMTOEQUIPITEM = 65,
-	RET_TILEISFULL = 66
+	RET_TILEISFULL = 66,
+	RET_CONTAINERHASTOMANYITEMS = 67,
+	RET_CONTAINERHASTOMANYCONTAINERS = 68
 };
 
 class Tile;
@@ -117,6 +119,9 @@ public:
 
 	virtual std::string getDescription(int32_t lookDistance) const = 0;
 	virtual std::string getXRayDescription() const {
+		if(isRemoved()){
+			return "Thing you looked at seems to be removed.";
+		}
 		std::stringstream ret;
 		ret << "Position: [";
 		ret << getPosition().x << ", " << getPosition().y << ", " << getPosition().z << "]";
@@ -144,7 +149,7 @@ public:
 	virtual const Creature* getCreature() const {return NULL;};
 
 	virtual bool isRemoved() const;
-
+	virtual uint32_t getTotalAmountOfItemsInside() const { return 1; } //includes the item itself
 private:
 	Cylinder* parent;
 	int32_t useCount;

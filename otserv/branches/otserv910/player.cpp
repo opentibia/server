@@ -1216,6 +1216,14 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 void Player::sendCancelMessage(ReturnValue message) const
 {
 	switch(message){
+	case RET_CONTAINERHASTOMANYCONTAINERS:
+		sendCancel("It would exceed the maximum size for a chain of containers.");
+		break;
+
+	case RET_CONTAINERHASTOMANYITEMS:
+		sendCancel("It would exceed the maximum amount of items inside of some container.");
+		break;
+
 	case RET_DESTINATIONOUTOFREACH:
 		sendCancel("Destination is out of reach.");
 		break;
@@ -3635,9 +3643,9 @@ Thing* Player::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
-	if(link == LINK_OWNER){
+	if(link == LINK_OWNER && isNewItem){
 		//calling movement scripts
 		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index);
 	}
@@ -3688,7 +3696,7 @@ void Player::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_
 
 void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	if(link == LINK_OWNER){
+	if(link == LINK_OWNER && isCompleteRemoval){
 		//calling movement scripts
 		g_moveEvents->onPlayerDeEquip(this, thing->getItem(), (slots_t)index, isCompleteRemoval);
 	}

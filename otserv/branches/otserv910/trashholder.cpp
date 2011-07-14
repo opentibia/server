@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -66,7 +66,7 @@ void TrashHolder::__addThing(Thing* thing)
 void TrashHolder::__addThing(int32_t index, Thing* thing)
 {
 	if(Item* item = thing->getItem()){
-		if(item != this){
+		if(item != this && (item->isPickupable() || item->isPushable() || item->isMoveable())){
 			g_game.internalRemoveItem(item);
 			if(effect != NM_ME_NONE){
 				g_game.addMagicEffect(getPosition(), effect);
@@ -90,9 +90,9 @@ void TrashHolder::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-void TrashHolder::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
+void TrashHolder::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
-	getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT);
+	getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT, isNewItem);
 }
 
 void TrashHolder::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
