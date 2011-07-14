@@ -379,8 +379,9 @@ enum MessageClasses
 	MSG_LOOT			= 0x1D,	//?
 	MSG_EVENT_ORANGE		= 0x22, /*Orange message in the console*/
 	MSG_STATUS_CONSOLE_ORANGE	= 0x23,  /*Orange message in the console*/
-	MSG_CHANNEL_GUILD			= 0x1F, /*SPEAK_CHANNEL_W(?) guild messages.*/
 	
+
+	MSG_CHANNEL_GUILD			= 0x1F, /*SPEAK_CHANNEL_W(?) guild messages. not in use just const?*/	
 	MSG_TRADE_NPC				= 0x1E,	// not in use just const?
 	MSG_PARTY_MANAGEMENT		= 0x20,	// not in use just const?
 	MSG_PARTY					= 0x21,	// not in use just const?

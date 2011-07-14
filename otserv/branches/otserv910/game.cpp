@@ -3548,15 +3548,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		case SPEAK_CHANNEL_Y:
 		
 		case SPEAK_CHANNEL_R1:// SPEAK_CHANNEL_O, SPEAK_CHANNEL_Y, SPEAK_CHANNEL_RN
-		case MSG_CHANNEL_GUILD: // SPEAK_CHANNEL_W
-			if(playerTalkToChannel(player, type, text, channelId)){
-				return true;
-			}
-			else{
-				// Resend in default channel
-				return playerSay(playerId, 0, SPEAK_SAY, receiver, text);
-			}
-			break;
 		case SPEAK_PRIVATE_PN:
 			return playerSpeakToNpc(player, text);
 			break;

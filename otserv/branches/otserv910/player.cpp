@@ -974,7 +974,7 @@ void Player::dropLoot(Container* corpse)
 		backpackLoss = 0;
 	}
 	
-	if(getVocationId() != 0 && itemLoss > 0 || backpackLoss > 0){
+	if(getVocationId() != VOCATION_NONE && (itemLoss > 0 || backpackLoss > 0)){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = inventory[i];
 			if(item){

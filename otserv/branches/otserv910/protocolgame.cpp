@@ -1213,7 +1213,6 @@ void ProtocolGame::parseSay(NetworkMessage& msg)
 		receiver = msg.GetString();
 		break;
 	case SPEAK_CHANNEL_Y:
-	case MSG_CHANNEL_GUILD:
 	case SPEAK_CHANNEL_R1:
 		channelId = msg.GetU16();
 		break;
