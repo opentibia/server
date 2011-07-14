@@ -24,6 +24,7 @@
 #include "tasks.h"
 #include "items.h"
 #include "creature.h"
+#include "globalevent.h"
 #include "player.h"
 #include "monster.h"
 #include "tile.h"
@@ -61,6 +62,7 @@ extern Monsters g_monsters;
 extern MoveEvents* g_moveEvents;
 extern Npcs g_npcs;
 extern CreatureEvents* g_creatureEvents;
+extern GlobalEvents* g_globalEvents;
 
 Game::Game()
 {
@@ -140,11 +142,13 @@ void Game::setGameState(GameState_t newState)
 					ConfigManager::DATA_DIRECTORY) + "quests.xml");
 
 				loadGameState();
+				g_globalEvents->startup();
 				break;
 			}
 
 			case GAME_STATE_SHUTDOWN:
 			{
+				g_globalEvents->execute(GLOBALEVENT_SHUTDOWN);
 				//kick all players that are still online
 				AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 				while(it != Player::listPlayer.list.end()){
@@ -5006,6 +5010,9 @@ void Game::reloadInfo(reloadTypes_t info)
 			break;
 		case RELOAD_TYPE_ITEMS:
 			Item::items.reload();
+			break;
+		case RELOAD_TYPE_GLOBALEVENTS:	
+			g_globalEvents->reload();
 			break;
 	}
 }

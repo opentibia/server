@@ -50,7 +50,7 @@ EXTRA_DIST=autogen.sh \
 	database.h	 logger.h	   raids.h \
 	luascript.h	   rsa.h \
 	mailbox.h	   scheduler.h \
-	guild.h
+	guild.h		globalevent.h
 
 
 
@@ -75,7 +75,7 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	cylinder.cpp	   logger.cpp	       protocolold.cpp	   waitlist.cpp \
 	database.cpp	   luascript.cpp       quests.cpp	   weapons.cpp \
 	mailbox.cpp	   raids.cpp \
-	guild.cpp
+	guild.cpp	globalevent.cpp
 
 pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
 

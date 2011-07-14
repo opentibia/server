@@ -122,6 +122,7 @@
     <ClInclude Include="..\exception.h" />
     <ClInclude Include="..\fileloader.h" />
     <ClInclude Include="..\game.h" />
+    <ClInclude Include="..\globalevent.h" />
     <ClInclude Include="..\guild.h" />
     <ClInclude Include="..\house.h" />
     <ClInclude Include="..\housetile.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="..\exception.cpp" />
     <ClCompile Include="..\fileloader.cpp" />
     <ClCompile Include="..\game.cpp" />
+    <ClCompile Include="..\globalevent.cpp" />
     <ClCompile Include="..\guild.cpp" />
     <ClCompile Include="..\house.cpp" />
     <ClCompile Include="..\housetile.cpp" />

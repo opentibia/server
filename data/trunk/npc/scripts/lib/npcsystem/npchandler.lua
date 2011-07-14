@@ -205,10 +205,14 @@ if(NpcHandler == nil) then
 
 			table.remove(self.focuses, pos)
 			self.talkStart[focus] = nil
+			if isPlayer(focus) then
 			closeShopWindow(focus) --Even if it can not exist, we need to prevent it.
+			end
 			self:updateFocus()
 		else
+			if isPlayer(focus) then
 			closeShopWindow(focus) --Even if it can not exist, we need to prevent it.
+			end
 			self:changeFocus(0)
 		end
 	end
@@ -564,7 +568,13 @@ if(NpcHandler == nil) then
 				if(self:processModuleCallback(CALLBACK_CREATURE_DISAPPEAR, cid)) then
 					if(self.queue == nil or not self.queue:greetNext()) then
 						local msg = self:getMessage(MESSAGE_WALKAWAY)
-						local parseInfo = { [TAG_PLAYERNAME] = getPlayerName(cid) }
+						local playerName = getPlayerName(cid)
+						if not playerName then
+							playerName = -1
+						end
+
+						local parseInfo = { [TAG_PLAYERNAME] = playerName }
+						
 						msg = self:parseMessage(msg, parseInfo)
 						self:say(msg, cid)
 						self:releaseFocus(cid)
@@ -576,6 +586,9 @@ if(NpcHandler == nil) then
 
 	-- Returns true if cid is within the talkRadius of this npc.
 	function NpcHandler:isInRange(cid)
+		if not isPlayer(cid) then
+		return false
+		end
 		local distance = getDistanceTo(cid) or -1
 		if distance == -1 then
 			return false
