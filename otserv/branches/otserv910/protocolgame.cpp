@@ -3163,7 +3163,7 @@ void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopInfo item)
 		msg->AddByte(fluidMap[fluidIndex]);
 	}
 	else{
-		msg->AddByte(1);
+		msg->AddByte(0x00);
 	}
 
 	msg->AddString(it.name);

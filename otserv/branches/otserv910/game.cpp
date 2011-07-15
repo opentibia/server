@@ -4153,8 +4153,8 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 			std::stringstream ss;
 			if(!attacker)
 				ss << ucfirst(target->getNameDescription()) << " was healed for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
-			else if(targetPlayer != NULL && attackerPlayer == targetPlayer)
-				ss << ucfirst(attacker->getNameDescription()) << " healed " << (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "herself for " : "himself for ") << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
+			else if(attacker == target)
+				ss << ucfirst(attacker->getNameDescription()) << " healed " << (targetPlayer ? (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "herself for " : "himself for ") : "itself for ") << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
 			else
 				ss << ucfirst(attacker->getNameDescription()) << " healed " << target->getNameDescription() << " for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
 
@@ -4219,8 +4219,8 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 						std::stringstream ss;
 					if(!attacker)
 						ss << ucfirst(target->getNameDescription()) << " loses " << manaDamage << " mana.";
-					else if(targetPlayer != NULL && attackerPlayer == targetPlayer)
-						ss << ucfirst(target->getNameDescription()) << " loses " << manaDamage << " mana blocking an attack by " << (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "herself." : "himself.");
+					else if(attacker == target)
+						ss << ucfirst(target->getNameDescription()) << " loses " << manaDamage << " mana blocking an attack by " << (targetPlayer ? (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "herself." : "himself.") : "itself.");
 					else
 						ss << ucfirst(target->getNameDescription()) << " loses " << manaDamage << " mana blocking an attack by " << attacker->getNameDescription() << ".";
 
@@ -4388,8 +4388,8 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 					std::stringstream ss;
 					if(!attacker)
 						ss << ucfirst(target->getNameDescription()) << " loses " << damage << " hitpoint" << (damage != 1 ? "s." : ".");
-					else if(targetPlayer != NULL && attackerPlayer == targetPlayer)
-						ss << ucfirst(target->getNameDescription()) << " loses " << damage << " hitpoint" << (damage != 1 ? "s" : "") << " due to " << (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "her" : "his") << " own attack.";
+					else if(attacker == target)
+						ss << ucfirst(target->getNameDescription()) << " loses " << damage << " hitpoint" << (damage != 1 ? "s" : "") << " due to " << (targetPlayer ? (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "her" : "his") : "its") << " own attack.";
 					else
 						ss << ucfirst(target->getNameDescription()) << " loses " << damage << " hitpoint" << (damage != 1 ? "s" : "") << " due to an attack by " << attacker->getNameDescription() << ".";
 
@@ -4464,8 +4464,8 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 			std::stringstream ss;
 			if(!attacker)
 				ss << ucfirst(target->getNameDescription()) << " loses " << manaLoss << " mana.";
-			else if(targetPlayer != NULL && attackerPlayer == targetPlayer)
-				ss << ucfirst(target->getNameDescription()) << " loses " << manaLoss << " mana blocking an attack by " << (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "herself." : "himself.");
+			else if(attacker == target)
+				ss << ucfirst(target->getNameDescription()) << " loses " << manaLoss << " mana blocking an attack by " << (targetPlayer ? (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "herself." : "himself.") : "itself.");
 			else
 				ss << ucfirst(target->getNameDescription()) << " loses " << manaLoss << " mana blocking an attack by " << attacker->getNameDescription() << ".";
 
@@ -4659,6 +4659,7 @@ void Game::checkDecay()
 		}
 		else if(dur <= EVENT_DECAYINTERVAL*(EVENT_DECAY_BUCKETS - 1) + (EVENT_DECAYINTERVAL-1)/2)
 		{
+			it = decayItems[bucket].erase(it);
 			size_t new_bucket = (bucket + ((dur + EVENT_DECAYINTERVAL/2) / EVENT_DECAYINTERVAL)) % EVENT_DECAY_BUCKETS;
 			decayItems[new_bucket].push_back(item);
 		}

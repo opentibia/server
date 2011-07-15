@@ -1375,26 +1375,27 @@ void Creature::onGainExperience(uint64_t gainExp, bool fromMonster)
 				getMaster()->getPlayer()->getGainExperience(gainExp, fromMonster);
 			}
 		}
-
+		const Position& targetPos = getPosition();
+		Player* thisPlayer = getPlayer();
+		if(thisPlayer)
+		{
+			std::stringstream ss;
+			ss << "You gained " << gainExp << " experience points.";
+			thisPlayer->sendExperienceMessage(MSG_EXPERIENCE, ss.str(), targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+		}
 
 		std::stringstream ssExp;
 		ssExp << getNameDescription() << " gained " << gainExp << " experience points.";
 		std::string strExp = ssExp.str();
 
-		const Position& targetPos = getPosition();
+		
 		const SpectatorVec& list = g_game.getSpectators(targetPos);
 		Player* tmpPlayer = NULL;
 		for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it)
 		{
 			if((tmpPlayer = (*it)->getPlayer()))
 			{
-				if(tmpPlayer == getPlayer())
-				{
-					std::stringstream ss;
-					ss << "You gained " << gainExp << " experience points.";
-					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE, ss.str(), targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
-				}
-				else
+				if(tmpPlayer != thisPlayer)
 					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE_OTHERS, strExp, targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
 			}
 		}
@@ -1405,24 +1406,26 @@ void Creature::onGainSharedExperience(uint64_t gainExp, bool fromMonster)
 {
 	if(gainExp > 0)
 	{
+		const Position& targetPos = getPosition();
+		Player* thisPlayer = getPlayer();
+		if(thisPlayer)
+		{
+			std::stringstream ss;
+			ss << "You gained " << gainExp << " experience points.";
+			thisPlayer->sendExperienceMessage(MSG_EXPERIENCE, ss.str(), targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+		}
+		
 		std::stringstream ssExp;
 		ssExp << getNameDescription() << " gained " << gainExp << " experience points.";
 		std::string strExp = ssExp.str();
 
-		const Position& targetPos = getPosition();
 		const SpectatorVec& list = g_game.getSpectators(targetPos);
 		Player* tmpPlayer = NULL;
 		for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it)
 		{
 			if((tmpPlayer = (*it)->getPlayer()))
 			{
-				if(tmpPlayer == getPlayer())
-				{
-					std::stringstream ss;
-					ss << "You gained " << gainExp << " experience points.";
-					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE, ss.str(), targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
-				}
-				else
+				if(tmpPlayer != thisPlayer)
 					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE_OTHERS, strExp, targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
 			}
 		}
