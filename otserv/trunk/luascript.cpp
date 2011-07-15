@@ -728,7 +728,7 @@ bool LuaScriptInterface::initState()
 	if(loadFile(std::string(datadir + "global.lua")) == -1){
 		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << datadir << "global.lua." << std::endl;
 	}
-	
+
 	lua_newtable(m_luaState);
 	lua_setfield(m_luaState, LUA_REGISTRYINDEX, "EVENTS");
 
@@ -2010,13 +2010,13 @@ void LuaScriptInterface::registerFunctions()
 
 	//getPlayerStamina(cid)
 	lua_register(m_luaState, "getPlayerStamina", LuaScriptInterface::luaGetPlayerStamina);
-	
+
 	//doPlayerSetStamina(cid, minutes)
-	lua_register(m_luaState, "doPlayerSetStamina", LuaScriptInterface::luaDoPlayerSetStamina);	
-	
+	lua_register(m_luaState, "doPlayerSetStamina", LuaScriptInterface::luaDoPlayerSetStamina);
+
 	//getPlayerModes(cid)
 	lua_register(m_luaState, "getPlayerModes", LuaScriptInterface::luaGetPlayerModes);
-	
+
 	#ifdef __GUILDWARSLUARELOAD__
 	//doUpdateGuildWar
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
@@ -7368,8 +7368,6 @@ int LuaScriptInterface::luaGetIPByPlayerName(lua_State *L)
 int LuaScriptInterface::luaGetPlayersByIPAddress(lua_State *L)
 {
 	//getPlayersByIPAddress(ip)
-	int parameters = lua_gettop(L);
-
 	uint32_t ip = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
