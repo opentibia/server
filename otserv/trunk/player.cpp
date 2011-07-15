@@ -2169,23 +2169,27 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 			amount = uint32_t(amount * getRateValue(LEVEL_MAGIC));
 		}
 		manaSpent += amount * g_config.getNumber(ConfigManager::RATE_MAGIC);
-		uint32_t reqMana = vocation->getReqMana(magLevel + 1);
 
-		if(manaSpent >= reqMana){
+		uint32_t origLevel = magLevel;
+
+		uint32_t reqMana = vocation->getReqMana(origLevel + 1);
+		while(manaSpent >= reqMana){
 			manaSpent -= reqMana;
 			magLevel++;
+			reqMana = vocation->getReqMana(magLevel + 1);
+		}
 
+		if (magLevel != origLevel){
 			std::stringstream MaglvMsg;
 			MaglvMsg << "You advanced to magic level " << magLevel << ".";
 			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
 
 			//scripting event - onAdvance
-			onAdvanceEvent(LEVEL_MAGIC, (magLevel - 1), magLevel);
-
-			sendStats();
+			onAdvanceEvent(LEVEL_MAGIC, origLevel, magLevel);
 		}
 
-		magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
+		magLevelPercent = Player::getPercentLevel(manaSpent, reqMana);
+		sendStats();
 	}
 }
 
@@ -2200,6 +2204,8 @@ void Player::addExperience(uint64_t exp)
 	if(nextLevelExp < currLevelExp) {
 		// Cannot gain more experience
 		// Perhaps some sort of notice should be printed here?
+		levelPercent = 0;
+		sendStats();
 		return;
 	}
 	while(experience >= nextLevelExp) {
