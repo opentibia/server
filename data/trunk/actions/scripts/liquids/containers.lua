@@ -13,6 +13,7 @@ local TYPE_WINE = 15
 local TYPE_MUD = 19
 local TYPE_RUM = 27
 local TYPE_SWAMP = 28
+local TYPE_TEA = 35
 
 local oilLamps = {[2046] = 2044}
 
