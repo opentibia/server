@@ -342,8 +342,8 @@ enum SpeakClasses
 	SPEAK_CHANNEL_Y		= 0x07,	//Yellow message in chat
 	SPEAK_CHANNEL_O		= 0x08,	//Talk orange on text
 	SPEAK_SPELL			= 0x09,	//?
-	SPEAK_PRIVATE_PN	= 0x0B,	//Player-to-NPC speaking(NPCs channel)
 	SPEAK_PRIVATE_NP	= 0x0A,	//NPC-to-Player speaking
+	SPEAK_PRIVATE_PN	= 0x0B,	//Player-to-NPC speaking(NPCs channel)
 	SPEAK_BROADCAST		= 0x0C,	//Broadcast a message - #b
 	SPEAK_CHANNEL_R1        = 0x0D, //red - #c text
 	SPEAK_PRIVATE_RED_FROM	= 0x0E, //@name@text
