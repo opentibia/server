@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<globalevents>
+
+
+	
+	<!--
+	EXAMPLES
+	<globalevent name="timer_example" time="12:00:00" script="my_script.lua"/>
+	<globalevent name="shutdown" type="shutdown" script="shutdown.lua"/>
+	<globalevent name="startup" type="startup" script="startup.lua"/>
+	-->
+</globalevents>
