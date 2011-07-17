@@ -1402,7 +1402,7 @@ void LuaScriptInterface::registerFunctions()
 	//doPlayerAddItemEx(cid, uid, <optional: default: 0> canDropOnMap, <optional> slot)
 	lua_register(m_luaState, "doPlayerAddItemEx", LuaScriptInterface::luaDoPlayerAddItemEx);
 
-	//doPlayerSendTextMessage(cid, MessageClasses, message)
+	//doPlayerSendTextMessage(cid, MessageClasses, message[, position, value, color])
 	lua_register(m_luaState, "doPlayerSendTextMessage", LuaScriptInterface::luaDoPlayerSendTextMessage);
 
 	//doPlayerRemoveMoney(cid, money)
@@ -3456,9 +3456,19 @@ int LuaScriptInterface::luaDoRelocate(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaDoPlayerSendTextMessage(lua_State *L)
+int LuaScriptInterface::luaDoPlayerSendTextMessage(lua_State* L)
 {
-	//doPlayerSendTextMessage(cid, MessageClasses, message)
+	//doPlayerSendTextMessage(cid, MessageClasses, message[, position, value, color])
+	int parameters = lua_gettop(L);
+	PositionEx position;
+	uint32_t value = 0;
+	TextColor_t color = TEXTCOLOR_NONE;
+	if(parameters > 5)
+	{
+		color = (TextColor_t)popNumber(L);
+		value = popNumber(L);
+		popPosition(L, position);
+	}
 	std::string text = popString(L);
 	uint32_t messageClass = popNumber(L);
 	uint32_t cid = popNumber(L);
@@ -3466,13 +3476,18 @@ int LuaScriptInterface::luaDoPlayerSendTextMessage(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 
 	const Player* player = env->getPlayerByUID(cid);
-	if(!player){
+	if(!player)
+	{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
 		lua_pushboolean(L, false);
 		return 1;
 	}
 
-	player->sendTextMessage((MessageClasses)messageClass, text);
+	if(parameters > 5)
+		player->sendTextMessage((MessageClasses)messageClass, text, &position, value, color);
+	else
+		player->sendTextMessage((MessageClasses)messageClass, text);
+
 	lua_pushboolean(L, true);
 	return 1;
 }
@@ -7383,7 +7398,6 @@ int LuaScriptInterface::luaGetIPByPlayerName(lua_State *L)
 int LuaScriptInterface::luaGetPlayersByIPAddress(lua_State *L)
 {
 	//getPlayersByIPAddress(ip)
-	int parameters = lua_gettop(L);
 
 	uint32_t ip = (uint32_t)popNumber(L);
 

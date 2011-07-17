@@ -628,8 +628,8 @@ public:
 	void sendStats();
 	void sendSkills() const
 		{if(client) client->sendSkills();}
-	void sendTextMessage(MessageClasses mclass, const std::string& message) const
-		{if(client) client->sendTextMessage(mclass, message);}
+	void sendTextMessage(MessageClasses mclass, const std::string& message, Position* pos = NULL, uint32_t value = 0, TextColor_t color = TEXTCOLOR_NONE) const
+		{if(client) client->sendTextMessage(mclass, message, pos, value, color);}
 	void sendTextWindow(Item* item, uint16_t maxlen, bool canWrite) const
 		{if(client) client->sendTextWindow(windowTextId, item, maxlen, canWrite);}
 	void sendTextWindow(uint32_t itemId, const std::string& text) const

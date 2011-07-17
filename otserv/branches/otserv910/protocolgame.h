@@ -197,7 +197,7 @@ private:
 	void sendCancelTarget();
 	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
 	void sendStats();
-	void sendTextMessage(MessageClasses mclass, const std::string& message);
+	void sendTextMessage(MessageClasses mclass, const std::string& message, Position* pos = NULL, uint32_t exp = 0, TextColor_t color = TEXTCOLOR_NONE);
 
 	void sendShop(Npc* npc, const std::list<ShopInfo>& shop);
 	void sendCloseShop();
@@ -279,6 +279,7 @@ private:
 
 	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
 	void AddTextMessage(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message);
+	void AddTextMessageEx(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message, const Position& pos, uint32_t value, TextColor_t color);
 	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, unsigned char type);
 	void AddDistanceShoot(NetworkMessage_ptr msg,const Position& from, const Position& to, uint8_t type);
 	void AddCreature(NetworkMessage_ptr msg,const Creature* creature, bool known, uint32_t remove);

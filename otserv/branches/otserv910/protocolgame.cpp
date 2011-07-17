@@ -1642,12 +1642,15 @@ void ProtocolGame::sendStats()
 	}
 }
 
-void ProtocolGame::sendTextMessage(MessageClasses mclass, const std::string& message)
+void ProtocolGame::sendTextMessage(MessageClasses mclass, const std::string& message, Position* pos/* = NULL*/, uint32_t value/* = 0*/, TextColor_t color/* = TEXTCOLOR_NONE*/)
 {
 	NetworkMessage_ptr msg = getOutputBuffer();
 	if(msg){
 		TRACK_MESSAGE(msg);
-		AddTextMessage(msg, mclass, message);
+		if(pos != NULL && (mclass == MSG_DAMAGE_DEALT || mclass == MSG_DAMAGE_RECEIVED || mclass == MSG_HEALED || mclass == MSG_EXPERIENCE || mclass == MSG_DAMAGE_OTHERS || mclass == MSG_HEALED_OTHERS || mclass == MSG_EXPERIENCE_OTHERS))
+			AddTextMessageEx(msg, mclass, message, *pos, value, color);
+		else
+			AddTextMessage(msg, mclass, message);
 	}
 }
 
@@ -2737,6 +2740,16 @@ void ProtocolGame::AddTextMessage(NetworkMessage_ptr msg, MessageClasses mclass,
 {
 	msg->AddByte(0xB4);
 	msg->AddByte(mclass);
+	msg->AddString(message);
+}
+
+void ProtocolGame::AddTextMessageEx(NetworkMessage_ptr msg, MessageClasses mclass, const std::string& message, const Position& pos, uint32_t value, TextColor_t color)
+{
+	msg->AddByte(0xB4);
+	msg->AddByte(mclass);
+	msg->AddPosition(pos);
+	msg->AddU32(value);
+	msg->AddByte(color);
 	msg->AddString(message);
 }
 

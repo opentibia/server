@@ -4175,7 +4175,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 					{
 						std::stringstream tmpSs;
 						if(!attacker)
-							tmpSs << "You were healed by " << attacker->getNameDescription() << " for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
+							tmpSs << "You were healed for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
 						else if(targetPlayer == attackerPlayer)
 							tmpSs << "You healed yourself for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
 						else
