@@ -417,12 +417,12 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 
 	MoveEvent* moveEvent = getEvent(tile, eventType1);
 	if(moveEvent){
-		ret = ret & moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
+		ret &= moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
 	}
 
 	moveEvent = getEvent(item, eventType1);
 	if(moveEvent){
-		ret = ret & moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
+		ret &= moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
 	}
 
 	Item* tileItem = NULL;
@@ -437,7 +437,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 			if(tileItem && tileItem != item){
 				moveEvent = getEvent(tileItem, eventType2);
 				if(moveEvent){
-					ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
+					ret &= moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
 				}
 			}
 		}
@@ -456,7 +456,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 			moveEvent = getEvent(tileItem, eventType2);
 			if(moveEvent){
 				m_lastCacheItemVector.push_back(tileItem);
-				ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
+				ret &= moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
 			}
 			else if(hasTileEvent(tileItem)){
 				m_lastCacheItemVector.push_back(tileItem);

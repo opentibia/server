@@ -121,13 +121,13 @@
 	</outfit>
 	
 	<outfit id="25" default="0">
-		<list type="female" looktype="430" name="Afflicated"/>
-		<list type="male" looktype="431" name="Afflicated"/>
+		<list type="female" looktype="431" name="Afflicated"/>
+		<list type="male" looktype="430" name="Afflicated"/>
 	</outfit>
 	
 	<outfit id="26" default="0">
-		<list type="female" looktype="432" name="Elementalist"/>
-		<list type="male" looktype="433" name="Elementalist"/>
+		<list type="female" looktype="433" name="Elementalist"/>
+		<list type="male" looktype="432" name="Elementalist"/>
 	</outfit>
 
 	<outfit id="27">

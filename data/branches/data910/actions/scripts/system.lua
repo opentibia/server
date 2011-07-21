@@ -91,7 +91,7 @@ function onUse(cid, item, fromPosition, itemEx, toPosition)
 		setPlayerStorageValue(cid, storage, 1)
 		if(questsExperience[storage] ~= nil) then
 			doPlayerAddExp(cid, questsExperience[storage])
-			doSendAnimatedText(getCreaturePosition(cid), questsExperience[storage], TEXTCOLOR_WHITE)
+			doPlayerSendTextMessage(cid, MESSAGE_EXPERIENCE, "You gained " .. questsExperience[storage] .. " experience.", getCreaturePosition(cid), questsExperience[storage], TEXTCOLOR_WHITE_EXP)
 		end
 	end
 

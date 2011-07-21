@@ -4169,7 +4169,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 					{
 						std::stringstream tmpSs;
 						tmpSs << "You heal " << target->getNameDescription() << " for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
-						tmpPlayer->sendHealMessage(MSG_HEALED, tmpSs.str(), targetPos, healthChange, TEXTCOLOR_GREEN);
+						tmpPlayer->sendHealMessage(MSG_HEALED, tmpSs.str(), targetPos, healthChange, TEXTCOLOR_MAYABLUE);
 					}
 					else if(tmpPlayer == targetPlayer)
 					{
@@ -4181,10 +4181,10 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 						else
 							tmpSs << "You were healed by " << attacker->getNameDescription() << " for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
 
-						tmpPlayer->sendHealMessage(MSG_HEALED, tmpSs.str(), targetPos, healthChange, TEXTCOLOR_GREEN);
+						tmpPlayer->sendHealMessage(MSG_HEALED, tmpSs.str(), targetPos, healthChange, TEXTCOLOR_MAYABLUE);
 					}
 					else
-						tmpPlayer->sendHealMessage(MSG_HEALED_OTHERS, message, targetPos, healthChange, TEXTCOLOR_GREEN);
+						tmpPlayer->sendHealMessage(MSG_HEALED_OTHERS, message, targetPos, healthChange, TEXTCOLOR_MAYABLUE);
 				}
 			}
 		
