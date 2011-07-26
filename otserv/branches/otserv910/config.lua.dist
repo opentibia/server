@@ -178,8 +178,8 @@ rate_spawn = 1
 show_new_skill_level = false
 
 --Displays amount of health healed.
---Similar to the way damage is shown, except in green numbers (Example: +17) [default: "no"]
-show_healing = false
+--Similar to the way damage is shown, except in green numbers (Example: +17) [default: "true"]
+show_healing = true
 
 --Use orange text for spells rather than traditional text [default: "no"]
 --NOTE: The orange text will not be displayed on the default channel

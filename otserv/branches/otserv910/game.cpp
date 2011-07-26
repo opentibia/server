@@ -4148,7 +4148,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 
 		Player* targetPlayer = target->getPlayer();
 
-		if(g_config.getNumber(ConfigManager::SHOW_HEALING)){
+		if(g_config.getNumber(ConfigManager::SHOW_HEALING) && (healthChange > 0)){
 			
 			std::stringstream ss;
 			if(!attacker)
