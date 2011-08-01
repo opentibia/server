@@ -4147,16 +4147,18 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 			attackerPlayer = attacker->getPlayer();
 
 		Player* targetPlayer = target->getPlayer();
-
-		if(g_config.getNumber(ConfigManager::SHOW_HEALING) && (healthChange > 0)){
+		
+		int32_t realHealthChange = target->getHealth();
+		realHealthChange = target->getHealth() - realHealthChange;
+		if(g_config.getNumber(ConfigManager::SHOW_HEALING) && (realHealthChange > 0)){
 			
 			std::stringstream ss;
 			if(!attacker)
-				ss << ucfirst(target->getNameDescription()) << " was healed for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
+				ss << ucfirst(target->getNameDescription()) << " was healed for " << realHealthChange << " hitpoint" << (realHealthChange != 1 ? "s." : ".");
 			else if(attacker == target)
-				ss << ucfirst(attacker->getNameDescription()) << " healed " << (targetPlayer ? (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "herself for " : "himself for ") : "itself for ") << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
+				ss << ucfirst(attacker->getNameDescription()) << " healed " << (targetPlayer ? (targetPlayer->getSex() == PLAYERSEX_FEMALE ? "herself for " : "himself for ") : "itself for ") << realHealthChange << " hitpoint" << (realHealthChange != 1 ? "s." : ".");
 			else
-				ss << ucfirst(attacker->getNameDescription()) << " healed " << target->getNameDescription() << " for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
+				ss << ucfirst(attacker->getNameDescription()) << " healed " << target->getNameDescription() << " for " << realHealthChange << " hitpoint" << (realHealthChange != 1 ? "s." : ".");
 
 			std::string message = ss.str();
 
@@ -4168,7 +4170,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 					if(tmpPlayer == attackerPlayer && attackerPlayer != targetPlayer)
 					{
 						std::stringstream tmpSs;
-						tmpSs << "You heal " << target->getNameDescription() << " for " << healthChange << " hitpoint" << (healthChange != 1 ? "s." : ".");
+						tmpSs << "You heal " << target->getNameDescription() << " for " << realHealthChange << " hitpoint" << (realHealthChange != 1 ? "s." : ".");
 						tmpPlayer->sendHealMessage(MSG_HEALED, tmpSs.str(), targetPos, healthChange, TEXTCOLOR_MAYABLUE);
 					}
 					else if(tmpPlayer == targetPlayer)
@@ -4833,7 +4835,9 @@ void Game::showUseHotkeyMessage(Player* player, Item* item)
 	uint32_t itemCount = player->__getItemTypeCount(item->getID(), -1);
 
 	std::stringstream ss;
-	if(itemCount == 1){
+	if(!it.showCount)
+		ss << "Using one of " << it.name << "...";
+	else if(itemCount == 1){
 		ss << "Using the last " << it.name << "...";
 	}
 	else{

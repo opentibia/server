@@ -22978,10 +22978,12 @@
 	</item>
 	<item id="10021" article="a" name="worn soft boots">
 		<attribute key="description" value="Someone specialised in shoes might be able to repair them for you."/>
+		<attribute key="slotType" value="feet" />
 		<attribute key="weight" value="800"/>
 	</item>
 	<item id="10022" article="a" name="worn firewalker boots">
 		<attribute key="description" value="They can be recharged with an enchanted ruby."/>
+		<attribute key="slotType" value="feet" />
 		<attribute key="weight" value="800"/>
 	</item>
 	<item id="10029" article="a" name="lever"/>
@@ -24662,25 +24664,25 @@
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="11311"/>
 		<attribute key="duration" value="10"/>
-		<attribute key="corpseType" value="blood"/>
-		<attribute key="fluidSource" value="blood"/>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
 	</item>
 	<item id="11311" article="a" name="dead wailing widow">
 		<attribute key="containerSize" value="10"/>
 		<attribute key="decayTo" value="11312"/>
 		<attribute key="duration" value="300"/>
-		<attribute key="corpseType" value="blood"/>
-		<attribute key="fluidSource" value="blood"/>
+		<attribute key="corpseType" value="venom"/>
+		<attribute key="fluidSource" value="slime"/>
 	</item>
 	<item id="11312" article="a" name="dead wailing widow">
 		<attribute key="decayTo" value="11313"/>
 		<attribute key="duration" value="300"/>
-		<attribute key="corpseType" value="blood"/>
+		<attribute key="corpseType" value="venom"/>
 	</item>
 	<item id="11313" article="a" name="dead wailing widow">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="60"/>
-		<attribute key="corpseType" value="blood"/>
+		<attribute key="corpseType" value="venom"/>
 	</item>
 	<item id="11314" name="weaver wandtip">
 		<attribute key="weight" value="170"/>
@@ -25726,6 +25728,528 @@
 		<attribute key="description" value="They will expire within a short time, sell them back to Esrik before they do."/>
 		<attribute key="weight" value="2500"/>
 	</item>
+	
+	
+	<item id="13247" article="a" name="hunting horn">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13291" article="a" name="maxilla maximus">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13292" article="a" name="tin key">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13293" article="a" name="leather whip">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13294" article="a" name="harness">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13295" article="a" name="reins">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13298" article="a" name="carrot on a stick">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13305" article="a" name="giant shrimp">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13307" article="a" name="sweet smelling bait">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	
+	<item id="13308" article="a" name="dead boar" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13309" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13309" article="a" name="dead boar">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13310" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13310" article="a" name="dead boar">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13311" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13311" article="a" name="dead boar">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13312" article="a" name="dead stampor">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13313" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13313" article="a" name="dead stampor">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13314" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13314" article="a" name="dead stampor"> 
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13315" article="a" name="dead stampor" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13312" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13316" article="a" name="dead draptor" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13317" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13317" article="a" name="dead draptor">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13318" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13318" article="a" name="dead draptor">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13319" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13319" article="a" name="dead draptor">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13320" article="a" name="dead undead cavebear">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13321" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13321" article="a" name="dead undead cavebear">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13322" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13322" article="a" name="dead undead cavebear">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13323" article="a" name="dead undead cavebear" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13320" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13324" article="a" name="dead midnight panther">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13325" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13325" article="a" name="dead midnight panther">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13336" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13327" article="a" name="dead midnight panther" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13324" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13336" article="a" name="dead midnight panther">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13328" article="a" name="dead crustacea gigantica">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13329" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13329" article="a" name="dead crustacea gigantica">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13330" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13330" article="a" name="dead crustacea gigantica">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13331" article="a" name="dead crustacea gigantica" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13328" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13484" article="a" name="dead golden servant" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13489" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13489" article="a" name="dead golden servant">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13490" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13490" article="a" name="dead golden servant">
+		<attribute key="decayTo" value="13491" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13491" article="a" name="dead golden servant">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13485" article="a" name="dead diamond servant" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13492" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13492" article="a" name="dead diamond servant">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13493" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13493" article="a" name="dead diamond servant">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13494" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13494" article="a" name="dead diamond servant">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13483" article="a" name="dead iron servant" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13486" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13486" article="a" name="dead iron servant">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13487" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13487" article="a" name="dead iron servant">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13488" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13488" article="a" name="dead iron servant">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+
+	<item id="13498" article="a" name="scorpion sceptre">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	
+	<item id="13501" article="a" name="dead sandstone scorpion" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13502" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13502" article="a" name="dead sandstone scorpion">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13503" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13503" article="a" name="dead sandstone scorpion">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13504" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13504" article="a" name="dead sandstone scorpion">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13506" article="a" name="medicine pouch">
+		<attribute key="weight" value="1200"/>
+	</item>
+	
+	<item id="13528" article="a" name="dead dromedary" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13519" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13519" article="a" name="dead dromedary">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13520" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13520" article="a" name="dead dromedary">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13521" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13521" article="a" name="dead dromedary">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13584" article="a" name="dead crystal wolf" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13595" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13594" article="a" name="dead crystal wolf">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13595" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13595" article="a" name="dead crystal wolf">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13596" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13596" article="a" name="dead crystal wolf">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13513" article="a" name="dead white deer" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13516" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13516" article="a" name="dead white deer">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13517" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13517" article="a" name="dead white deer">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13518" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13518" article="a" name="dead white deer">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13509" article="a" name="dead donkey" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13510" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13510" article="a" name="dead donkey">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13511" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13511" article="a" name="dead donkey">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13512" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13512" article="a" name="dead donkey">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13514" article="a" name="dead insectoid scout" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13525" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13525" article="a" name="dead insectoid scout">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13526" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13526" article="a" name="dead insectoid scout">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13527" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13527" article="a" name="dead insectoid scout">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13515" article="a" name="dead slug" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13522" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13522" article="a" name="dead slug">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13523" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13523" article="a" name="dead slug">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13524" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13524" article="a" name="dead slug">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13859" article="a" name="dead thornfire wolf" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13860" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13860" article="a" name="dead thornfire wolf">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13861" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13861" article="a" name="dead thornfire wolf">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13862" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13862" article="a" name="dead thornfire wolf">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13752" article="a" name="dead yielothax" editorsuffix=" (Unmoveable)">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13753" />
+		<attribute key="duration" value="10" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13753" article="a" name="dead yielothax">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13754" />
+		<attribute key="duration" value="900" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13754" article="a" name="dead yielothax">
+		<attribute key="containerSize" value="10" />
+		<attribute key="decayTo" value="13755" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	<item id="13755" article="a" name="dead yielothax">
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="600" />
+		<attribute key="corpseType" value="blood" />
+	</item>
+	
+	<item id="13508" article="a" name="slug drug">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13535" article="a" name="fist on a stick">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13536" article="a" name="diapason">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13537" article="a" name="bag of apple slices">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13538" article="a" name="bamboo leaves">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13539" article="a" name="golden fir cone">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13938" article="a" name="golden can of oil">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	<item id="13939" article="a" name="sugar oat">
+		<attribute key="description" value="A hermit near Carlin might be able to tell you more about it."/>
+		<attribute key="weight" value="200"/>
+	</item>
+	
+	<item id="13941" article="a" name="cup of molten gold">
+		<attribute key="description" value="Be careful, this vessel can hold the molten gold only for a short time."/>
+		<attribute key="decayTo" value="0" />
+		<attribute key="duration" value="14400" />
+		<attribute key="weight" value="500" />
+	</item>
+	
 	<item id="20001" name="water"/>
 	<item id="20002" name="blood"/>
 	<item id="20003" name="beer"/>

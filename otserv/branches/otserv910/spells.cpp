@@ -1762,7 +1762,8 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 
 	if(ret == RET_NOERROR){
 		spell->postCastSpell(player, (uint32_t)manaCost, (uint32_t)spell->getSoulCost(player));
-		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_ENERGY);
+		g_game.addMagicEffect(monster->getPosition(), NM_ME_TELEPORT);
 	}
 	else{
 		player->sendCancelMessage(ret);

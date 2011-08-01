@@ -851,24 +851,41 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			}
 		}
 		else if(it.showDuration){
-			if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
-				int32_t duration = item->getDuration() / 1000;
-				s << " that has energy for ";
+			if(item && item->hasAttribute(ATTR_ITEM_DURATION))
+		{
+			int32_t duration = item->getDuration() / 1000;
+			s << " that will expire in ";
 
-				if(duration >= 120){
-					s << duration / 60 << " minutes left.";
-				}
-				else if(duration > 60){
-					s << "1 minute left.";
-				}
-				else{
-					s << "less than a minute left.";
-				}
+			if(duration >= 86400)
+			{
+				uint16_t days = duration / 86400;
+				uint16_t hours = (duration % 86400) / 3600;
+				s << days << " day" << (days != 1 ? "s" : "");
+				if(hours > 0)
+					s << " and " << hours << " hour" << (hours != 1 ? "s" : "");
 			}
-			else{
-				s << " that is brand-new.";
+			else if(duration >= 3600)
+			{
+				uint16_t hours = duration / 3600;
+				uint16_t minutes = (duration % 3600) / 60;
+				s << hours << " hour" << (hours != 1 ? "s" : "");
+				if(minutes > 0)
+					s << " and " << minutes << " minute" << (minutes != 1 ? "s" : "");
 			}
+			else if(duration >= 60)
+			{
+				uint16_t minutes = duration / 60;
+				s << minutes << " minute" << (minutes != 1 ? "s" : "");
+				uint16_t seconds = duration % 60;
+				if(seconds > 0)
+					s << " and " << seconds << " second" << (seconds != 1 ? "s" : "");
+			}
+			else
+				s << duration << " second" << (duration != 1 ? "s" : "");
 		}
+		else
+			s << " that is brand-new";
+	}
 
 		s << " (";
 		bool prevDesc = false;
@@ -996,23 +1013,40 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 	}
 	else if(it.showDuration){
-		if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
+		if(item && item->hasAttribute(ATTR_ITEM_DURATION))
+		{
 			int32_t duration = item->getDuration() / 1000;
-			s << " that has energy for ";
+			s << " that will expire in ";
 
-			if(duration >= 120){
-				s << duration / 60 << " minutes left.";
+			if(duration >= 86400)
+			{
+				uint16_t days = duration / 86400;
+				uint16_t hours = (duration % 86400) / 3600;
+				s << days << " day" << (days != 1 ? "s" : "");
+				if(hours > 0)
+					s << " and " << hours << " hour" << (hours != 1 ? "s" : "");
 			}
-			else if(duration > 60){
-				s << "1 minute left.";
+			else if(duration >= 3600)
+			{
+				uint16_t hours = duration / 3600;
+				uint16_t minutes = (duration % 3600) / 60;
+				s << hours << " hour" << (hours != 1 ? "s" : "");
+				if(minutes > 0)
+					s << " and " << minutes << " minute" << (minutes != 1 ? "s" : "");
 			}
-			else{
-				s << "less than a minute left.";
+			else if(duration >= 60)
+			{
+				uint16_t minutes = duration / 60;
+				s << minutes << " minute" << (minutes != 1 ? "s" : "");
+				uint16_t seconds = duration % 60;
+				if(seconds > 0)
+					s << " and " << seconds << " second" << (seconds != 1 ? "s" : "");
 			}
+			else
+				s << duration << " second" << (duration != 1 ? "s" : "");
 		}
-		else{
-			s << " that is brand-new.";
-		}
+		else
+			s << " that is brand-new";
 	}
 	else{
 		s << ".";

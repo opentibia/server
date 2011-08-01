@@ -24,4 +24,7 @@ if you type attackspeed="-500" you will have to wait 0.5 secs MORE before you ca
    <mount id="19" looktype="402" name="Tamed Panda" attackspeed="0" default="0" premium="1" speed="20" />
    <mount id="20" looktype="405" name="Dromedary" attackspeed="0" default="0" premium="1" speed="20" />
    <mount id="21" looktype="406" name="Sandstone Scorpion" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="23" looktype="426" name="Fire War Horse" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="24" looktype="437" name="Rented Horse" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="25" looktype="438" name="Rented Horse" attackspeed="0" default="0" premium="1" speed="20" />
 </mounts>

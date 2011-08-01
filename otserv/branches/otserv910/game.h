@@ -97,8 +97,8 @@ typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 typedef std::vector<Player*> PlayerVector;
 
 #define EVENT_LIGHTINTERVAL  10000
-#define EVENT_DECAYINTERVAL  1000
-#define EVENT_DECAY_BUCKETS  16
+#define EVENT_DECAYINTERVAL  250
+#define EVENT_DECAY_BUCKETS  4
 
 /**
   * Main Game class.

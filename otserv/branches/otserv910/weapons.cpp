@@ -636,7 +636,8 @@ bool WeaponMelee::configureWeapon(const ItemType& it)
 
 bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
 {
-	if(!Weapon::useWeapon(player, item, target)){
+	int32_t damageModifier = playerWeaponCheck(player, target);
+	if(damageModifier == 0){
 		return false;
 	}
 
@@ -650,7 +651,7 @@ bool WeaponMelee::useWeapon(Player* player, Item* item, Creature* target) const
 
 	}
 
-	return true;
+	return internalUseWeapon(player, item, target, damageModifier);
 }
 
 void WeaponMelee::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
