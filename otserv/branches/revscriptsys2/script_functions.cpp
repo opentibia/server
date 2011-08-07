@@ -123,6 +123,8 @@ void Manager::registerClasses() {
 	registerEnum<WieldInformation>();
 	registerEnum<SkullType>();
 	registerEnum<ReturnValue>();
+	//registerEnum<PartyShieldType>();
+	//registerEnum<GuildEmblemType>();
 
 	registerClass("Event");
 	registerClass("OnSayEvent", "Event");

@@ -863,11 +863,11 @@ bool LuaStateManager::loadDirectory(std::string dir_path)
 	recursive_directory_iterator end_itr;
 
 	for(recursive_directory_iterator itr(dir_path); itr != end_itr; ++itr){
-		std::string s = itr->string();
+		std::string s = itr->path().string();
 		s = (s.size() >= 4? s.substr(s.size() - 4) : "");
 		if(s == ".lua"){
 			try {
-				if(!loadFile(itr->string()))
+				if(!loadFile(itr->path().string()))
 					return false; // default construction yields past-the-endath()))
 			} catch(Script::Error& err) {
 				std::cout << err.what();

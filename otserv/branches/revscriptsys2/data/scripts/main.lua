@@ -6,5 +6,6 @@ require("otstd/otstd")
 require("spells/spells")
 require("weapons/weapons")
 
+
 require_directory("examples")
 require_directory("npcs")

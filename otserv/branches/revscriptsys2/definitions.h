@@ -24,7 +24,7 @@
 
 #define OTSERV_VERSION "0.7.0_SVN"
 #define OTSERV_NAME "OTServ (branch revscriptsys)"
-#define OTSERV_CLIENT_VERSION "8.61"
+#define OTSERV_CLIENT_VERSION "8.70"
 #define CURRENT_SCHEMA_VERSION 19
 
 #ifdef __USE_SQLITE__

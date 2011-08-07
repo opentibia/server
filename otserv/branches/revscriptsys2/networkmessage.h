@@ -66,6 +66,10 @@ public:
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		return v;
 	}
+	uint64_t GetU64(){
+		uint64_t v = *(uint64_t*)(m_MsgBuf + m_ReadPos);
+		return v;
+	}
 	std::string GetString();
 	std::string GetRaw();
 	Position GetPosition();
@@ -91,6 +95,12 @@ public:
 			return;
 		*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
 		m_ReadPos += 4; m_MsgSize += 4;
+	}
+	void AddU64(uint64_t value){
+		if(!canAdd(8))
+			return;
+		*(uint64_t*)(m_MsgBuf + m_ReadPos) = value;
+		m_ReadPos += 8; m_MsgSize += 8;
 	}
 	void AddBytes(const char* bytes, uint32_t size);
 	void AddPaddingBytes(uint32_t n);

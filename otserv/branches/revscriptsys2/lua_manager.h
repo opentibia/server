@@ -219,14 +219,6 @@ public:
 	template <class E, int size_>
 	void push(const BitEnum<E, size_>& e) {pushEnum<E, size_>(e);}
 
-	#ifndef __GNUC__
-	#if VISUALC_VERSION < 10
-	// for some reason, having trouble compiling this under vc10
-	// TODO: Find a proper fix for this!
-	void push(int i) {pushInteger(i);}
-	#endif
-	#endif
-
 	// Don't use pushTable on a userdata class and vice-versa (events are table classes, everything else userdata)
 	Script::ObjectID* pushClassInstance(const std::string& classname);
 	void pushClassTableInstance(const std::string& classname);

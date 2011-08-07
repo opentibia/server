@@ -85,6 +85,7 @@ private:
 
 	void parseRequestOutfit(NetworkMessage& msg);
 	void parseSetOutfit(NetworkMessage& msg);
+	void parseMount(NetworkMessage &msg);
 	void parseSay(NetworkMessage& msg);
 	void parseLookAt(NetworkMessage& msg);
 	void parseFightModes(NetworkMessage& msg);
@@ -241,7 +242,7 @@ private:
 		int32_t width, int32_t height, NetworkMessage_ptr msg);
 
 	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
-	void AddTextMessage(NetworkMessage_ptr msg,MessageClass mclass, const std::string& message);
+	void AddTextMessage(NetworkMessage_ptr msg, MessageClass mclass, const std::string& message);
 	void AddAnimatedText(NetworkMessage_ptr msg,const Position& pos, unsigned char color, const std::string& text);
 	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, unsigned char type);
 	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, MagicEffect type) {AddMagicEffect(msg, pos, type.value());}

@@ -78,7 +78,7 @@ end
 
 -- Default fist formula callback
 function otstd.fistDamageFormula(player, target)
-	return -math.random(0, otstd.getWeaponMaxDamage(player:getLevel(), player:getSkill(SKILL_FIST), 7 --[[config["fist_strenght"]], player:getAttackFactor()))
+	return -math.random(0, otstd.getWeaponMaxDamage(player:getLevel(), player:getSkill(SKILL_FIST), 7, player:getAttackFactor()))
 end
 
 function otstd.onUseWeapon(event)
@@ -282,13 +282,14 @@ function otstd.internalUseFist(event)
 	local target = event.target
 
 
-	local damage = otstd.fistDamageFormula(player, target)
-
-	-- do the damage
-	internalCastSpell(COMBAT_PHYSICALDAMAGE, player, target, damage, true, true)
-
-	-- call finish handler
-	otstd.onUsedFist(event)
+	-- the target must be in range
+	if areInRange(player:getPosition(), target:getPosition(), 1) then
+		local damage = otstd.fistDamageFormula(player, target)
+		-- do the damage
+		internalCastSpell(COMBAT_PHYSICALDAMAGE, player, target, damage, true, true)
+		-- call finish handler
+		otstd.onUsedFist(event)
+	end
 end
 
 function Weapon:register()

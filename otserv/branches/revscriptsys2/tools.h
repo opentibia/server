@@ -39,14 +39,7 @@ void toUpperCaseString(std::string& source);
 std::string asLowerCaseString(const std::string& source);
 std::string asUpperCaseString(const std::string& source);
 bool utf8ToLatin1(char* intext, std::string& outtext);
-#if VISUALC_VERSION < 10
-// for some reason, having trouble compiling this under vc10
-// TODO: Find a proper fix for this!
-bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
-#endif
-#if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value);
-#endif
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value);
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);

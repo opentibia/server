@@ -439,7 +439,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		ErrorMessage(os.str());
 		exit(-1);
 	}
-	std::cout << " [done]" << std::endl;
+	std::cout << "[done]" << std::endl;
 
 #ifdef WIN32
 	std::stringstream mutexName;
@@ -494,9 +494,18 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << "Version = " << schema_version << " ";
 	std::cout << "[done]" << std::endl;
 
+	std::cout << ":: Cleaning online players info... " << std::flush;
+	if(!IOPlayer::instance()->cleanOnlineInfo()){
+		std::stringstream errormsg;
+		errormsg << "Unable to execute query for cleaning online status!";
+		ErrorMessage(errormsg.str().c_str());
+		exit(-1);
+	}
+	std::cout << "[done]" << std::endl;
+
 
 	//load RSA key
-	std::cout << ":: Loading RSA key..." << std::flush;
+	std::cout << ":: Loading RSA key... " << std::flush;
 	const char* p("14299623962416399520070177382898895550795403345466153217470516082934737582776038882967213386204600674145392845853859217990626450972452084065728686565928113");
 	const char* q("7630979195970404721891201847792002125535401292779123937207447574596692788513647179235335529307251350570728407373705564708871762033017096809910315212884101");
 	const char* d("46730330223584118622160180015036832148732986808519344675210555262940258739805766860224610646919605860206328024326703361630109888417839241959507572247284807035235569619173792292786907845791904955103601652822519121908367187885509270025388641700821735345222087940578381210879116823013776808975766851829020659073");
@@ -564,8 +573,8 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::cout << "[done]" << std::endl;
 
+	//set world type
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
-
 	if(asLowerCaseString(worldType) == "pvp")
 		g_game.setWorldType(WORLD_TYPE_PVP);
 	else if(asLowerCaseString(worldType) == "no-pvp")
@@ -576,17 +585,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		ErrorMessage("Unknown world type!");
 		exit(-1);
 	}
-
 	std::cout << ":: Worldtype: " << asUpperCaseString(worldType) << std::endl;
-
-	std::cout << ":: Cleaning online players info... " << std::flush;
-	if(!IOPlayer::instance()->cleanOnlineInfo()){
-		std::stringstream errormsg;
-		errormsg << "Unable to execute query for cleaning online status!";
-		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
-	}
-	std::cout << "[done]" << std::endl;
 
 	#ifdef __SKULLSYSTEM__
 	std::cout << ":: Skulls enabled" << std::endl;

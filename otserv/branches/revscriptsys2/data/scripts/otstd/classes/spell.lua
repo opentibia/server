@@ -839,28 +839,21 @@ function Spell:register()
 
 		-- Lamba callback to include what spell is being cast
 		local function spellSayHandler(event)
-			event:propagate()
+			event:skip()
 
-			local text = string.explode(event.text, "\"")
-			local words = string.strip_whitespace(text[1] or "")
-			local param = string.strip_whitespace(text[2] or "")
-			if self.words:lower() == words:lower() then
-				-- this is the right one
-				event:skip()
+			local param = string.strip_whitespace(string.sub(event.text, self.words:len()+1) or "")
+			event.spell = self
+			event.caster = event.creature
+			if self.needTarget then
+				event.targetCreature = getPlayerByName(param)
+			elseif self.maybeTarget then
+				event.targetCreature = event.creature:getTarget()
+			end
 
-				event.spell = self
-				event.caster = event.creature
-				if self.needTarget then
-					event.targetCreature = getPlayerByName(param)
-				elseif self.maybeTarget then
-					event.targetCreature = event.creature:getTarget()
-				end
-
-				if self.onSay then
-					self:onSay(event)
-				else
-					otstd.onSpell(event)
-				end
+			if self.onSay then
+				self:onSay(event)
+			else
+				otstd.onSpell(event)
 			end
 		end
 

@@ -1,21 +1,6 @@
--- Custom Formulas
-local customFormulas = {
-	[2545] = function(player, target, weapon) -- Explosive Arrow
-		return 0
-	end;
-
-	[2546] = function(player, target, weapon) -- Poison Arrow
-		return 0
-	end;
-
-	[7366] = function(player, target, weapon) -- Viper Star
-		return 0
-	end;
-}
-
 local distanceWeapons = {
 	-- Bows and Crossbows
-	[8849] = {vocation = {"Paladin", "Royal Paladin"}, level = 45, unproperly = true} -- Modified Crossbow
+	[8849] = {vocation = {"Paladin", "Royal Paladin"}, level = 45, unproperly = true}; -- Modified Crossbow
 	[8850] = {vocation = {"Paladin", "Royal Paladin"}, level = 60, unproperly = true}; -- Chain Bolter
 	[8853] = {vocation = {"Paladin", "Royal Paladin"}, level = 80, unproperly = true}; -- Ironworker
 	[8852] = {vocation = {"Paladin", "Royal Paladin"}, level = 100, unproperly = true}; -- Devileye
@@ -31,9 +16,15 @@ local distanceWeapons = {
 	[7438] = {}; -- Elvish Bow
 
 	-- Ammunition
-	[2545] = {damageFormula = customFormula[2545]}; -- Poison Arrow
-	[2546] = {damageFormula = customFormula[2546]}; -- Explosive Arrow
-	[7366] = {damageFormula = customFormula[7366]}; -- Viper Star
+	[2545] = {damageFormula = function(player, target, weapon)
+		--
+	end}; -- Poison Arrow
+	[2546] = {damageFormula = function(player, target, weapon)
+		--
+	end}; -- Explosive Arrow
+	[7366] = {damageFormula = function(player, target, weapon)
+		--
+	end}; -- Viper Star
 
 	[7838] = {combatType = COMBAT_ENERGYDAMAGE}; -- Flash Arrow
 	[7839] = {combatType = COMBAT_ICEDAMAGE}; -- Shiver Arrow

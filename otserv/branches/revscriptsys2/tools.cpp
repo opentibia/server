@@ -79,23 +79,6 @@ std::string asUpperCaseString(const std::string& source)
 	return s;
 }
 
-#if VISUALC_VERSION < 10
-// for some reason, having trouble compiling this under vc10
-// TODO: Find a proper fix for this!
-bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
-{
-	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
-	if(nodeValue){
-		value = atoi(nodeValue);
-		xmlFreeOTSERV(nodeValue);
-		return true;
-	}
-
-	return false;
-}
-#endif
-
-#if (defined __WINDOWS__ || defined WIN32) && !defined __GNUC__
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
@@ -107,7 +90,6 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 
 	return false;
 }
-#endif
 
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 {

@@ -10,4 +10,3 @@ end
 function Enum:value()
 	return self.__intValue
 end
-

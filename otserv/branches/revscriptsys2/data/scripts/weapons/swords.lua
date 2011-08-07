@@ -1,7 +1,7 @@
 local swords = {
 	-- Swords
 	[7385] = {level = 20, unproperly = true}; -- Crimson Sword
-	[2377] = {level = 20, unproperly = true} -- Two Handed Sword
+	[2377] = {level = 20, unproperly = true}; -- Two Handed Sword
 	[7408] = {level = 25, unproperly = true}; -- Wyvern Fang
 	[2392] = {level = 30, unproperly = true}; -- Fire Sword
 	[2407] = {level = 30, unproperly = true}; -- Bright Sword

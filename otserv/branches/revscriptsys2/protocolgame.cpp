@@ -640,6 +640,10 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		parseSetOutfit(msg);
 		break;
 
+	case 0xD4: // mount/unmount
+		parseMount(msg);
+		break;
+
 	case 0xDC:
 		parseAddVip(msg);
 		break;
@@ -1022,6 +1026,7 @@ void ProtocolGame::parseSetOutfit(NetworkMessage& msg)
 	uint8_t looklegs = msg.GetByte();
 	uint8_t lookfeet = msg.GetByte();
 	uint8_t lookaddons = msg.GetByte();
+	/*uint16_t lookmount =*/ msg.GetU16();
 
 	OutfitType newOutfit;
 	newOutfit.lookType = looktype;
@@ -1030,8 +1035,14 @@ void ProtocolGame::parseSetOutfit(NetworkMessage& msg)
 	newOutfit.lookLegs = looklegs;
 	newOutfit.lookFeet = lookfeet;
 	newOutfit.lookAddons = lookaddons;
+	//newOutfir.lookMount = lookmount;
 
 	addGameTask(&Game::playerChangeOutfit, player->getID(), newOutfit);
+}
+
+void ProtocolGame::parseMount(NetworkMessage &msg)
+{
+	//
 }
 
 void ProtocolGame::parseUseItem(NetworkMessage& msg)
@@ -2352,8 +2363,27 @@ void ProtocolGame::sendOutfitWindow(const std::list<Outfit>& outfitList)
 			msg->AddString("");
 			msg->AddByte(player->getDefaultOutfit().lookAddons);
 		}
+
+		// Mounts
+		msg->AddByte(0x01); // Num of mounts
+		msg->AddU16(0x00); // Look type of the mount
+		msg->AddString("No Mount"); // Name of the mount
  	}
- }
+}
+
+/*
+void ProtocolGame::sendSpellCooldown()
+{
+	NetworkMessage_ptr msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+		msg->addByte(0xA4); // 0xA4 -> Normal Spells | 0xA5 -> Group Spells
+		msg->addU16(0x0000); // spellid
+		msg->addU16(0x0000); // cooldown
+		msg->addByte(0x00); // ?
+	}
+}
+*/
 
 void ProtocolGame::sendVIPLogIn(uint32_t guid)
 {
@@ -2508,13 +2538,7 @@ void ProtocolGame::AddPlayerStats(NetworkMessage_ptr msg)
 	msg->AddU16(player->getHealth());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
 	msg->AddU32((uint32_t)(player->getFreeCapacity() * 100));
-	uint64_t experience = player->getExperience();
-	if(experience <= 0x7FFFFFFF){
-		msg->AddU32(player->getExperience());
-	}
-	else{
-		msg->AddU32(0x00); //Client debugs after 2,147,483,647 exp
-	}
+	msg->AddU64(player->getExperience());
 	msg->AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
 	msg->AddByte(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT));
 	msg->AddU16(player->getMana());
@@ -2616,8 +2640,10 @@ void ProtocolGame::AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* cre
 		msg->AddItemId(outfit.lookTypeEx);
 	}
 	else{
-		msg->AddU16(outfit.lookTypeEx);
+		msg->AddU16(0x00);
 	}
+
+	msg->AddU16(0x00); // Mount look
 }
 
 void ProtocolGame::AddWorldLight(NetworkMessage_ptr msg, const LightInfo& lightInfo)
