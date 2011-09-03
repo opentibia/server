@@ -341,6 +341,13 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 						Creature* creature = *node_iter;
 						const Position& cpos = creature->getPosition();
 						int32_t offsetZ = centerPos.z - cpos.z;
+						
+						//3lite - temporal "fix" TODO !!
+						if(!creature || creature->isRemoved()){
+							std::cout << "Map::getSpectatorsInternal : Leaf - NULL or removed creature on stack!" << std::endl;
+							// would be nice to remove that corrupted creature on the stack...
+							continue;
+						}
 
 						if(cpos.z < minRangeZ || cpos.z > maxRangeZ){
 							continue;
