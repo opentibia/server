@@ -2268,7 +2268,13 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
-
+	
+	if(!player->hasFlag(PlayerFlag_CanConvinceAll) && convinceCreature->getPlayerMaster()){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+	
 	int32_t manaCost = 0;
 
 	if(convinceCreature->getMonster()){
