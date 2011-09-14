@@ -169,6 +169,7 @@ public:
 	bool isPremium() const {return (premiumDays > 0 || hasFlag(PlayerFlag_IsAlwaysPremium));}
 
 	bool isOffline() const {return (getID() == 0);}
+	bool isOnline() const {return !isOffline();}
 	void disconnect() {if(client) client->disconnect();}
 	uint32_t getIP() const;
 
@@ -180,6 +181,10 @@ public:
 
 	void addStorageValue(const uint32_t key, const int32_t value);
 	bool getStorageValue(const uint32_t key, int32_t& value) const;
+	bool eraseStorageValue(const uint32_t key);
+	static bool getStorageValueByName(const std::string name, const uint32_t key, int32_t& value);
+	static bool setStorageValueByName(const std::string name, const uint32_t key, const int32_t value);
+	static bool eraseStorageValueByName(const std::string name, const uint32_t key);
 	void genReservedStorageRange();
 
 	bool withdrawMoney(uint32_t amount);

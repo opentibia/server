@@ -458,6 +458,12 @@ bool ScriptEnviroment::getGlobalStorageValue(const uint32_t key, int32_t& value)
 	}
 }
 
+bool ScriptEnviroment::eraseGlobalStorageValue(const uint32_t key)
+{
+	return (m_globalStorageMap.erase(key) > 0);
+}
+
+
 std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code){
 	switch(code){
 	case LUA_ERROR_PLAYER_NOT_FOUND:
@@ -1263,6 +1269,9 @@ void LuaScriptInterface::registerFunctions()
 	//setPlayerStorageValue(cid, valueid, newvalue)
 	lua_register(m_luaState, "setPlayerStorageValue", LuaScriptInterface::luaSetPlayerStorageValue);
 
+	//doErasePlayerStorageValue(cid, valueid)
+	lua_register(m_luaState, "doErasePlayerStorageValue", LuaScriptInterface::luaDoErasePlayerStorageValue);
+
 	//isPremium(cid)
 	lua_register(m_luaState, "isPremium", LuaScriptInterface::luaIsPremium);
 
@@ -1274,6 +1283,18 @@ void LuaScriptInterface::registerFunctions()
 
 	//setGlobalStorageValue(valueid, newvalue)
 	lua_register(m_luaState, "setGlobalStorageValue", LuaScriptInterface::luaSetGlobalStorageValue);
+
+	//doEraseGlobalStorageValue(valueid)
+	lua_register(m_luaState, "doEraseGlobalStorageValue", LuaScriptInterface::luaDoEraseGlobalStorageValue);
+
+	//doErasePlayerStorageValueByName(name, key)
+	lua_register(m_luaState, "doErasePlayerStorageValueByName", LuaScriptInterface::luaDoErasePlayerStorageValueByName);
+
+	//setPlayerStorageValueByName(name, key, newValue)
+	lua_register(m_luaState, "setPlayerStorageValueByName", LuaScriptInterface::luaSetPlayerStorageValueByName);
+
+	//getPlayerStorageValueByName(name, key)
+	lua_register(m_luaState, "getPlayerStorageValueByName", LuaScriptInterface::luaGetPlayerStorageValueByName);
 
 	//getTilePzInfo(pos)
 	//1 is pz. 0 no pz.
@@ -9409,6 +9430,80 @@ int LuaScriptInterface::luaGetPlayerModes(lua_State* L)
 	setField(L, "chase", player->getChaseMode());
 	setField(L, "fight", player->getFightMode());
 	setField(L, "safe", player->hasSafeMode());
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerStorageValueByName(lua_State *L)
+{
+	//getPlayerStorageValueByName(name, key)
+	std::string name = popString(L);
+	uint32_t key = popNumber(L);
+	int32_t ret;
+	if (Player::getStorageValueByName(name, key, ret))
+		lua_pushnumber(L,ret);
+	else
+		lua_pushnil(L);
+	return 1;
+}
+
+int LuaScriptInterface::luaSetPlayerStorageValueByName(lua_State *L)
+{
+	//setPlayerStorageValueByName(name, key, val)
+	int32_t value = popNumber(L);
+	uint32_t key = popNumber(L);
+	std::string name = popString(L);
+
+	lua_pushboolean(L, Player::setStorageValueByName(name, key, value));
+
+	return 1;
+}
+
+int LuaScriptInterface::luaDoErasePlayerStorageValueByName(lua_State *L)
+{
+	//doErasePlayerStorageValueByName(name, key)
+	uint32_t key = popNumber(L);
+	std::string name = popString(L);
+
+	lua_pushboolean(L, Player::eraseStorageValueByName(name, key));
+
+	return 1;
+}
+
+int LuaScriptInterface::luaDoErasePlayerStorageValue(lua_State *L)
+{
+	//erasePlayerStorageValue(cid, key)
+	uint32_t key = popNumber(L);
+	uint32_t cid = popNumber(L);
+	if(IS_IN_KEYRANGE(key, RESERVED_RANGE)){
+		std::stringstream error_str;
+		error_str << "Accessing to reserved range: "  << key;
+		reportErrorFunc(error_str.str());
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		player->eraseStorageValue(key);
+		lua_pushboolean(L, true);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushboolean(L, false);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoEraseGlobalStorageValue(lua_State *L)
+{
+	//eraseGlobalStorageValue(key)
+	uint32_t key = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	lua_pushboolean(L, env->eraseGlobalStorageValue(key));
 	return 1;
 }
 

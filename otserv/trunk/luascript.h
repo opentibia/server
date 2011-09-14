@@ -111,6 +111,7 @@ public:
 
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
+	bool eraseGlobalStorageValue(const uint32_t key);
 
 	void setRealPos(const Position& realPos) {m_realPos = realPos;}
 	Position getRealPos() {return m_realPos;}
@@ -492,9 +493,14 @@ protected:
 
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
+	static int luaDoErasePlayerStorageValueByName(lua_State *L);
+	static int luaSetPlayerStorageValueByName(lua_State *L);
+	static int luaGetPlayerStorageValueByName(lua_State *L);
+	static int luaDoErasePlayerStorageValue(lua_State *L);
 
 	static int luaGetGlobalStorageValue(lua_State *L);
 	static int luaSetGlobalStorageValue(lua_State *L);
+	static int luaDoEraseGlobalStorageValue(lua_State *L);
 
 	static int luaDoPlayerAddOutfit(lua_State *L);
 	static int luaDoPlayerRemoveOutfit(lua_State *L);

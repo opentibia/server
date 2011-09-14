@@ -1034,6 +1034,77 @@ bool Player::getStorageValue(const uint32_t key, int32_t& value) const
 	}
 }
 
+bool Player::eraseStorageValue(const uint32_t key)
+{
+ 	if(IS_IN_KEYRANGE(key, RESERVED_RANGE)) {
+		std::cout << "You can't erase the key number "<< key << "as it is reserved.\n";
+		return(false);
+		}
+	StorageMap::iterator it= storageMap.find(key);
+	if(it != storageMap.end()) {
+		storageMap.erase(it);
+		return(true);
+		}
+	return(false); //key not found
+}
+
+//static
+bool Player::getStorageValueByName(const std::string name, const uint32_t key, int32_t& value)
+{
+	Player* target = g_game.getPlayerByName(name);
+	if(!target){
+		target = new Player(name, NULL);
+		if(!IOPlayer::instance()->loadPlayer(target, name)){
+			delete target;
+			return false;
+		}
+	}
+	bool ret = target->getStorageValue(key, value);
+	if(!target->isOnline()){
+		IOPlayer::instance()->savePlayer(target);
+		delete target;
+	}
+	return (ret);
+}
+
+//static
+bool Player::setStorageValueByName(const std::string name, const uint32_t key, const int32_t value)
+{
+	Player* target = g_game.getPlayerByName(name);
+	if(!target){
+		target = new Player(name, NULL);
+		if(!IOPlayer::instance()->loadPlayer(target, name)){
+			delete target;
+			return false;
+		}
+	}
+	target->addStorageValue(key, value);
+	if(!target->isOnline()){
+		IOPlayer::instance()->savePlayer(target);
+		delete target;
+	}
+	return (true);
+}
+
+//static
+bool Player::eraseStorageValueByName(const std::string name, const uint32_t key)
+{
+	Player* target = g_game.getPlayerByName(name);
+	if(!target){
+		target = new Player(name, NULL);
+		if(!IOPlayer::instance()->loadPlayer(target, name)){
+			delete target;
+			return false;
+		}
+	}
+	bool ret = target->eraseStorageValue(key);
+	if(!target->isOnline()){
+		IOPlayer::instance()->savePlayer(target);
+		delete target;
+	}
+	return (ret);
+}
+
 bool Player::canSee(const Position& pos) const
 {
 	if(client){
