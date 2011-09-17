@@ -9436,8 +9436,8 @@ int LuaScriptInterface::luaGetPlayerModes(lua_State* L)
 int LuaScriptInterface::luaGetPlayerStorageValueByName(lua_State *L)
 {
 	//getPlayerStorageValueByName(name, key)
-	std::string name = popString(L);
 	uint32_t key = popNumber(L);
+	std::string name = popString(L);
 	int32_t ret;
 	if (Player::getStorageValueByName(name, key, ret))
 		lua_pushnumber(L,ret);
