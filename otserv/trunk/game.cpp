@@ -934,6 +934,10 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			return false;
 		}
+		else if(movingCreature->getNpc() && !Spawns::getInstance()->isInZone(movingCreature->masterPos, movingCreature->masterRadius, toPos)){
+			player->sendCancelMessage(RET_NOTENOUGHROOM);
+            return false;
+        }
 	}
 
 	ReturnValue ret = internalMoveCreature(movingCreature, movingCreature->getTile(), toTile);
@@ -1300,7 +1304,6 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	}
 
 	if(ret != RET_NOERROR){
-
 		return ret;
 	}
 

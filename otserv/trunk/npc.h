@@ -479,7 +479,7 @@ public:
 	virtual Npc* getNpc() {return this;};
 	virtual const Npc* getNpc() const {return this;};
 
-	virtual bool isPushable() const { return false;};
+	virtual bool isPushable() const { return true;};
 
 	virtual uint32_t idRange(){ return NPC_ID_RANGE;}
 	static AutoList<Npc> listNpc;
