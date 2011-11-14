@@ -22,6 +22,14 @@ local function __doTransformHole__(parameters)
 	end
 end
 
+local function __doTransformHole__2(parameters)
+	local thing = getTileItemById(parameters.pos, MUD_HOLE2)
+	local newItem = doTransformItem(thing.uid, parameters.oldType)
+	if parameters.oldAid ~= 0 and newItem then
+		doSetItemActionId(thing.uid, parameters.oldAid)
+	end
+end
+
 function onUse(cid, item, frompos, item2, topos)
 	--Jammed
 	local tim = getPlayerStorageValue(cid, STORAGE_VALUE_LOCATION)
@@ -118,7 +126,7 @@ function onUse(cid, item, frompos, item2, topos)
 		if item2.actionid ~= 0 then
 			doSetItemActionId(item2.uid, item2.actionid)
 		end
-		addEvent(__doTransformHole__, duration, {oldType = item2.itemid, pos = topos, oldaid = item2.actionid})
+		addEvent(__doTransformHole__2, duration, {oldType = item2.itemid, pos = topos, oldaid = item2.actionid})
 		return true
 	end
 	if(item2.itemid == FRAGILE_ICE) then
