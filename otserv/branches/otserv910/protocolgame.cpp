@@ -1856,7 +1856,8 @@ void ProtocolGame::sendContainer(uint32_t cid, const Container* container, bool 
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x6E);
 		msg->AddByte(cid);
-		msg->AddItemId(container);
+		
+		msg->AddItem(container);
 		msg->AddString(container->getName());
 		msg->AddByte(container->capacity());
 		msg->AddByte(hasParent ? 0x01 : 0x00);
