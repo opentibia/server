@@ -191,6 +191,8 @@ show_death_window = true
 -- What message should be sent for the player, after its own death? Use "" to disable.
 death_msg = "You are dead."
 
+--should players be able to rope creatures (like at older versions of tibia)?
+can_rope_creatures = true
 
 --how many floors away of a player should a monster be to become idle?
 --WARNING: setting this as any number bigger than 3 may increase CPU usage and
