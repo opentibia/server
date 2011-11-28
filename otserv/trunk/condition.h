@@ -292,11 +292,11 @@ public:
 	bool doForceUpdate() const { return forceUpdate;}
 	int32_t getTotalDamage() const;
 
-	int32_t getLength() {
-		int32_t length = 0;
-		for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); it++, length++){}
-		return length;
+	int32_t getLength() const
+	{
+		return damageList.size()
 	}
+	
 	IntervalInfo popBackDamage() {
 		IntervalInfo info = damageList.back();
 		damageList.pop_back();
