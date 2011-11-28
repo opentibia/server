@@ -260,7 +260,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getZone()", &Manager::lua_Creature_getZone);	
 	registerMemberFunction("Creature", "say(string msg [, SpeakClass type])", &Manager::lua_Creature_say);
 	registerMemberFunction("Creature", "setOutfit(table outfit)", &Manager::lua_Creature_setOutfit);
-	registerMemberFunction("Creature", "walk(Direction direction)", &Manager::lua_Creature_walk);
+	registerMemberFunction("Creature", "walk(Direction direction [,bool force])", &Manager::lua_Creature_walk);
 	registerMemberFunction("Creature", "getSpeed()", &Manager::lua_Creature_getSpeed);
 	registerMemberFunction("Creature", "getArmor()", &Manager::lua_Creature_getArmor);
 	registerMemberFunction("Creature", "getDefense()", &Manager::lua_Creature_getDefense);
@@ -3601,6 +3601,9 @@ int LuaState::lua_Creature_getNameDescription()
 
 int LuaState::lua_Creature_walk()
 {
+	bool force = false;
+	if (getStackSize() > 2)
+		force = popBoolean();
 	Direction ndir = popEnum<Direction>();
 	Creature* creature = popCreature();
 
@@ -3618,7 +3621,7 @@ int LuaState::lua_Creature_walk()
 			throw Error("Creature:walk : Invalid direction");
 	}
 
-	ReturnValue ret = g_game.internalMoveCreature(NULL, creature, (Direction)ndir);
+	ReturnValue ret = g_game.internalMoveCreature(NULL, creature, ndir, force ? FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE : 0);
 	pushBoolean(ret == RET_NOERROR);
 	return 1;
 }

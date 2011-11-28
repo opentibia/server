@@ -365,37 +365,10 @@ public:
 	bool positionChange() const {return hasFlag(TILEPROP_POSITIONCHANGE);}
 	bool floorChange() const {return hasFlag(TILEPROP_FLOORCHANGE);}
 	bool floorChangeDown() const {return hasFlag(TILEPROP_FLOORCHANGE_DOWN);}
-	bool floorChange(Direction direction) const
-	{
-		switch(direction.value()){
-		case enums::NORTH:
-			return hasFlag(TILEPROP_FLOORCHANGE_NORTH);
-		case enums::SOUTH:
-			return hasFlag(TILEPROP_FLOORCHANGE_SOUTH);
-		case enums::EAST:
-			return hasFlag(TILEPROP_FLOORCHANGE_EAST);
-		case enums::WEST:
-			return hasFlag(TILEPROP_FLOORCHANGE_WEST);
-		default:
-			return false;
-		}
-	}
+	bool floorChange(Direction direction) const;
 
-	ZoneType getZone() const {
-		if(hasFlag(TILEPROP_PROTECTIONZONE)){
-			return ZONE_PROTECTION;
-		}
-		else if(hasFlag(TILEPROP_NOPVPZONE)){
-			return ZONE_NOPVP;
-		}
-		else if(hasFlag(TILEPROP_PVPZONE)){
-			return ZONE_PVP;
-		}
-		else{
-			return ZONE_NORMAL;
-		}
-	}
-
+	ZoneType getZone() const;
+	bool isZone(ZoneType zt) const;
 	bool hasHeight(uint32_t n) const;
 	void moveCreature(Creature* actor, Creature* creature, Cylinder* toCylinder, bool teleport = false);
 	int32_t getClientIndexOfThing(const Player* player, const Thing* thing) const;
@@ -1252,3 +1225,4 @@ inline IndexedTile::~IndexedTile()
 {}
 
 #endif
+

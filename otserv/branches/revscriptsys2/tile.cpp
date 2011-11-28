@@ -81,6 +81,51 @@ bool Tile::hasHeight(uint32_t n) const
 	return false;
 }
 
+
+bool Tile::floorChange(Direction direction) const
+{
+	switch(direction.value()){
+	case enums::NORTH:
+		return hasFlag(TILEPROP_FLOORCHANGE_NORTH);
+	case enums::SOUTH:
+		return hasFlag(TILEPROP_FLOORCHANGE_SOUTH);
+	case enums::EAST:
+		return hasFlag(TILEPROP_FLOORCHANGE_EAST);
+	case enums::WEST:
+		return hasFlag(TILEPROP_FLOORCHANGE_WEST);
+	default:
+		return false;
+	}
+}
+
+ZoneType Tile::getZone() const
+{
+	if(hasFlag(TILEPROP_PROTECTIONZONE)){
+		return ZONE_PROTECTION;
+	}
+	else if(hasFlag(TILEPROP_NOPVPZONE)){
+		return ZONE_NOPVP;
+	}
+	else if(hasFlag(TILEPROP_PVPZONE)){
+		return ZONE_PVP;
+	}
+	else{
+		return ZONE_NORMAL;
+	}
+}
+
+bool Tile::isZone(ZoneType zt) const
+{
+	switch(zt.value()){
+		case enums::ZONE_PROTECTION: return hasFlag(TILEPROP_PROTECTIONZONE);
+		case enums::ZONE_NOPVP:      return hasFlag(TILEPROP_NOPVPZONE);
+		case enums::ZONE_PVP:        return hasFlag(TILEPROP_PVPZONE);
+		case enums::ZONE_NOLOGOUT:   return hasFlag(TILEPROP_NOLOGOUT);
+		case enums::ZONE_NORMAL:     return true;
+	}
+	return true;
+}
+
 Teleport* Tile::getTeleportItem() const
 {
 	Item* item = items_getItemWithType(ITEM_TYPE_TELEPORT);
@@ -370,26 +415,28 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 			}
 
-			if(monster->canPushCreatures() && !monster->isSummon()){
-				Creature* creature;
-				for(uint32_t i = 0; i < creatures_count(); ++i){
-					creature = creatures_get(i);
-					if(monster->canWalkthrough(creature)){
-						continue;
-					}
+			if (!hasBitSet(FLAG_IGNOREBLOCKCREATURE, flags)){
+				if(monster->canPushCreatures() && !monster->isSummon()){
+					Creature* creature;
+					for(uint32_t i = 0; i < creatures_count(); ++i){
+						creature = creatures_get(i);
+						if(monster->canWalkthrough(creature)){
+							continue;
+						}
 
-					if( !creature->getActor() ||
-						!creature->isPushable() ||
-						(creature->getActor()->isPlayerSummon()))
-					{
-						return RET_NOTPOSSIBLE;
+						if( !creature->getActor() ||
+							!creature->isPushable() ||
+							(creature->getActor()->isPlayerSummon()))
+						{
+							return RET_NOTPOSSIBLE;
+						}
 					}
 				}
-			}
-			else if(!creatures_empty()){
-				for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
-					if(!monster->canWalkthrough(*cit)){
-						return RET_NOTENOUGHROOM;
+				else if(!creatures_empty()){
+					for(CreatureConstIterator cit = creatures_begin(); cit != creatures_end(); ++cit){
+						if(!monster->canWalkthrough(*cit)){
+							return RET_NOTENOUGHROOM;
+						}
 					}
 				}
 			}
