@@ -435,8 +435,10 @@ bool OnUseWeapon::Event::check_match(const ScriptInformation& info)
 			return true;
 		case FILTER_FIST:
 			return !weapon;
-		case FILTER_WEAPONID:
-			return weapon && weapon->getID() == info.weaponid;
+		case FILTER_ITEMID:
+			return weapon && weapon->getID() == info.id;
+		case FILTER_ACTIONID:
+			return weapon && weapon->getActionId() == info.id;
 		default: break;
 	}
 	return false;
@@ -444,8 +446,36 @@ bool OnUseWeapon::Event::check_match(const ScriptInformation& info)
 
 bool OnUseWeapon::Event::dispatch(Manager& state, Environment& environment)
 {
+	ListenerMap::iterator list_iter;
+	
+
+	if (!weapon) {
+		if(dispatchEvent<OnUseWeapon::Event>
+			(this, state, environment, environment.Generic.OnUseFist))
+			return true;
+	}
+	else {
+		if(weapon->getActionId() != 0){
+			list_iter = environment.Generic.OnUseWeapon.ActionId.find(weapon->getActionId());
+			if(list_iter != environment.Generic.OnUseWeapon.ActionId.end()){
+				if(dispatchEvent<OnUseWeapon::Event, ScriptInformation>
+						(this, state, environment, list_iter->second)){
+					return true;
+				}
+			}
+		}
+
+		list_iter = environment.Generic.OnUseWeapon.ItemId.find(weapon->getID());
+		if(list_iter != environment.Generic.OnUseWeapon.ItemId.end()){
+			if(dispatchEvent<OnUseWeapon::Event, ScriptInformation>
+					(this, state, environment, list_iter->second)){
+				return true;
+			}
+		}
+	}
+
 	return dispatchEvent<OnUseWeapon::Event>
-			(this, state, environment, environment.Generic.OnUseWeapon);
+			(this, state, environment, environment.Generic.OnUseAnyWeapon);
 }
 
 void OnUseWeapon::Event::push_instance(LuaState& state, Environment& environment)
@@ -455,10 +485,10 @@ void OnUseWeapon::Event::push_instance(LuaState& state, Environment& environment
 	state.setField(-2, "player");
 	state.pushThing(attacked);
 	state.setField(-2, "attacked");
-	if(weapon){
+	if(weapon) {
 		state.pushThing(weapon);
 	}
-	else{
+	else {
 		state.pushNil();
 	}
 	state.setField(-2, "weapon");

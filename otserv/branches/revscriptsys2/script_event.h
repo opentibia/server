@@ -252,12 +252,13 @@ namespace Script {
 		enum FilterType {
 			FILTER_ALL, //
 			FILTER_FIST, // no weapon
-			FILTER_WEAPONID // specific weapon
+			FILTER_ITEMID, // specific weapon by item id
+			FILTER_ACTIONID // specific weapon by action id
 		};
 
 		struct ScriptInformation {
 			FilterType method;
-			uint16_t weaponid;
+			int32_t id; // either item or action id
 		};
 
 		class Event : public Script::Event {

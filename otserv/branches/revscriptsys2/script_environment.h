@@ -79,7 +79,9 @@ namespace Script {
 		struct {
 			ListenerList OnSay;
 			ListenerItemMap OnUseItem;
-			ListenerList OnUseWeapon;
+			ListenerItemMap OnUseWeapon;
+			ListenerList OnUseFist;
+			ListenerList OnUseAnyWeapon;
 			ListenerList OnEquipItem;
 			ListenerList OnMoveCreature;
 			ListenerList OnJoinChannel;

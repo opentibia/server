@@ -952,9 +952,13 @@ int LuaState::lua_registerGenericEvent_OnUseWeapon()
 	else if(method == "fist"){
 		si_onuseweapon.method = OnUseWeapon::FILTER_FIST;
 	}
-	else if(method =="weaponid"){
-		si_onuseweapon.method = OnUseWeapon::FILTER_WEAPONID;
-		si_onuseweapon.weaponid = weaponid;
+	else if(method =="itemid"){
+		si_onuseweapon.method = OnUseWeapon::FILTER_ITEMID;
+		si_onuseweapon.id = weaponid;
+	}
+	else if(method =="actionid"){
+		si_onuseweapon.method = OnUseWeapon::FILTER_ACTIONID;
+		si_onuseweapon.id = weaponid;
 	}
 	else{
 		throw Error("Invalid argument (2) 'method'");
@@ -962,8 +966,16 @@ int LuaState::lua_registerGenericEvent_OnUseWeapon()
 
 	boost::any p(si_onuseweapon);
 	Listener_ptr listener(new Listener(ON_USE_WEAPON_LISTENER, p, *manager));
-
-	environment->Generic.OnUseWeapon.push_back(listener);
+	
+	ListenerList* list = NULL;
+	switch(si_onuseweapon.method){
+		case OnUseWeapon::FILTER_ITEMID: list = &environment->Generic.OnUseWeapon.ItemId[si_onuseweapon.id]; break;
+		case OnUseWeapon::FILTER_ACTIONID: list = &environment->Generic.OnUseWeapon.ActionId[si_onuseweapon.id]; break;
+		case OnUseWeapon::FILTER_FIST: list = &environment->Generic.OnUseFist; break;
+		case OnUseWeapon::FILTER_ALL: list = &environment->Generic.OnUseAnyWeapon; break;
+		default: break; // impossible, crash
+	}
+	list->push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1272,7 +1284,7 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *manager));
 
 	environment->Generic.OnEquipItem.push_back(listener);
-
+	
 	// Register event
 	setRegistryItem(listener->getLuaTag());
 
