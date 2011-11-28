@@ -93,9 +93,9 @@ function otstd.onUseWeapon(event)
 		otstd.internalUseFist(event)
 	else
 		local internalWeapon = otstd.weapons[weapon:getItemID()]
-		if not internalWeapon then
-			error("onUseWeapon event triggered with an unknown weapon. (ItemID: " .. weapon:getItemID() .. ")")
-		end
+		--if not internalWeapon then
+			-- error("onUseWeapon event triggered with an unknown weapon. (ItemID: " .. weapon:getItemID() .. ")")
+		--end
 
 		event.internalWeapon = internalWeapon
 		event.target = event.attacked
@@ -103,7 +103,7 @@ function otstd.onUseWeapon(event)
 
 		-- damage modifier will be used only if weaponcheck returns ok
 		if otstd.onWeaponCheck(event) then
-			if internalWeapon.onUseWeapon then
+			if internalWeapon and internalWeapon.onUseWeapon then
 				internalWeapon:onUseWeapon(event)
 			else
 				otstd.internalUseWeapon(event)
@@ -149,19 +149,21 @@ function otstd.onUsedWeapon(event)
 		player:advanceSkill(skillType, skillPoints)
 	end
 
-	if not player:hasInfiniteMana() then
-		player:spendMana(internalWeapon.mana)
-	end
+	if internalWeapon then
+		if not player:hasInfiniteMana() then
+			player:spendMana(internalWeapon.mana)
+		end
 
-	if not player:hasInfiniteSoul() then
-		player:removeSoul(internalWeapon.soul)
-	end
+		if not player:hasInfiniteSoul() then
+			player:removeSoul(internalWeapon.soul)
+		end
 
-	if not player:canGetExhausted() and
-		internalWeapon.exhausted then
-		player:addCombatExhaustion(config["fight_exhausted"])
+		if not player:canGetExhausted() and
+			internalWeapon.exhausted then
+			player:addCombatExhaustion(config["fight_exhausted"])
+		end
 	end
-
+	
 	if not player:cannotGainInFight() then
 		player:addInFight(config["in_fight_duration"])
 	end
@@ -202,6 +204,11 @@ function otstd.onWeaponCheck(event)
 		return false
 	end
 
+	if not internalWeapon then
+		-- No script-specific restrictions
+		return true
+	end
+	
 	if not player:ignoreWeaponCheck() then
 		if (internalWeapon.premium and not player:isPremium()) or
 			(internalWeapon.mana > player:getMana()) or
@@ -249,7 +256,7 @@ function otstd.internalUseWeapon(event)
 
 	-- get max min damages
 	local damage = 0
-	if internalWeapon.damageFormula then
+	if internalWeapon and internalWeapon.damageFormula then
 		damage = internalWeapon:damageFormula(player, target, weapon)
 	else
 		damage = otstd.damageFormula(player, target, weapon)
@@ -258,9 +265,16 @@ function otstd.internalUseWeapon(event)
 	damage = (damage * event.damageModifier) / 100
 
 	-- do the damage
-	internalCastSpell(internalWeapon.combatType, player, target, damage,
-		internalWeapon.blockedByShield, internalWeapon.blockedByArmor)
-
+	if internalWeapon then
+		internalCastSpell(
+			internalWeapon.combatType, player, target, damage,
+			internalWeapon.blockedByShield, internalWeapon.blockedByArmor)
+	else
+		internalCastSpell(
+			COMBAT_PHYSICALDAMAGE, player, target, damage,
+			true, true)
+	end
+	
 	-- if weapon has a shoot effect send it
 	local shootType = weapon:getShootType()
 	if shootType ~= SHOOT_EFFECT_NONE then
@@ -268,7 +282,7 @@ function otstd.internalUseWeapon(event)
 	end
 
 	-- call finish handler
-	if internalWeapon.onUsedWeapon then
+	if internalWeapon and internalWeapon.onUsedWeapon then
 		internalWeapon:onUsedWeapon(event)
 	else
 		otstd.onUsedWeapon(event)
@@ -299,7 +313,7 @@ function Weapon:register()
 		error("Duplicate weapon id \"" .. self.id .. "\"")
 	end
 
-	self.onUseWeaponHandler = registerOnUseWeapon(self.id, "weaponid", otstd.onUseWeapon)
+	self.onUseWeaponHandler = registerOnUseWeapon(self.id, "itemid", otstd.onUseWeapon)
 
 	otstd.weapons[self.id] = self
 end
@@ -312,3 +326,7 @@ function Weapon:unregister()
 
 	otstd.weapons[self.id] = nil
 end
+
+
+otstd.onFistHandler = registerOnUseWeapon("fist", otstd.onUseWeapon)
+otstd.onDefaultWeaponHandler = registerOnUseWeapon("all", otstd.onUseWeapon)
