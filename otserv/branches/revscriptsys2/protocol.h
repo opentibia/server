@@ -26,11 +26,6 @@
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;
 
-#define CLIENT_VERSION_MIN 870
-#define CLIENT_VERSION_MAX 870
-
-#define STRING_CLIENT_VERSION "This server requires client version " OTSERV_CLIENT_VERSION "."
-
 #define NETWORKMESSAGE_MAXSIZE 15340
 
 const int32_t Map_maxViewportX = 11;		//min value: maxClientViewportX + 1
