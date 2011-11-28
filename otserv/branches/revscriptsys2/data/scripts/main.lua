@@ -1,11 +1,12 @@
 -- initialize Lua random numbers
 math.randomseed(os.time())
 
-require("otstd/otstd")
+require("otstd/include")
+include("otstd/otstd")
 
-require("spells/spells")
-require("weapons/weapons")
+include("spells/spells")
+include("weapons/weapons")
 
 
-require_directory("examples")
-require_directory("npcs")
+include_directory("examples")
+include_directory("npcs")
