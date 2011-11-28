@@ -713,7 +713,11 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		}
 	}
 
-	std::cout << convertIPToString(resolvedIp) << std::endl << "::" << std::endl;
+	std::cout << convertIPToString(resolvedIp) << std::endl;
+	
+	std::cout << ":: Client Protocol        " << CLIENT_VERSION_STRING << std::endl;
+
+	std::cout << "::" << std::endl;
 
 	IpNetMask.first  = resolvedIp;
 	IpNetMask.second = 0;

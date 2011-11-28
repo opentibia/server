@@ -4135,6 +4135,9 @@ bool Game::checkReload(Player* player, const std::string& text)
 			std::cout << "================================================================================\n";
 
 			runShutdownScripts(false);
+			
+			uint64_t start = OTSYS_TIME();
+
 			try{
 				g_game.loadScripts();
 				runStartupScripts(false);
@@ -4153,7 +4156,12 @@ bool Game::checkReload(Player* player, const std::string& text)
 				std::cout << err.what() << std::endl;
 			}
 
-			std::cout << ":: Reloaded Scripts " << (script_system == NULL? "[ Failed ]" : "") << std::endl;
+			std::cout << ":: Reloaded Scripts ";
+			if (script_system == NULL)
+				std::cout << "[ Failed ]";
+			else
+				std::cout << "[ " << (OTSYS_TIME() - start)/(1000.) << "s. ]";
+			std::cout << std::endl;
 			if(player) player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Reloaded scripts.");
 		}
 		return true;

@@ -1,8 +1,7 @@
 function registerWeapons(weapons)
-	local weapon = nil
 	for weaponID, info in pairs(weapons) do
 		-- create the weapon
-		weapon = Weapon:new(weaponID)
+		local weapon = Weapon:new(weaponID)
 
 		-- set infos
 
@@ -71,3 +70,4 @@ require("weapons/axes")
 require("weapons/clubs")
 require("weapons/distance")
 require("weapons/wands")
+

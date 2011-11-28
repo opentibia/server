@@ -317,7 +317,7 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	msg.SkipBytes(6); //841 specific
 
 	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
-		disconnectClient(0x0A, STRING_CLIENT_VERSION);
+		disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
 		return false;
 	}
 

@@ -157,7 +157,7 @@ std::string Status::getStatusString() const
 	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getString(ConfigManager::URL).c_str());
 	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)OTSERV_NAME);
 	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)OTSERV_VERSION);
-	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)OTSERV_CLIENT_VERSION);
+	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)CLIENT_VERSION_STRING);
 	xmlAddChild(root, p);
 
 	p = xmlNewNode(NULL,(const xmlChar*)"owner");
@@ -296,7 +296,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddByte(0x23); // server software info
 		output->AddString(OTSERV_NAME);
 		output->AddString(OTSERV_VERSION);
-		output->AddString(OTSERV_CLIENT_VERSION);
+		output->AddString(CLIENT_VERSION_STRING);
 	}
 
 	return;

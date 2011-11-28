@@ -863,7 +863,7 @@ function Spell:register()
 	elseif self.rune ~= 0 and self.rune then
 
 		if table.findf(otstd.spells, function(s) return s.rune == self.rune end) ~= nil then
-			error("Duplicate spell \"" .. self.words .. "\": two rune spells can't use the same ID.")
+			error("Duplicate spell \"" .. (self.words or self.name or "Unknown spell") .. "\": two rune spells can't use the same ID (" .. self.rune .. ").")
 		end
 
 		self.internalBeginCast  = otstd.onBeginCastRuneSpell
