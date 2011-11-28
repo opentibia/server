@@ -673,10 +673,8 @@ int LuaState::lua_require_directory()
 {
 	std::string script_dir = g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/";
 	std::string dir = popString();
-	if(!manager->loadDirectory(script_dir + dir)){
-		throw Error("Failed to load directory " + dir + ".");
-	}
-	pushBoolean(true);
+
+	pushBoolean(manager->loadDirectory(script_dir + dir));
 	return 1;
 }
 

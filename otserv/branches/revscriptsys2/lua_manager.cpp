@@ -819,38 +819,66 @@ LuaStateManager::~LuaStateManager() {
 }
 
 void LuaStateManager::setupLuaStandardLibrary() {
-	//getGlobal("package");
+
+	// Set a package.path = the script path
 	lua_getfield(state, LUA_GLOBALSINDEX, "package");
 	assert(lua_istable(state, 1));
-	//pushString(g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/?.lua");
 	lua_pushstring(state, (g_config.getString(ConfigManager::DATA_DIRECTORY) + "scripts/?.lua").c_str());
-	//setField(2, "path");
 	lua_setfield(state, -2, "path");
-
 	lua_pop(state, 1);
+	
+	// Load the error handler
+	int32_t eret = luaL_loadfile(state, "error_module.lua");
+	if (eret != 0) {
+		std::ostringstream error;
+		error << "Lua Error: Could not load error handler from 'error_module.lua'";
+		error << "\t" << popString();
+		throw Script::Error(error.str());
+	}
+
+	eret = lua_pcall(state, 0, 1, 0);
+	if(eret != 0) {
+		std::ostringstream error;
+		std::cout << "Lua Error: Could not load error handler from 'error_module.lua'" << std::endl;
+		error << "\t" << popString();
+		throw Script::Error(error.str());
+	}
+
+	// Set a register item to this table
+	lua_setfield(state, LUA_REGISTRYINDEX, "stacktraceplus");
 }
 
 bool LuaStateManager::loadFile(std::string file)
 {
-	//std::cout << "Loaded file " << file << std::endl;
+	// Get the error handler
+	bool use_error_handler = g_config.getNumber(ConfigManager::DETAIL_SCRIPT_ERRORS) != 0;
+	if (use_error_handler) {
+		lua_getfield(state, LUA_REGISTRYINDEX, "stacktraceplus");
+		lua_getfield(state, -1, "stacktrace");
+		lua_replace(state, -2);
+	}
+	
 	//loads file as a chunk at stack top
 	int32_t ret = luaL_loadfile(state, file.c_str());
 
-	if(ret != 0){
-		std::cout << "Lua Error: " << popString() << std::endl;
-		return false;
-	}
-	//check that it is loaded as a function
-	if(lua_isfunction(state, -1) == 0){
-		return false;
+	if(ret != 0) {
+		std::ostringstream error;
+		error << popString();
+		if (use_error_handler)
+			error << "\n";
+		pop(); // pop error handler
+		
+		throw Script::Error(error.str());
 	}
 
 	//execute it
 	// REVSCRIPT TODO a better error handler here
-	ret = lua_pcall(state, 0, 0, 0);
+	ret = lua_pcall(state, 0, 0, (use_error_handler ? -2 : 0));
 	if(ret != 0) {
-		std::stringstream error;
-		error << "Lua Error: Failed to load file " << file << " - " << popString();
+		std::ostringstream error;
+		error << popString();
+		if (use_error_handler)
+			error << "\n";
 		throw Script::Error(error.str());
 	}
 	return true;
@@ -863,11 +891,11 @@ bool LuaStateManager::loadDirectory(std::string dir_path)
 	recursive_directory_iterator end_itr;
 
 	for(recursive_directory_iterator itr(dir_path); itr != end_itr; ++itr){
-		std::string s = itr->path().string();
+		std::string s = itr->string();
 		s = (s.size() >= 4? s.substr(s.size() - 4) : "");
 		if(s == ".lua"){
 			try {
-				if(!loadFile(itr->path().string()))
+				if(!loadFile(itr->string()))
 					return false; // default construction yields past-the-endath()))
 			} catch(Script::Error& err) {
 				std::cout << err.what();

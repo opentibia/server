@@ -257,180 +257,193 @@ int Manager::luaFunctionCallback(lua_State* L) {
 		}
 	}
 
-	// If the script failed
-	try {
-		// In here it's safe to allocate complex objects
+	{
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
+		try {
+			// In here it's safe to allocate complex objects
 
-		int32_t argument_count = state->getStackSize();
-		if((unsigned int)argument_count > cc->parameters.size()) {
-			throw Script::Error("Too many arguments passed to function " + cc->name);
-		}
-
-		// This loop counts how many argument required arguments we need, at least
-		// This could probably be done at register time out
-		int32_t required_arguments = 0;
-
-		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
-				ctditer != cc->parameters.end();
-				++ctditer)
-		{
-			if(ctditer->optional_level == 0)
-				required_arguments += 1;
-		}
-		
-		if(argument_count < required_arguments) {
-			throw Script::Error("Too few arguments passed to function " + cc->name);
-		}
-
-		// parsed_argument_count is how many arguments we have parsed in the loop so far
-		int32_t parsed_argument_count = 0;
-		for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
-				ctditer != cc->parameters.end();
-				++ctditer)
-		{
-			const ComposedTypeDeclaration& ctd = *ctditer;
-
-			bool ignoreTypeCheck = false;
-			if((size_t)argument_count < cc->parameters.size() && required_arguments - parsed_argument_count > 0 && !ctd.default_value.empty() && ctd.optional_level > 0) {
-				// We got an optional argument, and one is missing on this spot!
-				// Push our default argument onto the stack
-				if(ctd.default_value.type() == typeid(std::string))
-					state->push(boost::any_cast<std::string>(ctd));
-				else if(ctd.default_value.type() == typeid(int))
-					state->push(boost::any_cast<std::string>(ctd));
-				else if(ctd.default_value.type() == typeid(void*))
-					state->pushNil();
-				else
-					throw Error("Cannot deduce type of optional argument default value (function " + ctd.name + ") (source error)");
-				// inject it to the correct position
-				state->insert(parsed_argument_count+1);
-				// We now have one more argument passed
-				required_arguments += 1;
-
-				ignoreTypeCheck = true;
+			int32_t argument_count = state->getStackSize();
+			if((unsigned int)argument_count > cc->parameters.size()) {
+				throw Script::Error("Too many arguments passed to function " + cc->name);
 			}
 
-			if(parsed_argument_count >= required_arguments) {
-				// We have already parsed all passed arguments
-				break;
-			}
-			parsed_argument_count += 1;
+			// This loop counts how many argument required arguments we need, at least
+			// This could probably be done at register time instead
+			int32_t required_arguments = 0;
 
-			if(ignoreTypeCheck)
-				continue;
-
-			std::string expected_type = "";
-
-			for(std::vector<std::string>::const_iterator type_iter = ctd.types.begin();
-					type_iter != ctd.types.end();
-					++type_iter)
+			for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
+					ctditer != cc->parameters.end();
+					++ctditer)
 			{
-				if(*type_iter == "mixed") {
-						expected_type = "";
+				if(ctditer->optional_level == 0)
+					required_arguments += 1;
+			}
+		
+			if(argument_count < required_arguments) {
+				throw Script::Error("Too few arguments passed to function " + cc->name);
+			}
+
+			// parsed_argument_count is how many arguments we have parsed in the loop so far
+			int32_t parsed_argument_count = 0;
+			for(std::vector<ComposedTypeDeclaration>::const_iterator ctditer = cc->parameters.begin();
+					ctditer != cc->parameters.end();
+					++ctditer)
+			{
+				const ComposedTypeDeclaration& ctd = *ctditer;
+
+				bool ignoreTypeCheck = false;
+				if((size_t)argument_count < cc->parameters.size() && required_arguments - parsed_argument_count > 0 && !ctd.default_value.empty() && ctd.optional_level > 0) {
+					// We got an optional argument, and one is missing on this spot!
+					// Push our default argument onto the stack
+					if(ctd.default_value.type() == typeid(std::string))
+						state->push(boost::any_cast<std::string>(ctd));
+					else if(ctd.default_value.type() == typeid(int))
+						state->push(boost::any_cast<std::string>(ctd));
+					else if(ctd.default_value.type() == typeid(void*))
+						state->pushNil();
+					else
+						throw Error("Cannot deduce type of optional argument default value (function " + ctd.name + ")");
+					// inject it to the correct position
+					state->insert(parsed_argument_count+1);
+					// We now have one more argument passed
+					required_arguments += 1;
+
+					ignoreTypeCheck = true;
+				}
+
+				if(parsed_argument_count >= required_arguments) {
+					// We have already parsed all passed arguments
 					break;
 				}
-				else if(*type_iter == "boolean") {
-					if(state->isBoolean(parsed_argument_count)) {
-						expected_type = "";
+				parsed_argument_count += 1;
+
+				if(ignoreTypeCheck)
+					continue;
+
+				std::string expected_type = "";
+
+				for(std::vector<std::string>::const_iterator type_iter = ctd.types.begin();
+						type_iter != ctd.types.end();
+						++type_iter)
+				{
+					if(*type_iter == "mixed") {
+							expected_type = "";
 						break;
 					}
-					expected_type = "boolean";
+					else if(*type_iter == "boolean") {
+						if(state->isBoolean(parsed_argument_count)) {
+							expected_type = "";
+							break;
+						}
+						expected_type = "boolean";
+					}
+					else if(*type_iter == "number") {
+						if(state->isNumber(parsed_argument_count)) {
+							expected_type = "";
+							break;
+						}
+						expected_type = "number";
+					}
+					else if(*type_iter == "string") {
+						if(state->isString(parsed_argument_count)) {
+							expected_type = "";
+							break;
+						}
+						expected_type = "string";
+					}
+					else if(*type_iter == "function") {
+						if(state->isFunction(parsed_argument_count)) {
+							expected_type = "";
+							break;
+						}
+						expected_type = "function";
+					}
+					else if(*type_iter == "userdata") {
+						if(state->isUserdata(parsed_argument_count)) {
+							expected_type = "";
+							break;
+						}
+						expected_type = "userdata";
+					}
+					else if(*type_iter == "thread") {
+						if(state->isThread(parsed_argument_count)) {
+							expected_type = "";
+							break;
+						}
+						expected_type = "thread";
+					}
+					else if(*type_iter == "table") {
+						if(state->isTable(parsed_argument_count)) {
+							expected_type = "";
+							break;
+						}
+						expected_type = "table";
+					}
 				}
-				else if(*type_iter == "number") {
-					if(state->isNumber(parsed_argument_count)) {
-						expected_type = "";
-						break;
-					}
-					expected_type = "number";
-				}
-				else if(*type_iter == "string") {
-					if(state->isString(parsed_argument_count)) {
-						expected_type = "";
-						break;
-					}
-					expected_type = "string";
-				}
-				else if(*type_iter == "function") {
-					if(state->isFunction(parsed_argument_count)) {
-						expected_type = "";
-						break;
-					}
-					expected_type = "function";
-				}
-				else if(*type_iter == "userdata") {
-					if(state->isUserdata(parsed_argument_count)) {
-						expected_type = "";
-						break;
-					}
-					expected_type = "userdata";
-				}
-				else if(*type_iter == "thread") {
-					if(state->isThread(parsed_argument_count)) {
-						expected_type = "";
-						break;
-					}
-					expected_type = "thread";
-				}
-				else if(*type_iter == "table") {
-					if(state->isTable(parsed_argument_count)) {
-						expected_type = "";
-						break;
-					}
-					expected_type = "table";
+				if(expected_type != "") {
+					std::ostringstream os;
+					os <<
+						"When calling function " <<
+						"'" << cc->name << "'" <<
+						" - Expected '" << expected_type << "' for argument " <<
+						"'" << ctd.name << "'" <<
+						" type was " <<
+						"'" << state->typeName(parsed_argument_count) << "'";
+					throw Error(os.str());
 				}
 			}
-			if(expected_type != "") {
-				std::ostringstream os;
-				os <<
-					"When calling function " <<
-					"'" << cc->name << "'" <<
-					" - Expected '" << expected_type << "' for argument " <<
-					"'" << ctd.name << "'" <<
-					" type was " <<
-					"'" << state->typeName(parsed_argument_count) << "'";
-				throw Error(os.str());
-			}
-		}
-		// All arguments checked out, call the function!
-		int32_t ret = (state->*(cc->func))();
-		if(private_thread)
-			private_thread->~LuaThread();
-		return ret;
-	} catch(Script::Error& err) {
-		// We can't use lua_error in the C++ function as it doesn't call destructors properly.
-		std::ostringstream os;
+			// All arguments checked out, call the function!
+			int32_t ret = (state->*(cc->func))();
 
-		os << err.what();
-
-		if(g_config.getNumber(ConfigManager::DETAIL_SCRIPT_ERRORS)){
-			os << "\nLua stack contents:\n";
-			for(int i = 1; i <= lua_gettop(L); ++i){
-				os << "\t" << i << "\t" << luaL_typename(L, i) << " = ";
-				switch(lua_type(L, i)){
-					case LUA_TNIL:
-						os << "nil";
-						break;
-					case LUA_TNUMBER:
-						os << lua_tonumber(L, i);
-						break;
-					case LUA_TBOOLEAN:
-						os << (lua_toboolean(L, i) == 1 ? "true" : "false");
-						break;
-					case LUA_TSTRING:
-						os << lua_tostring(L, i);
-						break;
-					default:
-						os << lua_topointer(L, i);
-						break;
-				}
+			// Cleanup
+			if(private_thread)
+				private_thread->~LuaThread();
+			return ret;
+		} catch(Script::Error& err) {
+			// We can't use lua_error in the C++ function as it doesn't call destructors properly.
+			std::ostringstream os;
+			
+			bool detailed = g_config.getNumber(ConfigManager::DETAIL_SCRIPT_ERRORS) != 0;
+			
+			if (detailed){
 				os << "\n";
+				os << "                                   Lua Error\n";
+				os << "==============================================================================\n";
+				os << "\tDescription: " << err.what() << "\n";
+				os << "\tLast Source function: " << cc->name << "\n";
+				os << "\n";
+				os << "   Lua Stack\n";
+				os << "==============\n";
+				for(int i = 1; i <= lua_gettop(L); ++i){
+					os << "\t" << i << "\t" << luaL_typename(L, i) << " = ";
+					switch(lua_type(L, i)){
+						case LUA_TNIL:
+							os << "nil";
+							break;
+						case LUA_TNUMBER:
+							os << lua_tonumber(L, i);
+							break;
+						case LUA_TBOOLEAN:
+							os << (lua_toboolean(L, i) == 1 ? "true" : "false");
+							break;
+						case LUA_TSTRING:
+							os << lua_tostring(L, i);
+							break;
+						default:
+							os << lua_topointer(L, i);
+							break;
+					}
+					os << "\n";
+				}
 			}
+			else{
+				os << "Lua Error: " << err.what();
+			}
+
+
+			state->clearStack();
+			state->pushString(os.str().c_str());
 		}
-
-
-		state->clearStack();
-		state->pushString(os.str().c_str());
 	}
 
 	if(private_thread)
