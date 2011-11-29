@@ -509,7 +509,6 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 					std::cout << "Warning: [Npc::loadInteraction] Duplicate listId found " << strValue << std::endl;
 				}
 				else{
-					std::string listId = strValue;
 					xmlNodePtr tmpNode = node->children;
 					std::list<ListItem>& list = itemListMap[strValue];
 
@@ -1519,7 +1518,7 @@ void Npc::onThink(uint32_t interval)
 		}
 	}
 
-	if(list.size()) //loop only if there's at least one player
+	if(!list.empty()) //loop only if there's at least one player
 	{
 		int64_t now = OTSYS_TIME();
 		for(VoiceList::iterator it = voiceList.begin(); it != voiceList.end(); ++it)
@@ -1544,9 +1543,10 @@ void Npc::onThink(uint32_t interval)
 		}
 	}
 
-	bool idleResponse = false;
-	if((uint32_t)(MAX_RAND_RANGE / idleInterval) >= (uint32_t)random_range(0, MAX_RAND_RANGE))
-		idleResponse = true;
+	// TODO: This code does nothing. Check if nothing was left undone.
+	// bool idleResponse = false;
+	// if((uint32_t)(MAX_RAND_RANGE / idleInterval) >= (uint32_t)random_range(0, MAX_RAND_RANGE))
+	//	idleResponse = true;
 		
 	if (getTimeSinceLastMove() >= walkTicks)
 		addEventWalk();
@@ -2393,7 +2393,7 @@ void Npc::setCreatureFocus(Creature* creature)
 	}
 }
 
-bool Npc::getParameter(const std::string key, std::string& value)
+bool Npc::getParameter(const std::string& key, std::string& value)
 {
 	ParametersMap::const_iterator it = m_parameters.find(key);
 	if(it != m_parameters.end()){

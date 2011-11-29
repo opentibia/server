@@ -70,7 +70,7 @@ inline int32_t swap_int32(int32_t x)
 	return *((float *)(void *)&ui);
 }*/
 
-void replaceString(std::string& str, const std::string sought, const std::string replacement);
+void replaceString(std::string& str, const std::string& sought, const std::string& replacement);
 void trim_right(std::string& source, const std::string& t = "\n\t ");
 void trim_left(std::string& source, const std::string& t = "\n\t ");
 void trim(std::string& source, const std::string& t = "\n\t ");

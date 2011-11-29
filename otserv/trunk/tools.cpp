@@ -33,7 +33,7 @@
 
 extern ConfigManager g_config;
 
-void replaceString(std::string& str, const std::string sought, const std::string replacement)
+void replaceString(std::string& str, const std::string& sought, const std::string& replacement)
 {
 	size_t pos = 0;
 	size_t start = 0;

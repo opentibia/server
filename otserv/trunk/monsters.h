@@ -150,7 +150,7 @@ public:
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
 	std::list<Item*> createLootItem(const LootBlock& lootblock);
 
-	bool getParameter(const std::string key, std::string& value);
+	bool getParameter(const std::string& key, std::string& value);
 };
 
 class Monsters{
@@ -168,7 +168,7 @@ public:
 
 	static uint32_t getLootRandom();
 
-	void pushSpellParameters(const std::string name, LuaScriptInterface* env);
+	void pushSpellParameters(const std::string& name, LuaScriptInterface* env);
 
 private:
 	ConditionDamage* getDamageCondition(ConditionType_t conditionType,

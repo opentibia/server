@@ -182,9 +182,9 @@ public:
 	void addStorageValue(const uint32_t key, const int32_t value);
 	bool getStorageValue(const uint32_t key, int32_t& value) const;
 	bool eraseStorageValue(const uint32_t key);
-	static bool getStorageValueByName(const std::string name, const uint32_t key, int32_t& value);
-	static bool setStorageValueByName(const std::string name, const uint32_t key, const int32_t value);
-	static bool eraseStorageValueByName(const std::string name, const uint32_t key);
+	static bool getStorageValueByName(const std::string& name, const uint32_t key, int32_t& value);
+	static bool setStorageValueByName(const std::string& name, const uint32_t key, const int32_t value);
+	static bool eraseStorageValueByName(const std::string& name, const uint32_t key);
 	void genReservedStorageRange();
 
 	bool withdrawMoney(uint32_t amount);

@@ -1049,7 +1049,7 @@ bool Player::eraseStorageValue(const uint32_t key)
 }
 
 //static
-bool Player::getStorageValueByName(const std::string name, const uint32_t key, int32_t& value)
+bool Player::getStorageValueByName(const std::string& name, const uint32_t key, int32_t& value)
 {
 	Player* target = g_game.getPlayerByName(name);
 	if(!target){
@@ -1068,7 +1068,7 @@ bool Player::getStorageValueByName(const std::string name, const uint32_t key, i
 }
 
 //static
-bool Player::setStorageValueByName(const std::string name, const uint32_t key, const int32_t value)
+bool Player::setStorageValueByName(const std::string& name, const uint32_t key, const int32_t value)
 {
 	Player* target = g_game.getPlayerByName(name);
 	if(!target){
@@ -1087,7 +1087,7 @@ bool Player::setStorageValueByName(const std::string name, const uint32_t key, c
 }
 
 //static
-bool Player::eraseStorageValueByName(const std::string name, const uint32_t key)
+bool Player::eraseStorageValueByName(const std::string& name, const uint32_t key)
 {
 	Player* target = g_game.getPlayerByName(name);
 	if(!target){

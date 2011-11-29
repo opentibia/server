@@ -1015,7 +1015,7 @@ int32_t Spell::getSoulCost(const Player* player) const
 	return 0;
 }
 
-ReturnValue Spell::CreateIllusion(Creature* creature, const Outfit_t outfit, int32_t time)
+ReturnValue Spell::CreateIllusion(Creature* creature, const Outfit_t& outfit, int32_t time)
 {
 	ConditionOutfit* outfitCondition = new ConditionOutfit(CONDITIONID_COMBAT, CONDITION_OUTFIT, time);
 
@@ -1109,7 +1109,6 @@ bool InstantSpell::configureEvent(xmlNodePtr p)
 	}
 
 	int intValue;
-	std::string strValue;
 
 	if(readXMLInteger(p, "params", intValue)){
 		if(intValue == 1)

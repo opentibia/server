@@ -126,7 +126,7 @@ uint32_t Monsters::getLootRandom()
 	return random_range(0, MAX_LOOTCHANCE)/g_config.getNumber(ConfigManager::RATE_LOOT);
 }
 
-void Monsters::pushSpellParameters(const std::string name, LuaScriptInterface* env)
+void Monsters::pushSpellParameters(const std::string& name, LuaScriptInterface* env)
 {
 	lua_State* L = env->getLuaState();
 
@@ -242,7 +242,7 @@ void MonsterType::createLootContainer(Container* parent, const LootBlock& lootbl
 	}
 }
 
-bool MonsterType::getParameter(const std::string key, std::string& value)
+bool MonsterType::getParameter(const std::string& key, std::string& value)
 {
 	ParametersMap::const_iterator it = m_parameters.find(key);
 	if(it != m_parameters.end()){

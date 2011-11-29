@@ -392,7 +392,7 @@ bool Chat::removeUserFromChannel(Player* player, uint16_t channelId)
 void Chat::removeUserFromAllChannels(Player* player)
 {
 	ChannelList list = getChannelList(player);
-	while(list.size()){
+	while(!list.empty()){
 		ChatChannel *channel = list.front();
 		list.pop_front();
 

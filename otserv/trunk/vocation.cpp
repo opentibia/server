@@ -62,10 +62,9 @@ bool Vocations::loadFromXml(const std::string& datadir)
 			float floatVal;
 			if(xmlStrcmp(p->name, (const xmlChar*)"vocation") == 0){
 				Vocation* voc = new Vocation();
-				uint32_t voc_id;
 				xmlNodePtr skillNode;
 				if(readXMLInteger(p, "id", intVal)){
-					voc_id = intVal;
+					uint32_t voc_id = intVal;
 					if(readXMLString(p, "name", str)){
 						voc->name = str;
 					}
@@ -108,9 +107,8 @@ bool Vocations::loadFromXml(const std::string& datadir)
 					skillNode = p->children;
 					while(skillNode){
 						if(xmlStrcmp(skillNode->name, (const xmlChar*)"skill") == 0){
-							int32_t skill_id;
 							if(readXMLInteger(skillNode, "id", intVal)){
-								skill_id = intVal;
+								int32_t skill_id = intVal;
 								if(skill_id < SKILL_FIRST || skill_id > SKILL_LAST){
 									std::cout << "No valid skill id. " << skill_id << std::endl;
 

@@ -1622,7 +1622,7 @@ void ProtocolGame::sendChannelsDialog()
 		msg->AddByte(0xAB);
 		msg->AddByte(list.size());
 
-		while(list.size()){
+		while(!list.empty()){
 			ChatChannel *channel;
 			channel = list.front();
 			list.pop_front();
@@ -2957,7 +2957,7 @@ void ProtocolGame::RemoveContainerItem(NetworkMessage_ptr msg, uint8_t cid, uint
 }
 
 // shop
-void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopInfo item)
+void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopInfo& item)
 {
 	const ItemType& it = Item::items[item.itemId];
 	msg->AddU16(it.clientId);

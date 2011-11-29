@@ -706,7 +706,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	std::cout << ":: Local ports:           ";
 	std::list<uint16_t> ports = service_manager->get_ports();
-	while(ports.size()){
+	while(!ports.empty()){
 		std::cout << ports.front() << "\t";
 		ports.pop_front();
 	}

@@ -302,7 +302,7 @@ private:
 	void RemoveInventoryItem(NetworkMessage_ptr msg, slots_t slot);
 
 	//shop
-	void AddShopItem(NetworkMessage_ptr msg, const ShopInfo item);
+	void AddShopItem(NetworkMessage_ptr msg, const ShopInfo& item);
 
 	friend class Player;
 

@@ -517,7 +517,7 @@ public:
 	void turnToCreature(Creature* creature);
 	void setCreatureFocus(Creature* creature);
 	void turnToInitialLookDirection();
-	bool getParameter(const std::string key, std::string& value);
+	bool getParameter(const std::string& key, std::string& value);
 	NpcScriptInterface* getScriptInterface();
 
 protected:

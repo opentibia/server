@@ -78,8 +78,8 @@ std::string Mission::getDescription(Player* player)
 
 bool Mission::isStarted(Player* player) const
 {
-	uint32_t value;
 	if(player){
+		uint32_t value = 0;
 		player->getStorageValue(storageID, (int32_t&)value);
 		if(value >= startValue && value <= endValue){
 			return true;
@@ -91,7 +91,7 @@ bool Mission::isStarted(Player* player) const
 bool Mission::isCompleted(Player* player) const
 {
 	if(player){
-		int32_t value;
+		int32_t value = 0;
 		player->getStorageValue(storageID, value);
 		if(uint32_t(value) == endValue){
 			return true;
@@ -150,8 +150,8 @@ bool Quest::isCompleted(Player* player)
 
 bool Quest::isStarted(Player* player) const
 {
-	uint32_t value;
 	if(player){
+		uint32_t value = 0;
 		player->getStorageValue(startStorageID, (int32_t&)value);
 		if(value >= startStorageValue)
 			return true;
