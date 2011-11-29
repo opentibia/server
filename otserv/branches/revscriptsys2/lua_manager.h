@@ -179,6 +179,7 @@ public:
 	Item* popItem(Script::ErrorMode mode = Script::ERROR_THROW);
 	Container* popContainer(Script::ErrorMode mode = Script::ERROR_THROW);
 	Depot* popDepot(Script::ErrorMode mode = Script::ERROR_THROW);
+	Teleport* popTeleport(Script::ErrorMode mode = Script::ERROR_THROW);
 	Condition* popCondition(Script::ErrorMode mode = Script::ERROR_THROW);
 	Vocation* popVocation(Script::ErrorMode mode = Script::ERROR_THROW);
 	Tile* popTile(Script::ErrorMode mode = Script::ERROR_THROW);
@@ -569,7 +570,10 @@ public:
 	// - Depot
 	int lua_Depot_getDepotID();
 	int lua_Depot_setDepotID();
-	
+
+	// - Teleport
+	int lua_Teleport_setDestination();
+
 	// - Tile
 	int lua_Tile_getThing();
 	int lua_Tile_getCreatures();

@@ -26,6 +26,7 @@
 #include "housetile.h"
 #include "player.h"
 #include "depot.h"
+#include "teleport.h"
 #include "ioplayer.h"
 #include "game.h"
 #include "actor.h"
@@ -438,7 +439,10 @@ void Manager::registerClasses() {
 	// Depot
 	registerMemberFunction("Depot", "getDepotID()", &Manager::lua_Depot_getDepotID);
 	registerMemberFunction("Depot", "setDepotID(int id)", &Manager::lua_Depot_setDepotID);
-	
+
+	// Teleport
+	registerMemberFunction("Teleport", "setDestination(position dest)", &Manager::lua_Teleport_setDestination);
+
 	// Tile
 	registerMemberFunction("Tile", "getThing(int index)", &Manager::lua_Tile_getThing);
 	registerMemberFunction("Tile", "getCreatures([Creature who = nil])", &Manager::lua_Tile_getCreatures);
@@ -5314,6 +5318,20 @@ int LuaState::lua_Depot_setDepotID()
 	Depot* depot = popDepot();
 
 	depot->setDepotId(id);
+	return 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Class Teleport
+
+int LuaState::lua_Teleport_setDestination()
+{
+	Position pos = popPosition();
+	Teleport* teleport = popTeleport();
+
+	teleport->setDestPos(pos);
+
+	pushBoolean(true);
 	return 1;
 }
 

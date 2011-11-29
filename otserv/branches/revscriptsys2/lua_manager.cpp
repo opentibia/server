@@ -763,6 +763,17 @@ Depot* LuaState::popDepot(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 	return NULL;
 }
 
+Teleport* LuaState::popTeleport(Script::ErrorMode mode /* = Script::ERROR_THROW */)
+{
+	Item* i = popItem(mode);
+	if(i) {
+		Teleport* t = i->getTeleport();
+		if(!t) HandleError(mode, "Object is not a depot.");
+		return t;
+	}
+	return NULL;
+}
+
 Condition* LuaState::popCondition(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 {
 	getMetaObject();
@@ -890,18 +901,25 @@ bool LuaStateManager::loadDirectory(std::string dir_path)
 	// default construction yields past-the-end
 	recursive_directory_iterator end_itr;
 
-	for(recursive_directory_iterator itr(dir_path); itr != end_itr; ++itr){
-		std::string s = itr->string();
-		s = (s.size() >= 4? s.substr(s.size() - 4) : "");
-		if(s == ".lua"){
-			try {
-				if(!loadFile(itr->string()))
-					return false; // default construction yields past-the-endath()))
-			} catch(Script::Error& err) {
-				std::cout << err.what();
-				return false;
+	try
+	{
+		for(recursive_directory_iterator itr(dir_path); itr != end_itr; ++itr){
+			std::string s = itr->string();
+			s = (s.size() >= 4? s.substr(s.size() - 4) : "");
+			if(s == ".lua"){
+				try {
+					if(!loadFile(itr->string()))
+						return false; // default construction yields past-the-endath()))
+				} catch(Script::Error& err) {
+					std::cout << err.what();
+					return false;
+				}
 			}
 		}
+	}
+	catch (boost::filesystem::filesystem_error&)
+	{
+		return false;
 	}
 	return true;
 }
