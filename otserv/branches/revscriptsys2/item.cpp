@@ -175,9 +175,6 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 			setCharges(_count);
 		}
 	}
-	else{
-		setCharges(it.charges);
-	}
 
 	setDefaultDuration();
 }
