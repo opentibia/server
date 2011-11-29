@@ -458,7 +458,7 @@ bool OnUseWeapon::Event::dispatch(Manager& state, Environment& environment)
 		if(weapon->getActionId() != 0){
 			list_iter = environment.Generic.OnUseWeapon.ActionId.find(weapon->getActionId());
 			if(list_iter != environment.Generic.OnUseWeapon.ActionId.end()){
-				if(dispatchEvent<OnUseWeapon::Event, ScriptInformation>
+				if(dispatchEvent<OnUseWeapon::Event>
 						(this, state, environment, list_iter->second)){
 					return true;
 				}
@@ -467,7 +467,7 @@ bool OnUseWeapon::Event::dispatch(Manager& state, Environment& environment)
 
 		list_iter = environment.Generic.OnUseWeapon.ItemId.find(weapon->getID());
 		if(list_iter != environment.Generic.OnUseWeapon.ItemId.end()){
-			if(dispatchEvent<OnUseWeapon::Event, ScriptInformation>
+			if(dispatchEvent<OnUseWeapon::Event>
 					(this, state, environment, list_iter->second)){
 				return true;
 			}
@@ -682,10 +682,108 @@ bool OnMoveCreature::Event::dispatch(Manager& state, Environment& environment)
 		)
 		return true;
 
-	// Extremely naive solution
-	// Should be a map with id:callback instead.
-	return dispatchEvent<OnMoveCreature::Event, ScriptInformation>
-		(this, state, environment, environment.Generic.OnMoveCreature);
+	// First do the on move out events
+	ListenerMap::iterator list_iter;
+
+	// Reuse a vector for performance reasons
+	static std::set<int32_t> id_list, itemid_list;
+
+	if (moveType == TYPE_MOVE || moveType == TYPE_STEPOUT)
+	{
+		// Fetch action ids
+		id_list.clear();
+		fromTile->items_fetchListWithActionId(id_list);
+
+		// Check action ID matches
+		if (!id_list.empty())
+		{
+			for (std::set<int32_t>::const_iterator id = id_list.begin(); id != id_list.end(); ++id)
+			{
+				list_iter = environment.Generic.OnMoveOutCreature.ActionId.find(*id);
+				if(list_iter != environment.Generic.OnMoveOutCreature.ActionId.end()){
+					if(dispatchEvent<OnMoveCreature::Event>
+						(this, state, environment, list_iter->second)){
+							return true;
+					}
+				}
+			}
+		}
+
+		// Fetch item ids
+		id_list.clear();
+		fromTile->items_fetchListWithItemId(id_list);
+		
+		// Check item id matches
+		if (!id_list.empty())
+		{
+			for (std::set<int32_t>::const_iterator id = id_list.begin(); id != id_list.end(); ++id)
+			{
+				list_iter = environment.Generic.OnMoveOutCreature.ItemId.find(*id);
+				if(list_iter != environment.Generic.OnMoveOutCreature.ItemId.end()){
+					if(dispatchEvent<OnMoveCreature::Event>
+						(this, state, environment, list_iter->second)){
+							return true;
+					}
+				}
+			}
+		}
+
+		// Check generic matches
+		if (dispatchEvent<OnMoveCreature::Event, ScriptInformation>
+			(this, state, environment, environment.Generic.OnMoveOutAnyCreature)){
+				return true;
+		}
+	}
+
+
+	if (moveType == TYPE_MOVE || moveType == TYPE_STEPIN)
+	{
+		// Fetch action ids
+		id_list.clear();
+		toTile->items_fetchListWithActionId(id_list);
+
+		// Check action ID matches
+		if (!id_list.empty())
+		{
+			for (std::set<int32_t>::const_iterator id = id_list.begin(); id != id_list.end(); ++id)
+			{
+				list_iter = environment.Generic.OnMoveInCreature.ActionId.find(*id);
+				if(list_iter != environment.Generic.OnMoveInCreature.ActionId.end()){
+					if(dispatchEvent<OnMoveCreature::Event>
+						(this, state, environment, list_iter->second)){
+							return true;
+					}
+				}
+			}
+		}
+
+		// Fetch item ids
+		id_list.clear();
+		toTile->items_fetchListWithItemId(id_list);;
+
+		// Check item id matches
+		if (!id_list.empty())
+		{
+			for (std::set<int32_t>::const_iterator id = id_list.begin(); id != id_list.end(); ++id)
+			{
+				list_iter = environment.Generic.OnMoveInCreature.ItemId.find(*id);
+				if(list_iter != environment.Generic.OnMoveInCreature.ItemId.end()){
+					if(dispatchEvent<OnMoveCreature::Event>
+						(this, state, environment, list_iter->second)){
+							return true;
+					}
+				}
+			}
+		}
+
+		// Check generic matches
+		if (dispatchEvent<OnMoveCreature::Event, ScriptInformation>
+			(this, state, environment, environment.Generic.OnMoveInAnyCreature)){
+				return true;
+		}
+	}
+
+	return false;
 }
 
 void OnMoveCreature::Event::push_instance(LuaState& state, Environment& environment)

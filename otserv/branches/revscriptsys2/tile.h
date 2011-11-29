@@ -31,7 +31,7 @@
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/random_access_index.hpp>
 
-#define INDEXED_TILE_ITEM_COUNT 50
+#define INDEXED_TILE_ITEM_COUNT 20
 
 typedef std::vector<Creature*> CreatureVector;
 typedef CreatureVector::iterator CreatureIterator;
@@ -294,8 +294,10 @@ public:
 
 	Item* items_getItemWithItemId(uint16_t itemId) const;
 	ItemVector items_getListWithItemId(uint16_t itemId, int32_t max_result = -1) const;
+	void items_fetchListWithItemId(std::set<int32_t>& into, int32_t max_result = -1) const;
 	Item* items_getItemWithActionId(int32_t actionId) const;
 	ItemVector items_getListWithActionId(int32_t actionId, int32_t max_result = -1) const;
+	void items_fetchListWithActionId(std::set<int32_t>& into, int32_t max_result = -1) const;
 	Item* items_getItemWithType(ItemTypes_t type) const;
 	ItemVector items_getListWithType(ItemTypes_t type, int32_t max_result = -1) const;
 	Item* items_getItemWithProps(ItemProp props) const;
@@ -518,6 +520,28 @@ public:
 		}
 		return vector;
 	}
+	void items_fetchListWithActionId(std::set<int32_t>& into, int max_result /* = -1*/) const
+	{
+		if(ground && ground->getActionId() != 0){
+			into.insert(ground->getActionId());
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)into.size() < max_result) ); ++it){
+			if((*it)->getActionId() != 0){
+				into.insert((*it)->getActionId());
+			}
+		}
+	}
+	void items_fetchListWithItemId(std::set<int32_t>& into, int max_result /* = -1*/) const
+	{
+		if(ground){
+			into.insert(ground->getID());
+		}
+
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)into.size() < max_result) ); ++it){
+			into.insert((*it)->getID());
+		}
+	}
 	Item* items_getItemWithType(ItemTypes_t type) const
 	{
 		if(ground && ground->getType() == type){
@@ -673,6 +697,26 @@ public:
 			}
 		}
 		return vector;
+	}
+	void items_fetchListWithActionId(std::set<int32_t>& into, int max_result /* = -1*/) const
+	{
+		if(ground && ground->getActionId() != 0){
+			into.insert(ground->getActionId());
+		}
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)into.size() < max_result) ); ++it){
+			if((*it)->getActionId() != 0){
+				into.insert((*it)->getActionId());
+			}
+		}
+	}
+	void items_fetchListWithItemId(std::set<int32_t>& into, int max_result /* = -1*/) const
+	{
+		if(ground){
+			into.insert(ground->getID());
+		}
+		for(TileItemConstIterator it = items_begin(); (it != items_end() && (max_result == -1 || (int32_t)into.size() < max_result) ); ++it){
+			into.insert((*it)->getID());
+		}
 	}
 	Item* items_getItemWithType(ItemTypes_t type) const
 	{
@@ -849,6 +893,36 @@ public:
 		}
 		return vector;
 	}
+	void items_fetchListWithActionId(std::set<int32_t>& into, int max_result /* = -1*/) const
+	{
+		if(ground && ground->getActionId() != 0){
+			into.insert(ground->getActionId());
+		}
+
+		ItemMultiIndexActionIdIterator ic0,ic1;
+		// Inefficient, redo!
+		ic0 = items.get<2>().upper_bound(0);
+		ic1 = items.get<2>().end();
+		while( (max_result == -1 || (int32_t)into.size() < max_result) && ic0 != ic1){
+			into.insert((*ic0)->getActionId());
+			++ic0;
+		}
+	}
+	void items_fetchListWithItemId(std::set<int32_t>& into, int max_result /* = -1*/) const
+	{
+		if(ground){
+			into.insert(ground->getID());
+		}
+
+		ItemMultiIndexItemIdIterator ic0,ic1;
+		// Inefficient, redo!
+		ic0 = items.get<1>().begin();
+		ic1 = items.get<1>().end();
+		while( (max_result == -1 || (int32_t)into.size() < max_result) && ic0 != ic1){
+			into.insert((*ic0)->getID());
+			++ic0;
+		}
+	}
 	Item* items_getItemWithType(ItemTypes_t type) const
 	{
 		if(ground && ground->getType() == type){
@@ -961,7 +1035,7 @@ inline Tile::Tile(uint16_t x, uint16_t y, uint16_t z) :
 
 inline Tile::~Tile()
 {
-	// We don't need to free any memory as tiles are always deallocated
+	// We don't need to free any memory as tiles are never deallocated
 	// and OS will free up anything left when the server is shutdown
 }
 
@@ -1015,6 +1089,16 @@ inline ItemVector Tile::items_getListWithItemId(uint16_t itemId, int32_t max_res
 	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithItemId(itemId, max_result);
 }
 
+inline void Tile::items_fetchListWithItemId(std::set<int32_t>& into, int32_t max_result /* = -1*/) const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_fetchListWithItemId(into, max_result);
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_fetchListWithItemId(into, max_result);
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_fetchListWithItemId(into, max_result);
+}
+
 inline Item* Tile::items_getItemWithActionId(int32_t actionId) const
 {
 	if(is_dynamic())
@@ -1033,6 +1117,16 @@ inline ItemVector Tile::items_getListWithActionId(int32_t actionId, int32_t max_
 		return static_cast<const IndexedTile*>(this)->IndexedTile::items_getListWithActionId(actionId, max_result);
 
 	return static_cast<const StaticTile*>(this)->StaticTile::items_getListWithActionId(actionId, max_result);
+}
+
+inline void Tile::items_fetchListWithActionId(std::set<int32_t>& into, int32_t max_result /* = -1*/) const
+{
+	if(is_dynamic())
+		return static_cast<const DynamicTile*>(this)->DynamicTile::items_fetchListWithActionId(into, max_result);
+	else if(is_indexed())
+		return static_cast<const IndexedTile*>(this)->IndexedTile::items_fetchListWithActionId(into, max_result);
+
+	return static_cast<const StaticTile*>(this)->StaticTile::items_fetchListWithActionId(into, max_result);
 }
 
 inline Item* Tile::items_getItemWithType(ItemTypes_t type) const

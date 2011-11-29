@@ -1475,7 +1475,10 @@ int LuaState::lua_registerGenericEvent_CreatureMoveIn() {
 	boost::any p(si_onmovecreature);
 	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager));
 
-	environment->Generic.OnMoveCreature.push_back(listener);
+	if (si_onmovecreature.method == OnMoveCreature::FILTER_ACTIONID)
+		environment->Generic.OnMoveInCreature.ActionId[si_onmovecreature.id].push_back(listener);
+	else if (si_onmovecreature.method == OnMoveCreature::FILTER_ITEMID)
+		environment->Generic.OnMoveInCreature.ItemId[si_onmovecreature.id].push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -1508,8 +1511,11 @@ int LuaState::lua_registerGenericEvent_CreatureMoveOut() {
 
 	boost::any p(si_onmovecreature);
 	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager));
-
-	environment->Generic.OnMoveCreature.push_back(listener);
+	
+	if (si_onmovecreature.method == OnMoveCreature::FILTER_ACTIONID)
+		environment->Generic.OnMoveOutCreature.ActionId[si_onmovecreature.id].push_back(listener);
+	else if (si_onmovecreature.method == OnMoveCreature::FILTER_ITEMID)
+		environment->Generic.OnMoveOutCreature.ItemId[si_onmovecreature.id].push_back(listener);
 
 	// Register event
 	setRegistryItem(listener->getLuaTag());
@@ -3004,7 +3010,7 @@ int LuaState::lua_Tile_getCreatures()
 int LuaState::lua_Tile_getMoveableItems()
 {
 	Tile* tile = popTile();
-
+	
 	newTable();
 	int n = 1;
 	for(TileItemIterator iter = tile->items_begin(), end_iter = tile->items_end(); iter != end_iter; ++iter){

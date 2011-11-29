@@ -73,7 +73,10 @@ void Environment::cleanupUnusedListeners(ListenerItemMap& list)
 	cleanupUnusedListeners(Generic.OnUseFist);
 	cleanupUnusedListeners(Generic.OnUseAnyWeapon);
 	cleanupUnusedListeners(Generic.OnEquipItem);
-	cleanupUnusedListeners(Generic.OnMoveCreature);
+	cleanupUnusedListeners(Generic.OnMoveInAnyCreature);
+	cleanupUnusedListeners(Generic.OnMoveOutAnyCreature);
+	cleanupUnusedListeners(Generic.OnMoveInCreature);
+	cleanupUnusedListeners(Generic.OnMoveOutCreature);
 	cleanupUnusedListeners(Generic.OnJoinChannel);
 	cleanupUnusedListeners(Generic.OnLeaveChannel);
 	cleanupUnusedListeners(Generic.OnAccountLogin);
@@ -169,7 +172,7 @@ bool Environment::stopListener(ListenerType type, uint32_t id)
 				return true;
 			break;
 		case enums::ON_MOVE_CREATURE_LISTENER:
-			if(stopListener(Generic.OnMoveCreature, id))
+			if(stopListener(Generic.OnMoveInAnyCreature, id) || stopListener(Generic.OnMoveInCreature, id) || stopListener(Generic.OnMoveOutAnyCreature, id) || stopListener(Generic.OnMoveOutCreature, id))
 				return true;
 			break;
 		case enums::ON_MOVE_ITEM_LISTENER:

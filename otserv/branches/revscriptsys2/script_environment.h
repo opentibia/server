@@ -30,7 +30,7 @@ namespace Script {
 	//typedef boost::shared_ptr<const Listener> Listener_cptr;
 
 	typedef std::vector<Listener_ptr> ListenerList;
-	typedef std::map<uint32_t, ListenerList> ListenerMap;
+	typedef std::map<int32_t, ListenerList> ListenerMap;
 	typedef struct{
 		ListenerMap ItemId;
 		ListenerMap ActionId;
@@ -83,7 +83,10 @@ namespace Script {
 			ListenerList OnUseFist;
 			ListenerList OnUseAnyWeapon;
 			ListenerList OnEquipItem;
-			ListenerList OnMoveCreature;
+			ListenerItemMap OnMoveInCreature;
+			ListenerItemMap OnMoveOutCreature;
+			ListenerList OnMoveInAnyCreature;
+			ListenerList OnMoveOutAnyCreature;
 			ListenerList OnJoinChannel;
 			ListenerList OnLeaveChannel;
 			ListenerList OnAccountLogin;
