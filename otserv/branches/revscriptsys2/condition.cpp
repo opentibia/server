@@ -21,6 +21,7 @@
 
 #include "condition.h"
 #include "game.h"
+#include "tile.h"
 #include "player.h"
 #include "configmanager.h"
 
@@ -313,7 +314,7 @@ bool Condition::unserialize(PropStream& propStream)
 				return false;
 			}
 
-			effectList.push_back(effect);
+			addEffect(effect);
 		}
 		else{
 			return false;
@@ -438,7 +439,7 @@ bool ConditionEffect::onBegin(Creature* creature)
 		{
 			const ConditionEffect::ModLight& modLight = getModEffect<const ConditionEffect::ModLight>();
 			LightInfo lightInfo;
-			lightInfo.level = modLight.level;
+			lightInfo.level = std::max(modLight.level, 1);
 			lightInfo.color = modLight.color;
 			creature->setCreatureLight(lightInfo);
 			g_game.changeLight(creature);
