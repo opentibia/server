@@ -259,7 +259,7 @@ public:
 	bool isGroundTile() const {return items[id].isGroundTile();}
 	bool isSplash() const {return items[id].isSplash();}
 	bool isMagicField() const {return items[id].isMagicField();}
-	bool isMoveable() const {return items[id].moveable;}
+	bool isMoveable() const;
 	bool isPickupable() const {return items[id].pickupable;}
 	bool isWeapon() const {return (items[id].weaponType != WEAPON_NONE);}
 	bool isUseable() const {return items[id].useable;}
@@ -431,6 +431,15 @@ inline int32_t Item::getActionId() const {
 	if(aid)
 		return *aid;
 	return 0;
+}
+
+inline bool Item::isMoveable() const {
+	if (!items[id].moveable)
+		return false;
+	const bool* m = getBooleanAttribute("moveable");
+	if (m != NULL)
+		return *m;
+	return true;
 }
 
 inline void Item::setCharges(uint16_t n) {
