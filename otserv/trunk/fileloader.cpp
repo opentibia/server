@@ -206,10 +206,11 @@ bool FileLoader::parseNode(NODE node)
 const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
 {
 	if(node){
-		if(node->propsSize >= m_buffer_size){
+		while(node->propsSize >= m_buffer_size){
 			delete[] m_buffer;
-			m_buffer = new unsigned char[m_buffer_size + 1024];
-			m_buffer_size = m_buffer_size + 1024;
+			while (node->propsSize >= m_buffer_size)
+				m_buffer_size *= 2;
+			m_buffer = new unsigned char[m_buffer_size];
 		}
 		//get buffer
 		if(readBytes(m_buffer, node->propsSize, node->start + 2)){
