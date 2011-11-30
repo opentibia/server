@@ -124,8 +124,6 @@ void Manager::registerClasses() {
 	registerEnum<WieldInformation>();
 	registerEnum<SkullType>();
 	registerEnum<ReturnValue>();
-	//registerEnum<PartyShieldType>();
-	//registerEnum<GuildEmblemType>();
 
 	registerClass("Event");
 	registerClass("OnSayEvent", "Event");
@@ -441,6 +439,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Depot", "setDepotID(int id)", &Manager::lua_Depot_setDepotID);
 
 	// Teleport
+	registerMemberFunction("Teleport", "getDestination()", &Manager::lua_Teleport_getDestination);
 	registerMemberFunction("Teleport", "setDestination(position dest)", &Manager::lua_Teleport_setDestination);
 
 	// Tile
@@ -3164,16 +3163,17 @@ int LuaState::lua_Tile_addItem()
 {
 	Item* item = popItem(Script::ERROR_PASS);
 	if(item == NULL) {
-		pushEnum(RET_NOTPOSSIBLE);
 		pushBoolean(false);
+		pushEnum(RET_NOTPOSSIBLE);
 		return 2;
 	}
 
 	Tile* tile = popTile();
 
 	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), tile, INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE);
-	pushEnum(ret);
+
 	pushBoolean(ret == RET_NOERROR);
+	pushEnum(ret);
 	return 2;
 }
 
@@ -4672,8 +4672,9 @@ int LuaState::lua_Player_internalPickup()
 	Player* player = popPlayer();
 
 	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), player, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
-	pushEnum(ret);
+
 	pushBoolean(ret == RET_NOERROR);
+	pushEnum(ret);
 	return 2;
 }
 
@@ -4774,8 +4775,8 @@ int LuaState::lua_Player_addItem()
 
 	Item* item = popItem(ERROR_PASS);
 	if(item == NULL) {
-		pushEnum(RET_NOTPOSSIBLE);
 		pushBoolean(false);
+		pushEnum(RET_NOTPOSSIBLE);
 		return 2;
 	}
 
@@ -4786,8 +4787,8 @@ int LuaState::lua_Player_addItem()
 		ret = g_game.internalMoveItem(NULL, item->getParent(), player->getParentTile(), INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 	}
 
-	pushEnum(ret);
 	pushBoolean(ret == RET_NOERROR);
+	pushEnum(ret);
 	return 2;
 }
 
@@ -4856,8 +4857,8 @@ int LuaState::lua_getPlayerByNameWildcard()
 	Player* p = NULL;
 	ReturnValue ret = g_game.getPlayerByNameWildcard(name, p);
 
-	pushEnum(ret);
 	pushThing(p);
+	pushEnum(ret);
 	return 2;
 }
 
@@ -5096,15 +5097,16 @@ int LuaState::lua_Container_addItem()
 {
 	Item* item = popItem(ERROR_PASS);
 	if(item == NULL) {
-		pushEnum(RET_NOTPOSSIBLE);
 		pushBoolean(false);
+		pushEnum(RET_NOTPOSSIBLE);
 		return 2;
 	}
 	Container* container = popContainer();
 
 	ReturnValue ret = g_game.internalMoveItem(NULL, item->getParent(), container, INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE);
-	pushEnum(ret);
+
 	pushBoolean(ret == RET_NOERROR);
+	pushEnum(ret);
 	return 2;
 }
 
@@ -5323,6 +5325,14 @@ int LuaState::lua_Depot_setDepotID()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Class Teleport
+
+int LuaState::lua_Teleport_getDestination()
+{
+	Teleport* teleport = popTeleport();
+
+	pushPosition(teleport->getDestPos());
+	return 1;
+}
 
 int LuaState::lua_Teleport_setDestination()
 {

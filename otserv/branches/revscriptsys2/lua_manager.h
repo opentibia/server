@@ -572,6 +572,7 @@ public:
 	int lua_Depot_setDepotID();
 
 	// - Teleport
+	int lua_Teleport_getDestination();
 	int lua_Teleport_setDestination();
 
 	// - Tile
