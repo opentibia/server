@@ -508,9 +508,13 @@ ReturnValue Game::internalUseItem(Player* player, const Position& pos, uint8_t i
 	}
 
 	if(script_system){
-		Script::OnUseItem::Event evt(player, item, retval);
-		if(script_system->dispatchEvent(evt)) {
-			return retval;
+		// Don't fire an event for closing a container
+		Container *container = item->getContainer();
+		if (!container || player->getContainerID(container) == -1){
+			Script::OnUseItem::Event evt(player, item, retval);
+			if(script_system->dispatchEvent(evt)) {
+				return retval;
+			}
 		}
 	}
 
