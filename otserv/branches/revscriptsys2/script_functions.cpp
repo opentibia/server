@@ -124,6 +124,8 @@ void Manager::registerClasses() {
 	registerEnum<WieldInformation>();
 	registerEnum<SkullType>();
 	registerEnum<ReturnValue>();
+	registerEnum<PartyShieldType>();
+	registerEnum<GuildEmblemType>();
 
 	registerClass("Event");
 	registerClass("OnSayEvent", "Event");
@@ -506,6 +508,7 @@ void Manager::registerFunctions() {
 	// General functions
 	registerGlobalFunction("wait(int delay)", &Manager::lua_wait);
 	registerGlobalFunction("stacktrace(thread thread)", &Manager::lua_stacktrace);
+	registerGlobalFunction("scriptStatistics()", &Manager::lua_statistics);
 	registerGlobalFunction("require_directory(string path)", &Manager::lua_require_directory);
 	registerGlobalFunction("get_thread_id(thread t)", &Manager::lua_get_thread_id);
 
@@ -658,6 +661,35 @@ int LuaState::lua_wait()
 	// integer delay is ontop of stack
 	pushString("WAIT");
 	return lua_yield(state, 2);
+}
+
+int LuaState::lua_statistics()
+{
+	// integer delay is ontop of stack
+	newTable();
+
+	Script::Manager* manager = NULL;
+
+	if (LuaThread* t = dynamic_cast<LuaThread *>(this)) {
+		manager = t->manager;
+	}
+	else { 
+		manager = dynamic_cast<Script::Manager *>(this);
+	}
+
+	if (manager == NULL) {
+		return 1;
+	}
+
+	setField(-1, "objects", environment->countObjects());
+	setField(-1, "eventsDispatched", manager->eventsDispatched());
+	setField(-1, "eventsHandled", manager->handlersCalled());
+	setField(-1, "eventsDiscarded", manager->eventsDiscarded());
+	setField(-1, "functionsCalled", manager->functionsCalled());
+	setField(-1, "threads", manager->countThreads());
+	setField(-1, "listeners", environment->countListeners());
+
+	return 1;
 }
 
 int LuaState::lua_getConfigValue()
@@ -5177,14 +5209,14 @@ int LuaState::lua_getItemType()
 {
 	int32_t itemid = popInteger();
 
-	newTable();
-
 	const ItemType& it = Item::items[itemid];
 
 	if(it.id == 0){
 		pushNil();
 		return 1;
 	}
+
+	newTable();
 
 	setField(-1, "id", it.id);
 	setField(-1, "clientID", it.clientId);

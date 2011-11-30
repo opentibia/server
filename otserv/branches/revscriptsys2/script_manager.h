@@ -37,6 +37,13 @@ namespace Script {
 
 		// Event handling
 		bool dispatchEvent(Event& event);
+
+		// Get statistics
+		int32_t eventsDispatched() const;
+		int32_t handlersCalled() const;
+		int32_t eventsDiscarded() const;
+		int32_t functionsCalled() const;
+
 	protected:
 		// This actually registers functions!
 		// Defined in script functions.cpp
@@ -70,6 +77,12 @@ namespace Script {
 		uint32_t function_id_counter;
 		int32_t event_nested_level;
 
+		// Statistics
+		int32_t events_dispatched;
+		int32_t event_handlers_called;
+		int32_t events_discarded;
+		int32_t functions_called;
+
 		// Expose functions/classes to lua
 		void registerClass(const std::string& cname);
 		void registerClass(const std::string& cname, const std::string& parent_class);
@@ -94,6 +107,7 @@ namespace Script {
 		boost::any parseDefaultDefinition(std::string& s);
 
 		friend class LuaClassType;
+		friend class LuaThread;
 	};
 
 

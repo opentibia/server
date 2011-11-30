@@ -34,6 +34,7 @@ namespace Script {
 	typedef struct{
 		ListenerMap ItemId;
 		ListenerMap ActionId;
+		int32_t size() const {return ItemId.size() + ActionId.size();}
 	} ListenerItemMap;
 	typedef std::map<uint32_t, Listener_ptr> SpecificListenerMap;
 	typedef std::map<std::string, ListenerList> ListenerStringMap;
@@ -46,6 +47,10 @@ namespace Script {
 		~Environment();
 
 		void cleanup();
+
+		int32_t countObjects() const;
+		int32_t countListeners() const;
+		int32_t countSpecificListeners() const;
 
 		typedef boost::bimap<ObjectID, void*> ObjectMap;
 

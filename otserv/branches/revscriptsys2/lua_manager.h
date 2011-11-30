@@ -210,6 +210,7 @@ public:
 	void push(bool b) {pushBoolean(b);}
 	void push(int32_t i) {pushInteger(i);}
 	void push(uint32_t ui) {pushUnsignedInteger(ui);}
+	void push(int64_t i) {pushFloat((double)i);}
 	void push(uint64_t ui) {pushFloat((double)ui);}
 	void push(double d) {pushFloat(d);}
 	void push(const std::string& str) {pushString(str);}
@@ -219,6 +220,14 @@ public:
 	void push(const Enum<E, size_>& e) {pushEnum<E, size_>(e);}
 	template <class E, int size_>
 	void push(const BitEnum<E, size_>& e) {pushEnum<E, size_>(e);}
+
+	#ifndef __GNUC__
+	#if VISUALC_VERSION < 10
+	// for some reason, having trouble compiling this under vc10
+	// TODO: Find a proper fix for this!
+	void push(int i) {pushInteger(i);}
+	#endif
+	#endif
 
 	// Don't use pushTable on a userdata class and vice-versa (events are table classes, everything else userdata)
 	Script::ObjectID* pushClassInstance(const std::string& classname);
@@ -245,6 +254,7 @@ public:
 	int lua_require_directory();
 	int lua_get_thread_id();
 	int lua_stacktrace();
+	int lua_statistics();
 
 	int lua_getConfigValue();
 	// - Register Events
@@ -726,6 +736,7 @@ public:
 
 	LuaThread_ptr newThread(const std::string& name);
 	void scheduleThread(int32_t schedule, LuaThread_ptr thread);
+	int32_t countThreads() const;
 	void runScheduledThreads();
 	void freeThread(LuaThread_ptr thread);
 

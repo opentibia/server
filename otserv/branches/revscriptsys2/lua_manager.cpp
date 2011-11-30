@@ -965,6 +965,11 @@ void LuaStateManager::runScheduledThreads()
 	}
 }
 
+int32_t LuaStateManager::countThreads() const
+{
+	return threads.size();
+}
+
 void LuaStateManager::freeThread(LuaThread_ptr thread)
 {
 	ThreadMap::iterator iter = threads.find(thread->state);
@@ -1071,7 +1076,13 @@ std::string LuaThread::report(const std::string& extramessage)
 
 int32_t LuaThread::run(int32_t args)
 {
+	// Keep track of stats!
+	++manager->event_handlers_called;
+
+	// Run the lua code
 	int32_t ret = lua_resume(state, args);
+
+	// 
 	thread_state = ret;
 	if(ret == LUA_YIELD) {
 		// Thread yielded, add us to the manager

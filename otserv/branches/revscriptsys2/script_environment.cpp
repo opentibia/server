@@ -38,6 +38,62 @@ void Environment::cleanup()
 	Generic.OnSay.clear();
 }
 
+int32_t Environment::countObjects() const
+{
+	return object_map.size();
+}
+
+int32_t Environment::countSpecificListeners() const
+{
+	return specific_listeners.size();
+}
+
+int32_t Environment::countListeners() const
+{
+	return
+		countSpecificListeners().size() +
+		Generic.OnSay.size() + 
+		Generic.OnUseItem.size() + 
+		Generic.OnUseWeapon.size() + 
+		Generic.OnUseFist.size() + 
+		Generic.OnUseAnyWeapon.size() + 
+		Generic.OnEquipItem.size() + 
+		Generic.OnMoveInAnyCreature.size() + 
+		Generic.OnMoveOutAnyCreature.size() + 
+		Generic.OnMoveInCreature.size() + 
+		Generic.OnMoveOutCreature.size() + 
+		Generic.OnJoinChannel.size() + 
+		Generic.OnLeaveChannel.size() + 
+		Generic.OnAccountLogin.size() + 
+		Generic.OnLogin.size() + 
+		Generic.OnLogout.size() + 
+		Generic.OnChangeOutfit.size() + 
+		Generic.OnLook.size() + 
+		Generic.OnTurn.size() + 
+		Generic.OnLoad.size() + 
+		Generic.OnUnload.size() + 
+		Generic.OnSpawn.size() + 
+		Generic.OnAdvance.size() + 
+		Generic.OnTrade.size() + 
+		Generic.OnShopPurchase.size() + 
+		Generic.OnShopSell.size() + 
+		Generic.OnShopClose.size() + 
+		Generic.OnTradeBegin.size() + 
+		Generic.OnTradeEnd.size() + 
+		Generic.OnMoveItem.size() + 
+		Generic.OnMoveItemOnItem.size() + 
+		Generic.OnConditionEffect.size() + 
+		Generic.OnAttack.size() + 
+		Generic.OnDamage.size() + 
+		Generic.OnKilled.size() + 
+		Generic.OnKill.size() + 
+		Generic.OnDeathBy.size() + 
+		Generic.OnDeath.size() + 
+		Generic.OnActorLoadSpell.size() + 
+		Generic.OnActorCastSpell.size()
+		;
+}
+
 void Environment::cleanupUnusedListeners(ListenerList& list)
 {
 	for(ListenerList::iterator giter = list.begin(); giter != list.end();){
