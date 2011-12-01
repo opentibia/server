@@ -2909,7 +2909,17 @@ int LuaState::lua_Thing_getZ()
 int LuaState::lua_Thing_getParentTile()
 {
 	Thing* thing = popThing();
-	pushTile(thing->getParentTile());
+	Tile* parent = thing->getParentTile();
+
+	if (parent != NULL) {
+		// Creatures are removed from the map, but parent pointer still remains on tile
+		// This should be fixed, but is a lot of work so this is a simpler solution for now.
+		if (parent->__getIndexOfThing(thing) == -1) {
+			pushTile(parent);
+			return 1;
+		}
+	}
+	pushNil();
 	return 1;
 }
 
