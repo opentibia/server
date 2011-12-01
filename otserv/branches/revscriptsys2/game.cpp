@@ -668,22 +668,24 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 				thing = tile->items_firstDown();
 			}
 			else if(type == STACKPOS_USEITEM){
-				//First check items with topOrder 2 (ladders, signs, splashes)
-				//TODO: Find proper solution for the 2 hacks below!
+				Item* item = NULL;
 
-				//HACK: For some reason we tried to "get" the item below the depot instead (if the depot is on top)
-				Item* item = tile->items_getItemWithType(ITEM_TYPE_DEPOT);
-				if(!item || (tile->items_downCount() - tile->items_topCount()) == 1){
-					item = tile->getItemByTopOrder(2);
+				// First check top downItem and if it matches the spriteID client requested
+				item = tile->items_firstDown();
+				if (item && item->getClientID() == spriteId) {
+					thing = item;
 				}
 
-				if (item && item->getClientID() != spriteId){
-					Item* tmp = tile->items_firstDown();
-					if (tmp && tmp->getClientID() == spriteId)
-						thing = tmp;
+				// Then check items with topOrder 2 (ladders, signs, splashes)
+				if (thing == NULL) {
+					if ((tile->items_downCount() - tile->items_topCount()) == 1) {
+						item = tile->getItemByTopOrder(2);
+						if (item)
+							thing = item;
+					}
 				}
 
-				if(!item){
+				if (thing == NULL) {
 					//then down items
 					thing = tile->items_firstDown();
 					if(thing == NULL){
