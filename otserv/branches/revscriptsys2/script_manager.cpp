@@ -33,17 +33,57 @@ Manager::Manager(Script::Environment& e) : LuaStateManager(NULL),
 	manager = this;
 	environment = &e;
 
+	events_dispatched = 0;
+	event_handlers_called = 0;
+	events_discarded = 0;
+	functions_called = 0;
+
 	registerClasses();
 	registerFunctions();
 }
 
-Manager::~Manager() {
+Manager::~Manager()
+{
 }
 
-bool Manager::dispatchEvent(Script::Event& event) {
+///////////////////////////////////////////////////////////////////////////////
+// Fetch statistics
+
+int32_t Manager::eventsDispatched() const
+{
+	return events_dispatched;
+}
+
+int32_t Manager::functionsCalled() const
+{
+	return functions_called;
+}
+
+int32_t Manager::eventsDiscarded() const
+{
+	return events_discarded;
+}
+
+int32_t Manager::handlersCalled() const
+{
+	return event_handlers_called;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Event Dispatching
+
+bool Manager::dispatchEvent(Script::Event& event)
+{
+	// Prevent infinite loops
 	if(event_nested_level > g_config.getNumber(ConfigManager::MAXIMUM_SCRIPT_RECURSION_DEPTH))
+	{
 		// Event not handled
+		++events_discarded;
 		return false;
+	}
+
+	// Keep track of statistics
+	++events_dispatched;
 
 	event_nested_level++;
 	bool s = event.dispatch(*this, *environment);
@@ -256,6 +296,9 @@ int Manager::luaFunctionCallback(lua_State* L) {
 			state = private_thread;
 		}
 	}
+	
+	// Keep track of the statistics!
+	++manager->functions_called;
 
 	{
 		ComposedCallback_ptr cc = manager->function_map[callbackID];
