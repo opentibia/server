@@ -237,12 +237,12 @@ void Game::loadGameState()
 void Game::saveGameState()
 {
 	Database* db = Database::instance();
-	
+
 	DBQuery q;
 	DBTransaction transaction(db);
 	transaction.begin();
-	std::ostringstream query;
-	
+	DBQuery query;
+
 	db->executeQuery("DELETE FROM `global_storage`");
 
 	DBInsert global_stmt(db);
@@ -250,7 +250,7 @@ void Game::saveGameState()
 
 	for(StorageMap::const_iterator giter = globalStorage.begin(); giter != globalStorage.end(); ++giter){
 		query << db->escapeString(giter->first) << ", " << db->escapeString(giter->second);
-		if(!global_stmt.addRow(query.str())){
+		if(!global_stmt.addRow(query)){
 			std::cout << "Could not save global game state." << std::endl;
 			return;
 		}
