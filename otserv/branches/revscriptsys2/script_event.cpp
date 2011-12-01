@@ -613,6 +613,7 @@ OnMoveCreature::Event::Event(Creature* actor, Creature* moving_creature, Tile* f
 	moving_creature(moving_creature),
 	fromTile(fromTile),
 	toTile(toTile),
+	item(NULL),
 	moveType(TYPE_NONE)
 {
 	if(fromTile && toTile){
@@ -701,10 +702,12 @@ bool OnMoveCreature::Event::dispatch(Manager& state, Environment& environment)
 			{
 				list_iter = environment.Generic.OnMoveOutCreature.ActionId.find(*id);
 				if(list_iter != environment.Generic.OnMoveOutCreature.ActionId.end()){
+					item = fromTile->items_getItemWithActionId(*id);
 					if(dispatchEvent<OnMoveCreature::Event>
 						(this, state, environment, list_iter->second)){
 							return true;
 					}
+					item = NULL;
 				}
 			}
 		}
@@ -720,10 +723,12 @@ bool OnMoveCreature::Event::dispatch(Manager& state, Environment& environment)
 			{
 				list_iter = environment.Generic.OnMoveOutCreature.ItemId.find(*id);
 				if(list_iter != environment.Generic.OnMoveOutCreature.ItemId.end()){
+					item = fromTile->items_getItemWithItemId(*id);
 					if(dispatchEvent<OnMoveCreature::Event>
 						(this, state, environment, list_iter->second)){
 							return true;
 					}
+					item = NULL;
 				}
 			}
 		}
@@ -749,10 +754,12 @@ bool OnMoveCreature::Event::dispatch(Manager& state, Environment& environment)
 			{
 				list_iter = environment.Generic.OnMoveInCreature.ActionId.find(*id);
 				if(list_iter != environment.Generic.OnMoveInCreature.ActionId.end()){
+					item = toTile->items_getItemWithActionId(*id);
 					if(dispatchEvent<OnMoveCreature::Event>
 						(this, state, environment, list_iter->second)){
 							return true;
 					}
+					item = NULL;
 				}
 			}
 		}
@@ -768,10 +775,12 @@ bool OnMoveCreature::Event::dispatch(Manager& state, Environment& environment)
 			{
 				list_iter = environment.Generic.OnMoveInCreature.ItemId.find(*id);
 				if(list_iter != environment.Generic.OnMoveInCreature.ItemId.end()){
+					item = toTile->items_getItemWithItemId(*id);
 					if(dispatchEvent<OnMoveCreature::Event>
 						(this, state, environment, list_iter->second)){
 							return true;
 					}
+					item = NULL;
 				}
 			}
 		}
@@ -790,7 +799,7 @@ void OnMoveCreature::Event::push_instance(LuaState& state, Environment& environm
 {
 	state.pushClassTableInstance("OnMoveCreatureEvent");
 	state.pushThing(actor);
-	state.setField(-2, "creature");
+	state.setField(-2, "pushing_creature");
 
 	state.pushTile(fromTile);
 	state.setField(-2, "fromTile");
@@ -798,7 +807,9 @@ void OnMoveCreature::Event::push_instance(LuaState& state, Environment& environm
 	state.setField(-2, "toTile");
 
 	state.pushThing(moving_creature);
-	state.setField(-2, "moving_creature");
+	state.setField(-2, "creature");
+	state.pushThing(item);
+	state.setField(-2, "item");
 }
 
 void OnMoveCreature::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
@@ -1549,7 +1560,9 @@ bool OnSpawn::Event::dispatch(Manager& state, Environment& environment)
 	if(eiter != environment.Generic.OnSpawn.end())
 		return dispatchEvent<OnSpawn::Event>
 			(this, state, environment, eiter->second);
-	return false;
+
+	// Default is success
+	return true;
 }
 
 void OnSpawn::Event::push_instance(LuaState& state, Environment& environment)

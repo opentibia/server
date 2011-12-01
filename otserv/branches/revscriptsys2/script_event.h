@@ -341,6 +341,9 @@ namespace Script {
 	////////////////////////////////////////////////////////////////
 	// OnMoveCreature event
 	// Triggered when a creature moves
+	// If tied to item / action item, will only be triggered ONCE
+	// if several identical items are on a single tile (ie. once per
+	// item/action id, not once per item)
 
 	namespace OnMoveCreature {
 		enum FilterType {
@@ -387,6 +390,7 @@ namespace Script {
 			Creature* moving_creature;
 			Tile* fromTile;
 			Tile* toTile;
+			Item* item;
 			MoveType moveType;
 		};
 	}

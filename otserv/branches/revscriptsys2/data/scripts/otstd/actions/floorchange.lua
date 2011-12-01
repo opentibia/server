@@ -5,11 +5,14 @@ otstd.ladders = {
 		[3678] = {ladder=true},
 		[5543] = {ladder=true},
 		[430] = {drop=true},
-		[3135] = {drop=true}
+		[3135] = {drop=true},
+		[293] = {pitfall=true, drop=true},
 	}
 
 
 function otstd.floorchange.callback(event)
+	event:skip()
+	
 	local pos = event.item:getPosition()
 	if event.drop then
 		pos.z = pos.z + 1
@@ -17,7 +20,12 @@ function otstd.floorchange.callback(event)
 		pos.y = pos.y + 1
 		pos.z = pos.z - 1
 	end
-	event.player:moveTo(pos)
+	
+	if event.player then
+		event.player:moveTo(pos)
+	elseif event.creature then
+		event.creature:moveTo(pos)
+	end
 end
 
 function otstd.floorchange.registerHandlers()
@@ -26,13 +34,18 @@ function otstd.floorchange.registerHandlers()
 			stopListener(data.listener)
 		end
 
-		local function lamba_callback(event)
+		local function lambda_callback(event)
 			event.ladder = data.ladder
 			event.drop = data.drop
 			otstd.floorchange.callback(event)
 		end
-		data.listener =
-			registerOnUseItem("itemid", id, lamba_callback)
+		
+		if data.pitfall then
+			data.listener = registerOnAnyCreatureMoveIn("itemid", id, lambda_callback)
+		else
+			data.listener =
+				registerOnUseItem("itemid", id, lambda_callback)
+		end
 	end
 end
 
