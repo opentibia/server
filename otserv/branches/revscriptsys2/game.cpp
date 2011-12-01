@@ -2518,7 +2518,8 @@ Item* Game::transformItem(Creature* actor, Item* item, uint16_t newId, int32_t n
 		}
 
 		// Update script environment
-		script_environment->reassignThing(item, newItem);
+		if (script_environment != NULL)
+			script_environment->reassignThing(item, newItem);
 
 		return newItem;
 	}
@@ -2593,7 +2594,8 @@ Item* Game::transformItem(Creature* actor, Item* item, uint16_t newId, int32_t n
 		FreeThing(item);
 
 		// Update script environment
-		script_environment->reassignThing(item, newItem);
+		if (script_environment != NULL)
+			script_environment->reassignThing(item, newItem);
 
 		return newItem;
 	}
