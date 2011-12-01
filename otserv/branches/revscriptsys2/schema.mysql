@@ -107,7 +107,8 @@ CREATE TABLE `player_storage` (
     `player_id` INT UNSIGNED NOT NULL,
     `id` TEXT NOT NULL,
     `value` TEXT NOT NULL,
-	PRIMARY KEY(`player_id`, `id`(10)),
+	PRIMARY KEY(`player_id`),
+	KEY(`id`(10)),
     FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
@@ -257,7 +258,7 @@ CREATE TABLE `player_depotitems` (
 CREATE TABLE `global_storage` (
 	`id` TEXT NOT NULL,
 	`value` TEXT NOT NULL,
-	PRIMARY KEY(`id`(10))
+	KEY(`id`(10))
 ) ENGINE = InnoDB;
 
 CREATE TABLE `schema_info` (
