@@ -677,11 +677,13 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 					item = tile->getItemByTopOrder(2);
 				}
 
-				//HACK: For some reason we tried to "get" a splash below an item/corpse instead (if the corpse is on top)
-				if(item && (!item->isSplash() || (item->isSplash() && !tile->items_firstTop()))){
-					thing = item;
+				if (item && item->getClientID() != spriteId){
+					Item* tmp = tile->items_firstDown();
+					if (tmp && tmp->getClientID() == spriteId)
+						item = tmp;
 				}
-				else{
+
+				if(!item){
 					//then down items
 					thing = tile->items_firstDown();
 					if(thing == NULL){
