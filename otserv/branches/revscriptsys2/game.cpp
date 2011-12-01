@@ -680,7 +680,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 				if (item && item->getClientID() != spriteId){
 					Item* tmp = tile->items_firstDown();
 					if (tmp && tmp->getClientID() == spriteId)
-						item = tmp;
+						thing = tmp;
 				}
 
 				if(!item){
