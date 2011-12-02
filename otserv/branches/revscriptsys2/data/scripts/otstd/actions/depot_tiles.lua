@@ -1,39 +1,28 @@
-otstd.depot_tiles = {{416, 417}, {426, 425}, {446, 447}, {3216, 3217}, {11062, 11063}}
-otstd.depot_lockers = {2589, 2590, 2591, 2592}
-otstd.depot_listeners = {}
+otstd.depot = {}
+otstd.depot.tiles = {{416, 417}, {426, 425}, {446, 447}, {3216, 3217}, {11062, 11063}}
+otstd.depot.lockers = {2589, 2590, 2591, 2592}
+otstd.depot.listeners = {}
 
 function otstd.depot.registerHandlers()
-	for _, data in ipairs(otstd.depot_tiles) do
+	for _, data in ipairs(otstd.depot.tiles) do
 		if otstd.depot.listeners[data[1]] then
 			stopListener(otstd.depot.listeners[data[1]])
 		end
 		
 		otstd.depot.listeners[data[1]] = registerOnAnyCreatureMoveIn("itemid", data[1], function(event)
-			local item = event.toTile:getItemWithItemID(data[1])
-			item:setItemID(data[2])
-			
 			if typeof(event.creature, "Player") then
-				local pos = event.toTile:getPosition()
-				local direction = event.creature:getOrientation()
+				local switchItem = event.item
 				
 				-- TODO: Change the way finding the locker works (to looping through tiles around the player)?
 				-- This will only work for lockers that only reachable with horizontal and vertical movement
 				-- As we base it on a direction, we dont have to loop through 8 tiles around, which is better!
 				-- Then again.. if depots are not placed as usual (like in regular Tibia), then this would not work!
-				if direction == NORTH then
-					pos.y = pos.y - 1
-				elseif direction == EAST then
-					pos.x = pos.x + 1
-				elseif direction == WEST then
-					pos.x = pos.x - 1
-				else
-					pos.y = pos.y + 1
-				end
 				
-				local tile = map:getTile(pos)
-				for _, tileItem in ipairs(tile:getItems()) do
-					if table.find(otstd.depot.lockers, tileItem:getItemID()) and typeof(tileItem, "Depot") then
-						local depot = event.creature:getDepot(tileItem:getDepotID(), true)
+				local tile = event.toTile:getTileInDirection(event.creature:getOrientation())
+				for _, depotID in ipairs(otstd.depot.lockers) do
+					local depotItem = tile:getItemWithItemID(depotID)
+					if depotItem then
+						local depot = event.creature:getDepot(depotItem:getDepotID(), true)
 						
 						if depot then
 							local count = depot:getItemHoldingCount()
@@ -44,22 +33,20 @@ function otstd.depot.registerHandlers()
 								event.creature:sendCancel("Your depot contains " .. count .. " item.")
 							end
 							
+							switchItem:setItemID(data[2])
+							
+							local onMoveOutListener = nil
+							onMoveOutListener = registerOnCreatureMoveOut(event.creature, "itemid", data[2], function(event)
+								switchItem:setItemID(data[1])
+								stopListener(onMoveOutListener)
+							end)
+							
 							break
 						end
+						
 					end
 				end
 			end
-		end)
-
-		if otstd.depot.listeners[data[2]] then
-			stopListener(otstd.depot.listeners[data[2]])
-		end
-		
-		-- TODO
-		-- This is bad, makes all switches de-indent when you walk over them
-		otstd.depot.listeners[data[2]] = registerOnAnyCreatureMoveOut("itemid", data[2], function(event)
-			local item = event.fromTile:getItemWithItemID(data[2])
-			item:setItemID(data[1])
 		end)
 	end
 end
