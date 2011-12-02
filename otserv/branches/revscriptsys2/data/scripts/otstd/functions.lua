@@ -162,6 +162,11 @@ function getDestination(param)
 	local N = 1
 	local name = ""
 	local kind = nil
+	
+	local px, py, pz = param:match "[Xx]?:?(%d+)[%s,]+[Yy]?:?(%d+)[%s,]+[Zz]?:?(%d+)"
+	if px and py and pz then
+		return {x=px, y=py, z=pz}
+	end
 
 	kind, name, N = param:match "(%w+):(.-)#(%d+)"
 	if kind and name and N then
@@ -227,7 +232,7 @@ function getDestination(param)
 			pos = players[N]:getPosition()
 		else
 			-- Try waypoint
-			local waypoint = getWaypointByName(name)
+			local waypoint = map:getWaypoint(name)
 			if waypoint then
 				pos = waypoint:getPosition()
 			else
@@ -278,12 +283,13 @@ function checkVocation(vocation, vocationList)
 			end
 		elseif typeof(vocationList, "table") then
 			for _, v in ipairs(vocationList) do
-				if v:lower() == "any" or
-					vocation:getName():lower() == v:lower() then
+				if checkVocation(v) then
 					return true
 				end
 			end
 		end
+	else
+		error("First argument to 'checkVocation' must be a vocation object")
 	end
 
 	return false

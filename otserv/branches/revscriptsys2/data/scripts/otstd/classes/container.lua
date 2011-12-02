@@ -9,9 +9,11 @@ end
 function createContainer(contents)
 	if type(contents) == "table" then
 		local item = createItem(contents.itemid or contents.id, contents.count or contents.fluidtype or contents.charges)
-		for k, v in ipairs(contents) do
-			-- Create
-			item:addItem(createContainer(v))
+		if contents.contents then
+			for k, v in ipairs(contents.contents) do
+				-- Create
+				item:addItem(createContainer(v))
+			end
 		end
 		
 		for k, v in pairs(contents) do

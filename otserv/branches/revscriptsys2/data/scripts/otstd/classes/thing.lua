@@ -3,6 +3,18 @@ function Thing:type()
 	return self.__name
 end
 
+function Thing:isPlayer()
+	return false
+end
+
+function Thing:isCreature()
+	return false
+end
+
+function Thing:isItem()
+	return false
+end
+
 
 function Thing:teleportTo(pos)
 	local oldpos = self:getPosition()

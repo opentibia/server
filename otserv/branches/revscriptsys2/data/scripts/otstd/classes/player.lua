@@ -1,6 +1,10 @@
 
 otstd.Player = {}
 
+function Player:isPlayer()
+	return true
+end
+
 -- Easier message passing
 
 function Player:sendNote(msg)
@@ -103,6 +107,8 @@ function Player:walkTo(to)
 end
 
 -- Fetch some data about the player
+
+Player.getFreeCapacity = Player.getFreeCap
 
 function Player:getTimeSinceLogin()
 	return os.difftime(os.time(), self:getLastLogin())

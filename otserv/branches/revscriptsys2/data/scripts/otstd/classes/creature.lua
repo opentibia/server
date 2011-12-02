@@ -1,4 +1,7 @@
 
+function Creature:isCreature()
+	return true
+end
 
 function Creature:setCustomValue(key, value)
 	local t = type(value)
@@ -30,6 +33,13 @@ end
 
 Creature.setStorageValue = Creature.setCustomValue
 Creature.getStorageValue = Creature.getCustomValue
+
+function Creature:alive()
+	-- We need to check parent tile to know if the creature is on the map
+	-- Creatures in limba or w/e are not considered to be alive (this includes
+	-- despawned creatures)
+	return self:getHealth() > 0 and self:getParentTile() ~= nil
+end
 
 function Creature:addHealth(howmuch)
 	r = true

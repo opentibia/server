@@ -1,4 +1,7 @@
 
+function Item:isItem()
+	return true
+end
 
 function Item:removeCount(count)
 	if count <= 0 then
@@ -24,7 +27,7 @@ function Item:setAttribute(key, value)
 	if type(value) == "nil" then
 		return self:eraseAttribute(key)
 	elseif type(value) == "boolean" then
-		return self:setBooleanAttribute(value)
+		return self:setBooleanAttribute(key, value)
 	elseif type(value) == "string" or type(value) == "number" then
 		if tonumber(value) ~= nil then
 			if tostring(value):find(".", 1, true) then
@@ -100,6 +103,7 @@ function Item:getAttack(extra)
 	end
 	return a
 end
+
 function Item:getAttack() return self:getIntegerAttribute("attack") or self:getDefaultAttack() end
 function Item:getDefaultAttack() return Items[self:getItemID()].attack end
 function Item:setAttack(v) return self:setIntegerAttribute("attack", v) end
@@ -122,3 +126,5 @@ function Item:getMaxHitChance() return Items[self:getItemID()].maxHitChance end
 function Item:getBreakChance() return Items[self:getItemID()].breakChance end
 
 function Item:isCorpse() return Items[self:getItemID()].corpseType ~= RACE_NONE end
+function Item:isGround() return Items[self:getItemID()].isGround end
+function Item:isTeleport() return Items[self:getItemID()].isTeleport end

@@ -9,6 +9,28 @@ function Tile:getY() return self.y end
 function Tile:getZ() return self.z end
 function Tile:getPosition() return {x = self.x, y = self.y, z = self.z} end
 
+function Tile:northOf() return map:getTile{x = self.x, y = self.y - 1, z = self.z} end
+function Tile:southOf() return map:getTile{x = self.x, y = self.y + 1, z = self.z} end
+function Tile:westOf() return map:getTile{x = self.x - 1, y = self.y, z = self.z} end
+function Tile:eastOf() return map:getTile{x = self.x + 1, y = self.y, z = self.z} end
+function Tile:northeastOf() return map:getTile{x = self.x + 1, y = self.y - 1, z = self.z} end
+function Tile:northwestOf() return map:getTile{x = self.x - 1, y = self.y - 1, z = self.z} end
+function Tile:southeastOf() return map:getTile{x = self.x + 1, y = self.y + 1, z = self.z} end
+function Tile:southwestOf() return map:getTile{x = self.x - 1, y = self.y + 1, z = self.z} end
+
+function Tile:getTileInDirection(dir)
+	if dir == NORTH then return self:northOf()
+	elseif dir == SOUTH then return self:southOf()
+	elseif dir == EAST then return self:eastOf()
+	elseif dir == WEST then return self:westOf()
+	elseif dir == NORTHEAST then return self:northeastOf()
+	elseif dir == NORTHWEST then return self:northwestOf()
+	elseif dir == SOUTHEAST then return self:southeastOf()
+	elseif dir == SOUTHWEST then return self:southwestOf()
+	else error "Unknown direction!"
+	end
+end
+
 function Tile:getGround()
 	return self:getThing(0)
 end
@@ -46,6 +68,49 @@ function Tile:getTopMoveableThing()
 		return nil
 	end
 	return t
+end
+
+function Tile:pushTo(newPosition)
+	-- Go by direction?
+	if typeof(newPosition, "Direction") then
+		newPosition = self:getTileInDirection(newPosition)
+	end
+		
+	for i, thing in ipairs(self:getMoveableItems()) do
+		thing:moveTo(newPosition)
+	end
+	
+	local dir = nil
+	if self.x - newPosition.x == 1 then
+		dir = WEST
+	elseif self.x - newPosition.x == -1 then
+		dir = EAST
+	elseif self.y - newPosition.y == 1 then
+		dir = NORTH
+	elseif self.y - newPosition.y == -1 then
+		dir = SOUTH
+	end
+	
+	for i, thing in ipairs(self:getCreatures()) do
+		if dir then
+			thing:walk(dir, true)
+		else
+			thing:moveTo(newPosition)
+		end
+	end
+end
+
+function Tile:teleportTo(newPosition)
+	for i, thing in ipairs(self:getMoveableItems()) do
+		thing:moveTo(newPosition)
+	end
+	
+	for i, thing in ipairs(self:getCreatures()) do
+		thing:moveTo(newPosition)
+	end
+	
+	sendMagicEffect(self, MAGIC_EFFECT_POFF)
+	sendMagicEffect(newPosition, MAGIC_EFFECT_BLUE_BUBBLE)
 end
 
 function Tile:isPz()

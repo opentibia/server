@@ -40,11 +40,57 @@ end
 -- Can also be called as map(x,y,z)
 Map_meta.__call = Map.getTile
 
--- Alias some builtin functions
+-- Get creatures in an area
+
+function Map:getCreaturesInArea(from, to, filterFunction)
+	assert(from ~= nil, "Must pass first argument!")
+	if type(to) == "function" then
+		assert(filterFunction == nil, "Invalid arguments, use either (from, to, filter), (from, to) or (area, filter)")
+		filterFunction = to
+		to = nil
+	end
+	
+	if to == nil then
+		to = from.to
+		from = from.from
+	end
+	
+	local creatures = {}
+	
+	for x = from.x, to.x do
+		for y = from.y, to.y do
+			for z = from.z, to.z do
+				local tile = map(x, y, z)
+				if tile then
+					for _, c in ipairs(tile:getCreatures()) do
+						if filterFunction == nil or filterFunction(c) then
+							table.insert(creatures, c)
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	return creatures
+end
+
+function Map:getMonstersInArea(from, to)
+	return self:getCreaturesInArea(from, to, function(c)
+		if typeof(c, "Actor") then
+			if (c:isSummon() and typeof(c:getMaster(), "Player")
+				return false
+			end
+			return true
+		end
+		return false
+	end)
+end
+
+-- Waypoints!
 function Map:getWaypoint(name)
 	return getWaypointByName(name)
 end
-
 function Map:getTowns()
 	return getAllTowns()
 end
