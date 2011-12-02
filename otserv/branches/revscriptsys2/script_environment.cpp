@@ -51,7 +51,7 @@ int32_t Environment::countSpecificListeners() const
 int32_t Environment::countListeners() const
 {
 	return
-		countSpecificListeners().size() +
+		countSpecificListeners() +
 		Generic.OnSay.size() + 
 		Generic.OnUseItem.size() + 
 		Generic.OnUseWeapon.size() + 

@@ -687,7 +687,9 @@ int LuaState::lua_statistics()
 	setField(-1, "eventsDiscarded", manager->eventsDiscarded());
 	setField(-1, "functionsCalled", manager->functionsCalled());
 	setField(-1, "threads", manager->countThreads());
-	setField(-1, "listeners", environment->countListeners());
+	setField(-1, "totalListeners", environment->countListeners());
+	setField(-1, "genericListeners", environment->countListeners() - environment->countSpecificListeners());
+	setField(-1, "specificListeners", environment->countSpecificListeners());
 
 	return 1;
 }
