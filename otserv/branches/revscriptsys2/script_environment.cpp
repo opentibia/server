@@ -320,6 +320,7 @@ bool Environment::stopListener(ListenerType type, uint32_t id)
 	if(iter != specific_listeners.end()) {
 		Listener_ptr listener = iter->second;
 		listener->deactivate();
+		specific_listeners.erase(iter);
 		return true;
 	}
 
