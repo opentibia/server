@@ -62,14 +62,6 @@ inline int32_t swap_int32(int32_t x)
 	return (int32_t)swap_uint32((uint32_t)x);
 }
 
-/*inline float swap_float32(float x)
-{
-	uint32_t ui = *((uint32_t *)(void *)&x);
-	ui = swap_uint32(ui);
-
-	return *((float *)(void *)&ui);
-}*/
-
 void replaceString(std::string& str, const std::string& sought, const std::string& replacement);
 void trim_right(std::string& source, const std::string& t = "\n\t ");
 void trim_left(std::string& source, const std::string& t = "\n\t ");
@@ -86,10 +78,10 @@ bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 bool readXMLContentString(xmlNodePtr node, std::string& value);
 std::vector<std::string> explodeString(const std::string& inString, const std::string& separator);
-bool hasBitSet(uint32_t flag, uint32_t flags);
+bool hasBitSet(const uint32_t& flag, const uint32_t& flags);
 
 uint32_t rand24b();
-float box_muller(float m, float s);
+float box_muller(const float& m, const float& s);
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM, float deviation = 0.25);
 
@@ -101,26 +93,22 @@ std::string urlEncode(const std::string& str);
 
 bool passwordTest(std::string plain, std::string &hash);
 
-std::string convertIPToString(uint32_t ip);
+std::string convertIPToString(const uint32_t& ip);
 //buffer should have at least 21 bytes. dd/mm/yyyy  hh:mm:ss
-void formatDate(time_t time, char* buffer);
+void formatDate(const time_t& time, char* buffer);
 //buffer should have at least 16 bytes
-void formatDateShort(time_t time, char* buffer);
+void formatDateShort(const time_t& time, char* buffer);
 
 MagicEffectClasses getMagicEffect(const std::string& strValue);
 ShootType_t getShootType(const std::string& strValue);
 Ammo_t getAmmoType(const std::string& strValue);
 AmmoAction_t getAmmoAction(const std::string& strValue);
 
-std::string getViolationReasonString(int32_t reasonId);
-std::string getViolationActionString(violationAction_t actionId, bool ipBanishment);
-std::string playerSexAdjectiveString(PlayerSex_t sex);
-std::string playerSexSubjectString(PlayerSex_t sex);
+std::string getViolationReasonString(const int32_t& reasonId);
+std::string getViolationActionString(const violationAction_t& actionId, bool ipBanishment);
+std::string playerSexAdjectiveString(const PlayerSex_t& sex);
+std::string playerSexSubjectString(const PlayerSex_t& sex);
 
 uint32_t adlerChecksum(uint8_t *data, int32_t len);
-
-void showTime(std::stringstream& str, uint32_t time);
-uint32_t parseTime(const std::string& time);
-std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end);
 
 #endif

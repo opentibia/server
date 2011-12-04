@@ -2000,7 +2000,7 @@ void Player::onCloseContainer(const Container* container)
 void Player::onSendContainer(const Container* container)
 {
 	if(client){
-		bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
+		bool hasParent = (dynamic_cast<const Container*>(container->getParent()));
 
 		for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
 			if(cl->second == container){
@@ -2063,7 +2063,7 @@ void Player::checkTradeState(const Item* item)
 		else{
 			const Container* container = dynamic_cast<const Container*>(item->getParent());
 
-			while(container != NULL){
+			while(container){
 				if(container == tradeItem){
 					g_game.internalCloseTrade(this);
 					break;
@@ -2940,7 +2940,7 @@ void Player::autoCloseContainers(const Container* container)
 
 	for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
 		Container* tmpcontainer = it->second;
-		while(tmpcontainer != NULL){
+		while(tmpcontainer){
 			if(tmpcontainer->isRemoved() || tmpcontainer == container){
 				closeList.push_back(it->first);
 				break;
@@ -2983,12 +2983,12 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 	uint32_t flags) const
 {
 	Player* self = const_cast<Player*>(this);
-	if(self == NULL){
+	if(!self){
 		return RET_NOTPOSSIBLE;
 	}
 
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -3180,7 +3180,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 
 	if(ret == RET_NOERROR || ret == RET_NOTENOUGHROOM){
 		//need an exchange with source?
-		if(getInventoryItem((slots_t)index) != NULL){
+		if(getInventoryItem((slots_t)index)){
 			if(!getInventoryItem((slots_t)index)->isStackable() || getInventoryItem((slots_t)index)->getID() != item->getID()){
 				return RET_NEEDEXCHANGE;
 			}
@@ -3206,7 +3206,7 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 	uint32_t flags) const
 {
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		maxQueryCount = 0;
 		return RET_NOTPOSSIBLE;
 	}
@@ -3288,7 +3288,7 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count, uint32_t f
 	}
 
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -3472,7 +3472,7 @@ void Player::__addThing(int32_t index, Thing* thing)
 	}
 
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__addThing], " << "player: " << getName() << ", item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -3502,7 +3502,7 @@ void Player::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	}
 
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing], " << "player: " << getName() << ", item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -3543,7 +3543,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 	}
 
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing], " << "player: " << getName() << ", item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -3567,7 +3567,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 void Player::__removeThing(Thing* thing, uint32_t count)
 {
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__removeThing], " << "player: " << getName() << ", item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -3822,7 +3822,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 #endif
 
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__internalAddThing] item == NULL" << std::endl;
 #endif

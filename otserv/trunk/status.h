@@ -66,7 +66,6 @@ protected:
 
 class Status{
 public:
-	// procs
 	static Status* instance()
 	{
 		static Status status;
@@ -82,10 +81,8 @@ public:
 	uint32_t getPlayersOnline() const {return m_playersonline;}
 	uint64_t getUptime() const;
 
-protected:
-	Status();
-
 private:
+	Status();
 	uint64_t m_start;
 	int m_playersonline, m_playerspeak;
 	std::string m_mapname, m_mapauthor;

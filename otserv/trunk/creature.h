@@ -283,8 +283,8 @@ public:
 
 	void setMaster(Creature* creature) {master = creature;}
 	Creature* getMaster() {return master;}
-	bool isSummon() const {return master != NULL;}
-	bool isPlayerSummon() const {return master != NULL && master->getPlayer() != NULL;}
+	bool isSummon() const {return master;}
+	bool isPlayerSummon() const {return master && master->getPlayer();}
 	Player* getPlayerMaster() const {return (isPlayerSummon() ? master->getPlayer() : NULL);}
 	Player* getPlayerInCharge() { return (getPlayer() ? getPlayer() : getPlayerMaster());}
 	const Player* getPlayerInCharge() const { return (getPlayer() ? getPlayer() : getPlayerMaster());}

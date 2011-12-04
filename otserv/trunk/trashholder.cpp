@@ -24,14 +24,25 @@
 
 extern Game g_game;
 
-TrashHolder::TrashHolder(uint16_t _type, MagicEffectClasses _effect /*= NM_ME_NONE*/) : Item(_type)
+TrashHolder::TrashHolder(uint16_t _type, MagicEffectClasses _effect /*= NM_ME_NONE*/)
+	: Item(_type)
 {
 	effect = _effect;
 }
 
 TrashHolder::~TrashHolder()
 {
-	//
+	// Virtual Destructor
+}
+
+TrashHolder* TrashHolder::getTrashHolder()
+{
+	return this;
+}
+
+const TrashHolder* TrashHolder::getTrashHolder() const
+{
+	return this;
 }
 
 ReturnValue TrashHolder::__queryAdd(int32_t index, const Thing* thing, uint32_t count,

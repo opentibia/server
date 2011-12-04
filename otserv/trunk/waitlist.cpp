@@ -29,14 +29,7 @@
 extern ConfigManager g_config;
 
 WaitingList::WaitingList()
-{
-	//
-}
-
-WaitingList::~WaitingList()
-{
-	waitList.clear();
-}
+{}
 
 WaitListIterator WaitingList::findClient(const Player* player, uint32_t& slot)
 {
@@ -53,7 +46,7 @@ WaitListIterator WaitingList::findClient(const Player* player, uint32_t& slot)
 	return waitList.end();
 }
 
-int32_t WaitingList::getTime(int32_t slot)
+int32_t WaitingList::getTime(const int32_t& slot)
 {
 	if(slot < 5){
 		return 5;
@@ -72,7 +65,7 @@ int32_t WaitingList::getTime(int32_t slot)
 	}
 }
 
-int32_t WaitingList::getTimeOut(int32_t slot)
+int32_t WaitingList::getTimeOut(const int32_t& slot)
 {
 	//timeout is set to 15 seconds longer than expected retry attempt
 	return getTime(slot) + 15;
@@ -143,7 +136,7 @@ bool WaitingList::clientLogin(const Player* player)
 
 int32_t WaitingList::getClientSlot(const Player* player)
 {
-	uint32_t slot;
+	uint32_t slot = 0;
 	WaitListIterator it = findClient(player, slot);
 	if(it != waitList.end()){
 		return slot;

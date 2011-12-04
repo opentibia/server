@@ -130,7 +130,7 @@ void House::updateDoorDescription()
 
 AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
 {
-	if(player == NULL) // By script
+	if(!player) // By script
 		return HOUSE_OWNER;
 
 	if(player->hasFlag(PlayerFlag_CanEditHouses))
@@ -407,7 +407,7 @@ bool House::canEditAccessList(uint32_t listId, const Player* player)
 
 HouseTransferItem* House::getTransferItem()
 {
-	if(transferItem != NULL)
+	if(transferItem)
 		return NULL;
 
 	transfer_container.setParent(NULL);
@@ -699,7 +699,7 @@ bool Door::serializeAttr(PropWriteStream& propWriteStream) const
 
 void Door::setHouse(House* _house)
 {
-	if(house != NULL){
+	if(house){
 		#ifdef __DEBUG_HOUSES__
 		std::cout << "Warning: [Door::setHouse] house != NULL" << std::endl;
 		#endif

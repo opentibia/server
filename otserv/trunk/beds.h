@@ -46,7 +46,7 @@ public:
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	//override
-	virtual bool canRemove() const {return (house == NULL); }
+	virtual bool canRemove() const {return !house; }
 
 	uint32_t getSleeper() const { return sleeperGUID; }
 	void setSleeper(uint32_t guid){ sleeperGUID = guid; }

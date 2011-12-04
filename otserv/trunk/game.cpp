@@ -367,17 +367,17 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 					}
 				}
 
-				if(thing == NULL){
+				if(!thing){
 					//first down item
 					thing = downItem;
 				}
 
-				if(thing == NULL){
+				if(!thing){
 					//then items with topOrder 3 (doors etc)
 					thing = tile->getTopTopItem();
 				}
 
-				if(thing == NULL){
+				if(!thing){
 					//and finally the ground
 					thing = tile->ground;
 				}
@@ -632,7 +632,7 @@ ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player* &player)
 		if(!(*it).second->isRemoved()){
 			std::string txt2 = asUpperCaseString((*it).second->getName());
 			if(txt2.substr(0, txt1.length()) == txt1){
-				if(lastFound == NULL)
+				if(!lastFound)
 					lastFound = (*it).second;
 				else
 					return RET_NAMEISTOOAMBIGIOUS;
@@ -640,7 +640,7 @@ ReturnValue Game::getPlayerByNameWildcard(const std::string& s, Player* &player)
 		}
 	}
 
-	if(lastFound != NULL){
+	if(lastFound){
 		player = lastFound;
 		return RET_NOERROR;
 	}
@@ -691,7 +691,7 @@ PlayerVector Game::getPlayersByIP(uint32_t ipadress, uint32_t mask)
 
 bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool extendedPos /*=false*/, bool forced /*= false*/)
 {
-	if(creature->getParent() != NULL){
+	if(creature->getParent()){
 		return false;
 	}
 
@@ -1004,7 +1004,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 		//try go up
 		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
 			Tile* tmpTile = getTile(currentPos.x, currentPos.y, currentPos.z - 1);
-			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
+			if(!tmpTile || (!tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID))){
 				tmpTile = getTile(destPos.x, destPos.y, destPos.z - 1);
 				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)){
 					flags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
@@ -1015,7 +1015,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 		else{
 			//try go down
 			Tile* tmpTile = getTile(destPos);
-			if(currentPos.z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID)))){
+			if(currentPos.z != 7 && (!tmpTile || (!tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)))){
 				tmpTile = getTile(destPos.x, destPos.y, destPos.z + 1);
 
 				if(tmpTile && tmpTile->hasHeight(3)){
@@ -1029,7 +1029,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction, 
 	toTile = getTile(destPos);
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
-	if(toTile != NULL){
+	if(toTile){
 		ret = internalMoveCreature(creature, fromTile, toTile, flags);
 	}
 
@@ -1116,7 +1116,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 		}
 	}
 
-	if(fromCylinder == NULL || toCylinder == NULL || item == NULL || item->getClientID() != spriteId){
+	if(!fromCylinder || !toCylinder || !item || item->getClientID() != spriteId){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
@@ -1409,7 +1409,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 	uint32_t flags, bool test, uint32_t& remainderCount)
 {
 	remainderCount = 0;
-	if(toCylinder == NULL || item == NULL){
+	if(!toCylinder || !item){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -1484,7 +1484,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool test /*= false*/, uint32_t flags /*= 0*/)
 {
 	Cylinder* cylinder = item->getParent();
-	if(cylinder == NULL){
+	if(!cylinder){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -1545,7 +1545,7 @@ ReturnValue Game::internalPlayerAddItem(Player* player, Item* item, bool dropOnM
 Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
 	bool depthSearch /*= true*/, int32_t subType /*= -1*/)
 {
-	if(cylinder == NULL){
+	if(!cylinder){
 		return false;
 	}
 
@@ -1597,7 +1597,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
 
 bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, int32_t subType /*= -1*/, bool onlyContainers /*= false*/)
 {
-	if(cylinder == NULL || ((int32_t)cylinder->__getItemTypeCount(itemId, subType) < count) ){
+	if(!cylinder || ((int32_t)cylinder->__getItemTypeCount(itemId, subType) < count) ){
 		return false;
 	}
 
@@ -1683,7 +1683,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count, 
 
 uint32_t Game::getMoney(const Cylinder* cylinder)
 {
-	if(cylinder == NULL){
+	if(!cylinder){
 		return 0;
 	}
 
@@ -1734,7 +1734,7 @@ uint32_t Game::getMoney(const Cylinder* cylinder)
 
 bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*/)
 {
-	if(cylinder == NULL)
+	if(!cylinder)
 		return false;
 	else if(money <= 0)
 		return true;
@@ -1844,7 +1844,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 		return item;
 
 	Cylinder* cylinder = item->getParent();
-	if(cylinder == NULL){
+	if(!cylinder){
 		return NULL;
 	}
 
@@ -1951,7 +1951,7 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 		else{
 			newItem = Item::CreateItem(newId, newCount);
 		}
-		if(newItem == NULL) {
+		if(!newItem) {
 			// Decaying into deprecated item?
 #ifdef __DEBUG__
 			std::cout << "Error: [Game::transformItem] Item of type " << item->getID() << " transforming into invalid type " << newId << std::endl;
@@ -2544,7 +2544,7 @@ bool Game::playerMoveUpContainer(uint32_t playerId, uint8_t cid)
 		return false;
 	}
 
-	bool hasParent = (dynamic_cast<const Container*>(parentContainer->getParent()) != NULL);
+	bool hasParent = (dynamic_cast<const Container*>(parentContainer->getParent()));
 	player->addContainer(cid, parentContainer);
 	player->sendContainer(cid, parentContainer, hasParent);
 
@@ -2576,7 +2576,7 @@ bool Game::playerUpdateContainer(uint32_t playerId, uint8_t cid)
 		return false;
 	}
 
-	bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
+	bool hasParent = (dynamic_cast<const Container*>(container->getParent()));
 	player->sendContainer(cid, container, hasParent);
 
 	return true;
@@ -3077,14 +3077,14 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 	uint8_t amount, bool ignoreCapacity, bool buyWithBackpack)
 {
 	Player* player = getPlayerByID(playerId);
-	if(player == NULL || player->isRemoved())
+	if(!player || player->isRemoved())
 		return false;
 
 	int32_t onBuy;
 	int32_t onSell;
 
 	Npc* merchant = player->getShopOwner(onBuy, onSell);
-	if(merchant == NULL)
+	if(!merchant)
 		return false;
 
 	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
@@ -3114,14 +3114,14 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count, uint8_t amount, bool ignoreEquipped)
 {
 	Player* player = getPlayerByID(playerId);
-	if(player == NULL || player->isRemoved())
+	if(!player || player->isRemoved())
 		return false;
 
 	int32_t onBuy;
 	int32_t onSell;
 
 	Npc* merchant = player->getShopOwner(onBuy, onSell);
-	if(merchant == NULL)
+	if(!merchant)
 		return false;
 
 	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
@@ -3147,7 +3147,7 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count, u
 bool Game::playerCloseShop(uint32_t playerId)
 {
 	Player* player = getPlayerByID(playerId);
-	if(player == NULL || player->isRemoved())
+	if(!player || player->isRemoved())
 		return false;
 
 	player->closeShopWindow();
@@ -3157,7 +3157,7 @@ bool Game::playerCloseShop(uint32_t playerId)
 bool Game::playerLookInShop(uint32_t playerId, uint16_t spriteId, uint8_t count)
 {
 	Player* player = getPlayerByID(playerId);
-	if(player == NULL || player->isRemoved())
+	if(!player || player->isRemoved())
 		return false;
 
 	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
@@ -3455,7 +3455,7 @@ bool Game::playerRequestAddVip(uint32_t playerId, const std::string& vip_name)
 		return false;
 	}
 
-	bool online = (getPlayerByName(real_name) != NULL);
+	bool online = (getPlayerByName(real_name));
 	return player->addVIP(guid, real_name, online);
 }
 

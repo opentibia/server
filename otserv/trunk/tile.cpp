@@ -41,6 +41,145 @@ extern ConfigManager g_config;
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 Tile& Tile::null_tile = real_null_tile;
 
+TileItemVector::TileItemVector()
+	: downItemCount(0)
+{}
+
+ItemVector::iterator TileItemVector::begin()
+{
+	return items.begin();
+}
+
+ItemVector::const_iterator TileItemVector::begin() const
+{
+	return items.begin();
+}
+
+ItemVector::reverse_iterator TileItemVector::rbegin()
+{
+	return items.rbegin();
+}
+
+ItemVector::const_reverse_iterator TileItemVector::rbegin() const
+{
+	return items.rbegin();
+}
+
+ItemVector::iterator TileItemVector::end()
+{
+	return items.end();
+}
+
+ItemVector::const_iterator TileItemVector::end() const
+{
+	return items.end();
+}
+
+ItemVector::reverse_iterator TileItemVector::rend()
+{
+	return items.rend();
+}
+
+ItemVector::const_reverse_iterator TileItemVector::rend() const
+{
+	return items.rend();
+}
+
+size_t TileItemVector::size() const 
+{
+	return items.size();
+}
+
+bool TileItemVector::empty() const
+{
+	return items.empty();
+}
+
+ItemVector::iterator TileItemVector::insert(ItemVector::iterator _where, Item* item)
+{
+	return items.insert(_where, item);
+}
+
+ItemVector::iterator TileItemVector::erase(ItemVector::iterator _pos)
+{
+	return items.erase(_pos);
+}
+
+Item* TileItemVector::at(size_t _pos)
+{
+	return items.at(_pos);
+}
+
+Item* TileItemVector::at(size_t _pos) const
+{
+	return items.at(_pos);
+}
+
+Item* TileItemVector::back() 
+{
+	return items.back();
+}
+
+const Item* TileItemVector::back() const
+{
+	return items.back();
+}
+
+void TileItemVector::push_back(Item* item)
+{
+	return items.push_back(item);
+}
+
+ItemVector::iterator TileItemVector::getBeginDownItem()
+{
+	return items.begin();
+}
+
+ItemVector::const_iterator TileItemVector::getBeginDownItem() const
+{
+	return items.begin();
+}
+
+ItemVector::iterator TileItemVector::getEndDownItem()
+{
+	return items.begin() + downItemCount;
+}
+
+ItemVector::const_iterator TileItemVector::getEndDownItem() const
+{
+	return items.begin() + downItemCount;
+}
+
+ItemVector::iterator TileItemVector::getBeginTopItem()
+{
+	return items.begin() + downItemCount;
+}
+
+ItemVector::const_iterator TileItemVector::getBeginTopItem() const
+{
+	return items.begin() + downItemCount;
+}
+
+ItemVector::iterator TileItemVector::getEndTopItem()
+{
+	return items.end();
+}
+
+ItemVector::const_iterator TileItemVector::getEndTopItem() const
+{
+	return items.end();
+}
+
+uint32_t TileItemVector::getTopItemCount() const
+{
+	return std::distance(getBeginTopItem(), getEndTopItem());
+}
+
+uint32_t TileItemVector::getDownItemCount() const
+{
+	return std::distance(getBeginDownItem(), getEndDownItem());
+}
+
 bool Tile::hasProperty(enum ITEMPROPERTY prop, bool checkSolidForItems /* =false */) const
 {
 	if(ground && ground->hasProperty(prop)){
@@ -544,7 +683,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		if(ground == NULL)
+		if(!ground)
 			return RET_NOTPOSSIBLE;
 
 		if(const Monster* monster = creature->getMonster()){
@@ -625,7 +764,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 
-			if(player->getParent() == NULL && hasFlag(TILESTATE_NOLOGOUT)){
+			if(!player->getParent() && hasFlag(TILESTATE_NOLOGOUT)){
 				//player is trying to login to a "no logout" tile
 				return RET_NOTPOSSIBLE;
 			}
@@ -696,7 +835,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	}
 	else if(const Item* item = thing->getItem()){
 #ifdef __DEBUG__
-		if(thing->getParent() == NULL && !hasBitSet(FLAG_NOLIMIT, flags)){
+		if(!thing->getParent() && !hasBitSet(FLAG_NOLIMIT, flags)){
 			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
 		}
 #endif
@@ -716,7 +855,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 		bool itemIsHangable = item->isHangable();
 
-		if(ground == NULL && !itemIsHangable){
+		if(!ground && !itemIsHangable){
 			return RET_NOTPOSSIBLE;
 		}
 
@@ -796,7 +935,7 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count, uint32_t fla
 	}
 
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -852,7 +991,7 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 	}
 
 
-	if(destTile == NULL){
+	if(!destTile){
 		destTile = this;
 	}
 	else{
@@ -885,7 +1024,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 	}
 	else{
 		Item* item = thing->getItem();
-		if(item == NULL){
+		if(!item){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__addThing] item == NULL" << std::endl;
 			DEBUG_REPORT
@@ -902,7 +1041,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 		item->setParent(this);
 
 		if(item->isGroundTile()){
-			if(ground == NULL){
+			if(!ground){
 				ground = item;
 				++thingCount;
 				onAddTileItem(item);
@@ -1014,7 +1153,7 @@ void Tile::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	}
 
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -1040,7 +1179,7 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 	int32_t pos = index;
 
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -1154,7 +1293,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 	}
 	else{
 		Item* item = thing->getItem();
-		if(item == NULL){
+		if(!item){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__removeThing] item == NULL" << std::endl;
 			DEBUG_REPORT
@@ -1534,7 +1673,7 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 	else{
 		Item* item = thing->getItem();
 
-		if(item == NULL)
+		if(!item)
 			return;
 
 		TileItemVector* items = makeItemList();
@@ -1544,7 +1683,7 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 		}
 
 		if(item->isGroundTile()){
-			if(ground == NULL){
+			if(!ground){
 				ground = item;
 				++thingCount;
 			}

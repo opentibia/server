@@ -55,7 +55,7 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -93,14 +93,14 @@ ReturnValue Depot::__queryMaxCount(int32_t index, const Thing* thing, uint32_t c
 
 void Depot::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
-	if(getParent() != NULL){
+	if(getParent()){
 		getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT, isNewItem);
 	}
 }
 
 void Depot::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	if(getParent() != NULL){
+	if(getParent()){
 		getParent()->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 	}
 }

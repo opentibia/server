@@ -294,7 +294,7 @@ public:
 
 	int32_t getLength() const
 	{
-		return damageList.size()
+		return damageList.size();
 	}
 	
 	IntervalInfo popBackDamage() {

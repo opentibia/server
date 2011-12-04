@@ -1610,14 +1610,14 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 
 bool Monsters::loadLootContainer(xmlNodePtr node, LootBlock& lBlock)
 {
-	if(node == NULL){
+	if(!node){
 		return false;
 	}
 
 	xmlNodePtr tmpNode = node->children;
 	xmlNodePtr p;
 
-	if(tmpNode == NULL){
+	if(!tmpNode){
 		return false;
 	}
 

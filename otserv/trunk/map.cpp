@@ -624,7 +624,7 @@ const Tile* Map::canWalkTo(const Creature* creature, const Position& pos)
 bool Map::getPathTo(const Creature* creature, const Position& destPos,
 	std::list<Direction>& listDir, int32_t maxSearchDist /*= -1*/)
 {
-	if(canWalkTo(creature, destPos) == NULL){
+	if(!canWalkTo(creature, destPos)){
 		return false;
 	}
 
@@ -1075,7 +1075,7 @@ int32_t AStarNodes::getMapWalkCost(const Creature* creature, AStarNode* node,
 int32_t AStarNodes::getTileWalkCost(const Creature* creature, const Tile* tile)
 {
 	int cost = 0;
-	if(tile->getTopVisibleCreature(creature) != NULL){
+	if(tile->getTopVisibleCreature(creature)){
 		//destroy creature cost
 		cost += MAP_NORMALWALKCOST * 3;
 	}

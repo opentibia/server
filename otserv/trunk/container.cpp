@@ -327,7 +327,7 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 	}
 
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -391,7 +391,7 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 	uint32_t& maxQueryCount, uint32_t flags) const
 {
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		maxQueryCount = 0;
 		return RET_NOTPOSSIBLE;
 	}
@@ -459,7 +459,7 @@ ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count, uint32_
 	}
 
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -506,7 +506,7 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 	}
 
 	const Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 		return this;
 	}
 
@@ -562,7 +562,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 	}
 	Item* item = thing->getItem();
 
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__addThing] item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -617,7 +617,7 @@ void Container::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 	}
 
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__updateThing] item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -659,7 +659,7 @@ void Container::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
 void Container::__replaceThing(uint32_t index, Thing* thing)
 {
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__replaceThing] item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -720,7 +720,7 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 void Container::__removeThing(Thing* thing, uint32_t count)
 {
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__removeThing] item == NULL" << std::endl;
 		DEBUG_REPORT
@@ -895,7 +895,7 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 #endif
 
 	Item* item = thing->getItem();
-	if(item == NULL){
+	if(!item){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__internalAddThing] item == NULL" << std::endl;
 #endif

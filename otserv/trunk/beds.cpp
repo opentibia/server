@@ -104,7 +104,7 @@ BedItem* BedItem::getNextBedItem()
 	}
 
 	Tile* tile = g_game.getMap()->getTile(targetPos);
-	if(tile != NULL) {
+	if(tile) {
 		return tile->getBedItem();
 	}
 
@@ -113,7 +113,7 @@ BedItem* BedItem::getNextBedItem()
 
 bool BedItem::canUse(Player* player)
 {
-	if(house == NULL || (g_config.getNumber(ConfigManager::PREMIUM_ONLY_BEDS) &&
+	if(!house || (g_config.getNumber(ConfigManager::PREMIUM_ONLY_BEDS) &&
 		!player->isPremium())){
 		return false;
 	}
@@ -147,7 +147,7 @@ bool BedItem::canUse(Player* player)
 
 void BedItem::sleep(Player* player)
 {
-	if((house == NULL) || (player == NULL) || player->isRemoved()){
+	if(!house || !player || player->isRemoved()){
 		return;
 	}
 
@@ -180,7 +180,7 @@ void BedItem::sleep(Player* player)
 
 void BedItem::wakeUp()
 {
-	if(house == NULL){
+	if(!house){
 		return;
 	}
 

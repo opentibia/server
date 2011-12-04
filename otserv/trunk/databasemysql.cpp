@@ -250,7 +250,7 @@ int32_t MySQLResult::getDataInt(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
 	if(it != m_listNames.end() ){
-		if(m_row[it->second] == NULL){
+		if(!m_row[it->second]){
 			return 0;
 		}
 		else{
@@ -266,7 +266,7 @@ int64_t MySQLResult::getDataLong(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
 	if(it != m_listNames.end()){
-		if(m_row[it->second] == NULL){
+		if(!m_row[it->second]){
 			return 0;
 		}
 		else{
@@ -282,7 +282,7 @@ std::string MySQLResult::getDataString(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
 	if(it != m_listNames.end() ){
-		if(m_row[it->second] == NULL)
+		if(!m_row[it->second])
 			return std::string("");
 		else
 			return std::string(m_row[it->second]);
@@ -296,7 +296,7 @@ const char* MySQLResult::getDataStream(const std::string &s, unsigned long &size
 {
 	listNames_t::iterator it = m_listNames.find(s);
 	if(it != m_listNames.end() ){
-		if(m_row[it->second] == NULL){
+		if(!m_row[it->second]){
 			size = 0;
 			return NULL;
 		}
@@ -314,7 +314,7 @@ const char* MySQLResult::getDataStream(const std::string &s, unsigned long &size
 bool MySQLResult::next()
 {
 	m_row = mysql_fetch_row(m_handle);
-	return m_row != NULL;
+	return m_row;
 }
 
 MySQLResult::MySQLResult(MYSQL_RES* res)

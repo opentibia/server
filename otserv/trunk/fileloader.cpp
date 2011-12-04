@@ -517,7 +517,7 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 		}
 	}
 
-	if(m_cached_data[loading_cache].data == NULL){
+	if(!m_cached_data[loading_cache].data){
 		m_cached_data[loading_cache].data = new unsigned char[m_cache_size];
 	}
 

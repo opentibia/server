@@ -39,16 +39,54 @@ Thing::~Thing()
 	//std::cout << "thing destructor " << this << std::endl;
 }
 
+void Thing::useThing2()
+{
+	++useCount;
+}
+
+void Thing::releaseThing2()
+{
+	--useCount;
+	if(useCount <= 0)
+		delete this;
+}
+
+std::string Thing::getXRayDescription() const
+{
+	if(isRemoved()){
+		return "Thing you looked at seems to be removed.";
+	}
+	std::stringstream ret;
+	ret << "Position: [";
+	ret << getPosition().x << ", " << getPosition().y << ", " << getPosition().z << "]";
+	return ret.str();
+}
+
+Cylinder* Thing::getParent()
+{
+	return parent;
+}
+
+const Cylinder* Thing::getParent() const
+{
+	return parent;
+}
+
+void Thing::setParent(Cylinder* cylinder)
+{
+	parent = cylinder;
+}
+
 Cylinder* Thing::getTopParent()
 {
 	//tile
-	if(getParent() == NULL)
+	if(!getParent())
 		return dynamic_cast<Cylinder*>(this);
 
 	Cylinder* aux = getParent();
 	Cylinder* prevaux = dynamic_cast<Cylinder*>(this);
 
-	while(aux->getParent() != NULL){
+	while(aux->getParent()){
 		prevaux = aux;
 		aux = aux->getParent();
 	}
@@ -63,13 +101,13 @@ Cylinder* Thing::getTopParent()
 const Cylinder* Thing::getTopParent() const
 {
 	//tile
-	if(getParent() == NULL)
+	if(!getParent())
 		return dynamic_cast<const Cylinder*>(this);
 
 	const Cylinder* aux = getParent();
 	const Cylinder* prevaux = dynamic_cast<const Cylinder*>(this);
 
-	while(aux->getParent() != NULL){
+	while(aux->getParent()){
 		prevaux = aux;
 		aux = aux->getParent();
 	}
@@ -134,9 +172,29 @@ Position Thing::getPosition() const
 	}
 }
 
+Item* Thing::getItem()
+{
+	return NULL;
+}
+
+const Item* Thing::getItem() const
+{
+	return NULL;
+}
+
+Creature* Thing::getCreature()
+{
+	return NULL;
+}
+
+const Creature* Thing::getCreature() const
+{
+	return NULL;
+}
+
 bool Thing::isRemoved() const
 {
-	if(parent == NULL)
+	if(!parent)
 		return true;
 
 	const Cylinder* aux = getParent();
@@ -144,4 +202,10 @@ bool Thing::isRemoved() const
 		return true;
 
 	return false;
+}
+
+uint32_t Thing::getTotalAmountOfItemsInside() const
+{
+	//includes the item itself
+	return 1;
 }

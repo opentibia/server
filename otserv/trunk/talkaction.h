@@ -75,12 +75,12 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 
-	std::string getWords() const {return commandString;}
-	TalkActionFilterType getFilterType() const {return filterType;}
-	TalkActionFunction* getFunction() const {return function;}
-	bool isCaseSensitive() const {return caseSensitive;}
-	int16_t getAccessLevel() const {return accessLevel;}
-	bool isScripted() const {return m_scripted;}
+	const std::string& getWords() const;
+	TalkActionFilterType getFilterType() const;
+	TalkActionFunction* getFunction() const;
+	bool isCaseSensitive() const;
+	const int16_t& getAccessLevel() const;
+	bool isScripted() const;
 
 	//scripting
 	bool executeSay(Player* player, const std::string& words, const std::string& param);

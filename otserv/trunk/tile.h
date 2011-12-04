@@ -87,44 +87,41 @@ class HouseTile;
 class TileItemVector
 {
 public:
-	TileItemVector() : downItemCount(0) {};
-	~TileItemVector() {};
+	TileItemVector();
 
-	ItemVector::iterator begin() {return items.begin();}
-	ItemVector::const_iterator begin() const {return items.begin();}
-	ItemVector::reverse_iterator rbegin() {return items.rbegin();}
-	ItemVector::const_reverse_iterator rbegin() const {return items.rbegin();}
+	ItemVector::iterator begin();
+	ItemVector::const_iterator begin() const;
+	ItemVector::reverse_iterator rbegin();
+	ItemVector::const_reverse_iterator rbegin() const;
 
-	ItemVector::iterator end() {return items.end();}
-	ItemVector::const_iterator end() const {return items.end();}
-	ItemVector::reverse_iterator rend() {return items.rend();}
-	ItemVector::const_reverse_iterator rend() const {return items.rend();}
+	ItemVector::iterator end();
+	ItemVector::const_iterator end() const;
+	ItemVector::reverse_iterator rend();
+	ItemVector::const_reverse_iterator rend() const;
 
-	size_t size() {return items.size();}
-	size_t size() const {return items.size();}
-	bool empty() {return items.empty();}
-	bool empty() const {return items.empty();}
+	size_t size() const;
+	bool empty() const;
 
-	ItemVector::iterator insert(ItemVector::iterator _where, Item* item) {return items.insert(_where, item);}
-	ItemVector::iterator erase(ItemVector::iterator _pos) {return items.erase(_pos);}
-	Item* at(size_t _pos) {return items.at(_pos);}
-	Item* at(size_t _pos) const {return items.at(_pos);}
-	Item* back() {return items.back();}
-	const Item* back() const {return items.back();}
-	void push_back(Item* item) {return items.push_back(item);}
+	ItemVector::iterator insert(ItemVector::iterator _where, Item* item);
+	ItemVector::iterator erase(ItemVector::iterator _pos);
+	Item* at(size_t _pos);
+	Item* at(size_t _pos) const;
+	Item* back();
+	const Item* back() const;
+	void push_back(Item* item);
 
-	ItemVector::iterator getBeginDownItem() {return items.begin();}
-	ItemVector::const_iterator getBeginDownItem() const {return items.begin();}
-	ItemVector::iterator getEndDownItem() {return items.begin() + downItemCount;}
-	ItemVector::const_iterator getEndDownItem() const {return items.begin() + downItemCount;}
+	ItemVector::iterator getBeginDownItem();
+	ItemVector::const_iterator getBeginDownItem() const;
+	ItemVector::iterator getEndDownItem();
+	ItemVector::const_iterator getEndDownItem() const;
 
-	ItemVector::iterator getBeginTopItem() {return items.begin() + downItemCount;}
-	ItemVector::const_iterator getBeginTopItem() const {return items.begin() + downItemCount;}
-	ItemVector::iterator getEndTopItem() {return items.end();}
-	ItemVector::const_iterator getEndTopItem() const {return items.end();}
+	ItemVector::iterator getBeginTopItem();
+	ItemVector::const_iterator getBeginTopItem() const;
+	ItemVector::iterator getEndTopItem();
+	ItemVector::const_iterator getEndTopItem() const;
 
-	uint32_t getTopItemCount() const {return std::distance(getBeginTopItem(), getEndTopItem() );}
-	uint32_t getDownItemCount() const {return std::distance(getBeginDownItem(), getEndDownItem() );}
+	uint32_t getTopItemCount() const;
+	uint32_t getDownItemCount() const;
 	Item* getTopTopItem();
 	Item* getTopDownItem();
 

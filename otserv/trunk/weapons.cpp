@@ -157,13 +157,14 @@ bool Weapons::registerEvent(Event* event, xmlNodePtr p)
 }
 
 //monsters
-int32_t Weapons::getMaxMeleeDamage(int32_t attackSkill, int32_t attackValue)
+int32_t Weapons::getMaxMeleeDamage(const int32_t& attackSkill, const int32_t& attackValue)
 {
 	return ((int32_t)std::ceil((attackSkill * (attackValue * 0.05)) + (attackValue * 0.5)));
 }
 
 //players
-int32_t Weapons::getMaxWeaponDamage(int32_t level, int32_t attackSkill, int32_t attackValue, float attackFactor)
+int32_t Weapons::getMaxWeaponDamage(const int32_t& level, const int32_t& attackSkill,
+	const int32_t& attackValue, const float& attackFactor)
 {
 	// Updated to include level in formula!
 	return (int32_t)std::ceil(2 * ((float)(attackValue * (attackSkill + 5.8) / 25. + level / 10. - 0.1) / attackFactor) );
@@ -195,6 +196,11 @@ Weapon::~Weapon()
 void Weapon::setCombatParam(const CombatParams& _params)
 {
 	params = _params;
+}
+
+const uint16_t& Weapon::getID() const
+{
+	return id;
 }
 
 bool Weapon::configureEvent(xmlNodePtr p)
@@ -343,6 +349,11 @@ bool Weapon::configureWeapon(const ItemType& it)
 	return true;
 }
 
+bool Weapon::interruptSwing() const
+{
+	return false;
+}
+
 std::string Weapon::getScriptEventName()
 {
 	return "onUseWeapon";
@@ -466,6 +477,36 @@ bool Weapon::useFist(Player* player, Creature* target)
 	return false;
 }
 
+int32_t Weapon::getElementDamage(const Player* player, const Creature* target) const
+{
+	return 0;
+}
+
+const uint32_t& Weapon::getReqLevel() const
+{
+	return level;
+}
+
+const uint32_t& Weapon::getReqMagLv() const
+{
+	return magLevel;
+}
+
+const bool Weapon::hasExhaustion() const
+{	
+	return (exhaustion != 0);
+}
+
+const bool Weapon::isWieldedUnproperly() const
+{
+	return wieldUnproperly;
+}
+
+const bool Weapon::isPremium() const
+{
+	return premium;
+}
+
 bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int32_t damageModifier) const
 {
 	if(m_scripted){
@@ -562,19 +603,26 @@ void Weapon::onUsedAmmo(Player* player, Item* item, Tile* destTile) const
 	}
 }
 
+bool Weapon::getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const
+{
+	return false;
+}
+
 int32_t Weapon::getManaCost(const Player* player) const
 {
-	if(mana != 0){
+	static const int32_t NO_MANA_COST = 0;
+	
+	if(mana != NO_MANA_COST){
 		return mana;
 	}
 
-	if(manaPercent != 0){
+	if(manaPercent != NO_MANA_COST){
 		int32_t maxMana = player->getMaxMana();
 		int32_t manaCost = (maxMana * manaPercent) / 100;
 		return manaCost;
 	}
 
-	return 0;
+	return NO_MANA_COST;
 }
 
 void Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
@@ -616,6 +664,11 @@ WeaponMelee::WeaponMelee(LuaScriptInterface* _interface) :
 	params.combatType = COMBAT_PHYSICALDAMAGE;
 	elementType = COMBAT_NONE;
 	elementDamage = 0;
+}
+
+WeaponMelee::~WeaponMelee()
+{
+	// Virtual Destructor
 }
 
 bool WeaponMelee::configureEvent(xmlNodePtr p)
@@ -760,6 +813,11 @@ WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
 	ammoAction = AMMOACTION_REMOVECOUNT;
 	params.blockedByArmor = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
+}
+
+WeaponDistance::~WeaponDistance()
+{
+	// Virtual Destructor
 }
 
 bool WeaponDistance::configureEvent(xmlNodePtr p)
@@ -958,7 +1016,7 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 			for(RelPosList::iterator it = destList.begin(); it != destList.end(); ++it){
 				tmpTile = g_game.getTile(destPos.x + it->first, destPos.y + it->second, destPos.z);
 				// Blocking tiles or tiles without ground ain't valid targets for spears
-				if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID) && tmpTile->ground != NULL){
+				if(tmpTile && !tmpTile->hasProperty(IMMOVABLEBLOCKSOLID) && tmpTile->ground){
 					destTile = tmpTile;
 					break;
 				}
@@ -1065,6 +1123,11 @@ WeaponWand::WeaponWand(LuaScriptInterface* _interface) :
 	maxChange = 0;
 }
 
+WeaponWand::~WeaponWand()
+{
+	// Virtual Destructor
+}
+
 bool WeaponWand::configureEvent(xmlNodePtr p)
 {
 	if(!Weapon::configureEvent(p)){
@@ -1140,4 +1203,9 @@ int32_t WeaponWand::getWeaponDamage(const Player* player, const Creature* target
 	}
 
 	return random_range(-minValue, -maxValue, DISTRO_NORMAL);
+}
+
+bool WeaponWand::getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const
+{
+	return false;
 }

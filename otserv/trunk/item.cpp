@@ -1049,7 +1049,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 	}
 
 	if(lookDistance <= 1){
-		double weight = (item == NULL ? it.weight : item->getWeight());
+		double weight = (!item ? it.weight : item->getWeight());
 		if(weight > 0){
 			s << std::endl << getWeightDescription(it, weight);
 		}
@@ -1220,7 +1220,7 @@ void ItemAttributes::removeAttribute(itemAttrTypes type)
 		//go trough the linked list until find it
 		Attribute* prevAttr = NULL;
 		Attribute* curAttr = m_firstAttr;
-		while(curAttr != NULL){
+		while(curAttr){
 			if(curAttr->type == type){
 				//found so remove it from the linked list
 				if(prevAttr){

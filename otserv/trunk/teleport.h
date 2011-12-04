@@ -30,15 +30,15 @@ public:
 	Teleport(uint16_t _type);
 	~Teleport();
 
-	virtual Teleport* getTeleport() {return this;};
-	virtual const Teleport* getTeleport() const {return this;};
+	virtual Teleport* getTeleport();
+	virtual const Teleport* getTeleport() const;
 
 	//serialization
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	void setDestPos(const Position& pos) {destPos = pos;}
-	const Position& getDestPos() const {return destPos;}
+	void setDestPos(const Position& pos);
+	const Position& getDestPos() const;
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,

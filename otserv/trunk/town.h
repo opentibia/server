@@ -32,19 +32,14 @@
 class Town
 {
 public:
-	Town(uint32_t _townid)
-	{
-		townid = _townid;
-	}
+	explicit Town(const uint32_t& _townid);
 	
-	~Town(){};
-	
-	const Position& getTemplePosition() const {return posTemple;};
-	const std::string& getName() const {return townName;};
+	const Position& getTemplePosition() const;
+	const std::string& getName() const;
 
-	void setTemplePos(const Position& pos) {posTemple = pos;};
-	void setName(std::string _townName) {townName = _townName;};
-	uint32_t getTownID() const {return townid;};
+	void setTemplePos(const Position& pos);
+	void setName(const std::string& _townName);
+	const uint32_t& getTownID() const;
 
 private:
 	uint32_t townid;
@@ -54,8 +49,9 @@ private:
 
 typedef std::map<uint32_t, Town*> TownMap;
 
-class Towns
-{
+class Towns : boost::noncopyable {
+	Towns(){};
+	
 public:
 	static Towns& getInstance()
 	{

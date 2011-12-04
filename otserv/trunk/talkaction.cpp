@@ -256,6 +256,36 @@ bool TalkAction::loadFunction(const std::string& functionName)
 	return true;
 }
 
+const std::string& TalkAction::getWords() const
+{
+	return commandString;
+}
+
+TalkActionFilterType TalkAction::getFilterType() const
+{
+	return filterType;
+}
+
+TalkActionFunction* TalkAction::getFunction() const
+{
+	return function;
+}
+
+bool TalkAction::isCaseSensitive() const
+{
+	return caseSensitive;
+}
+
+const int16_t& TalkAction::getAccessLevel() const
+{
+	return accessLevel;
+}
+
+bool TalkAction::isScripted() const
+{
+	return m_scripted;
+}
+
 std::string TalkAction::getScriptEventName()
 {
 	return "onSay";

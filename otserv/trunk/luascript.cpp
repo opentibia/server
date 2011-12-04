@@ -2692,7 +2692,7 @@ int LuaScriptInterface::luaGetInstantSpellInfoByName(lua_State *L)
 	setField(L, "words", spell->getWords());
 	setField(L, "level", spell->getLevel());
 	setField(L, "mlevel", spell->getMagicLevel());
-	setField(L, "mana", (player != NULL ? spell->getManaCost(player) : 0));
+	setField(L, "mana", (player ? spell->getManaCost(player) : 0));
 	setField(L, "manapercent", spell->getManaPercent());
 	return 1;
 }
@@ -3887,7 +3887,7 @@ int LuaScriptInterface::luaGetThingFromPos(lua_State *L)
 		if(pos.stackpos == 255){
 			thing = tile->getTopCreature();
 
-			if(thing == NULL){
+			if(!thing){
 				Item* item = tile->getTopDownItem();
 				if(item && !item->isNotMoveable())
 					thing = item;

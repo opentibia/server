@@ -52,7 +52,7 @@ std::string Mission::getDescription(Player* player)
 	MissionState *lastState = 0;
  
 	player->getStorageValue(storageID, value);
-	if(mainState != NULL){
+	if(mainState){
 		lastState = mainState;
 	}
 	else{

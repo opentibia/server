@@ -110,28 +110,16 @@ protected:
 public:
 	virtual ~Thing();
 
-	void useThing2() {++useCount;}
-	void releaseThing2() {
-		--useCount;
-		if(useCount <= 0)
-			delete this;
-	}
+	void useThing2();
+	void releaseThing2() ;
 
 	virtual std::string getDescription(int32_t lookDistance) const = 0;
-	virtual std::string getXRayDescription() const {
-		if(isRemoved()){
-			return "Thing you looked at seems to be removed.";
-		}
-		std::stringstream ret;
-		ret << "Position: [";
-		ret << getPosition().x << ", " << getPosition().y << ", " << getPosition().z << "]";
-		return ret.str();
-	}
+	virtual std::string getXRayDescription() const;
 
-	Cylinder* getParent() {return parent;};
-	const Cylinder* getParent() const {return parent;};
+	Cylinder* getParent();
+	const Cylinder* getParent() const;
 
-	virtual void setParent(Cylinder* cylinder) {parent = cylinder;};
+	virtual void setParent(Cylinder* cylinder);
 
 	Cylinder* getTopParent(); //returns Tile/Container or a Player
 	const Cylinder* getTopParent() const;
@@ -143,13 +131,14 @@ public:
 	virtual int getThrowRange() const = 0;
 	virtual bool isPushable() const = 0;
 
-	virtual Item* getItem() {return NULL;};
-	virtual const Item* getItem() const {return NULL;};
-	virtual Creature* getCreature() {return NULL;};
-	virtual const Creature* getCreature() const {return NULL;};
+	virtual Item* getItem();
+	virtual const Item* getItem() const;
+	virtual Creature* getCreature();
+	virtual const Creature* getCreature() const;
 
 	virtual bool isRemoved() const;
-	virtual uint32_t getTotalAmountOfItemsInside() const { return 1; } //includes the item itself
+	virtual uint32_t getTotalAmountOfItemsInside() const;
+	
 private:
 	Cylinder* parent;
 	int32_t useCount;

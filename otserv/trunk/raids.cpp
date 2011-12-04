@@ -683,7 +683,7 @@ bool AreaSpawnEvent::executeEvent()
 
 				Tile* tile = g_game.getMap()->getTile(pos);
 				if(tile && !tile->isMoveableBlocking() && !tile->hasFlag(TILESTATE_PROTECTIONZONE) &&
-					tile->getTopCreature() == NULL && g_game.placeCreature(monster, pos, false, true)){
+					!tile->getTopCreature() && g_game.placeCreature(monster, pos, false, true)){
 					success = true;
 					break;
 				}

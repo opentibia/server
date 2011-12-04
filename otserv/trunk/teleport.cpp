@@ -37,6 +37,16 @@ Teleport::~Teleport()
 	//
 }
 
+Teleport* Teleport::getTeleport()
+{
+	return this;
+}
+
+const Teleport* Teleport::getTeleport() const
+{
+	return this;
+}
+
 Attr_ReadValue Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_TELE_DEST == attr){
@@ -65,6 +75,16 @@ bool Teleport::serializeAttr(PropWriteStream& propWriteStream) const
 	propWriteStream.ADD_UINT16((uint16_t)destPos.y);
 	propWriteStream.ADD_UINT8((uint8_t)destPos.z);
 	return ret;
+}
+
+void Teleport::setDestPos(const Position& pos)
+{
+	destPos = pos;
+}
+
+const Position& Teleport::getDestPos() const
+{
+	return destPos;
 }
 
 ReturnValue Teleport::__queryAdd(int32_t index, const Thing* thing, uint32_t count,

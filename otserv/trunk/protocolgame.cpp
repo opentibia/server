@@ -2903,7 +2903,7 @@ void ProtocolGame::MoveDownCreature(NetworkMessage_ptr msg, const Creature* crea
 //inventory
 void ProtocolGame::AddInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item)
 {
-	if(item == NULL){
+	if(!item){
 		msg->AddByte(0x79);
 		msg->AddByte(slot);
 	}
@@ -2916,7 +2916,7 @@ void ProtocolGame::AddInventoryItem(NetworkMessage_ptr msg, slots_t slot, const 
 
 void ProtocolGame::UpdateInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item)
 {
-	if(item == NULL){
+	if(!item){
 		msg->AddByte(0x79);
 		msg->AddByte(slot);
 	}

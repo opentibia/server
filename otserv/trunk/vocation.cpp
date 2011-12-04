@@ -37,7 +37,6 @@ Vocations::~Vocations()
 	for(VocationsMap::iterator it = vocationsMap.begin(); it != vocationsMap.end(); ++it){
 		delete it->second;
 	}
-	vocationsMap.clear();
 }
 
 bool Vocations::loadFromXml(const std::string& datadir)
@@ -248,30 +247,35 @@ Vocation::Vocation()
 	armorDefense = 1.;
 }
 
-Vocation::~Vocation()
+const std::string& Vocation::getName() const
 {
-	cacheMana.clear();
-	for(uint32_t i = SKILL_FIRST; i < SKILL_LAST; ++i){
-		cacheSkill[i].clear();
-	}
+	return name;
 }
 
-uint32_t Vocation::getReqSkillTries(int32_t skill, int32_t level)
+const std::string& Vocation::getDescription() const
 {
+	return description;
+}
+
+const uint32_t& Vocation::getReqSkillTries(const int32_t& skill, const int32_t& level)
+{
+	static const uint32_t NO_SKILL_TRIES = 0;
 	if(skill < SKILL_FIRST || skill > SKILL_LAST){
-		return 0;
+		return NO_SKILL_TRIES;
 	}
+	
 	cacheMap& skillMap = cacheSkill[skill];
 	cacheMap::iterator it = skillMap.find(level);
 	if(it != cacheSkill[skill].end()){
 		return it->second;
 	}
+	
 	uint32_t tries = (uint32_t)(skillBases[skill] * std::pow((float)skillMultipliers[skill], (float)(level - 11)));
-	skillMap[level] = tries;
-	return tries;
+
+	return skillMap[level] = tries;
 }
 
-uint32_t Vocation::getReqMana(int32_t magLevel)
+const uint32_t& Vocation::getReqMana(const int32_t& magLevel)
 {
 	cacheMap::iterator it = cacheMana.find(magLevel);
 	if(it != cacheMana.end()){
@@ -279,9 +283,97 @@ uint32_t Vocation::getReqMana(int32_t magLevel)
 	}
 
 	uint32_t reqMana = (uint32_t)(1600*std::pow(manaMultiplier, magLevel-1));
-	cacheMana[magLevel] = reqMana;
 
-	return reqMana;
+	return cacheMana[magLevel] = reqMana;
+}
+
+const uint32_t& Vocation::getHPGain() const
+{
+	return gainHP;
+}
+
+const uint32_t& Vocation::getManaGain() const
+{
+	return gainMana;
+}
+
+const uint32_t& Vocation::getCapGain() const
+{
+	return gainCap;
+}
+
+const uint32_t& Vocation::getManaGainTicks() const
+{
+	return gainManaTicks;
+}
+
+const uint32_t& Vocation::getManaGainAmount() const
+{
+	return gainManaAmount;
+}
+
+const uint32_t& Vocation::getHealthGainTicks() const
+{
+	return gainHealthTicks;
+}
+
+const uint32_t& Vocation::getHealthGainAmount() const
+{
+	return gainHealthAmount;
+}
+
+const uint16_t& Vocation::getSoulMax() const
+{
+	return maxSoul;
+}
+
+const uint16_t& Vocation::getSoulGainTicks() const
+{
+	return gainSoulTicks;
+}
+
+const uint32_t& Vocation::getAttackSpeed() const
+{
+	return attackSpeed;
+}
+	
+const float& Vocation::getMeleeBaseDamage(const WeaponType_t& weaponType) const
+{
+	if(weaponType == WEAPON_SWORD)
+		return swordBaseDamage;
+	else if(weaponType == WEAPON_AXE)
+		return axeBaseDamage;
+	else if(weaponType == WEAPON_CLUB)
+		return clubBaseDamage;
+	else if(weaponType == WEAPON_DIST)
+		return distBaseDamage;
+	else
+		return fistBaseDamage;
+}
+
+const float& Vocation::getMagicBaseDamage() const
+{
+	return magicBaseDamage;
+}
+
+const float& Vocation::getWandBaseDamage() const
+{
+	return wandBaseDamage;
+}
+
+const float& Vocation::getHealingBaseDamage() const
+{
+	return healingBaseDamage;
+}
+
+const float& Vocation::getBaseDefense() const
+{
+	return baseDefense;
+}
+
+const float& Vocation::getArmorDefense() const
+{
+	return armorDefense;
 }
 
 void Vocation::debugVocation()

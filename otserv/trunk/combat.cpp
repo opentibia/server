@@ -366,8 +366,8 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 		attackerPlayer = attacker->getPlayerMaster();
 	}
 
-	if(	attackerPlayer == NULL ||
-		targetPlayer == NULL ||
+	if(	!attackerPlayer ||
+		!targetPlayer ||
 		targetPlayer == attackerPlayer ||
 		attackerPlayer->hasFlag(PlayerFlag_NotGainInFight) ||
 		attackerPlayer->isPartner(targetPlayer) ||

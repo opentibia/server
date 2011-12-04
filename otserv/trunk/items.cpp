@@ -411,19 +411,19 @@ bool Items::loadFromXml(const std::string& datadir)
 	std::string strValue;
 	uint32_t id = 0;
 
-	if(doc == NULL){
+	if(!doc){
 		return false;
 	}
 
 	//validation against xml-schema
 	xmlDocPtr schemaDoc = xmlReadFile(xmlSchema.c_str(), NULL, XML_PARSE_NONET);
-	if(schemaDoc != NULL){
+	if(schemaDoc){
 		xmlSchemaParserCtxtPtr schemaParserContext = xmlSchemaNewDocParserCtxt(schemaDoc);
-		if(schemaParserContext != NULL){
+		if(schemaParserContext){
 			xmlSchemaPtr schema = xmlSchemaParse(schemaParserContext);
-			if(schema != NULL){
+			if(schema){
 				xmlSchemaValidCtxtPtr validContext = xmlSchemaNewValidCtxt(schema);
-				if(validContext != NULL){
+				if(validContext){
 					int returnVal = xmlSchemaValidateDoc(validContext, doc);
 					if(returnVal != 0){
 						if(returnVal > 0){

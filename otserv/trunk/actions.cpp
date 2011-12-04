@@ -162,10 +162,10 @@ ReturnValue Actions::canUse(const Player* player, const Position& pos)
 
 bool Actions::hasAction(const Item* item) const
 {
-	return	(getAction(item, ACTION_UNIQUEID) != NULL) ||
-			(getAction(item, ACTION_ACTIONID) != NULL) ||
-			(getAction(item, ACTION_ITEMID) != NULL) ||
-			(getAction(item, ACTION_RUNEID) != NULL);
+	return	(getAction(item, ACTION_UNIQUEID)) ||
+			(getAction(item, ACTION_ACTIONID)) ||
+			(getAction(item, ACTION_ITEMID)) ||
+			(getAction(item, ACTION_RUNEID));
 }
 
 ReturnValue Actions::canUse(const Player* player, const Position& pos, const Item* item)

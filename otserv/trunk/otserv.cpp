@@ -465,7 +465,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 	std::cout << ":: Checking Database Connection... ";
 	Database* db = Database::instance();
-	if(db == NULL || !db->isConnected()){
+	if(!db || !db->isConnected()){
 		ErrorMessage("Database Connection Failed!");
 		exit(-1);
 	}
@@ -687,7 +687,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 			std::cout << ":: Local IP address(es):  ";
 			unsigned char** addr = (unsigned char**)he->h_addr_list;
 
-			while (addr[0] != NULL){
+			while (addr[0]){
 				std::cout << (unsigned int)(addr[0][0]) << "."
 				<< (unsigned int)(addr[0][1]) << "."
 				<< (unsigned int)(addr[0][2]) << "."

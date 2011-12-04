@@ -1237,7 +1237,7 @@ bool Monster::canWalkTo(Position pos, Direction dir)
 		}
 
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-		if(tile && tile->getTopVisibleCreature(this) == NULL && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+		if(tile && !tile->getTopVisibleCreature(this) && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			return true;
 		}
 	}
@@ -1272,7 +1272,7 @@ Item* Monster::createCorpse()
 				corpseOwner = mostDamageCreature->getPlayerMaster();
 			}
 
-			if(corpseOwner != NULL){
+			if(corpseOwner){
 				corpse->setCorpseOwner(corpseOwner->getID());
 			}
 		}

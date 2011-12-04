@@ -1559,7 +1559,7 @@ void Npc::onThink(uint32_t interval)
 
 		const NpcResponse* response = NULL;
 		Player* player = g_game.getPlayerByID(npcState->playerId);
-		bool closeConversation = (player == NULL);
+		bool closeConversation = !player;
 		bool closeDueToTimeout = false;
 		if(!npcState->isQueued){
 			if(npcState->focusState == -1){

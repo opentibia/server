@@ -128,7 +128,7 @@ public:
 	}
 
 	void deallocate(void* deletable) {
-		if(deletable == NULL)
+		if(!deletable)
 			return;
 
 		poolTag* const tag = reinterpret_cast<poolTag*>(deletable) - 1U;

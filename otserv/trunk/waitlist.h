@@ -24,6 +24,7 @@
 #include "definitions.h"
 #include "game.h"
 #include "networkmessage.h"
+#include <boost/noncopyable.hpp>
 
 struct Wait{
 	uint32_t acc;
@@ -36,11 +37,9 @@ struct Wait{
 typedef std::list<Wait*> WaitList;
 typedef WaitList::iterator WaitListIterator;
 
-class WaitingList
+class WaitingList : boost::noncopyable
 {
 public:
-	~WaitingList();
-
 	static WaitingList* getInstance()
 	{
 		static WaitingList waitingList;
@@ -49,14 +48,15 @@ public:
 
 	bool clientLogin(const Player* player);
 	int32_t getClientSlot(const Player* player);
-	static int32_t getTime(int32_t slot);
+	static int32_t getTime(const int32_t& slot);
 
-protected:
+private:
 	WaitingList();
+	
 	WaitList priorityWaitList;
 	WaitList waitList;
 
-	int32_t getTimeOut(int32_t slot);
+	int32_t getTimeOut(const int32_t& slot);
 	WaitListIterator findClient(const Player* player, uint32_t& slot);
 	void cleanUpList();
 };

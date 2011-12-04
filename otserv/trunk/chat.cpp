@@ -281,7 +281,7 @@ ChatChannel* Chat::createChannel(Player* player, uint16_t channelId)
 		return newChannel;
 	}
 	else if(channelId == CHANNEL_PARTY){
-		if(player->getParty() == NULL)
+		if(!player->getParty())
 			return NULL;
 
 		PrivateChatChannel *newChannel = new PrivateChatChannel(channelId, "Party");
@@ -546,7 +546,7 @@ ChatChannel* Chat::getChannel(Player* player, uint16_t channelId)
 		return NULL;
 	}
 	else if(channelId == CHANNEL_PARTY){
-		if(player->getParty() == NULL) {
+		if(!player->getParty()) {
 			return NULL;
 		}
 

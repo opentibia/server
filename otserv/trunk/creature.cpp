@@ -1418,7 +1418,7 @@ void Creature::destroySummons()
 
 bool Creature::addCondition(Condition* condition)
 {
-	if(condition == NULL){
+	if(!condition){
 		return false;
 	}
 

@@ -131,7 +131,7 @@ bool utf8ToLatin1(char* intext, std::string& outtext)
 {
 	outtext = "";
 
-	if(intext == NULL){
+	if(!intext){
 		return false;
 	}
 
@@ -199,7 +199,7 @@ std::vector<std::string> explodeString(const std::string& inString, const std::s
 	return returnVector;
 }
 
-bool hasBitSet(uint32_t flag, uint32_t flags)
+bool hasBitSet(const uint32_t& flag, const uint32_t& flags)
 {
 	return ((flags & flag) == flag);
 }
@@ -210,7 +210,7 @@ uint32_t rand24b()
 	return ((rand() << 12) ^ ((rand()) & (0xFFFFFF)) );
 }
 
-float box_muller(float m, float s)
+float box_muller(const float& m, const float& s)
 {
 	// normal random variate generator
 	// mean m, standard deviation s
@@ -290,7 +290,7 @@ void hexdump(unsigned char *_data, int _len) {
 
 		fprintf(stderr, " ");
 		for(i = 0; i < 16 && i < _len; ++i)
-			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
+			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? 'Â·' : _data[i]);
 
 		fprintf(stderr, "\n");
 	}
@@ -388,7 +388,7 @@ bool passwordTest(std::string plain, std::string &hash)
 	return false;
 }
 
-std::string convertIPToString(uint32_t ip)
+std::string convertIPToString(const uint32_t& ip)
 {
 	char buffer[20];
 	sprintf(buffer, "%d.%d.%d.%d", ip & 0xFF, (ip >> 8) & 0xFF, (ip >> 16) & 0xFF, (ip >> 24));
@@ -396,7 +396,7 @@ std::string convertIPToString(uint32_t ip)
 }
 
 //buffer should have at least 21 bytes
-void formatDate(time_t time, char* buffer)
+void formatDate(const time_t& time, char* buffer)
 {
 	const tm* tms = localtime(&time);
 	if(tms){
@@ -409,7 +409,7 @@ void formatDate(time_t time, char* buffer)
 }
 
 //buffer should have at least 16 bytes
-void formatDateShort(time_t time, char* buffer)
+void formatDateShort(const time_t& time, char* buffer)
 {
 	const tm* tms = localtime(&time);
 	if(tms){
@@ -632,7 +632,7 @@ AmmoAction_t getAmmoAction(const std::string& strValue)
 	return AMMOACTION_NONE;
 }
 
-std::string getViolationReasonString(int32_t reasonId)
+std::string getViolationReasonString(const int32_t& reasonId)
 {
 	switch(reasonId)
 	{
@@ -681,7 +681,7 @@ std::string getViolationReasonString(int32_t reasonId)
 	return "Unknown Reason";
 }
 
-std::string getViolationActionString(violationAction_t actionId, bool ipBanishment)
+std::string getViolationActionString(const violationAction_t& actionId, bool ipBanishment)
 {
 	std::string action;
 	switch(actionId)
@@ -719,7 +719,7 @@ std::string getViolationActionString(violationAction_t actionId, bool ipBanishme
 	return action;
 }
 
-std::string playerSexAdjectiveString(PlayerSex_t sex)
+std::string playerSexAdjectiveString(const PlayerSex_t& sex)
 {
 	if(sex % 2 == 0){
 		return "her";
@@ -729,7 +729,7 @@ std::string playerSexAdjectiveString(PlayerSex_t sex)
 	}
 }
 
-std::string playerSexSubjectString(PlayerSex_t sex)
+std::string playerSexSubjectString(const PlayerSex_t& sex)
 {
 	if(sex % 2 == 0){
 		return "She";
@@ -767,82 +767,3 @@ uint32_t adlerChecksum(uint8_t *data, int32_t len)
 
 	return (b << 16) | a;
 }
-
-void showTime(std::stringstream& str, uint32_t time)
-{
-	if(time == 0xFFFFFFFF){
-		str << "permanent";
-	}
-	else if(time == 0){
-		str << "serversave";
-	}
-	else{
-		char buffer[32];
-		formatDate((time_t)time, buffer);
-		str << buffer;
-	}
-}
-
-uint32_t parseTime(const std::string& time)
-{
-	if(time == "serversave" || time == "shutdown"){
-		return 0;
-	}
-	if(time == "permanent"){
-		return 0xFFFFFFFF;
-	}
-	else{
-		boost::char_separator<char> sep("+");
-		tokenizer timetoken(time, sep);
-		tokenizer::iterator timeit = timetoken.begin();
-		if(timeit == timetoken.end()){
-			return 0;
-		}
-		uint32_t number = atoi(timeit->c_str());
-		uint32_t multiplier = 0;
-		++timeit;
-		if(timeit == timetoken.end()){
-			return 0;
-		}
-		if(*timeit == "m") //minute
-			multiplier = 60;
-		if(*timeit == "h") //hour
-			multiplier = 60*60;
-		if(*timeit == "d") //day
-			multiplier = 60*60*24;
-		if(*timeit == "w") //week
-			multiplier = 60*60*24*7;
-		if(*timeit == "o") //month
-			multiplier = 60*60*24*30;
-		if(*timeit == "y") //year
-			multiplier = 60*60*24*365;
-
-		uint32_t currentTime = std::time(NULL);
-		return currentTime + number*multiplier;
-	}
-}
-
-std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end)
-{
-	std::string tmp;
-	if(it == end){
-		return "";
-	}
-	else{
-		tmp = *it;
-		++it;
-		if(tmp[0] == '"'){
-			tmp.erase(0,1);
-			while(it != end && tmp[tmp.length() - 1] != '"'){
-				tmp += " " + *it;
-				++it;
-			}
-
-			if(tmp.length() > 0 && tmp[tmp.length() - 1] == '"'){
-				tmp.erase(tmp.length() - 1);
-			}
-		}
-		return tmp;
-	}
-}
-
