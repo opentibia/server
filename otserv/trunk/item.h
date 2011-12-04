@@ -299,7 +299,7 @@ public:
 	virtual bool isPushable() const {return !isNotMoveable();};
 	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
 
-	virtual std::string getDescription(int32_t lookDistance) const;
+	virtual std::string getDescription(const int32_t& lookDistance) const;
 	virtual std::string getXRayDescription() const;
 	std::string getWeightDescription() const;
 

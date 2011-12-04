@@ -34,10 +34,9 @@ class NpcResponse;
 struct NpcState;
 
 typedef std::list<Npc*> NpcList;
+
 class Npcs{
 public:
-	Npcs() {};
-	~Npcs() {};
 	void reload();
 };
 
@@ -539,7 +538,7 @@ protected:
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 	virtual void onThink(uint32_t interval);
-	virtual std::string getDescription(int32_t lookDistance) const;
+	virtual std::string getDescription(const int32_t& lookDistance) const;
 
 	bool isImmune(CombatType_t type) const {return true;}
 	bool isImmune(ConditionType_t type, bool aggressive = true) const {return true;}

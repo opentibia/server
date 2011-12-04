@@ -53,7 +53,7 @@ public:
 protected:
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
-	virtual std::string getScriptBaseName();
+	virtual const std::string& getScriptBaseName() const;
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 
@@ -93,7 +93,7 @@ public:
 	const bool isPremium() const;
 
 protected:
-	virtual std::string getScriptEventName();
+	virtual const std::string& getScriptEventName() const;
 
 	void executeUseWeapon(Player* player, const LuaVariant& var) const;
 	bool internalUseWeapon(Player* player, Item* item, Creature* target, int32_t damageModifier) const;

@@ -48,6 +48,12 @@ void GlobalEvents::clearMap(GlobalEventMap& map)
 	map.clear();
 }
 
+const std::string& GlobalEvents::getScriptBaseName() const
+{
+	static const std::string BASE_NAME = "globalevents";
+	return BASE_NAME;
+}
+
 void GlobalEvents::clear()
 {
 	g_scheduler.stopEvent(thinkEventId);
@@ -118,6 +124,11 @@ bool GlobalEvents::registerEvent(Event* event, xmlNodePtr)
 	return false;
 }
 
+LuaScriptInterface& GlobalEvents::getScriptInterface()
+{
+	return m_scriptInterface;
+}
+
 void GlobalEvents::startup()
 {
 	execute(GLOBALEVENT_STARTUP);
@@ -157,7 +168,7 @@ void GlobalEvents::think()
 		boost::bind(&GlobalEvents::think, this)));
 }
 
-void GlobalEvents::execute(GlobalEvent_t type)
+void GlobalEvents::execute(const GlobalEvent_t& type)
 {
 	for(GlobalEventMap::iterator it = serverMap.begin(); it != serverMap.end(); ++it)
 	{
@@ -166,7 +177,7 @@ void GlobalEvents::execute(GlobalEvent_t type)
 	}
 }
 
-GlobalEventMap GlobalEvents::getEventMap(GlobalEvent_t type)
+GlobalEventMap GlobalEvents::getEventMap(const GlobalEvent_t& type)
 {
 	switch(type)
 	{
@@ -186,12 +197,17 @@ GlobalEventMap GlobalEvents::getEventMap(GlobalEvent_t type)
 	return GlobalEventMap();
 }
 
-GlobalEvent::GlobalEvent(LuaScriptInterface* _interface):
-	Event(_interface)
+GlobalEvent::GlobalEvent(LuaScriptInterface* _interface)
+	: Event(_interface)
 {
 	m_lastExecution = OTSYS_TIME();
 	m_nextExecution = 0;
 	m_interval = 0;
+}
+
+GlobalEvent::~GlobalEvent()
+{
+	// Virtual Destructor
 }
 
 bool GlobalEvent::configureEvent(xmlNodePtr p)
@@ -282,21 +298,17 @@ bool GlobalEvent::configureEvent(xmlNodePtr p)
 	return false;
 }
 
-std::string GlobalEvent::getScriptEventName()
+const std::string& GlobalEvent::getScriptEventName() const
 {
-	switch(m_eventType)
+	static const std::string EVENT_NAME[] =
 	{
-		case GLOBALEVENT_STARTUP:
-			return "onStartup";
-		case GLOBALEVENT_SHUTDOWN:
-			return "onShutdown";
-		case GLOBALEVENT_TIMER:
-			return "onTime";
-		default:
-			break;
-	}
+		"onThink",
+		"onStartup",
+		"onShutdown",
+		"onTime"
+	};
 
-	return "onThink";
+	return EVENT_NAME[m_eventType];
 }
 
 uint32_t GlobalEvent::executeEvent()
@@ -325,4 +337,39 @@ uint32_t GlobalEvent::executeEvent()
 		std::cout << "[Error - GlobalEvent::executeEvent] Call stack overflow." << std::endl;
 		return 0;
 	}
+}
+
+const GlobalEvent_t& GlobalEvent::getEventType() const
+{
+	return m_eventType;
+}
+
+const std::string& GlobalEvent::getName() const
+{
+	return m_name;
+}
+
+const uint32_t& GlobalEvent::getInterval() const
+{
+	return m_interval;
+}
+
+const int64_t& GlobalEvent::getLastExecution() const
+{
+	return m_lastExecution;
+}
+
+void GlobalEvent::setLastExecution(const int64_t& time)
+{
+	m_lastExecution = time;
+}
+
+const time_t& GlobalEvent::getNextExecution() const
+{
+	return m_nextExecution;
+}
+
+void GlobalEvent::setNextExecution(const time_t& time)
+{
+	m_nextExecution = time;
 }

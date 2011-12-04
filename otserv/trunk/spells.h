@@ -56,7 +56,7 @@ public:
 	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, std::string& words);
 
 	static Position getCasterPosition(Creature* creature, Direction dir);
-	virtual std::string getScriptBaseName();
+	virtual const std::string& getScriptBaseName() const;
 
 protected:
 
@@ -103,22 +103,22 @@ public:
 	Combat* getCombat();
 
 protected:
-	virtual std::string getScriptEventName();
+	virtual const std::string& getScriptEventName() const;
 	bool needDirection;
 	bool needTarget;
 	Combat* combat;
 };
 
-class Spell : public BaseSpell{
+class Spell : public BaseSpell {
 public:
 	Spell();
 	virtual ~Spell();
 
 	bool configureSpell(xmlNodePtr xmlspell);
-	const std::string& getName() const {return name;}
+	const std::string& getName() const;
 
 	void postCastSpell(Player* player, bool finishedSpell = true, bool payCost = true) const;
-	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;
+	void postCastSpell(Player* player, const uint32_t& manaCost, const uint32_t& soulCost) const;
 
 	int32_t getManaCost(const Player* player) const;
 	const int32_t& getSoulCost(const Player* player) const;
@@ -193,7 +193,7 @@ public:
 	bool canThrowSpell(const Creature* creature, const Creature* target) const;
 
 protected:
-	virtual std::string getScriptEventName();
+	virtual const std::string& getScriptEventName() const;
 
 	static InstantSpellFunction HouseGuestList;
 	static InstantSpellFunction HouseSubOwnerList;
@@ -234,7 +234,7 @@ public:
 	const uint32_t& getReagentId() const;
 
 protected:
-	virtual std::string getScriptEventName();
+	virtual const std::string& getScriptEventName() const;
 
 	static ReturnValue internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount);
 	static ReturnValue internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount, uint32_t reagentId, bool test = false);
@@ -278,7 +278,7 @@ public:
 	const uint32_t& getRuneItemId();
 
 protected:
-	virtual std::string getScriptEventName();
+	virtual const std::string& getScriptEventName() const;
 
 	static RuneSpellFunction Illusion;
 	static RuneSpellFunction Convince;

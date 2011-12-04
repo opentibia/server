@@ -445,4 +445,4 @@ protected:
 	uint32_t size;
 };
 
-#endif
+#endif // __OTSERV_FILELOADER_H__

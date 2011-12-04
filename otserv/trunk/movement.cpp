@@ -108,9 +108,10 @@ LuaScriptInterface& MoveEvents::getScriptInterface()
 	return m_scriptInterface;
 }
 
-std::string MoveEvents::getScriptBaseName()
+const std::string& MoveEvents::getScriptBaseName() const
 {
-	return "movements";
+	static const std::string BASE_NAME = "movements";
+	return BASE_NAME;
 }
 
 Event* MoveEvents::getEvent(const std::string& nodeName)
@@ -199,7 +200,7 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	return success;
 }
 
-void MoveEvents::addEvent(MoveEvent* moveEvent, int32_t id, MoveListMap& map)
+void MoveEvents::addEvent(MoveEvent* moveEvent, const int32_t& id, MoveListMap& map)
 {
 	MoveListMap::iterator it = map.find(id);
 	if(it == map.end()){
@@ -218,7 +219,7 @@ void MoveEvents::addEvent(MoveEvent* moveEvent, int32_t id, MoveListMap& map)
 	}
 }
 
-MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType, slots_t slot)
+MoveEvent* MoveEvents::getEvent(Item* item, const MoveEvent_t& eventType, const slots_t& slot)
 {
 	uint32_t slotp = 0;
 	switch(slot){
@@ -247,7 +248,7 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType, slots_t slot)
 	return NULL;
 }
 
-MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
+MoveEvent* MoveEvents::getEvent(Item* item, const MoveEvent_t& eventType)
 {
 	MoveListMap::iterator it;
 	if(item->getUniqueId() != 0){
@@ -281,7 +282,7 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
 	return NULL;
 }
 
-void MoveEvents::addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& map)
+void MoveEvents::addEvent(MoveEvent* moveEvent, const Position& pos, MovePosListMap& map)
 {
 	MovePosListMap::iterator it = map.find(pos);
 	if(it == map.end()){
@@ -299,7 +300,7 @@ void MoveEvents::addEvent(MoveEvent* moveEvent, Position pos, MovePosListMap& ma
 	}
 }
 
-MoveEvent* MoveEvents::getEvent(const Tile* tile, MoveEvent_t eventType)
+MoveEvent* MoveEvents::getEvent(const Tile* tile, const MoveEvent_t& eventType)
 {
 	MovePosListMap::iterator it = m_positionMap.find(tile->getPosition());
 	if(it != m_positionMap.end()){
@@ -391,7 +392,7 @@ uint32_t MoveEvents::onPlayerEquip(Player* player, Item* item, slots_t slot)
 	return 1;
 }
 
-uint32_t MoveEvents::onPlayerDeEquip(Player* player, Item* item, slots_t slot, bool isRemoval)
+uint32_t MoveEvents::onPlayerDeEquip(Player* player, Item* item, const slots_t& slot, bool isRemoval)
 {
 	MoveEvent* moveEvent = getEvent(item, MOVE_EVENT_DEEQUIP, slot);
 	if(moveEvent){
@@ -523,37 +524,30 @@ Event(_interface)
 
 MoveEvent::~MoveEvent()
 {
-	//
+	// Virtual Destructor
 }
 
-std::string MoveEvent::getScriptEventName()
+MoveEvent* MoveEvent::clone() const
 {
-	switch(m_eventType){
-	case MOVE_EVENT_STEP_IN:
-		return "onStepIn";
-		break;
-	case MOVE_EVENT_STEP_OUT:
-		return "onStepOut";
-		break;
-	case MOVE_EVENT_EQUIP:
-		return "onEquip";
-		break;
-	case MOVE_EVENT_DEEQUIP:
-		return "onDeEquip";
-		break;
-	case MOVE_EVENT_ADD_ITEM:
-	case MOVE_EVENT_ADD_ITEM_ITEMTILE:
-		return "onAddItem";
-		break;
-	case MOVE_EVENT_REMOVE_ITEM:
-	case MOVE_EVENT_REMOVE_ITEM_ITEMTILE:
-		return "onRemoveItem";
-		break;
-	default:
-		std::cout << "Error: [MoveEvent::getScriptEventName()] No valid event type." <<  std::endl;
-		return "";
-		break;
+	return new MoveEvent(*this);
+}
+
+const std::string& MoveEvent::getScriptEventName() const
+{
+	static const std::string EVENT_NAME[] =
+	{
+		"",
+		"onStepIn",
+		"onStepOut",
+		"onEquip",
+		"onDeEquip",
+		"onAddItem",
+		"onRemoveItem",
+		"onAddItem",
+		"onRemoveItem",
 	};
+	
+	return EVENT_NAME[m_eventType];
 }
 
 bool MoveEvent::configureEvent(xmlNodePtr p)
@@ -719,16 +713,15 @@ bool MoveEvent::loadFunction(const std::string& functionName)
 	return true;
 }
 
-MoveEvent_t MoveEvent::getEventType() const
+const MoveEvent_t& MoveEvent::getEventType() const
 {
 	if(m_eventType == MOVE_EVENT_NONE){
 		std::cout << "Error: [MoveEvent::getEventType()] MOVE_EVENT_NONE" << std::endl;
-		return (MoveEvent_t)0;
 	}
 	return m_eventType;
 }
 
-void MoveEvent::setEventType(MoveEvent_t type)
+void MoveEvent::setEventType(const MoveEvent_t& type)
 {
 	m_eventType = type;
 }
@@ -995,14 +988,18 @@ uint32_t MoveEvent::executeStep(Creature* creature, Item* item, const Position& 
 	}
 }
 
-uint32_t MoveEvent::fireEquip(Player* player, Item* item, slots_t slot, bool isRemoval)
+uint32_t MoveEvent::fireEquip(Player* player, Item* item, const slots_t& slot, bool isRemoval)
 {
 	if(m_scripted){
 		return executeEquip(player, item, slot);
 	}
-	else{
-		return equipFunction(this, player, item, slot, isRemoval);
-	}
+
+	return equipFunction(this, player, item, slot, isRemoval);
+}
+
+const uint32_t& MoveEvent::getSlot() const
+{
+	return slot;
 }
 
 uint32_t MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
@@ -1092,7 +1089,7 @@ uint32_t MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position
 	}
 }
 
-ReturnValue MoveEvent::canPlayerWearEquip(Player* player, slots_t slot)
+ReturnValue MoveEvent::canPlayerWearEquip(Player* player, const slots_t& slot)
 {
 	//check if we need to continue
 	if(player->isItemAbilityEnabled(slot) || player->hasFlag(PlayerFlag_IgnoreWeaponCheck) || getWieldInfo() == 0){
@@ -1115,4 +1112,34 @@ ReturnValue MoveEvent::canPlayerWearEquip(Player* player, slots_t slot)
 	}
 
 	return RET_NOERROR;
+}
+
+const uint32_t& MoveEvent::getReqLevel() const
+{
+	return reqLevel;
+}
+
+const uint32_t& MoveEvent::getReqMagLv() const
+{
+	return reqMagLevel;
+}
+
+bool MoveEvent::isPremium() const
+{
+	return premium;
+}
+
+const std::string& MoveEvent::getVocationString() const
+{
+	return vocationString;
+}
+
+const uint32_t& MoveEvent::getWieldInfo() const
+{
+	return wieldInfo;
+}
+
+const VocEquipMap& MoveEvent::getVocEquipMap() const
+{
+	return vocEquipMap;
 }

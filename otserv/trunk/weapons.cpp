@@ -73,9 +73,10 @@ LuaScriptInterface& Weapons::getScriptInterface()
 	return m_scriptInterface;
 }
 
-std::string Weapons::getScriptBaseName()
+const std::string& Weapons::getScriptBaseName() const
 {
-	return "weapons";
+	static const std::string BASE_NAME = "weapons";
+	return BASE_NAME;
 }
 
 bool Weapons::loadDefaults()
@@ -354,9 +355,10 @@ bool Weapon::interruptSwing() const
 	return false;
 }
 
-std::string Weapon::getScriptEventName()
+const std::string& Weapon::getScriptEventName() const
 {
-	return "onUseWeapon";
+	static const std::string EVENT_NAME = "onUseWeapon";
+	return EVENT_NAME;
 }
 
 int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const

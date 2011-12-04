@@ -25,7 +25,8 @@
 
 extern Game g_game;
 
-Teleport::Teleport(uint16_t _type) : Item(_type)
+Teleport::Teleport(const uint16_t& _type)
+	: Item(_type)
 {
 	destPos.x = 0;
 	destPos.y = 0;

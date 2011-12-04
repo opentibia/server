@@ -59,10 +59,13 @@ Account IOAccount::loadAccount(const std::string& name, bool preLoad/* = false*/
 	}
 
 	do {
-		acc.charList.push_back(result->getDataString("name"));
+		acc.characters.push_back(result->getDataString("name"));
 	} while(result->next());
 
-	acc.charList.sort();
+	// Sort the character list
+	std::vector<std::string>& charVector = acc.characters;
+	std::sort(charVector.begin(), charVector.end());
+	
 	db->freeResult(result);
 	return acc;
 }

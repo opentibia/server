@@ -84,9 +84,10 @@ LuaScriptInterface& Actions::getScriptInterface()
 	return m_scriptInterface;
 }
 
-std::string Actions::getScriptBaseName()
+const std::string& Actions::getScriptBaseName() const
 {
-	return "actions";
+	static const std::string BASE_NAME = "actions";
+	return BASE_NAME;
 }
 
 Event* Actions::getEvent(const std::string& nodeName)
@@ -567,9 +568,10 @@ bool Action::configureEvent(xmlNodePtr p)
 	return true;
 }
 
-std::string Action::getScriptEventName()
+const std::string& Action::getScriptEventName() const
 {
-	return "onUse";
+	static const std::string EVENT_NAME = "onUse";
+	return EVENT_NAME;
 }
 
 ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos)

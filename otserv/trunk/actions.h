@@ -68,7 +68,7 @@ protected:
 
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
-	virtual std::string getScriptBaseName();
+	virtual const std::string& getScriptBaseName() const;
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 
@@ -108,7 +108,7 @@ public:
 	virtual bool hasOwnErrorHandler() {return false;}
 
 protected:
-	virtual std::string getScriptEventName();
+	virtual const std::string& getScriptEventName() const;
 
 	bool allowFarUse;
 	bool checkLineOfSight;

@@ -37,81 +37,84 @@ typedef std::list<Quest*> QuestsList;
 
 class MissionState
 {
-	public:
-		MissionState(std::string _description, uint32_t _missionID);
-		uint32_t getMissionID() { return missionID; }
-		std::string getMissionDescription() { return description; }
+public:
+	MissionState(const std::string& _description, const uint32_t& _missionID);
+	
+	const uint32_t& getMissionID() const;
+	const std::string& getMissionDescription() const;
 
-	private:
-		std::string description;
-		uint32_t missionID;
+private:
+	const std::string description;
+	const uint32_t missionID;
 };
 
 class Mission
 {
-	public:
-		Mission(std::string _missionName, uint32_t _storageID, uint32_t _startValue, int32_t _endValue);
-		~Mission();
-		bool isCompleted(Player* player) const;
-		bool isStarted(Player* player) const;
-		std::string getName(Player* player);
-		std::string getDescription(Player* player);
+public:
+	Mission(const std::string& _missionName, const uint32_t& _storageID,
+		const uint32_t& _startValue, const int32_t& _endValue);
+	~Mission();
+		
+	bool isCompleted(Player* player) const;
+	bool isStarted(Player* player) const;
+	std::string getName(Player* player);
+	std::string getDescription(Player* player);
 
-		MissionState* mainState;
-		StateList state;
+	MissionState* mainState;
+	StateList state;
 
-	private:
-		std::string missionName;
-		uint32_t storageID, startValue, endValue;
+private:
+	std::string missionName;
+	uint32_t storageID;
+	uint32_t startValue;
+	uint32_t endValue;
 };
 
 class Quest
 {
-	public:
-		Quest(std::string _name, uint16_t _id, uint32_t _startStorageID, uint32_t _startStorageValue);
-		~Quest();
-		
-		bool isCompleted(Player* player);
-		bool isStarted(Player* player) const;
-		uint16_t getID() const {return id;}
-		std::string getName() {return name;}
-		uint16_t getMissionsCount(Player* player) const;
+public:
+	Quest(const std::string& _name, const uint16_t& _id,
+		const uint32_t& _startStorageID, const uint32_t& _startStorageValue);
+	~Quest();
 
-		void addMission(Mission* mission) {missions.push_back(mission);}
+	bool isCompleted(Player* player);
+	bool isStarted(Player* player) const;
+	const uint16_t& getID() const;
+	const std::string& getName() const;
+	uint16_t getMissionsCount(Player* player) const;
 
-		MissionsList::const_iterator getFirstMission() const {return missions.begin();}
-		MissionsList::const_iterator getEndMission() const {return missions.end();}
+	void addMission(Mission* mission);
 
-	private:
-		std::string name;
-		uint16_t id;
-		uint32_t startStorageID, startStorageValue;
-		MissionsList missions;
+	MissionsList::const_iterator getFirstMission() const;
+	MissionsList::const_iterator getEndMission() const;
+
+private:
+	std::string name;
+	uint16_t id;
+	uint32_t startStorageID;
+	uint32_t startStorageValue;
+	MissionsList missions;
 };
 
 class Quests
 {
-	public:
-		Quests();
-		~Quests();
+	Quests();
+public:
+	~Quests();
 
-		static Quests* getInstance()
-		{
-			static Quests instance;
-			return &instance;
-		}
+	static Quests* getInstance();
 
-		QuestsList::const_iterator getFirstQuest() const {return quests.begin();}
-		QuestsList::const_iterator getEndQuest() const {return quests.end();}
+	QuestsList::const_iterator getFirstQuest() const;
+	QuestsList::const_iterator getEndQuest() const;
 
-		bool loadFromXml(const std::string& _filename);
-		Quest* getQuestByID(uint16_t id);
-		uint16_t getQuestsCount(Player* player);
-		bool reload();
+	bool loadFromXml(const std::string& _filename);
+	Quest* getQuestByID(const uint16_t& id);
+	uint16_t getQuestsCount(Player* player);
+	bool reload();
 
-	private:
-		std::string filename;
-		QuestsList quests;
+private:
+	std::string filename;
+	QuestsList quests;
 };
 
 #endif

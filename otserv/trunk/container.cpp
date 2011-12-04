@@ -28,10 +28,9 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
-
-Container::Container(uint16_t _type) : Item(_type)
+Container::Container(const uint16_t& _type)
+	: Item(_type)
 {
-	//std::cout << "Container constructor " << this << std::endl;
 	maxSize = items[_type].maxItems;
 	total_weight = 0.0;
 	amountOfItems = 1;
@@ -41,7 +40,6 @@ Container::Container(uint16_t _type) : Item(_type)
 
 Container::~Container()
 {
-	//std::cout << "Container destructor " << this << std::endl;
 	for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
 		(*cit)->setParent(NULL);
 		(*cit)->releaseThing2();
@@ -57,6 +55,26 @@ Item* Container::clone() const
 		_item->addItem((*it)->clone());
 	}
 	return _item;
+}
+
+Container* Container::getContainer()
+{
+	return this;
+}
+
+const Container* Container::getContainer() const
+{
+	return this;
+}
+
+Depot* Container::getDepot()
+{
+	return NULL;
+}
+
+const Depot* Container::getDepot() const
+{
+	return NULL;
 }
 
 Container* Container::getParentContainer()
@@ -80,7 +98,6 @@ const Container* Container::getParentContainer() const
 
 	return NULL;
 }
-
 
 void Container::addItem(Item* item)
 {
@@ -210,7 +227,22 @@ std::ostringstream& Container::getContentDescription(std::ostringstream& os) con
 	return os;
 }
 
-Item* Container::getItem(uint32_t index)
+size_t Container::size() const
+{
+	return itemlist.size();
+}
+
+bool Container::full() const
+{
+	return maxSize ? itemlist.size() >= maxSize : true;
+}
+
+bool Container::empty() const
+{
+	return itemlist.empty();
+}
+
+Item* Container::getItem(const uint32_t& index)
 {
 	size_t n = 0;
 	for (ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
@@ -241,6 +273,11 @@ bool Container::isHoldingItem(const Item* item) const
 			return true;
 	}
 	return false;
+}
+
+uint32_t Container::capacity() const
+{
+	return maxSize ? maxSize : std::min(255, (int32_t)itemlist.size() + 1);
 }
 
 void Container::onAddContainerItem(Item* item)
@@ -939,6 +976,21 @@ void Container::__startDecaying()
 	}
 }
 
+const uint32_t& Container::getTotalAmountOfItemsInside() const
+{
+	//includes the item itself
+	return amountOfItems;
+} 
+
+const uint16_t& Container::getDeepness() const
+{
+	return deepness; 
+}
+
+void Container::setDeepness(const uint16_t& newDeepness)
+{
+	deepness = newDeepness;
+}
 
 ContainerIterator Container::begin()
 {
@@ -968,6 +1020,26 @@ ContainerIterator Container::end() const
 {
 	Container* evil = const_cast<Container*>(this);
 	return evil->end();
+}
+
+ItemList::const_iterator Container::getItems() const
+{
+	return itemlist.begin();
+}
+
+ItemList::const_iterator Container::getEnd() const
+{
+	return itemlist.end();
+}
+
+ItemList::const_reverse_iterator Container::getReversedItems() const
+{
+	return itemlist.rbegin();
+}
+
+ItemList::const_reverse_iterator Container::getReversedEnd() const
+{
+	return itemlist.rend();
 }
 
 ContainerIterator::ContainerIterator():

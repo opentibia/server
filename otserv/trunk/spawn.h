@@ -75,10 +75,11 @@ public:
 	Spawn(const Position& _pos, int32_t _radius);
 	~Spawn();
 	
-	bool addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval);
+	bool addMonster(const std::string& _name, const Position& _pos, 
+		const Direction& _dir, const uint32_t& _interval);
 	void removeMonster(Monster* monster);
 
-	uint32_t getInterval() const {return interval;}
+	const uint32_t& getInterval() const;
 	void startup();
 
 	void startSpawnCheck();
@@ -106,7 +107,8 @@ private:
 	uint32_t checkSpawnEvent;
 
 	bool findPlayer(const Position& pos);
-	bool spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup = false);
+	bool spawnMonster(const uint32_t& spawnId, MonsterType* mType,
+		const Position& pos, const Direction& dir, bool startup = false);
 	void checkSpawn();
 };
 

@@ -74,9 +74,10 @@ LuaScriptInterface& TalkActions::getScriptInterface()
 	return m_scriptInterface;
 }
 
-std::string TalkActions::getScriptBaseName()
+const std::string& TalkActions::getScriptBaseName() const
 {
-	return "talkactions";
+	static const std::string BASE_NAME = "talkactions";
+	return BASE_NAME;
 }
 
 Event* TalkActions::getEvent(const std::string& nodeName)
@@ -286,9 +287,10 @@ bool TalkAction::isScripted() const
 	return m_scripted;
 }
 
-std::string TalkAction::getScriptEventName()
+const std::string& TalkAction::getScriptEventName() const
 {
-	return "onSay";
+	static const std::string EVENT_NAME = "onSay";
+	return EVENT_NAME;
 }
 
 bool TalkAction::executeSay(Player* player, const std::string& words, const std::string& param)

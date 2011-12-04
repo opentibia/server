@@ -34,7 +34,7 @@ bool BanManager::clearTemporaryBans() const
 	return db->executeQuery("UPDATE `bans` SET `active` = 0 WHERE `expires` = 0");
 }
 
-bool BanManager::acceptConnection(uint32_t clientip)
+bool BanManager::acceptConnection(const uint32_t& clientip)
 {
 	if(clientip == 0) return false;
 	banLock.lock();
@@ -75,7 +75,7 @@ bool BanManager::acceptConnection(uint32_t clientip)
 	return true;
 }
 
-bool BanManager::isIpDisabled(uint32_t clientip)
+bool BanManager::isIpDisabled(const uint32_t& clientip)
 {
 	if(g_config.getNumber(ConfigManager::LOGIN_TRIES) == 0 || clientip == 0) return false;
 	banLock.lock();
@@ -96,7 +96,7 @@ bool BanManager::isIpDisabled(uint32_t clientip)
 	return false;
 }
 
-bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/) const
+bool BanManager::isIpBanished(const uint32_t& clientip, const uint32_t& mask /*= NULL_MASK*/) const
 {
 	if(clientip == 0) return false;
 	Database* db = Database::instance();
@@ -122,7 +122,7 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 	return t > 0;
 }
 
-bool BanManager::isPlayerBanished(uint32_t playerId) const
+bool BanManager::isPlayerBanished(const uint32_t& playerId) const
 {
 	Database* db = Database::instance();
 
@@ -155,7 +155,7 @@ bool BanManager::isPlayerBanished(const std::string& name) const
 		&& isPlayerBanished(playerId);
 }
 
-bool BanManager::isAccountBanished(uint32_t accountId) const
+bool BanManager::isAccountBanished(const uint32_t& accountId) const
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -199,7 +199,7 @@ bool BanManager::isAccountBanished(uint32_t accountId) const
 	return t > 0;
 }
 
-void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
+void BanManager::addLoginAttempt(const uint32_t& clientip, bool isSuccess)
 {
 	if(clientip == 0) return;
 	banLock.lock();
@@ -228,8 +228,8 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 	banLock.unlock();
 }
 
-bool BanManager::addIpBan(uint32_t ip, uint32_t mask, int32_t time,
-	uint32_t adminid, std::string comment) const
+bool BanManager::addIpBan(const uint32_t& ip, const uint32_t& mask, const int32_t& time,
+	const uint32_t& adminid, const std::string& comment) const
 {
 	if(ip == 0 || mask == 0) return false;
 	Database* db = Database::instance();
@@ -246,8 +246,9 @@ bool BanManager::addIpBan(uint32_t ip, uint32_t mask, int32_t time,
 	return stmt.execute();
 }
 
-bool BanManager::addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid,
-	std::string comment, std::string statement, uint32_t reason, violationAction_t action) const
+bool BanManager::addPlayerBan(const uint32_t& playerId, const int32_t& time, const uint32_t& adminid,
+	const std::string& comment, const std::string& statement,
+	const uint32_t& reason, const violationAction_t& action) const
 {
 	if(playerId == 0) return false;
 	Database* db = Database::instance();
@@ -263,8 +264,9 @@ bool BanManager::addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid,
 	return stmt.execute();
 }
 
-bool BanManager::addPlayerBan(const std::string& name, int32_t time, uint32_t adminid,
-	std::string comment, std::string statement, uint32_t reason, violationAction_t action) const
+bool BanManager::addPlayerBan(const std::string& name, const int32_t& time, const uint32_t& adminid,
+	const std::string& comment, const std::string& statement,
+	const uint32_t& reason, const violationAction_t& action) const
 {
 	uint32_t guid = 0;
 	std::string n = name;
@@ -272,8 +274,8 @@ bool BanManager::addPlayerBan(const std::string& name, int32_t time, uint32_t ad
 		addPlayerBan(guid, time, adminid, comment, statement, reason, action);
 }
 
-bool BanManager::addPlayerStatement(uint32_t playerId, uint32_t adminid, std::string comment,
-	std::string statement, uint32_t reason, violationAction_t action) const
+bool BanManager::addPlayerStatement(const uint32_t& playerId, const uint32_t& adminid, const std::string& comment,
+	const std::string& statement, const uint32_t& reason, const violationAction_t& action) const
 {
 	if(playerId == 0) return false;
 	Database* db = Database::instance();
@@ -289,8 +291,8 @@ bool BanManager::addPlayerStatement(uint32_t playerId, uint32_t adminid, std::st
 	return stmt.execute();
 }
 
-bool BanManager::addPlayerNameReport(uint32_t playerId, uint32_t adminid, std::string comment,
-	std::string statement, uint32_t reason, violationAction_t action) const
+bool BanManager::addPlayerNameReport(const uint32_t& playerId, const uint32_t& adminid, const std::string& comment,
+	const std::string& statement, const uint32_t& reason, const violationAction_t& action) const
 {
 	if(playerId == 0) return false;
 	Database* db = Database::instance();
@@ -306,8 +308,9 @@ bool BanManager::addPlayerNameReport(uint32_t playerId, uint32_t adminid, std::s
 	return stmt.execute();
 }  
 
-bool BanManager::addAccountBan(uint32_t account, int32_t time, uint32_t adminid,
-	std::string comment, std::string statement, uint32_t reason, violationAction_t action) const
+bool BanManager::addAccountBan(const uint32_t& account, const int32_t& time, const uint32_t& adminid,
+	const std::string& comment, const std::string& statement,
+	const uint32_t& reason, const violationAction_t& action) const
 {
 	if(account == 0) return false;
 	Database* db = Database::instance();
@@ -323,8 +326,8 @@ bool BanManager::addAccountBan(uint32_t account, int32_t time, uint32_t adminid,
 	return stmt.execute();
 }
 
-bool BanManager::addAccountNotation(uint32_t account, uint32_t adminid, std::string comment,
-	std::string statement, uint32_t reason, violationAction_t action) const
+bool BanManager::addAccountNotation(const uint32_t& account, const uint32_t& adminid, const std::string& comment,
+	const std::string& statement, const uint32_t& reason, const violationAction_t& action) const
 {
 	if(account == 0) return false;
 	Database* db = Database::instance();
@@ -340,7 +343,7 @@ bool BanManager::addAccountNotation(uint32_t account, uint32_t adminid, std::str
 	return stmt.execute();
 }
 
-bool BanManager::removeIpBans(uint32_t ip, uint32_t mask) const
+bool BanManager::removeIpBans(const uint32_t& ip, const uint32_t& mask /*= NULL_MASK*/) const
 {
 	if(!isIpBanished(ip, mask)) return false;
 	Database* db = Database::instance();
@@ -350,7 +353,7 @@ bool BanManager::removeIpBans(uint32_t ip, uint32_t mask) const
 	return db->executeQuery(query.str());
 }
 
-bool BanManager::removePlayerBans(uint32_t guid) const
+bool BanManager::removePlayerBans(const uint32_t& guid) const
 {
 	if(!isPlayerBanished(guid)) return false;
 	Database* db = Database::instance();
@@ -368,7 +371,7 @@ bool BanManager::removePlayerBans(const std::string& name) const
 		&& removePlayerBans(playerId);
 }
 
-bool BanManager::removeAccountBans(uint32_t accno) const
+bool BanManager::removeAccountBans(const uint32_t& accno) const
 {
 	if(!isAccountBanished(accno)) return false;
 	Database* db = Database::instance();
@@ -378,7 +381,7 @@ bool BanManager::removeAccountBans(uint32_t accno) const
 	return db->executeQuery(query.str());
 }
 
-bool BanManager::removeNotations(uint32_t accno) const
+bool BanManager::removeNotations(const uint32_t& accno) const
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -387,7 +390,7 @@ bool BanManager::removeNotations(uint32_t accno) const
 	return db->executeQuery(query.str());
 }
 
-uint32_t BanManager::getNotationsCount(uint32_t account)
+uint32_t BanManager::getNotationsCount(const uint32_t& account)
 {
 	Database* db = Database::instance();
 	DBResult* result;
@@ -402,7 +405,7 @@ uint32_t BanManager::getNotationsCount(uint32_t account)
 	return count;
 }
 
-std::vector<Ban> BanManager::getBans(BanType_t type)
+std::vector<Ban> BanManager::getBans(const BanType_t& type)
 {
 	assert(type == BAN_IPADDRESS || type == BAN_PLAYER || type == BAN_ACCOUNT || type == BAN_NOTATION);
 	Database* db = Database::instance();

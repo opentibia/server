@@ -29,7 +29,8 @@
 #include <list>
 
 struct Outfit{
-	Outfit() : outfitId(0), lookType(0), addons(0), isPremium(false), isDefault(false), name("") {}
+	Outfit();
+	
 	uint32_t outfitId;
 	uint32_t lookType;
 	uint32_t addons;
@@ -38,33 +39,24 @@ struct Outfit{
 	std::string name;
 };
 
-//typedef std::map<uint32_t, OutfitList > OutfitMap;
-
 typedef std::list<Outfit> OutfitList;
-typedef std::map<uint32_t, Outfit > OutfitMap;
+typedef std::map<uint32_t, Outfit> OutfitMap;
 
-class Outfits
-{
+class Outfits {
+	Outfits();
+	
 public:
-	~Outfits();
-
-	static Outfits* getInstance()
-	{
-		static Outfits instance;
-		return &instance;
-	}
+	static Outfits* getInstance();
 
 	bool loadFromXml(const std::string& datadir);
 	bool reload();
 
-	uint32_t getOutfitId(uint32_t lookType);
-	bool getOutfit(uint32_t lookType, Outfit& outfit);
-	bool getOutfit(uint32_t outfitId, PlayerSex_t sex, Outfit& outfit);
-	const OutfitMap& getOutfits(PlayerSex_t playersex);
+	const uint32_t& getOutfitId(const uint32_t& lookType);
+	bool getOutfit(const uint32_t& lookType, Outfit& outfit);
+	bool getOutfit(const uint32_t& outfitId, const PlayerSex_t& sex, Outfit& outfit);
+	const OutfitMap& getOutfits(const PlayerSex_t& playersex);
 
 private:
-	Outfits();
-	
 	std::string m_datadir;
 	OutfitList allOutfits;
 	std::map<PlayerSex_t, OutfitMap > outfitMaps;

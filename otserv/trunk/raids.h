@@ -211,7 +211,7 @@ public:
 	static void initScriptInterface();
 
 protected:
-	virtual std::string getScriptEventName();
+	virtual const std::string& getScriptEventName() const;
 	static LuaScriptInterface m_scriptInterface;
 };
 

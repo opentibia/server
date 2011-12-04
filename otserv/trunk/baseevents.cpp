@@ -24,6 +24,86 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
+Event::Event(LuaScriptInterface* _interface)
+{
+	m_scriptInterface = _interface;
+	m_scriptId = 0;
+	m_scripted = false;
+}
+
+Event::~Event()
+{
+	//
+}
+
+bool Event::checkScript(const std::string& datadir, const std::string& scriptsName, const std::string& scriptFile)
+{
+	LuaScriptInterface testInterface("Test Interface");
+	testInterface.initState();
+
+	if(testInterface.loadFile(std::string(datadir + scriptsName + "/lib/" + scriptsName + ".lua")) == -1){
+		std::cout << "Warning: [Event::checkScript] Can not load " << scriptsName << " lib/" << scriptsName << ".lua" << std::endl;
+	}
+
+	if(m_scriptId != 0){
+		std::cout << "Failure: [Event::checkScript] scriptid = " << m_scriptId << std::endl;
+		return false;
+	}
+
+	if(testInterface.loadFile(datadir + scriptsName + scriptFile) == -1){
+		std::cout << "Warning: [Event::checkScript] Can not load script. " << scriptFile << std::endl;
+		std::cout << testInterface.getLastLuaError() << std::endl;
+		return false;
+	}
+
+	int32_t id = testInterface.getEvent(getScriptEventName());
+	if(id == -1){
+		std::cout << "Warning: [Event::checkScript] Event " << getScriptEventName() << " not found. " << scriptFile << std::endl;
+		return false;
+
+	}
+
+	return true;
+}
+
+bool Event::loadScript(const std::string& scriptFile, bool reserveEnviroment /*= true*/)
+{
+	if(!m_scriptInterface || m_scriptId != 0){
+		std::cout << "Failure: [Event::loadScript] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
+		return false;
+	}
+
+	if(m_scriptInterface->loadFile(scriptFile, reserveEnviroment) == -1){
+		std::cout << "Warning: [Event::loadScript] Can not load script. " << scriptFile << std::endl;
+		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
+		return false;
+	}
+	int32_t id = m_scriptInterface->getEvent(getScriptEventName());
+	if(id == -1){
+		std::cout << "Warning: [Event::loadScript] Event " << getScriptEventName() << " not found. " << scriptFile << std::endl;
+		return false;
+
+	}
+	m_scripted = true;
+	m_scriptId = id;
+	return true;
+}
+
+bool Event::loadFunction(const std::string& functionName)
+{
+	return false;
+}
+
+const int32_t& Event::getScriptId() const
+{
+	return m_scriptId; 
+}
+
+LuaScriptInterface* Event::getScriptInterface()
+{
+	return m_scriptInterface;
+}
+
 BaseEvents::BaseEvents()
 {
 	m_loaded = false;
@@ -125,75 +205,9 @@ bool BaseEvents::reload()
 	return loadFromXml(m_datadir);
 }
 
-
-Event::Event(LuaScriptInterface* _interface)
+bool BaseEvents::isLoaded() const
 {
-	m_scriptInterface = _interface;
-	m_scriptId = 0;
-	m_scripted = false;
-}
-
-Event::~Event()
-{
-	//
-}
-
-bool Event::checkScript(const std::string& datadir, const std::string& scriptsName, const std::string& scriptFile)
-{
-	LuaScriptInterface testInterface("Test Interface");
-	testInterface.initState();
-
-	if(testInterface.loadFile(std::string(datadir + scriptsName + "/lib/" + scriptsName + ".lua")) == -1){
-		std::cout << "Warning: [Event::checkScript] Can not load " << scriptsName << " lib/" << scriptsName << ".lua" << std::endl;
-	}
-
-	if(m_scriptId != 0){
-		std::cout << "Failure: [Event::checkScript] scriptid = " << m_scriptId << std::endl;
-		return false;
-	}
-
-	if(testInterface.loadFile(datadir + scriptsName + scriptFile) == -1){
-		std::cout << "Warning: [Event::checkScript] Can not load script. " << scriptFile << std::endl;
-		std::cout << testInterface.getLastLuaError() << std::endl;
-		return false;
-	}
-
-	int32_t id = testInterface.getEvent(getScriptEventName());
-	if(id == -1){
-		std::cout << "Warning: [Event::checkScript] Event " << getScriptEventName() << " not found. " << scriptFile << std::endl;
-		return false;
-
-	}
-
-	return true;
-}
-
-bool Event::loadScript(const std::string& scriptFile, bool reserveEnviroment /*= true*/)
-{
-	if(!m_scriptInterface || m_scriptId != 0){
-		std::cout << "Failure: [Event::loadScript] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
-		return false;
-	}
-
-	if(m_scriptInterface->loadFile(scriptFile, reserveEnviroment) == -1){
-		std::cout << "Warning: [Event::loadScript] Can not load script. " << scriptFile << std::endl;
-		std::cout << m_scriptInterface->getLastLuaError() << std::endl;
-		return false;
-	}
-	int32_t id = m_scriptInterface->getEvent(getScriptEventName());
-	if(id == -1){
-		std::cout << "Warning: [Event::loadScript] Event " << getScriptEventName() << " not found. " << scriptFile << std::endl;
-		return false;
-
-	}
-	m_scripted = true;
-	m_scriptId = id;
-	return true;
-}
-
-bool Event::loadFunction(const std::string& functionName)
-{
-	return false;
+	return m_loaded;
 }
 
 CallBack::CallBack()
@@ -208,7 +222,7 @@ CallBack::~CallBack()
 	//
 }
 
-bool CallBack::loadCallBack(LuaScriptInterface* _interface, std::string name)
+bool CallBack::loadCallBack(LuaScriptInterface* _interface, const std::string& name)
 {
 	if(!_interface){
 		std::cout << "Failure: [CallBack::loadCallBack] m_scriptInterface == NULL" << std::endl;

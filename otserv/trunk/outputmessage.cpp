@@ -34,6 +34,79 @@ OutputMessage::OutputMessage()
 	freeMessage();
 }
 
+char* OutputMessage::getOutputBuffer()
+{
+	return (char*)&m_MsgBuf[m_outputBufferStart];
+}
+
+void OutputMessage::writeMessageLength()
+{
+	add_header((uint16_t)(m_MsgSize));
+}
+
+void OutputMessage::addCryptoHeader(bool addChecksum)
+{
+	if(addChecksum){
+		add_header((uint32_t)(adlerChecksum((uint8_t*)(m_MsgBuf + m_outputBufferStart), m_MsgSize)));
+	}
+	add_header((uint16_t)(m_MsgSize));
+}
+
+Protocol* OutputMessage::getProtocol()
+{
+	return m_protocol;
+}
+
+Connection_ptr OutputMessage::getConnection()
+{
+	return m_connection;
+}
+
+const uint64_t& OutputMessage::getFrame() const
+{
+	return m_frame;
+}
+
+void OutputMessage::freeMessage()
+{
+	setConnection(Connection_ptr());
+	setProtocol(NULL);
+	m_frame = 0;
+	//allocate enough size for headers
+	//2 bytes for unencrypted message size
+	//4 bytes for checksum
+	//2 bytes for encrypted message size
+	m_outputBufferStart = 8;
+
+	//setState have to be the last one
+	setState(OutputMessage::STATE_FREE);
+}
+
+void OutputMessage::setProtocol(Protocol* protocol)
+{
+	m_protocol = protocol;
+}
+
+void OutputMessage::setConnection(Connection_ptr connection)
+{
+	m_connection = connection;
+}
+
+void OutputMessage::setState(OutputMessageState state)
+{
+	m_state = state;
+}
+
+OutputMessage::OutputMessageState OutputMessage::getState() const
+{
+	return m_state;
+}
+
+void OutputMessage::setFrame(const uint64_t& frame)
+{
+	m_frame = frame;
+}
+
 //*********** OutputMessagePool ****************
 
 OutputMessagePool::OutputMessagePool()
@@ -48,20 +121,18 @@ OutputMessagePool::OutputMessagePool()
 	m_frameTime = OTSYS_TIME();
 }
 
-void OutputMessagePool::startExecutionFrame()
-{
-	//boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
-	m_frameTime = OTSYS_TIME();
-	m_isOpen = true;
-}
-
 OutputMessagePool::~OutputMessagePool()
 {
 	InternalOutputMessageList::iterator it;
 	for(it = m_outputMessages.begin(); it != m_outputMessages.end(); ++it){
 		delete *it;
 	}
-	m_outputMessages.clear();
+}
+
+OutputMessagePool* OutputMessagePool::getInstance()
+{
+	static OutputMessagePool instance;
+	return &instance;
 }
 
 void OutputMessagePool::send(OutputMessage_ptr msg)
@@ -150,6 +221,11 @@ void OutputMessagePool::sendAll()
 	}
 }
 
+void OutputMessagePool::stop()
+{
+	m_isOpen = false;
+}
+
 void OutputMessagePool::releaseMessage(OutputMessage* msg)
 {
 	g_dispatcher.addTask(
@@ -226,6 +302,22 @@ OutputMessage_ptr OutputMessagePool::getOutputMessage(Protocol* protocol, bool a
 
 	configureOutputMessage(outputmessage, protocol, autosend);
 	return outputmessage;
+}
+
+void OutputMessagePool::startExecutionFrame()
+{
+	m_frameTime = OTSYS_TIME();
+	m_isOpen = true;
+}
+
+size_t OutputMessagePool::getAvailableMessageCount() const
+{
+	return m_outputMessages.size();
+}
+
+size_t OutputMessagePool::getAutoMessageCount() const
+{
+	return m_autoSendOutputMessages.size();
 }
 
 void OutputMessagePool::configureOutputMessage(OutputMessage_ptr msg, Protocol* protocol, bool autosend)

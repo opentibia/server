@@ -122,9 +122,10 @@ LuaScriptInterface& Spells::getScriptInterface()
 	return m_scriptInterface;
 }
 
-std::string Spells::getScriptBaseName()
+const std::string& Spells::getScriptBaseName() const 
 {
-	return "spells";
+	static const std::string BASE_NAME = "spells";
+	return BASE_NAME;
 }
 
 Event* Spells::getEvent(const std::string& nodeName)
@@ -406,9 +407,10 @@ Combat* CombatSpell::getCombat()
 	return combat;
 }
 
-std::string CombatSpell::getScriptEventName()
+const std::string& CombatSpell::getScriptEventName() const
 {
-	return "onCastSpell";
+	static const std::string EVENT_NAME = "onCastSpell";
+	return EVENT_NAME;
 }
 
 bool CombatSpell::castSpell(Creature* creature)
@@ -657,6 +659,11 @@ bool Spell::configureSpell(xmlNodePtr p)
 	}
 
 	return true;
+}
+
+const std::string& Spell::getName() const
+{
+	return name;
 }
 
 bool Spell::playerSpellCheck(Player* player) const
@@ -998,7 +1005,7 @@ void Spell::postCastSpell(Player* player, bool finishedCast /*= true*/, bool pay
 	}
 }
 
-void Spell::postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const
+void Spell::postCastSpell(Player* player, const uint32_t& manaCost, const uint32_t& soulCost) const
 {
 
 	if(manaCost > 0){
@@ -1164,9 +1171,10 @@ bool InstantSpell::loadScript(const std::string& scriptFile, bool reserveEnvirom
 	return false;
 }
 
-std::string InstantSpell::getScriptEventName()
+const std::string& InstantSpell::getScriptEventName() const
 {
-	return "onCastSpell";
+	static const std::string EVENT_NAME = "onCastSpell";
+	return EVENT_NAME;
 }
 
 bool InstantSpell::configureEvent(xmlNodePtr p)
@@ -1909,9 +1917,10 @@ ConjureSpell::~ConjureSpell()
 	//
 }
 
-std::string ConjureSpell::getScriptEventName()
+const std::string& ConjureSpell::getScriptEventName() const
 {
-	return "onCastSpell";
+	static const std::string& EVENT_NAME = "onCastSpell";
+	return EVENT_NAME;
 }
 
 bool ConjureSpell::configureEvent(xmlNodePtr p)
@@ -2189,9 +2198,10 @@ bool RuneSpell::loadScript(const std::string& scriptFile, bool reserveEnviroment
 	return false;
 }
 
-std::string RuneSpell::getScriptEventName()
+const std::string& RuneSpell::getScriptEventName() const
 {
-	return "onCastSpell";
+	static const std::string EVENT_NAME = "onCastSpell";
+	return EVENT_NAME;
 }
 
 bool RuneSpell::configureEvent(xmlNodePtr p)

@@ -49,49 +49,26 @@ typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
 
 class ConnectionManager
 {
+	ConnectionManager();
+	
 public:
-	~ConnectionManager()
-	{
-	}
-
-	static ConnectionManager* getInstance(){
-		static ConnectionManager instance;
-		return &instance;
-	}
+	static ConnectionManager* getInstance();
 
 	Connection_ptr createConnection(boost::asio::ip::tcp::socket* socket,
 		boost::asio::io_service& io_service, ServicePort_ptr servicers);
 	void releaseConnection(Connection_ptr connection);
 	void closeAll();
 
-protected:
-
-	ConnectionManager()
-	{
-	}
-
+private:
 	std::list<Connection_ptr> m_connections;
 	boost::recursive_mutex m_connectionManagerLock;
 };
 
 class Connection : public boost::enable_shared_from_this<Connection>, boost::noncopyable
 {
+	friend class ConnectionManager;
+
 public:
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	static uint32_t connectionCount;
-#endif
-
-	enum { write_timeout = 30 };
-	enum { read_timeout = 30 };
-
-	enum ConnectionState_t {
-		CONNECTION_STATE_OPEN = 0,
-		CONNECTION_STATE_REQUEST_CLOSE = 1,
-		CONNECTION_STATE_CLOSING = 2,
-		CONNECTION_STATE_CLOSED = 3
-	};
-
-private:
 	Connection(boost::asio::ip::tcp::socket* socket,
 		boost::asio::io_service& io_service,
 		ServicePort_ptr service_port) :
@@ -114,15 +91,27 @@ private:
 		connectionCount++;
 #endif
 	}
-	friend class ConnectionManager;
-
-public:
+	
+	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	~Connection()
 	{
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		connectionCount--;
-#endif
 	}
+#endif
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t connectionCount;
+#endif
+
+	enum { write_timeout = 30 };
+	enum { read_timeout = 30 };
+
+	enum ConnectionState_t {
+		CONNECTION_STATE_OPEN = 0,
+		CONNECTION_STATE_REQUEST_CLOSE = 1,
+		CONNECTION_STATE_CLOSING = 2,
+		CONNECTION_STATE_CLOSED = 3
+	};
 
 	boost::asio::ip::tcp::socket& getHandle() { return *m_socket; }
 

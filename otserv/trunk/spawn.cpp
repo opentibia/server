@@ -326,7 +326,8 @@ bool Spawn::isInSpawnZone(const Position& pos)
 	return Spawns::getInstance()->isInZone(centerPos, radius, pos);
 }
 
-bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup /*= false*/)
+bool Spawn::spawnMonster(const uint32_t& spawnId, MonsterType* mType,
+	const Position& pos, const Direction& dir, bool startup /*= false*/)
 {
 	Monster* monster = Monster::createMonster(mType);
 	if(!monster){
@@ -440,7 +441,8 @@ void Spawn::cleanup()
 	}
 }
 
-bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval)
+bool Spawn::addMonster(const std::string& _name, const Position& _pos,
+	const Direction& _dir, const uint32_t& _interval)
 {
 	MonsterType* mType = g_monsters.getMonsterType(_name);
 	if(!mType){
@@ -486,6 +488,11 @@ void Spawn::removeMonster(Monster* monster)
 			break;
 		}
 	}
+}
+
+const uint32_t& Spawn::getInterval() const
+{
+	return interval;
 }
 
 void Spawn::stopEvent()

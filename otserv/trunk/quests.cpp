@@ -23,27 +23,35 @@
 #include "quests.h"
 #include "tools.h"
 
-MissionState::MissionState(std::string _description, uint32_t _missionID)
+MissionState::MissionState(const std::string& _description, const uint32_t& _missionID)
+	: description(_description)
+	, missionID(missionID)
+{}
+
+const uint32_t& MissionState::getMissionID() const
 {
-	description = _description;
-	missionID = _missionID;
+	return missionID;
 }
 
-Mission::Mission(std::string _missionName, uint32_t _storageID, uint32_t _startValue, int32_t _endValue)
+const std::string& MissionState::getMissionDescription() const
 {
-	missionName = _missionName;
-	endValue = _endValue;
-	startValue = _startValue;
-	storageID = _storageID;
-	mainState = NULL;
+	return description;
 }
+
+Mission::Mission(const std::string& _missionName, const uint32_t& _storageID,
+	const uint32_t& _startValue, const int32_t& _endValue)
+	: mainState(NULL)
+	, missionName(_missionName)
+	, storageID(_storageID)
+	, startValue(_startValue)
+	, endValue(_endValue)
+{}
 
 Mission::~Mission()
 {
 	for(uint32_t it = 0; it != state.size(); ++it){
 		delete state[it];
 	}
-	state.clear();
 }
 
 std::string Mission::getDescription(Player* player)
@@ -105,18 +113,17 @@ std::string Mission::getName(Player* player)
 	if(isCompleted(player)){
 		return missionName + " (completed)";
 	}
-	else{
-		return missionName;
-	}
+
+	return missionName;
 }
 
-Quest::Quest(std::string _name, uint16_t _id, uint32_t _startStorageID, uint32_t _startStorageValue)
-{
-	name = _name;
-	id = _id;
-	startStorageID = _startStorageID;
-	startStorageValue = _startStorageValue;
-}
+Quest::Quest(const std::string& _name, const uint16_t& _id,
+	const uint32_t& _startStorageID, const uint32_t& _startStorageValue)
+	: name(_name)
+	, id(_id)
+	, startStorageID(_startStorageID)
+	, startStorageValue(_startStorageValue)
+{}
 
 Quest::~Quest()
 {
@@ -124,7 +131,6 @@ Quest::~Quest()
 	for(it = missions.begin(); it != missions.end(); ++it){
 		delete (*it);
 	}
-	missions.clear();
 }
 
 uint16_t Quest::getMissionsCount(Player* player) const
@@ -136,6 +142,21 @@ uint16_t Quest::getMissionsCount(Player* player) const
 		}
 	}
 	return count;
+}
+
+void Quest::addMission(Mission* mission)
+{
+	missions.push_back(mission);
+}
+
+MissionsList::const_iterator Quest::getFirstMission() const
+{
+	return missions.begin();
+}
+
+MissionsList::const_iterator Quest::getEndMission() const
+{
+	return missions.end();
 }
 
 bool Quest::isCompleted(Player* player)
@@ -159,6 +180,16 @@ bool Quest::isStarted(Player* player) const
 	return false;
 }
 
+const uint16_t& Quest::getID() const
+{
+	return id;
+}
+
+const std::string& Quest::getName() const
+{
+	return name;
+}
+
 Quests::Quests()
 {
 	//
@@ -167,16 +198,33 @@ Quests::Quests()
 Quests::~Quests()
 {
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); ++it)
+	for(it = quests.begin(); it != quests.end(); ++it){
 		delete (*it);
-	quests.clear();
+	}
+}
+
+Quests* Quests::getInstance()
+{
+	static Quests instance;
+	return &instance;
+}
+
+QuestsList::const_iterator Quests::getFirstQuest() const
+{
+	return quests.begin();
+}
+
+QuestsList::const_iterator Quests::getEndQuest() const
+{
+	return quests.end();
 }
 
 bool Quests::reload()
 {
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); ++it)
+	for(it = quests.begin(); it != quests.end(); ++it){
 		delete (*it);
+	}
 	quests.clear();
 
 	return loadFromXml(filename);
@@ -264,7 +312,7 @@ bool Quests::loadFromXml(const std::string& _filename)
 	return false;
 }
 
-Quest *Quests::getQuestByID(uint16_t id)
+Quest *Quests::getQuestByID(const uint16_t& id)
 {
 	QuestsList::iterator it;
 	for(it = quests.begin(); it != quests.end(); ++it){

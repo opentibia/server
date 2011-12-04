@@ -31,7 +31,8 @@ extern Game g_game;
 extern ConfigManager g_config;
 
 
-BedItem::BedItem(uint16_t _id) : Item(_id)
+BedItem::BedItem(const uint16_t& _id)
+	: Item(_id)
 {
 	house = NULL;
 	internalRemoveSleeper();
@@ -39,7 +40,52 @@ BedItem::BedItem(uint16_t _id) : Item(_id)
 
 BedItem::~BedItem()
 {
-	//
+	// Virtual Destructor
+}
+
+BedItem* BedItem::getBed()
+{
+	return this;
+}
+
+const BedItem* BedItem::getBed() const
+{
+	return this;
+}
+
+bool BedItem::canRemove() const
+{
+	return !house;
+}
+
+const uint32_t& BedItem::getSleeper() const
+{
+	return sleeperGUID;
+}
+
+void BedItem::setSleeper(const uint32_t& guid)
+{
+	sleeperGUID = guid;
+}
+
+const time_t& BedItem::getSleepStart() const
+{
+	return sleepStart;
+}
+
+void BedItem::setSleepStart(const time_t& now)
+{
+	sleepStart = now;
+}
+
+House* BedItem::getHouse() const
+{
+	return house;
+}
+
+void BedItem::setHouse(House* h)
+{
+	house = h;
 }
 
 Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
@@ -298,13 +344,16 @@ void BedItem::internalRemoveSleeper()
 	setSpecialDescription("Nobody is sleeping there.");
 }
 
+Beds::Beds()
+{}
+
 Beds& Beds::instance()
 {
 	static Beds instance;
 	return instance;
 }
 
-BedItem* Beds::getBedBySleeper(uint32_t guid)
+BedItem* Beds::getBedBySleeper(const uint32_t& guid)
 {
 	std::map<uint32_t, BedItem*>::iterator it = BedSleepersMap.find(guid);
 	if(it != BedSleepersMap.end()){
@@ -313,7 +362,7 @@ BedItem* Beds::getBedBySleeper(uint32_t guid)
 	return NULL;
 }
 
-void Beds::setBedSleeper(BedItem* bed, uint32_t guid)
+void Beds::setBedSleeper(BedItem* bed, const uint32_t& guid)
 {
 	BedSleepersMap[guid] = bed;
 }

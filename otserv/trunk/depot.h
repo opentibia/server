@@ -23,20 +23,20 @@
 
 #include "container.h"
 
-class Depot : public Container{
+class Depot : public Container {
 public:
-	Depot(uint16_t _type);
-	~Depot();
+	Depot(const uint16_t& _type);
+	virtual ~Depot();
 
-	virtual Depot* getDepot() {return this;};
-	virtual const Depot* getDepot() const {return this;};
+	virtual Depot* getDepot();
+	virtual const Depot* getDepot() const;
 
 	//serialization
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 
-	uint32_t getDepotId() const {return depotId;};
-	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
-	void setDepotId(uint32_t id) {depotId = id;};
+	const uint32_t& getDepotId() const;
+	void setMaxDepotLimit(const uint32_t& maxitems);
+	void setDepotId(const uint32_t& id);
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -49,12 +49,11 @@ public:
 	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	//overrides
-	virtual bool canRemove() const {return false;}
+	virtual bool canRemove() const;
 
 private:
 	uint32_t maxDepotLimit;
 	uint32_t depotId;
 };
 
-#endif
-
+#endif // __OTSERV_DEPOT_H__

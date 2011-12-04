@@ -26,14 +26,23 @@
 #include <libxml/parser.h>
 #include <iostream>
 
+Outfit::Outfit()
+	: outfitId(0)
+	, lookType(0)
+	, addons(0)
+	, isPremium(false)
+	, isDefault(false)
+{}
+
 Outfits::Outfits()
 {
 	//
 }
 
-Outfits::~Outfits()
+Outfits* Outfits::getInstance()
 {
-	//
+	static Outfits instance;
+	return &instance;
 }
 
 bool Outfits::loadFromXml(const std::string& datadir)
@@ -166,18 +175,18 @@ bool Outfits::reload()
 }
 
 
-uint32_t Outfits::getOutfitId(uint32_t lookType)
+const uint32_t& Outfits::getOutfitId(const uint32_t& lookType)
 {
+	static const uint32_t OUTFIT_NOT_FOUND = 0;
 	for(OutfitList::iterator it = allOutfits.begin(); it != allOutfits.end(); ++it){
 		if(it->lookType == lookType){
 			return it->outfitId;
 		}
 	}
-
-	return 0;
+	return OUTFIT_NOT_FOUND;
 }
 
-bool Outfits::getOutfit(uint32_t lookType, Outfit& outfit)
+bool Outfits::getOutfit(const uint32_t& lookType, Outfit& outfit)
 {
 	for(OutfitList::iterator it = allOutfits.begin(); it != allOutfits.end(); ++it){
 		if(it->lookType == lookType){
@@ -189,7 +198,7 @@ bool Outfits::getOutfit(uint32_t lookType, Outfit& outfit)
 	return false;
 }
 
-bool Outfits::getOutfit(uint32_t outfitId, PlayerSex_t sex, Outfit& outfit)
+bool Outfits::getOutfit(const uint32_t& outfitId, const PlayerSex_t& sex, Outfit& outfit)
 {
 	OutfitMap map = getOutfits(sex);
 	OutfitMap::iterator it = map.find(outfitId);
@@ -201,7 +210,7 @@ bool Outfits::getOutfit(uint32_t outfitId, PlayerSex_t sex, Outfit& outfit)
 	return false;
 }
 
-const OutfitMap& Outfits::getOutfits(PlayerSex_t playersex)
+const OutfitMap& Outfits::getOutfits(const PlayerSex_t& playersex)
 {
 	return outfitMaps[playersex];
 }

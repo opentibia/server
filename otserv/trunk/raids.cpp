@@ -739,9 +739,10 @@ bool ScriptEvent::configureRaidEvent(xmlNodePtr eventNode)
 	return true;
 }
 
-std::string ScriptEvent::getScriptEventName()
+const std::string& ScriptEvent::getScriptEventName() const
 {
-	return "onRaid";
+	static const std::string EVENT_NAME = "onRaid";
+	return EVENT_NAME;
 }
 
 bool ScriptEvent::executeEvent()

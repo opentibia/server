@@ -232,7 +232,7 @@ public:
 
 	virtual bool isPushable() const {return false;}
 	virtual int getThrowRange() const {return 1;}
-	virtual std::string getDescription(int32_t lookDistance) const {return "";}
+	virtual std::string getDescription(const int32_t& lookDistance) const {return "";}
 
 	virtual bool isRemoved() const {return false;}
 };

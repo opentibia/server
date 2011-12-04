@@ -1295,7 +1295,7 @@ bool Npc::canSee(const Position& pos) const
 	return Creature::canSee(getPosition(), pos, talkRadius, talkRadius);
 }
 
-std::string Npc::getDescription(int32_t lookDistance) const
+std::string Npc::getDescription(const int32_t& lookDistance) const
 {
 	std::stringstream s;
 	s << name << ".";

@@ -27,8 +27,8 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
-HouseTile::HouseTile(int x, int y, int z, House* _house) :
-	DynamicTile(x, y, z)
+HouseTile::HouseTile(const int32_t& x, const int32_t& y, const int32_t& z, House* _house)
+	: DynamicTile(x, y, z)
 {
 	house = _house;
 	setFlag(TILESTATE_HOUSE);
@@ -36,7 +36,7 @@ HouseTile::HouseTile(int x, int y, int z, House* _house) :
 
 HouseTile::~HouseTile()
 {
-	//
+	// Virtual Destructor
 }
 
 void HouseTile::__addThing(int32_t index, Thing* thing)
@@ -63,6 +63,11 @@ void HouseTile::__internalAddThing(uint32_t index, Thing* thing)
 	if(Item* item = thing->getItem()){
 		updateHouse(item);
 	}
+}
+
+House* HouseTile::getHouse()
+{
+	return house;
 }
 
 void HouseTile::updateHouse(Item* item)

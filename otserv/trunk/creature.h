@@ -165,7 +165,7 @@ public:
 	virtual const std::string& getName() const = 0;
 	virtual const std::string& getNameDescription() const = 0;
 	virtual std::string getXRayDescription() const;
-	virtual std::string getDescription(int32_t lookDistance) const;
+	virtual std::string getDescription(const int32_t& lookDistance) const;
 
 	void setID(){this->id = auto_id | this->idRange();}
 	void setRemoved() {isInternalRemoved = true;}
@@ -417,7 +417,7 @@ public:
 		Thing::setParent(cylinder);
 	}
 
-	virtual Position getPosition() const {return _tile->getTilePosition();}
+	virtual const Position& getPosition() const {return _tile->getTilePosition();}
 	virtual Tile* getTile(){return _tile;}
 	virtual const Tile* getTile() const{return _tile;}
 	int32_t getWalkCache(const Position& pos) const;

@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __HOUSETILE_H__
-#define __HOUSETILE_H__
+#ifndef __OTSERV_HOUSETILE_H__
+#define __OTSERV_HOUSETILE_H__
 
 #include "definitions.h"
 #include "tile.h"
@@ -27,11 +27,10 @@
 class House;
 
 // House tiles are almost always dynamic
-class HouseTile : public DynamicTile
-{
+class HouseTile : public DynamicTile {
 public:
-	HouseTile(int x, int y, int z, House* _house);
-	~HouseTile();
+	HouseTile(const int32_t& x, const int32_t& y, const int32_t& z, House* _house);
+	virtual ~HouseTile();
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -43,12 +42,11 @@ public:
 	virtual void __addThing(int32_t index, Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
-	House* getHouse() {return house;};
+	House* getHouse();
 
 private:
 	void updateHouse(Item* item);
-
 	House* house;
 };
 
-#endif
+#endif // __OTSERV_HOUSETILE_H__

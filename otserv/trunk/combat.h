@@ -414,4 +414,4 @@ inline CombatType_t CombatIndexToType(int combatindex) {
 	return (CombatType_t)(1 << (combatindex-1));
 }
 
-#endif
+#endif // __OTSERV_COMBAT_H__

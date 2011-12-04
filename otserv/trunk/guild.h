@@ -42,25 +42,23 @@ struct GuildWar {
 
 typedef std::map<uint32_t, GuildWar> GuildWarsMap;
 
-class Guild
-{
+class Guild {
 public:
 	Guild();
-	~Guild();
 
-	void setId(uint32_t _id){ id = _id; }
-	void setName(std::string _name){ name = _name; }
+	void setId(const uint32_t& _id);
+	void setName(const std::string& _name);
 
-	uint32_t getId() const { return id; }
-	std::string getName() const { return name; }
+	const uint32_t& getId() const;
+	const std::string& getName() const;
 
-	bool addFrag(uint32_t enemyId) const;
-	bool isAtWar() const { return !enemyGuilds.empty(); }
-	bool hasDeclaredWar(uint32_t warId) const;
-	void broadcastMessage(SpeakClasses type, const std::string& msg) const;
+	bool addFrag(const uint32_t& enemyId) const;
+	bool isAtWar() const;
+	bool hasDeclaredWar(const uint32_t& warId) const;
+	void broadcastMessage(const SpeakClasses& type, const std::string& msg) const;
 
-	uint32_t isEnemy(uint32_t enemyId) const;
-	void addEnemy(uint32_t enemyId, uint32_t warId);
+	bool isEnemy(const uint32_t& enemyId) const;
+	void addEnemy(const uint32_t& enemyId, const uint32_t& warId);
 	
 protected:
 	uint32_t id;
@@ -70,20 +68,22 @@ protected:
 	EnemyGuildsMap enemyGuilds;
 };
 
-class Guilds
-{
+class Guilds {
 public:
 	void loadWars();
 	#ifdef __GUILDWARSLUARELOAD__
 	bool loadWar(uint32_t warId);
 	#endif
-	void endWar(uint32_t warId);
-	bool transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee);
-	bool setWarStatus(uint32_t warId, int32_t statusId);
-	void broadcastKill(uint32_t guildId, Player* player, const DeathList& killers);
-	GuildWarsMap& getWars() { return guildWars; }
-
-	Guild* getGuildById(uint32_t guildId);
+	void endWar(const uint32_t& warId);
+	bool transferMoney(const uint32_t& guildId, const uint32_t& opponentId,
+		const int32_t& guildFee, const int32_t& opponentFee);
+	bool setWarStatus(const uint32_t& warId, const int32_t& statusId);
+	void broadcastKill(const uint32_t& guildId, Player* player, const DeathList& killers);
+	
+	GuildWarsMap& getWars();
+	const GuildWarsMap& getWars() const;
+	
+	Guild* getGuildById(const uint32_t& guildId);
 	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 
 protected:

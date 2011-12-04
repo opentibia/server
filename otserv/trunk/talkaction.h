@@ -53,7 +53,7 @@ public:
 
 protected:
 	virtual LuaScriptInterface& getScriptInterface();
-	virtual std::string getScriptBaseName();
+	virtual const std::string& getScriptBaseName() const;
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	virtual void clear();
@@ -86,7 +86,7 @@ public:
 	bool executeSay(Player* player, const std::string& words, const std::string& param);
 
 protected:
-	virtual std::string getScriptEventName();
+	virtual const std::string& getScriptEventName() const;
 
 	static TalkActionFunction placeNpc;
 	static TalkActionFunction sellHouse;

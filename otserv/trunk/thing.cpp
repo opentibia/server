@@ -36,7 +36,6 @@ Thing::Thing()
 Thing::~Thing()
 {
 	//
-	//std::cout << "thing destructor " << this << std::endl;
 }
 
 void Thing::useThing2()
@@ -157,7 +156,7 @@ const Tile* Thing::getTile() const
 	return dynamic_cast<const Tile*>(cylinder);
 }
 
-Position Thing::getPosition() const
+const Position& Thing::getPosition() const
 {
 	const Tile* tile = getTile();
 	if(tile){
@@ -204,8 +203,8 @@ bool Thing::isRemoved() const
 	return false;
 }
 
-uint32_t Thing::getTotalAmountOfItemsInside() const
+const uint32_t& Thing::getTotalAmountOfItemsInside() const
 {
-	//includes the item itself
-	return 1;
+	static const uint32_t ITEMS_AMOUNT = 1;
+	return ITEMS_AMOUNT;
 }

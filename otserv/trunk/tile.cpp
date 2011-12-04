@@ -180,6 +180,20 @@ uint32_t TileItemVector::getDownItemCount() const
 	return std::distance(getBeginDownItem(), getEndDownItem());
 }
 
+Tile::Tile(const uint16_t& x, const uint16_t& y, const uint16_t& z)
+	: qt_node(NULL)
+	, ground(NULL)
+	, thingCount(0)
+	, tilePos(x, y, z)
+	, m_flags(0)
+{}
+
+Tile::~Tile()
+{
+	// We don't need to free any memory as tiles are always deallocated
+	// and OS will free up anything left when the server is shutdown
+}
+
 bool Tile::hasProperty(enum ITEMPROPERTY prop, bool checkSolidForItems /* =false */) const
 {
 	if(ground && ground->hasProperty(prop)){
@@ -214,6 +228,77 @@ bool Tile::hasProperty(Item* exclude, enum ITEMPROPERTY prop) const
 	return false;
 }
 
+bool Tile::hasFlag(const tileflags_t& flag) const
+{
+	return ((m_flags & (uint32_t)flag) == flag);
+}
+
+void Tile::setFlag(const tileflags_t& flag)
+{
+	m_flags |= flag;
+}
+
+void Tile::resetFlag(const tileflags_t& flag)
+{
+	m_flags &= ~flag;
+}
+
+bool Tile::positionChange() const
+{
+	return hasFlag(TILESTATE_TELEPORT);
+}
+
+bool Tile::floorChange() const
+{
+	return hasFlag(TILESTATE_FLOORCHANGE);
+}
+
+bool Tile::floorChangeDown() const
+{
+	return hasFlag(TILESTATE_FLOORCHANGE_DOWN);
+}
+
+bool Tile::floorChange(const Direction& direction) const
+{
+	bool ret = false;
+	switch(direction){
+		case NORTH:
+			ret = hasFlag(TILESTATE_FLOORCHANGE_NORTH);
+			break;
+			
+		case SOUTH:
+			ret = hasFlag(TILESTATE_FLOORCHANGE_SOUTH);
+			break;
+			
+		case EAST:
+			ret = hasFlag(TILESTATE_FLOORCHANGE_EAST);
+			break;
+			
+		case WEST:
+			ret = hasFlag(TILESTATE_FLOORCHANGE_WEST);
+			break;
+			
+		default:
+			break;
+	}
+	return ret;
+}
+
+ZoneType_t Tile::getZone() const
+{
+	if(hasFlag(TILESTATE_PROTECTIONZONE)){
+		return ZONE_PROTECTION;
+	}
+	else if(hasFlag(TILESTATE_NOPVPZONE)){
+		return ZONE_NOPVP;
+	}
+	else if(hasFlag(TILESTATE_PVPZONE)){
+		return ZONE_PVP;
+	}
+
+	return ZONE_NORMAL;
+}
+
 HouseTile* Tile::getHouseTile()
 {
 	if(isHouseTile())
@@ -233,7 +318,17 @@ bool Tile::isHouseTile() const
 	return hasFlag(TILESTATE_HOUSE);
 }
 
-bool Tile::hasHeight(uint32_t n) const
+int Tile::getThrowRange() const
+{
+	return 0;
+}
+
+bool Tile::isPushable() const
+{
+	return false;
+}
+
+bool Tile::hasHeight(const uint32_t& n) const
 {
 	uint32_t height = 0;
 
@@ -296,9 +391,9 @@ uint32_t Tile::getDownItemCount() const
 	return 0;
 }
 
-std::string Tile::getDescription(int32_t lookDistance) const
+std::string Tile::getDescription(const int32_t& lookDistance) const
 {
-	std::string ret = "You dont know why, but you cant see anything!";
+	static const std::string ret = "You dont know why, but you cant see anything!";
 	return ret;
 }
 
@@ -431,7 +526,7 @@ Item* Tile::getTopTopItem()
 	return NULL;
 }
 
-Item* Tile::getItemByTopOrder(uint32_t topOrder)
+Item* Tile::getItemByTopOrder(const int32_t& topOrder)
 {
 	//topOrder:
 	//1: borders
@@ -442,13 +537,18 @@ Item* Tile::getItemByTopOrder(uint32_t topOrder)
 	if(TileItemVector* items = getItemList()){
 		ItemVector::reverse_iterator itEnd = ItemVector::reverse_iterator(items->getBeginTopItem());
 		for(ItemVector::reverse_iterator it = ItemVector::reverse_iterator(items->getEndTopItem()); it != itEnd; ++it){
-			if(Item::items[(*it)->getID()].alwaysOnTopOrder == (int32_t)topOrder){
+			if(Item::items[(*it)->getID()].alwaysOnTopOrder == topOrder){
 				return (*it);
 			}
 		}
 	}
 
 	return NULL;
+}
+
+const uint32_t& Tile::getThingCount() const
+{
+	return thingCount;
 }
 
 Thing* Tile::getTopVisibleThing(const Creature* creature, bool checkVisibility/*=true*/)
@@ -1714,6 +1814,21 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 	}
 }
 
+const Position& Tile::getPosition() const
+{
+	return tilePos;
+}
+
+const Position& Tile::getTilePosition() const
+{
+	return tilePos;	
+}
+
+bool Tile::isRemoved() const
+{
+	return false;
+}
+
 void Tile::updateTileFlags(Item* item, bool removed)
 {
 	if(!removed){
@@ -1834,6 +1949,10 @@ void Tile::updateTileFlags(Item* item, bool removed)
 	}
 }
 
+bool Tile::is_dynamic() const
+{
+	return (m_flags & TILESTATE_DYNAMIC_TILE) != 0;
+}
 
 bool Tile::isMoveableBlocking() const
 {
@@ -1842,4 +1961,86 @@ bool Tile::isMoveableBlocking() const
 	}
 
 	return false;
+}
+
+DynamicTile::DynamicTile(const uint16_t& x, const uint16_t& y, const uint16_t& z)
+	: Tile(x, y, z)
+{
+	m_flags |= TILESTATE_DYNAMIC_TILE;
+}
+
+DynamicTile::~DynamicTile()
+{
+	// Virtual destructor
+}
+
+TileItemVector* DynamicTile::getItemList()
+{
+	return &items;
+}
+
+const TileItemVector* DynamicTile::getItemList() const
+{
+	return &items;
+}
+
+TileItemVector* DynamicTile::makeItemList()
+{
+	return &items;
+}
+
+CreatureVector* DynamicTile::getCreatures()
+{
+	return &creatures;
+}
+
+const CreatureVector* DynamicTile::getCreatures() const
+{
+	return &creatures;
+}
+
+CreatureVector* DynamicTile::makeCreatures()
+{
+	return &creatures;
+}
+
+StaticTile::StaticTile(const uint16_t& x, const uint16_t& y, const uint16_t& z)
+	: Tile(x, y, z)
+	, items(NULL)
+	, creatures(NULL)
+{}
+
+StaticTile::~StaticTile()
+{
+	// Virtual Destructor
+}
+
+TileItemVector* StaticTile::getItemList()
+{
+	return items;
+}
+
+const TileItemVector* StaticTile::getItemList() const
+{
+	return items;
+}
+
+TileItemVector* StaticTile::makeItemList()
+{
+	return items ? items : items = new TileItemVector;
+}
+
+CreatureVector* StaticTile::getCreatures()
+{
+	return creatures;
+}
+
+const CreatureVector* StaticTile::getCreatures() const
+{
+	return creatures;
+}
+
+CreatureVector* StaticTile::makeCreatures()
+{
+	return creatures ? creatures : creatures = new CreatureVector;
 }

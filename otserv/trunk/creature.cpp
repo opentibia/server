@@ -1583,7 +1583,7 @@ bool Creature::isSuppress(ConditionType_t type) const
 	return ((getConditionSuppressions() & (uint32_t)type) == (uint32_t)type);
 }
 
-std::string Creature::getDescription(int32_t lookDistance) const
+std::string Creature::getDescription(const int32_t& lookDistance) const
 {
 	std::string str = "a creature";
 	return str;

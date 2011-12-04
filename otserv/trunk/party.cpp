@@ -43,8 +43,14 @@ Party::Party(Player* _leader)
 	}
 }
 
-Party::~Party()
+Player* Party::getLeader() const
 {
+	return leader;
+}
+
+void Party::setLeader(Player* _leader)
+{
+	leader = _leader;
 }
 
 void Party::disband()
@@ -336,6 +342,11 @@ void Party::broadcastPartyMessage(MessageClasses msgClass, const std::string& ms
 	}
 }
 
+bool Party::disbandParty() const 
+{
+	return memberList.empty() && inviteList.empty();
+}
+
 void Party::updateSharedExperience()
 {
 	if(sharedExpActive){
@@ -377,7 +388,17 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 	return true;
 }
 
-void Party::shareExperience(uint64_t experience, bool fromMonster)
+bool Party::isSharedExperienceActive() const
+{
+	return sharedExpActive;
+}
+
+bool Party::isSharedExperienceEnabled() const
+{
+	return sharedExpEnabled;
+}
+
+void Party::shareExperience(const uint64_t& experience, bool fromMonster)
 {
 	double member_factor = g_config.getNumber(ConfigManager::PARTY_MEMBER_EXP_BONUS);
 	double xpgained = (experience + (experience * (member_factor / 100.))) / (memberList.size() + 1);
@@ -452,7 +473,7 @@ bool Party::canEnableSharedExperience()
 	return true;
 }
 
-void Party::addPlayerHealedMember(Player* player, uint32_t points)
+void Party::addPlayerHealedMember(Player* player, const uint32_t& points)
 {
 	if(!player->hasFlag(PlayerFlag_NotGainInFight)){
 		if(points > 0){
@@ -474,7 +495,7 @@ void Party::addPlayerHealedMember(Player* player, uint32_t points)
 	}
 }
 
-void Party::addPlayerDamageMonster(Player* player, uint32_t points)
+void Party::addPlayerDamageMonster(Player* player, const uint32_t& points)
 {
 	if(!player->hasFlag(PlayerFlag_NotGainInFight)){
 		if(points > 0){
@@ -505,7 +526,12 @@ void Party::clearPlayerPoints(Player* player)
 	}
 }
 
-bool Party::canOpenCorpse(uint32_t ownerId)
+const PlayerVector& Party::getMemberList() const
+{
+	return memberList;
+}
+
+bool Party::canOpenCorpse(const uint32_t& ownerId)
 {
 	Player* player = g_game.getPlayerByID(ownerId);
 	if(!player){

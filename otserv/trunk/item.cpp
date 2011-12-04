@@ -1065,7 +1065,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 	return s.str();
 }
 
-std::string Item::getDescription(int32_t lookDistance) const
+std::string Item::getDescription(const int32_t& lookDistance) const
 {
 	std::stringstream s;
 	const ItemType& it = items[id];

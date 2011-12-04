@@ -150,9 +150,9 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		output->AddString(motd.str());
 		//Add char list
 		output->AddByte(0x64);
-		output->AddByte((uint8_t)account.charList.size());
-		std::list<std::string>::iterator it;
-		for(it = account.charList.begin(); it != account.charList.end(); ++it){
+		output->AddByte((uint8_t)account.characters.size());
+		std::vector<std::string>::iterator it;
+		for(it = account.characters.begin(); it != account.characters.end(); ++it){
 			output->AddString((*it));
 			output->AddString(g_config.getString(ConfigManager::WORLD_NAME));
 			output->AddU32(serverip);

@@ -18,14 +18,13 @@
 
 #ifndef __OTSERV_GLOBALEVENT_H__
 #define __OTSERV_GLOBALEVENT_H__
-#include "baseevents.h"
 
+#include "baseevents.h"
 #include "const.h"
 
 #define TIMER_INTERVAL 1000
 
-enum GlobalEvent_t
-{
+enum GlobalEvent_t {
 	GLOBALEVENT_NONE,
 	GLOBALEVENT_TIMER,
 	GLOBALEVENT_STARTUP,
@@ -35,65 +34,64 @@ enum GlobalEvent_t
 class GlobalEvent;
 typedef std::map<std::string, GlobalEvent*> GlobalEventMap;
 
-class GlobalEvents : public BaseEvents
-{
-	public:
-		GlobalEvents();
-		virtual ~GlobalEvents();
-		void startup();
+class GlobalEvents : public BaseEvents {
+public:
+	GlobalEvents();
+	virtual ~GlobalEvents();
+	
+	void startup();
+	void timer();
+	void think();
+	void execute(const GlobalEvent_t& type);
 
-		void timer();
-		void think();
-		void execute(GlobalEvent_t type);
+	GlobalEventMap getEventMap(const GlobalEvent_t& type);
+	void clearMap(GlobalEventMap& map);
 
-		GlobalEventMap getEventMap(GlobalEvent_t type);
-		void clearMap(GlobalEventMap& map);
+protected:
+	virtual const std::string& getScriptBaseName() const;
+	virtual void clear();
 
-	protected:
-		virtual std::string getScriptBaseName() {return "globalevents";}
-		virtual void clear();
+	virtual Event* getEvent(const std::string& nodeName);
+	virtual bool registerEvent(Event* event, xmlNodePtr p);
 
-		virtual Event* getEvent(const std::string& nodeName);
-		virtual bool registerEvent(Event* event, xmlNodePtr p);
+	virtual LuaScriptInterface& getScriptInterface();
+	LuaScriptInterface m_scriptInterface;
 
-		virtual LuaScriptInterface& getScriptInterface() {return m_scriptInterface;}
-		LuaScriptInterface m_scriptInterface;
-
-		GlobalEventMap thinkMap, serverMap, timerMap;
-		int32_t thinkEventId, timerEventId;
+	GlobalEventMap thinkMap;
+	GlobalEventMap serverMap;
+	GlobalEventMap timerMap;
+	int32_t thinkEventId;
+	int32_t timerEventId;
 };
 
-class GlobalEvent : public Event
-{
-	public:
-		GlobalEvent(LuaScriptInterface* _interface);
-		virtual ~GlobalEvent() {}
+class GlobalEvent : public Event {
+public:
+	GlobalEvent(LuaScriptInterface* _interface);
+	virtual ~GlobalEvent();
 
-		virtual bool configureEvent(xmlNodePtr p);
+	virtual bool configureEvent(xmlNodePtr p);
 
-		uint32_t executeRecord(uint32_t current, uint32_t old);
-		uint32_t executeEvent();
+	uint32_t executeEvent();
 
-		GlobalEvent_t getEventType() const {return m_eventType;}
-		std::string getName() const {return m_name;}
+	const GlobalEvent_t& getEventType() const;
+	const std::string& getName() const;
 
-		uint32_t getInterval() const {return m_interval;}
+	const uint32_t& getInterval() const;
 
-		int64_t getLastExecution() const {return m_lastExecution;}
-		void setLastExecution(int64_t time) {m_lastExecution = time;}
+	const int64_t& getLastExecution() const;
+	void setLastExecution(const int64_t& time);
 
-		time_t getNextExecution() const {return m_nextExecution;}
-		void setNextExecution(time_t time) {m_nextExecution = time;}
+	const time_t& getNextExecution() const;
+	void setNextExecution(const time_t& time);
 
-	protected:
-		GlobalEvent_t m_eventType;
+protected:
+	virtual const std::string& getScriptEventName() const;
 
-		virtual std::string getScriptEventName();
-
-		std::string m_name;
-		time_t m_nextExecution;
-		int64_t m_lastExecution;
-		uint32_t m_interval;
+	std::string m_name;
+	time_t m_nextExecution;
+	int64_t m_lastExecution;
+	uint32_t m_interval;
+	GlobalEvent_t m_eventType;
 };
 
-#endif
+#endif // __OTSERV_GLOBALEVENT_H__

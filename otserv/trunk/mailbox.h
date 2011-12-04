@@ -29,11 +29,11 @@
 class Mailbox : public Item, public Cylinder
 {
 public:
-	Mailbox(uint16_t _type);
-	~Mailbox();
+	Mailbox(const uint16_t& _type);
+	virtual ~Mailbox();
 
-	virtual Mailbox* getMailbox() {return this;};
-	virtual const Mailbox* getMailbox() const {return this;};
+	virtual Mailbox* getMailbox();
+	virtual const Mailbox* getMailbox() const;
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -57,7 +57,7 @@ public:
 
 	static bool getDepotId(const std::string& strTown, uint32_t& depotId);
 	static bool getRepicient(Item* item, std::string& name, uint32_t& depotId);
-	static bool sendItemTo(const std::string& name, uint32_t depotId, Item* item);
+	static bool sendItemTo(const std::string& name, const uint32_t& depotId, Item* item);
 	static bool sendItem(Item* item);
 	static bool canSend(const Item* item);
 };

@@ -24,129 +24,9 @@
 #include "player.h"
 #include <sstream>
 
-CreatureEvents::CreatureEvents() :
-m_scriptInterface("CreatureScript Interface")
-{
-	m_scriptInterface.initState();
-}
 
-CreatureEvents::~CreatureEvents()
-{
-	CreatureEventList::iterator it;
-	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
-		delete it->second;
-	}
-}
-
-void CreatureEvents::clear()
-{
-	//clear all events
-	CreatureEventList::iterator it;
-	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
-		it->second->clearEvent();
-	}
-
-	//clear lua state
-	m_scriptInterface.reInitState();
-}
-
-LuaScriptInterface& CreatureEvents::getScriptInterface()
-{
-	return m_scriptInterface;
-}
-
-std::string CreatureEvents::getScriptBaseName()
-{
-	return "creaturescripts";
-}
-
-Event* CreatureEvents::getEvent(const std::string& nodeName)
-{
-	if(asLowerCaseString(nodeName) == "event"){
-		return new CreatureEvent(&m_scriptInterface);
-	}
-	return NULL;
-}
-
-bool CreatureEvents::registerEvent(Event* event, xmlNodePtr p)
-{
-	CreatureEvent* creatureEvent = dynamic_cast<CreatureEvent*>(event);
-	if(!creatureEvent){
-		return false;
-	}
-
-	switch(creatureEvent->getEventType()){
-	case CREATURE_EVENT_NONE:
-		std::cout << "Error: [CreatureEvents::registerEvent] Trying to register event without type!." << std::endl;
-		return false;
-		break;
-	// events are stored in a std::map
-	default:
-		{
-			CreatureEvent* oldEvent = getEventByName(creatureEvent->getName(), false);
-			if(oldEvent){
-				// if there was an event with the same that is not loaded
-				// (happens when realoading), it is reused
-				if(!oldEvent->isLoaded() &&
-					oldEvent->getEventType() == creatureEvent->getEventType()){
-					oldEvent->copyEvent(creatureEvent);
-				}
-				return false;
-			}
-			else{
-				//if not, register it normally
-				m_creatureEvents[creatureEvent->getName()] = creatureEvent;
-				return true;
-			}
-		}
-	}
-}
-
-CreatureEvent* CreatureEvents::getEventByName(const std::string& name, bool forceLoaded /*= true*/)
-{
-	CreatureEventList::iterator it = m_creatureEvents.find(name);
-	if(it != m_creatureEvents.end()){
-		// After reloading, a creature can have script that was not
-		// loaded again, if is the case, return NULL
-		if(!forceLoaded || it->second->isLoaded()){
-			return it->second;
-		}
-	}
-	return NULL;
-}
-
-
-//Global events
-bool CreatureEvents::playerLogIn(Player* player)
-{
-	for(CreatureEventList::iterator it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it)
-	{
-		if(it->second->getEventType() == CREATURE_EVENT_LOGIN){
-			if(!it->second->executeOnLogin(player))
-				return false;
-		}
-	}
-
-	return true;
-}
-
-bool CreatureEvents::playerLogOut(Player* player)
-{
-	for(CreatureEventList::iterator it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it)
-	{
-		if(it->second->getEventType() == CREATURE_EVENT_LOGOUT){
-			if(!it->second->executeOnLogout(player))
-				return false;
-		}
-	}
-
-	return true;
-}
-
-/////////////////////////////////////
-
-CreatureEvent::CreatureEvent(LuaScriptInterface* _interface) :
-Event(_interface)
+CreatureEvent::CreatureEvent(LuaScriptInterface* _interface)
+	: Event(_interface)
 {
 	m_type = CREATURE_EVENT_NONE;
 	m_isLoaded = false;
@@ -154,7 +34,7 @@ Event(_interface)
 
 CreatureEvent::~CreatureEvent()
 {
-	//
+	// Virtual Destructor
 }
 
 bool CreatureEvent::configureEvent(xmlNodePtr p)
@@ -202,33 +82,35 @@ bool CreatureEvent::configureEvent(xmlNodePtr p)
 	return true;
 }
 
-std::string CreatureEvent::getScriptEventName()
+const CreatureEventType_t& CreatureEvent::getEventType() const
 {
-	//Depending on the type script event name is different
-	switch(m_type){
-	case CREATURE_EVENT_LOGIN:
-		return "onLogin";
-		break;
-	case CREATURE_EVENT_LOGOUT:
-		return "onLogout";
-		break;
-	case CREATURE_EVENT_DIE:
-		return "onDie";
-		break;
-	case CREATURE_EVENT_KILL:
-		return "onKill";
-		break;
-	case CREATURE_EVENT_ADVANCE:
-		return "onAdvance";
-		break;
-	case CREATURE_EVENT_LOOK:
-		return "onLook";
-		break;
-	case CREATURE_EVENT_NONE:
-	default:
-		return "";
-		break;
-	}
+	return m_type;
+}
+
+const std::string& CreatureEvent::getName() const
+{
+	return m_eventName;
+}
+
+bool CreatureEvent::isLoaded() const
+{
+	return m_isLoaded;
+}
+
+const std::string& CreatureEvent::getScriptEventName() const
+{
+	static const std::string EVENT_NAME[] =
+	{
+		"",
+		"onLogin",
+		"onLogout",
+		"onDie",
+		"onKill",
+		"onAdvance",
+		"onLook"
+	};
+	
+	return EVENT_NAME[m_type];
 }
 
 void CreatureEvent::copyEvent(CreatureEvent* creatureEvent)
@@ -457,4 +339,123 @@ bool CreatureEvent::executeOnLook(Player* player, Thing* target, uint16_t itemId
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnLook" << std::endl;
 		return 0;
 	}
+}
+
+CreatureEvents::CreatureEvents() :
+m_scriptInterface("CreatureScript Interface")
+{
+	m_scriptInterface.initState();
+}
+
+CreatureEvents::~CreatureEvents()
+{
+	CreatureEventList::iterator it;
+	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
+		delete it->second;
+	}
+}
+
+void CreatureEvents::clear()
+{
+	//clear all events
+	CreatureEventList::iterator it;
+	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
+		it->second->clearEvent();
+	}
+
+	//clear lua state
+	m_scriptInterface.reInitState();
+}
+
+LuaScriptInterface& CreatureEvents::getScriptInterface()
+{
+	return m_scriptInterface;
+}
+
+const std::string& CreatureEvents::getScriptBaseName() const
+{
+	static const std::string BASE_NAME = "creaturescripts";
+	return BASE_NAME;
+}
+
+Event* CreatureEvents::getEvent(const std::string& nodeName)
+{
+	if(asLowerCaseString(nodeName) == "event"){
+		return new CreatureEvent(&m_scriptInterface);
+	}
+	return NULL;
+}
+
+bool CreatureEvents::registerEvent(Event* event, xmlNodePtr p)
+{
+	CreatureEvent* creatureEvent = dynamic_cast<CreatureEvent*>(event);
+	if(!creatureEvent){
+		return false;
+	}
+
+	switch(creatureEvent->getEventType()){
+	case CREATURE_EVENT_NONE:
+		std::cout << "Error: [CreatureEvents::registerEvent] Trying to register event without type!." << std::endl;
+		return false;
+		break;
+	// events are stored in a std::map
+	default:
+		{
+			CreatureEvent* oldEvent = getEventByName(creatureEvent->getName(), false);
+			if(oldEvent){
+				// if there was an event with the same that is not loaded
+				// (happens when realoading), it is reused
+				if(!oldEvent->isLoaded() &&
+					oldEvent->getEventType() == creatureEvent->getEventType()){
+					oldEvent->copyEvent(creatureEvent);
+				}
+				return false;
+			}
+			else{
+				//if not, register it normally
+				m_creatureEvents[creatureEvent->getName()] = creatureEvent;
+				return true;
+			}
+		}
+	}
+}
+
+CreatureEvent* CreatureEvents::getEventByName(const std::string& name, bool forceLoaded /*= true*/)
+{
+	CreatureEventList::iterator it = m_creatureEvents.find(name);
+	if(it != m_creatureEvents.end()){
+		// After reloading, a creature can have script that was not
+		// loaded again, if is the case, return NULL
+		if(!forceLoaded || it->second->isLoaded()){
+			return it->second;
+		}
+	}
+	return NULL;
+}
+
+
+bool CreatureEvents::playerLogIn(Player* player)
+{
+	for(CreatureEventList::iterator it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it)
+	{
+		if(it->second->getEventType() == CREATURE_EVENT_LOGIN){
+			if(!it->second->executeOnLogin(player))
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool CreatureEvents::playerLogOut(Player* player)
+{
+	for(CreatureEventList::iterator it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it)
+	{
+		if(it->second->getEventType() == CREATURE_EVENT_LOGOUT){
+			if(!it->second->executeOnLogout(player))
+				return false;
+		}
+	}
+
+	return true;
 }

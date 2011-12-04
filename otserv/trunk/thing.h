@@ -113,7 +113,7 @@ public:
 	void useThing2();
 	void releaseThing2() ;
 
-	virtual std::string getDescription(int32_t lookDistance) const = 0;
+	virtual std::string getDescription(const int32_t& lookDistance) const = 0;
 	virtual std::string getXRayDescription() const;
 
 	Cylinder* getParent();
@@ -127,7 +127,7 @@ public:
 	virtual Tile* getTile();
 	virtual const Tile* getTile() const;
 
-	virtual Position getPosition() const;
+	virtual const Position& getPosition() const;
 	virtual int getThrowRange() const = 0;
 	virtual bool isPushable() const = 0;
 
@@ -137,7 +137,7 @@ public:
 	virtual const Creature* getCreature() const;
 
 	virtual bool isRemoved() const;
-	virtual uint32_t getTotalAmountOfItemsInside() const;
+	virtual const uint32_t& getTotalAmountOfItemsInside() const;
 	
 private:
 	Cylinder* parent;

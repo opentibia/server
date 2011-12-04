@@ -43,22 +43,6 @@ private:
 	OutputMessage();
 
 public:
-	~OutputMessage() {}
-
-	char* getOutputBuffer() { return (char*)&m_MsgBuf[m_outputBufferStart];}
-
-	void writeMessageLength()
-	{
-		add_header((uint16_t)(m_MsgSize));
-	}
-
-	void addCryptoHeader(bool addChecksum)
-	{
-		if(addChecksum){
-			add_header((uint32_t)(adlerChecksum((uint8_t*)(m_MsgBuf + m_outputBufferStart), m_MsgSize)));
-		}
-		add_header((uint16_t)(m_MsgSize));
-	}
 
 	enum OutputMessageState{
 		STATE_FREE,
@@ -66,13 +50,14 @@ public:
 		STATE_ALLOCATED_NO_AUTOSEND,
 		STATE_WAITING
 	};
+	
+	char* getOutputBuffer();
+	void writeMessageLength();
+	void addCryptoHeader(bool addChecksum);
 
-	Protocol* getProtocol() { return m_protocol;}
-	Connection_ptr getConnection() { return m_connection;}
-	uint64_t getFrame() const { return m_frame;}
-
-	//void setOutputBufferStart(uint32_t pos) {m_outputBufferStart = pos;}
-	//uint32_t getOutputBufferStart() const {return m_outputBufferStart;}
+	Protocol* getProtocol();
+	Connection_ptr getConnection();
+	const uint64_t& getFrame() const;
 
 #ifdef __TRACK_NETWORK__
 	virtual void Track(std::string file, long line, std::string func)
@@ -119,30 +104,15 @@ protected:
 	}
 
 
-	void freeMessage()
-	{
-		setConnection(Connection_ptr());
-		setProtocol(NULL);
-		m_frame = 0;
-		//allocate enough size for headers
-		//2 bytes for unencrypted message size
-		//4 bytes for checksum
-		//2 bytes for encrypted message size
-		m_outputBufferStart = 8;
-
-		//setState have to be the last one
-		setState(OutputMessage::STATE_FREE);
-	}
+	void freeMessage();
 
 	friend class OutputMessagePool;
 
-	void setProtocol(Protocol* protocol){ m_protocol = protocol;}
-	void setConnection(Connection_ptr connection){ m_connection = connection;}
-
-	void setState(OutputMessageState state) { m_state = state;}
-	OutputMessageState getState() const { return m_state;}
-
-	void setFrame(uint64_t frame) { m_frame = frame;}
+	void setProtocol(Protocol* protocol);
+	void setConnection(Connection_ptr connection);
+	void setState(OutputMessageState state);
+	OutputMessageState getState() const;
+	void setFrame(const uint64_t& frame);
 
 	Protocol* m_protocol;
 	Connection_ptr m_connection;
@@ -163,19 +133,15 @@ private:
 public:
 	~OutputMessagePool();
 
-	static OutputMessagePool* getInstance()
-	{
-		static OutputMessagePool instance;
-		return &instance;
-	}
-
+	static OutputMessagePool* getInstance();
+	
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t OutputMessagePoolCount;
 #endif
 
 	void send(OutputMessage_ptr msg);
 	void sendAll();
-	void stop() {m_isOpen = false;}
+	void stop();
 	OutputMessage_ptr getOutputMessage(Protocol* protocol, bool autosend = true);
 	void startExecutionFrame();
 
@@ -184,8 +150,8 @@ public:
 #else
 	size_t getTotalMessageCount() const {return m_allOutputMessages.size();}
 #endif
-	size_t getAvailableMessageCount() const {return m_outputMessages.size();}
-	size_t getAutoMessageCount() const {return m_autoSendOutputMessages.size();}
+	size_t getAvailableMessageCount() const;
+	size_t getAutoMessageCount() const;
 	void addToAutoSend(OutputMessage_ptr msg);
 
 protected:

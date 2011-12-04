@@ -29,14 +29,23 @@
 
 extern Game g_game;
 
-Mailbox::Mailbox(uint16_t _type) : Item(_type)
-{
-	//
-}
+Mailbox::Mailbox(const uint16_t& _type)
+	: Item(_type)
+{}
 
 Mailbox::~Mailbox()
 {
-	//
+	// Virtual Destructor
+}
+
+Mailbox* Mailbox::getMailbox()
+{
+	return this;
+}
+
+const Mailbox* Mailbox::getMailbox() const
+{
+	return this;
 }
 
 ReturnValue Mailbox::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -108,7 +117,7 @@ void Mailbox::postRemoveNotification(Thing* thing, const Cylinder* newParent, in
 	getParent()->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 }
 
-bool Mailbox::sendItemTo(const std::string& name, uint32_t depotId, Item* item)
+bool Mailbox::sendItemTo(const std::string& name, const uint32_t& depotId, Item* item)
 {
 	uint32_t guid;
 	std::string dbname = name;

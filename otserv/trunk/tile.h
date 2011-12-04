@@ -42,7 +42,7 @@ typedef std::list<Player*> PlayerList;
 typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
 typedef std::vector<Item*> ItemVector;
 
-enum tileflags_t{
+enum tileflags_t : uint32_t {
 	TILESTATE_NONE						= 0,
 	TILESTATE_PROTECTIONZONE			= 1 << 0,
 	TILESTATE_DEPRECATED_HOUSE			= 1 << 1,
@@ -135,8 +135,8 @@ class Tile : public Cylinder
 {
 public:
 	static Tile& null_tile;
-	Tile(uint16_t x, uint16_t y, uint16_t z);
-	~Tile();
+	Tile(const uint16_t& x, const uint16_t& y, const uint16_t& z);
+	virtual ~Tile();
 
 	TileItemVector* getItemList();
 	const TileItemVector* getItemList() const;
@@ -150,8 +150,8 @@ public:
 	const HouseTile* getHouseTile() const;
 	bool isHouseTile() const;
 
-	virtual int getThrowRange() const {return 0;};
-	virtual bool isPushable() const {return false;};
+	virtual int getThrowRange() const;
+	virtual bool isPushable() const;
 
 	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
@@ -166,58 +166,31 @@ public:
 	Thing* getTopVisibleThing(const Creature* creature, bool checkVisibility = true);
 	Creature* getTopVisibleCreature(const Creature* creature, bool checkVisibility = true);
 	const Creature* getTopVisibleCreature(const Creature* creature, bool checkVisibility = true) const;
-	Item* getItemByTopOrder(uint32_t topOrder);
+	Item* getItemByTopOrder(const int32_t& topOrder);
 
-	uint32_t getThingCount() const {return thingCount;}
+	const uint32_t& getThingCount() const;
 	// If these return != 0 the associated vectors are guaranteed to exists
 	uint32_t getCreatureCount() const;
 	uint32_t getItemCount() const;
 	uint32_t getTopItemCount() const;
 	uint32_t getDownItemCount() const;
 
-	bool hasProperty(enum ITEMPROPERTY prop, bool checkSemiSolid = false) const;
-	bool hasProperty(Item* exclude, enum ITEMPROPERTY prop) const;
+	bool hasProperty(ITEMPROPERTY prop, bool checkSemiSolid = false) const;
+	bool hasProperty(Item* exclude, ITEMPROPERTY prop) const;
 
-	bool hasFlag(tileflags_t flag) const {return ((m_flags & (uint32_t)flag) == (uint32_t)flag);}
-	void setFlag(tileflags_t flag) {m_flags |= (uint32_t)flag;}
-	void resetFlag(tileflags_t flag) {m_flags &= ~(uint32_t)flag;}
+	bool hasFlag(const tileflags_t& flag) const;
+	void setFlag(const tileflags_t& flag);
+	void resetFlag(const tileflags_t& flag);
 
-	bool positionChange() const {return hasFlag(TILESTATE_TELEPORT);}
-	bool floorChange() const {return hasFlag(TILESTATE_FLOORCHANGE);}
-	bool floorChangeDown() const {return hasFlag(TILESTATE_FLOORCHANGE_DOWN);}
-	bool floorChange(Direction direction) const
-	{
-		switch(direction){
-		case NORTH:
-			return hasFlag(TILESTATE_FLOORCHANGE_NORTH);
-		case SOUTH:
-			return hasFlag(TILESTATE_FLOORCHANGE_SOUTH);
-		case EAST:
-			return hasFlag(TILESTATE_FLOORCHANGE_EAST);
-		case WEST:
-			return hasFlag(TILESTATE_FLOORCHANGE_WEST);
-		default:
-			return false;
-		}
-	}
+	bool positionChange() const;
+	bool floorChange() const;
+	bool floorChangeDown() const;
+	bool floorChange(const Direction& direction) const;
 
-	ZoneType_t getZone() const {
-		if(hasFlag(TILESTATE_PROTECTIONZONE)){
-			return ZONE_PROTECTION;
-		}
-		else if(hasFlag(TILESTATE_NOPVPZONE)){
-			return ZONE_NOPVP;
-		}
-		else if(hasFlag(TILESTATE_PVPZONE)){
-			return ZONE_PVP;
-		}
-		else{
-			return ZONE_NORMAL;
-		}
-	}
+	ZoneType_t getZone() const;
 
-	bool hasHeight(uint32_t n) const;
-	virtual std::string getDescription(int32_t lookDistance) const;
+	bool hasHeight(const uint32_t& n) const;
+	virtual std::string getDescription(const int32_t& lookDistance) const;
 
 	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
 	int32_t getClientIndexOfThing(const Player* player, const Thing* thing) const;
@@ -251,10 +224,10 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
-	virtual Position getPosition() const {return tilePos;}
-	const Position& getTilePosition() const {return tilePos;}
+	virtual const Position& getPosition() const;
+	const Position& getTilePosition() const;
 
-	virtual bool isRemoved() const {return false;};
+	virtual bool isRemoved() const;
 
 private:
 	void onAddTileItem(Item* item);
@@ -264,8 +237,8 @@ private:
 
 	void updateTileFlags(Item* item, bool removed);
 
- protected:
-	bool is_dynamic() const {return (m_flags & TILESTATE_DYNAMIC_TILE) != 0;}
+protected:
+	bool is_dynamic() const;
 
 public:
 	QTreeLeafNode*	qt_node;
@@ -287,16 +260,16 @@ class DynamicTile : public Tile
 	CreatureVector	creatures;
 
 public:
-	DynamicTile(uint16_t x, uint16_t y, uint16_t z);
-	~DynamicTile();
+	DynamicTile(const uint16_t& x, const uint16_t& y, const uint16_t& z);
+	virtual ~DynamicTile();
 
-	TileItemVector* getItemList() {return &items;}
-	const TileItemVector* getItemList() const {return &items;}
-	TileItemVector* makeItemList() {return &items;}
-
-	CreatureVector* getCreatures() {return &creatures;}
-	const CreatureVector* getCreatures() const {return &creatures;}
-	CreatureVector* makeCreatures() {return &creatures;}
+	TileItemVector* getItemList();
+	const TileItemVector* getItemList() const;
+	TileItemVector* makeItemList();
+	
+	CreatureVector* getCreatures();
+	const CreatureVector* getCreatures() const;
+	CreatureVector* makeCreatures();
 };
 
 // For blocking tiles, where we very rarely actually have items
@@ -307,32 +280,17 @@ class StaticTile : public Tile
 	CreatureVector*	creatures;
 
 public:
-	StaticTile(uint16_t x, uint16_t y, uint16_t z);
-	~StaticTile();
+	StaticTile(const uint16_t& x, const uint16_t& y, const uint16_t& z);
+	virtual ~StaticTile();
 
-	TileItemVector* getItemList() {return items;}
-	const TileItemVector* getItemList() const {return items;}
-	TileItemVector* makeItemList() {return (items)? (items) : (items = new TileItemVector);}
+	TileItemVector* getItemList();
+	const TileItemVector* getItemList() const;
+	TileItemVector* makeItemList();
 
-	CreatureVector* getCreatures() {return creatures;}
-	const CreatureVector* getCreatures() const {return creatures;}
-	CreatureVector* makeCreatures() {return (creatures)? (creatures) : (creatures = new CreatureVector);}
+	CreatureVector* getCreatures();
+	const CreatureVector* getCreatures() const;
+	CreatureVector* makeCreatures();
 };
-
-inline Tile::Tile(uint16_t x, uint16_t y, uint16_t z) :
-	qt_node(NULL),
-	ground(NULL),
-	thingCount(0),
-	tilePos(x, y, z),
-	m_flags(0)
-{
-}
-
-inline Tile::~Tile()
-{
-	// We don't need to free any memory as tiles are always deallocated
-	// and OS will free up anything left when the server is shutdown
-}
 
 inline CreatureVector* Tile::getCreatures()
 {
@@ -381,23 +339,5 @@ inline TileItemVector* Tile::makeItemList()
 
 	return static_cast<StaticTile*>(this)->StaticTile::makeItemList();
 }
-
-inline StaticTile::StaticTile(uint16_t x, uint16_t y, uint16_t z) :
-	Tile(x, y, z),
-	items(NULL),
-	creatures(NULL)
-{}
-
-inline StaticTile::~StaticTile()
-{}
-
-inline DynamicTile::DynamicTile(uint16_t x, uint16_t y, uint16_t z) :
-	Tile(x, y, z)
-{
-	m_flags |= TILESTATE_DYNAMIC_TILE;
-}
-
-inline DynamicTile::~DynamicTile()
-{}
 
 #endif

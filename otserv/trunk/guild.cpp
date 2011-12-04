@@ -89,7 +89,8 @@ void Guilds::loadWars()
 	}
 }
 #ifdef __GUILDWARSLUARELOAD__
-bool Guilds::loadWar(uint32_t warId)
+
+bool Guilds::loadWar(const uint32_t& warId)
 {
 	Database* db = Database::instance();
 	DBResult* result;
@@ -145,7 +146,8 @@ bool Guilds::loadWar(uint32_t warId)
 	return false;
 }
 #endif
-void Guilds::endWar(uint32_t warId)
+
+void Guilds::endWar(const uint32_t& warId)
 {
 	GuildWarsMap::iterator it = guildWars.find(warId);
 	if(it != guildWars.end()){
@@ -177,7 +179,9 @@ void Guilds::endWar(uint32_t warId)
 }
 
 #ifndef __OLD_GUILD_SYSTEM__
-bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee)
+
+bool Guilds::transferMoney(const uint32_t guildId, const uint32_t& opponentId,
+	const int32_t& guildFee, const int32_t& opponentFee)
 {
 	//Tries to get first leader that has enough money
 	Database* db = Database::instance();
@@ -241,7 +245,9 @@ bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildF
 	return false;
 }
 #else
-bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee)
+
+bool Guilds::transferMoney(const uint32_t& guildId, const uint32_t& opponentId,
+	const int32_t& guildFee, const int32_t& opponentFee)
 {
 	//Tries to get first leader that has enough money
 	Database* db = Database::instance();
@@ -301,7 +307,7 @@ bool Guilds::transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildF
 
 #endif
 
-bool Guilds::setWarStatus(uint32_t warId, int32_t statusId)
+bool Guilds::setWarStatus(const uint32_t& warId, const int32_t& statusId)
 {
 	Database* db = Database::instance();
 	DBQuery query;
@@ -310,7 +316,7 @@ bool Guilds::setWarStatus(uint32_t warId, int32_t statusId)
 	return db->executeQuery(query.str());
 }
 
-void Guilds::broadcastKill(uint32_t guildId, Player* player, const DeathList& killers)
+void Guilds::broadcastKill(const uint32_t& guildId, Player* player, const DeathList& killers)
 {
 	Guild* guild = getGuildById(guildId);
 	Guild* enemy = getGuildById(player->getGuildId());
@@ -376,7 +382,17 @@ void Guilds::broadcastKill(uint32_t guildId, Player* player, const DeathList& ki
 	}
 }
 
-Guild* Guilds::getGuildById(uint32_t guildId)
+GuildWarsMap& Guilds::getWars()
+{
+	return guildWars;
+}
+
+const GuildWarsMap& Guilds::getWars() const
+{
+	return guildWars;
+}
+
+Guild* Guilds::getGuildById(const uint32_t& guildId)
 {
 	GuildsMap::iterator it = loadedGuilds.find(guildId);
 	if(it != loadedGuilds.end())
@@ -434,12 +450,27 @@ Guild::Guild()
 	name = "";
 }
 
-Guild::~Guild()
+void Guild::setId(const uint32_t& _id)
 {
-	enemyGuilds.clear();
+	id = _id; 
 }
 
-bool Guild::addFrag(uint32_t enemyId) const
+void Guild::setName(const std::string& _name)
+{
+	name = _name;
+}
+
+const uint32_t& Guild::getId() const
+{
+	return id;
+}
+
+const std::string& Guild::getName() const
+{
+	return name;
+}
+
+bool Guild::addFrag(const uint32_t& enemyId) const
 {
 	uint32_t warId = isEnemy(enemyId);
 	GuildWarsMap::iterator it = g_guilds.getWars().find(warId);
@@ -472,7 +503,12 @@ bool Guild::addFrag(uint32_t enemyId) const
 	return false;
 }
 
-bool Guild::hasDeclaredWar(uint32_t warId) const
+bool Guild::isAtWar() const
+{
+	return !enemyGuilds.empty();
+}
+
+bool Guild::hasDeclaredWar(const uint32_t& warId) const
 {
 	GuildWarsMap::iterator it = g_guilds.getWars().find(warId);
 	if(it != g_guilds.getWars().end()){
@@ -483,7 +519,7 @@ bool Guild::hasDeclaredWar(uint32_t warId) const
 	return false;
 }
 
-void Guild::broadcastMessage(SpeakClasses type, const std::string& msg) const
+void Guild::broadcastMessage(const SpeakClasses& type, const std::string& msg) const
 {
 	ChatChannel* channel = g_chat.getGuildChannel(getId());
 	if(channel){
@@ -492,18 +528,18 @@ void Guild::broadcastMessage(SpeakClasses type, const std::string& msg) const
 	}
 }
 
-uint32_t Guild::isEnemy(uint32_t guildId) const
+bool Guild::isEnemy(const uint32_t& guildId) const
 {
 	EnemyGuildsMap::const_iterator it = enemyGuilds.find(guildId);
 	if(it != enemyGuilds.end()){
 		if(it->first == guildId)
-			return it->second;
+			return true;
 	}
 
-	return 0;
+	return false;
 }
 
-void Guild::addEnemy(uint32_t guildId, uint32_t warId)
+void Guild::addEnemy(const uint32_t& guildId, const uint32_t& warId)
 {
 	if(isEnemy(guildId) == 0)
 		enemyGuilds[guildId] = warId;

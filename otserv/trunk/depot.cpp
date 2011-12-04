@@ -23,8 +23,8 @@
 #include "tools.h"
 #include <sstream>
 
-Depot::Depot(uint16_t _type) :
-Container(_type)
+Depot::Depot(const uint16_t& _type)
+	: Container(_type)
 {
 	depotId = 0;
 	maxSize = 30;
@@ -33,7 +33,17 @@ Container(_type)
 
 Depot::~Depot()
 {
-	//
+	// Virtual Destructor
+}
+
+Depot* Depot::getDepot()
+{
+	return this;
+}
+
+const Depot* Depot::getDepot() const
+{
+	return this;
 }
 
 Attr_ReadValue Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
@@ -49,6 +59,21 @@ Attr_ReadValue Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 	}
 	else
 		return Item::readAttr(attr, propStream);
+}
+
+const uint32_t& Depot::getDepotId() const
+{
+	return depotId;
+}
+
+void Depot::setMaxDepotLimit(const uint32_t& maxitems)
+{
+	maxDepotLimit = maxitems;
+}
+
+void Depot::setDepotId(const uint32_t& id) 
+{
+	depotId = id;
 }
 
 ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -103,4 +128,9 @@ void Depot::postRemoveNotification(Thing* thing, const Cylinder* newParent, int3
 	if(getParent()){
 		getParent()->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 	}
+}
+
+bool Depot::canRemove() const
+{
+	return false;
 }

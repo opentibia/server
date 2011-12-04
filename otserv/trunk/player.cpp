@@ -263,7 +263,7 @@ bool Player::canMoveItem() const
 	return ( (moveItemTime <= 0) || (OTSYS_TIME() - lastMoveItem >= moveItemTime) );
 }
 
-std::string Player::getDescription(int32_t lookDistance) const
+std::string Player::getDescription(const int32_t& lookDistance) const
 {
 	std::stringstream s;
 	std::string str;
@@ -2825,7 +2825,7 @@ bool Player::isGuildEnemy(const Player* player) const
 	if(!player || !player->getGuild() || !getGuild())
 		return false;
 
-	if(getGuild()->isEnemy(player->getGuildId()) != 0)
+	if(getGuild()->isEnemy(player->getGuildId()))
 		return true;
 
 	return false;
