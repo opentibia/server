@@ -79,7 +79,6 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>otpch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\msvclibs\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -87,7 +86,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>lua5.1.lib;libmysql.lib;mpir.lib;libxml2.lib;dbghelp.lib;sqlite.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <AdditionalLibraryDirectories>C:\msvclibs\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
