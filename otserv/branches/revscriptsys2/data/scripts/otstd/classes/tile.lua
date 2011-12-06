@@ -9,24 +9,24 @@ function Tile:getY() return self.y end
 function Tile:getZ() return self.z end
 function Tile:getPosition() return {x = self.x, y = self.y, z = self.z} end
 
-function Tile:northOf() return map:getTile{x = self.x, y = self.y - 1, z = self.z} end
-function Tile:southOf() return map:getTile{x = self.x, y = self.y + 1, z = self.z} end
-function Tile:westOf() return map:getTile{x = self.x - 1, y = self.y, z = self.z} end
-function Tile:eastOf() return map:getTile{x = self.x + 1, y = self.y, z = self.z} end
-function Tile:northeastOf() return map:getTile{x = self.x + 1, y = self.y - 1, z = self.z} end
-function Tile:northwestOf() return map:getTile{x = self.x - 1, y = self.y - 1, z = self.z} end
-function Tile:southeastOf() return map:getTile{x = self.x + 1, y = self.y + 1, z = self.z} end
-function Tile:southwestOf() return map:getTile{x = self.x - 1, y = self.y + 1, z = self.z} end
+function Tile:northOf(steps) return map:getTile{x = self.x, y = self.y - (steps or 1), z = self.z} end
+function Tile:southOf(steps) return map:getTile{x = self.x, y = self.y + (steps or 1), z = self.z} end
+function Tile:westOf(steps) return map:getTile{x = self.x - (steps or 1), y = self.y, z = self.z} end
+function Tile:eastOf(steps) return map:getTile{x = self.x + (steps or 1), y = self.y, z = self.z} end
+function Tile:northeastOf(steps) return map:getTile{x = self.x + (steps or 1), y = self.y - (steps or 1), z = self.z} end
+function Tile:northwestOf(steps) return map:getTile{x = self.x - (steps or 1), y = self.y - (steps or 1), z = self.z} end
+function Tile:southeastOf(steps) return map:getTile{x = self.x + (steps or 1), y = self.y + (steps or 1), z = self.z} end
+function Tile:southwestOf(steps) return map:getTile{x = self.x - (steps or 1), y = self.y + (steps or 1), z = self.z} end
 
-function Tile:getTileInDirection(dir)
-	if dir == NORTH then return self:northOf()
-	elseif dir == SOUTH then return self:southOf()
-	elseif dir == EAST then return self:eastOf()
-	elseif dir == WEST then return self:westOf()
-	elseif dir == NORTHEAST then return self:northeastOf()
-	elseif dir == NORTHWEST then return self:northwestOf()
-	elseif dir == SOUTHEAST then return self:southeastOf()
-	elseif dir == SOUTHWEST then return self:southwestOf()
+function Tile:getTileInDirection(dir, steps)
+	if dir == NORTH then return self:northOf(steps)
+	elseif dir == SOUTH then return self:southOf(steps)
+	elseif dir == EAST then return self:eastOf(steps)
+	elseif dir == WEST then return self:westOf(steps)
+	elseif dir == NORTHEAST then return self:northeastOf(steps)
+	elseif dir == NORTHWEST then return self:northwestOf(steps)
+	elseif dir == SOUTHEAST then return self:southeastOf(steps)
+	elseif dir == SOUTHWEST then return self:southwestOf(steps)
 	else error "Unknown direction!"
 	end
 end

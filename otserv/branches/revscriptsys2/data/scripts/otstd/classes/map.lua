@@ -78,7 +78,7 @@ end
 function Map:getMonstersInArea(from, to)
 	return self:getCreaturesInArea(from, to, function(c)
 		if typeof(c, "Actor") then
-			if (c:isSummon() and typeof(c:getMaster(), "Player")
+			if c:isSummon() and typeof(c:getMaster(), "Player") then
 				return false
 			end
 			return true
