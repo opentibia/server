@@ -119,7 +119,7 @@ void badAllocationHandler();
 #if !defined(__WINDOWS__)
 // Runfile, for running OT as daemon in the background. If the server is shutdown by internal
 // means, we need to clear the file to notify the daemon manager of our change in status.
-// Note that if the server crashes, this will not happend. :|
+// Note that if the server crashes, this will not happen. :|
 void closeRunfile(void)
 {
 	std::ofstream runfile(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out);

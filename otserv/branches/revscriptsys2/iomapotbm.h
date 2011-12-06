@@ -116,7 +116,7 @@ struct OTBM_HouseTile_coords{
 #pragma pack()
 
 class IOMapOTBM : public IOMap{
-	static Tile* createTile(Item*& ground, Item* item, int px, int py, int pz);
+	static Tile* createTile(Item*& ground, Item* item, const Position& p);
 public:
 	IOMapOTBM(){};
 	~IOMapOTBM(){};
