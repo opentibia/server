@@ -494,17 +494,17 @@ const uint32_t& Weapon::getReqMagLv() const
 	return magLevel;
 }
 
-const bool Weapon::hasExhaustion() const
+bool Weapon::hasExhaustion() const
 {	
 	return (exhaustion != 0);
 }
 
-const bool Weapon::isWieldedUnproperly() const
+bool Weapon::isWieldedUnproperly() const
 {
 	return wieldUnproperly;
 }
 
-const bool Weapon::isPremium() const
+bool Weapon::isPremium() const
 {
 	return premium;
 }

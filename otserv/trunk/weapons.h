@@ -88,9 +88,9 @@ public:
 
 	const uint32_t& getReqLevel() const;
 	const uint32_t& getReqMagLv() const;
-	const bool hasExhaustion() const;
-	const bool isWieldedUnproperly() const;
-	const bool isPremium() const;
+	bool hasExhaustion() const;
+	bool isWieldedUnproperly() const;
+	bool isPremium() const;
 
 protected:
 	virtual const std::string& getScriptEventName() const;

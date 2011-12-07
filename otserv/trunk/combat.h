@@ -37,7 +37,8 @@ class Item;
 //for luascript callback
 class ValueCallback : public CallBack{
 public:
-	ValueCallback(formulaType_t _type) {type = _type;}
+	ValueCallback(const formulaType_t& _type);
+	virtual ~ValueCallback();
 	void getMinMaxValues(Player* player, int32_t& min, int32_t& max, bool useCharges) const;
 
 protected:
@@ -46,7 +47,7 @@ protected:
 
 class TileCallback : public CallBack{
 public:
-	TileCallback() {};
+	virtual ~TileCallback();
 	void onTileCombat(Creature* creature, Tile* tile) const;
 
 protected:
@@ -55,7 +56,7 @@ protected:
 
 class TargetCallback : public CallBack{
 public:
-	TargetCallback() {};
+	virtual ~TargetCallback();
 	void onTargetCombat(Creature* creature, Creature* target) const;
 
 protected:
@@ -110,66 +111,23 @@ struct Combat2Var{
 	int32_t maxChange;
 };
 
-class MatrixArea
-{
+class MatrixArea {
 public:
-	MatrixArea(uint32_t _rows, uint32_t _cols)
-	{
-		centerX = 0;
-		centerY = 0;
+	MatrixArea(const uint32_t& _rows, const uint32_t& _cols);
+	MatrixArea(const MatrixArea& rhs);
+	~MatrixArea();
 
-		rows = _rows;
-		cols = _cols;
+	void setValue(const uint32_t& row, const uint32_t& col, bool value) const;
+	bool getValue(const uint32_t& row, const uint32_t& col) const;
 
-		data_ = new bool*[rows];
+	void setCenter(const uint32_t& y, const uint32_t& x);
+	void getCenter(uint32_t& y, uint32_t& x) const;
 
-		for(uint32_t row = 0; row < rows; ++row){
-			data_[row] = new bool[cols];
+	const size_t& getRows() const;
+	const size_t& getCols() const;
 
-			for(uint32_t col = 0; col < cols; ++col){
-				data_[row][col] = 0;
-			}
-		}
-	}
-
-	MatrixArea(const MatrixArea& rhs)
-	{
-		centerX = rhs.centerX;
-		centerY = rhs.centerY;
-		rows = rhs.rows;
-		cols = rhs.cols;
-
-		data_ = new bool*[rows];
-
-		for(uint32_t row = 0; row < rows; ++row){
-			data_[row] = new bool[cols];
-
-			for(uint32_t col = 0; col < cols; ++col){
-				data_[row][col] = rhs.data_[row][col];
-			}
-		}
-	}
-
-	~MatrixArea()
-	{
-		for(uint32_t row = 0; row < rows; ++row){
-			delete[] data_[row];
-		}
-
-		delete[] data_;
-	}
-
-	void setValue(uint32_t row, uint32_t col, bool value) const {data_[row][col] = value;}
-	bool getValue(uint32_t row, uint32_t col) const {return data_[row][col];}
-
-	void setCenter(uint32_t y, uint32_t x) {centerX = x; centerY = y;}
-	void getCenter(uint32_t& y, uint32_t& x) const {x = centerX; y = centerY;}
-
-	size_t getRows() const {return rows;}
-	size_t getCols() const {return cols;}
-
-	inline const bool* operator[](uint32_t i) const { return data_[i]; }
-	inline bool* operator[](uint32_t i) { return data_[i]; }
+	const bool* operator[](const uint32_t& i) const;
+	bool* operator[](const uint32_t& i);
 
 protected:
 	uint32_t centerX;
@@ -184,18 +142,18 @@ typedef std::map<Direction, MatrixArea* > AreaCombatMap;
 
 class AreaCombat{
 public:
-	AreaCombat() {hasExtArea = false;}
-	~AreaCombat() {clear();}
+	AreaCombat();
+	~AreaCombat();
 
 	AreaCombat(const AreaCombat& rhs);
 
 	ReturnValue doCombat(Creature* attacker, const Position& pos, const Combat& combat) const;
 	bool getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const;
 
-	void setupArea(const std::list<uint32_t>& list, uint32_t rows);
-	void setupArea(int32_t length, int32_t spread);
-	void setupArea(int32_t radius);
-	void setupExtArea(const std::list<uint32_t>& list, uint32_t rows);
+	void setupArea(const std::list<uint32_t>& list, const uint32_t& rows);
+	void setupArea(const int32_t& length, const int32_t& spread);
+	void setupArea(const int32_t& radius);
+	void setupExtArea(const std::list<uint32_t>& list, const uint32_t& rows);
 	void clear();
 
 protected:
@@ -208,55 +166,11 @@ protected:
 		MATRIXOPERATION_ROTATE270
 	};
 
-	MatrixArea* createArea(const std::list<uint32_t>& list, uint32_t rows);
-	void copyArea(const MatrixArea* input, MatrixArea* output, MatrixOperation_t op) const;
+	MatrixArea* createArea(const std::list<uint32_t>& list, const uint32_t& rows);
+	void copyArea(const MatrixArea* input, MatrixArea* output, const MatrixOperation_t& op) const;
 
-	MatrixArea* getArea(const Position& centerPos, const Position& targetPos) const
-	{
-		int32_t dx = targetPos.x - centerPos.x;
-		int32_t dy = targetPos.y - centerPos.y;
-
-		Direction dir = NORTH;
-
-		if(dx < 0){
-			dir = WEST;
-		}
-		else if(dx > 0){
-			dir = EAST;
-		}
-		else if(dy < 0){
-			dir = NORTH;
-		}
-		else{
-			dir = SOUTH;
-		}
-
-		if(hasExtArea){
-			if(dx < 0 && dy < 0)
-				dir = NORTHWEST;
-			else if(dx > 0 && dy < 0)
-				dir = NORTHEAST;
-			else if(dx < 0 && dy > 0)
-				dir = SOUTHWEST;
-			else if(dx > 0 && dy > 0)
-				dir = SOUTHEAST;
-		}
-
-		AreaCombatMap::const_iterator it = areas.find(dir);
-		if(it != areas.end()){
-			return it->second;
-		}
-
-		return NULL;
-	}
-
-	int32_t round(float v) const{
-		int32_t t = (int32_t)std::floor(v);
-		if((v - t) > 0.5){
-			return t + 1;
-		}
-		return t;
-	}
+	MatrixArea* getArea(const Position& centerPos, const Position& targetPos) const;
+	int32_t round(const float& v) const;
 
 	AreaCombatMap areas;
 	bool hasExtArea;
@@ -268,14 +182,14 @@ public:
 	~Combat();
 
 	static void doCombatHealth(Creature* caster, Creature* target,
-		int32_t minChange, int32_t maxChange, const CombatParams& params);
+		const int32_t& minChange, const int32_t& maxChange, const CombatParams& params);
 	static void doCombatHealth(Creature* caster, const Position& pos,
-		const AreaCombat* area, int32_t minChange, int32_t maxChange, const CombatParams& params);
+		const AreaCombat* area, const int32_t& minChange, const int32_t& maxChange, const CombatParams& params);
 
 	static void doCombatMana(Creature* caster, Creature* target,
-		int32_t minChange, int32_t maxChange, const CombatParams& params);
+		const int32_t& minChange, const int32_t& maxChange, const CombatParams& params);
 	static void doCombatMana(Creature* caster, const Position& pos,
-		const AreaCombat* area, int32_t minChange, int32_t maxChange, const CombatParams& params);
+		const AreaCombat* area, const int32_t& minChange, const int32_t& maxChange, const CombatParams& params);
 
 	static void doCombatCondition(Creature* caster, Creature* target,
 		const CombatParams& params);
@@ -293,8 +207,8 @@ public:
 	static bool isInPvpZone(const Creature* attacker, const Creature* target);
 	static bool isUnjustKill(const Creature* attacker, const Creature* target);
 	static bool isPlayerCombat(const Creature* target);
-	static CombatType_t ConditionToDamageType(ConditionType_t type);
-	static ConditionType_t DamageToConditionType(CombatType_t type);
+	static CombatType_t ConditionToDamageType(const ConditionType_t& type);
+	static ConditionType_t DamageToConditionType(const CombatType_t& type);
 	static ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
 	static ReturnValue checkPVPExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalking);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
@@ -303,31 +217,22 @@ public:
 	static void checkPVPDamageReduction(const Creature* attacker, const Creature* target, int32_t& healthChange);
 	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
 
-	static void addDistanceEffect(Creature* caster, const Position& fromPos, const Position& toPos,
-	uint8_t effect);
+	static void addDistanceEffect(Creature* caster, const Position& fromPos,
+		const Position& toPos, const uint8_t& effect);
 
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;
 
-	bool setCallback(CallBackParam_t key);
-	CallBack* getCallback(CallBackParam_t key);
+	bool setCallback(const CallBackParam_t& key);
+	CallBack* getCallback(const CallBackParam_t& key);
 
-	bool setParam(CombatParam_t param, uint32_t value);
-	void setArea(AreaCombat* _area)
-	{
-		if(area){
-			delete area;
-		}
-
-		area = _area;
-	}
-	bool hasArea() const {return area;}
-	void setCondition(const Condition* _condition) {params.conditionList.push_back(_condition);}
-	void setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb);
-	void postCombatEffects(Creature* caster, const Position& pos) const
-	{
-		postCombatEffects(caster, pos, params);
-	}
+	bool setParam(const CombatParam_t& param, const uint32_t& value);
+	void setArea(AreaCombat* _area);
+	bool hasArea() const;
+	void setCondition(const Condition* _condition);
+	void setPlayerCombatValues(const formulaType_t& _type, const double& _mina,
+		const double& _minb, const double& _maxa, const double& _maxb);
+	void postCombatEffects(Creature* caster, const Position& pos) const;
 
 protected:
 	static void doCombatDefault(Creature* caster, Creature* target, const CombatParams& params);
@@ -359,21 +264,18 @@ protected:
 	AreaCombat* area;
 };
 
-class MagicField : public Item{
+class MagicField : public Item {
 public:
-	MagicField(uint16_t _type) : Item(_type) {createTime = OTSYS_TIME();}
-	~MagicField() {}
+	MagicField(const uint16_t& _type);
+	virtual ~MagicField();
 
-	virtual MagicField* getMagicField() {return this;}
-	virtual const MagicField* getMagicField() const {return this;}
+	virtual MagicField* getMagicField();
+	virtual const MagicField* getMagicField() const;
 
 	virtual bool isBlocking(const Creature* creature) const;
 
-	bool isReplaceable() const {return Item::items[getID()].replaceable;}
-	CombatType_t getCombatType() const {
-		const ItemType& it = items[getID()];
-		return it.combatType;
-	}
+	bool isReplaceable() const;
+	CombatType_t getCombatType() const;
 	void onStepInField(Creature* creature, bool purposeful = true);
 	bool canOwnerHarm(const Creature* target) const;
 
@@ -381,7 +283,7 @@ private:
 	int64_t createTime;
 };
 
-inline std::string CombatTypeName(CombatType_t combat) {
+inline std::string CombatTypeName(const CombatType_t& combat) {
 	switch(combat){
 		case COMBAT_NONE: return "unknown";
 		case COMBAT_PHYSICALDAMAGE: return "physical";
@@ -400,7 +302,7 @@ inline std::string CombatTypeName(CombatType_t combat) {
 	return "none";
 }
 
-inline int32_t CombatTypeToIndex(CombatType_t combat) {
+inline int32_t CombatTypeToIndex(const CombatType_t& combat) {
 	if(combat == COMBAT_NONE) return 0;
 	for(int32_t c = 0; c < COMBAT_COUNT; ++c){
 		if(combat & (1 << c))
@@ -409,7 +311,7 @@ inline int32_t CombatTypeToIndex(CombatType_t combat) {
 	return 0;
 }
 
-inline CombatType_t CombatIndexToType(int combatindex) {
+inline CombatType_t CombatIndexToType(const int& combatindex) {
 	if(combatindex == 0) return COMBAT_NONE;
 	return (CombatType_t)(1 << (combatindex-1));
 }

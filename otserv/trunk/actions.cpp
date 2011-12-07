@@ -548,7 +548,12 @@ Event(_interface)
 
 Action::~Action()
 {
-	//
+	// Virtual destructor
+}
+
+Action* Action::clone() const
+{
+	return new Action(*this);
 }
 
 bool Action::configureEvent(xmlNodePtr p)
@@ -568,34 +573,8 @@ bool Action::configureEvent(xmlNodePtr p)
 	return true;
 }
 
-const std::string& Action::getScriptEventName() const
-{
-	static const std::string EVENT_NAME = "onUse";
-	return EVENT_NAME;
-}
-
-ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos)
-{
-	ReturnValue ret = RET_NOERROR;
-
-	if(!getAllowFarUse()){
-		ret = g_actions->canUse(player, toPos);
-		if(ret != RET_NOERROR){
-			return ret;
-		}
-	}
-	else{
-		ret = g_actions->canUseFar(player, toPos, getCheckLineOfSight());
-		if(ret != RET_NOERROR){
-			return ret;
-		}
-	}
-
-	return RET_NOERROR;
-}
-
 bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
-	const PositionEx& toPos, bool extendedUse, uint32_t creatureId)
+	const PositionEx& toPos, bool extendedUse, const uint32_t& creatureId)
 {
 	//onUse(cid, item1, position1, item2, position2)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -641,4 +620,55 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& fromPos,
 		std::cout << "[Error] Call stack overflow. Action::executeUse" << std::endl;
 		return false;
 	}
+}
+
+bool Action::getAllowFarUse() const
+{
+	return allowFarUse;
+}
+
+void Action::setAllowFarUse(bool v)
+{
+	allowFarUse = v;
+}
+
+bool Action::getCheckLineOfSight() const
+{
+	return checkLineOfSight;
+}
+
+void Action::setCheckLineOfSight(bool v)
+{
+	checkLineOfSight = v;
+}
+
+ReturnValue Action::canExecuteAction(const Player* player, const Position& toPos)
+{
+	ReturnValue ret = RET_NOERROR;
+
+	if(!getAllowFarUse()){
+		ret = g_actions->canUse(player, toPos);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+	}
+	else{
+		ret = g_actions->canUseFar(player, toPos, getCheckLineOfSight());
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+	}
+
+	return RET_NOERROR;
+}
+
+bool Action::hasOwnErrorHandler()
+{
+	return false;
+}
+
+const std::string& Action::getScriptEventName() const
+{
+	static const std::string EVENT_NAME = "onUse";
+	return EVENT_NAME;
 }

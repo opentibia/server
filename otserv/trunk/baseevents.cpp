@@ -33,7 +33,7 @@ Event::Event(LuaScriptInterface* _interface)
 
 Event::~Event()
 {
-	//
+	// Virtual Destructor
 }
 
 bool Event::checkScript(const std::string& datadir, const std::string& scriptsName, const std::string& scriptFile)

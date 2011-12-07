@@ -106,8 +106,8 @@ public:
 	bool openFile(const char* filename, bool write, bool caching = false);
 	const unsigned char* getProps(const NODE, unsigned long &size);
 	bool getProps(const NODE, PropStream& props);
-	const NODE getChildNode(const NODE parent, unsigned long &type);
-	const NODE getNextNode(const NODE prev, unsigned long &type);
+	NODE getChildNode(const NODE parent, unsigned long &type);
+	NODE getNextNode(const NODE prev, unsigned long &type);
 
 	void startNode(unsigned char type);
 	void endNode();

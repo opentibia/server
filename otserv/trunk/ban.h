@@ -67,8 +67,6 @@ typedef std::map<uint32_t, ConnectBlock > IpConnectMap;
 class BanManager {
 public:
 
-	static const uint32_t NULL_MASK = 0xFFFFFFFF;
-
 	bool clearTemporaryBans() const;
 	bool acceptConnection(const uint32_t& clientip);
 
@@ -97,7 +95,7 @@ public:
 	bool addAccountNotation(const uint32_t& account, const uint32_t& adminid, const std::string& comment,
 		const std::string& statement, const uint32_t& reason, const violationAction_t& action) const;
 
-	bool removeIpBans(const uint32_t& ip, const uint32_t& mask = NULL_MASK) const;
+	bool removeIpBans(const uint32_t& ip, const uint32_t& mask = 0xFFFFFFFF) const;
 	bool removePlayerBans(const uint32_t& guid) const;
 	bool removePlayerBans(const std::string& name) const;
 	bool removeAccountBans(const uint32_t& accno) const;

@@ -176,7 +176,7 @@ enum SpeakClasses {
 	SPEAK_RVR_CHANNEL       = 0xFF + 1, //Reporting rule violation - Ctrl+R
 	SPEAK_RVR_ANSWER        = 0xFF + 2, //Answering report
 	SPEAK_RVR_CONTINUE	    = 0xFF + 3, //Answering the answer of the report
-	SPEAK_CHANNEL_R2        = 0xFF + 4,	//Talk red anonymously on chat - #d
+	SPEAK_CHANNEL_R2        = 0xFF + 4	//Talk red anonymously on chat - #d
 };
 
 enum MessageClasses {
@@ -287,7 +287,7 @@ enum TextColor_t {
 	TEXTCOLOR_UNK         = 256
 };
 
-enum Icons_t{
+enum Icons_t {
 	ICON_NONE       = 0,
 	ICON_POISON     = 1,
 	ICON_BURN       = 2,

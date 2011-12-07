@@ -251,7 +251,7 @@ public:
 	virtual bool hasHiddenHealth() const { return false; }
 
 	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
-	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
+	void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE, false);}
 	ZoneType_t getZone() const {return getTile()->getZone();}

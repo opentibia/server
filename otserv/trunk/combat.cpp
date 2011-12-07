@@ -165,7 +165,7 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	}
 }
 
-CombatType_t Combat::ConditionToDamageType(ConditionType_t type)
+CombatType_t Combat::ConditionToDamageType(const ConditionType_t& type)
 {
 	switch(type){
 		case CONDITION_FIRE:
@@ -203,7 +203,7 @@ CombatType_t Combat::ConditionToDamageType(ConditionType_t type)
 	return COMBAT_NONE;
 }
 
-ConditionType_t Combat::DamageToConditionType(CombatType_t type)
+ConditionType_t Combat::DamageToConditionType(const CombatType_t& type)
 {
 	switch(type){
 		case COMBAT_FIREDAMAGE:
@@ -490,7 +490,8 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 	return RET_NOERROR;
 }
 
-void Combat::setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb)
+void Combat::setPlayerCombatValues(const formulaType_t& _type, const double& _mina,
+	const double& _minb, const double& _maxa, const double& _maxb)
 {
 	formulaType = _type;
 	mina = _mina;
@@ -499,7 +500,12 @@ void Combat::setPlayerCombatValues(formulaType_t _type, double _mina, double _mi
 	maxb = _maxb;
 }
 
-bool Combat::setParam(CombatParam_t param, uint32_t value)
+void Combat::postCombatEffects(Creature* caster, const Position& pos) const
+{
+	postCombatEffects(caster, pos, params);
+}
+
+bool Combat::setParam(const CombatParam_t& param, const uint32_t& value)
 {
 	switch(param){
 		case COMBATPARAM_COMBATTYPE:
@@ -589,7 +595,26 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 	return false;
 }
 
-bool Combat::setCallback(CallBackParam_t key)
+void Combat::setArea(AreaCombat* _area)
+{
+	if(area){
+		delete area;
+	}
+
+	area = _area;
+}
+
+bool Combat::hasArea() const
+{
+	return area;
+}
+
+void Combat::setCondition(const Condition* _condition)
+{
+	params.conditionList.push_back(_condition);
+}
+
+bool Combat::setCallback(const CallBackParam_t& key)
 {
 	switch(key){
 		case CALLBACKPARAM_LEVELMAGICVALUE:
@@ -628,7 +653,7 @@ bool Combat::setCallback(CallBackParam_t key)
 	}
 }
 
-CallBack* Combat::getCallback(CallBackParam_t key)
+CallBack* Combat::getCallback(const CallBackParam_t& key)
 {
 	switch(key){
 		case CALLBACKPARAM_LEVELMAGICVALUE:
@@ -848,8 +873,8 @@ void Combat::postCombatEffects(Creature* caster, const Position& pos, const Comb
 	}
 }
 
-void Combat::addDistanceEffect(Creature* caster, const Position& fromPos, const Position& toPos,
-	uint8_t effect)
+void Combat::addDistanceEffect(Creature* caster, const Position& fromPos,
+	const Position& toPos, const uint8_t& effect)
 {
 	uint8_t distanceEffect = effect;
 
@@ -990,7 +1015,7 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 }
 
 void Combat::doCombatHealth(Creature* caster, Creature* target,
-	int32_t minChange, int32_t maxChange, const CombatParams& params)
+	const int32_t& minChange, const int32_t& maxChange, const CombatParams& params)
 {
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		Combat2Var var;
@@ -1009,7 +1034,7 @@ void Combat::doCombatHealth(Creature* caster, Creature* target,
 }
 
 void Combat::doCombatHealth(Creature* caster, const Position& pos,
-	const AreaCombat* area, int32_t minChange, int32_t maxChange, const CombatParams& params)
+	const AreaCombat* area, const int32_t& minChange, const int32_t& maxChange, const CombatParams& params)
 {
 	Combat2Var var;
 	var.minChange = minChange;
@@ -1019,7 +1044,7 @@ void Combat::doCombatHealth(Creature* caster, const Position& pos,
 }
 
 void Combat::doCombatMana(Creature* caster, Creature* target,
-	int32_t minChange, int32_t maxChange, const CombatParams& params)
+	const int32_t& minChange, const int32_t& maxChange, const CombatParams& params)
 {
 	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		Combat2Var var;
@@ -1042,7 +1067,7 @@ void Combat::doCombatMana(Creature* caster, Creature* target,
 }
 
 void Combat::doCombatMana(Creature* caster, const Position& pos,
-	const AreaCombat* area, int32_t minChange, int32_t maxChange, const CombatParams& params)
+	const AreaCombat* area, const int32_t& minChange, const int32_t& maxChange, const CombatParams& params)
 {
 	Combat2Var var;
 	var.minChange = minChange;
@@ -1135,6 +1160,15 @@ void Combat::onCreatureDoCombat(Creature* caster, Creature* target, bool isAggre
 }
 
 //**********************************************************
+
+ValueCallback::ValueCallback(const formulaType_t& _type)
+	: type(_type)
+{}
+
+ValueCallback::~ValueCallback()
+{
+	// Virtual Destructor
+}
 
 void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, bool useCharges) const
 {
@@ -1229,6 +1263,10 @@ void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max, 
 }
 
 //**********************************************************
+TileCallback::~TileCallback()
+{
+	// Virtual Destructor
+}
 
 void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
 {
@@ -1262,6 +1300,10 @@ void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
 }
 
 //**********************************************************
+TargetCallback::~TargetCallback()
+{
+	// Virtual Destructor
+}
 
 void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const
 {
@@ -1303,15 +1345,101 @@ void TargetCallback::onTargetCombat(Creature* creature, Creature* target) const
 	}
 }
 
-//**********************************************************
-
-void AreaCombat::clear()
+MatrixArea::MatrixArea(const uint32_t& _rows, const uint32_t& _cols)
 {
-	for(AreaCombatMap::iterator it = areas.begin(); it != areas.end(); ++it){
-		delete it->second;
+	centerX = 0;
+	centerY = 0;
+
+	rows = _rows;
+	cols = _cols;
+
+	data_ = new bool*[rows];
+
+	for(uint32_t row = 0; row < rows; ++row){
+		data_[row] = new bool[cols];
+
+		for(uint32_t col = 0; col < cols; ++col){
+			data_[row][col] = 0;
+		}
+	}
+}
+
+MatrixArea::MatrixArea(const MatrixArea& rhs)
+{
+	centerX = rhs.centerX;
+	centerY = rhs.centerY;
+	rows = rhs.rows;
+	cols = rhs.cols;
+
+	data_ = new bool*[rows];
+
+	for(uint32_t row = 0; row < rows; ++row){
+		data_[row] = new bool[cols];
+
+		for(uint32_t col = 0; col < cols; ++col){
+			data_[row][col] = rhs.data_[row][col];
+		}
+	}
+}
+
+MatrixArea::~MatrixArea()
+{
+	for(uint32_t row = 0; row < rows; ++row){
+		delete[] data_[row];
 	}
 
-	areas.clear();
+	delete[] data_;
+}
+
+void MatrixArea::setValue(const uint32_t& row, const uint32_t& col, bool value) const
+{
+	data_[row][col] = value;
+}
+
+bool MatrixArea::getValue(const uint32_t& row, const uint32_t& col) const
+{
+	return data_[row][col];
+}
+
+void MatrixArea::setCenter(const uint32_t& y, const uint32_t& x)
+{
+	centerX = x; centerY = y;
+}
+
+void MatrixArea::getCenter(uint32_t& y, uint32_t& x) const
+{
+	x = centerX; y = centerY;
+}
+
+const size_t& MatrixArea::getRows() const
+{
+	return rows;
+}
+
+const size_t& MatrixArea::getCols() const
+{
+	return cols;
+}
+
+const bool* MatrixArea::operator[](const uint32_t& i) const
+{
+	return data_[i];
+}
+
+bool* MatrixArea::operator[](const uint32_t& i)
+{
+	return data_[i];
+}
+
+//**********************************************************
+AreaCombat::AreaCombat()
+{
+	hasExtArea = false;
+}
+
+AreaCombat::~AreaCombat()
+{
+	clear();
 }
 
 AreaCombat::AreaCombat(const AreaCombat& rhs)
@@ -1321,6 +1449,15 @@ AreaCombat::AreaCombat(const AreaCombat& rhs)
 	for(AreaCombatMap::const_iterator it = rhs.areas.begin(); it != rhs.areas.end(); ++it){
 		areas[it->first] = new MatrixArea(*it->second);
 	}
+}
+
+void AreaCombat::clear()
+{
+	for(AreaCombatMap::iterator it = areas.begin(); it != areas.end(); ++it){
+		delete it->second;
+	}
+
+	areas.clear();
 }
 
 bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const
@@ -1375,7 +1512,7 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 	return true;
 }
 
-void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOperation_t op) const
+void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, const MatrixOperation_t& op) const
 {
 	uint32_t centerY, centerX;
 	input->getCenter(centerY, centerX);
@@ -1461,7 +1598,55 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 	}
 }
 
-MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, uint32_t rows)
+MatrixArea* AreaCombat::getArea(const Position& centerPos, const Position& targetPos) const
+{
+	int32_t dx = targetPos.x - centerPos.x;
+	int32_t dy = targetPos.y - centerPos.y;
+
+	Direction dir = NORTH;
+
+	if(dx < 0){
+		dir = WEST;
+	}
+	else if(dx > 0){
+		dir = EAST;
+	}
+	else if(dy < 0){
+		dir = NORTH;
+	}
+	else{
+		dir = SOUTH;
+	}
+
+	if(hasExtArea){
+		if(dx < 0 && dy < 0)
+			dir = NORTHWEST;
+		else if(dx > 0 && dy < 0)
+			dir = NORTHEAST;
+		else if(dx < 0 && dy > 0)
+			dir = SOUTHWEST;
+		else if(dx > 0 && dy > 0)
+			dir = SOUTHEAST;
+	}
+
+	AreaCombatMap::const_iterator it = areas.find(dir);
+	if(it != areas.end()){
+		return it->second;
+	}
+
+	return NULL;
+}
+
+int32_t AreaCombat::round(const float& v) const
+{
+	int32_t t = (int32_t)std::floor(v);
+	if((v - t) > 0.5){
+		return t + 1;
+	}
+	return t;
+}
+
+MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, const uint32_t& rows)
 {
 	unsigned int cols = list.size() / rows;
 	MatrixArea* area = new MatrixArea(rows, cols);
@@ -1489,7 +1674,7 @@ MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, uint32_t row
 	return area;
 }
 
-void AreaCombat::setupArea(const std::list<uint32_t>& list, uint32_t rows)
+void AreaCombat::setupArea(const std::list<uint32_t>& list, const uint32_t& rows)
 {
 	MatrixArea* area = createArea(list, rows);
 
@@ -1514,7 +1699,7 @@ void AreaCombat::setupArea(const std::list<uint32_t>& list, uint32_t rows)
 	areas[WEST] = westArea;
 }
 
-void AreaCombat::setupArea(int32_t length, int32_t spread)
+void AreaCombat::setupArea(const int32_t& length, const int32_t& spread)
 {
 	std::list<uint32_t> list;
 
@@ -1550,9 +1735,9 @@ void AreaCombat::setupArea(int32_t length, int32_t spread)
 	setupArea(list, rows);
 }
 
-void AreaCombat::setupArea(int32_t radius)
+void AreaCombat::setupArea(const int32_t& radius)
 {
-	int32_t area[13][13] = {
+	static const int32_t area[13][13] = {
 		{0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 8, 8, 7, 8, 8, 0, 0, 0, 0},
 		{0, 0, 0, 8, 7, 6, 6, 6, 7, 8, 0, 0, 0},
@@ -1587,7 +1772,7 @@ void AreaCombat::setupArea(int32_t radius)
 	setupArea(list, 13);
 }
 
-void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
+void AreaCombat::setupExtArea(const std::list<uint32_t>& list, const uint32_t& rows)
 {
 	if(list.empty()){
 		return;
@@ -1618,7 +1803,27 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 }
 
 //**********************************************************
+MagicField::MagicField(const uint16_t& _type)
+	: Item(_type)
+{
+	createTime = OTSYS_TIME();
+}
 
+MagicField::~MagicField()
+{
+	// Virtual Destructor
+}
+
+MagicField* MagicField::getMagicField()
+{
+	return this;
+}
+
+const MagicField* MagicField::getMagicField() const
+{
+	return this;
+}
+	
 bool MagicField::isBlocking(const Creature* creature) const
 {
 	if (id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE){
@@ -1636,6 +1841,17 @@ bool MagicField::isBlocking(const Creature* creature) const
 	}
 
 	return Item::isBlocking(creature);
+}
+
+bool MagicField::isReplaceable() const
+{
+	return Item::items[getID()].replaceable;
+}
+
+CombatType_t MagicField::getCombatType() const
+{
+	const ItemType& it = items[getID()];
+	return it.combatType;
 }
 
 bool MagicField::canOwnerHarm(const Creature* target) const

@@ -84,28 +84,27 @@ protected:
 	LuaScriptInterface m_scriptInterface;
 };
 
-class Action : public Event
-{
+class Action : public Event {
 public:
 	Action(LuaScriptInterface* _interface);
 	virtual ~Action();
 
-	Action* clone() const { return new Action(*this); }
+	Action* clone() const;
 
 	virtual bool configureEvent(xmlNodePtr p);
 
 	//scripting
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom,
-	const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
+		const PositionEx& posTo, bool extendedUse, const uint32_t& creatureId);
 
-	bool getAllowFarUse() const {return allowFarUse;};
-	void setAllowFarUse(bool v){allowFarUse = v;};
+	bool getAllowFarUse() const;
+	void setAllowFarUse(bool v);
 
-	bool getCheckLineOfSight() const {return checkLineOfSight;};
-	void setCheckLineOfSight(bool v){checkLineOfSight = v;};
+	bool getCheckLineOfSight() const;
+	void setCheckLineOfSight(bool v);
 
 	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
-	virtual bool hasOwnErrorHandler() {return false;}
+	virtual bool hasOwnErrorHandler();
 
 protected:
 	virtual const std::string& getScriptEventName() const;

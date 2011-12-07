@@ -1288,7 +1288,7 @@ bool Items::loadFromXml(const std::string& datadir)
 
 													if(start > 0){
 														std::list<int32_t> damageList;
-														ConditionDamage::generateDamageList(damage, start, damageList);
+														ConditionDamage::generateDamageList(std::abs(damage), std::abs(start), damageList);
 
 														for(std::list<int32_t>::iterator it = damageList.begin(); it != damageList.end(); ++it){
 															conditionDamage->addDamage(1, ticks, -*it);

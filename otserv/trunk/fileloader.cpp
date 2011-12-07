@@ -282,7 +282,7 @@ void FileLoader::endNode()
 	writeData(&nodeEnd, sizeof(nodeEnd), false);
 }
 
-const NODE FileLoader::getChildNode(const NODE parent, unsigned long &type)
+NODE FileLoader::getChildNode(const NODE parent, unsigned long &type)
 {
 	if(parent){
 		NODE child = parent->child;
@@ -297,7 +297,7 @@ const NODE FileLoader::getChildNode(const NODE parent, unsigned long &type)
 	}
 }
 
-const NODE FileLoader::getNextNode(const NODE prev, unsigned long &type)
+NODE FileLoader::getNextNode(const NODE prev, unsigned long &type)
 {
 	if(prev){
 		NODE next = prev->next;

@@ -72,7 +72,7 @@ class Guilds {
 public:
 	void loadWars();
 	#ifdef __GUILDWARSLUARELOAD__
-	bool loadWar(uint32_t warId);
+	bool loadWar(const uint32_t& warId);
 	#endif
 	void endWar(const uint32_t& warId);
 	bool transferMoney(const uint32_t& guildId, const uint32_t& opponentId,
