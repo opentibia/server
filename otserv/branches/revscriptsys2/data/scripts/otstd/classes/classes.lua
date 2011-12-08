@@ -34,6 +34,8 @@ require("otstd/classes/global")
 
 require("otstd/classes/events")
 
+require("otstd/classes/vocation")
+
 require("otstd/classes/thing")
 require("otstd/classes/item")
 require("otstd/classes/items")
