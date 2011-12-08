@@ -151,7 +151,8 @@ void Game::setGameState(GameState newState)
 
 				runShutdownScripts(true);
 
-				saveGameState();
+				if (!saveGameState())
+					std::cout << "Could not save global game state." << std::endl;
 
 				g_dispatcher.addTask(createTask(
 					boost::bind(&Game::shutdown, this)));
@@ -186,7 +187,8 @@ bool Game::saveServer(ServerSaveType saveType)
 
 	uint64_t start = OTSYS_TIME();
 
-	saveGameState();
+	if (!saveGameState())
+		std::cout << "Could not save global game state." << std::endl;
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 		it != Player::listPlayer.list.end();
@@ -234,15 +236,15 @@ void Game::loadGameState()
 	db->freeResult(result);
 }
 
-void Game::saveGameState()
+bool Game::saveGameState()
 {
 	Database* db = Database::instance();
-
+	
 	DBQuery q;
 	DBTransaction transaction(db);
 	transaction.begin();
 	DBQuery query;
-
+	
 	db->executeQuery("DELETE FROM `global_storage`");
 
 	DBInsert global_stmt(db);
@@ -251,12 +253,13 @@ void Game::saveGameState()
 	for(StorageMap::const_iterator giter = globalStorage.begin(); giter != globalStorage.end(); ++giter){
 		query << db->escapeString(giter->first) << ", " << db->escapeString(giter->second);
 		if(!global_stmt.addRow(query)){
-			std::cout << "Could not save global game state." << std::endl;
-			return;
+			return false;
 		}
 	}
 	if(!global_stmt.execute())
-		std::cout << "Could not save global game state." << std::endl;
+		return false;
+
+	return transaction.commit();
 }
 
 int Game::loadMap(std::string filename)
@@ -336,6 +339,11 @@ bool Game::loadScripts()
 		throw err;
 	}
 	return true;
+}
+
+bool Game::areScriptsLoaded() const
+{
+	return script_system != NULL;
 }
 
 void Game::runStartupScripts(bool real_startup)
@@ -684,7 +692,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 							thing = item;
 					}
 				}
-
+					
 				if (thing == NULL) {
 					//then down items
 					thing = tile->items_firstDown();
@@ -1126,47 +1134,52 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	Tile* tile = creature->getParentTile();
 
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	getSpectators(list, tile->getPosition(), false, true);
+	if (tile)
+	{
+		SpectatorVec list;
+		SpectatorVec::iterator it;
+		getSpectators(list, tile->getPosition(), false, true);
 
-	Player* player = NULL;
-	std::vector<uint32_t> oldStackPosVector;
-	for(it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			if(player->canSeeCreature(creature)){
-				oldStackPosVector.push_back(tile->getClientIndexOfThing(player, creature));
+		Player* player = NULL;
+		std::vector<uint32_t> oldStackPosVector;
+		for(it = list.begin(); it != list.end(); ++it){
+			if((player = (*it)->getPlayer())){
+				if(player->canSeeCreature(creature)){
+					oldStackPosVector.push_back(tile->getClientIndexOfThing(player, creature));
+				}
 			}
 		}
-	}
 
-	int32_t oldIndex = tile->__getIndexOfThing(creature);
-	if(!map->removeCreature(creature)){
-		return false;
-	}
+		int32_t oldIndex = tile->__getIndexOfThing(creature);
+		if(!map->removeCreature(creature)){
+			return false;
+		}
 
-	//send to client
-	uint32_t i = 0;
-	for(it = list.begin(); it != list.end(); ++it){
-		if((player = (*it)->getPlayer())){
-			if(player->canSeeCreature(creature)){
-				player->sendCreatureDisappear(creature, oldStackPosVector[i], isLogout);
-				++i;
+		//send to client
+		uint32_t i = 0;
+		for(it = list.begin(); it != list.end(); ++it){
+			if((player = (*it)->getPlayer())){
+				if(player->canSeeCreature(creature)){
+					player->sendCreatureDisappear(creature, oldStackPosVector[i], isLogout);
+					++i;
+				}
 			}
 		}
-	}
+	
+		//event method
+		for(it = list.begin(); it != list.end(); ++it){
+			(*it)->onCreatureDisappear(creature, isLogout);
+		}
 
-	//event method
-	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onCreatureDisappear(creature, isLogout);
+		creature->getParent()->postRemoveNotification(NULL, creature, NULL, oldIndex, true);
+		FreeThing(creature);
 	}
-
-	creature->getParent()->postRemoveNotification(NULL, creature, NULL, oldIndex, true);
+	else {
+		creature->onCreatureDisappear(creature, isLogout);
+	}
 
 	listCreature.removeList(creature->getID());
 	creature->onRemoved();
-	FreeThing(creature);
-
 	removeCreatureCheck(creature);
 
 	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
@@ -2607,20 +2620,33 @@ Item* Game::transformItem(Creature* actor, Item* item, uint16_t newId, int32_t n
 
 ReturnValue Game::internalTeleport(Creature* actor, Thing* thing, const Position& newPos, uint32_t flags /*= 0*/)
 {
-	if(newPos == thing->getPosition())
-		return RET_NOERROR;
-	else if(thing->isRemoved())
+	Tile* toTile = getParentTile(newPos.x, newPos.y, newPos.z);
+	if (!toTile)
 		return RET_NOTPOSSIBLE;
 
-	Tile* toTile = getParentTile(newPos.x, newPos.y, newPos.z);
-	if(toTile){
-		if(Creature* creature = thing->getCreature()){
-			creature->getParentTile()->moveCreature(actor, creature, toTile, true);
+	if(!thing->getParentTile()) {
+		if(thing->getCreature()) {
+			if (placeCreature(thing->getCreature(), newPos, false, ((flags & FLAG_IGNOREBLOCKITEM) || (flags & FLAG_IGNOREBLOCKCREATURE))))
+				return RET_NOERROR;
+		}
+		else {
+			return internalAddItem(NULL, toTile, thing->getItem(), INDEX_WHEREEVER);
+		}
+
+		return RET_NOTPOSSIBLE;
+	}
+
+	if(newPos == thing->getPosition())
 			return RET_NOERROR;
-		}
-		else if(Item* item = thing->getItem()){
-			return internalMoveItem(actor, item->getParent(), toTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL, flags);
-		}
+	if(thing->isRemoved())
+		return RET_NOTPOSSIBLE;
+
+	if(Creature* creature = thing->getCreature()){
+		creature->getParentTile()->moveCreature(actor, creature, toTile, true);
+		return RET_NOERROR;
+	}
+	else if(Item* item = thing->getItem()){
+		return internalMoveItem(actor, item->getParent(), toTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL, flags);
 	}
 
 	return RET_NOTPOSSIBLE;

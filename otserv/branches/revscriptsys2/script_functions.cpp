@@ -251,6 +251,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getRawCustomValue(string key)", &Manager::lua_Creature_getRawCustomValue);
 
 	registerMemberFunction("Creature", "addSummon(Actor other)", &Manager::lua_Creature_addSummon);
+	registerMemberFunction("Creature", "getSummons()", &Manager::lua_Creature_getSummons);
 	registerMemberFunction("Creature", "getMaster()", &Manager::lua_Creature_getMaster);
 	registerMemberFunction("Creature", "getHealth()", &Manager::lua_Creature_getHealth);
 	registerMemberFunction("Creature", "getHealthMax()", &Manager::lua_Creature_getHealthMax);
@@ -451,6 +452,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Tile", "addItem(Item item)", &Manager::lua_Tile_addItem);
 	registerMemberFunction("Tile", "getItemCount(int itemid [, int type])", &Manager::lua_Tile_getItemCount);
 	registerMemberFunction("Tile", "getItem(int index)", &Manager::lua_Tile_getItem);
+	registerMemberFunction("Tile", "getDownItem(int index)", &Manager::lua_Tile_getDownItem);
 	registerMemberFunction("Tile", "getItems()", &Manager::lua_Tile_getItems);
 	registerMemberFunction("Tile", "getMoveableItems()", &Manager::lua_Tile_getMoveableItems);
 	registerMemberFunction("Tile", "getItemsWithItemID(int aid)", &Manager::lua_Tile_getItemsWithItemID);
@@ -2883,28 +2885,40 @@ int LuaState::lua_Event_propagate() {
 int LuaState::lua_Thing_getPosition()
 {
 	Thing* thing = popThing();
-	pushPosition(thing->getPosition());
+	if (!thing->getParentTile())
+		throw Error("This Thing is not placed on a tile");
+	else
+		pushPosition(thing->getPosition());
 	return 1;
 }
 
 int LuaState::lua_Thing_getX()
 {
 	Thing* thing = popThing();
-	pushInteger(thing->getPosition().x);
+	if (!thing->getParentTile())
+		throw Error("This Thing is not placed on a tile");
+	else
+		pushInteger(thing->getPosition().x);
 	return 1;
 }
 
 int LuaState::lua_Thing_getY()
 {
 	Thing* thing = popThing();
-	pushInteger(thing->getPosition().y);
+	if (!thing->getParentTile())
+		throw Error("This Thing is not placed on a tile");
+	else
+		pushInteger(thing->getPosition().y);
 	return 1;
 }
 
 int LuaState::lua_Thing_getZ()
 {
 	Thing* thing = popThing();
-	pushInteger(thing->getPosition().z);
+	if (!thing->getParentTile())
+		throw Error("This Thing is not placed on a tile");
+	else
+		pushInteger(thing->getPosition().z);
 	return 1;
 }
 
@@ -3119,10 +3133,35 @@ int LuaState::lua_Tile_getItem()
 	}
 
 	index -= topItemSize;
-	index -= uint32_t(tile->creatures_count());
+	index -= tile->creatures_count();
 
 	if(uint32_t(index) < tile->items_downCount()){
 		pushThing(tile->items_get(index));
+		return 1;
+	}
+
+	pushNil();
+	return 1;
+}
+
+int LuaState::lua_Tile_getDownItem()
+{
+	int32_t index = popInteger();
+	Tile* tile = popTile();
+
+
+	// -1 is top item
+	int lastindex = tile->items_downCount();
+	if(index < 0) {
+		index = -1 - index;
+	}
+	else {
+		// We want down item 0 to be top item on tile
+		// index = -index;
+	}
+
+	if(index >= 0 && uint32_t(index) < tile->items_downCount()){
+		pushThing(*(tile->items_downBegin() + index));
 		return 1;
 	}
 
@@ -3639,6 +3678,23 @@ int LuaState::lua_Creature_addSummon()
 	return 1;
 }
 
+int LuaState::lua_Creature_getSummons()
+{
+	Creature* creature = popCreature();
+	const std::list<Creature*>& summons = creature->getSummons();
+
+	newTable();
+
+	int n = 1;
+	for (std::list<Creature*>::const_iterator summon = summons.begin(); summon != summons.end(); ++summon, ++n)
+	{
+		pushThing(*summon);
+		setField(-2, n);
+	}
+
+	return 1;
+}
+
 int LuaState::lua_Creature_getOrientation()
 {
 	Creature* creature = popCreature();
@@ -3948,10 +4004,17 @@ int LuaState::lua_createMonster()
 {
 	Position p = popPosition();
 
+
 	// Create a monster from a monster type
 	Actor* a = Actor::create(popString());
-	if(a)
-		g_game.placeCreature(a, p);
+	if(a) {
+		if (!g_game.getParentTile(p)) {
+			a->addRef();
+			g_game.FreeThing(a);
+		}
+		else
+			g_game.placeCreature(a, p);
+	}
 	pushThing(a);
 	return 1;
 }

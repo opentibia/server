@@ -397,6 +397,7 @@ public:
 	int lua_Creature_setOutfit();
 	int lua_Creature_walk();
 	int lua_Creature_addSummon();
+	int lua_Creature_getSummons();
 	int lua_Creature_getSpeed();
 	int lua_Creature_getArmor();
 	int lua_Creature_getDefense();
@@ -590,6 +591,7 @@ public:
 	int lua_Tile_getCreatures();
 	int lua_Tile_getMoveableItems();
 	int lua_Tile_getItem();
+	int lua_Tile_getDownItem();
 	int lua_Tile_getItems();
 	int lua_Tile_getItemsWithActionID();
 	int lua_Tile_getItemsWithItemID();

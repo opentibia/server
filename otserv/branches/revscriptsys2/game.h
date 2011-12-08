@@ -100,6 +100,11 @@ public:
 	void scriptCleanup();
 
 	/**
+	 * Did the scripts load correctly?
+	 */
+	bool areScriptsLoaded() const;
+
+	/**
 	 * Runs waiting scripts, reschedules itself every 50 ms
 	 */
 	void runWaitingScripts();
@@ -554,7 +559,7 @@ public:
 	GameState getGameState();
 	void setGameState(GameState newState);
 	bool saveServer(ServerSaveType saveType);
-	void saveGameState();
+	bool saveGameState();
 	void loadGameState();
 	void refreshMap(Map::TileMap::iterator* begin = NULL, int clean_max = 0);
 	void proceduralRefresh(Map::TileMap::iterator* begin = NULL);
