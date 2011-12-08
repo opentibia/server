@@ -170,17 +170,20 @@ end
 function otstd.onSpell(event)
 	local caster = event.caster
 	local spell = event.spell
+	
+	if event then
+		print "YES"
+	end
 
-	if otstd.onSpellCheck(event) then
+	if otstd.onSpellCheck(spell, event) then
 		-- Check extra conditions
-		if (not spell.internalBeginCast or spell.internalBeginCast(event)) and (not spell.onBeginCast or spell.onBeginCast(event)) then
-
+		if (not spell.internalBeginCast or spell:internalBeginCast(event)) and (not spell.onBeginCast or spell:onBeginCast(event)) then
 			-- Cast the spell!
 			if spell.onCast then
 				-- Normal (low-level) cast function has been overridden
-				spell.onCast(event)
+				spell.onCast(spell, event)
 			else
-				otstd.onCastSpell(event)
+				otstd.onCastSpell(spell, event)
 			end
 			return true
 		end
@@ -192,9 +195,8 @@ function otstd.onSpell(event)
 end
 
 -- Checks that are common for all spells that are cast
-function otstd.onSpellCheck(event)
+function otstd.onSpellCheck(spell, event)
 	local caster = event.caster
-	local spell = event.spell
 	local tile = map:getTile(caster:getPosition())
 
 	if typeof(caster, "Player") then
@@ -235,12 +237,11 @@ function otstd.onSpellCheck(event)
 end
 
 -- Called once a spell casting has been decided (ie. the cast did not abort)
-function otstd.onCastSpell(event)
+function otstd.onCastSpell(spell, event)
 	local caster = event.caster
 	local casterPos = caster and caster:getPosition()
 	local target = event.targetCreature
 	local targetPos = event.targetPosition or (target and target:getPosition())
-	local spell = event.spell
 
 	if typeof(caster, "Player") then
 		-- All spell checks have been done, remove mana etc.
@@ -377,18 +378,18 @@ function otstd.onCastSpell(event)
 
 	-- finish cast
 	if spell.onFinishCast then
-		return spell.onFinishCast(event)
+		return spell:onFinishCast(event)
 	end
 
 	if spell.internalFinishCast then
-		return spell.internalFinishCast(event)
+		return spell:internalFinishCast(event)
 	end
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Instant spells default handler begin/finish handlers
 
-function otstd.onFinishCastInstantSpell(event)
+function otstd.onFinishCastInstantSpell(spell, event)
 	local caster = event.caster
 	local text = event.text
 
@@ -405,12 +406,11 @@ end
 -- Rune spells default handler begin/finish handlers
 
 -- Extra conditions for casting rune spells
-function otstd.onBeginCastRuneSpell(event)
+function otstd.onBeginCastRuneSpell(spell, event)
 	local caster = event.caster
 	local creature = event.targetCreature
 	local toPos = event.targetPosition
 	local tile = map:getTile(toPos)
-	local spell = event.spell
 
 	if typeof(caster, "Player") then
 		if tile then
@@ -481,7 +481,7 @@ function otstd.onBeginCastRuneSpell(event)
 	return true
 end
 
-function otstd.onFinishCastRuneSpell(event)
+function otstd.onFinishCastRuneSpell(spell, event)
 	local caster = event.caster
 	local rune = event.item
 
@@ -503,9 +503,8 @@ end
 --  Conjuration Spells default begin/finish handlers
 
 -- Checks conditions for casting conjuration spells
-function otstd.onBeginCastConjureSpell(event)
+function otstd.onBeginCastConjureSpell(spell, event)
 	local caster = event.caster
-	local spell = event.spell
 
 	if spell.reagent and spell.reagent ~= 0 then -- Reagents! => Rune spell
 		local reagents = {}
@@ -535,9 +534,8 @@ end
 
 -- Cast handler for conjuration spells
 -- Converts the items, if runes, or creates the items if simple conjuration
-function otstd.onCastConjureSpell(event)
+function otstd.onCastConjureSpell(spell, event)
 	local caster = event.caster
-	local spell = event.spell
 
 	if event.reagents then -- Reagents! => Rune spell
 		for _, item in ipairs(event.reagents) do
@@ -839,21 +837,31 @@ function Spell:register()
 
 		-- Lamba callback to include what spell is being cast
 		local function spellSayHandler(event)
-			event:skip()
+			event:propagate()
 
-			local param = string.strip_whitespace(string.sub(event.text, self.words:len()+1) or "")
-			event.spell = self
-			event.caster = event.creature
-			if self.needTarget then
-				event.targetCreature = getPlayerByName(param)
-			elseif self.maybeTarget then
-				event.targetCreature = event.creature:getTarget()
-			end
+			local text = string.explode(event.text, "\"")
+			local words = string.strip_whitespace(text[1] or "")
+			local param = string.strip_whitespace(text[2] or "")
+			if self.words:lower() == words:lower() then
+				-- this is the right one
+				event:skip()
 
-			if self.onSay then
-				self:onSay(event)
-			else
-				otstd.onSpell(event)
+				event.spell = self
+				event.caster = event.creature
+				event.param = param
+				if self.needTarget then
+					event.targetCreature = getPlayerByName(param)
+				elseif self.maybeTarget then
+					event.targetCreature = event.creature:getTarget()
+				end
+				
+				print("Caster is " .. event.caster:getName())
+
+				if self.onSay then
+					self.onSay(event)
+				else
+					otstd.onSpell(event)
+				end
 			end
 		end
 
