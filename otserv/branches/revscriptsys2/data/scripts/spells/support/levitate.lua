@@ -26,36 +26,42 @@ function levitate:onBeginCast(event)
 	
 	if event.param == "up" then
 		if pos.z == 8 then
-			caster:sendCancel("Sorry not possible.")
+			caster:sendCancel(RET_NOTPOSSIBLE)
 			return false
 		end
 		pos.z = pos.z - 1
 	elseif event.param == "down" then
 		if pos.z == 7 then
-			caster:sendCancel("Sorry not possible.")
+			caster:sendCancel(RET_NOTPOSSIBLE)
 			return false
 		end
 		pos.z = pos.z + 1
 	else
-		caster:sendCancel("Sorry not possible")
+		caster:sendCancel(RET_NOTPOSSIBLE)
+		return false
 	end
 	
 	local up_tile = map:getTile(pos)
 	
-	if (not below_tile) or (not below_tile:getGround() and not below_tile:isBlocking()) then
-		if up_tile:getGround() and up_tile:isBlocking() == false and up_tile:isFloorwarp() == false then
+	if not up_tile then
+		caster:sendCancel(RET_NOTPOSSIBLE)
+		return false
+	end
+	
+	if (not below_tile) or (below_tile:getGround() and below_tile:isBlocking()) then
+		if up_tile:getGround() and not up_tile:isBlocking() and not up_tile:floorChange() then
 			-- Store the target position
 			event.new_pos = pos
 			return true
 		end
 	end
 	
-	caster:sendCancel("Sorry not possible")
+	caster:sendCancel(RET_NOTPOSSIBLE)
 	return false
 end
 
 function levitate:onFinishCast(event)
-	event.caster:moveTo(event.new_pos)
+	event.caster:teleportTo(event.new_pos)
 end
 
 levitate:register()
