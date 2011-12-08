@@ -1,7 +1,8 @@
 local creatureturn_example = {}
 
 function creatureturn_example.turn_callback(event)
-	if event.creature:getParentTile():getGround():getItemID() == 417 then
+	local ground = event.creature:getParentTile():getGround()
+	if ground and ground:getItemID() == 417 then
 		local m = "I turned " .. event.direction:name():lower() .. "."
 		
 		event.creature:say(m)
