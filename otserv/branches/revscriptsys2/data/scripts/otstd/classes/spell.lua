@@ -171,10 +171,6 @@ function otstd.onSpell(event)
 	local caster = event.caster
 	local spell = event.spell
 	
-	if event then
-		print "YES"
-	end
-
 	if otstd.onSpellCheck(spell, event) then
 		-- Check extra conditions
 		if (not spell.internalBeginCast or spell:internalBeginCast(event)) and (not spell.onBeginCast or spell:onBeginCast(event)) then
@@ -245,9 +241,7 @@ function otstd.onCastSpell(spell, event)
 
 	if typeof(caster, "Player") then
 		-- All spell checks have been done, remove mana etc.
-		if not caster:hasInfiniteMana() then
-			caster:spendMana(spell.mana)
-		end
+		caster:spendMana(spell.mana)
 
 		if not caster:hasInfiniteSoul() then
 			caster:removeSoul(spell.soul)
@@ -304,7 +298,7 @@ function otstd.onCastSpell(spell, event)
 								end
 
 								if spell.onHitCreature then
-									spell.onHitCreature(target, event)
+									spell:onHitCreature(target, event)
 								end
 							end
 						end
@@ -314,7 +308,7 @@ function otstd.onCastSpell(spell, event)
 						end
 
 						if spell.onHitCreature then
-							spell.onHitCreature(target, event)
+							spell:onHitCreature(target, event)
 						end
 					end
 
@@ -358,7 +352,7 @@ function otstd.onCastSpell(spell, event)
 
 			-- Call the tile hit callback
 			if spell.onHitTile then
-				spell.onHitTile(targetTile, event)
+				spell:onHitTile(targetTile, event)
 			end
 		end
 
@@ -854,8 +848,6 @@ function Spell:register()
 				elseif self.maybeTarget then
 					event.targetCreature = event.creature:getTarget()
 				end
-				
-				print("Caster is " .. event.caster:getName())
 
 				if self.onSay then
 					self.onSay(event)
@@ -888,7 +880,7 @@ function Spell:register()
 				event.targetCreature = tile and tile:getTopCreature(event.player)
 			end
 
-			event.caster:sendNote("Casting rune spell " .. self.name)
+			--event.caster:sendNote("Casting rune spell " .. self.name)
 			otstd.onSpell(event)
 		end
 

@@ -15,12 +15,18 @@ function Thing:isItem()
 	return false
 end
 
-
 function Thing:teleportTo(pos)
-	local oldpos = self:getPosition()
+	local oldpos = nil
+	if self:getParentTile() then
+		oldpos = self:getPosition()
+	end
+	
 	if self:moveTo(pos) then
-		sendMagicEffect(pos, MAGIC_EFFECT_BLUE_BUBBLE)
-		sendMagicEffect(oldpos, MAGIC_EFFECT_POFF)
+		-- Position may shift due to displacement, fetch new position
+		sendMagicEffect(self:getPosition(), MAGIC_EFFECT_BLUE_BUBBLE)
+		if oldpos then
+			sendMagicEffect(oldpos, MAGIC_EFFECT_POFF)
+		end
 		return true
 	end
 	return false

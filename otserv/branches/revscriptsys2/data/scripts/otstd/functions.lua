@@ -274,8 +274,18 @@ function areInRange(p1, p2, dx, dy, dz)
 	return true
 end
 
+function distanceBetweenPositions(a, b)
+	local d = math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y))
+	--print("Distance between " .. a.x .. " " .. a.y .. " and " .. b.x .. " " .. b.y .. " = " .. d)
+	return d
+end
+
 function checkVocation(vocation, vocationList)
-	if typeof(vocation, "Vocation") then
+	if typeof(vocation, "Player") then
+		vocation = vocation:getVocation()
+	end
+	
+	if typeof(vocation, Vocation) then
 		if typeof(vocationList, "string") then
 			if vocationList:lower() == "any" or
 				vocation:getName():lower() == vocationList:lower() then
@@ -283,13 +293,13 @@ function checkVocation(vocation, vocationList)
 			end
 		elseif typeof(vocationList, "table") then
 			for _, v in ipairs(vocationList) do
-				if checkVocation(v) then
+				if checkVocation(vocation, v) then
 					return true
 				end
 			end
 		end
 	else
-		error("First argument to 'checkVocation' must be a vocation object")
+		error("First argument to 'checkVocation' must be a vocation object was " .. vocation:type())
 	end
 
 	return false

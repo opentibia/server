@@ -145,8 +145,10 @@ function Player:removeMana(howmuch)
 end
 
 function Player:spendMana(howmuch)
-	self:removeMana(howmuch)
-	self:addManaSpent(howmuch)
+	if not self:hasInfiniteMana() then
+		self:removeMana(howmuch)
+		self:addManaSpent(howmuch)
+	end
 end
 
 function Player:addSoul(howmuch)
