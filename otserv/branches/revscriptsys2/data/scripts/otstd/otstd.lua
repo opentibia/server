@@ -1,20 +1,17 @@
 otstd = {}
 
-require("otstd/classes/config")
+include("classes/config")
 
-require("otstd/intrinistic/debug")
-require("otstd/intrinistic/functional")
-require("otstd/intrinistic/string")
-require("otstd/intrinistic/table")
+include_directory("intrinsic")
 
-require("otstd/enum")
-require("otstd/constants")
-require("otstd/functions")
-require("otstd/itemids")
+include("enum")
+include("constants")
+include("functions")
+include("itemids")
 
-require("otstd/classes/classes")
-require("otstd/game")
+include("classes/classes")
+include("game")
 
-require("otstd/commands")
-require_directory("otstd/actions")
-require("otstd/npc/npc")
+include("commands")
+include_directory("actions")
+include("npc/npc")
