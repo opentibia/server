@@ -53,7 +53,7 @@ class Combat;
 struct CombatSource;
 class PropStream;
 class PropWriteStream;
-class Account;
+struct Account;
 class Protocol;
 class ProtocolGame;
 class OutputMessage;

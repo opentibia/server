@@ -1310,7 +1310,7 @@ bool Game::playerMoveCreature(uint32_t playerId, uint32_t movingCreatureId,
 }
 
 bool Game::onAccountLogin(std::string& name, uint32_t& number, std::string& password,
-	time_t& premiumEnd, uint32_t& warnings, std::list<std::string>& charList)
+	time_t& premiumEnd, uint32_t& warnings, std::list<AccountCharacter>& charList)
 {
 	if(!script_system)
 		return false; // Not handled

@@ -1078,7 +1078,7 @@ void OnLeaveChannel::Event::update_instance(Manager& state, Environment& environ
 // Triggered when the character list is retrieved from the database
 
 OnAccountLogin::Event::Event(std::string& name, uint32_t& number, std::string& password,
-	time_t& premiumEnd, uint32_t& warnings, std::list<std::string>& charList) :
+	time_t& premiumEnd, uint32_t& warnings, std::list<AccountCharacter>& charList) :
 	name(name), number(number), password(password), premiumEnd(premiumEnd), warnings(warnings), charList(charList) 
 {
 	propagate_by_default = true;
@@ -1120,9 +1120,12 @@ void OnAccountLogin::Event::push_instance(LuaState& state, Environment& environm
 
 	state.newTable();
 	int n = 1;
-	for(std::list<std::string>::iterator iter = charList.begin(); iter != charList.end(); ++iter, ++n){
+	for(std::list<AccountCharacter>::iterator iter = charList.begin(); iter != charList.end(); ++iter, ++n){
 		state.newTable();
-		state.setField(-1, "name", *iter);
+		state.setField(-1, "name", iter->name);
+		state.setField(-1, "name", iter->world);
+		state.setField(-1, "ip", iter->ip);
+		state.setField(-1, "port", iter->port);
 	}
 	state.setField(-2, "charList");
 }
@@ -1178,12 +1181,28 @@ void OnAccountLogin::Event::update_instance(Manager& state, Environment& environ
 		thread->getField(-1, "charList");
 		if(!thread->isTable())
 			thread->HandleError("'charList' must be a table.");
+
+		// Clear old list
+		charList.clear();
+
 		// iterate over the table
 		thread->pushNil();
 		while(thread->iterateTable(-2)){
+			AccountCharacter character;
 
 			thread->getField(-1, "name");
-			charList.push_back(thread->popString());
+			character.name = thread->popString();
+
+			thread->getField(-1, "world");
+			character.world = thread->popString();
+
+			thread->getField(-1, "ip");
+			character.ip = thread->popUnsignedInteger();
+
+			thread->getField(-1, "port");
+			character.port = thread->popUnsignedInteger();
+
+			charList.push_back(character);
 			thread->pop(); // pop value
 		}
 		// Pop the 'charList' table

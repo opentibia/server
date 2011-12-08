@@ -21,56 +21,13 @@ CREATE TABLE `accounts` (
 	UNIQUE (`name`)
 ) ENGINE = InnoDB;
 
-CREATE TABLE `players` (
+CREATE TABLE `world` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`name` VARCHAR(255) NOT NULL,
-	`account_id` INT UNSIGNED NOT NULL,
-	`group_id` INT UNSIGNED NOT NULL COMMENT 'users group',
-	`sex` INT UNSIGNED NOT NULL DEFAULT 0,
-	`vocation` INT UNSIGNED NOT NULL DEFAULT 0,
-	`experience` BIGINT UNSIGNED NOT NULL DEFAULT 0,
-	`level` INT UNSIGNED NOT NULL DEFAULT 1,
-	`maglevel` INT UNSIGNED NOT NULL DEFAULT 0,
-	`health` INT UNSIGNED NOT NULL DEFAULT 100,
-	`healthmax` INT UNSIGNED NOT NULL DEFAULT 100,
-	`mana` INT UNSIGNED NOT NULL DEFAULT 100,
-	`manamax` INT UNSIGNED NOT NULL DEFAULT 100,
-	`manaspent` INT UNSIGNED NOT NULL DEFAULT 0,
-	`soul` INT UNSIGNED NOT NULL DEFAULT 0,
-	`direction` INT UNSIGNED NOT NULL DEFAULT 0,
-	`lookbody` INT UNSIGNED NOT NULL DEFAULT 10,
-	`lookfeet` INT UNSIGNED NOT NULL DEFAULT 10,
-	`lookhead` INT UNSIGNED NOT NULL DEFAULT 10,
-	`looklegs` INT UNSIGNED NOT NULL DEFAULT 10,
-	`looktype` INT UNSIGNED NOT NULL DEFAULT 136,
-	`lookaddons` INT UNSIGNED NOT NULL DEFAULT 0,
-	`posx` INT NOT NULL DEFAULT 0,
-	`posy` INT NOT NULL DEFAULT 0,
-	`posz` INT NOT NULL DEFAULT 0,
-	`cap` INT NOT NULL DEFAULT 0,
-	`lastlogin` INT UNSIGNED NOT NULL DEFAULT 0,
-	`lastlogout` INT UNSIGNED NOT NULL DEFAULT 0,
-	`lastip` INT UNSIGNED NOT NULL DEFAULT 0,
-	`save` TINYINT(1) NOT NULL DEFAULT TRUE,
-	`conditions` BLOB NOT NULL COMMENT 'drunk, poisoned etc',
-	`skull_type` INT NOT NULL DEFAULT 0,
-	`skull_time` INT UNSIGNED NOT NULL DEFAULT 0,
-	`guildnick` VARCHAR(255) NOT NULL DEFAULT '',
-	`loss_experience` INT NOT NULL DEFAULT 100,
-	`loss_mana` INT NOT NULL DEFAULT 100,
-	`loss_skills` INT NOT NULL DEFAULT 100,
-	`loss_items` INT NOT NULL DEFAULT 10,
-	`loss_containers` INT NOT NULL DEFAULT 100,
-	`rank_id` INT UNSIGNED NOT NULL COMMENT 'by this field everything with guilds is done - player has a rank which belongs to certain guild',
-	`town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
-	`balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
-	`stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds',
-	`online` TINYINT(1) NOT NULL DEFAULT 0,
+	`name` VARCHAR(32) NOT NULL DEFAULT "OTServ",
+	`ip` INT UNSIGNED NOT NULL DEFAULT 0,
+	`port` INT(5) UNSIGNED NOT NULL DEFAULT 7172,
 	PRIMARY KEY (`id`),
-	UNIQUE (`name`),
-	KEY (`online`),
-	FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
-	FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`)
+	KEY (`name`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guilds` (
@@ -88,6 +45,66 @@ CREATE TABLE `guild_ranks` (
 	`level` INT NOT NULL COMMENT 'rank level - leader, vice, member, maybe something else',
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `players` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`account_id` INT UNSIGNED NOT NULL,
+	`group_id` INT UNSIGNED NOT NULL COMMENT 'users group',
+	`world_id` INT UNSIGNED NOT NULL,
+
+	`rank_id` INT UNSIGNED DEFAULT NULL COMMENT 'by this field everything with guilds is done - player has a rank which belongs to certain guild',
+	`guildnick` VARCHAR(255) NOT NULL DEFAULT '',
+	`town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
+
+	`sex` INT UNSIGNED NOT NULL DEFAULT 0,
+	`vocation` INT UNSIGNED NOT NULL DEFAULT 0,
+
+	`experience` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+	`level` INT UNSIGNED NOT NULL DEFAULT 1,
+	`maglevel` INT UNSIGNED NOT NULL DEFAULT 0,
+	`health` INT UNSIGNED NOT NULL DEFAULT 100,
+	`healthmax` INT UNSIGNED NOT NULL DEFAULT 100,
+	`mana` INT UNSIGNED NOT NULL DEFAULT 100,
+	`manamax` INT UNSIGNED NOT NULL DEFAULT 100,
+	`manaspent` INT UNSIGNED NOT NULL DEFAULT,
+	`soul` INT UNSIGNED NOT NULL DEFAULT 0,
+	`cap` INT NOT NULL DEFAULT 0,
+	`stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds',
+	`lookbody` INT UNSIGNED NOT NULL DEFAULT 10,
+	`lookfeet` INT UNSIGNED NOT NULL DEFAULT 10,
+	`lookhead` INT UNSIGNED NOT NULL DEFAULT 10,
+	`looklegs` INT UNSIGNED NOT NULL DEFAULT 10,
+	`looktype` INT UNSIGNED NOT NULL DEFAULT 136,
+	`lookaddons` INT UNSIGNED NOT NULL DEFAULT 0,
+
+	`posx` INT NOT NULL DEFAULT 0,
+	`posy` INT NOT NULL DEFAULT 0,
+	`posz` INT NOT NULL DEFAULT 0,
+	`direction` INT UNSIGNED NOT NULL DEFAULT 0,
+	`lastlogin` INT UNSIGNED NOT NULL DEFAULT 0,
+	`lastlogout` INT UNSIGNED NOT NULL DEFAULT 0,
+	`lastip` INT UNSIGNED NOT NULL DEFAULT 0,
+	`save` TINYINT(1) NOT NULL DEFAULT TRUE,
+	`conditions` BLOB NOT NULL COMMENT 'drunk, poisoned etc',
+	`skull_type` INT NOT NULL DEFAULT 0,
+	`skull_time` INT UNSIGNED NOT NULL DEFAULT 0,
+	`loss_experience` INT NOT NULL DEFAULT 100,
+	`loss_mana` INT NOT NULL DEFAULT 100,
+	`loss_skills` INT NOT NULL DEFAULT 100,
+	`loss_items` INT NOT NULL DEFAULT 10,
+	`loss_containers` INT NOT NULL DEFAULT 100,
+	`balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
+
+	`online` TINYINT(1) NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`),
+	UNIQUE (`name`),
+	KEY (`online`),
+	FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
+	FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`) ON DELETE SET NULL,
+	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_viplist` (
@@ -108,7 +125,7 @@ CREATE TABLE `player_storage` (
     `id` TEXT NOT NULL,
     `value` TEXT NOT NULL,
 	PRIMARY KEY(`player_id`),
-	KEY(`id`(10)),
+	KEY(`id`(20)),
     FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
@@ -133,7 +150,9 @@ CREATE TABLE `player_items` (
 
 CREATE TABLE `houses` (
 	`id` INT UNSIGNED NOT NULL,
-	`townid` INT UNSIGNED NOT NULL DEFAULT 0,
+	`world_id` INT UNSIGNED NOT NULL,
+	`map_id` INT UNSIGNED NOT NULL COMMENT 'house id in map editor',
+	`town_id` INT UNSIGNED NOT NULL DEFAULT 0,
 	`name` VARCHAR(100) NOT NULL,
 	`rent` INT UNSIGNED NOT NULL DEFAULT 0,
 	`guildhall` TINYINT(1) NOT NULL DEFAULT 0,
@@ -145,7 +164,10 @@ CREATE TABLE `houses` (
 	`clear` TINYINT(1) NOT NULL DEFAULT 0,
 	`warnings` INT NOT NULL DEFAULT 0,
 	`lastwarning` INT UNSIGNED NOT NULL DEFAULT 0,
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`id`),
+	KEY (`map_id`),
+	KEY (`town_id`),
+	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `house_auctions` (
@@ -185,12 +207,14 @@ CREATE TABLE `bans` (
 
 CREATE TABLE `tiles` (
 	`id` INT UNSIGNED NOT NULL,
+	`world_id` INT UNSIGNED NOT NULL,
 	`house_id` INT UNSIGNED NOT NULL DEFAULT 0,
 	`x` INT(5) UNSIGNED NOT NULL,
 	`y` INT(5) UNSIGNED NOT NULL,
 	`z` INT(2) UNSIGNED NOT NULL,
 	PRIMARY KEY(`id`),
-	KEY(`x`, `y`, `z`)
+	KEY(`x`, `y`, `z`),
+	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `tile_items` (
@@ -206,8 +230,10 @@ CREATE TABLE `tile_items` (
 
 CREATE TABLE `map_store` (
 	`house_id` INT UNSIGNED NOT NULL,
+	`world_id` INT UNSIGNED NOT NULL,
 	`data` LONGBLOB NOT NULL,
-	KEY(`house_id`)
+	KEY(`house_id`),
+	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_deaths` (
@@ -217,7 +243,7 @@ CREATE TABLE `player_deaths` (
 	`level` INT NOT NULL,
 	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
 	PRIMARY KEY(`id`),
-	INDEX(`date`)
+	KEY (`date`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `killers` (
@@ -258,7 +284,7 @@ CREATE TABLE `player_depotitems` (
 CREATE TABLE `global_storage` (
 	`id` TEXT NOT NULL,
 	`value` TEXT NOT NULL,
-	KEY(`id`(10))
+	KEY(`id`(20))
 ) ENGINE = InnoDB;
 
 CREATE TABLE `schema_info` (
@@ -267,7 +293,10 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 19);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 25);
+
+# The default world
+INSERT INTO `world` VALUES (1, "OTServ", 0, 7172);
 
 INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
 	VALUES ('1', 'Player', 0, 0, 1000, 50);
@@ -339,7 +368,8 @@ END|
 
 DELIMITER ;
 
-# uncomment to add a single player
-#INSERT INTO `groups` VALUES (1, 'Group 1', 0, 3, 10, 10);
-#INSERT INTO `accounts` VALUES (1, 'tibia', 'tibia', '', 0, 0, 0, 0);
-#INSERT INTO `players` VALUES (2, 'OTSCMS', 1, 1, 0, 1, 2252770, 53, 8, 11970, 11970, 11820, 11820, 1847, 100, 2, 10, 10, 10, 10, 128, 0, 116, 106, 7, 9980, 1221452439, 102017216, 1, '', 0, 0, '', 10, 10, 10, 10, 0, 1, 10000000);
+
+# uncomment to add a default account 1/tibia
+#INSERT INTO `accounts`(`name`, `password`) VALUES ('1', 'tibia');
+#INSERT INTO `players`(`name`, `account_id`, `group_id`, `world_id`, `town_id`, `conditions`) VALUES
+#	("Player", 1, 1, 1, 1, ""), ("Administrator", 1, 8, 1, 1, ""),

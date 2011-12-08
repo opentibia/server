@@ -23,6 +23,7 @@
 #include "script_environment.h"
 #include "script_listener.h"
 #include "condition_attributes.h"
+#include "account.h"
 #include "chat.h"
 #include "const.h"
 #include "boost/any.hpp"
@@ -541,7 +542,7 @@ namespace Script {
 		class Event : public Script::Event {
 		public:
 			Event(std::string& name, uint32_t& number, std::string& password,
-				time_t& premiumEnd, uint32_t& warnings, std::list<std::string>& charList);
+				time_t& premiumEnd, uint32_t& warnings, std::list<AccountCharacter>& charList);
 			~Event();
 
 			std::string getName() const {return "OnAccountLogin";}
@@ -562,7 +563,7 @@ namespace Script {
 			std::string& password;
 			time_t& premiumEnd;
 			uint32_t& warnings;
-			std::list<std::string>& charList;
+			std::list<AccountCharacter>& charList;
 		};
 	}	
 

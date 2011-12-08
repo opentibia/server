@@ -29,7 +29,7 @@ ConfigManager::ConfigManager()
 
 	m_confString[IP] = "";
 	m_confInteger[ADMIN_PORT] = 0;
-	m_confInteger[GAME_PORT] = 0;
+	m_confInteger[WORLD_ID] = 1;
 	m_confInteger[LOGIN_PORT] = 0;
 	m_confInteger[STATUS_PORT] = 0;
 }
@@ -63,8 +63,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		// These settings might have been set from command line
 		if(m_confString[IP] == "")
 			m_confString[IP] = getGlobalString(L, "server_ip", "127.0.0.1");
-		if(m_confInteger[GAME_PORT] == 0)
-			m_confInteger[GAME_PORT] = getGlobalNumber(L, "game_port");
+		if(m_confInteger[WORLD_ID] == 0)
+			m_confInteger[WORLD_ID] = getGlobalNumber(L, "world_id");
 		if(m_confInteger[ADMIN_PORT] == 0)
 			m_confInteger[ADMIN_PORT] = getGlobalNumber(L, "admin_port");
 		if(m_confInteger[LOGIN_PORT] == 0)
@@ -99,13 +99,12 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confInteger[SQL_PORT] = getGlobalNumber(L, "database_port");
 	}
 
-	m_confString[LOGIN_MSG] = getGlobalString(L, "login_message", "Welcome.");
-	m_confString[SERVER_NAME] = getGlobalString(L, "server_name");
-	m_confString[WORLD_NAME] = getGlobalString(L, "game_world_name", "OpenTibia");
-	m_confString[OWNER_NAME] = getGlobalString(L, "server_owner_name");
-	m_confString[OWNER_EMAIL] = getGlobalString(L, "server_owner_email");
-	m_confString[URL] = getGlobalString(L, "server_url");
-	m_confString[LOCATION] = getGlobalString(L, "server_location");
+	m_confString[LOGIN_MSG] = getGlobalString(L, "loginmsg", "Welcome.");
+	m_confString[SERVER_NAME] = getGlobalString(L, "servername");
+	m_confString[OWNER_NAME] = getGlobalString(L, "ownername");
+	m_confString[OWNER_EMAIL] = getGlobalString(L, "owneremail");
+	m_confString[URL] = getGlobalString(L, "url");
+	m_confString[LOCATION] = getGlobalString(L, "location");
 	m_confString[MAP_STORAGE_TYPE] = getGlobalString(L, "map_store_type", "relational");
 	m_confInteger[LOGIN_TRIES] = getGlobalNumber(L, "maximum_login_tries", 5);
 	m_confInteger[RETRY_TIMEOUT] = getGlobalNumber(L, "login_retry_timeout", 30 * 1000);
@@ -185,6 +184,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "status_information_timeout", 30 * 1000);
+	
 	m_isLoaded = true;
 	return true;
 }
@@ -240,6 +240,26 @@ bool ConfigManager::setNumber(uint32_t _what, int64_t _value)
 		std::cout << "Warning: [ConfigManager::setNumber] " << _what << std::endl;
 		return false;
 	}
+}
+
+std::vector<std::string> ConfigManager::getIPServerList()
+{
+	lua_getglobal(L, "ip_server_list");
+
+	if(!lua_istable(L, -1))
+		return std::vector<std::string>();
+
+	std::vector<std::string> servers;
+
+	lua_pushnil(L);
+	while (lua_next(L, -2)){
+		std::string s(lua_tostring(L, -1), lua_strlen(L, -1));
+		servers.push_back(s);
+		lua_pop(L, 1);
+	}
+	lua_pop(L, 1);
+
+	return servers;
 }
 
 bool ConfigManager::setString(uint32_t _what, const std::string& _value)

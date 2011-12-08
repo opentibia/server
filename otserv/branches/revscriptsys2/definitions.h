@@ -24,7 +24,7 @@
 
 #define OTSERV_VERSION "0.7.0_SVN"
 #define OTSERV_NAME "OTServ (branch revscriptsys)"
-#define CURRENT_SCHEMA_VERSION 19
+#define CURRENT_SCHEMA_VERSION 25
 
 #define CLIENT_VERSION_MIN 870
 #define CLIENT_VERSION_MAX 870

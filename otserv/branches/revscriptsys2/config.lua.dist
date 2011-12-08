@@ -15,31 +15,28 @@ map_file = "data/world/map.otbm"
 -- type /reload config and the save the server with /closeserver serversave
 map_store_type = "binary"
 
--- server name
-server_name = "OTServ"
+-- Bind to all available local IP addresses
+use_local_ip = false
 
--- server location
-server_location = "Germany"
+-- server ip (the ip that this server on)
+-- Can be "auto" to fetch the global ip automatically
+ip = "auto"
 
--- server ip (the ip that server listens on)
-server_ip = "127.0.0.1"
+-- ID of the world in the database, world name / port is fetched from the database
+world_id = 1
 
 -- login server port
 -- This should be the port used for connecting with IP changers etc.
-login_port = "7171"
-
--- game server port
--- game server must be on it's own port (due to limits of the protocol)
-game_port = "7172"
+login_port = 7171
 
 -- status port
 -- Used by status protocol connections, should be same as login
 -- to work correctly with server lists etc.
-status_port = "7171"
+status_port = 7171
 
 -- admin port
 -- Port used by the OTAdmin protocol
-admin_port = "7171"
+admin_port = 7171
 
 -- server url
 server_url = "http://otfans.net"
@@ -49,9 +46,6 @@ server_owner_name = "Tliff"
 
 -- server owner email
 server_owner_email = "otserv@tibia.de"
-
--- world name
-game_world_name = "OpenTibia"
 
 -- world type
 -- options: pvp, no-pvp, pvp-enforced
@@ -272,6 +266,14 @@ house_level = 1
 -- PS: This info is going to be shown just if house has no owner
 show_house_prices = false
 
+-- Server will pick one of these at random to fetch the global IP address
+ip_server_list = {
+	"http://remeresmapeditor.com/echo_ip.php",
+	"http://otfans.net/otserv/ip.php",
+	"http://classictibia.com/echo_ip.php",
+}
+
+-- SQL type
 -- The amount of events that can be called inside eachother
 script_recursion_depth = 16
 

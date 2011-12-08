@@ -27,6 +27,7 @@
 #include "enums.h"
 #include "const.h"
 #include "combat.h"
+#include "account.h"
 
 enum stackPosType_t{
 	STACKPOS_NORMAL,
@@ -491,7 +492,7 @@ public:
 
 	// Script event callbacks, all are in the game class so we don't have to include the script files
 	bool onAccountLogin(std::string& name, uint32_t& number, std::string& password,
-		time_t& premiumEnd, uint32_t& warnings, std::list<std::string>& charList);
+		time_t& premiumEnd, uint32_t& warnings, std::list<AccountCharacter>& charList);
 	bool onPlayerLogin(Player* player);
 	bool onPlayerLogout(Player* player, bool forced, bool timeout);
 	bool onPlayerChangeOutfit(Player* player, std::list<Outfit>& outfitList);

@@ -27,12 +27,18 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
+bool predicateAccountCharactersByName(const AccountCharacter& a, const AccountCharacter& b)
+{
+	return a.name < b.name;
+}
+
 Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* = false*/)
 {
 	Account acc;
 	acc.name = accountName;
 
-	if(g_game.onAccountLogin(acc.name, acc.number, acc.password,
+	if(g_game.onAccountLogin(
+		acc.name, acc.number, acc.password,
 		acc.premiumEnd, acc.warnings, acc.charList)){
 		//handled by script
 		return acc;
@@ -58,16 +64,26 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 		return acc;
 
 	query.str("");
-	query << "SELECT `name` FROM `players` WHERE `account_id` = " << acc.number;
+	query << "SELECT " <<
+			"`players`.`name` AS `name`, `worlds`.`name` AS `world`, " <<
+			"`worlds`.`port` AS `port`, `worlds`.`ip` AS `ip` " <<
+		"FROM `players` " <<
+		"LEFT JOIN `worlds` ON `worlds`.`id` = `players`.`world_id` " <<
+		"WHERE `account_id` = " << acc.number;
 	if(!(result = db->storeQuery(query.str()))){
 		return acc;
 	}
 
 	do {
-		acc.charList.push_back(result->getDataString("name"));
+		AccountCharacter c;
+		c.name = result->getDataString("name");
+		c.world = result->getDataString("world");
+		c.port = (uint16_t)result->getDataInt("port");
+		c.ip = (uint32_t)result->getDataLong("ip");
+		acc.charList.push_back(c);
 	} while(result->next());
 
-	acc.charList.sort();
+	acc.charList.sort(predicateAccountCharactersByName);
 	db->freeResult(result);
 	return acc;
 }
@@ -87,7 +103,9 @@ bool IOAccount::getPassword(const std::string& accountName, const std::string& p
 	DBQuery query;
 	DBResult* result;
 
-	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`name` = " << db->escapeString(accountName) << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(playerName);
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` " <<
+		"WHERE `accounts`.`name` = " << db->escapeString(accountName) << 
+		" AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(playerName);
 	if((result = db->storeQuery(query.str()))){
 		password = result->getDataString("password");
 		db->freeResult(result);

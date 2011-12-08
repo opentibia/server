@@ -34,12 +34,12 @@ public:
 		HOUSE_RENT_PERIOD,
 		LOGIN_MSG,
 		SERVER_NAME,
-		WORLD_NAME,
 		OWNER_NAME,
 		OWNER_EMAIL,
 		URL,
 		LOCATION,
 		IP,
+		USE_LOCAL_IP,
 		MOTD,
 		PASSWORD_TYPE_STR,
 		PASSWORD_SALT,
@@ -55,7 +55,7 @@ public:
 
 	enum integer_config_t {
 		LOGIN_TRIES = 0,
-		GAME_PORT,
+		WORLD_ID,
 		ADMIN_PORT,
 		LOGIN_PORT,
 		STATUS_PORT,
@@ -152,6 +152,8 @@ public:
 	int64_t getNumber(uint32_t _what) const;
 	bool setNumber(uint32_t _what, int64_t _value);
 	bool setString(uint32_t _what, const std::string& _value);
+
+	std::vector<std::string> getIPServerList();
 
 private:
 	static void moveValue(lua_State* fromL, lua_State* toL);

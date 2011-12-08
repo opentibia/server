@@ -22,6 +22,7 @@
 #define __OTSERV_IOACCOUNT_H__
 
 #include "classes.h"
+#include "account.h"
 
 class IOAccount {
 public:
@@ -38,20 +39,6 @@ public:
 	bool getPassword(const std::string& accountName, const std::string& playerName, std::string& password);
 	
 	static uint16_t getPremiumDaysLeft(uint32_t time);
-};
-
-class Account
-{
-public:
-	Account() : number(0), premiumEnd(0), warnings(0) {}
-	~Account() {};
-
-	std::string name;
-	uint32_t number;
-	std::string password;
-	time_t premiumEnd;
-	uint32_t warnings;
-	std::list<std::string> charList;
 };
 
 #endif

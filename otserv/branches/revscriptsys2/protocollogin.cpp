@@ -28,7 +28,6 @@
 #include <iomanip>
 
 extern ConfigManager g_config;
-extern IPList serverIPs;
 extern BanManager g_bans;
 extern Game g_game;
 
@@ -115,7 +114,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		disconnectClient(0x0A, "Your IP is banished!");
 		return false;
 	}
-
+	/*
 	uint32_t serverip = serverIPs[0].first;
 	for(uint32_t i = 0; i < serverIPs.size(); i++){
 		if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
@@ -123,6 +122,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 			break;
 		}
 	}
+	*/
 
 	Account account = IOAccount::instance()->loadAccount(accname);
 	if(!(asLowerCaseString(account.name) == asLowerCaseString(accname) &&
@@ -148,12 +148,13 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		//Add char list
 		output->AddByte(0x64);
 		output->AddByte((uint8_t)account.charList.size());
-		std::list<std::string>::iterator it;
+		std::list<AccountCharacter>::iterator it;
 		for(it = account.charList.begin(); it != account.charList.end(); it++){
-			output->AddString((*it));
-			output->AddString(g_config.getString(ConfigManager::WORLD_NAME));
-			output->AddU32(serverip);
-			output->AddU16(g_config.getNumber(ConfigManager::GAME_PORT));
+			const AccountCharacter& character = *it;
+			output->AddString(character.name);
+			output->AddString(character.world);
+			output->AddU32(character.ip);
+			output->AddU16(character.port);
 		}
 		output->AddU16(IOAccount::getPremiumDaysLeft(account.premiumEnd));
 

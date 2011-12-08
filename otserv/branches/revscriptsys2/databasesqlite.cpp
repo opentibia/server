@@ -235,6 +235,16 @@ int32_t SQLiteResult::getDataInt(const std::string &s)
 	return 0; // Failed
 }
 
+uint32_t SQLiteResult::getDataUInt(const std::string &s)
+{
+	listNames_t::iterator it = m_listNames.find(s);
+	if(it != m_listNames.end() )
+		return (uint32_t)sqlite3_column_int64(m_handle, it->second);
+
+	std::cout << "Error during getDataInt(" << s << ")." << std::endl;
+	return 0; // Failed
+}
+
 int64_t SQLiteResult::getDataLong(const std::string &s)
 {
 	listNames_t::iterator it = m_listNames.find(s);
