@@ -23,6 +23,36 @@
 #include "scheduler.h"
 #include "exception.h"
 
+SchedulerTask::SchedulerTask(const uint32_t& delay, const boost::function<void (void)>& f)
+	: Task(delay, f)
+	, m_eventid(0)
+{}
+	
+SchedulerTask::~SchedulerTask()
+{
+	// Virtual Destructor
+}
+
+void SchedulerTask::setEventId(const uint32_t& eventid)
+{
+	m_eventid = eventid;
+}
+
+const uint32_t& SchedulerTask::getEventId() const
+{
+	return m_eventid;
+}
+
+const boost::system_time& SchedulerTask::getCycle() const
+{
+	return m_expiration;
+}
+
+bool SchedulerTask::operator<(const SchedulerTask& other) const
+{
+	return getCycle() > other.getCycle();
+}
+
 Scheduler::Scheduler()
 {
 	m_lastEventId = 0;

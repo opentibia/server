@@ -23,6 +23,47 @@
 #include "fileloader.h"
 #include <cmath>
 
+NodeStruct::NodeStruct()
+{
+	start = 0;
+	propsSize = 0;
+	next = 0;
+	child = 0;
+	type = 0;
+}
+
+void NodeStruct::clearNet(NodeStruct* root)
+{
+	if(root){
+		clearChild(root);
+	}
+}
+
+void NodeStruct::clearNext(NodeStruct* node)
+{
+	NodeStruct* deleteNode = node;
+	NodeStruct* nextNode;
+	while(deleteNode){
+		if(deleteNode->child){
+			clearChild(deleteNode->child);
+		}
+		nextNode = deleteNode->next;
+		delete deleteNode;
+		deleteNode = nextNode;
+	}
+}
+
+void NodeStruct::clearChild(NodeStruct* node)
+{
+	if(node->child){
+		clearChild(node->child);
+	}
+	if(node->next){
+		clearNext(node->next);
+	}
+	delete node;
+}
+
 FileLoader::FileLoader()
 {
 	m_file = NULL;
@@ -475,6 +516,27 @@ inline bool FileLoader::safeTell(long &pos)
 	}
 }
 
+bool FileLoader::writeData(const void* data, int size, bool unescape){
+	for(int i = 0; i < size; ++i) {
+		unsigned char c = *(((unsigned char*)data) + i);
+		if(unescape && (c == NODE_START || c == NODE_END || c == ESCAPE_CHAR)) {
+			unsigned char escape = ESCAPE_CHAR;
+			size_t value = fwrite(&escape, 1, 1, m_file);
+			if(value != 1) {
+				m_lastError = ERROR_COULDNOTWRITE;
+				return false;
+			}
+		}
+		size_t value = fwrite(&c, 1, 1, m_file);
+		if(value != 1) {
+			m_lastError = ERROR_COULDNOTWRITE;
+			return false;
+		}
+	}
+	
+	return true;
+}
+
 inline unsigned long FileLoader::getCacheBlock(unsigned long pos)
 {
 	bool found = false;
@@ -539,4 +601,286 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 	m_cached_data[loading_cache].loaded = 1;
 
 	return loading_cache;
+}
+
+PropStream::PropStream()
+{
+	end = NULL;
+	p = NULL;
+}
+
+void PropStream::init(const char* a, unsigned long size)
+{
+	p = a;
+	end = a + size;
+}
+
+int64_t PropStream::size()
+{
+	return end-p;
+}
+
+#ifndef __SWAP_ENDIAN__
+bool PropStream::GET_UINT32(uint32_t& ret)
+{
+	return GET_VALUE(ret);
+}
+
+bool PropStream::GET_INT32(int32_t &ret)
+{
+	return GET_VALUE(ret);
+}
+
+bool PropStream::GET_UINT16(uint16_t& ret)
+{
+	return GET_VALUE(ret);
+}
+
+bool PropStream::GET_INT16(int16_t& ret)
+{
+	return GET_VALUE(ret);
+}
+
+bool PropStream::GET_FLOAT(float& ret)
+{
+	return GET_VALUE(ret);
+}
+
+#else
+
+bool PropStream::GET_UINT32(uint32_t& ret)
+{
+	bool b = GET_VALUE(ret);
+	swap_uint32(ret);
+	return b;
+}
+
+bool PropStream::GET_INT32(int32_t& ret)
+{
+	bool b = GET_VALUE(ret);
+	swap_int32(ret);
+	return b;
+}
+
+bool PropStream::GET_UINT16(uint16_t& ret)
+{
+	bool b = GET_VALUE(ret);
+	swap_uint16(ret);
+	return b;
+}
+
+bool PropStream::GET_INT16(int16_t& ret)
+{
+	bool b = GET_VALUE(ret);
+	swap_int16(ret);
+	return b;
+}
+
+bool PropStream::GET_FLOAT(float& ret)
+{
+	bool b = GET_VALUE(ret);
+	swap_float(ret);
+	return b;
+}
+
+#endif
+
+bool PropStream::GET_UINT8(uint8_t& ret)
+{
+	return GET_VALUE(ret);
+}
+
+bool PropStream::GET_INT8(int8_t& ret)
+{
+	return GET_VALUE(ret);
+}
+
+bool PropStream::GET_CHAR(int8_t& ret)
+{
+	return GET_VALUE(ret);
+}
+
+bool PropStream::GET_STRING(std::string& ret)
+{
+	char* str;
+	uint16_t str_len;
+
+	if(!GET_VALUE(str_len)){
+		return false;
+	}
+	if(size() < (int32_t)str_len){
+		return false;
+	}
+	str = new char[str_len+1];
+	memcpy(str, p, str_len);
+	str[str_len] = 0;
+	ret.assign(str, str_len);
+	delete[] str;
+	p = p + str_len;
+	return true;
+}
+
+bool PropStream::GET_LSTRING(std::string& ret
+){
+	char* str;
+	uint32_t str_len;
+
+	if(!GET_VALUE(str_len)){
+		return false;
+	}
+	if(size() < (int32_t)str_len){
+		return false;
+	}
+	str = new char[str_len+1];
+	memcpy(str, p, str_len);
+	str[str_len] = 0;
+	ret.assign(str, str_len);
+	delete[] str;
+	p = p + str_len;
+	return true;
+}
+
+bool PropStream::GET_NSTRING(std::string& ret, unsigned short str_len)
+{
+	char* str;
+	if(size() < (int32_t)str_len){
+		return false;
+	}
+	str = new char[str_len+1];
+	memcpy(str, p, str_len);
+	str[str_len] = 0;
+	ret.assign(str, str_len); // String can contain 0s
+	delete[] str;
+	p = p + str_len;
+	return true;
+}
+
+bool PropStream::GET_RAWSTRING(char* buffer, unsigned short str_len)
+{
+	if(size() < (int32_t)str_len){
+		return false;
+	}
+	memcpy(&buffer[0], p, str_len);
+	p = p + str_len;
+	return true;
+}
+
+bool PropStream::SKIP_N(int32_t n)
+{
+	if(size() < n){
+		return false;
+	}
+	p = p + n;
+	return true;
+}
+
+PropWriteStream::PropWriteStream()
+{
+	buffer = (char*)malloc(32*sizeof(char));
+	buffer_size = 32;
+	size = 0;
+	memset(buffer, 0, 32*sizeof(char));
+}
+
+PropWriteStream::~PropWriteStream()
+{
+	free(buffer);
+}
+
+const char* PropWriteStream::getStream(uint32_t& _size) const
+{
+	_size = size;
+	return buffer;
+}
+
+#ifndef __SWAP_ENDIAN__
+
+void PropWriteStream::ADD_UINT32(uint32_t ret)
+{
+	ADD_VALUE(ret);
+}
+
+void PropWriteStream::ADD_INT32(int32_t ret)
+{
+	ADD_VALUE(ret);
+}
+
+void PropWriteStream::ADD_UINT16(uint16_t ret)
+{
+	ADD_VALUE(ret);
+}
+
+void PropWriteStream::ADD_INT16(int16_t ret)
+{
+	ADD_VALUE(ret);
+}
+
+void PropWriteStream::ADD_FLOAT(float ret)
+{
+	ADD_VALUE(ret);
+}
+
+#else
+
+void PropWriteStream::ADD_UINT32(uint32_t ret)
+{
+	ADD_VALUE(swap_uint32(ret));
+}
+
+void PropWriteStream::ADD_INT32(int32_t ret)
+{
+	ADD_VALUE(swap_int32(ret));
+}
+
+void PropWriteStream::ADD_UINT16(uint16_t ret)
+{
+	ADD_VALUE(swap_uint16(ret));
+}
+
+void PropWriteStream::ADD_INT16(int16_t ret)
+{
+	ADD_VALUE(swap_int16(ret));
+}
+
+void PropWriteStream::ADD_FLOAT(float ret)
+{
+	ADD_VALUE(swap_float(ret));
+}
+
+#endif
+
+void PropWriteStream::ADD_UINT8(uint8_t ret)
+{
+	ADD_VALUE(ret);
+}
+
+void PropWriteStream::ADD_INT8(int8_t ret)
+{
+	ADD_VALUE(ret);
+}
+
+void PropWriteStream::ADD_STRING(const std::string& add)
+{
+	uint16_t str_len = (uint16_t)add.size();
+	ADD_VALUE(str_len);
+
+	if((buffer_size - size) < str_len){
+		buffer_size = buffer_size + str_len + 0x1F;
+		buffer = (char*)realloc(buffer, buffer_size);
+	}
+
+	memcpy(&buffer[size], add.c_str(), str_len);
+	size = size + str_len;
+}
+
+void PropWriteStream::ADD_LSTRING(const std::string& add)
+{
+	uint32_t str_len = (uint32_t)add.size();
+	ADD_VALUE(str_len);
+	if((buffer_size - size) < str_len){
+		buffer_size = buffer_size + str_len + 0x1F;
+		buffer = (char*)realloc(buffer, buffer_size);
+	}
+	memcpy(&buffer[size], add.c_str(), str_len);
+	size = size + str_len;
 }

@@ -116,7 +116,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	loadOutfit(player, result);
 
-#ifdef __SKULLSYSTEM__
 	int32_t skullType = result->getDataInt("skull_type");
 	int64_t lastSkullTime = result->getDataLong("skull_time");
 
@@ -125,7 +124,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		player->lastSkullTime = lastSkullTime;
 		player->skullType = (Skulls_t)skullType;
 	}
-#endif
 
 	loadConditions(player, result);
 
@@ -350,7 +348,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 
 	loadOutfit(player, result);
 
-#ifdef __SKULLSYSTEM__
 	int32_t skullType = result->getDataInt("skull_type");
 	int64_t lastSkullTime = result->getDataLong("skull_time");
 
@@ -359,7 +356,6 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		player->lastSkullTime = lastSkullTime;
 		player->skullType = (Skulls_t)skullType;
 	}
-#endif
 
 	loadConditions(player, result);
 
@@ -773,14 +769,10 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	<< ", `loss_items` = " << (int32_t)player->getLossPercent(LOSS_ITEMS)
 	<< ", `loss_containers` = " << (int32_t)player->getLossPercent(LOSS_CONTAINERS)
 	<< ", `balance` = " << player->balance
-	<< ", `stamina` = " << player->stamina;
-
-#ifdef __SKULLSYSTEM__
-	query << ", `skull_type` = " << (player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK ? player->getSkull() : 0);
-	query << ", `skull_time` = " << player->lastSkullTime;
-#endif
-
-	query << " WHERE `id` = " << player->getGUID();
+	<< ", `stamina` = " << player->stamina
+	<< ", `skull_type` = " << (player->getSkull() == SKULL_RED || player->getSkull() == SKULL_BLACK ? player->getSkull() : 0)
+	<< ", `skull_time` = " << player->lastSkullTime
+	<< " WHERE `id` = " << player->getGUID();
 
 	DBTransaction transaction(db);
 	if(!transaction.begin())

@@ -129,32 +129,28 @@ public:
 
 	std::string getDescription(uint8_t count) const;
 
-	bool isGroundTile() const {return (group == ITEM_GROUP_GROUND);}
-	bool isContainer() const {return (group == ITEM_GROUP_CONTAINER);}
-	bool isSplash() const {return (group == ITEM_GROUP_SPLASH);}
-	bool isFluidContainer() const {return (group == ITEM_GROUP_FLUID);}
+	bool isGroundTile() const;
+	bool isContainer() const;
+	bool isSplash() const;
+	bool isFluidContainer() const;
 
-	bool isDoor() const {return (type == ITEM_TYPE_DOOR);}
-	bool isMagicField() const {return (type == ITEM_TYPE_MAGICFIELD);}
-	bool isTeleport() const {return (type == ITEM_TYPE_TELEPORT);}
-	bool isKey() const {return (type == ITEM_TYPE_KEY);}
-	bool isDepot() const {return (type == ITEM_TYPE_DEPOT);}
-	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
-	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
-	bool isRune() const {return (type == ITEM_TYPE_RUNE);}
-	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
-	bool isSolidForItems() const { return id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE;}
-
-	//[ added for beds system
-	bool isBed() const {return type == ITEM_TYPE_BED;}
-
-	bool isLevelDoor() const {return id == 1227 || id == 1229 || id == 1245 || id == 1247 || id == 1259 || id == 1261 || id == 3540 || id == 3549 || id == 5103 || id == 5112 || id == 5121 || id == 5130 || id == 5292 || id == 5294 || id == 6206 || id == 6208 || id == 6263 || id == 6265 || id == 6896 || id == 6905 || id == 7038 || id == 7047 || id == 8555 || id == 8557 || id == 9179 || id == 9181 || id == 9281 || id == 9283 || id == 10282 || id == 10284 || id == 10473 ||  id == 10482 ||  id == 10780 || id == 10789; }
+	bool isDoor() const;
+	bool isMagicField() const;
+	bool isTeleport() const;
+	bool isKey() const;
+	bool isDepot() const;
+	bool isMailbox() const;
+	bool isTrashHolder() const;
+	bool isRune() const;
+	bool hasSubType() const;
+	bool isSolidForItems() const;
+	bool isBed() const;
+	bool isLevelDoor() const;
 
 	Direction bedPartnerDir;
 	uint16_t maleSleeperID;
 	uint16_t femaleSleeperID;
 	uint16_t noSleeperID;
-	//]
 
 	uint16_t id;
 	uint16_t clientId;
@@ -164,7 +160,7 @@ public:
 	std::string    pluralName;
 	std::string    description;
 	uint16_t       maxItems;
-	float          weight;
+	double          weight;
 	bool           showCount;
 	WeaponType_t   weaponType;
 	Ammo_t         amuType;
@@ -174,7 +170,7 @@ public:
 	int32_t        defense;
 	int32_t        extraDef;
 	int32_t        armor;
-	uint16_t       slot_position;
+	uint32_t       slot_position;
 	uint16_t       wield_position;
 	bool           isVertical;
 	bool           isHorizontal;
@@ -294,22 +290,19 @@ private:
 	uint32_t m_size;
 };
 
-
-
 class Items{
 public:
 	Items();
-	~Items();
 
 	bool reload();
 	void clear();
 
-	int loadFromOtb(std::string);
+	int loadFromOtb(const std::string& file);
 
-	const ItemType& operator[](int32_t id) const {return getItemType(id);}
-	const ItemType& getItemType(int32_t id) const;
-	ItemType& getItemType(int32_t id);
-	const ItemType& getItemIdByClientId(int32_t spriteId) const;
+	const ItemType& operator[](const int32_t& id) const;
+	const ItemType& getItemType(const int32_t& id) const;
+	ItemType& getItemType(const int32_t& id);
+	const ItemType& getItemIdByClientId(const int32_t &spriteId) const;
 
 	int32_t getItemIdByName(const std::string& name);
 
@@ -319,10 +312,8 @@ public:
 
 	bool loadFromXml(const std::string& datadir);
 
-	void addItemType(ItemType* iType);
-
-	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
-	uint32_t size() {return items.size();}
+	const ItemType* getElement(const uint32_t& id) const;
+	uint32_t size() const;
 
 	std::map<uint32_t, ItemType*> currencyMap;
 

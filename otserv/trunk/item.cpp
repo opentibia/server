@@ -39,9 +39,420 @@
 extern Game g_game;
 extern Weapons* g_weapons;
 
+
+ItemAttributes::ItemAttributes()
+{
+	m_attributes = 0;
+	m_firstAttr = NULL;
+}
+
+ItemAttributes::ItemAttributes(const ItemAttributes& i)
+{
+	m_attributes = i.m_attributes;
+	if(i.m_firstAttr){
+		m_firstAttr = new Attribute(*i.m_firstAttr);
+	}
+}
+
+ItemAttributes::~ItemAttributes()
+{
+	if(m_firstAttr){
+		deleteAttrs(m_firstAttr);
+	}
+}
+
+void ItemAttributes::setSpecialDescription(const std::string& desc)
+{
+	setStrAttr(ATTR_ITEM_DESC, desc);
+}
+
+void ItemAttributes::resetSpecialDescription()
+{
+	removeAttribute(ATTR_ITEM_DESC);
+}
+
+const std::string& ItemAttributes::getSpecialDescription() const
+{
+	return getStrAttr(ATTR_ITEM_DESC);
+}
+
+void ItemAttributes::setText(const std::string& text)
+{
+	setStrAttr(ATTR_ITEM_TEXT, text);
+}
+
+void ItemAttributes::resetText()
+{
+	removeAttribute(ATTR_ITEM_TEXT);
+}
+
+const std::string& ItemAttributes::getText() const
+{
+	return getStrAttr(ATTR_ITEM_TEXT);
+}
+
+void ItemAttributes::setWrittenDate(const time_t& n)
+{
+	setIntAttr(ATTR_ITEM_WRITTENDATE, (uint32_t)n);
+}
+
+void ItemAttributes::resetWrittenDate()
+{
+	removeAttribute(ATTR_ITEM_WRITTENDATE);
+}
+
+time_t ItemAttributes::getWrittenDate() const
+{
+	return (time_t)getIntAttr(ATTR_ITEM_WRITTENDATE);
+}
+
+void ItemAttributes::setWriter(const std::string& _writer)
+{
+	setStrAttr(ATTR_ITEM_WRITTENBY, _writer);
+}
+
+void ItemAttributes::resetWriter()
+{
+	removeAttribute(ATTR_ITEM_WRITTENBY);
+}
+
+const std::string& ItemAttributes::getWriter() const
+{
+	return getStrAttr(ATTR_ITEM_WRITTENBY);
+}
+
+void ItemAttributes::setActionId(const uint16_t& n)
+{
+	setIntAttr(ATTR_ITEM_ACTIONID, n > 100 ? n : 100);
+}
+
+uint16_t ItemAttributes::getActionId() const
+{
+	return (uint16_t)getIntAttr(ATTR_ITEM_ACTIONID);
+}
+
+void ItemAttributes::setUniqueId(const uint16_t& n)
+{
+	setIntAttr(ATTR_ITEM_UNIQUEID, n > 1000 ? n : 1000);
+}
+
+uint16_t ItemAttributes::getUniqueId() const
+{
+	return (uint16_t)getIntAttr(ATTR_ITEM_UNIQUEID);
+}
+
+void ItemAttributes::setCharges(const uint16_t& n)
+{
+	setIntAttr(ATTR_ITEM_CHARGES, n);
+}
+
+uint16_t ItemAttributes::getCharges() const
+{
+	return (uint16_t)getIntAttr(ATTR_ITEM_CHARGES);
+}
+
+void ItemAttributes::setFluidType(const uint16_t& n)
+{
+	setIntAttr(ATTR_ITEM_FLUIDTYPE, n);
+}
+
+uint16_t ItemAttributes::getFluidType() const
+{
+	return (uint16_t)getIntAttr(ATTR_ITEM_FLUIDTYPE);
+}
+
+void ItemAttributes::setOwner(const uint32_t& _owner)
+{
+	setIntAttr(ATTR_ITEM_OWNER, _owner);
+}
+
+uint32_t ItemAttributes::getOwner() const
+{
+	return (uint32_t)getIntAttr(ATTR_ITEM_OWNER);
+}
+
+void ItemAttributes::setCorpseOwner(const uint32_t& _corpseOwner)
+{
+	setIntAttr(ATTR_ITEM_CORPSEOWNER, _corpseOwner);
+}
+
+uint32_t ItemAttributes::getCorpseOwner()
+{
+	return (uint32_t)getIntAttr(ATTR_ITEM_CORPSEOWNER);
+}
+
+void ItemAttributes::setDuration(const int32_t& time)
+{
+	setIntAttr(ATTR_ITEM_DURATION, time);
+}
+
+void ItemAttributes::decreaseDuration(const int32_t& time)
+{
+	increaseIntAttr(ATTR_ITEM_DURATION, -time);
+}
+
+int32_t ItemAttributes::getDuration() const
+{
+	return (int32_t)getIntAttr(ATTR_ITEM_DURATION);
+}
+
+void ItemAttributes::setDecaying(const ItemDecayState_t& decayState)
+{
+	setIntAttr(ATTR_ITEM_DECAYING, decayState);
+}
+
+uint32_t ItemAttributes::getDecaying() const
+{
+	return (uint32_t)getIntAttr(ATTR_ITEM_DECAYING);
+}
+
+bool ItemAttributes::hasAttribute(const itemAttrTypes& type) const
+{
+	if(!validateIntAttrType(type))
+		return false;
+
+	Attribute* attr = getAttrConst(type);
+	if(attr){
+		return true;
+	}
+
+	return false;
+}
+
+void ItemAttributes::removeAttribute(const itemAttrTypes& type)
+{
+	//check if we have it
+	if((type & m_attributes) != 0){
+		//go trough the linked list until find it
+		Attribute* prevAttr = NULL;
+		Attribute* curAttr = m_firstAttr;
+		while(curAttr){
+			if(curAttr->type == type){
+				//found so remove it from the linked list
+				if(prevAttr){
+					prevAttr->next = curAttr->next;
+				}
+				else{
+					m_firstAttr = curAttr->next;
+				}
+				//remove it from flags
+				m_attributes = m_attributes & ~type;
+
+				//delete string if it is string type
+				if(validateStrAttrType(type)){
+					delete (std::string*)curAttr->value;
+				}
+				//finally delete the attribute and return
+				delete curAttr;
+				return;
+			}
+
+			//advance in the linked list
+			prevAttr = curAttr;
+			curAttr = curAttr->next;
+		}
+	}
+}
+
+const std::string& ItemAttributes::getStrAttr(const itemAttrTypes& type) const
+{
+	static const std::string EMPTY_STRING;
+	if(!validateStrAttrType(type))
+		return EMPTY_STRING;
+
+	//this will *NOT* create the attribute if it does not exist
+	Attribute* attr = getAttrConst(type);
+	if(attr){
+		return *(std::string*)attr->value;
+	}
+	else{
+		return EMPTY_STRING;
+	}
+}
+
+void ItemAttributes::setStrAttr(const itemAttrTypes& type, const std::string& value)
+{
+	if(!validateStrAttrType(type))
+		return;
+
+	if(value.length() == 0)
+		return;
+
+	//this will create the attribute if it does not exist
+	Attribute* attr = getAttr(type);
+	if(attr){
+		//if has a previous value delete it
+		if(attr->value){
+			delete (std::string*)attr->value;
+		}
+		//create the new value as string
+		attr->value = (void*)new std::string(value);
+	}
+}
+
+uint32_t ItemAttributes::getIntAttr(const itemAttrTypes& type) const
+{
+	if(!validateIntAttrType(type))
+		return 0;
+
+	Attribute* attr = getAttrConst(type);
+	if(attr){
+		return static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value));
+	}
+	else{
+		return 0;
+	}
+}
+
+void ItemAttributes::setIntAttr(const itemAttrTypes& type, const int32_t& value)
+{
+	if(!validateIntAttrType(type))
+		return;
+
+	Attribute* attr = getAttr(type);
+	if(attr){
+		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(value));
+	}
+}
+
+void ItemAttributes::increaseIntAttr(const itemAttrTypes& type, const int32_t& value)
+{
+	if(!validateIntAttrType(type))
+		return;
+
+	Attribute* attr = getAttr(type);
+	if(attr){
+		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value)) + value));
+	}
+}
+
+bool ItemAttributes::validateIntAttrType(const itemAttrTypes& type)
+{
+	//list of numeric type attributes
+	switch(type){
+	case ATTR_ITEM_ACTIONID:
+	case ATTR_ITEM_UNIQUEID:
+	case ATTR_ITEM_OWNER:
+	case ATTR_ITEM_DURATION:
+	case ATTR_ITEM_DECAYING:
+	case ATTR_ITEM_WRITTENDATE:
+	case ATTR_ITEM_CORPSEOWNER:
+	case ATTR_ITEM_CHARGES:
+	case ATTR_ITEM_FLUIDTYPE:
+	case ATTR_ITEM_DOORID:
+		return true;
+		break;
+
+	default:
+		return false;
+		break;
+	}
+	return false;
+}
+
+bool ItemAttributes::validateStrAttrType(const itemAttrTypes& type)
+{
+	//list of text type attributes
+	switch(type){
+	case ATTR_ITEM_DESC:
+	case ATTR_ITEM_TEXT:
+	case ATTR_ITEM_WRITTENBY:
+		return true;
+		break;
+	default:
+		return false;
+		break;
+	}
+	return false;
+}
+
+void ItemAttributes::addAttr(Attribute* attr)
+{
+	//add an attribute to the linked list
+	if(m_firstAttr){
+		//is not the first, so look for the end of the list
+		Attribute* curAttr = m_firstAttr;
+		while(curAttr->next){
+			curAttr = curAttr->next;
+		}
+		//and add it at the end
+		curAttr->next = attr;
+	}
+	else{
+		//is the first
+		m_firstAttr = attr;
+	}
+	//add it to flags
+	m_attributes = m_attributes | attr->type;
+}
+
+ItemAttributes::Attribute* ItemAttributes::getAttrConst(const itemAttrTypes& type) const
+{
+	//check flags
+	if((type & m_attributes) == 0){
+		return NULL;
+	}
+	//it is here, so search it in the linked list
+	Attribute* curAttr = m_firstAttr;
+	while(curAttr){
+		if(curAttr->type == type){
+			//found
+			return curAttr;
+		}
+		curAttr = curAttr->next;
+	}
+	//not found?
+	std::cout << "Warning: [ItemAttributes::getAttrConst] (type & m_attributes) != 0 but attribute not found" << std::endl;
+	return NULL;
+}
+
+ItemAttributes::Attribute* ItemAttributes::getAttr(const itemAttrTypes& type)
+{
+	Attribute* curAttr;
+	if((type & m_attributes) == 0){
+		//if that type was not present add it
+		curAttr = new Attribute(type);
+		addAttr(curAttr);
+		return curAttr;
+	}
+	else{
+		//was present, search and return it
+		curAttr = m_firstAttr;
+		while(curAttr){
+			if(curAttr->type == type){
+				return curAttr;
+			}
+			curAttr = curAttr->next;
+		}
+	}
+	std::cout << "Warning: [ItemAttributes::getAttr] (type & m_attributes) != 0 but attribute not found" << std::endl;
+	curAttr = new Attribute(type);
+	addAttr(curAttr);
+	return curAttr;
+}
+
+void ItemAttributes::deleteAttrs(Attribute* attr)
+{
+	//deletes all attributes recursively
+	if(attr){
+		//if is string type, delete the allocated string
+		if(validateStrAttrType(attr->type)){
+			delete (std::string*)attr->value;
+		}
+		Attribute* next_attr = attr->next;
+		attr->next = NULL;
+		//delete next while it was not NULL
+		if(next_attr){
+			deleteAttrs(next_attr);
+		}
+		delete attr;
+	}
+}
+
+
 Items Item::items;
 
-Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
+Item* Item::CreateItem(const uint16_t& _type, const uint16_t& _count /*= 0*/)
 {
 	Item* newItem = NULL;
 
@@ -52,10 +463,6 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 		std::cout << "Error: [Item::CreateItem] Item id " << it.id << " has been declared deprecated."  << std::endl;
 #endif
 		return NULL;
-	}
-
-	if(it.stackable && !_count){
-		_count = 1;
 	}
 
 	if(it.id != 0){
@@ -84,7 +491,14 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 			newItem = new BedItem(_type);
 		}
 		else{
-			newItem = new Item(_type, _count);
+			if(it.stackable && !_count)
+			{
+				newItem = new Item(_type, 1);
+			}
+			else
+			{
+				newItem = new Item(_type, _count);
+			}
 		}
 
 		newItem->useThing2();
@@ -166,8 +580,8 @@ bool Item::loadContainer(xmlNodePtr parentNode, Container* parent)
 	return true;
 }
 
-Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
-	ItemAttributes()
+Item::Item(const uint16_t& _type, const uint16_t& _count /*= 0*/)
+	: ItemAttributes()
 {
 	id = _type;
 
@@ -199,8 +613,9 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 	setDefaultDuration();
 }
 
-Item::Item(const Item &i) :
-	Thing(), ItemAttributes()
+Item::Item(const Item &i)
+	: Thing()
+	, ItemAttributes()
 {
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
@@ -210,6 +625,11 @@ Item::Item(const Item &i) :
 	if(i.m_firstAttr){
 		m_firstAttr = new Attribute(*i.m_firstAttr);
 	}
+}
+
+Item::~Item()
+{
+	// Virtual Destructor
 }
 
 Item* Item::clone() const
@@ -234,9 +654,84 @@ void Item::copyAttributes(Item* item)
 	removeAttribute(ATTR_ITEM_DURATION);
 }
 
-Item::~Item()
+Item* Item::getItem()
 {
-	//std::cout << "Item destructor " << this << std::endl;
+	return this;
+}
+
+const Item* Item::getItem() const
+{
+	return this;
+}
+
+Container* Item::getContainer()
+{
+	return NULL;
+}
+
+const Container* Item::getContainer() const
+{
+	return NULL;
+}
+
+Teleport* Item::getTeleport()
+{
+	return NULL;
+}
+
+const Teleport* Item::getTeleport() const
+{
+	return NULL;
+}
+
+TrashHolder* Item::getTrashHolder()
+{
+	return NULL;
+}
+
+const TrashHolder* Item::getTrashHolder() const
+{
+	return NULL;
+}
+
+Mailbox* Item::getMailbox()
+{
+	return NULL;
+}
+
+const Mailbox* Item::getMailbox() const
+{
+	return NULL;
+}
+
+Door* Item::getDoor()
+{
+	return NULL;
+}
+
+const Door* Item::getDoor() const
+{
+	return NULL;
+}
+
+MagicField* Item::getMagicField()
+{
+	return NULL;
+}
+
+const MagicField* Item::getMagicField() const
+{
+	return NULL;
+}
+
+BedItem* Item::getBed()
+{
+	return NULL;
+}
+
+const BedItem* Item::getBed() const
+{
+	return NULL;
 }
 
 void Item::setDefaultSubtype()
@@ -263,7 +758,7 @@ void Item::onRemoved()
 	}
 }
 
-void Item::setID(uint16_t newid)
+void Item::setID(const uint16_t& newid)
 {
 	const ItemType& prevIt = Item::items[id];
 	id = newid;
@@ -326,7 +821,22 @@ const Player* Item::getHoldingPlayer() const
 	return const_cast<Item*>(this)->getHoldingPlayer();
 }
 
-void Item::setSubType(uint16_t n)
+const WeaponType_t& Item::getWeaponType() const
+{
+	return items[id].weaponType;
+}
+
+const Ammo_t& Item::getAmuType() const
+{
+	return items[id].amuType;
+}
+
+const uint32_t& Item::getShootRange() const
+{
+	return items[id].shootRange;
+}
+
+void Item::setSubType(const uint16_t& n)
 {
 	const ItemType& it = items[id];
 
@@ -344,7 +854,7 @@ void Item::setSubType(uint16_t n)
 	}
 }
 
-Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue Item::readAttr(const AttrTypes_t& attr, PropStream& propStream)
 {
 	switch(attr){
 		case ATTR_COUNT:
@@ -638,7 +1148,17 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream) const
 	return true;
 }
 
-bool Item::hasProperty(enum ITEMPROPERTY prop) const
+bool Item::isPushable() const
+{
+	return !isNotMoveable();
+}
+
+int Item::getThrowRange() const
+{
+	return (isPickupable() ? 15 : 2);
+}
+
+bool Item::hasProperty(const ITEMPROPERTY& prop) const
 {
 	const ItemType& it = items[id];
 
@@ -709,6 +1229,142 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 	return false;
 }
 
+bool Item::isBlocking(const Creature* creature) const
+{
+	return items[id].blockSolid;
+}
+
+bool Item::isStackable() const
+{
+	return items[id].stackable;
+}
+
+bool Item::isRune() const
+{
+	return items[id].isRune();
+}
+
+bool Item::isFluidContainer() const
+{
+	return (items[id].isFluidContainer());
+}
+
+bool Item::isAlwaysOnTop() const
+{
+	return items[id].alwaysOnTop;
+}
+
+bool Item::isGroundTile() const
+{
+	return items[id].isGroundTile();
+}
+
+bool Item::isSplash() const
+{
+	return items[id].isSplash();
+}
+
+bool Item::isMagicField() const
+{
+	return items[id].isMagicField();
+}
+
+bool Item::isNotMoveable() const
+{
+	return !items[id].moveable;
+}
+
+bool Item::isMoveable() const
+{
+	return items[id].moveable;
+}
+
+bool Item::isPickupable() const
+{
+	return items[id].pickupable;
+}
+
+bool Item::isWeapon() const
+{
+	return (items[id].weaponType != WEAPON_NONE);
+}
+
+bool Item::isUseable() const
+{
+	return items[id].useable;
+}
+
+bool Item::isHangable() const
+{
+	return items[id].isHangable;
+}
+
+bool Item::isRoteable() const
+{
+	const ItemType& it = items[id];
+	return it.rotable && it.rotateTo;
+}
+
+bool Item::isDoor() const
+{
+	return items[id].isDoor();
+}
+
+bool Item::isBed() const
+{
+	return items[id].isBed();
+}
+
+bool Item::isLevelDoor() const
+{
+	return items[id].isLevelDoor();
+}
+
+bool Item::hasCharges() const
+{
+	return getCharges() > 0;
+}
+
+bool Item::isSolidForItems() const
+{
+	return items[id].isSolidForItems();
+}
+
+bool Item::floorChangeDown() const
+{
+	return items[id].floorChangeDown;
+}
+
+bool Item::floorChangeNorth() const
+{
+	return items[id].floorChangeNorth;
+}
+
+bool Item::floorChangeSouth() const
+{
+	return items[id].floorChangeSouth;
+}
+
+bool Item::floorChangeEast() const
+{
+	return items[id].floorChangeEast;
+}
+
+bool Item::floorChangeWest() const
+{
+	return items[id].floorChangeWest;
+}
+
+const std::string& Item::getName() const
+{
+	return items[id].name;
+}
+
+const std::string& Item::getPluralName() const
+{
+	return items[id].pluralName;
+}
+
 double Item::getWeight() const
 {
 	if(isStackable()){
@@ -718,7 +1374,57 @@ double Item::getWeight() const
 	return items[id].weight;
 }
 
-std::string Item::getLongName(const ItemType& it, int32_t lookDistance,
+const int& Item::getAttack() const
+{
+	return items[id].attack;
+}
+
+const int& Item::getArmor() const
+{
+	return items[id].armor;
+}
+
+const int& Item::getDefense() const
+{
+	return items[id].defense;
+}
+
+const int& Item::getExtraDef() const
+{
+	return items[id].extraDef;
+}
+
+const uint32_t& Item::getSlotPosition() const
+{
+	return items[id].slot_position;
+}
+
+const uint16_t& Item::getWieldPosition() const
+{
+	return items[id].wield_position;
+}
+
+const int& Item::getHitChance() const
+{
+	return items[id].hitChance;
+}
+
+bool Item::isReadable() const
+{
+	return items[id].canReadText;
+}
+
+bool Item::canWriteText() const
+{
+	return items[id].canWriteText;
+}
+
+const uint16_t& Item::getMaxWriteLength() const
+{
+	return items[id].maxTextLen;
+}
+
+std::string Item::getLongName(const ItemType& it, const int32_t& lookDistance,
 	const Item* item /*= NULL*/, int32_t subType /*= -1*/, bool addArticle /*= true*/)
 {
 	std::ostringstream s;
@@ -755,7 +1461,26 @@ std::string Item::getLongName() const
 	return getLongName(it, 0, this);
 }
 
-std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
+const uint8_t& Item::getItemCount() const
+{
+	return count;
+}
+
+void Item::setItemCount(const uint8_t& n)
+{
+	count = n > 1 ? n : 0;
+}
+
+uint32_t Item::countByType(const Item* i, const int32_t& subType)
+{
+	if(subType == -1 || subType == i->getSubType()){
+		return i->getItemCount();
+	}
+
+	return 0;
+}
+
+std::string Item::getDescription(const ItemType& it, const int32_t& lookDistance,
 	const Item* item /*= NULL*/, int32_t subType /*= -1*/, bool addArticle /*= true*/)
 {
 	std::stringstream s;
@@ -1104,13 +1829,23 @@ std::string Item::getWeightDescription() const
 	}
 }
 
-std::string Item::getWeightDescription(double weight) const
+const uint16_t& Item::getID() const
+{
+	return id;
+}
+
+const uint16_t& Item::getClientID() const
+{
+	return items[id].clientId;
+}
+
+std::string Item::getWeightDescription(const double& weight) const
 {
 	const ItemType& it = Item::items[id];
 	return getWeightDescription(it, weight, getItemCount());
 }
 
-std::string Item::getWeightDescription(const ItemType& it, double weight, uint32_t count /*= 1*/)
+std::string Item::getWeightDescription(const ItemType& it, double weight, const uint32_t& count /*= 1*/)
 {
 	std::stringstream ss;
 	if(it.stackable && count > 1){
@@ -1123,13 +1858,26 @@ std::string Item::getWeightDescription(const ItemType& it, double weight, uint32
 }
 
 
-void Item::setUniqueId(uint16_t n)
+void Item::setUniqueId(const uint16_t& n)
 {
 	if(getUniqueId() != 0)
 		return;
 
 	ItemAttributes::setUniqueId(n);
 	ScriptEnviroment::addUniqueThing(this);
+}
+
+void Item::setDefaultDuration()
+{
+	uint32_t duration = getDefaultDuration();
+	if(duration != 0){
+		setDuration(duration);
+	}
+}
+
+uint32_t Item::getDefaultDuration() const
+{
+	return items[id].decayTime * 1000;
 }
 
 bool Item::canDecay()
@@ -1150,6 +1898,21 @@ bool Item::canDecay()
 	return true;
 }
 
+bool Item::canRemove() const
+{
+	return true;
+}
+
+bool Item::canTransform() const
+{
+	return true;
+}
+
+bool Item::onTradeEvent(const TradeEvents_t& event, Player* owner)
+{
+	return true;
+}
+
 uint32_t Item::getWorth() const
 {
 	const ItemType& it = Item::items[id];
@@ -1161,250 +1924,6 @@ void Item::getLight(LightInfo& lightInfo)
 	const ItemType& it = items[id];
 	lightInfo.color = it.lightColor;
 	lightInfo.level = it.lightLevel;
-}
-
-std::string ItemAttributes::emptyString("");
-
-const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
-{
-	if(!validateStrAttrType(type))
-		return emptyString;
-
-	//this will *NOT* create the attribute if it does not exist
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return *(std::string*)attr->value;
-	}
-	else{
-		return emptyString;
-	}
-}
-
-void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
-{
-	if(!validateStrAttrType(type))
-		return;
-
-	if(value.length() == 0)
-		return;
-
-	//this will create the attribute if it does not exist
-	Attribute* attr = getAttr(type);
-	if(attr){
-		//if has a previous value delete it
-		if(attr->value){
-			delete (std::string*)attr->value;
-		}
-		//create the new value as string
-		attr->value = (void*)new std::string(value);
-	}
-}
-
-bool ItemAttributes::hasAttribute(itemAttrTypes type) const
-{
-	if(!validateIntAttrType(type))
-		return false;
-
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return true;
-	}
-
-	return false;
-}
-
-void ItemAttributes::removeAttribute(itemAttrTypes type)
-{
-	//check if we have it
-	if((type & m_attributes) != 0){
-		//go trough the linked list until find it
-		Attribute* prevAttr = NULL;
-		Attribute* curAttr = m_firstAttr;
-		while(curAttr){
-			if(curAttr->type == type){
-				//found so remove it from the linked list
-				if(prevAttr){
-					prevAttr->next = curAttr->next;
-				}
-				else{
-					m_firstAttr = curAttr->next;
-				}
-				//remove it from flags
-				m_attributes = m_attributes & ~type;
-
-				//delete string if it is string type
-				if(validateStrAttrType(type)){
-					delete (std::string*)curAttr->value;
-				}
-				//finally delete the attribute and return
-				delete curAttr;
-				return;
-			}
-
-			//advance in the linked list
-			prevAttr = curAttr;
-			curAttr = curAttr->next;
-		}
-	}
-}
-
-uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
-{
-	if(!validateIntAttrType(type))
-		return 0;
-
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value));
-	}
-	else{
-		return 0;
-	}
-}
-
-void ItemAttributes::setIntAttr(itemAttrTypes type, int32_t value)
-{
-	if(!validateIntAttrType(type))
-		return;
-
-	Attribute* attr = getAttr(type);
-	if(attr){
-		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(value));
-	}
-}
-
-void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
-{
-	if(!validateIntAttrType(type))
-		return;
-
-	Attribute* attr = getAttr(type);
-	if(attr){
-		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value)) + value));
-	}
-}
-
-bool ItemAttributes::validateIntAttrType(itemAttrTypes type)
-{
-	//list of numeric type attributes
-	switch(type){
-	case ATTR_ITEM_ACTIONID:
-	case ATTR_ITEM_UNIQUEID:
-	case ATTR_ITEM_OWNER:
-	case ATTR_ITEM_DURATION:
-	case ATTR_ITEM_DECAYING:
-	case ATTR_ITEM_WRITTENDATE:
-	case ATTR_ITEM_CORPSEOWNER:
-	case ATTR_ITEM_CHARGES:
-	case ATTR_ITEM_FLUIDTYPE:
-	case ATTR_ITEM_DOORID:
-		return true;
-		break;
-
-	default:
-		return false;
-		break;
-	}
-	return false;
-}
-
-bool ItemAttributes::validateStrAttrType(itemAttrTypes type)
-{
-	//list of text type attributes
-	switch(type){
-	case ATTR_ITEM_DESC:
-	case ATTR_ITEM_TEXT:
-	case ATTR_ITEM_WRITTENBY:
-		return true;
-		break;
-	default:
-		return false;
-		break;
-	}
-	return false;
-}
-
-void ItemAttributes::addAttr(Attribute* attr)
-{
-	//add an attribute to the linked list
-	if(m_firstAttr){
-		//is not the first, so look for the end of the list
-		Attribute* curAttr = m_firstAttr;
-		while(curAttr->next){
-			curAttr = curAttr->next;
-		}
-		//and add it at the end
-		curAttr->next = attr;
-	}
-	else{
-		//is the first
-		m_firstAttr = attr;
-	}
-	//add it to flags
-	m_attributes = m_attributes | attr->type;
-}
-
-ItemAttributes::Attribute* ItemAttributes::getAttrConst(itemAttrTypes type) const
-{
-	//check flags
-	if((type & m_attributes) == 0){
-		return NULL;
-	}
-	//it is here, so search it in the linked list
-	Attribute* curAttr = m_firstAttr;
-	while(curAttr){
-		if(curAttr->type == type){
-			//found
-			return curAttr;
-		}
-		curAttr = curAttr->next;
-	}
-	//not found?
-	std::cout << "Warning: [ItemAttributes::getAttrConst] (type & m_attributes) != 0 but attribute not found" << std::endl;
-	return NULL;
-}
-
-ItemAttributes::Attribute* ItemAttributes::getAttr(itemAttrTypes type)
-{
-	Attribute* curAttr;
-	if((type & m_attributes) == 0){
-		//if that type was not present add it
-		curAttr = new Attribute(type);
-		addAttr(curAttr);
-		return curAttr;
-	}
-	else{
-		//was present, search and return it
-		curAttr = m_firstAttr;
-		while(curAttr){
-			if(curAttr->type == type){
-				return curAttr;
-			}
-			curAttr = curAttr->next;
-		}
-	}
-	std::cout << "Warning: [ItemAttributes::getAttr] (type & m_attributes) != 0 but attribute not found" << std::endl;
-	curAttr = new Attribute(type);
-	addAttr(curAttr);
-	return curAttr;
-}
-
-void ItemAttributes::deleteAttrs(Attribute* attr)
-{
-	//deletes all attributes recursively
-	if(attr){
-		//if is string type, delete the allocated string
-		if(validateStrAttrType(attr->type)){
-			delete (std::string*)attr->value;
-		}
-		Attribute* next_attr = attr->next;
-		attr->next = NULL;
-		//delete next while it was not NULL
-		if(next_attr){
-			deleteAttrs(next_attr);
-		}
-		delete attr;
-	}
 }
 
 void Item::__startDecaying()

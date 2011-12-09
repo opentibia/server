@@ -114,6 +114,71 @@ Monster::~Monster()
 #endif
 }
 
+Monster* Monster::getMonster()
+{
+	return this;
+}
+
+const Monster* Monster::getMonster() const
+{
+	return this;
+}
+
+uint32_t Monster::idRange()
+{
+	return MONSTER_ID_RANGE;
+}
+
+void Monster::removeList()
+{
+	listMonster.removeList(getID());
+}
+
+void Monster::addList()
+{
+	listMonster.addList(this);
+}
+
+const std::string& Monster::getName() const
+{
+	return mType->name;
+}
+
+const std::string& Monster::getNameDescription() const
+{
+	return mType->nameDescription;
+}
+
+std::string Monster::getDescription(const int32_t& lookDistance) const
+{
+	return strDescription + '.';
+}
+
+RaceType_t Monster::getRace() const
+{
+	return mType->race;
+}
+
+int32_t Monster::getArmor() const
+{
+	return mType->armor;
+}
+
+int32_t Monster::getDefense() const
+{
+	return mType->defense;
+}
+
+bool Monster::isPushable() const
+{
+	return mType->pushable && (baseSpeed > 0);
+}
+
+bool Monster::isAttackable() const
+{
+	return mType->isAttackable;
+}
+
 void Monster::onAttackedCreatureDissapear(bool isLogout)
 {
 #ifdef __DEBUG__
@@ -370,6 +435,16 @@ bool Monster::isOpponent(const Creature* creature)
 	return false;
 }
 
+uint64_t Monster::getLostExperience() const
+{
+	return ((skillLoss ? mType->experience : 0));
+}
+
+uint16_t Monster::getLookCorpse()
+{
+	return mType->lookCorpse;
+}
+
 void Monster::onCreatureLeave(Creature* creature)
 {
 	//std::cout << "onCreatureLeave - " << creature->getName() << std::endl;
@@ -546,6 +621,21 @@ bool Monster::isTarget(Creature* creature)
 	return true;
 }
 
+bool Monster::getIdleStatus() const
+{
+	return isIdle;
+}
+
+bool Monster::isFleeing() const
+{
+	return getHealth() <= mType->runAwayHealth;
+}
+
+bool Monster::hasHiddenHealth() const
+{
+	return mType->hideHealth; 
+}
+
 bool Monster::selectTarget(Creature* creature)
 {
 #ifdef __DEBUG__
@@ -573,6 +663,16 @@ bool Monster::selectTarget(Creature* creature)
 	}
 
 	return setFollowCreature(creature, true);
+}
+
+const CreatureList& Monster::getTargetList()
+{
+	return targetList;
+}
+
+const CreatureList& Monster::getFriendList()
+{
+	return friendList;
 }
 
 void Monster::setIdle(bool _idle)
@@ -762,6 +862,11 @@ void Monster::doAttacking(uint32_t interval)
 	if(resetTicks){
 		attackTicks = 0;
 	}
+}
+
+bool Monster::hasExtraSwing()
+{
+	return extraMeleeAttack;
 }
 
 bool Monster::canUseAttack(const Position& pos, const Creature* target) const
@@ -1400,6 +1505,26 @@ void Monster::dropLoot(Container* corpse)
 	}
 }
 
+const uint32_t& Monster::getDamageImmunities() const
+{
+	return mType->damageImmunities;
+}
+
+const uint32_t& Monster::getConditionImmunities() const
+{
+	return mType->conditionImmunities;
+}
+
+const uint16_t& Monster::getLookCorpse() const
+{
+	return mType->lookCorpse;
+}
+
+bool Monster::useCacheMap() const
+{
+	return true;
+}
+
 bool Monster::isImmune(CombatType_t type) const
 {
 	ElementMap::iterator it = mType->elementMap.find(type);
@@ -1410,6 +1535,36 @@ bool Monster::isImmune(CombatType_t type) const
 	}
 
 	return Creature::isImmune(type);
+}
+
+bool Monster::canPushItems() const
+{
+	return mType->canPushItems;
+}
+
+bool Monster::canPushCreatures() const
+{
+	return mType->canPushCreatures;
+}
+
+bool Monster::isHostile() const
+{
+	return mType->isHostile;
+}
+
+bool Monster::canSeeInvisibility() const
+{
+	return Creature::isImmune(CONDITION_INVISIBLE);
+}
+
+uint32_t Monster::getManaCost() const
+{
+	return mType->manaCost;
+}
+
+void Monster::setSpawn(Spawn* _spawn)
+{
+	spawn = _spawn;
 }
 
 void Monster::setNormalCreatureLight()
@@ -1447,6 +1602,11 @@ void Monster::updateHadRecentBattleVar()
 		hadRecentBattleVar = newRecentBattleVar;
 		updateMapCache();
 	}
+}
+
+bool Monster::hadRecentBattle() const
+{
+	return hadRecentBattleVar;
 }
 
 bool Monster::challengeCreature(Creature* creature)

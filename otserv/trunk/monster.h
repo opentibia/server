@@ -40,11 +40,9 @@ enum TargetSearchType_t{
 	TARGETSEARCH_NEAREAST
 };
 
-class Monster : public Creature
-{
+class Monster : public Creature {
 private:
 	Monster(MonsterType* mtype);
-	//const Monster& operator=(const Monster& rhs);
 
 public:
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -56,31 +54,31 @@ public:
 
 	virtual ~Monster();
 
-	virtual Monster* getMonster() {return this;};
-	virtual const Monster* getMonster() const {return this;};
+	virtual Monster* getMonster();
+	virtual const Monster* getMonster() const;
 
-	virtual uint32_t idRange(){ return MONSTER_ID_RANGE;}
+	virtual uint32_t idRange();
 	static AutoList<Monster> listMonster;
-	void removeList(){listMonster.removeList(getID());}
-	void addList() {listMonster.addList(this);}
+	void removeList();
+	void addList();
 
-	virtual const std::string& getName() const {return mType->name;}
-	virtual const std::string& getNameDescription() const {return mType->nameDescription;}
-	virtual std::string getDescription(const int32_t& lookDistance) const {return strDescription + '.';}
+	virtual const std::string& getName() const;
+	virtual const std::string& getNameDescription() const;
+	virtual std::string getDescription(const int32_t& lookDistance) const;
 
-	virtual RaceType_t getRace() const { return mType->race; }
-	virtual int32_t getArmor() const { return mType->armor; }
-	virtual int32_t getDefense() const { return mType->defense; }
-	virtual bool isPushable() const { return mType->pushable && (baseSpeed > 0); }
-	virtual bool isAttackable() const { return mType->isAttackable;}
+	virtual RaceType_t getRace() const;
+	virtual int32_t getArmor() const;
+	virtual int32_t getDefense() const;
+	virtual bool isPushable() const;
+	virtual bool isAttackable() const;
 	virtual bool isImmune(CombatType_t type) const;
 
-	bool canPushItems() const {return mType->canPushItems;}
-	bool canPushCreatures() const {return mType->canPushCreatures;}
-	bool isHostile() const { return mType->isHostile;}
-	virtual bool canSeeInvisibility() const {return Creature::isImmune(CONDITION_INVISIBLE);}
-	uint32_t getManaCost() const {return mType->manaCost;}
-	void setSpawn(Spawn* _spawn) {spawn = _spawn;};
+	bool canPushItems() const;
+	bool canPushCreatures() const;
+	bool isHostile() const;
+	virtual bool canSeeInvisibility() const;
+	uint32_t getManaCost() const;
+	void setSpawn(Spawn* _spawn);
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
@@ -109,21 +107,21 @@ public:
 	virtual bool getCombatValues(int32_t& min, int32_t& max);
 
 	virtual void doAttacking(uint32_t interval);
-	virtual bool hasExtraSwing() {return extraMeleeAttack;}
+	virtual bool hasExtraSwing();
 
 	bool searchTarget(TargetSearchType_t searchType = TARGETSEARCH_DEFAULT);
 	bool selectTarget(Creature* creature);
 
-	const CreatureList& getTargetList() {return targetList;}
-	const CreatureList& getFriendList() {return friendList;}
+	const CreatureList& getTargetList();
+	const CreatureList& getFriendList();
 
 	void updateHadRecentBattleVar();
-	bool hadRecentBattle() const { return hadRecentBattleVar; }
+	bool hadRecentBattle() const;
 	bool isTarget(Creature* creature);
-	bool getIdleStatus() const { return isIdle;}
-	bool isFleeing() const {return getHealth() <= mType->runAwayHealth;}
+	bool getIdleStatus() const;
+	bool isFleeing() const;
 
-	virtual bool hasHiddenHealth() const { return mType->hideHealth; }
+	virtual bool hasHiddenHealth() const;
 
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
@@ -197,14 +195,14 @@ private:
 	bool isFriend(const Creature* creature);
 	bool isOpponent(const Creature* creature);
 
-	virtual uint64_t getLostExperience() const { return ((skillLoss ? mType->experience : 0)); }
-	virtual uint16_t getLookCorpse() { return mType->lookCorpse; }
+	virtual uint64_t getLostExperience() const;
+	virtual uint16_t getLookCorpse();
 	virtual void dropLoot(Container* corpse);
-	virtual uint32_t getDamageImmunities() const { return mType->damageImmunities; }
-	virtual uint32_t getConditionImmunities() const { return mType->conditionImmunities; }
-	virtual uint16_t getLookCorpse() const { return mType->lookCorpse; }
+	virtual const uint32_t& getDamageImmunities() const;
+	virtual const uint32_t& getConditionImmunities() const;
+	virtual const uint16_t& getLookCorpse() const;
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
-	virtual bool useCacheMap() const {return true;}
+	virtual bool useCacheMap() const;
 };
 
 #endif

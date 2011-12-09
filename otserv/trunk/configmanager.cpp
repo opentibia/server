@@ -35,11 +35,6 @@ ConfigManager::ConfigManager()
 	m_confInteger[STATUS_PORT] = 0;
 }
 
-ConfigManager::~ConfigManager()
-{
-	//
-}
-
 bool ConfigManager::loadFile(const std::string& _filename)
 {
 	if(L)
@@ -230,7 +225,7 @@ bool ConfigManager::reload()
 	return loadFile(m_confString[CONFIG_FILE]);
 }
 
-const std::string& ConfigManager::getString(uint32_t _what) const
+const std::string& ConfigManager::getString(const uint32_t& _what) const
 {
 	if(m_isLoaded && _what < LAST_STRING_CONFIG)
 		return m_confString[_what];
@@ -241,7 +236,7 @@ const std::string& ConfigManager::getString(uint32_t _what) const
 	}
 }
 
-int64_t ConfigManager::getNumber(uint32_t _what) const
+int64_t ConfigManager::getNumber(const uint32_t& _what) const
 {
 	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
 		return m_confInteger[_what];
@@ -252,7 +247,12 @@ int64_t ConfigManager::getNumber(uint32_t _what) const
 	}
 }
 
-double ConfigManager::getFloat(uint32_t _what) const
+bool ConfigManager::getBoolean(const uint32_t& _what) const
+{
+	return getNumber(_what) != 0;
+}
+
+double ConfigManager::getFloat(const uint32_t& _what) const
 {
 	if(m_isLoaded && _what < LAST_FLOAT_CONFIG)
 		return m_confFloat[_what];
@@ -263,7 +263,7 @@ double ConfigManager::getFloat(uint32_t _what) const
 	}
 }
 
-bool ConfigManager::setNumber(uint32_t _what, int64_t _value)
+bool ConfigManager::setNumber(const uint32_t& _what, const int64_t& _value)
 {
 	if(_what < LAST_INTEGER_CONFIG)
 	{
@@ -277,7 +277,7 @@ bool ConfigManager::setNumber(uint32_t _what, int64_t _value)
 	}
 }
 
-bool ConfigManager::setString(uint32_t _what, const std::string& _value)
+bool ConfigManager::setString(const uint32_t& _what, const std::string& _value)
 {
 	if(_what < LAST_STRING_CONFIG)
 	{

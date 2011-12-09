@@ -2172,7 +2172,6 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 		case PlayerInfoSkullEndTime:
 		{
 			int32_t value = 0;
-			#ifdef __SKULLSYSTEM__
 			switch(player->getSkull()){
 				case SKULL_RED:
 					value = player->lastSkullTime + g_config.getNumber(ConfigManager::RED_SKULL_DURATION);
@@ -2183,7 +2182,6 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 
 				default: break;
 			}
-			#endif
 
 			lua_pushnumber(L, value);
 			return 1;
@@ -2405,7 +2403,6 @@ int LuaScriptInterface::luaGetPlayerStamina(lua_State* L)
 int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
 {
 	//getPlayerSkullType(cid, <optional> viewer)
-	#ifdef __SKULLSYSTEM__
 	uint32_t viewer = 0;
 	if(lua_gettop(L) > 1){
 		viewer = popNumber(L);
@@ -2434,16 +2431,13 @@ int LuaScriptInterface::luaGetPlayerSkullType(lua_State *L)
 	}
 
 	lua_pushnumber(L, viewingPlayer->getSkullClient(player));
-	#else
-	lua_pushnumber(L, SKULL_NONE);
-	#endif
+
 	return 1;
 }
 
 int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 {
 	//setPlayerSkullType(cid, skull_type)
-	#ifdef __SKULLSYSTEM__
 	uint32_t skull = popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -2466,10 +2460,7 @@ int LuaScriptInterface::luaSetPlayerSkullType(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushboolean(L, false);
 	}
-	#else
-	reportErrorFunc("Skull system is not enabled.");
-	lua_pushboolean(L, false);
-	#endif
+	
 	return 1;
 }
 

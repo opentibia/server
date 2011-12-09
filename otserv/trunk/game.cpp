@@ -4411,7 +4411,6 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 	}
 }
 
-#ifdef __SKULLSYSTEM__
 void Game::updateCreatureSkull(Player* player)
 {
 	const SpectatorVec& list = getSpectators(player->getPosition());
@@ -4424,7 +4423,7 @@ void Game::updateCreatureSkull(Player* player)
 		}
 	}
 }
-#endif
+
 #ifdef __GUILDWARSLUARELOAD__
 void Game::updateCreatureEmblem(Creature* creature)
 {

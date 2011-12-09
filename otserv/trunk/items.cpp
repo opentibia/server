@@ -149,23 +149,111 @@ std::string ItemType::getDescription(uint8_t count) const
 	return Item::getDescription(*this, 1, NULL, subType);
 }
 
-
-Items::Items() :
-items(8000)
+bool ItemType::isGroundTile() const
 {
-	//
-	currencyMap.clear();
+	return (group == ITEM_GROUP_GROUND);
 }
 
-Items::~Items()
+bool ItemType::isContainer() const
 {
-	clear();
+	return (group == ITEM_GROUP_CONTAINER);
 }
+
+bool ItemType::isSplash() const
+{
+	return (group == ITEM_GROUP_SPLASH);
+}
+
+bool ItemType::isFluidContainer() const
+{
+	return (group == ITEM_GROUP_FLUID);
+}
+
+bool ItemType::isDoor() const
+{
+	return (type == ITEM_TYPE_DOOR);
+}
+
+bool ItemType::isMagicField() const
+{
+	return (type == ITEM_TYPE_MAGICFIELD);
+}
+
+bool ItemType::isTeleport() const
+{
+	return (type == ITEM_TYPE_TELEPORT);
+}
+
+bool ItemType::isKey() const
+{
+	return (type == ITEM_TYPE_KEY);
+}
+
+bool ItemType::isDepot() const
+{
+	return (type == ITEM_TYPE_DEPOT);
+}
+
+bool ItemType::isMailbox() const
+{
+	return (type == ITEM_TYPE_MAILBOX);
+}
+
+bool ItemType::isTrashHolder() const
+{
+	return (type == ITEM_TYPE_TRASHHOLDER);
+}
+
+bool ItemType::isRune() const
+{
+	return (type == ITEM_TYPE_RUNE);
+}
+
+bool ItemType::hasSubType() const
+{
+	return (isFluidContainer() || isSplash() || stackable || charges != 0);
+}
+
+bool ItemType::isSolidForItems() const
+{
+	return id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE;
+}
+
+bool ItemType::isBed() const
+{
+	return type == ITEM_TYPE_BED;
+}
+
+bool ItemType::isLevelDoor() const
+{
+	const bool ret = 
+		(id == 1227 || id == 1229 || 
+		id == 1245 || id == 1247 || 
+		id == 1259 || id == 1261 || 
+		id == 3540 || id == 3549 || 
+		id == 5103 || id == 5112 || 
+		id == 5121 || id == 5130 || 
+		id == 5292 || id == 5294 || 
+		id == 6206 || id == 6208 || 
+		id == 6263 || id == 6265 || 
+		id == 6896 || id == 6905 || 
+		id == 7038 || id == 7047 || 
+		id == 8555 || id == 8557 || 
+		id == 9179 || id == 9181 || 
+		id == 9281 || id == 9283 || 
+		id == 10282 || id == 10284 || 
+		id == 10473 ||  id == 10482 || 
+		id == 10780 || id == 10789); 
+	return ret;
+}
+
+Items::Items()
+	: items(8000)
+{}
 
 void Items::clear()
 {
 	currencyMap.clear();
-	//TODO. clear items?
 }
 
 bool Items::reload()
@@ -181,7 +269,7 @@ bool Items::reload()
 	return false;
 }
 
-int Items::loadFromOtb(std::string file)
+int Items::loadFromOtb(const std::string& file)
 {
 	FileLoader f;
 	if(!f.openFile(file.c_str(), false, true)){
@@ -1460,7 +1548,12 @@ bool Items::loadFromXml(const std::string& datadir)
 	return true;
 }
 
-ItemType& Items::getItemType(int32_t id)
+const ItemType& Items::operator[](const int32_t& id) const
+{
+	return getItemType(id);
+}
+
+ItemType& Items::getItemType(const int32_t& id)
 {
 	ItemType* iType = items.getElement(id);
 	if(iType){
@@ -1475,7 +1568,7 @@ ItemType& Items::getItemType(int32_t id)
 	}
 }
 
-const ItemType& Items::getItemType(int32_t id) const
+const ItemType& Items::getItemType(const int32_t& id) const
 {
 	ItemType* iType = items.getElement(id);
 	if(iType){
@@ -1487,7 +1580,7 @@ const ItemType& Items::getItemType(int32_t id) const
 	}
 }
 
-const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
+const ItemType& Items::getItemIdByClientId(const int32_t& spriteId) const
 {
 	uint32_t i = 100;
 	ItemType* iType;
@@ -1501,6 +1594,34 @@ const ItemType& Items::getItemIdByClientId(int32_t spriteId) const
 
 	static ItemType dummyItemType; // use this for invalid ids
 	return dummyItemType;
+}
+
+const ItemType* Items::getElement(const uint32_t& id) const
+{
+	return items.getElement(id);
+}
+
+uint32_t Items::size() const
+{
+	return items.size();
+}
+
+int32_t Items::getItemIdByName(const std::string& name)
+{
+	if(!name.empty()){
+		uint32_t i = 100;
+		ItemType* iType;
+		do{
+			iType = items.getElement(i);
+			if(iType){
+				if(boost::algorithm::iequals(name, iType->name)){
+					return i;
+				}
+			}
+			i++;
+		}while(iType);
+	}
+	return -1;
 }
 
 Abilities::Abilities()
@@ -1601,22 +1722,4 @@ bool Abilities::Absorb::reduce(CombatType_t ctype, int32_t& dmg) const
 	}
 
 	return r;
-}
-
-int32_t Items::getItemIdByName(const std::string& name)
-{
-	if(!name.empty()){
-		uint32_t i = 100;
-		ItemType* iType;
-		do{
-			iType = items.getElement(i);
-			if(iType){
-				if(boost::algorithm::iequals(name, iType->name)){
-					return i;
-				}
-			}
-			i++;
-		}while(iType);
-	}
-	return -1;
 }

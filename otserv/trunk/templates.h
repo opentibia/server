@@ -27,15 +27,8 @@
 #include <set>
 #include <map>
 
-template<class T> class AutoList
-{
+template<class T> class AutoList {
 public:
-	AutoList(){}
-
-	~AutoList(){
-		list.clear();
-	}
-
 	void addList(T* t){
 		list[t->getID()] = t;
 	}

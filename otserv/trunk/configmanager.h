@@ -30,11 +30,9 @@ extern "C"
 #include <lauxlib.h>
 }
 
-
 class ConfigManager {
 public:
 	ConfigManager();
-	~ConfigManager();
 
 	enum string_config_t {
 		DUMMY_STR = 0,
@@ -188,12 +186,12 @@ public:
 	bool reload();
 
 	void getConfigValue(const std::string& key, lua_State* _L);
-	const std::string& getString(uint32_t _what) const;
-	double getFloat(uint32_t _what) const;
-	int64_t getNumber(uint32_t _what) const;
-	bool getBoolean(uint32_t _what) const { return getNumber(_what) != 0; }
-	bool setNumber(uint32_t _what, int64_t _value);
-	bool setString(uint32_t _what, const std::string& _value);
+	const std::string& getString(const uint32_t& _what) const;
+	double getFloat(const uint32_t& _what) const;
+	int64_t getNumber(const uint32_t& _what) const;
+	bool getBoolean(const uint32_t& _what) const;
+	bool setNumber(const uint32_t& _what, const int64_t& _value);
+	bool setString(const uint32_t& _what, const std::string& _value);
 
 private:
 	static void moveValue(lua_State* fromL, lua_State* toL);

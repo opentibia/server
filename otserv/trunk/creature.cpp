@@ -972,6 +972,12 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 	return list;
 }
 
+const uint16_t& Creature::getLookCorpse() const
+{
+	static const uint16_t NO_LOOK_CORPSE = 0;
+	return NO_LOOK_CORPSE;
+}
+
 bool Creature::hasBeenAttacked(uint32_t attackerId) const
 {
 	CountMap::const_iterator it = damageMap.find(attackerId);
@@ -1581,6 +1587,24 @@ bool Creature::isImmune(ConditionType_t type, bool aggressive /* = true */) cons
 bool Creature::isSuppress(ConditionType_t type) const
 {
 	return ((getConditionSuppressions() & (uint32_t)type) == (uint32_t)type);
+}
+
+const uint32_t& Creature::getDamageImmunities() const
+{
+	static const uint32_t NO_DAMAGE_IMMUNITIES = 0;
+	return NO_DAMAGE_IMMUNITIES;
+}
+
+const uint32_t& Creature::getConditionImmunities() const
+{ 
+	static const uint32_t NO_CONDITION_IMMUNITIES = 0;
+	return NO_CONDITION_IMMUNITIES;
+}
+
+const uint32_t& Creature::getConditionSuppressions() const
+{
+	static const uint32_t NO_CONDITION_SUPPRESSIONS = 0;
+	return NO_CONDITION_SUPPRESSIONS;
 }
 
 std::string Creature::getDescription(const int32_t& lookDistance) const

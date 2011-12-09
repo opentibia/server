@@ -28,30 +28,18 @@
 
 const int DISPATCHER_TASK_EXPIRATION = 2000;
 
-class Task{
+class Task {
 public:
 	// DO NOT allocate this class on the stack
-	Task(uint32_t ms, const boost::function<void (void)>& f) : m_f(f)
-	{
-		m_expiration = boost::get_system_time() + boost::posix_time::milliseconds(ms);
-	}
-	Task(const boost::function<void (void)>& f)
-		: m_expiration(boost::date_time::not_a_date_time), m_f(f) {}
+	Task(const uint32_t& ms, const boost::function<void (void)>& f);
+	Task(const boost::function<void (void)>& f);
+	virtual ~Task();
 
-	~Task() {}
+	void operator()();
 
-	void operator()(){
-		m_f();
-	}
-
-	void setDontExpire() {
-		m_expiration = boost::date_time::not_a_date_time;
-	}
-	bool hasExpired() const{
-		if(m_expiration == boost::date_time::not_a_date_time)
-			return false;
-		return m_expiration < boost::get_system_time();
-	}
+	void setDontExpire();
+	bool hasExpired() const;
+	
 protected:
 	// Expiration has another meaning for scheduler tasks,
 	// then it is the time the task should be added to the
@@ -77,7 +65,6 @@ enum DispatcherState{
 class Dispatcher{
 public:
 	Dispatcher();
-	~Dispatcher() {}
 
 	void addTask(Task* task, bool push_front = false);
 

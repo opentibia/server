@@ -788,7 +788,6 @@ bool Spell::playerInstantSpellCheck(Player* player, const Creature* target)
 			return false;
 		}
 
-#ifdef __SKULLSYSTEM__
 		if(player->getSkull() == SKULL_BLACK && isAggressive){
 			if(!hasArea()){
 				if(const Player* targetPlayer = target->getPlayer()){
@@ -805,7 +804,6 @@ bool Spell::playerInstantSpellCheck(Player* player, const Creature* target)
 				return false;
 			}
 		}
-#endif
 	}
 
 	return true;
@@ -837,7 +835,6 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
-#ifdef __SKULLSYSTEM__
 			if(player->getSkull() == SKULL_BLACK && isAggressive){
 				if(!hasArea()){
 					Creature* targetCreature = tile->getTopVisibleCreature(player);
@@ -856,7 +853,6 @@ bool Spell::playerInstantSpellCheck(Player* player, const Position& toPos)
 					return false;
 				}
 			}
-#endif
 			ReturnValue ret;
 			if((ret = Combat::canDoCombat(player, tile, isAggressive)) != RET_NOERROR){
 				player->sendCancelMessage(ret);
@@ -940,7 +936,6 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 				return false;
 			}
 
-			#ifdef __SKULLSYSTEM__
 			if(player->getSkull() == SKULL_BLACK && isAggressive){
 				if(!hasArea()){
 					Creature* targetCreature = tile->getTopVisibleCreature(player);
@@ -970,7 +965,6 @@ bool Spell::playerRuneSpellCheck(Player* player, const Position& toPos)
 					return false;
 				}
 			}
-			#endif
 		}
 	}
 
@@ -1758,13 +1752,11 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 
 	int32_t manaCost = mType->manaCost;
 	if(!player->hasFlag(PlayerFlag_CanSummonAll)){
-		#ifdef __SKULLSYSTEM__
 		if(player->getSkull() == SKULL_BLACK){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
-		#endif
 
 		if(!mType->isSummonable){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -2304,13 +2296,11 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 	}
 
 	if(!player->hasFlag(PlayerFlag_CanConvinceAll)){
-		#ifdef __SKULLSYSTEM__
 		if(player->getSkull() == SKULL_BLACK){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
-		#endif
 
 		if(player->getSummonCount() >= 2){
 			player->sendCancelMessage(RET_NOTPOSSIBLE);

@@ -113,8 +113,8 @@ public:
 
 	Outfit_t outfit;
 	uint16_t lookCorpse;
-	int conditionImmunities;
-	int damageImmunities;
+	uint32_t conditionImmunities;
+	uint32_t damageImmunities;
 	RaceType_t race;
 	bool isSummonable;
 	bool isIllusionable;

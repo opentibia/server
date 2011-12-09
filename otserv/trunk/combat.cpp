@@ -281,7 +281,6 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 		}
 	}
 
-#ifdef __SKULLSYSTEM__
 	if(const Player* targetPlayer = target->getPlayer()){
 		if(player->hasSafeMode()){
 			if(player->isPartner(targetPlayer) || player->isWarPartner(targetPlayer) ||
@@ -300,7 +299,6 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 			}
 		}
 	}
-#endif
 
 	return Combat::canDoCombat(player, target);
 }
@@ -358,7 +356,6 @@ bool Combat::isInPvpZone(const Creature* attacker, const Creature* target)
 
 bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 {
-	#ifdef __SKULLSYSTEM__
 	const Player* attackerPlayer = attacker->getPlayer();
 	const Player* targetPlayer = target->getPlayer();
 
@@ -380,9 +377,6 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 	}
 
 	return true;
-	#else
-	return false;
-	#endif
 }
 
 ReturnValue Combat::checkPVPExtraRestrictions(const Creature* attacker, const Creature* target, bool isWalkCheck)
@@ -452,7 +446,6 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 					return RET_YOUMAYNOTATTACKTHISPERSON;
 				}
 
-				#ifdef __SKULLSYSTEM__
 				if(attackerPlayer->getSkull() == SKULL_BLACK &&
 					!attackerPlayer->isGuildEnemy(targetPlayer) &&
 					!attackerPlayer->isPartner(targetPlayer) &&
@@ -461,7 +454,6 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 						return RET_YOUMAYNOTATTACKTHISPERSON;
 					}
 				}
-				#endif
 			}
 
 			if(const Player* masterAttackerPlayer = attacker->getPlayerMaster()){
@@ -680,14 +672,11 @@ void Combat::doPVPDamageReduction(int32_t& healthChange, const Player *target) /
 {
 	if(healthChange < 0){
 		int64_t factor;
-		#ifdef __SKULLSYSTEM__
 		if (target->getSkull() != SKULL_BLACK)
 			factor = std::max(g_config.getNumber(ConfigManager::PVP_DAMAGE), int64_t(0));
 		else
 			factor = std::max(g_config.getNumber(ConfigManager::PVP_DAMAGE_AT_BLACK_SKULLS), int64_t(0));
-		#else
-		factor = std::max(g_config.getNumber(ConfigManager::PVP_DAMAGE), int64_t(0));
-		#endif
+
 		healthChange = (healthChange * factor)/100;
 	}
 
@@ -696,11 +685,7 @@ void Combat::doPVPDamageReduction(int32_t& healthChange, const Player *target) /
 void Combat::checkPVPDamageReduction(const Creature* attacker, const Creature* target, int32_t& healthChange) //static
 {
 	if(attacker && attacker->getPlayer() && target->getPlayer() && (attacker != target)){
-		#ifdef __SKULLSYSTEM__
 		Combat::doPVPDamageReduction(healthChange, target->getPlayer());
-		#else
-		Combat::doPVPDamageReduction(healthChange);
-		#endif
 	}
 }
 

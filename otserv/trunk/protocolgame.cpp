@@ -1508,11 +1508,7 @@ void ProtocolGame::sendCreatureSkull(const Creature* creature)
 			TRACK_MESSAGE(msg);
 			msg->AddByte(0x90);
 			msg->AddU32(creature->getID());
-			#ifdef __SKULLSYSTEM__
 			msg->AddByte(player->getSkullClient(creature->getPlayer()));
-			#else
-			msg->AddByte(SKULL_NONE);
-			#endif
 		}
 	}
 }
@@ -2607,11 +2603,7 @@ void ProtocolGame::AddCreature(NetworkMessage_ptr msg,const Creature* creature, 
 	msg->AddByte(lightInfo.color);
 
 	msg->AddU16(creature->getStepSpeed());
-#ifdef __SKULLSYSTEM__
 	msg->AddByte(player->getSkullClient(creature->getPlayer()));
-#else
-	msg->AddByte(SKULL_NONE);
-#endif
 	msg->AddByte(player->getPartyShield(creature->getPlayer()));
 	if(!known){
 		msg->AddByte(player->getGuildEmblem(creature->getPlayer())); // guild war emblem

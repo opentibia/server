@@ -312,9 +312,9 @@ public:
 	virtual bool isImmune(ConditionType_t type, bool aggressive = true) const;
 	virtual bool isImmune(CombatType_t type) const;
 	virtual bool isSuppress(ConditionType_t type) const;
-	virtual uint32_t getDamageImmunities() const { return 0; }
-	virtual uint32_t getConditionImmunities() const { return 0; }
-	virtual uint32_t getConditionSuppressions() const { return 0; }
+	virtual const uint32_t& getDamageImmunities() const;
+	virtual const uint32_t& getConditionImmunities() const;
+	virtual const uint32_t& getConditionSuppressions() const;
 	virtual bool isAttackable() const { return true;}
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
@@ -515,7 +515,7 @@ protected:
 	virtual double getDamageRatio(Creature* attacker) const;
 	DeathList getKillers(int32_t assist_count = 1);
 	virtual void dropLoot(Container* corpse) {};
-	virtual uint16_t getLookCorpse() const { return 0; }
+	virtual const uint16_t& getLookCorpse() const;
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 	virtual Item* dropCorpse();
 	virtual Item* createCorpse();

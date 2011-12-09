@@ -494,9 +494,8 @@ public:
 	#endif
 	void changeLight(const Creature* creature);
 
-#ifdef __SKULLSYSTEM__
 	void updateCreatureSkull(Player* player);
-#endif
+
 #ifdef __GUILDWARSLUARELOAD__
 	void updateCreatureEmblem(Creature* creature);
 #endif

@@ -612,10 +612,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	g_guilds.loadWars();
 	std::cout << "[done]" << std::endl;
 
-	#ifdef __SKULLSYSTEM__
-	std::cout << ":: Skulls enabled" << std::endl;
-	#endif
-
 	std::string passwordType = g_config.getString(ConfigManager::PASSWORD_TYPE_STR);
 	if(passwordType.empty() || asLowerCaseString(passwordType) == "plain"){
 		g_config.setNumber(ConfigManager::PASSWORD_TYPE, PASSWORD_TYPE_PLAIN);

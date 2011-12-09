@@ -26,6 +26,40 @@
 
 extern Game g_game;
 
+	// DO NOT allocate this class on the stack
+Task::Task(const uint32_t& ms, const boost::function<void (void)>& f)
+	: m_f(f)
+{
+	m_expiration = boost::get_system_time() + boost::posix_time::milliseconds(ms);
+}
+
+Task::Task(const boost::function<void (void)>& f)
+	: m_expiration(boost::date_time::not_a_date_time)
+	, m_f(f)
+{}
+
+Task::~Task()
+{
+	// Virtual Destructor
+}
+
+void Task::operator()()
+{
+	m_f();
+}
+
+void Task::setDontExpire()
+{
+	m_expiration = boost::date_time::not_a_date_time;
+}
+
+bool Task::hasExpired() const
+{
+	if(m_expiration == boost::date_time::not_a_date_time)
+		return false;
+	return m_expiration < boost::get_system_time();
+}
+
 Dispatcher::Dispatcher()
 {
 	m_taskList.clear();
