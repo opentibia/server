@@ -27,13 +27,16 @@
 #include <set>
 #include <map>
 
-template<class T> class AutoList {
+template<class T> class AutoList
+{
 public:
-	void addList(T* t){
+	void addList(T* t)
+	{
 		list[t->getID()] = t;
 	}
 
-	void removeList(uint32_t _id){
+	void removeList(uint32_t _id)
+	{
 		list.erase(_id);
 	}
 
@@ -43,27 +46,42 @@ public:
 	typedef typename list_type::iterator listiterator;
 };
 
-class AutoID {
+class AutoID
+{
 public:
-	AutoID() {
+	AutoID()
+	{
 		boost::recursive_mutex::scoped_lock lockClass(autoIDLock);
 		count++;
-		if(count >= 0xFFFFFF)
-			count = 1000;
 
-		while(list.find(count) != list.end()){
-			if(count >= 0xFFFFFF)
-				count = 1000;
-			else
-				count++;
+		if (count >= 0xFFFFFF)
+		{
+			count = 1000;
 		}
+
+		while (list.find(count) != list.end())
+		{
+			if (count >= 0xFFFFFF)
+			{
+				count = 1000;
+			}
+			else
+			{
+				count++;
+			}
+		}
+
 		list.insert(count);
 		auto_id = count;
 	}
-	virtual ~AutoID(){
+	virtual ~AutoID()
+	{
 		list_type::iterator it = list.find(auto_id);
-		if(it != list.end())
+
+		if (it != list.end())
+		{
 			list.erase(it);
+		}
 	}
 
 	typedef std::set<uint32_t> list_type;

@@ -29,7 +29,8 @@
 
 class Player;
 
-struct GuildWar {
+struct GuildWar
+{
 	uint32_t guildId;
 	uint32_t opponentId;
 	uint32_t guildFrags;
@@ -42,7 +43,8 @@ struct GuildWar {
 
 typedef std::map<uint32_t, GuildWar> GuildWarsMap;
 
-class Guild {
+class Guild
+{
 public:
 	Guild();
 
@@ -59,30 +61,31 @@ public:
 
 	bool isEnemy(const uint32_t& enemyId) const;
 	void addEnemy(const uint32_t& enemyId, const uint32_t& warId);
-	
+
 protected:
 	uint32_t id;
 	std::string name;
-	
+
 	typedef std::map<uint32_t, uint32_t> EnemyGuildsMap; //enemy guild id, war id
 	EnemyGuildsMap enemyGuilds;
 };
 
-class Guilds {
+class Guilds
+{
 public:
 	void loadWars();
-	#ifdef __GUILDWARSLUARELOAD__
+#ifdef __GUILDWARSLUARELOAD__
 	bool loadWar(const uint32_t& warId);
-	#endif
+#endif
 	void endWar(const uint32_t& warId);
 	bool transferMoney(const uint32_t& guildId, const uint32_t& opponentId,
-		const int32_t& guildFee, const int32_t& opponentFee);
+	                   const int32_t& guildFee, const int32_t& opponentFee);
 	bool setWarStatus(const uint32_t& warId, const int32_t& statusId);
 	void broadcastKill(const uint32_t& guildId, Player* player, const DeathList& killers);
-	
+
 	GuildWarsMap& getWars();
 	const GuildWarsMap& getWars() const;
-	
+
 	Guild* getGuildById(const uint32_t& guildId);
 	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 

@@ -27,7 +27,8 @@
 #include <list>
 #include <vector>
 
-enum BanType_t {
+enum BanType_t
+{
 	BAN_IPADDRESS = 1,
 	BAN_PLAYER = 2,
 	BAN_ACCOUNT = 3,
@@ -36,7 +37,8 @@ enum BanType_t {
 	BAN_NAMELOCK = 6
 };
 
-struct Ban {
+struct Ban
+{
 	BanType_t type;
 	uint32_t id;
 	uint32_t added;
@@ -50,12 +52,14 @@ struct Ban {
 	std::string param;
 };
 
-struct LoginBlock {
+struct LoginBlock
+{
 	time_t lastLoginTime;
 	uint32_t numberOfLogins;
 };
 
-struct ConnectBlock {
+struct ConnectBlock
+{
 	uint64_t startTime;
 	uint64_t blockTime;
 	uint32_t count;
@@ -64,7 +68,8 @@ struct ConnectBlock {
 typedef std::map<uint32_t, LoginBlock > IpLoginMap;
 typedef std::map<uint32_t, ConnectBlock > IpConnectMap;
 
-class BanManager {
+class BanManager
+{
 public:
 
 	bool clearTemporaryBans() const;
@@ -78,22 +83,22 @@ public:
 
 	void addLoginAttempt(const uint32_t& clientip, bool isSuccess);
 	bool addIpBan(const uint32_t& ip, const uint32_t& mask, const int32_t& time,
-		const uint32_t& adminid, const std::string& comment) const;
+	              const uint32_t& adminid, const std::string& comment) const;
 	bool addPlayerBan(const uint32_t& playerId, const int32_t& time, const uint32_t& adminid,
-		const std::string& comment,	const std::string& statement,
-		const uint32_t& reason, const violationAction_t& action) const;
+	                  const std::string& comment,	const std::string& statement,
+	                  const uint32_t& reason, const violationAction_t& action) const;
 	bool addPlayerBan(const std::string& name, const int32_t& time, const uint32_t& adminid,
-		const std::string& comment, const std::string& statement,
-		const uint32_t& reason, const violationAction_t& action) const;
+	                  const std::string& comment, const std::string& statement,
+	                  const uint32_t& reason, const violationAction_t& action) const;
 	bool addPlayerStatement(const uint32_t& playerId, const uint32_t& adminid, const std::string& comment,
-		const std::string& statement, const uint32_t& reason, const violationAction_t& action) const;
+	                        const std::string& statement, const uint32_t& reason, const violationAction_t& action) const;
 	bool addPlayerNameReport(const uint32_t& playerId, const uint32_t& adminid, const std::string& comment,
-		const std::string& statement, const uint32_t& reason, const violationAction_t& action) const;
+	                         const std::string& statement, const uint32_t& reason, const violationAction_t& action) const;
 	bool addAccountBan(const uint32_t& account, const int32_t& time, const uint32_t& adminid,
-		const std::string& comment,	const std::string& statement,
-		const uint32_t& reason, const violationAction_t& action) const;
+	                   const std::string& comment,	const std::string& statement,
+	                   const uint32_t& reason, const violationAction_t& action) const;
 	bool addAccountNotation(const uint32_t& account, const uint32_t& adminid, const std::string& comment,
-		const std::string& statement, const uint32_t& reason, const violationAction_t& action) const;
+	                        const std::string& statement, const uint32_t& reason, const violationAction_t& action) const;
 
 	bool removeIpBans(const uint32_t& ip, const uint32_t& mask = 0xFFFFFFFF) const;
 	bool removePlayerBans(const uint32_t& guid) const;

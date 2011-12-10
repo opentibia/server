@@ -120,8 +120,11 @@ char* NetworkMessage::getBodyBuffer()
 std::string NetworkMessage::GetString()
 {
 	uint16_t stringlen = GetU16();
-	if(stringlen >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos))
+
+	if (stringlen >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos))
+	{
 		return std::string();
+	}
 
 	char* v = (char*)(m_MsgBuf + m_ReadPos);
 	m_ReadPos += stringlen;
@@ -130,9 +133,12 @@ std::string NetworkMessage::GetString()
 
 std::string NetworkMessage::GetRaw()
 {
-	uint16_t stringlen = m_MsgSize- m_ReadPos;
-	if(stringlen >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos))
+	uint16_t stringlen = m_MsgSize - m_ReadPos;
+
+	if (stringlen >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos))
+	{
 		return std::string();
+	}
 
 	char* v = (char*)(m_MsgBuf + m_ReadPos);
 	m_ReadPos += stringlen;
@@ -156,42 +162,65 @@ void NetworkMessage::SkipBytes(const int& count)
 // simply write functions for outgoing message
 void NetworkMessage::AddByte(const uint8_t& value)
 {
-	if(!canAdd(1))
+	if (!canAdd(1))
+	{
 		return;
+	}
+
 	m_MsgBuf[m_ReadPos++] = value;
 	m_MsgSize++;
 }
 
 #ifndef __SWAP_ENDIAN__
 
-void NetworkMessage::AddU16(const uint16_t& value){
-	if(!canAdd(2))
+void NetworkMessage::AddU16(const uint16_t& value)
+{
+	if (!canAdd(2))
+	{
 		return;
+	}
+
 	*(uint16_t*)(m_MsgBuf + m_ReadPos) = value;
-	m_ReadPos += 2; m_MsgSize += 2;
+	m_ReadPos += 2;
+	m_MsgSize += 2;
 }
 
-void NetworkMessage::AddU32(const uint32_t& value){
-	if(!canAdd(4))
+void NetworkMessage::AddU32(const uint32_t& value)
+{
+	if (!canAdd(4))
+	{
 		return;
+	}
+
 	*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
-	m_ReadPos += 4; m_MsgSize += 4;
+	m_ReadPos += 4;
+	m_MsgSize += 4;
 }
 
 #else
 
-void NetworkMessage::AddU16(const uint16_t& value){
-	if(!canAdd(2))
+void NetworkMessage::AddU16(const uint16_t& value)
+{
+	if (!canAdd(2))
+	{
 		return;
+	}
+
 	*(uint16_t*)(m_MsgBuf + m_ReadPos) = swap_uint16(value);
-	m_ReadPos += 2; m_MsgSize += 2;
+	m_ReadPos += 2;
+	m_MsgSize += 2;
 }
 
-void NetworkMessage::AddU32(const uint32_t& value){
-	if(!canAdd(4))
+void NetworkMessage::AddU32(const uint32_t& value)
+{
+	if (!canAdd(4))
+	{
 		return;
+	}
+
 	*(uint32_t*)(m_MsgBuf + m_ReadPos) = swap_uint32(value);
-	m_ReadPos += 4; m_MsgSize += 4;
+	m_ReadPos += 4;
+	m_MsgSize += 4;
 }
 
 #endif
@@ -206,8 +235,11 @@ void NetworkMessage::AddString(const std::string& value)
 void NetworkMessage::AddString(const char* value)
 {
 	uint32_t stringlen = (uint32_t)strlen(value);
-	if(!canAdd(stringlen+2) || stringlen > 8192)
+
+	if (!canAdd(stringlen + 2) || stringlen > 8192)
+	{
 		return;
+	}
 
 	AddU16(stringlen);
 	strcpy((char*)(m_MsgBuf + m_ReadPos), value);
@@ -217,8 +249,10 @@ void NetworkMessage::AddString(const char* value)
 
 void NetworkMessage::AddBytes(const char* bytes, const uint32_t& size)
 {
-	if(!canAdd(size) || size > 8192)
+	if (!canAdd(size) || size > 8192)
+	{
 		return;
+	}
 
 	memcpy(m_MsgBuf + m_ReadPos, bytes, size);
 	m_ReadPos += size;
@@ -227,8 +261,10 @@ void NetworkMessage::AddBytes(const char* bytes, const uint32_t& size)
 
 void NetworkMessage::AddPaddingBytes(const uint32_t& n)
 {
-	if(!canAdd(n))
+	if (!canAdd(n))
+	{
 		return;
+	}
 
 	memset((void*)&m_MsgBuf[m_ReadPos], 0x33, n);
 	m_MsgSize = m_MsgSize + n;
@@ -243,14 +279,15 @@ void NetworkMessage::AddPosition(const Position& pos)
 
 void NetworkMessage::AddItem(const uint16_t& id, const uint8_t& count)
 {
-	const ItemType &it = Item::items[id];
-
+	const ItemType& it = Item::items[id];
 	AddU16(it.clientId);
 
-	if(it.stackable){
+	if (it.stackable)
+	{
 		AddByte(count);
 	}
-	else if(it.isSplash() || it.isFluidContainer()){
+	else if (it.isSplash() || it.isFluidContainer())
+	{
 		uint32_t fluidIndex = count % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
@@ -258,28 +295,29 @@ void NetworkMessage::AddItem(const uint16_t& id, const uint8_t& count)
 
 void NetworkMessage::AddItem(const Item* item)
 {
-	const ItemType &it = Item::items[item->getID()];
-
+	const ItemType& it = Item::items[item->getID()];
 	AddU16(it.clientId);
 
-	if(it.stackable){
+	if (it.stackable)
+	{
 		AddByte(item->getSubType());
 	}
-	else if(it.isSplash() || it.isFluidContainer()){
+	else if (it.isSplash() || it.isFluidContainer())
+	{
 		uint32_t fluidIndex = item->getSubType() % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
 }
 
-void NetworkMessage::AddItemId(const Item *item)
+void NetworkMessage::AddItemId(const Item* item)
 {
-	const ItemType &it = Item::items[item->getID()];
+	const ItemType& it = Item::items[item->getID()];
 	AddU16(it.clientId);
 }
 
 void NetworkMessage::AddItemId(const uint16_t& itemId)
 {
-	const ItemType &it = Item::items[itemId];
+	const ItemType& it = Item::items[itemId];
 	AddU16(it.clientId);
 }
 

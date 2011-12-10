@@ -33,27 +33,25 @@
 class Spawn;
 typedef std::list<Spawn*> SpawnList;
 
-class Spawns{
+class Spawns
+{
 private:
 	Spawns();
 
 public:
-	static Spawns* getInstance(){
-		static Spawns instance;
-		return &instance;
-	}
-	
-	bool isInZone(const Position& centerPos, int32_t radius, const Position& pos);
-
 	~Spawns();
-	
+
+	static Spawns* getInstance();
+
+	bool isInZone(const Position& centerPos, const int32_t& radius, const Position& pos);
+
 	bool loadFromXml(const std::string& datadir);
 	void startup();
 	void clear();
-	
-	bool isLoaded() const { return loaded; }
-	bool isStarted() const { return started; }
-	
+
+	bool isLoaded() const;
+	bool isStarted() const;
+
 private:
 	typedef std::list<Npc*> NpcList;
 	NpcList npcList;
@@ -62,7 +60,8 @@ private:
 	std::string filename;
 };
 
-struct spawnBlock_t{
+struct spawnBlock_t
+{
 	MonsterType* mType;
 	Direction direction;
 	Position pos;
@@ -70,13 +69,14 @@ struct spawnBlock_t{
 	int64_t lastSpawn;
 };
 
-class Spawn{
+class Spawn
+{
 public:
-	Spawn(const Position& _pos, int32_t _radius);
+	Spawn(const Position& _pos, const int32_t& _radius);
 	~Spawn();
-	
-	bool addMonster(const std::string& _name, const Position& _pos, 
-		const Direction& _dir, const uint32_t& _interval);
+
+	bool addMonster(const std::string& _name, const Position& _pos,
+	                const Direction& _dir, const uint32_t& _interval);
 	void removeMonster(Monster* monster);
 
 	const uint32_t& getInterval() const;
@@ -108,7 +108,7 @@ private:
 
 	bool findPlayer(const Position& pos);
 	bool spawnMonster(const uint32_t& spawnId, MonsterType* mType,
-		const Position& pos, const Direction& dir, bool startup = false);
+	                  const Position& pos, const Direction& dir, bool startup = false);
 	void checkSpawn();
 };
 

@@ -32,7 +32,8 @@ class Party;
 
 typedef std::map<uint32_t, Player*> UsersMap;
 
-enum ChannelID {
+enum ChannelID
+{
 	CHANNEL_GUILD      = 0x00,
 	CHANNEL_RULE_REP   = 0x03,
 	CHANNEL_GAME_CHAT  = 0x04,
@@ -96,11 +97,12 @@ protected:
 
 typedef std::list<ChatChannel*> ChannelList;
 
-class Chat {
+class Chat
+{
 public:
 	Chat();
 	~Chat();
-	
+
 	ChatChannel* createChannel(Player* player, const uint16_t& channelId);
 	bool deleteChannel(Player* player, const uint16_t& channelId);
 	bool deleteChannel(Party* party);
@@ -113,8 +115,8 @@ public:
 	bool isPrivateChannel(const uint16_t& channelId) const;
 	bool isMuteableChannel(const uint16_t& channelId, const SpeakClasses& type);
 
-	bool talkToChannel(Player* player, const SpeakClasses& type, 
-		const std::string& text, const uint16_t& channelId);
+	bool talkToChannel(Player* player, const SpeakClasses& type,
+	                   const std::string& text, const uint16_t& channelId);
 
 	std::string getChannelName(Player* player, const uint16_t& channelId);
 	ChannelList getChannelList(Player* player);

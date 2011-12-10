@@ -35,7 +35,8 @@ struct NpcState;
 
 typedef std::list<Npc*> NpcList;
 
-class Npcs{
+class Npcs
+{
 public:
 	void reload();
 };
@@ -48,33 +49,33 @@ public:
 
 	bool loadNpcLib(std::string file);
 
-	static void pushState(lua_State *L, NpcState* state);
-	static void popState(lua_State *L, NpcState* &state);
+	static void pushState(lua_State* L, NpcState* state);
+	static void popState(lua_State* L, NpcState* &state);
 
 protected:
 
 	virtual void registerFunctions();
 
-	static int luaActionSay(lua_State *L);
-	static int luaActionMove(lua_State *L);
-	static int luaActionMoveTo(lua_State *L);
+	static int luaActionSay(lua_State* L);
+	static int luaActionMove(lua_State* L);
+	static int luaActionMoveTo(lua_State* L);
 	static int luaActionTurn(lua_State* L);
 	static int luaActionFollow(lua_State* L);
-	static int luaCreatureGetName(lua_State *L);
-	static int luaCreatureGetName2(lua_State *L);
-	static int luaCreatureGetPos(lua_State *L);
-	static int luaSelfGetPos(lua_State *L);
-	static int luagetDistanceTo(lua_State *L);
-	static int luaSetNpcFocus(lua_State *L);
-	static int luaGetNpcCid(lua_State *L);
-	static int luaGetNpcPos(lua_State *L);
-	static int luaGetNpcState(lua_State *L);
-	static int luaSetNpcState(lua_State *L);
-	static int luaGetNpcName(lua_State *L);
-	static int luaGetNpcParameter(lua_State *L);
-	static int luaOpenShopWindow(lua_State *L);
-	static int luaCloseShopWindow(lua_State *L);
-	static int luaDoSellItem(lua_State *L);
+	static int luaCreatureGetName(lua_State* L);
+	static int luaCreatureGetName2(lua_State* L);
+	static int luaCreatureGetPos(lua_State* L);
+	static int luaSelfGetPos(lua_State* L);
+	static int luagetDistanceTo(lua_State* L);
+	static int luaSetNpcFocus(lua_State* L);
+	static int luaGetNpcCid(lua_State* L);
+	static int luaGetNpcPos(lua_State* L);
+	static int luaGetNpcState(lua_State* L);
+	static int luaSetNpcState(lua_State* L);
+	static int luaGetNpcName(lua_State* L);
+	static int luaGetNpcParameter(lua_State* L);
+	static int luaOpenShopWindow(lua_State* L);
+	static int luaCloseShopWindow(lua_State* L);
+	static int luaDoSellItem(lua_State* L);
 
 
 private:
@@ -90,15 +91,15 @@ public:
 	NpcEventsHandler(Npc* npc);
 	virtual ~NpcEventsHandler();
 
-	virtual void onCreatureAppear(const Creature* creature){};
-	virtual void onCreatureDisappear(const Creature* creature){};
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos){};
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
+	virtual void onCreatureAppear(const Creature* creature) {};
+	virtual void onCreatureDisappear(const Creature* creature) {};
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos) {};
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text) {};
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
-		uint8_t count, uint8_t amount, bool ignore = false, bool buyWithBackpack = false){};
-	virtual void onPlayerCloseChannel(const Player* player){};
-	virtual void onPlayerEndTrade(const Player* player){};
-	virtual void onThink(){};
+	                           uint8_t count, uint8_t amount, bool ignore = false, bool buyWithBackpack = false) {};
+	virtual void onPlayerCloseChannel(const Player* player) {};
+	virtual void onPlayerEndTrade(const Player* player) {};
+	virtual void onThink() {};
 
 	bool isLoaded();
 
@@ -119,7 +120,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
-		uint8_t count, uint8_t amount, bool ignore, bool buyWithBackpack);
+	                           uint8_t count, uint8_t amount, bool ignore, bool buyWithBackpack);
 	virtual void onPlayerCloseChannel(const Player* player);
 	virtual void onPlayerEndTrade(const Player* player);
 	virtual void onThink();
@@ -136,7 +137,8 @@ private:
 	int32_t m_onThink;
 };
 
-enum RespondParam_t{
+enum RespondParam_t
+{
 	RESPOND_DEFAULT      =  0x0000,
 	RESPOND_MALE         =  0x0001,
 	RESPOND_FEMALE       =  0x0002,
@@ -154,23 +156,26 @@ enum RespondParam_t{
 	RESPOND_ENOUGHAMOUNT =  0x2000,
 	RESPOND_HIGHLEVEL    =  0x4000,
 	RESPOND_KNOWSPELL    =  0x8000,
-	RESPOND_CANNOTLEARNSPELL= 0x10000,
+	RESPOND_CANNOTLEARNSPELL = 0x10000,
 	RESPOND_PROMOTED     = 0x20000,
 	RESPOND_NOTTOPIC     = 0x40000
 };
 
-enum ResponseType_t{
+enum ResponseType_t
+{
 	RESPONSE_DEFAULT,
 	RESPONSE_SCRIPT
 };
 
-enum InteractType_t{
+enum InteractType_t
+{
 	INTERACT_NONE,
 	INTERACT_TEXT,
 	INTERACT_EVENT
 };
 
-enum ReponseActionParam_t{
+enum ReponseActionParam_t
+{
 	ACTION_NONE,
 	ACTION_SETTOPIC,
 	ACTION_SETLEVEL,
@@ -199,7 +204,8 @@ enum ReponseActionParam_t{
 	ACTION_SETIDLE
 };
 
-enum StorageComparision_t{
+enum StorageComparision_t
+{
 	STORAGE_LESS,
 	STORAGE_LESSOREQUAL,
 	STORAGE_EQUAL,
@@ -208,7 +214,8 @@ enum StorageComparision_t{
 	STORAGE_GREATER
 };
 
-struct StorageCondition {
+struct StorageCondition
+{
 	int32_t id;
 	int32_t value;
 	StorageComparision_t op;
@@ -216,7 +223,8 @@ struct StorageCondition {
 
 typedef std::vector<StorageCondition> StorageConditions;
 
-enum NpcEvent_t{
+enum NpcEvent_t
+{
 	EVENT_NONE,
 	EVENT_BUSY,
 	EVENT_THINK,
@@ -235,13 +243,15 @@ enum NpcEvent_t{
 	*/
 };
 
-enum ShopEvent_t{
+enum ShopEvent_t
+{
 	SHOPEVENT_SELL,
 	SHOPEVENT_BUY,
 	SHOPEVENT_CLOSE
 };
 
-struct ResponseAction{
+struct ResponseAction
+{
 public:
 	ResponseAction()
 	{
@@ -261,7 +271,8 @@ public:
 	Position pos;
 };
 
-struct ScriptVars{
+struct ScriptVars
+{
 	ScriptVars()
 	{
 		n1 = -1;
@@ -286,7 +297,8 @@ struct ScriptVars{
 	std::string s3;
 };
 
-struct ListItem{
+struct ListItem
+{
 	ListItem()
 	{
 		itemId = 0;
@@ -315,7 +327,8 @@ typedef std::list<NpcResponse*> ResponseList;
 class NpcResponse
 {
 public:
-	struct ResponseProperties{
+	struct ResponseProperties
+	{
 		ResponseProperties()
 		{
 			topic = -1;
@@ -331,7 +344,6 @@ public:
 			itemList.clear();
 			time = 0;
 			singleEvent = false;
-
 			responseType = RESPONSE_DEFAULT;
 			output = "";
 			knowSpell = "";
@@ -367,8 +379,8 @@ public:
 	};
 
 	NpcResponse(const ResponseProperties& _prop,
-		ResponseList _subResponseList,
-		ScriptVars _scriptVars)
+	            ResponseList _subResponseList,
+	            ScriptVars _scriptVars)
 	{
 		prop = _prop;
 		subResponseList = _subResponseList;
@@ -379,7 +391,9 @@ public:
 	{
 		prop = rhs.prop;
 		scriptVars = rhs.scriptVars;
-		for(ResponseList::iterator it = rhs.subResponseList.begin(); it != rhs.subResponseList.end(); ++it){
+
+		for (ResponseList::iterator it = rhs.subResponseList.begin(); it != rhs.subResponseList.end(); ++it)
+		{
 			NpcResponse* response = new NpcResponse(*(*it));
 			subResponseList.push_back(response);
 		}
@@ -387,48 +401,122 @@ public:
 
 	~NpcResponse()
 	{
-		for(ResponseList::iterator it = subResponseList.begin(); it != subResponseList.end(); ++it){
+		for (ResponseList::iterator it = subResponseList.begin(); it != subResponseList.end(); ++it)
+		{
 			delete *it;
 		}
 
 		subResponseList.clear();
 	}
 
-	uint32_t getParams() const {return prop.params;}
-	std::string getInputText() const {return (prop.inputList.empty() ? "" : *prop.inputList.begin());}
-	int32_t getTopic() const {return prop.topic;}
-	int32_t getFocusState() const {return prop.focusStatus;}
-	int32_t getHaveItemID() const {return prop.haveItemId;}
-	int32_t getDontHaveItemID() const {return prop.dontHaveItemId;}
-	ConditionType_t getCondition() const {return prop.condition;}
-	int32_t getHealth() const {return prop.health;}
-	int32_t getLevel() const {return prop.level;}
-	ResponseType_t getResponseType() const {return prop.responseType;}
-	NpcEvent_t getEventType() const {return prop.eventType;}
-	const std::string& getKnowSpell() const {return prop.knowSpell;}
-	const std::string& getText() const {return prop.output;}
-	int32_t getAmount() const {return prop.amount;}
-	void setAmount(int32_t _amount) { prop.amount = _amount;}
-	bool publicize() const {return prop.publicize;}
-	uint32_t getTime() const {return prop.time;}
-	uint32_t isSingleEvent() const {return prop.singleEvent;}
+	uint32_t getParams() const
+	{
+		return prop.params;
+	}
+	std::string getInputText() const
+	{
+		return (prop.inputList.empty() ? "" : *prop.inputList.begin());
+	}
+	int32_t getTopic() const
+	{
+		return prop.topic;
+	}
+	int32_t getFocusState() const
+	{
+		return prop.focusStatus;
+	}
+	int32_t getHaveItemID() const
+	{
+		return prop.haveItemId;
+	}
+	int32_t getDontHaveItemID() const
+	{
+		return prop.dontHaveItemId;
+	}
+	ConditionType_t getCondition() const
+	{
+		return prop.condition;
+	}
+	int32_t getHealth() const
+	{
+		return prop.health;
+	}
+	int32_t getLevel() const
+	{
+		return prop.level;
+	}
+	ResponseType_t getResponseType() const
+	{
+		return prop.responseType;
+	}
+	NpcEvent_t getEventType() const
+	{
+		return prop.eventType;
+	}
+	const std::string& getKnowSpell() const
+	{
+		return prop.knowSpell;
+	}
+	const std::string& getText() const
+	{
+		return prop.output;
+	}
+	int32_t getAmount() const
+	{
+		return prop.amount;
+	}
+	void setAmount(int32_t _amount)
+	{
+		prop.amount = _amount;
+	}
+	bool publicize() const
+	{
+		return prop.publicize;
+	}
+	uint32_t getTime() const
+	{
+		return prop.time;
+	}
+	uint32_t isSingleEvent() const
+	{
+		return prop.singleEvent;
+	}
 
 	std::string formatResponseString(Creature* creature) const;
-	void addAction(ResponseAction action) {prop.actionList.push_back(action);}
-	const std::list<std::string>& getInputList() const { return prop.inputList;}
+	void addAction(ResponseAction action)
+	{
+		prop.actionList.push_back(action);
+	}
+	const std::list<std::string>& getInputList() const
+	{
+		return prop.inputList;
+	}
 
-	void setResponseList(ResponseList _list) { subResponseList.insert(subResponseList.end(),_list.begin(),_list.end());}
-	const ResponseList& getResponseList() const { return subResponseList;}
+	void setResponseList(ResponseList _list)
+	{
+		subResponseList.insert(subResponseList.end(), _list.begin(), _list.end());
+	}
+	const ResponseList& getResponseList() const
+	{
+		return subResponseList;
+	}
 
-	ActionList::const_iterator getFirstAction() const {return prop.actionList.begin();}
-	ActionList::const_iterator getEndAction() const {return prop.actionList.end();}
+	ActionList::const_iterator getFirstAction() const
+	{
+		return prop.actionList.begin();
+	}
+	ActionList::const_iterator getEndAction() const
+	{
+		return prop.actionList.end();
+	}
 
 	ResponseProperties prop;
 	ResponseList subResponseList;
 	ScriptVars scriptVars;
 };
 
-struct NpcState{
+struct NpcState
+{
 	uint32_t playerId;
 	int32_t topic;
 	int32_t focusState;
@@ -475,15 +563,33 @@ public:
 
 	virtual ~Npc();
 
-	virtual Npc* getNpc() {return this;};
-	virtual const Npc* getNpc() const {return this;};
+	virtual Npc* getNpc()
+	{
+		return this;
+	};
+	virtual const Npc* getNpc() const
+	{
+		return this;
+	};
 
-	virtual bool isPushable() const { return true;};
+	virtual bool isPushable() const
+	{
+		return true;
+	};
 
-	virtual uint32_t idRange(){ return NPC_ID_RANGE;}
+	virtual uint32_t idRange()
+	{
+		return NPC_ID_RANGE;
+	}
 	static AutoList<Npc> listNpc;
-	void removeList() {listNpc.removeList(getID());}
-	void addList() {listNpc.addList(this);}
+	void removeList()
+	{
+		listNpc.removeList(getID());
+	}
+	void addList()
+	{
+		listNpc.addList(this);
+	}
 
 	static Npc* createNpc(const std::string& name);
 
@@ -492,8 +598,14 @@ public:
 	bool load();
 	void reload();
 
-	virtual const std::string& getName() const {return name;};
-	virtual const std::string& getNameDescription() const {return name;};
+	virtual const std::string& getName() const
+	{
+		return name;
+	};
+	virtual const std::string& getNameDescription() const
+	{
+		return name;
+	};
 
 	void doSay(const std::string& text, SpeakClasses type, Player* player);
 	void doSayToPlayer(Player* player, const std::string& text);
@@ -501,16 +613,23 @@ public:
 	void doMove(Direction dir);
 	void doTurn(Direction dir);
 	void doMoveTo(Position pos);
-	bool isLoaded(){return loaded;}
-	virtual void setMasterPos(const Position& pos, uint32_t radius = 1) {
+	bool isLoaded()
+	{
+		return loaded;
+	}
+	virtual void setMasterPos(const Position& pos, uint32_t radius = 1)
+	{
 		masterPos = pos;
-		if(masterRadius == -1)
+
+		if (masterRadius == -1)
+		{
 			masterRadius = radius;
+		}
 	}
 
 	void onPlayerCloseChannel(const Player* player);
 	void onPlayerTrade(Player* player, ShopEvent_t type, int32_t callback, uint16_t itemId,
-		uint8_t count, uint8_t amount, bool ignore = false, bool buyWithBackpack = false);
+	                   uint8_t count, uint8_t amount, bool ignore = false, bool buyWithBackpack = false);
 	void onPlayerEndTrade(Player* player, int32_t buyCallback, int32_t sellCallback);
 
 	void turnToCreature(Creature* creature);
@@ -524,15 +643,15 @@ protected:
 
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos,
-		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
+	                              const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	virtual void onRemoveTileItem(const Tile* tile, const Position& pos,
-		const ItemType& iType, const Item* item);
+	                              const ItemType& iType, const Item* item);
 	virtual void onUpdateTile(const Tile* tile, const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-		const Tile* oldTile, const Position& oldPos, bool teleport);
+	                            const Tile* oldTile, const Position& oldPos, bool teleport);
 	virtual void onPlacedCreature();
 	virtual void onCreatureTurn(const Creature* creature);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
@@ -540,9 +659,18 @@ protected:
 	virtual void onThink(uint32_t interval);
 	virtual std::string getDescription(const int32_t& lookDistance) const;
 
-	bool isImmune(CombatType_t type) const {return true;}
-	bool isImmune(ConditionType_t type, bool aggressive = true) const {return true;}
-	virtual bool isAttackable() const { return attackable; }
+	bool isImmune(CombatType_t type) const
+	{
+		return true;
+	}
+	bool isImmune(ConditionType_t type, bool aggressive = true) const
+	{
+		return true;
+	}
+	virtual bool isAttackable() const
+	{
+		return attackable;
+	}
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 
 	bool canWalkTo(const Position& fromPos, Direction dir);
@@ -552,14 +680,14 @@ protected:
 	bool loadFromXml(const std::string& name);
 
 	const NpcResponse* getResponse(const ResponseList& list, const Player* player,
-		NpcState* npcState, const std::string& text,
-		bool exactMatch = false, NpcEvent_t eventType = EVENT_NONE);
+	                               NpcState* npcState, const std::string& text,
+	                               bool exactMatch = false, NpcEvent_t eventType = EVENT_NONE);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState, const std::string& text, bool checkLastResponse);
 	const NpcResponse* getResponse(const Player* player, NpcEvent_t eventType);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState,
-		NpcEvent_t eventType, const std::string& text, bool checkLastResponse);
+	                               NpcEvent_t eventType, const std::string& text, bool checkLastResponse);
 	const NpcResponse* getResponse(const Player* player, NpcState* npcState,
-		NpcEvent_t eventType, bool checkLastResponse);
+	                               NpcEvent_t eventType, bool checkLastResponse);
 
 	int32_t matchKeywords(NpcResponse* response, std::vector<std::string> wordList, bool exactMatch);
 
@@ -618,10 +746,10 @@ protected:
 
 	typedef std::list<uint32_t> QueueList;
 	QueueList queueList;
-	
+
 	typedef std::list<Voice> VoiceList;
 	VoiceList voiceList;
-	
+
 	bool loaded;
 
 	static NpcScriptInterface* m_scriptInterface;

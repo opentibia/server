@@ -34,13 +34,13 @@
 #define __DATABASE_ODBC_H__
 
 #ifndef __OTSERV_DATABASE_H__
-	#error "database.h should be included first."
+#error "database.h should be included first."
 #endif
 
 #ifdef __WINDOWS__
-	#include <windows.h>
+#include <windows.h>
 #else
-	#include <sqltypes.h>
+#include <sqltypes.h>
 #endif
 
 #include "definitions.h"
@@ -62,16 +62,16 @@ public:
 	DATABASE_VIRTUAL bool rollback();
 	DATABASE_VIRTUAL bool commit();
 
-	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
-	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
+	DATABASE_VIRTUAL bool executeQuery(const std::string& query);
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string& query);
 
-	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
+	DATABASE_VIRTUAL std::string escapeString(const std::string& s);
 	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length);
 
-	DATABASE_VIRTUAL void freeResult(DBResult *res);
+	DATABASE_VIRTUAL void freeResult(DBResult* res);
 
 protected:
-	std::string _parse(const std::string &s);
+	std::string _parse(const std::string& s);
 
 	SQLHDBC m_handle;
 	SQLHENV m_env;
@@ -82,10 +82,10 @@ class ODBCResult : public _DBResult
 	friend class DatabaseODBC;
 
 public:
-	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);
-	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s);
-	DATABASE_VIRTUAL std::string getDataString(const std::string &s);
-	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size);
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string& s);
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string& s);
+	DATABASE_VIRTUAL std::string getDataString(const std::string& s);
+	DATABASE_VIRTUAL const char* getDataStream(const std::string& s, unsigned long& size);
 
 	DATABASE_VIRTUAL bool next();
 

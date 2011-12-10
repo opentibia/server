@@ -25,9 +25,7 @@
 ConfigManager::ConfigManager()
 {
 	L = NULL;
-
 	m_isLoaded = false;
-
 	m_confString[IP] = "";
 	m_confInteger[ADMIN_PORT] = 0;
 	m_confInteger[GAME_PORT] = 0;
@@ -37,14 +35,19 @@ ConfigManager::ConfigManager()
 
 bool ConfigManager::loadFile(const std::string& _filename)
 {
-	if(L)
+	if (L)
+	{
 		lua_close(L);
+	}
 
 	L = lua_open();
 
-	if(!L) return false;
+	if (!L)
+	{
+		return false;
+	}
 
-	if(luaL_dofile(L, _filename.c_str()))
+	if (luaL_dofile(L, _filename.c_str()))
 	{
 		lua_close(L);
 		L = NULL;
@@ -52,27 +55,44 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	}
 
 	// parse config
-	if(!m_isLoaded) // info that must be loaded one time (unless we reset the modules involved)
+	if (!m_isLoaded) // info that must be loaded one time (unless we reset the modules involved)
 	{
 		m_confString[CONFIG_FILE] = _filename;
 
 		// These settings might have been set from command line
-		if(m_confString[IP] == "")
+		if (m_confString[IP] == "")
+		{
 			m_confString[IP] = getGlobalString(L, "ip", "127.0.0.1");
-		if(m_confInteger[GAME_PORT] == 0)
+		}
+
+		if (m_confInteger[GAME_PORT] == 0)
+		{
 			m_confInteger[GAME_PORT] = getGlobalNumber(L, "game_port");
-		if(m_confInteger[ADMIN_PORT] == 0)
+		}
+
+		if (m_confInteger[ADMIN_PORT] == 0)
+		{
 			m_confInteger[ADMIN_PORT] = getGlobalNumber(L, "admin_port");
-		if(m_confInteger[LOGIN_PORT] == 0)
+		}
+
+		if (m_confInteger[LOGIN_PORT] == 0)
+		{
 			m_confInteger[LOGIN_PORT] = getGlobalNumber(L, "login_port");
-		if(m_confInteger[STATUS_PORT] == 0)
+		}
+
+		if (m_confInteger[STATUS_PORT] == 0)
+		{
 			m_confInteger[STATUS_PORT] = getGlobalNumber(L, "status_port");
+		}
 
 #if defined __CONFIG_V2__
 		unsigned int pos = _filename.rfind("/");
 		std::string configPath = "";
-		if(pos != std::string::npos)
-			configPath = _filename.substr(0, pos+1);
+
+		if (pos != std::string::npos)
+		{
+			configPath = _filename.substr(0, pos + 1);
+		}
 
 		m_confString[DATA_DIRECTORY] = configPath + getGlobalString(L, "datadir", "data/");
 		m_confString[MAP_FILE] = m_confString[DATA_DIRECTORY] + getGlobalString(L, "map");
@@ -86,9 +106,12 @@ bool ConfigManager::loadFile(const std::string& _filename)
 #endif
 		m_confString[HOUSE_RENT_PERIOD] = getGlobalString(L, "houserentperiod", "monthly");
 		m_confString[MAP_KIND] = getGlobalString(L, "mapkind");
-		if(getGlobalString(L, "md5passwords") != ""){
+
+		if (getGlobalString(L, "md5passwords") != "")
+		{
 			std::cout << "Warning: [ConfigManager] md5passwords is deprecated. Use passwordtype instead." << std::endl;
 		}
+
 		m_confString[PASSWORD_TYPE_STR] = getGlobalString(L, "passwordtype");
 		m_confString[PASSWORD_SALT] = getGlobalString(L, "passwordsalt", "");
 		m_confString[WORLD_TYPE] = getGlobalString(L, "worldtype");
@@ -119,7 +142,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[EXHAUSTED_ADD] = getGlobalNumber(L, "exhaustedadd", 5000);
 	m_confInteger[COMBAT_EXHAUSTED] = getGlobalNumber(L, "fightexhausted", 2000);
 	m_confInteger[HEAL_EXHAUSTED] = getGlobalNumber(L, "healexhausted", 1000);
-	m_confInteger[STAIRHOP_EXHAUSTED] = getGlobalNumber(L, "stairhop_exhausted", 2*1000);
+	m_confInteger[STAIRHOP_EXHAUSTED] = getGlobalNumber(L, "stairhop_exhausted", 2 * 1000);
 	m_confInteger[IN_FIGHT_DURATION] = getGlobalNumber(L, "in_fight_duration", 60 * 1000);
 	m_confInteger[HUNTING_KILL_DURATION] = getGlobalNumber(L, "hunting_kill_duration", 60 * 1000);
 	m_confInteger[FIELD_OWNERSHIP_DURATION] = getGlobalNumber(L, "field_ownership_duration", 5 * 1000);
@@ -146,21 +169,21 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[CHECK_ACCOUNTS] = getGlobalBoolean(L, "checkaccounts", true);
 	m_confInteger[USE_BALANCE_HOUSE_PAYING] = getGlobalBoolean(L, "use_balance_house_paying", true);
 	m_confInteger[PREMIUM_ONLY_BEDS] = getGlobalBoolean(L, "premonlybeds", true);
-	m_confInteger[UNJUST_SKULL_DURATION] = getGlobalNumber(L, "unjust_skull_duration", 15*60*1000);
+	m_confInteger[UNJUST_SKULL_DURATION] = getGlobalNumber(L, "unjust_skull_duration", 15 * 60 * 1000);
 	m_confInteger[KILLS_PER_DAY_RED_SKULL] = getGlobalNumber(L, "kills_per_day_red_skull", 3);
 	m_confInteger[KILLS_PER_WEEK_RED_SKULL] = getGlobalNumber(L, "kills_per_week_red_skull", 5);
 	m_confInteger[KILLS_PER_MONTH_RED_SKULL] = getGlobalNumber(L, "kills_per_month_red_skull", 10);
 	m_confInteger[KILLS_PER_DAY_BLACK_SKULL] = getGlobalNumber(L, "kills_per_day_black_skull", 6);
 	m_confInteger[KILLS_PER_WEEK_BLACK_SKULL] = getGlobalNumber(L, "kills_per_week_black_skull", 10);
 	m_confInteger[KILLS_PER_MONTH_BLACK_SKULL] = getGlobalNumber(L, "kills_per_month_black_skull", 20);
-	m_confInteger[RED_SKULL_DURATION] = getGlobalNumber(L, "red_skull_duration", 30*24*60*60);
-	m_confInteger[BLACK_SKULL_DURATION] = getGlobalNumber(L, "black_skull_duration", 45*24*60*60);
+	m_confInteger[RED_SKULL_DURATION] = getGlobalNumber(L, "red_skull_duration", 30 * 24 * 60 * 60);
+	m_confInteger[BLACK_SKULL_DURATION] = getGlobalNumber(L, "black_skull_duration", 45 * 24 * 60 * 60);
 	m_confInteger[REMOVE_AMMUNITION] = getGlobalBoolean(L, "remove_ammunition", true);
 	m_confInteger[REMOVE_RUNE_CHARGES] = getGlobalBoolean(L, "remove_rune_charges", true);
 	m_confInteger[REMOVE_WEAPON_CHARGES] = getGlobalBoolean(L, "remove_weapon_charges", true);
-	m_confInteger[LOGIN_ATTACK_DELAY] = getGlobalNumber(L, "login_attack_delay", 10*1000);
-	m_confInteger[IDLE_TIME] = getGlobalNumber(L, "max_idle_time", 16*60*1000);
-	m_confInteger[IDLE_TIME_WARNING] = getGlobalNumber(L, "max_idle_time_warning", 15*60*1000);
+	m_confInteger[LOGIN_ATTACK_DELAY] = getGlobalNumber(L, "login_attack_delay", 10 * 1000);
+	m_confInteger[IDLE_TIME] = getGlobalNumber(L, "max_idle_time", 16 * 60 * 1000);
+	m_confInteger[IDLE_TIME_WARNING] = getGlobalNumber(L, "max_idle_time_warning", 15 * 60 * 1000);
 	m_confInteger[HOUSE_ONLY_PREMIUM] = getGlobalBoolean(L, "house_only_premium", true);
 	m_confInteger[HOUSE_LEVEL] = getGlobalNumber(L, "house_level", 1);
 	m_confInteger[HOUSE_TILE_PRICE] = getGlobalNumber(L, "house_tile_price", 100);
@@ -194,9 +217,9 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[CAN_PASS_THROUGH] = getGlobalBoolean(L, "can_pass_through", true);
 	m_confInteger[MIN_PVP_LEVEL] = getGlobalNumber(L, "min_pvp_level", 0);
 	m_confInteger[MW_DISAPPEAR_ON_WALK] = getGlobalBoolean(L, "magic_wall_disappear_on_walk", true);
-	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	m_confInteger[MIN_PVP_LEVEL_APPLIES_TO_SUMMONS] = getGlobalBoolean(L, "min_pvp_level_applies_to_summons", true);
-	#endif
+#endif
 	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 3);
 	m_confInteger[EXPERIENCE_STAGES] = getGlobalBoolean(L, "experience_stages", false);
 	m_confInteger[PUSH_INTERVAL] = getGlobalNumber(L, "push_interval", 2000);
@@ -219,16 +242,20 @@ bool ConfigManager::loadFile(const std::string& _filename)
 
 bool ConfigManager::reload()
 {
-	if(!m_isLoaded)
+	if (!m_isLoaded)
+	{
 		return false;
+	}
 
 	return loadFile(m_confString[CONFIG_FILE]);
 }
 
 const std::string& ConfigManager::getString(const uint32_t& _what) const
 {
-	if(m_isLoaded && _what < LAST_STRING_CONFIG)
+	if (m_isLoaded && _what < LAST_STRING_CONFIG)
+	{
 		return m_confString[_what];
+	}
 	else
 	{
 		std::cout << "Warning: [ConfigManager::getString] " << _what << std::endl;
@@ -238,8 +265,10 @@ const std::string& ConfigManager::getString(const uint32_t& _what) const
 
 int64_t ConfigManager::getNumber(const uint32_t& _what) const
 {
-	if(m_isLoaded && _what < LAST_INTEGER_CONFIG)
+	if (m_isLoaded && _what < LAST_INTEGER_CONFIG)
+	{
 		return m_confInteger[_what];
+	}
 	else
 	{
 		std::cout << "Warning: [ConfigManager::getNumber] " << _what << std::endl;
@@ -254,8 +283,10 @@ bool ConfigManager::getBoolean(const uint32_t& _what) const
 
 double ConfigManager::getFloat(const uint32_t& _what) const
 {
-	if(m_isLoaded && _what < LAST_FLOAT_CONFIG)
+	if (m_isLoaded && _what < LAST_FLOAT_CONFIG)
+	{
 		return m_confFloat[_what];
+	}
 	else
 	{
 		std::cout << "Warning: [ConfigManager::getFloat] " << _what << std::endl;
@@ -265,7 +296,7 @@ double ConfigManager::getFloat(const uint32_t& _what) const
 
 bool ConfigManager::setNumber(const uint32_t& _what, const int64_t& _value)
 {
-	if(_what < LAST_INTEGER_CONFIG)
+	if (_what < LAST_INTEGER_CONFIG)
 	{
 		m_confInteger[_what] = _value;
 		return true;
@@ -279,7 +310,7 @@ bool ConfigManager::setNumber(const uint32_t& _what, const int64_t& _value)
 
 bool ConfigManager::setString(const uint32_t& _what, const std::string& _value)
 {
-	if(_what < LAST_STRING_CONFIG)
+	if (_what < LAST_STRING_CONFIG)
 	{
 		m_confString[_what] = _value;
 		return true;
@@ -295,15 +326,15 @@ std::string ConfigManager::getGlobalString(lua_State* _L, const std::string& _id
 {
 	lua_getglobal(_L, _identifier.c_str());
 
-	if(!lua_isstring(_L, -1)){
+	if (!lua_isstring(_L, -1))
+	{
 		lua_pop(_L, 1);
 		return _default;
 	}
 
 	int len = (int)lua_strlen(_L, -1);
 	std::string ret(lua_tostring(_L, -1), len);
-	lua_pop(_L,1);
-
+	lua_pop(_L, 1);
 	return ret;
 }
 
@@ -311,14 +342,14 @@ int64_t ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identi
 {
 	lua_getglobal(_L, _identifier.c_str());
 
-	if(!lua_isnumber(_L, -1)){
+	if (!lua_isnumber(_L, -1))
+	{
 		lua_pop(_L, 1);
 		return _default;
 	}
 
 	int64_t val = (int64_t)lua_tonumber(_L, -1);
-	lua_pop(_L,1);
-
+	lua_pop(_L, 1);
 	return val;
 }
 
@@ -326,14 +357,14 @@ double ConfigManager::getGlobalFloat(lua_State* _L, const std::string& _identifi
 {
 	lua_getglobal(_L, _identifier.c_str());
 
-	if(!lua_isnumber(_L, -1)){
+	if (!lua_isnumber(_L, -1))
+	{
 		lua_pop(_L, 1);
 		return _default;
 	}
 
 	double val = lua_tonumber(_L, -1);
-	lua_pop(_L,1);
-
+	lua_pop(_L, 1);
 	return val;
 }
 
@@ -341,15 +372,20 @@ bool ConfigManager::getGlobalBoolean(lua_State* _L, const std::string& _identifi
 {
 	lua_getglobal(_L, _identifier.c_str());
 
-	if(lua_isnumber(_L, -1)){
+	if (lua_isnumber(_L, -1))
+	{
 		int val = (int)lua_tonumber(_L, -1);
 		lua_pop(_L, 1);
 		return val != 0;
-	} else if(lua_isstring(_L, -1)){
+	}
+	else if (lua_isstring(_L, -1))
+	{
 		std::string val = lua_tostring(_L, -1);
 		lua_pop(_L, 1);
 		return val == "yes";
-	} else if(lua_isboolean(_L, -1)){
+	}
+	else if (lua_isboolean(_L, -1))
+	{
 		bool v = lua_toboolean(_L, -1) != 0;
 		lua_pop(_L, 1);
 		return v;
@@ -366,7 +402,8 @@ void ConfigManager::getConfigValue(const std::string& key, lua_State* toL)
 
 void ConfigManager::moveValue(lua_State* from, lua_State* to)
 {
-	switch(lua_type(from, -1)){
+	switch (lua_type(from, -1))
+	{
 		case LUA_TNIL:
 			lua_pushnil(to);
 			break;
@@ -382,28 +419,29 @@ void ConfigManager::moveValue(lua_State* from, lua_State* to)
 			const char* str = lua_tolstring(from, -1, &len);
 			lua_pushlstring(to, str, len);
 		}
-			break;
+		break;
 		case LUA_TTABLE:
 			lua_newtable(to);
-
 			lua_pushnil(from); // First key
-			while(lua_next(from, -2)){
+
+			while (lua_next(from, -2))
+			{
 				// Move value to the other state
 				moveValue(from, to);
 				// Value is popped, key is left
-
 				// Move key to the other state
 				lua_pushvalue(from, -1); // Make a copy of the key to use for the next iteration
 				moveValue(from, to);
 				// Key is in other state.
 				// We still have the key in the 'from' state ontop of the stack
-
 				lua_insert(to, -2); // Move key above value
 				lua_settable(to, -3); // Set the key
 			}
+
 		default:
 			break;
 	}
+
 	// Pop the value we just read
 	lua_pop(from, 1);
 }

@@ -33,7 +33,8 @@
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
-enum DistributionType_t {
+enum DistributionType_t
+{
 	DISTRO_UNIFORM,
 	DISTRO_SQUARE,
 	DISTRO_NORMAL
@@ -47,9 +48,9 @@ inline uint16_t swap_uint16(uint16_t x)
 inline uint32_t swap_uint32(uint32_t x)
 {
 	return (x & 0xFF000000) >> 24
-		 | (x & 0x00FF0000) >> 8
-		 | (x & 0x0000FF00) << 8
-		 | (x & 0x000000FF) << 24;
+	       | (x & 0x00FF0000) >> 8
+	       | (x & 0x0000FF00) << 8
+	       | (x & 0x000000FF) << 24;
 }
 
 inline int16_t swap_int16(int16_t x)
@@ -85,13 +86,13 @@ float box_muller(const float& m, const float& s);
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM, float deviation = 0.25);
 
-void hexdump(unsigned char *_data, int _len);
+void hexdump(unsigned char* _data, int _len);
 char upchar(char c);
 
 std::string urlEncode(const char* str);
 std::string urlEncode(const std::string& str);
 
-bool passwordTest(std::string plain, std::string &hash);
+bool passwordTest(std::string plain, std::string& hash);
 
 std::string convertIPToString(const uint32_t& ip);
 //buffer should have at least 21 bytes. dd/mm/yyyy  hh:mm:ss
@@ -109,6 +110,6 @@ std::string getViolationActionString(const violationAction_t& actionId, bool ipB
 std::string playerSexAdjectiveString(const PlayerSex_t& sex);
 std::string playerSexSubjectString(const PlayerSex_t& sex);
 
-uint32_t adlerChecksum(uint8_t *data, int32_t len);
+uint32_t adlerChecksum(uint8_t* data, int32_t len);
 
 #endif

@@ -39,7 +39,7 @@ const std::string& MissionState::getMissionDescription() const
 }
 
 Mission::Mission(const std::string& _missionName, const uint32_t& _storageID,
-	const uint32_t& _startValue, const int32_t& _endValue)
+                 const uint32_t& _startValue, const int32_t& _endValue)
 	: mainState(NULL)
 	, missionName(_missionName)
 	, storageID(_storageID)
@@ -49,7 +49,8 @@ Mission::Mission(const std::string& _missionName, const uint32_t& _storageID,
 
 Mission::~Mission()
 {
-	for(uint32_t it = 0; it != state.size(); ++it){
+	for (uint32_t it = 0; it != state.size(); ++it)
+	{
 		delete state[it];
 	}
 }
@@ -57,25 +58,33 @@ Mission::~Mission()
 std::string Mission::getDescription(Player* player)
 {
 	int32_t value;
-	MissionState *lastState = 0;
- 
+	MissionState* lastState = 0;
 	player->getStorageValue(storageID, value);
-	if(mainState){
+
+	if (mainState)
+	{
 		lastState = mainState;
 	}
-	else{
+	else
+	{
 		StateList::iterator it;
-		for(int32_t i = startValue; i <= value; ++i){
+
+		for (int32_t i = startValue; i <= value; ++i)
+		{
 			it = state.find(i);
-			if(it != state.end()){
+
+			if (it != state.end())
+			{
 				lastState = it->second;
 			}
 		}
 	}
- 
-	if(!lastState)
+
+	if (!lastState)
+	{
 		return "An error has occurred, please contact a gamemaster.";
- 
+	}
+
 	std::stringstream s;
 	s << value;
 	std::string desc = lastState->getMissionDescription();
@@ -86,31 +95,40 @@ std::string Mission::getDescription(Player* player)
 
 bool Mission::isStarted(Player* player) const
 {
-	if(player){
+	if (player)
+	{
 		uint32_t value = 0;
 		player->getStorageValue(storageID, (int32_t&)value);
-		if(value >= startValue && value <= endValue){
+
+		if (value >= startValue && value <= endValue)
+		{
 			return true;
 		}
 	}
+
 	return false;
 }
 
 bool Mission::isCompleted(Player* player) const
 {
-	if(player){
+	if (player)
+	{
 		int32_t value = 0;
 		player->getStorageValue(storageID, value);
-		if(uint32_t(value) == endValue){
+
+		if (uint32_t(value) == endValue)
+		{
 			return true;
 		}
 	}
+
 	return false;
 }
 
 std::string Mission::getName(Player* player)
 {
-	if(isCompleted(player)){
+	if (isCompleted(player))
+	{
 		return missionName + " (completed)";
 	}
 
@@ -118,7 +136,7 @@ std::string Mission::getName(Player* player)
 }
 
 Quest::Quest(const std::string& _name, const uint16_t& _id,
-	const uint32_t& _startStorageID, const uint32_t& _startStorageValue)
+             const uint32_t& _startStorageID, const uint32_t& _startStorageValue)
 	: name(_name)
 	, id(_id)
 	, startStorageID(_startStorageID)
@@ -128,19 +146,25 @@ Quest::Quest(const std::string& _name, const uint16_t& _id,
 Quest::~Quest()
 {
 	MissionsList::iterator it;
-	for(it = missions.begin(); it != missions.end(); ++it){
-		delete (*it);
+
+	for (it = missions.begin(); it != missions.end(); ++it)
+	{
+		delete(*it);
 	}
 }
 
 uint16_t Quest::getMissionsCount(Player* player) const
 {
 	uint16_t count = 0;
-	for(MissionsList::const_iterator it = missions.begin(); it != missions.end(); ++it){
-		if((*it)->isStarted(player)){
+
+	for (MissionsList::const_iterator it = missions.begin(); it != missions.end(); ++it)
+	{
+		if ((*it)->isStarted(player))
+		{
 			count++;
 		}
 	}
+
 	return count;
 }
 
@@ -162,21 +186,31 @@ MissionsList::const_iterator Quest::getEndMission() const
 bool Quest::isCompleted(Player* player)
 {
 	MissionsList::iterator it;
-	for(it = missions.begin(); it != missions.end(); ++it){
-		if(!(*it)->isCompleted(player))
+
+	for (it = missions.begin(); it != missions.end(); ++it)
+	{
+		if (!(*it)->isCompleted(player))
+		{
 			return false;
+		}
 	}
+
 	return true;
 }
 
 bool Quest::isStarted(Player* player) const
 {
-	if(player){
+	if (player)
+	{
 		uint32_t value = 0;
 		player->getStorageValue(startStorageID, (int32_t&)value);
-		if(value >= startStorageValue)
+
+		if (value >= startStorageValue)
+		{
 			return true;
+		}
 	}
+
 	return false;
 }
 
@@ -198,8 +232,10 @@ Quests::Quests()
 Quests::~Quests()
 {
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); ++it){
-		delete (*it);
+
+	for (it = quests.begin(); it != quests.end(); ++it)
+	{
+		delete(*it);
 	}
 }
 
@@ -222,11 +258,13 @@ QuestsList::const_iterator Quests::getEndQuest() const
 bool Quests::reload()
 {
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); ++it){
-		delete (*it);
-	}
-	quests.clear();
 
+	for (it = quests.begin(); it != quests.end(); ++it)
+	{
+		delete(*it);
+	}
+
+	quests.clear();
 	return loadFromXml(filename);
 }
 
@@ -234,91 +272,144 @@ bool Quests::loadFromXml(const std::string& _filename)
 {
 	std::string filename = _filename;
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	if(doc){
+
+	if (doc)
+	{
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
-		if(xmlStrcmp(root->name,(const xmlChar*)"quests") == 0){
+
+		if (xmlStrcmp(root->name, (const xmlChar*)"quests") == 0)
+		{
 			int32_t intValue;
 			std::string strValue;
 			uint16_t id = 0;
 			p = root->children;
-			while(p){
-				if(xmlStrcmp(p->name, (const xmlChar*)"quest") == 0){
+
+			while (p)
+			{
+				if (xmlStrcmp(p->name, (const xmlChar*)"quest") == 0)
+				{
 					std::string name;
 					uint32_t startStorageID = 0, startStorageValue = 0;
-					if(readXMLString(p, "name", strValue))
+
+					if (readXMLString(p, "name", strValue))
+					{
 						name = strValue;
+					}
 
-					if(readXMLInteger(p, "startstorageid", intValue))
+					if (readXMLInteger(p, "startstorageid", intValue))
+					{
 						startStorageID = intValue;
+					}
 
-					if(readXMLInteger(p, "startstoragevalue", intValue))
+					if (readXMLInteger(p, "startstoragevalue", intValue))
+					{
 						startStorageValue = intValue;
+					}
 
-					Quest *quest = new Quest(name, id, startStorageID, startStorageValue);
+					Quest* quest = new Quest(name, id, startStorageID, startStorageValue);
 					xmlNodePtr tmpNode = p->children;
-					while(tmpNode){
-						if(xmlStrcmp(tmpNode->name, (const xmlChar*)"mission") == 0){
+
+					while (tmpNode)
+					{
+						if (xmlStrcmp(tmpNode->name, (const xmlChar*)"mission") == 0)
+						{
 							std::string missionName, missionState;
 							uint32_t storageID = 0, startValue = 0, endValue = 0;
-							if(readXMLString(tmpNode, "name", strValue))
+
+							if (readXMLString(tmpNode, "name", strValue))
+							{
 								missionName = strValue;
+							}
 
-							if(readXMLInteger(tmpNode, "storageid", intValue))
+							if (readXMLInteger(tmpNode, "storageid", intValue))
+							{
 								storageID = intValue;
+							}
 
-							if(readXMLInteger(tmpNode, "startvalue", intValue))
+							if (readXMLInteger(tmpNode, "startvalue", intValue))
+							{
 								startValue = intValue;
+							}
 
-							if(readXMLInteger(tmpNode, "endvalue", intValue))
+							if (readXMLInteger(tmpNode, "endvalue", intValue))
+							{
 								endValue = intValue;
+							}
 
-							if(readXMLString(tmpNode, "description", strValue))
+							if (readXMLString(tmpNode, "description", strValue))
+							{
 								missionState = strValue;
+							}
 
 							Mission* mission = new Mission(missionName, storageID, startValue, endValue);
-							if(missionState.empty()){
+
+							if (missionState.empty())
+							{
 								// parse sub-states only if there's no main one
 								xmlNodePtr tmpNode2 = tmpNode->children;
-								while(tmpNode2){
-									if(xmlStrcmp(tmpNode2->name, (const xmlChar*)"missionstate") == 0){
+
+								while (tmpNode2)
+								{
+									if (xmlStrcmp(tmpNode2->name, (const xmlChar*)"missionstate") == 0)
+									{
 										std::string description;
 										uint32_t missionID = 0;
-										if(readXMLInteger(tmpNode2, "id", intValue))
+
+										if (readXMLInteger(tmpNode2, "id", intValue))
+										{
 											missionID = intValue;
-										if(readXMLString(tmpNode2, "description", strValue))
+										}
+
+										if (readXMLString(tmpNode2, "description", strValue))
+										{
 											description = strValue;
+										}
+
 										mission->state[missionID] = new MissionState(description, missionID);
 									}
+
 									tmpNode2 = tmpNode2->next;
 								}
 							}
-							else {
+							else
+							{
 								mission->mainState = new MissionState(missionState, 0);
 							}
+
 							quest->addMission(mission);
 						}
+
 						tmpNode = tmpNode->next;
 					}
+
 					quests.push_back(quest);
 				}
+
 				id++;
 				p = p->next;
 			}
 		}
+
 		xmlFreeDoc(doc);
 		return true;
 	}
+
 	return false;
 }
 
-Quest *Quests::getQuestByID(const uint16_t& id)
+Quest* Quests::getQuestByID(const uint16_t& id)
 {
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); ++it){
-		if((*it)->getID() == id)
+
+	for (it = quests.begin(); it != quests.end(); ++it)
+	{
+		if ((*it)->getID() == id)
+		{
 			return (*it);
+		}
 	}
+
 	return NULL;
 }
 
@@ -326,9 +417,14 @@ uint16_t Quests::getQuestsCount(Player* player)
 {
 	uint16_t count = 0;
 	QuestsList::iterator it;
-	for(it = quests.begin(); it != quests.end(); ++it){
-		if((*it)->isStarted(player))
+
+	for (it = quests.begin(); it != quests.end(); ++it)
+	{
+		if ((*it)->isStarted(player))
+		{
 			count++;
+		}
 	}
+
 	return count;
 }

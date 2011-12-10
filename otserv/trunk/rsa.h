@@ -27,7 +27,8 @@
 #include <string.h>
 #include <boost/thread.hpp>
 
-class RSA{
+class RSA
+{
 public:
 	RSA();
 	~RSA();

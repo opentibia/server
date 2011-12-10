@@ -27,7 +27,8 @@
 #include <sstream>
 
 /*Notice: remember to add new error codes to global.lua*/
-enum ReturnValue{
+enum ReturnValue
+{
 	RET_NOERROR = 1,
 	RET_NOTPOSSIBLE = 2,
 	RET_NOTENOUGHROOM = 3,
@@ -103,7 +104,8 @@ class Cylinder;
 class Item;
 class Creature;
 
-class Thing {
+class Thing
+{
 protected:
 	Thing();
 
@@ -138,7 +140,7 @@ public:
 
 	virtual bool isRemoved() const;
 	virtual const uint32_t& getTotalAmountOfItemsInside() const;
-	
+
 private:
 	Cylinder* parent;
 	int32_t useCount;

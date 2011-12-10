@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,7 +32,7 @@ class Town
 {
 public:
 	explicit Town(const uint32_t& _townid);
-	
+
 	const Position& getTemplePosition() const;
 	const std::string& getName() const;
 
@@ -48,13 +48,14 @@ private:
 
 typedef std::map<uint32_t, Town*> TownMap;
 
-class Towns : boost::noncopyable {
+class Towns : boost::noncopyable
+{
 	Towns();
-	
+
 public:
 	static Towns& getInstance();
 
-	bool addTown(const uint32_t& _townid, Town* town);	
+	bool addTown(const uint32_t& _townid, Town* town);
 	Town* getTown(const std::string& townname);
 	Town* getTown(const uint32_t& _townid);
 	TownMap::const_iterator getTownBegin() const;

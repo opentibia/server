@@ -33,7 +33,8 @@ class Action;
 class Container;
 class ItemType;
 
-enum ActionType_t{
+enum ActionType_t
+{
 	ACTION_ANY,
 	ACTION_UNIQUEID,
 	ACTION_ACTIONID,
@@ -49,7 +50,7 @@ public:
 
 	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey);
 	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
-		uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
+	               uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
 
 	ReturnValue canUse(const Player* player, const Position& pos);
 	ReturnValue canUse(const Player* player, const Position& pos, const Item* item);
@@ -59,12 +60,12 @@ public:
 protected:
 	bool executeUse(Action* action, Player* player, Item* item, const PositionEx& posEx, uint32_t creatureId);
 	ReturnValue internalUseItem(Player* player, const Position& pos,
-		uint8_t index, Item* item, uint32_t creatureId);
+	                            uint8_t index, Item* item, uint32_t creatureId);
 
 	bool executeUseEx(Action* action, Player* player, Item* item, const PositionEx& fromPosEx,
-		const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId);
+	                  const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-		Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
+	                              Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
 
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
@@ -84,7 +85,8 @@ protected:
 	LuaScriptInterface m_scriptInterface;
 };
 
-class Action : public Event {
+class Action : public Event
+{
 public:
 	Action(LuaScriptInterface* _interface);
 	virtual ~Action();
@@ -95,7 +97,7 @@ public:
 
 	//scripting
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom,
-		const PositionEx& posTo, bool extendedUse, const uint32_t& creatureId);
+	                        const PositionEx& posTo, bool extendedUse, const uint32_t& creatureId);
 
 	bool getAllowFarUse() const;
 	void setAllowFarUse(bool v);

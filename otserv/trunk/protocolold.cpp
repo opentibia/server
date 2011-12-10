@@ -42,18 +42,22 @@ void ProtocolOld::deleteProtocolTask()
 void ProtocolOld::disconnectClient(uint8_t error, const char* message)
 {
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-	if(output){
+
+	if (output)
+	{
 		TRACK_MESSAGE(output);
 		output->AddByte(error);
 		output->AddString(message);
 		OutputMessagePool::getInstance()->send(output);
 	}
+
 	getConnection()->closeConnection();
 }
 
 bool ProtocolOld::parseFirstPacket(NetworkMessage& msg)
 {
-	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+	if (g_game.getGameState() == GAME_STATE_SHUTDOWN)
+	{
 		getConnection()->closeConnection();
 		return false;
 	}
@@ -62,11 +66,13 @@ bool ProtocolOld::parseFirstPacket(NetworkMessage& msg)
 	uint16_t version  = msg.GetU16();
 	msg.SkipBytes(12);
 
-	if(version <= 760){
+	if (version <= 760)
+	{
 		disconnectClient(0x0A, STRING_CLIENT_VERSION);
 	}
 
-	if(!RSA_decrypt(msg)){
+	if (!RSA_decrypt(msg))
+	{
 		getConnection()->closeConnection();
 		return false;
 	}
@@ -79,7 +85,8 @@ bool ProtocolOld::parseFirstPacket(NetworkMessage& msg)
 	enableXTEAEncryption();
 	setXTEAKey(key);
 
-	if(version <= 822){
+	if (version <= 822)
+	{
 		disableChecksum();
 	}
 

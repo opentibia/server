@@ -58,7 +58,8 @@ bool Towns::addTown(const uint32_t& _townid, Town* town)
 {
 	TownMap::iterator it = townMap.find(_townid);
 
-	if(it != townMap.end()){
+	if (it != townMap.end())
+	{
 		return false;
 	}
 
@@ -71,11 +72,13 @@ Towns& Towns::getInstance()
 	static Towns instance;
 	return instance;
 }
-	
+
 Town* Towns::getTown(const std::string& townname)
 {
-	for(TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it){
-		if(boost::algorithm::iequals(it->second->getName(), townname)){
+	for (TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it)
+	{
+		if (boost::algorithm::iequals(it->second->getName(), townname))
+		{
 			return it->second;
 		}
 	}
@@ -86,8 +89,9 @@ Town* Towns::getTown(const std::string& townname)
 Town* Towns::getTown(const uint32_t& _townid)
 {
 	TownMap::iterator it = townMap.find(_townid);
-	
-	if(it != townMap.end()){
+
+	if (it != townMap.end())
+	{
 		return it->second;
 	}
 
@@ -98,7 +102,7 @@ TownMap::const_iterator Towns::getTownBegin() const
 {
 	return townMap.begin();
 }
-	
+
 TownMap::const_iterator Towns::getTownEnd() const
 {
 	return townMap.end();

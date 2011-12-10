@@ -31,8 +31,10 @@ Account::Account()
 
 uint16_t Account::getPremiumDaysLeft(const int32_t& _premEnd)
 {
-	if(_premEnd < std::time(NULL)){
+	if (_premEnd < std::time(NULL))
+	{
 		return 0;
 	}
+
 	return (uint16_t)std::ceil(((double)(_premEnd - time(NULL))) / 86400.);
 }

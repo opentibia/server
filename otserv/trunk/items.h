@@ -43,7 +43,8 @@
 #define	SLOTP_DEPOT 1024
 #define	SLOTP_TWO_HAND 2048
 
-enum ItemTypes_t {
+enum ItemTypes_t
+{
 	ITEM_TYPE_NONE = 0,
 	ITEM_TYPE_DEPOT,
 	ITEM_TYPE_MAILBOX,
@@ -58,27 +59,30 @@ enum ItemTypes_t {
 	ITEM_TYPE_LAST
 };
 
-struct Abilities{
+struct Abilities
+{
 	Abilities();
 
-	struct Absorb {
-			int16_t resistances[COMBAT_COUNT];
+	struct Absorb
+	{
+		int16_t resistances[COMBAT_COUNT];
 
-			bool any() const;
-			bool reduce(CombatType_t type, int32_t& dmg) const;
-			std::ostream& getDescription(std::ostream& os) const;
+		bool any() const;
+		bool reduce(CombatType_t type, int32_t& dmg) const;
+		std::ostream& getDescription(std::ostream& os) const;
 	protected:
-			std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
+		std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
 	} absorb;
 
 	//extra skill modifiers
-	struct Skill {
-			int16_t upgrades[SKILL_LAST+1];
+	struct Skill
+	{
+		int16_t upgrades[SKILL_LAST + 1];
 
-			bool any() const;
-			std::ostream& getDescription(std::ostream& os) const;
+		bool any() const;
+		std::ostream& getDescription(std::ostream& os) const;
 	protected:
-			std::ostream& getDescription(std::ostream& os, bool& first, int32_t type) const;
+		std::ostream& getDescription(std::ostream& os, bool& first, int32_t type) const;
 	} skill;
 
 	//field damage
@@ -86,7 +90,7 @@ struct Abilities{
 
 	//condition manipulating
 	uint16_t conditionCount;
-	
+
 	//elemental damage
 	CombatType_t elementType;
 	int16_t elementDamage;
@@ -115,10 +119,11 @@ struct Abilities{
 
 class Condition;
 
-class ItemType {
+class ItemType
+{
 private:
 	//It is private because calling it can cause unexpected results
-	ItemType(const ItemType& it){};
+	ItemType(const ItemType& it);
 
 public:
 	ItemType();
@@ -221,7 +226,7 @@ public:
 	bool blockProjectile;
 	bool blockPathFind;
 	bool allowPickupable;
-	
+
 	unsigned short transformEquipTo;
 	unsigned short transformDeEquipTo;
 	bool showDuration;
@@ -244,11 +249,12 @@ public:
 };
 
 template<typename A>
-class Array{
+class Array
+{
 public:
 	Array(uint32_t n)
 	{
-		m_data = (A*)malloc(sizeof(A)*n);
+		m_data = (A*)malloc(sizeof(A) * n);
 		memset(m_data, 0, sizeof(A)*n);
 		m_size = n;
 	}
@@ -259,38 +265,49 @@ public:
 
 	A getElement(uint32_t id)
 	{
-		if(id < m_size){
+		if (id < m_size)
+		{
 			return m_data[id];
 		}
+
 		return 0;
 	}
 
 	const A getElement(uint32_t id) const
 	{
-		if(id < m_size){
+		if (id < m_size)
+		{
 			return m_data[id];
 		}
+
 		return 0;
 	}
 
 	void addElement(A a, uint32_t pos)
 	{
 		static const int INCREMENT = 5000;
-		if(pos >= m_size){
-			m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
-			memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
+
+		if (pos >= m_size)
+		{
+			m_data = (A*)realloc(m_data, sizeof(A) * (pos + INCREMENT));
+			memset(m_data + m_size, 0, sizeof(A) * (pos + INCREMENT - m_size));
 			m_size = pos + INCREMENT;
 		}
+
 		m_data[pos] = a;
 	}
 
-	uint32_t size() const {return m_size;}
+	uint32_t size() const
+	{
+		return m_size;
+	}
 private:
 	A* m_data;
 	uint32_t m_size;
 };
 
-class Items{
+class Items
+{
 public:
 	Items();
 
@@ -302,7 +319,7 @@ public:
 	const ItemType& operator[](const int32_t& id) const;
 	const ItemType& getItemType(const int32_t& id) const;
 	ItemType& getItemType(const int32_t& id);
-	const ItemType& getItemIdByClientId(const int32_t &spriteId) const;
+	const ItemType& getItemIdByClientId(const int32_t& spriteId) const;
 
 	int32_t getItemIdByName(const std::string& name);
 

@@ -25,7 +25,8 @@
 #include <cmath>
 #include <iostream>
 
-enum Direction {
+enum Direction
+{
 	NORTH = 0,
 	EAST = 1,
 	SOUTH = 2,
@@ -36,7 +37,8 @@ enum Direction {
 	NORTHEAST = 7
 };
 
-class Position{
+class Position
+{
 public:
 	int32_t x;
 	int32_t y;
@@ -47,21 +49,27 @@ public:
 	virtual ~Position();
 
 	template<int32_t deltax, int32_t deltay, int32_t deltaz>
-	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
-			std::abs(int32_t(p1.y - p2.y)) > deltay ||
-			std::abs(int32_t(p1.z - p2.z)) > deltaz){
+	inline static bool areInRange(const Position& p1, const Position& p2)
+	{
+		if (std::abs(int32_t(p1.x - p2.x)) > deltax ||
+		        std::abs(int32_t(p1.y - p2.y)) > deltay ||
+		        std::abs(int32_t(p1.z - p2.z)) > deltaz)
+		{
 			return false;
 		}
+
 		return true;
 	}
 
 	template<int32_t deltax, int32_t deltay>
-	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
-			std::abs(int32_t(p1.y - p2.y)) > deltay){
+	inline static bool areInRange(const Position& p1, const Position& p2)
+	{
+		if (std::abs(int32_t(p1.x - p2.x)) > deltax ||
+		        std::abs(int32_t(p1.y - p2.y)) > deltay)
+		{
 			return false;
 		}
+
 		return true;
 	}
 
@@ -75,16 +83,17 @@ public:
 std::ostream& operator<<(std::ostream&, const Position&);
 std::ostream& operator<<(std::ostream&, const Direction&);
 
-class PositionEx : public Position {
+class PositionEx : public Position
+{
 public:
 	int32_t stackpos;
 
-	PositionEx();	
+	PositionEx();
 	PositionEx(const int32_t& _x, const int32_t& _y, const int32_t& _z, const int32_t& _stackpos);
 	PositionEx(const int32_t& _x, const int32_t& _y, const int32_t& _z);
 	PositionEx(const Position& p);
 	PositionEx(const PositionEx& p);
-	PositionEx(const Position& p, const int32_t& _stackpos);	
+	PositionEx(const Position& p, const int32_t& _stackpos);
 	virtual ~PositionEx();
 
 	bool operator==(const PositionEx& p) const;

@@ -25,7 +25,8 @@
 #include "luascript.h"
 #include <libxml/parser.h>
 
-class Event{
+class Event
+{
 public:
 	Event(LuaScriptInterface* _interface);
 	virtual ~Event();
@@ -68,7 +69,8 @@ protected:
 	std::string m_datadir;
 };
 
-class CallBack{
+class CallBack
+{
 public:
 	CallBack();
 	virtual ~CallBack();

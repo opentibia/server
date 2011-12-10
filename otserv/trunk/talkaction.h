@@ -29,14 +29,16 @@
 #include <list>
 #include <string>
 
-enum TalkActionResult_t{
+enum TalkActionResult_t
+{
 	//TALKACTION_NOTFOUND,
 	TALKACTION_CONTINUE,
 	TALKACTION_BREAK,
 	TALKACTION_FAILED
 };
 
-enum TalkActionFilterType{
+enum TalkActionFilterType
+{
 	TALKACTION_MATCH_QUOTATION,
 	TALKACTION_MATCH_FIRST_WORD
 };
@@ -91,9 +93,9 @@ protected:
 	static TalkActionFunction placeNpc;
 	static TalkActionFunction sellHouse;
 	static TalkActionFunction forceRaid;
-	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static TalkActionFunction serverDiag;
-	#endif
+#endif
 
 	std::string commandString;
 	TalkActionFilterType filterType;

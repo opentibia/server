@@ -28,7 +28,8 @@ typedef uint8_t attribute_t;
 typedef uint16_t datasize_t;
 typedef uint32_t flags_t;
 
-enum itemgroup_t{
+enum itemgroup_t
+{
 	ITEM_GROUP_NONE = 0,
 	ITEM_GROUP_GROUND,
 	ITEM_GROUP_CONTAINER,
@@ -48,7 +49,8 @@ enum itemgroup_t{
 };
 
 /////////OTB specific//////////////
-enum clientVersion_t{
+enum clientVersion_t
+{
 	CLIENT_VERSION_750 = 1,
 	CLIENT_VERSION_755 = 2,
 	CLIENT_VERSION_760 = 3,
@@ -81,11 +83,13 @@ enum clientVersion_t{
 	CLIENT_VERSION_920 = 29
 };
 
-enum rootattrib_t{
+enum rootattrib_t
+{
 	ROOT_ATTR_VERSION = 0x01
 };
 
-enum itemattrib_t {
+enum itemattrib_t
+{
 	ITEM_ATTR_FIRST = 0x10,
 	ITEM_ATTR_SERVERID = ITEM_ATTR_FIRST,
 	ITEM_ATTR_CLIENTID,
@@ -121,7 +125,8 @@ enum itemattrib_t {
 	ITEM_ATTR_LAST
 };
 
-enum itemflags_t {
+enum itemflags_t
+{
 	FLAG_BLOCK_SOLID = 1,
 	FLAG_BLOCK_PROJECTILE = 2,
 	FLAG_BLOCK_PATHFIND = 4,
@@ -151,14 +156,16 @@ enum itemflags_t {
 //1-byte aligned structs
 #pragma pack(1)
 
-struct VERSIONINFO{
+struct VERSIONINFO
+{
 	uint32_t dwMajorVersion;
 	uint32_t dwMinorVersion;
 	uint32_t dwBuildNumber;
 	uint8_t CSDVersion[128];
 };
 
-struct lightBlock2{
+struct lightBlock2
+{
 	uint16_t lightLevel;
 	uint16_t lightColor;
 };

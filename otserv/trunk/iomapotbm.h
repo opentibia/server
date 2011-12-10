@@ -25,7 +25,8 @@
 #include "iomap.h"
 #include "item.h"
 
-enum OTBM_AttrTypes_t{
+enum OTBM_AttrTypes_t
+{
 	OTBM_ATTR_DESCRIPTION = 1,
 	OTBM_ATTR_EXT_FILE = 2,
 	OTBM_ATTR_TILE_FLAGS = 3,
@@ -50,7 +51,8 @@ enum OTBM_AttrTypes_t{
 	OTBM_ATTR_CHARGES = 22
 };
 
-enum OTBM_NodeTypes_t{
+enum OTBM_NodeTypes_t
+{
 	OTBM_ROOTV1 = 1,
 	OTBM_MAP_DATA = 2,
 	OTBM_ITEM_DEF = 3,
@@ -71,7 +73,8 @@ enum OTBM_NodeTypes_t{
 
 #pragma pack(1)
 
-struct OTBM_root_header{
+struct OTBM_root_header
+{
 	uint32_t version;
 	uint16_t width;
 	uint16_t height;
@@ -79,30 +82,35 @@ struct OTBM_root_header{
 	uint32_t minorVersionItems;
 };
 
-struct OTBM_TeleportDest{
+struct OTBM_TeleportDest
+{
 	uint16_t _x;
 	uint16_t _y;
 	uint8_t _z;
 };
 
-struct OTBM_Tile_area_coords{
+struct OTBM_Tile_area_coords
+{
 	uint16_t _x;
 	uint16_t _y;
 	uint8_t _z;
 };
 
-struct OTBM_Tile_coords{
+struct OTBM_Tile_coords
+{
 	uint8_t _x;
 	uint8_t _y;
 };
 
-struct OTBM_TownTemple_coords{
+struct OTBM_TownTemple_coords
+{
 	uint16_t _x;
 	uint16_t _y;
 	uint8_t _z;
 };
 
-struct OTBM_HouseTile_coords{
+struct OTBM_HouseTile_coords
+{
 	uint8_t _x;
 	uint8_t _y;
 	uint32_t _houseid;
@@ -110,13 +118,17 @@ struct OTBM_HouseTile_coords{
 
 #pragma pack()
 
-class IOMapOTBM : public IOMap{
+class IOMapOTBM : public IOMap
+{
 	static Tile* createTile(Item*& ground, Item* item, int px, int py, int pz);
 public:
-	IOMapOTBM(){};
-	~IOMapOTBM(){};
+	IOMapOTBM() {};
+	~IOMapOTBM() {};
 
-	virtual const char* getSourceDescription(){ return "OTBM";};
+	virtual const char* getSourceDescription()
+	{
+		return "OTBM";
+	};
 	virtual bool loadMap(Map* map, const std::string& identifier);
 };
 

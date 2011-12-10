@@ -43,7 +43,6 @@ public:
 	ProtocolOld(Connection_ptr connection) : Protocol(connection)
 	{
 		enableChecksum();
-
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		protocolOldCount++;
 #endif
@@ -63,17 +62,20 @@ protected:
 
 	bool parseFirstPacket(NetworkMessage& msg);
 
-	#ifdef __DEBUG_NET_DETAIL__
+#ifdef __DEBUG_NET_DETAIL__
 	virtual void deleteProtocolTask();
-	#endif
+#endif
 };
 
 class ProtocolOldLogin : public ProtocolOld
 {
 public:
 	enum {protocol_identifier = 0x01};
-	static const char* protocol_name() {return "old login protocol";}
-	
+	static const char* protocol_name()
+	{
+		return "old login protocol";
+	}
+
 	ProtocolOldLogin(Connection_ptr connection) : ProtocolOld(connection) {}
 };
 
@@ -81,8 +83,11 @@ class ProtocolOldGame : public ProtocolOld
 {
 public:
 	enum {protocol_identifier = 0x0A};
-	static const char* protocol_name() {return "old gameworld protocol";}
-	
+	static const char* protocol_name()
+	{
+		return "old gameworld protocol";
+	}
+
 	ProtocolOldGame(Connection_ptr connection) : ProtocolOld(connection) {}
 };
 

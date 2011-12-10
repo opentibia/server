@@ -34,7 +34,10 @@ public:
 	enum {server_sends_first = false};
 	enum {protocol_identifier = 0xFF};
 	enum {use_checksum = false};
-	static const char* protocol_name() {return "status protocol";}
+	static const char* protocol_name()
+	{
+		return "status protocol";
+	}
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolStatusCount;
@@ -59,12 +62,13 @@ public:
 protected:
 	static std::map<uint32_t, int64_t> ipConnectMap;
 
-	#ifdef __DEBUG_NET_DETAIL__
+#ifdef __DEBUG_NET_DETAIL__
 	virtual void deleteProtocolTask();
-	#endif
+#endif
 };
 
-class Status{
+class Status
+{
 public:
 	static Status* instance()
 	{
@@ -78,7 +82,10 @@ public:
 
 	std::string getStatusString() const;
 	void getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const;
-	uint32_t getPlayersOnline() const {return m_playersonline;}
+	uint32_t getPlayersOnline() const
+	{
+		return m_playersonline;
+	}
 	uint64_t getUptime() const;
 
 private:

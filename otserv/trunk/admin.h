@@ -84,7 +84,8 @@
 class NetworkMessage;
 class RSA;
 
-enum{
+enum
+{
 	//
 	AP_MSG_LOGIN = 1,
 	AP_MSG_ENCRYPTION = 2,
@@ -107,7 +108,8 @@ enum{
 	AP_MSG_ERROR = 12
 };
 
-enum{
+enum
+{
 	CMD_BROADCAST = 1,
 	CMD_CLOSE_SERVER = 2,
 	CMD_PAY_HOUSES = 3,
@@ -127,16 +129,19 @@ enum{
 };
 
 
-enum{
+enum
+{
 	REQUIRE_LOGIN = 1,
 	REQUIRE_ENCRYPTION = 2
 };
 
-enum{
+enum
+{
 	ENCRYPTION_RSA1024XTEA = 1
 };
 
-class AdminProtocolConfig{
+class AdminProtocolConfig
+{
 public:
 	AdminProtocolConfig();
 	~AdminProtocolConfig();
@@ -183,7 +188,10 @@ public:
 	enum {server_sends_first = false};
 	enum {protocol_identifier = 0xFE}; // Not required as we send first
 	enum {use_checksum = false};
-	static const char* protocol_name() {return "admin protocol";}
+	static const char* protocol_name()
+	{
+		return "admin protocol";
+	}
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolAdminCount;
@@ -211,7 +219,8 @@ protected:
 
 	Item* createMail(const std::string& xmlData, std::string& name, uint32_t& depotId);
 
-	enum ConnectionState_t{
+	enum ConnectionState_t
+	{
 		NO_CONNECTED,
 		ENCRYPTION_NO_SET,
 		ENCRYPTION_OK,

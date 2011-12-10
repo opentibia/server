@@ -31,10 +31,11 @@
 
 #define SCHEDULER_MINTICKS 50
 
-class SchedulerTask : public Task {
+class SchedulerTask : public Task
+{
 protected:
 	SchedulerTask(const uint32_t& delay, const boost::function<void (void)>& f);
-	
+
 public:
 	virtual ~SchedulerTask();
 
@@ -53,13 +54,17 @@ protected:
 inline SchedulerTask* createSchedulerTask(const uint32_t& delay, const boost::function<void (void)>& f)
 {
 	assert(delay != 0);
-	if(delay < SCHEDULER_MINTICKS){
+
+	if (delay < SCHEDULER_MINTICKS)
+	{
 		return new SchedulerTask(SCHEDULER_MINTICKS, f);
 	}
+
 	return new SchedulerTask(delay, f);
 }
 
-class Scheduler {
+class Scheduler
+{
 public:
 	Scheduler();
 
@@ -70,14 +75,15 @@ public:
 	void stop();
 	void shutdown();
 
-	enum SchedulerState{
+	enum SchedulerState
+	{
 		STATE_RUNNING,
 		STATE_CLOSING,
 		STATE_TERMINATED
 	};
 
 protected:
-	
+
 	struct lessSchedTask : public std::binary_function<SchedulerTask*&, SchedulerTask*&, bool>
 	{
 		bool operator()(SchedulerTask*& t1, SchedulerTask*& t2) const
@@ -85,7 +91,7 @@ protected:
 			return (*t1) < (*t2);
 		}
 	};
-	
+
 	static void schedulerThread(void* p);
 
 	boost::mutex m_eventLock;

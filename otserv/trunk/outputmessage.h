@@ -44,13 +44,14 @@ private:
 
 public:
 
-	enum OutputMessageState{
+	enum OutputMessageState
+	{
 		STATE_FREE,
 		STATE_ALLOCATED,
 		STATE_ALLOCATED_NO_AUTOSEND,
 		STATE_WAITING
 	};
-	
+
 	char* getOutputBuffer();
 	void writeMessageLength();
 	void addCryptoHeader(bool addChecksum);
@@ -62,9 +63,11 @@ public:
 #ifdef __TRACK_NETWORK__
 	virtual void Track(std::string file, long line, std::string func)
 	{
-		if(last_uses.size() >= 25) {
+		if (last_uses.size() >= 25)
+		{
 			last_uses.pop_front();
 		}
+
 		std::ostringstream os;
 		os << /*file << ":"*/ "line " << line << " " << func;
 		last_uses.push_back(os.str());
@@ -78,7 +81,9 @@ public:
 	void PrintTrace()
 	{
 		int n = 1;
-		for(std::list<std::string>::const_reverse_iterator iter = last_uses.rbegin(); iter != last_uses.rend(); ++iter, ++n) {
+
+		for (std::list<std::string>::const_reverse_iterator iter = last_uses.rbegin(); iter != last_uses.rend(); ++iter, ++n)
+		{
 			std::cout << "\t" << n << ".\t" << *iter << std::endl;
 		}
 	}
@@ -91,12 +96,15 @@ protected:
 #endif
 
 	template <typename T>
-	inline void add_header(T add){
-		if((int32_t)m_outputBufferStart - (int32_t)sizeof(T) < 0){
+	inline void add_header(T add)
+	{
+		if ((int32_t)m_outputBufferStart - (int32_t)sizeof(T) < 0)
+		{
 			std::cout << "Error: [OutputMessage::add_header] m_outputBufferStart(" << m_outputBufferStart <<
-					") < " << sizeof(T) << std::endl;
+			          ") < " << sizeof(T) << std::endl;
 			return;
 		}
+
 		m_outputBufferStart = m_outputBufferStart - sizeof(T);
 		*(T*)(m_MsgBuf + m_outputBufferStart) = add;
 		//added header size to the message size
@@ -134,7 +142,7 @@ public:
 	~OutputMessagePool();
 
 	static OutputMessagePool* getInstance();
-	
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t OutputMessagePoolCount;
 #endif
@@ -146,9 +154,15 @@ public:
 	void startExecutionFrame();
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	size_t getTotalMessageCount() const {return OutputMessagePoolCount;}
+	size_t getTotalMessageCount() const
+	{
+		return OutputMessagePoolCount;
+	}
 #else
-	size_t getTotalMessageCount() const {return m_allOutputMessages.size();}
+	size_t getTotalMessageCount() const
+	{
+		return m_allOutputMessages.size();
+	}
 #endif
 	size_t getAvailableMessageCount() const;
 	size_t getAutoMessageCount() const;

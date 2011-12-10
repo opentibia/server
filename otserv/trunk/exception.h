@@ -24,8 +24,8 @@
 #include "definitions.h"
 
 #ifdef __WINDOWS__
-	#include <Windows.h>
-	#include <dbghelp.h>
+#include <Windows.h>
+#include <dbghelp.h>
 #endif
 
 class ExceptionHandler

@@ -23,7 +23,8 @@
 
 #include "container.h"
 
-class Depot : public Container {
+class Depot : public Container
+{
 public:
 	Depot(const uint16_t& _type);
 	virtual ~Depot();
@@ -40,10 +41,10 @@ public:
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t flags) const;
+	                               uint32_t flags) const;
 
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount, uint32_t flags) const;
+	                                    uint32_t& maxQueryCount, uint32_t flags) const;
 
 	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER, bool isNewItem = true);
 	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);

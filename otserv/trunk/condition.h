@@ -31,7 +31,8 @@ class Creature;
 class Player;
 class PropStream;
 
-enum ConditionType_t {
+enum ConditionType_t
+{
 	CONDITION_NONE           = 0,
 	CONDITION_POISON         = 1 << 0,
 	CONDITION_FIRE           = 1 << 1,
@@ -62,14 +63,16 @@ enum ConditionType_t {
 	CONDITION_EXHAUST_OTHERS = 1 << 26
 };
 
-enum ConditionEnd_t{
+enum ConditionEnd_t
+{
 	CONDITIONEND_CLEANUP,
 	CONDITIONEND_DIE,
 	CONDITIONEND_TICKS,
 	CONDITIONEND_ABORT
 };
 
-enum ConditionAttr_t{
+enum ConditionAttr_t
+{
 	CONDITIONATTR_TYPE = 1,
 	CONDITIONATTR_ID = 2,
 	CONDITIONATTR_TICKS = 3,
@@ -103,13 +106,15 @@ enum ConditionAttr_t{
 	CONDITIONATTR_END      = 254
 };
 
-struct IntervalInfo{
+struct IntervalInfo
+{
 	int32_t timeLeft;
 	int32_t value;
 	int32_t interval;
 };
 
-class Condition{
+class Condition
+{
 public:
 	Condition(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
 	virtual ~Condition();
@@ -130,8 +135,8 @@ public:
 	void setTicks(const int32_t& newTicks);
 
 	static bool canBeAggressive(const ConditionType_t& type);
-	static Condition* createCondition(const ConditionId_t& _id, const ConditionType_t& _type, 
-		const int32_t& ticks, const int32_t& param = 0);
+	static Condition* createCondition(const ConditionId_t& _id, const ConditionType_t& _type,
+	                                  const int32_t& ticks, const int32_t& param = 0);
 	static Condition* createCondition(PropStream& propStream);
 
 	virtual bool setParam(const ConditionParam_t& param, const int32_t& value);
@@ -154,7 +159,8 @@ protected:
 	virtual bool updateCondition(const Condition* addCondition);
 };
 
-class ConditionGeneric: public Condition {
+class ConditionGeneric: public Condition
+{
 public:
 	ConditionGeneric(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
 	virtual ~ConditionGeneric();
@@ -166,7 +172,8 @@ public:
 	virtual ConditionGeneric* clone() const;
 };
 
-class ConditionManaShield : public ConditionGeneric {
+class ConditionManaShield : public ConditionGeneric
+{
 public:
 	ConditionManaShield(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
 	virtual ~ConditionManaShield();
@@ -174,10 +181,11 @@ public:
 	virtual ConditionManaShield* clone() const;
 };
 
-class ConditionAttributes : public ConditionGeneric {
+class ConditionAttributes : public ConditionGeneric
+{
 public:
 	ConditionAttributes(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~ConditionAttributes(){};
+	virtual ~ConditionAttributes() {};
 
 	virtual bool startCondition(Creature* creature);
 	virtual bool executeCondition(Creature* creature, const int32_t& interval);
@@ -206,7 +214,8 @@ protected:
 	void updateSkills(Player* player);
 };
 
-class ConditionRegeneration : public ConditionGeneric {
+class ConditionRegeneration : public ConditionGeneric
+{
 public:
 	ConditionRegeneration(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
 	virtual ~ConditionRegeneration();
@@ -231,7 +240,8 @@ protected:
 	uint32_t manaGain;
 };
 
-class ConditionSoul : public ConditionGeneric {
+class ConditionSoul : public ConditionGeneric
+{
 public:
 	ConditionSoul(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
 	virtual ~ConditionSoul();
@@ -252,7 +262,8 @@ protected:
 	uint32_t soulGain;
 };
 
-class ConditionInvisible: public ConditionGeneric {
+class ConditionInvisible: public ConditionGeneric
+{
 public:
 	ConditionInvisible(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
 	virtual ~ConditionInvisible();
@@ -263,7 +274,8 @@ public:
 	virtual ConditionInvisible* clone() const;
 };
 
-class ConditionDamage: public Condition {
+class ConditionDamage: public Condition
+{
 public:
 	ConditionDamage(const ConditionId_t& _id, const ConditionType_t& _type);
 	virtual ~ConditionDamage();
@@ -285,7 +297,7 @@ public:
 	int32_t getTotalDamage() const;
 
 	size_t getLength() const;
-	
+
 	IntervalInfo popBackDamage();
 	IntervalInfo popFrontDamage();
 	void clearDamageList();
@@ -316,10 +328,11 @@ protected:
 	bool updateCondition(const ConditionDamage* addCondition);
 };
 
-class ConditionSpeed: public Condition {
+class ConditionSpeed: public Condition
+{
 public:
 	ConditionSpeed(const ConditionId_t& _id, const ConditionType_t& _type,
-		const int32_t& _ticks, const int32_t& changeSpeed);
+	               const int32_t& _ticks, const int32_t& changeSpeed);
 	virtual ~ConditionSpeed();
 
 	virtual bool startCondition(Creature* creature);
@@ -350,7 +363,8 @@ protected:
 	float maxb;
 };
 
-class ConditionOutfit: public Condition {
+class ConditionOutfit: public Condition
+{
 public:
 	ConditionOutfit(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
 	virtual ~ConditionOutfit();
@@ -374,10 +388,11 @@ protected:
 	void changeOutfit(Creature* creature, const int32_t& index = -1);
 };
 
-class ConditionLight : public Condition {
+class ConditionLight : public Condition
+{
 public:
 	ConditionLight(const ConditionId_t& _id, const ConditionType_t& _type,
-		const int32_t& _ticks, const int32_t& _lightlevel, const int32_t& _lightcolor);
+	               const int32_t& _ticks, const int32_t& _lightlevel, const int32_t& _lightcolor);
 	virtual ~ConditionLight();
 
 	virtual bool startCondition(Creature* creature);

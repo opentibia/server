@@ -24,7 +24,7 @@
 #define __DATABASE_SQLITE_H__
 
 #ifndef __OTSERV_DATABASE_H__
-	#error "database.h should be included first."
+#error "database.h should be included first."
 #endif
 
 #include "definitions.h"
@@ -44,18 +44,18 @@ public:
 	DATABASE_VIRTUAL bool rollback();
 	DATABASE_VIRTUAL bool commit();
 
-	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
-	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
+	DATABASE_VIRTUAL bool executeQuery(const std::string& query);
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string& query);
 
 	DATABASE_VIRTUAL uint64_t getLastInsertedRowID();
 
-	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
+	DATABASE_VIRTUAL std::string escapeString(const std::string& s);
 	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length);
 
-	DATABASE_VIRTUAL void freeResult(DBResult *res);
+	DATABASE_VIRTUAL void freeResult(DBResult* res);
 
 protected:
-	std::string _parse(const std::string &s);
+	std::string _parse(const std::string& s);
 
 	boost::recursive_mutex sqliteLock;
 	sqlite3* m_handle;
@@ -66,10 +66,10 @@ class SQLiteResult : public _DBResult
 	friend class DatabaseSQLite;
 
 public:
-	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);
-	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s);
-	DATABASE_VIRTUAL std::string getDataString(const std::string &s);
-	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size);
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string& s);
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string& s);
+	DATABASE_VIRTUAL std::string getDataString(const std::string& s);
+	DATABASE_VIRTUAL const char* getDataStream(const std::string& s, unsigned long& size);
 
 	DATABASE_VIRTUAL bool next();
 

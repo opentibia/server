@@ -61,12 +61,27 @@ template <typename ProtocolType>
 class Service : public ServiceBase
 {
 public:
-	bool is_single_socket() const {return ProtocolType::server_sends_first;}
-	bool is_checksummed() const {return ProtocolType::use_checksum;}
-	uint8_t get_protocol_identifier() const {return ProtocolType::protocol_identifier;}
-	const char* get_protocol_name() const {return ProtocolType::protocol_name();}
+	bool is_single_socket() const
+	{
+		return ProtocolType::server_sends_first;
+	}
+	bool is_checksummed() const
+	{
+		return ProtocolType::use_checksum;
+	}
+	uint8_t get_protocol_identifier() const
+	{
+		return ProtocolType::protocol_identifier;
+	}
+	const char* get_protocol_name() const
+	{
+		return ProtocolType::protocol_name();
+	}
 
-	Protocol* make_protocol(Connection_ptr c) const {return new ProtocolType(c);}
+	Protocol* make_protocol(Connection_ptr c) const
+	{
+		return new ProtocolType(c);
+	}
 };
 
 // A Service Port represents a listener on a port.
@@ -121,7 +136,10 @@ public:
 	template <typename ProtocolType>
 	bool add(uint16_t port);
 
-	bool is_running() const {return !m_acceptors.empty();}
+	bool is_running() const
+	{
+		return !m_acceptors.empty();
+	}
 	std::list<uint16_t> get_ports() const;
 protected:
 	void die();
@@ -136,26 +154,31 @@ protected:
 template <typename ProtocolType>
 bool ServiceManager::add(uint16_t port)
 {
-	if(port == 0){
+	if (port == 0)
+	{
 		std::cout << "ERROR: No port provided for service " << ProtocolType::protocol_name() << ". Service disabled." << std::endl;
 		return false;
 	}
+
 	ServicePort_ptr service_port;
+	std::map<uint16_t, ServicePort_ptr>::iterator finder =
+	    m_acceptors.find(port);
 
-	std::map<uint16_t, ServicePort_ptr>::iterator finder = 
-		m_acceptors.find(port);
-
-	if(finder == m_acceptors.end()){
+	if (finder == m_acceptors.end())
+	{
 		service_port.reset(new ServicePort(m_io_service));
 		service_port->open(port);
 		m_acceptors[port] = service_port;
 	}
-	else{
+	else
+	{
 		service_port = finder->second;
-		if(service_port->is_single_socket() || ProtocolType::server_sends_first){
-			std::cout << "ERROR: " << ProtocolType::protocol_name() << 
-				" and " << service_port->get_protocol_names() << 
-				" cannot use the same port " << port << "." << std::endl;
+
+		if (service_port->is_single_socket() || ProtocolType::server_sends_first)
+		{
+			std::cout << "ERROR: " << ProtocolType::protocol_name() <<
+			          " and " << service_port->get_protocol_names() <<
+			          " cannot use the same port " << port << "." << std::endl;
 			return false;
 		}
 	}

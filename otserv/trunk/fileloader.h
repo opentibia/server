@@ -31,9 +31,10 @@ struct NodeStruct;
 
 typedef NodeStruct* NODE;
 
-struct NodeStruct {
+struct NodeStruct
+{
 	NodeStruct();
-	
+
 	unsigned long start;
 	unsigned long propsSize;
 	unsigned long type;
@@ -49,7 +50,8 @@ private:
 
 #define NO_NODE 0
 
-enum FILELOADER_ERRORS{
+enum FILELOADER_ERRORS
+{
 	ERROR_NONE,
 	ERROR_INVALID_FILE_VERSION,
 	ERROR_CAN_NOT_OPEN,
@@ -66,26 +68,34 @@ enum FILELOADER_ERRORS{
 
 class PropStream;
 
-class FileLoader {
+class FileLoader
+{
 public:
 	FileLoader();
 	virtual ~FileLoader();
 
 	bool openFile(const char* filename, bool write, bool caching = false);
-	const unsigned char* getProps(const NODE, unsigned long &size);
+	const unsigned char* getProps(const NODE, unsigned long& size);
 	bool getProps(const NODE, PropStream& props);
-	NODE getChildNode(const NODE parent, unsigned long &type);
-	NODE getNextNode(const NODE prev, unsigned long &type);
+	NODE getChildNode(const NODE parent, unsigned long& type);
+	NODE getNextNode(const NODE prev, unsigned long& type);
 
 	void startNode(unsigned char type);
 	void endNode();
 	int setProps(void* data, unsigned short size);
 
-	int getError(){return m_lastError;}
-	void clearError(){m_lastError = ERROR_NONE;}
+	int getError()
+	{
+		return m_lastError;
+	}
+	void clearError()
+	{
+		m_lastError = ERROR_NONE;
+	}
 
 protected:
-	enum SPECIAL_BYTES{
+	enum SPECIAL_BYTES
+	{
 		NODE_START = 0xFE,
 		NODE_END = 0xFF,
 		ESCAPE_CHAR = 0xFD
@@ -93,15 +103,15 @@ protected:
 
 	bool parseNode(NODE node);
 
-	bool readByte(int &value);
+	bool readByte(int& value);
 	bool readBytes(unsigned char* buffer, unsigned int size, long pos);
 	bool checks(const NODE node);
 	bool safeSeek(unsigned long pos);
-	bool safeTell(long &pos);
+	bool safeTell(long& pos);
 
 public:
 	bool writeData(const void* data, int size, bool unescape);
-	
+
 protected:
 	FILE* m_file;
 	FILELOADER_ERRORS m_lastError;
@@ -110,28 +120,30 @@ protected:
 	unsigned char* m_buffer;
 
 	bool m_use_cache;
-	struct _cache{
+	struct _cache
+	{
 		unsigned long loaded;
 		unsigned long base;
 		unsigned char* data;
 		size_t size;
 	};
-	#define CACHE_BLOCKS 3
+#define CACHE_BLOCKS 3
 	unsigned long m_cache_size;
 	_cache m_cached_data[CACHE_BLOCKS];
-	#define NO_VALID_CACHE 0xFFFFFFFF
+#define NO_VALID_CACHE 0xFFFFFFFF
 	unsigned long m_cache_index;
 	unsigned long m_cache_offset;
 	inline unsigned long getCacheBlock(unsigned long pos);
 	long loadCacheBlock(unsigned long pos);
 };
 
-class PropStream {
+class PropStream
+{
 public:
 	PropStream();
 
 	void init(const char* a, unsigned long size);
-	int64_t size();
+	int64_t size() const;
 
 	bool GET_UINT32(uint32_t& ret);
 	bool GET_INT32(int32_t& ret);
@@ -145,14 +157,17 @@ public:
 	bool GET_LSTRING(std::string& ret);
 	bool GET_NSTRING(std::string& ret, unsigned short str_len);
 	bool GET_RAWSTRING(char* buffer, unsigned short str_len);
-	bool SKIP_N(int32_t n);	
+	bool SKIP_N(int32_t n);
 
 protected:
 	template <typename T>
-	bool GET_VALUE(T& ret){
-		if(size() < (long)sizeof(T)){
+	bool GET_VALUE(T& ret)
+	{
+		if (size() < (long)sizeof(T))
+		{
 			return false;
 		}
+
 		ret = *((T*)p);
 		p = p + sizeof(T);
 		return true;
@@ -162,7 +177,8 @@ protected:
 	const char* end;
 };
 
-class PropWriteStream{
+class PropWriteStream
+{
 public:
 	PropWriteStream();
 	~PropWriteStream();
@@ -181,10 +197,12 @@ public:
 
 protected:
 	template <typename T>
-	void ADD_VALUE(T add){
-		if((buffer_size - size) < sizeof(T)){
+	void ADD_VALUE(T add)
+	{
+		if ((buffer_size - size) < sizeof(T))
+		{
 			buffer_size = buffer_size + sizeof(T) + 0x1F;
-			buffer = (char*)realloc(buffer,buffer_size);
+			buffer = (char*)realloc(buffer, buffer_size);
 		}
 
 		memcpy(&buffer[size], &add, sizeof(T));

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,7 +39,7 @@ class MissionState
 {
 public:
 	MissionState(const std::string& _description, const uint32_t& _missionID);
-	
+
 	const uint32_t& getMissionID() const;
 	const std::string& getMissionDescription() const;
 
@@ -52,9 +52,9 @@ class Mission
 {
 public:
 	Mission(const std::string& _missionName, const uint32_t& _storageID,
-		const uint32_t& _startValue, const int32_t& _endValue);
+	        const uint32_t& _startValue, const int32_t& _endValue);
 	~Mission();
-		
+
 	bool isCompleted(Player* player) const;
 	bool isStarted(Player* player) const;
 	std::string getName(Player* player);
@@ -74,7 +74,7 @@ class Quest
 {
 public:
 	Quest(const std::string& _name, const uint16_t& _id,
-		const uint32_t& _startStorageID, const uint32_t& _startStorageValue);
+	      const uint32_t& _startStorageID, const uint32_t& _startStorageValue);
 	~Quest();
 
 	bool isCompleted(Player* player);

@@ -29,7 +29,8 @@
 class Container;
 class Depot;
 
-class ContainerIterator {
+class ContainerIterator
+{
 public:
 	ContainerIterator();
 	ContainerIterator(const ContainerIterator& rhs);
@@ -53,7 +54,8 @@ protected:
 	friend class Container;
 };
 
-class Container : public Item, public Cylinder {
+class Container : public Item, public Cylinder
+{
 public:
 	Container(const uint16_t& _type);
 	virtual ~Container();
@@ -69,7 +71,7 @@ public:
 	std::string getContentDescription() const;
 
 	size_t size() const;
-	
+
 	bool full() const;
 	bool empty() const;
 
@@ -93,12 +95,12 @@ public:
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t flags) const;
+	                               uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
-		uint32_t flags) const;
+	                                    uint32_t flags) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const;
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-		uint32_t& flags);
+	                                     uint32_t& flags);
 
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
@@ -124,11 +126,11 @@ public:
 	virtual const uint32_t& getTotalAmountOfItemsInside() const;
 	const uint16_t& getDeepness() const;
 	void setDeepness(const uint16_t& newDeepness);
-	
+
 private:
 	void onAddContainerItem(Item* item);
 	void onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemType& oldType,
-		Item* newItem, const ItemType& newType);
+	                           Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(uint32_t index, Item* item);
 	void updateAmountOfItems(int32_t diff);
 	const Container* getParentContainer() const;

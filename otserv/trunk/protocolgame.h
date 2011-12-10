@@ -28,7 +28,8 @@
 #include "creature.h"
 #include <string>
 
-enum connectResult_t{
+enum connectResult_t
+{
 	CONNECT_SUCCESS = 1,
 	CONNECT_TOMANYPLAYERS = 2,
 	CONNECT_MASTERPOSERROR = 3,
@@ -52,7 +53,10 @@ public:
 	enum {server_sends_first = true};
 	enum {protocol_identifier = 0}; // Not required as we send first
 	enum {use_checksum = true};
-	static const char* protocol_name() {return "gameworld protocol";}
+	static const char* protocol_name()
+	{
+		return "gameworld protocol";
+	}
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolGameCount;
@@ -76,7 +80,7 @@ private:
 	virtual void releaseProtocol();
 	virtual void deleteProtocolTask();
 
-	void checkCreatureAsKnown(uint32_t id, bool &known, uint32_t &removedKnown);
+	void checkCreatureAsKnown(uint32_t id, bool& known, uint32_t& removedKnown);
 
 	bool canSee(int x, int y, int z) const;
 	bool canSee(const Creature*) const;
@@ -223,9 +227,9 @@ private:
 
 	void sendCreatureSkull(const Creature* creature);
 	void sendCreatureShield(const Creature* creature);
-	#ifdef __GUILDWARSLUARELOAD__
+#ifdef __GUILDWARSLUARELOAD__
 	void sendCreatureEmblem(const Creature* creature);
-	#endif
+#endif
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 
 	//tiles
@@ -237,7 +241,7 @@ private:
 	void sendAddCreature(const Creature* creature, const Position& pos, uint32_t stackpos);
 	void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
 	void sendMoveCreature(const Creature* creature, const Tile* newTile, const Position& newPos, uint32_t newStackPos,
-		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	                      const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	//containers
 	void sendAddContainerItem(uint8_t cid, const Item* item);
@@ -259,21 +263,21 @@ private:
 
 	// translate a floor to clientreadable format
 	void GetFloorDescription(NetworkMessage_ptr msg, int32_t x, int32_t y, int32_t z,
-		int32_t width, int32_t height, int32_t offset, int32_t& skip);
+	                         int32_t width, int32_t height, int32_t offset, int32_t& skip);
 
 	// translate a map area to clientreadable format
 	void GetMapDescription(int32_t x, int32_t y, int32_t z,
-		int32_t width, int32_t height, NetworkMessage_ptr msg);
+	                       int32_t width, int32_t height, NetworkMessage_ptr msg);
 
 	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
-	void AddTextMessage(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message);
-	void AddAnimatedText(NetworkMessage_ptr msg,const Position& pos, unsigned char color, const std::string& text);
-	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, unsigned char type);
-	void AddDistanceShoot(NetworkMessage_ptr msg,const Position& from, const Position& to, uint8_t type);
-	void AddCreature(NetworkMessage_ptr msg,const Creature* creature, bool known, uint32_t remove);
+	void AddTextMessage(NetworkMessage_ptr msg, MessageClasses mclass, const std::string& message);
+	void AddAnimatedText(NetworkMessage_ptr msg, const Position& pos, unsigned char color, const std::string& text);
+	void AddMagicEffect(NetworkMessage_ptr msg, const Position& pos, unsigned char type);
+	void AddDistanceShoot(NetworkMessage_ptr msg, const Position& from, const Position& to, uint8_t type);
+	void AddCreature(NetworkMessage_ptr msg, const Creature* creature, bool known, uint32_t remove);
 	void AddPlayerStats(NetworkMessage_ptr msg);
 	void AddCreatureSpeak(NetworkMessage_ptr msg, const Creature* creature, SpeakClasses type, std::string text, uint16_t channelId, uint32_t time = 0);
-	void AddCreatureHealth(NetworkMessage_ptr msg,const Creature* creature);
+	void AddCreatureHealth(NetworkMessage_ptr msg, const Creature* creature);
 	void AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const Outfit_t& outfit);
 	void AddCreatureInvisible(NetworkMessage_ptr msg, const Creature* creature);
 	void AddPlayerSkills(NetworkMessage_ptr msg);
@@ -287,9 +291,9 @@ private:
 	void RemoveTileItem(NetworkMessage_ptr msg, const Position& pos, uint32_t stackpos);
 
 	void MoveUpCreature(NetworkMessage_ptr msg, const Creature* creature,
-		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
+	                    const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
 	void MoveDownCreature(NetworkMessage_ptr msg, const Creature* creature,
-		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
+	                      const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
 
 	//container
 	void AddContainerItem(NetworkMessage_ptr msg, uint8_t cid, const Item* item);

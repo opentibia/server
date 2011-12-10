@@ -44,7 +44,8 @@ class MagicField;
 class BedItem;
 //]
 
-enum ITEMPROPERTY{
+enum ITEMPROPERTY
+{
 	BLOCKSOLID = 0,
 	HASHEIGHT,
 	BLOCKPROJECTILE,
@@ -59,12 +60,14 @@ enum ITEMPROPERTY{
 	SUPPORTHANGABLE
 };
 
-enum TradeEvents_t{
+enum TradeEvents_t
+{
 	ON_TRADE_TRANSFER,
 	ON_TRADE_CANCEL
 };
 
-enum ItemDecayState_t{
+enum ItemDecayState_t
+{
 	DECAYING_FALSE = 0,
 	DECAYING_TRUE,
 	DECAYING_PENDING
@@ -72,14 +75,16 @@ enum ItemDecayState_t{
 
 /*from iomapotbm.h*/
 #pragma pack(1)
-struct TeleportDest{
+struct TeleportDest
+{
 	uint16_t _x;
 	uint16_t _y;
 	uint8_t	_z;
 };
 #pragma pack()
 
-enum AttrTypes_t{
+enum AttrTypes_t
+{
 	// attr 0 means end of attribute list
 	//ATTR_DESCRIPTION = 1,
 	//ATTR_EXT_FILE = 2,
@@ -108,16 +113,18 @@ enum AttrTypes_t{
 	ATTR_CONTAINER_ITEMS = 23
 };
 
-enum Attr_ReadValue{
+enum Attr_ReadValue
+{
 	ATTR_READ_CONTINUE,
 	ATTR_READ_ERROR,
 	ATTR_READ_END
 };
 
-class ItemAttributes{
+class ItemAttributes
+{
 public:
 	ItemAttributes();
-	ItemAttributes(const ItemAttributes &i);
+	ItemAttributes(const ItemAttributes& i);
 	virtual ~ItemAttributes();
 
 	void setSpecialDescription(const std::string& desc);
@@ -162,7 +169,8 @@ public:
 	uint32_t getDecaying() const;
 
 protected:
-	enum itemAttrTypes{
+	enum itemAttrTypes
+	{
 		ATTR_ITEM_ACTIONID = 1 << 0,
 		ATTR_ITEM_UNIQUEID = 1 << 1,
 		ATTR_ITEM_DESC = 1 << 2,
@@ -182,36 +190,45 @@ protected:
 	void removeAttribute(const itemAttrTypes& type);
 
 protected:
-	class Attribute{
+	class Attribute
+	{
 	public:
 		itemAttrTypes type;
 		void* value;
 		Attribute* next;
-		Attribute(itemAttrTypes _type){
+		Attribute(itemAttrTypes _type)
+		{
 			type = _type;
 			value = NULL;
 			next = NULL;
 		}
 
-		Attribute(const Attribute &i){
+		Attribute(const Attribute& i)
+		{
 			type = i.type;
-			if(ItemAttributes::validateIntAttrType(type)){
+
+			if (ItemAttributes::validateIntAttrType(type))
+			{
 				value = i.value;
 			}
-			else if(ItemAttributes::validateStrAttrType(type)){
-				value = (void*)new std::string( *((std::string*)i.value) );
+			else if (ItemAttributes::validateStrAttrType(type))
+			{
+				value = (void*)new std::string(*((std::string*)i.value));
 			}
-			else{
+			else
+			{
 				value = NULL;
 			}
 
 			next = NULL;
-			if(i.next){
+
+			if (i.next)
+			{
 				next = new Attribute(*i.next);
 			}
 		}
 	};
-	
+
 	const std::string& getStrAttr(const itemAttrTypes& type) const;
 	void setStrAttr(const itemAttrTypes& type, const std::string& value);
 
@@ -232,10 +249,11 @@ protected:
 	Attribute* m_firstAttr;
 };
 
-class Item : virtual public Thing, public ItemAttributes {
+class Item : virtual public Thing, public ItemAttributes
+{
 public:
 	Item(const uint16_t& _type, const uint16_t& _count = 0);
-	Item(const Item &i);
+	Item(const Item& i);
 	virtual ~Item();
 
 	//Factory member to create item of right type based on type
@@ -267,9 +285,9 @@ public:
 	virtual const BedItem* getBed() const;
 
 	static std::string getDescription(const ItemType& it, const int32_t& lookDistance,
-		const Item* item = NULL, int32_t subType = -1, bool addArticle = true);
+	                                  const Item* item = NULL, int32_t subType = -1, bool addArticle = true);
 	static std::string getLongName(const ItemType& it, const int32_t& lookDistance,
-		const Item* item = NULL, int32_t subType = -1, bool addArticle = true);
+	                               const Item* item = NULL, int32_t subType = -1, bool addArticle = true);
 	static std::string getWeightDescription(const ItemType& it, double weight, const uint32_t& count = 1);
 
 	//serialization
@@ -380,6 +398,6 @@ protected:
 	//Don't add variables here, use the ItemAttribute class.
 };
 
-typedef std::list<Item *> ItemList;
+typedef std::list<Item*> ItemList;
 
 #endif

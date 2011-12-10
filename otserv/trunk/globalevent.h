@@ -24,7 +24,8 @@
 
 #define TIMER_INTERVAL 1000
 
-enum GlobalEvent_t {
+enum GlobalEvent_t
+{
 	GLOBALEVENT_NONE,
 	GLOBALEVENT_TIMER,
 	GLOBALEVENT_STARTUP,
@@ -34,11 +35,12 @@ enum GlobalEvent_t {
 class GlobalEvent;
 typedef std::map<std::string, GlobalEvent*> GlobalEventMap;
 
-class GlobalEvents : public BaseEvents {
+class GlobalEvents : public BaseEvents
+{
 public:
 	GlobalEvents();
 	virtual ~GlobalEvents();
-	
+
 	void startup();
 	void timer();
 	void think();
@@ -64,7 +66,8 @@ protected:
 	int32_t timerEventId;
 };
 
-class GlobalEvent : public Event {
+class GlobalEvent : public Event
+{
 public:
 	GlobalEvent(LuaScriptInterface* _interface);
 	virtual ~GlobalEvent();

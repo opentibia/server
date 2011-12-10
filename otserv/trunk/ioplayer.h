@@ -26,7 +26,8 @@
 #include "database.h"
 #include <string>
 
-enum UnjustKillPeriod_t{
+enum UnjustKillPeriod_t
+{
 	UNJUST_KILL_PERIOD_DAY,
 	UNJUST_KILL_PERIOD_WEEK,
 	UNJUST_KILL_PERIOD_MONTH
@@ -36,7 +37,8 @@ typedef std::pair<int32_t, Item*> itemBlock;
 typedef std::list<itemBlock> ItemBlockList;
 
 /** Class responsible for loading players from database. */
-class IOPlayer {
+class IOPlayer
+{
 public:
 	IOPlayer() {}
 	~IOPlayer() {}
@@ -78,7 +80,7 @@ public:
 	bool cleanOnlineInfo();
 
 protected:
-	bool storeNameByGuid(Database &mysql, uint32_t guid);
+	bool storeNameByGuid(Database& mysql, uint32_t guid);
 
 	struct StringCompareCase
 	{
@@ -88,7 +90,7 @@ protected:
 		}
 	};
 
-	typedef std::map<int,std::pair<Item*,int> > ItemMap;
+	typedef std::map<int, std::pair<Item*, int> > ItemMap;
 
 	void loadVip(Player* player, DBResult* result);
 	void loadOutfit(Player* player, DBResult* result);
@@ -103,7 +105,8 @@ protected:
 	typedef std::map<uint32_t, std::string> NameCacheMap;
 	typedef std::map<std::string, uint32_t, StringCompareCase> GuidCacheMap;
 
-	struct UnjustKillBlock{
+	struct UnjustKillBlock
+	{
 		uint32_t dayUnjustCount;
 		int64_t dayQueryTime;	//the time which was used to query the database
 		int64_t dayExpireTime;	//the time when the cached value expires (lowest date that the query returned)
@@ -121,11 +124,9 @@ protected:
 			dayUnjustCount = 0;
 			dayQueryTime = 0;
 			dayExpireTime = 0;
-
 			weekUnjustCount = 0;
 			weekQueryTime = 0;
 			weekExpireTime = 0;
-
 			monthUnjustCount = 0;
 			monthQueryTime = 0;
 			monthExpireTime = 0;

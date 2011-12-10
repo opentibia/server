@@ -23,7 +23,8 @@
 
 #include "definitions.h"
 
-enum RaceType_t {
+enum RaceType_t
+{
 	RACE_NONE	= 0,
 	RACE_VENOM  = 1,
 	RACE_BLOOD	= 2,
@@ -32,7 +33,8 @@ enum RaceType_t {
 	RACE_ENERGY	= 5
 };
 
-enum CombatType_t {
+enum CombatType_t
+{
 	COMBAT_NONE             = 0,
 	COMBAT_FIRST            = COMBAT_NONE,
 	COMBAT_PHYSICALDAMAGE	= 1,
@@ -52,7 +54,8 @@ enum CombatType_t {
 
 const int COMBAT_COUNT = 13;
 
-enum CombatParam_t{
+enum CombatParam_t
+{
 	COMBATPARAM_COMBATTYPE				= 1,
 	COMBATPARAM_EFFECT					= 2,
 	COMBATPARAM_DISTANCEEFFECT			= 3,
@@ -68,14 +71,16 @@ enum CombatParam_t{
 	COMBATPARAM_PZBLOCK					= 13
 };
 
-enum CallBackParam_t{
+enum CallBackParam_t
+{
 	CALLBACKPARAM_LEVELMAGICVALUE = 1,
 	CALLBACKPARAM_SKILLVALUE = 2,
 	CALLBACKPARAM_TARGETTILECALLBACK = 3,
 	CALLBACKPARAM_TARGETCREATURECALLBACK = 4
 };
 
-enum ConditionParam_t{
+enum ConditionParam_t
+{
 	CONDITIONPARAM_OWNER = 1,
 	CONDITIONPARAM_TICKS = 2,
 	//CONDITIONPARAM_OUTFIT = 3,
@@ -123,14 +128,16 @@ enum ConditionParam_t{
 	CONDITIONPARAM_SUBID = 45
 };
 
-enum BlockType_t {
+enum BlockType_t
+{
 	BLOCK_NONE = 0,
 	BLOCK_DEFENSE,
 	BLOCK_ARMOR,
 	BLOCK_IMMUNITY
 };
 
-enum Vocation_t {
+enum Vocation_t
+{
 	VOCATION_NONE = 0,
 	VOCATION_SORCERER = 1,
 	VOCATION_DRUID = 2,
@@ -142,7 +149,8 @@ enum Vocation_t {
 	VOCATION_ELITEKNIGHT = 8
 };
 
-enum levelTypes_t {
+enum levelTypes_t
+{
 	LEVEL_FIRST = 0,
 	LEVEL_SKILL_FIST = LEVEL_FIRST,
 	LEVEL_SKILL_CLUB = 1,
@@ -168,7 +176,8 @@ enum violationAction_t
 	ACTION_DELETION
 };
 
-enum skills_t {
+enum skills_t
+{
 	SKILL_FIRST = 0,
 	SKILL_FIST = SKILL_FIRST,
 	SKILL_CLUB = 1,
@@ -180,7 +189,8 @@ enum skills_t {
 	SKILL_LAST = SKILL_FISH
 };
 
-enum stats_t {
+enum stats_t
+{
 	STAT_FIRST = 0,
 	STAT_MAXHITPOINTS = STAT_FIRST,
 	STAT_MAXMANAPOINTS,
@@ -189,7 +199,8 @@ enum stats_t {
 	STAT_LAST = STAT_MAGICPOINTS
 };
 
-enum lossTypes_t {
+enum lossTypes_t
+{
 	LOSS_FIRST = 0,
 	LOSS_EXPERIENCE = LOSS_FIRST,
 	LOSS_MANASPENT = 1,
@@ -199,14 +210,16 @@ enum lossTypes_t {
 	LOSS_LAST = LOSS_CONTAINERS
 };
 
-enum formulaType_t{
+enum formulaType_t
+{
 	FORMULA_UNDEFINED = 0,
 	FORMULA_LEVELMAGIC = 1,
 	FORMULA_SKILL = 2,
 	FORMULA_VALUE = 3
 };
 
-enum ConditionId_t{
+enum ConditionId_t
+{
 	CONDITIONID_DEFAULT = -1,
 	CONDITIONID_COMBAT = 0,
 	CONDITIONID_HEAD = 1,
@@ -221,7 +234,8 @@ enum ConditionId_t{
 	CONDITIONID_AMMO = 10
 };
 
-enum PlayerSex_t {
+enum PlayerSex_t
+{
 	PLAYERSEX_FIRST = 0,
 	PLAYERSEX_FEMALE = PLAYERSEX_FIRST,
 	PLAYERSEX_MALE = 1,
@@ -236,8 +250,10 @@ enum PlayerSex_t {
 	//When adding new types remember that females should be even and males odd
 };
 
-struct Outfit_t{
-	Outfit_t(){
+struct Outfit_t
+{
+	Outfit_t()
+	{
 		lookHead   = 0;
 		lookBody   = 0;
 		lookLegs   = 0;
@@ -256,34 +272,40 @@ struct Outfit_t{
 	uint32_t lookAddons;
 };
 
-struct LightInfo{
+struct LightInfo
+{
 	uint32_t level;
 	uint32_t color;
-	LightInfo(){
+	LightInfo()
+	{
 		level = 0;
 		color = 0;
 	};
-	LightInfo(uint32_t _level, uint32_t _color){
+	LightInfo(uint32_t _level, uint32_t _color)
+	{
 		level = _level;
 		color = _color;
 	};
 };
 
-struct ShopInfo{
+struct ShopInfo
+{
 	uint32_t itemId;
 	int32_t subType;
 	uint32_t buyPrice;
 	uint32_t sellPrice;
 	// Name can be found using Item::items[itemId].
 
-	ShopInfo(){
+	ShopInfo()
+	{
 		itemId = 0;
 		subType = 1;
 		buyPrice = 0;
 		sellPrice = 0;
 	};
 	ShopInfo(uint32_t _itemId, int32_t _subType = 0,
-		uint32_t _buyPrice = 0, uint32_t _sellPrice = 0){
+	         uint32_t _buyPrice = 0, uint32_t _sellPrice = 0)
+	{
 		itemId = _itemId;
 		subType = _subType;
 		buyPrice = _buyPrice;
@@ -291,7 +313,8 @@ struct ShopInfo{
 	};
 };
 
-enum reloadTypes_t {
+enum reloadTypes_t
+{
 	RELOAD_TYPE_ACTIONS = 0,
 	RELOAD_TYPE_MONSTERS = 1,
 	RELOAD_TYPE_NPCS = 2,

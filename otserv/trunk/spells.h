@@ -76,7 +76,8 @@ typedef bool (InstantSpellFunction)(const InstantSpell* spell, Creature* creatur
 typedef bool (ConjureSpellFunction)(const ConjureSpell* spell, Creature* creature, const std::string& param);
 typedef bool (RuneSpellFunction)(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo);
 
-class BaseSpell{
+class BaseSpell
+{
 public:
 	virtual ~BaseSpell();
 
@@ -84,10 +85,11 @@ public:
 	virtual bool castSpell(Creature* creature, Creature* target) = 0;
 
 	//used by some child classes, like CombatSpell and InstantSpell
-	bool internalExecuteCastSpell(Event *event, Creature* creature, const LuaVariant& var, bool &result);
+	bool internalExecuteCastSpell(Event* event, Creature* creature, const LuaVariant& var, bool& result);
 };
 
-class CombatSpell : public Event, public BaseSpell{
+class CombatSpell : public Event, public BaseSpell
+{
 public:
 	CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection);
 	virtual ~CombatSpell();
@@ -109,7 +111,8 @@ protected:
 	Combat* combat;
 };
 
-class Spell : public BaseSpell {
+class Spell : public BaseSpell
+{
 public:
 	Spell();
 	virtual ~Spell();
@@ -125,7 +128,7 @@ public:
 	const uint32_t& getLevel() const;
 	const uint32_t& getMagicLevel() const;
 	const int32_t& getMana() const;
-	static bool playerHasEnoughManaToCast(const Player *p, const int32_t& manaCost);
+	static bool playerHasEnoughManaToCast(const Player* p, const int32_t& manaCost);
 	const int32_t& getManaPercent() const;
 	bool isPremium() const;
 	bool hasArea() const;
@@ -265,7 +268,7 @@ public:
 	virtual bool hasOwnErrorHandler();
 
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom,
-		const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
+	                        const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
 
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);

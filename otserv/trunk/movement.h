@@ -27,7 +27,8 @@
 #include "creature.h"
 #include <map>
 
-enum MoveEvent_t{
+enum MoveEvent_t
+{
 	MOVE_EVENT_NONE,
 	MOVE_EVENT_STEP_IN,
 	MOVE_EVENT_STEP_OUT,
@@ -42,7 +43,8 @@ enum MoveEvent_t{
 
 class MoveEvent;
 
-struct MoveEventList{
+struct MoveEventList
+{
 	std::list<MoveEvent*> moveEvent[MOVE_EVENT_LAST];
 };
 

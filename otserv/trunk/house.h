@@ -30,7 +30,8 @@
 #include <list>
 #include <map>
 
-class AccessList {
+class AccessList
+{
 public:
 	AccessList();
 	~AccessList();
@@ -60,7 +61,8 @@ private:
 class House;
 class BedItem;
 
-class Door : public Item {
+class Door : public Item
+{
 public:
 	Door(const uint16_t& _type);
 	virtual ~Door();
@@ -95,12 +97,14 @@ private:
 	friend class House;
 };
 
-enum AccessList_t{
+enum AccessList_t
+{
 	GUEST_LIST = 0x100,
 	SUBOWNER_LIST = 0x101
 };
 
-enum AccessHouseLevel_t{
+enum AccessHouseLevel_t
+{
 	HOUSE_NO_INVITED = 0,
 	HOUSE_GUEST = 1,
 	HOUSE_SUBOWNER = 2,
@@ -111,7 +115,8 @@ typedef std::list<HouseTile*> HouseTileList;
 typedef std::list<Door*> HouseDoorList;
 typedef std::list<BedItem*> HouseBedItemList;
 
-class HouseTransferItem : public Item {
+class HouseTransferItem : public Item
+{
 public:
 	HouseTransferItem(House* _house);
 	virtual ~HouseTransferItem();
@@ -127,9 +132,11 @@ protected:
 	House* house;
 };
 
-class House {
+class House
+{
 public:
-	enum syncflags_t{
+	enum syncflags_t
+	{
 		HOUSE_SYNC_TOWNID		= 0,
 		HOUSE_SYNC_NAME			= 1 << 0,
 		HOUSE_SYNC_PRICE		= 1 << 1,
@@ -246,7 +253,8 @@ private:
 
 typedef std::map<uint32_t, House*> HouseMap;
 
-enum RentPeriod_t{
+enum RentPeriod_t
+{
 	RENTPERIOD_DAILY,
 	RENTPERIOD_WEEKLY,
 	RENTPERIOD_MONTHLY,
@@ -254,9 +262,10 @@ enum RentPeriod_t{
 	RENTPERIOD_NEVER
 };
 
-class Houses {
+class Houses
+{
 	Houses();
-	
+
 public:
 	static Houses& getInstance();
 

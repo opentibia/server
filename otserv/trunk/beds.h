@@ -73,9 +73,10 @@ protected:
 };
 
 
-class Beds {
+class Beds
+{
 	Beds();
-	
+
 public:
 	static Beds& instance();
 

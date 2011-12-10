@@ -26,7 +26,8 @@
 #include "luascript.h"
 #include "baseevents.h"
 
-enum CreatureEventType_t{
+enum CreatureEventType_t
+{
 	CREATURE_EVENT_NONE,
 	CREATURE_EVENT_LOGIN,
 	CREATURE_EVENT_LOGOUT,

@@ -28,12 +28,14 @@
 #include <vector>
 #include <list>
 
-enum RaidState_t {
+enum RaidState_t
+{
 	RAIDSTATE_IDLE = 0,
 	RAIDSTATE_EXECUTING
 };
 
-struct MonsterSpawn {
+struct MonsterSpawn
+{
 	std::string name;
 	uint32_t minAmount;
 	uint32_t maxAmount;
@@ -54,7 +56,8 @@ typedef std::list<MonsterSpawn*> MonsterSpawnList;
 class Raids
 {
 public:
-	static Raids* getInstance(){
+	static Raids* getInstance()
+	{
 		static Raids instance;
 		return &instance;
 	}
@@ -67,16 +70,34 @@ public:
 	void clear();
 	void reload();
 
-	bool isLoaded() { return loaded; }
-	bool isStarted() { return started; }
+	bool isLoaded()
+	{
+		return loaded;
+	}
+	bool isStarted()
+	{
+		return started;
+	}
 
-	Raid* getRunning() { return running; }
-	void setRunning(Raid* newRunning) { running = newRunning; }
+	Raid* getRunning()
+	{
+		return running;
+	}
+	void setRunning(Raid* newRunning)
+	{
+		running = newRunning;
+	}
 
 	Raid* getRaidByName(const std::string& name);
 
-	uint64_t getLastRaidEnd() { return lastRaidEnd; }
-	void setLastRaidEnd(uint64_t newLastRaidEnd) { lastRaidEnd = newLastRaidEnd; }
+	uint64_t getLastRaidEnd()
+	{
+		return lastRaidEnd;
+	}
+	void setLastRaidEnd(uint64_t newLastRaidEnd)
+	{
+		lastRaidEnd = newLastRaidEnd;
+	}
 
 	void checkRaids();
 
@@ -104,14 +125,29 @@ public:
 	void resetRaid();
 
 	RaidEvent* getNextRaidEvent();
-	void setState(RaidState_t newState) { state = newState; }
-	std::string getName() const { return name; }
+	void setState(RaidState_t newState)
+	{
+		state = newState;
+	}
+	std::string getName() const
+	{
+		return name;
+	}
 
 	void addEvent(RaidEvent* event);
 
-	bool isLoaded() { return loaded; }
-	uint64_t getMargin() { return margin; }
-	uint32_t getInterval() {return interval;}
+	bool isLoaded()
+	{
+		return loaded;
+	}
+	uint64_t getMargin()
+	{
+		return margin;
+	}
+	uint32_t getInterval()
+	{
+		return interval;
+	}
 
 	void stopEvents();
 
@@ -135,9 +171,18 @@ public:
 
 	virtual bool configureRaidEvent(xmlNodePtr eventNode);
 
-	virtual bool executeEvent() {return false;}
-	uint32_t getDelay() const {return m_delay;}
-	void setDelay(uint32_t newDelay) {m_delay = newDelay;}
+	virtual bool executeEvent()
+	{
+		return false;
+	}
+	uint32_t getDelay() const
+	{
+		return m_delay;
+	}
+	void setDelay(uint32_t newDelay)
+	{
+		m_delay = newDelay;
+	}
 
 	static bool compareEvents(const RaidEvent* lhs, const RaidEvent* rhs)
 	{
@@ -178,7 +223,8 @@ private:
 	Position m_position;
 };
 
-class AreaSpawnEvent : public RaidEvent{
+class AreaSpawnEvent : public RaidEvent
+{
 public:
 	AreaSpawnEvent() {};
 	virtual ~AreaSpawnEvent();
@@ -203,7 +249,10 @@ public:
 	~ScriptEvent() {};
 
 	virtual bool configureRaidEvent(xmlNodePtr eventNode);
-	virtual bool configureEvent(xmlNodePtr p) {return false;}
+	virtual bool configureEvent(xmlNodePtr p)
+	{
+		return false;
+	}
 
 	bool executeEvent();
 

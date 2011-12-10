@@ -42,7 +42,9 @@ typedef std::list<Player*> PlayerList;
 typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
 typedef std::vector<Item*> ItemVector;
 
-enum tileflags_t : uint32_t {
+enum tileflags_t :
+uint32_t
+{
 	TILESTATE_NONE						= 0,
 	TILESTATE_PROTECTIONZONE			= 1 << 0,
 	TILESTATE_DEPRECATED_HOUSE			= 1 << 1,
@@ -74,7 +76,8 @@ enum tileflags_t : uint32_t {
 	TILESTATE_DYNAMIC_TILE				= 1 << 25
 };
 
-enum ZoneType_t{
+enum ZoneType_t
+{
 	ZONE_PROTECTION,
 	ZONE_NOPVP,
 	ZONE_PVP,
@@ -197,12 +200,12 @@ public:
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t flags) const;
+	                               uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount, uint32_t flags) const;
+	                                    uint32_t& maxQueryCount, uint32_t flags) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const;
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-		uint32_t& flags);
+	                                     uint32_t& flags);
 
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
@@ -266,7 +269,7 @@ public:
 	TileItemVector* getItemList();
 	const TileItemVector* getItemList() const;
 	TileItemVector* makeItemList();
-	
+
 	CreatureVector* getCreatures();
 	const CreatureVector* getCreatures() const;
 	CreatureVector* makeCreatures();
@@ -294,48 +297,60 @@ public:
 
 inline CreatureVector* Tile::getCreatures()
 {
-	if(is_dynamic())
+	if (is_dynamic())
+	{
 		return static_cast<DynamicTile*>(this)->DynamicTile::getCreatures();
+	}
 
 	return static_cast<StaticTile*>(this)->StaticTile::getCreatures();
 }
 
 inline const CreatureVector* Tile::getCreatures() const
 {
-	if(is_dynamic())
+	if (is_dynamic())
+	{
 		return static_cast<const DynamicTile*>(this)->DynamicTile::getCreatures();
+	}
 
 	return static_cast<const StaticTile*>(this)->StaticTile::getCreatures();
 }
 
 inline CreatureVector* Tile::makeCreatures()
 {
-	if(is_dynamic())
+	if (is_dynamic())
+	{
 		return static_cast<DynamicTile*>(this)->DynamicTile::makeCreatures();
+	}
 
 	return static_cast<StaticTile*>(this)->StaticTile::makeCreatures();
 }
 
 inline TileItemVector* Tile::getItemList()
 {
-	if(is_dynamic())
+	if (is_dynamic())
+	{
 		return static_cast<DynamicTile*>(this)->DynamicTile::getItemList();
+	}
 
 	return static_cast<StaticTile*>(this)->StaticTile::getItemList();
 }
 
 inline const TileItemVector* Tile::getItemList() const
 {
-	if(is_dynamic())
+	if (is_dynamic())
+	{
 		return static_cast<const DynamicTile*>(this)->DynamicTile::getItemList();
+	}
 
 	return static_cast<const StaticTile*>(this)->StaticTile::getItemList();
 }
 
 inline TileItemVector* Tile::makeItemList()
 {
-	if(is_dynamic())
+	if (is_dynamic())
+	{
 		return static_cast<DynamicTile*>(this)->DynamicTile::makeItemList();
+	}
 
 	return static_cast<StaticTile*>(this)->StaticTile::makeItemList();
 }

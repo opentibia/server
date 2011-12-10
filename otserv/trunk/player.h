@@ -43,13 +43,15 @@ class Party;
 class SchedulerTask;
 class Guild;
 
-enum skillsid_t {
-	SKILL_LEVEL=0,
-	SKILL_TRIES=1,
-	SKILL_PERCENT=2
+enum skillsid_t
+{
+	SKILL_LEVEL = 0,
+	SKILL_TRIES = 1,
+	SKILL_PERCENT = 2
 };
 
-enum playerinfo_t {
+enum playerinfo_t
+{
 	PLAYERINFO_LEVEL,
 	PLAYERINFO_LEVELPERCENT,
 	PLAYERINFO_HEALTH,
@@ -61,24 +63,28 @@ enum playerinfo_t {
 	PLAYERINFO_SOUL
 };
 
-enum freeslot_t {
+enum freeslot_t
+{
 	SLOT_TYPE_NONE,
 	SLOT_TYPE_INVENTORY,
 	SLOT_TYPE_CONTAINER
 };
 
-enum chaseMode_t {
+enum chaseMode_t
+{
 	CHASEMODE_STANDSTILL,
 	CHASEMODE_FOLLOW
 };
 
-enum fightMode_t {
+enum fightMode_t
+{
 	FIGHTMODE_ATTACK,
 	FIGHTMODE_BALANCED,
 	FIGHTMODE_DEFENSE
 };
 
-enum tradestate_t {
+enum tradestate_t
+{
 	TRADE_NONE,
 	TRADE_INITIATED,
 	TRADE_ACCEPT,
@@ -106,7 +112,8 @@ const int32_t MAX_STAMINA_MINUTES = MAX_STAMINA / 60000;
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
 
-class Player : public Creature, public Cylinder {
+class Player : public Creature, public Cylinder
+{
 public:
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t playerCount;
@@ -215,7 +222,7 @@ public:
 	bool isLoginAttackLocked(const uint32_t& attackerId) const;
 
 	virtual bool isPushable() const;
-	virtual bool canBePushedBy(const Player *player) const;
+	virtual bool canBePushedBy(const Player* player) const;
 	virtual int getThrowRange() const;
 	virtual bool canSeeInvisibility() const;
 	uint32_t getMuteTime();
@@ -234,8 +241,8 @@ public:
 	// As above, but returns NULL if the item can not be weared in that slot (armor in hand for example)
 	Item* getEquippedItem(const slots_t& slot) const;
 
-    // Returns the first found item with chosen itemid
-    Item* getFirstItemById(const uint32_t& id) const;
+	// Returns the first found item with chosen itemid
+	Item* getFirstItemById(const uint32_t& id) const;
 
 	bool isItemAbilityEnabled(const slots_t& slot) const;
 	void setItemAbility(const slots_t& slot, bool enabled);
@@ -319,7 +326,7 @@ public:
 
 	bool isPzLocked() const;
 	virtual BlockType_t blockHit(Creature* attacker, const CombatType_t& combatType, int32_t& damage,
-		bool checkDefense = false, bool checkArmor = false);
+	                             bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(const uint32_t& interval);
 	virtual bool hasExtraSwing();
 	const int32_t& getShootRange() const;
@@ -400,7 +407,7 @@ public:
 	void checkSkullTicks(int32_t ticks);
 
 #ifdef __GUILDWARSLUARELOAD__
-	void sendCreatureEmblem(const Creature* creature)
+	void sendCreatureEmblem(const Creature* creature);
 #endif
 
 	void checkRecentlyGainedExperience(const uint32_t& interval);
@@ -425,16 +432,16 @@ public:
 	void sendCreatureAppear(const Creature* creature, const Position& pos);
 	void sendCreatureDisappear(const Creature* creature, const uint32_t& stackpos, bool isLogout);
 	void sendCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-		const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	                      const Tile* oldTile, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	void sendCreatureTurn(const Creature* creature);
 	void sendCreatureSay(const Creature* creature, const SpeakClasses& type, const std::string& text);
 	void sendCreatureSquare(const Creature* creature, const SquareColor_t& color);
 	void sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 	void sendCreatureChangeVisible(const Creature* creature, bool visible);
-	#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 	void forceClientToReloadCreature(const Creature* creature);
-	#endif
+#endif
 	void sendCreatureLight(const Creature* creature);
 	void sendCreatureShield(const Creature* creature);
 
@@ -452,15 +459,15 @@ public:
 	//event methods
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos,
-		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
+	                              const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	virtual void onRemoveTileItem(const Tile* tile, const Position& pos,
-		const ItemType& iType, const Item* item);
+	                              const ItemType& iType, const Item* item);
 	virtual void onUpdateTile(const Tile* tile, const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-		const Tile* oldTile, const Position& oldPos, bool teleport);
+	                            const Tile* oldTile, const Position& oldPos, bool teleport);
 
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
@@ -468,7 +475,7 @@ public:
 	//container
 	void onAddContainerItem(const Container* container, const Item* item);
 	void onUpdateContainerItem(const Container* container, const uint8_t& slot,
-		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
+	                           const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(const Container* container, const uint8_t& slot, const Item* item);
 
 	void onCloseContainer(const Container* container);
@@ -478,7 +485,7 @@ public:
 	//inventory
 	void onAddInventoryItem(const slots_t& slot, Item* item);
 	void onUpdateInventoryItem(const slots_t& slot, Item* oldItem, const ItemType& oldType,
-		Item* newItem, const ItemType& newType);
+	                           Item* newItem, const ItemType& newType);
 	void onRemoveInventoryItem(const slots_t& slot, Item* item);
 
 	//other send messages
@@ -571,7 +578,7 @@ public:
 	const int32_t& getStamina();
 	int32_t getSpentStamina();
 	void setStaminaMinutes(const uint32_t& value);
-	
+
 	//depots
 	DepotMap depots;
 	uint32_t maxDepotLimit;
@@ -596,12 +603,12 @@ protected:
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t flags) const;
+	                               uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
-		uint32_t flags) const;
+	                                    uint32_t flags) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const;
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-		uint32_t& flags);
+	                                     uint32_t& flags);
 
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);

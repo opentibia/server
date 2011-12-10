@@ -66,7 +66,8 @@ typedef DBRES_CLASS DBResult;
 
 class DBQuery;
 
-enum DBParam_t{
+enum DBParam_t
+{
 	DBPARAM_MULTIINSERT = 1
 };
 
@@ -90,7 +91,10 @@ public:
 	* @param DBParam_t parameter to get
 	* @return suitable for given parameter
 	*/
-	DATABASE_VIRTUAL bool getParam(DBParam_t param) { return false; }
+	DATABASE_VIRTUAL bool getParam(DBParam_t param)
+	{
+		return false;
+	}
 
 	/**
 	* Database connected.
@@ -99,7 +103,10 @@ public:
 	*
 	* @return whether or not the database is connected.
 	*/
-	bool isConnected() { return m_connected; }
+	bool isConnected()
+	{
+		return m_connected;
+	}
 
 protected:
 	/**
@@ -112,9 +119,18 @@ protected:
 	*	If your database system doesn't support transactions you should return true - it's not feature test, code should work without transaction, just will lack integrity.
 	*/
 	friend class DBTransaction;
-	DATABASE_VIRTUAL bool beginTransaction() { return 0; }
-	DATABASE_VIRTUAL bool rollback() { return 0; }
-	DATABASE_VIRTUAL bool commit() { return 0; }
+	DATABASE_VIRTUAL bool beginTransaction()
+	{
+		return 0;
+	}
+	DATABASE_VIRTUAL bool rollback()
+	{
+		return 0;
+	}
+	DATABASE_VIRTUAL bool commit()
+	{
+		return 0;
+	}
 
 public:
 	/**
@@ -125,14 +141,20 @@ public:
 	* @param std::string query command
 	* @return true on success, false on error
 	*/
-	DATABASE_VIRTUAL bool executeQuery(const std::string &query) { return 0; }
+	DATABASE_VIRTUAL bool executeQuery(const std::string& query)
+	{
+		return 0;
+	}
 
 	/**
 	 * Returns ID of last inserted row
 	 *
 	 * @return id of last inserted row, 0 if last query did not result in any rows with auto_increment keys
 	 */
-	DATABASE_VIRTUAL uint64_t getLastInsertedRowID() {return 0;}
+	DATABASE_VIRTUAL uint64_t getLastInsertedRowID()
+	{
+		return 0;
+	}
 
 	/**
 	* Queries database.
@@ -142,7 +164,10 @@ public:
 	* @param std::string query
 	* @return results object (null on error)
 	*/
-	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query) { return 0; }
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string& query)
+	{
+		return 0;
+	}
 
 	/**
 	* Escapes string for query.
@@ -152,7 +177,10 @@ public:
 	* @param std::string string to be escaped
 	* @return quoted string
 	*/
-	DATABASE_VIRTUAL std::string escapeString(const std::string &s) { return "''"; }
+	DATABASE_VIRTUAL std::string escapeString(const std::string& s)
+	{
+		return "''";
+	}
 	/**
 	* Escapes binary stream for query.
 	*
@@ -162,14 +190,17 @@ public:
 	* @param long stream length
 	* @return quoted string
 	*/
-	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length) { return "''"; };
+	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length)
+	{
+		return "''";
+	};
 
 	/**
 	* Resource freeing.
 	*
 	* @param DBResult* resource to be freed
 	*/
-	DATABASE_VIRTUAL void freeResult(DBResult *res) {};
+	DATABASE_VIRTUAL void freeResult(DBResult* res) {};
 
 protected:
 	_Database() : m_connected(false) {};
@@ -193,29 +224,44 @@ public:
 	*\return The Integer value of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s) { return 0; }
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string& s)
+	{
+		return 0;
+	}
 	/** Get the Long value of a field in database
 	*\return The Long value of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s) { return 0; }
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string& s)
+	{
+		return 0;
+	}
 	/** Get the String of a field in database
 	*\return The String of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL std::string getDataString(const std::string &s) { return "''"; }
+	DATABASE_VIRTUAL std::string getDataString(const std::string& s)
+	{
+		return "''";
+	}
 	/** Get the blob of a field in database
 	*\return a PropStream that is initiated with the blob data field, if not exist it returns NULL.
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size) { return 0; }
+	DATABASE_VIRTUAL const char* getDataStream(const std::string& s, unsigned long& size)
+	{
+		return 0;
+	}
 
 	/**
 	* Moves to next result in set.
 	*
 	* \return true if moved, false if there are no more results.
 	*/
-	DATABASE_VIRTUAL bool next() {return false;};
+	DATABASE_VIRTUAL bool next()
+	{
+		return false;
+	};
 
 protected:
 	_DBResult() {};
@@ -317,7 +363,8 @@ public:
 
 	~DBTransaction()
 	{
-		if(m_state == STATE_START){
+		if (m_state == STATE_START)
+		{
 			m_database->rollback();
 		}
 	}
@@ -330,17 +377,20 @@ public:
 
 	bool commit()
 	{
-		if(m_state == STATE_START){
+		if (m_state == STATE_START)
+		{
 			m_state = STEATE_COMMIT;
 			return m_database->commit();
 		}
-		else{
+		else
+		{
 			return false;
 		}
 	}
 
 private:
-	enum TransactionStates_t{
+	enum TransactionStates_t
+	{
 		STATE_NO_START,
 		STATE_START,
 		STEATE_COMMIT

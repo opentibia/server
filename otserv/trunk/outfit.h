@@ -28,9 +28,10 @@
 #include <map>
 #include <list>
 
-struct Outfit{
+struct Outfit
+{
 	Outfit();
-	
+
 	uint32_t outfitId;
 	uint32_t lookType;
 	uint32_t addons;
@@ -42,9 +43,10 @@ struct Outfit{
 typedef std::list<Outfit> OutfitList;
 typedef std::map<uint32_t, Outfit> OutfitMap;
 
-class Outfits {
+class Outfits
+{
 	Outfits();
-	
+
 public:
 	static Outfits* getInstance();
 

@@ -34,7 +34,8 @@ class Container;
 
 typedef std::vector<Player*> PlayerVector;
 
-class Party {
+class Party
+{
 public:
 	Party(Player* _leader);
 
@@ -79,7 +80,8 @@ protected:
 	PlayerVector memberList;
 	PlayerVector inviteList;
 
-	struct CountBlock_t{
+	struct CountBlock_t
+	{
 		int32_t totalHeal;
 		int32_t totalDamage;
 		int64_t ticks;

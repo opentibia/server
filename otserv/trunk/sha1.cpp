@@ -41,7 +41,7 @@
 
 #include "sha1.h"
 
-/*	
+/*
  *	SHA1
  *
  *	Description:
@@ -61,7 +61,7 @@ SHA1::SHA1()
 	Reset();
 }
 
-/*	
+/*
  *	~SHA1
  *
  *	Description:
@@ -81,7 +81,7 @@ SHA1::~SHA1()
 	// The destructor does nothing
 }
 
-/*	
+/*
  *	Reset
  *
  *	Description:
@@ -102,18 +102,16 @@ void SHA1::Reset()
 	Length_Low			= 0;
 	Length_High			= 0;
 	Message_Block_Index	= 0;
-
 	H[0]		= 0x67452301;
 	H[1]		= 0xEFCDAB89;
 	H[2]		= 0x98BADCFE;
 	H[3]		= 0x10325476;
 	H[4]		= 0xC3D2E1F0;
-
 	Computed	= false;
 	Corrupted	= false;
 }
 
-/*	
+/*
  *	Result
  *
  *	Description:
@@ -131,7 +129,7 @@ void SHA1::Reset()
  *	Comments:
  *
  */
-bool SHA1::Result(unsigned *message_digest_array)
+bool SHA1::Result(unsigned* message_digest_array)
 {
 	int i;									// Counter
 
@@ -146,7 +144,7 @@ bool SHA1::Result(unsigned *message_digest_array)
 		Computed = true;
 	}
 
-	for(i = 0; i < 5; ++i)
+	for (i = 0; i < 5; ++i)
 	{
 		message_digest_array[i] = H[i];
 	}
@@ -154,7 +152,7 @@ bool SHA1::Result(unsigned *message_digest_array)
 	return true;
 }
 
-/*	
+/*
  *	Input
  *
  *	Description:
@@ -172,8 +170,8 @@ bool SHA1::Result(unsigned *message_digest_array)
  *	Comments:
  *
  */
-void SHA1::Input(	const unsigned char	*message_array,
-					unsigned 			length)
+void SHA1::Input(const unsigned char*	message_array,
+                 unsigned 			length)
 {
 	if (!length)
 	{
@@ -186,16 +184,17 @@ void SHA1::Input(	const unsigned char	*message_array,
 		return;
 	}
 
-	while(length-- && !Corrupted)
+	while (length-- && !Corrupted)
 	{
 		Message_Block[Message_Block_Index++] = (*message_array & 0xFF);
-
 		Length_Low += 8;
 		Length_Low &= 0xFFFFFFFF;				// Force it to 32 bits
+
 		if (Length_Low == 0)
 		{
 			Length_High++;
 			Length_High &= 0xFFFFFFFF;			// Force it to 32 bits
+
 			if (Length_High == 0)
 			{
 				Corrupted = true;				// Message is too long
@@ -211,7 +210,7 @@ void SHA1::Input(	const unsigned char	*message_array,
 	}
 }
 
-/*	
+/*
  *	Input
  *
  *	Description:
@@ -231,13 +230,13 @@ void SHA1::Input(	const unsigned char	*message_array,
  *	Comments:
  *
  */
-void SHA1::Input(	const char	*message_array,
-					unsigned 	length)
+void SHA1::Input(const char*	message_array,
+                 unsigned 	length)
 {
-	Input((unsigned char *) message_array, length);
+	Input((unsigned char*) message_array, length);
 }
 
-/*	
+/*
  *	Input
  *
  *	Description:
@@ -258,7 +257,7 @@ void SHA1::Input(unsigned char message_element)
 	Input(&message_element, 1);
 }
 
-/*	
+/*
  *	Input
  *
  *	Description:
@@ -276,10 +275,10 @@ void SHA1::Input(unsigned char message_element)
  */
 void SHA1::Input(char message_element)
 {
-	Input((unsigned char *) &message_element, 1);
+	Input((unsigned char*) &message_element, 1);
 }
 
-/*	
+/*
  *	operator<<
  *
  *	Description:
@@ -297,11 +296,11 @@ void SHA1::Input(char message_element)
  *		Each character is assumed to hold 8 bits of information.
  *
  */
-SHA1& SHA1::operator<<(const char *message_array)
+SHA1& SHA1::operator<<(const char* message_array)
 {
-	const char *p = message_array;
+	const char* p = message_array;
 
-	while(*p)
+	while (*p)
 	{
 		Input(*p);
 		p++;
@@ -310,7 +309,7 @@ SHA1& SHA1::operator<<(const char *message_array)
 	return *this;
 }
 
-/*	
+/*
  *	operator<<
  *
  *	Description:
@@ -328,11 +327,11 @@ SHA1& SHA1::operator<<(const char *message_array)
  *		Each character is assumed to hold 8 bits of information.
  *
  */
-SHA1& SHA1::operator<<(const unsigned char *message_array)
+SHA1& SHA1::operator<<(const unsigned char* message_array)
 {
-	const unsigned char *p = message_array;
+	const unsigned char* p = message_array;
 
-	while(*p)
+	while (*p)
 	{
 		Input(*p);
 		p++;
@@ -341,7 +340,7 @@ SHA1& SHA1::operator<<(const unsigned char *message_array)
 	return *this;
 }
 
-/*	
+/*
  *	operator<<
  *
  *	Description:
@@ -360,12 +359,11 @@ SHA1& SHA1::operator<<(const unsigned char *message_array)
  */
 SHA1& SHA1::operator<<(const char message_element)
 {
-	Input((unsigned char *) &message_element, 1);
-
+	Input((unsigned char*) &message_element, 1);
 	return *this;
 }
 
-/*	
+/*
  *	operator<<
  *
  *	Description:
@@ -385,11 +383,10 @@ SHA1& SHA1::operator<<(const char message_element)
 SHA1& SHA1::operator<<(const unsigned char message_element)
 {
 	Input(&message_element, 1);
-
 	return *this;
 }
 
-/*	
+/*
  *	ProcessMessageBlock
  *
  *	Description:
@@ -410,12 +407,13 @@ SHA1& SHA1::operator<<(const unsigned char message_element)
  */
 void SHA1::ProcessMessageBlock()
 {
-	const unsigned K[] = 	{ 				// Constants defined for SHA-1
-								0x5A827999,
-								0x6ED9EBA1,
-								0x8F1BBCDC,
-								0xCA62C1D6
-							};
+	const unsigned K[] = 	  				// Constants defined for SHA-1
+	{
+		0x5A827999,
+		0x6ED9EBA1,
+		0x8F1BBCDC,
+		0xCA62C1D6
+	};
 	int 		t;							// Loop counter
 	unsigned 	temp;						// Temporary word value
 	unsigned	W[80];						// Word sequence
@@ -424,7 +422,7 @@ void SHA1::ProcessMessageBlock()
 	/*
 	 *	Initialize the first 16 words in the array W
 	 */
-	for(t = 0; t < 16; ++t)
+	for (t = 0; t < 16; ++t)
 	{
 		W[t] = ((unsigned) Message_Block[t * 4]) << 24;
 		W[t] |= ((unsigned) Message_Block[t * 4 + 1]) << 16;
@@ -432,9 +430,9 @@ void SHA1::ProcessMessageBlock()
 		W[t] |= ((unsigned) Message_Block[t * 4 + 3]);
 	}
 
-	for(t = 16; t < 80; ++t)
+	for (t = 16; t < 80; ++t)
 	{
-	   W[t] = CircularShift(1,W[t-3] ^ W[t-8] ^ W[t-14] ^ W[t-16]);
+		W[t] = CircularShift(1, W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16]);
 	}
 
 	A = H[0];
@@ -443,47 +441,47 @@ void SHA1::ProcessMessageBlock()
 	D = H[3];
 	E = H[4];
 
-	for(t = 0; t < 20; ++t)
+	for (t = 0; t < 20; ++t)
 	{
-		temp = CircularShift(5,A) + ((B & C) | ((~B) & D)) + E + W[t] + K[0];
+		temp = CircularShift(5, A) + ((B & C) | ((~B) & D)) + E + W[t] + K[0];
 		temp &= 0xFFFFFFFF;
 		E = D;
 		D = C;
-		C = CircularShift(30,B);
+		C = CircularShift(30, B);
 		B = A;
 		A = temp;
 	}
 
-	for(t = 20; t < 40; ++t)
+	for (t = 20; t < 40; ++t)
 	{
-		temp = CircularShift(5,A) + (B ^ C ^ D) + E + W[t] + K[1];
+		temp = CircularShift(5, A) + (B ^ C ^ D) + E + W[t] + K[1];
 		temp &= 0xFFFFFFFF;
 		E = D;
 		D = C;
-		C = CircularShift(30,B);
+		C = CircularShift(30, B);
 		B = A;
 		A = temp;
 	}
 
-	for(t = 40; t < 60; ++t)
+	for (t = 40; t < 60; ++t)
 	{
-		temp = CircularShift(5,A) +
-		 	   ((B & C) | (B & D) | (C & D)) + E + W[t] + K[2];
+		temp = CircularShift(5, A) +
+		       ((B & C) | (B & D) | (C & D)) + E + W[t] + K[2];
 		temp &= 0xFFFFFFFF;
 		E = D;
 		D = C;
-		C = CircularShift(30,B);
+		C = CircularShift(30, B);
 		B = A;
 		A = temp;
 	}
 
-	for(t = 60; t < 80; ++t)
+	for (t = 60; t < 80; ++t)
 	{
-		temp = CircularShift(5,A) + (B ^ C ^ D) + E + W[t] + K[3];
+		temp = CircularShift(5, A) + (B ^ C ^ D) + E + W[t] + K[3];
 		temp &= 0xFFFFFFFF;
 		E = D;
 		D = C;
-		C = CircularShift(30,B);
+		C = CircularShift(30, B);
 		B = A;
 		A = temp;
 	}
@@ -493,11 +491,10 @@ void SHA1::ProcessMessageBlock()
 	H[2] = (H[2] + C) & 0xFFFFFFFF;
 	H[3] = (H[3] + D) & 0xFFFFFFFF;
 	H[4] = (H[4] + E) & 0xFFFFFFFF;
-
 	Message_Block_Index = 0;
 }
 
-/*	
+/*
  *	PadMessage
  *
  *	Description:
@@ -528,14 +525,15 @@ void SHA1::PadMessage()
 	if (Message_Block_Index > 55)
 	{
 		Message_Block[Message_Block_Index++] = 0x80;
-		while(Message_Block_Index < 64)
+
+		while (Message_Block_Index < 64)
 		{
 			Message_Block[Message_Block_Index++] = 0;
 		}
 
 		ProcessMessageBlock();
 
-		while(Message_Block_Index < 56)
+		while (Message_Block_Index < 56)
 		{
 			Message_Block[Message_Block_Index++] = 0;
 		}
@@ -543,11 +541,11 @@ void SHA1::PadMessage()
 	else
 	{
 		Message_Block[Message_Block_Index++] = 0x80;
-		while(Message_Block_Index < 56)
+
+		while (Message_Block_Index < 56)
 		{
 			Message_Block[Message_Block_Index++] = 0;
 		}
-
 	}
 
 	/*
@@ -561,12 +559,11 @@ void SHA1::PadMessage()
 	Message_Block[61] = (Length_Low >> 16) & 0xFF;
 	Message_Block[62] = (Length_Low >> 8) & 0xFF;
 	Message_Block[63] = (Length_Low) & 0xFF;
-
 	ProcessMessageBlock();
 }
 
 
-/*	
+/*
  *	CircularShift
  *
  *	Description:
@@ -586,5 +583,5 @@ void SHA1::PadMessage()
  */
 unsigned SHA1::CircularShift(int bits, unsigned word)
 {
-	return ((word << bits) & 0xFFFFFFFF) | ((word & 0xFFFFFFFF) >> (32-bits));
+	return ((word << bits) & 0xFFFFFFFF) | ((word & 0xFFFFFFFF) >> (32 - bits));
 }

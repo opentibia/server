@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -37,7 +37,10 @@ public:
 	enum {server_sends_first = false};
 	enum {protocol_identifier = 0x01};
 	enum {use_checksum = true};
-	static const char* protocol_name() {return "login protocol";}
+	static const char* protocol_name()
+	{
+		return "login protocol";
+	}
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolLoginCount;
@@ -46,7 +49,6 @@ public:
 	ProtocolLogin(Connection_ptr connection) : Protocol(connection)
 	{
 		enableChecksum();
-
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		protocolLoginCount++;
 #endif
@@ -60,15 +62,15 @@ public:
 	}
 
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
-	
+
 protected:
 	void disconnectClient(uint8_t error, const char* message);
-	
+
 	bool parseFirstPacket(NetworkMessage& msg);
 
-	#ifdef __DEBUG_NET_DETAIL__
+#ifdef __DEBUG_NET_DETAIL__
 	virtual void deleteProtocolTask();
-	#endif
+#endif
 };
 
 #endif

@@ -22,7 +22,8 @@
 #include <string>
 #include <map>
 
-class Waypoint {
+class Waypoint
+{
 public:
 	Waypoint(const std::string& name, const Position& pos) :
 		name(name), pos(pos) {}
@@ -33,7 +34,8 @@ public:
 
 typedef boost::shared_ptr<Waypoint> Waypoint_ptr;
 
-class Waypoints {
+class Waypoints
+{
 public:
 	// Does not require either constructor nor destructor
 
@@ -54,8 +56,11 @@ inline void Waypoints::addWaypoint(Waypoint_ptr wp)
 inline Waypoint_ptr Waypoints::getWaypointByName(const std::string& name) const
 {
 	WaypointMap::const_iterator f = waypoints.find(name);
-	if(f == waypoints.end()) {
+
+	if (f == waypoints.end())
+	{
 		return Waypoint_ptr();
 	}
+
 	return f->second;
 }

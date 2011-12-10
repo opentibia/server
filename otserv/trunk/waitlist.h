@@ -26,7 +26,8 @@
 #include "networkmessage.h"
 #include <boost/noncopyable.hpp>
 
-struct Wait{
+struct Wait
+{
 	uint32_t acc;
 	uint32_t ip;
 	std::string name;
@@ -52,7 +53,7 @@ public:
 
 private:
 	WaitingList();
-	
+
 	WaitList priorityWaitList;
 	WaitList waitList;
 

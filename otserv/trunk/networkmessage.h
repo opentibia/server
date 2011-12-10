@@ -33,7 +33,8 @@ class Player;
 class Position;
 class RSA;
 
-class NetworkMessage {
+class NetworkMessage
+{
 public:
 	enum { header_length = 2 };
 	enum { crypto_length = 4 };
@@ -69,12 +70,12 @@ public:
 	void AddString(const char* value);
 
 	// write functions for complex types
-	void AddPosition(const Position &pos);
+	void AddPosition(const Position& pos);
 	void AddItem(const uint16_t& id, const uint8_t& count);
-	void AddItem(const Item *item);
-	void AddItemId(const Item *item);
-	void AddItemId(const uint16_t &itemId);
-	void AddCreature(const Creature *creature, bool known, unsigned int remove);
+	void AddItem(const Item* item);
+	void AddItemId(const Item* item);
+	void AddItemId(const uint16_t& itemId);
+	void AddCreature(const Creature* creature, bool known, unsigned int remove);
 
 	const int32_t& getMessageLength() const;
 	void setMessageLength(const int32_t& newSize);

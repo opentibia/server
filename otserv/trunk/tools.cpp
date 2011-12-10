@@ -39,7 +39,9 @@ void replaceString(std::string& str, const std::string& sought, const std::strin
 	size_t start = 0;
 	size_t soughtLen = sought.length();
 	size_t replaceLen = replacement.length();
-	while((pos = str.find(sought, start)) != std::string::npos){
+
+	while ((pos = str.find(sought, start)) != std::string::npos)
+	{
 		str = str.substr(0, pos) + replacement + str.substr(pos + soughtLen);
 		start = pos + replaceLen;
 	}
@@ -47,7 +49,7 @@ void replaceString(std::string& str, const std::string& sought, const std::strin
 
 void trim_right(std::string& source, const std::string& t)
 {
-	source.erase(source.find_last_not_of(t)+1);
+	source.erase(source.find_last_not_of(t) + 1);
 }
 
 void trim_left(std::string& source, const std::string& t)
@@ -94,7 +96,9 @@ bool booleanString(std::string source)
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
-	if(nodeValue){
+
+	if (nodeValue)
+	{
 		value = atoi(nodeValue);
 		xmlFree(nodeValue);
 		return true;
@@ -106,7 +110,9 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
-	if(nodeValue){
+
+	if (nodeValue)
+	{
 		value = ATOI64(nodeValue);
 		xmlFree(nodeValue);
 		return true;
@@ -118,7 +124,9 @@ bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
-	if(nodeValue){
+
+	if (nodeValue)
+	{
 		value = atof(nodeValue);
 		xmlFree(nodeValue);
 		return true;
@@ -131,19 +139,24 @@ bool utf8ToLatin1(char* intext, std::string& outtext)
 {
 	outtext = "";
 
-	if(!intext){
+	if (!intext)
+	{
 		return false;
 	}
 
 	int inlen = strlen(intext);
-	if(inlen == 0){
+
+	if (inlen == 0)
+	{
 		return false;
 	}
 
-	int outlen = inlen*2;
+	int outlen = inlen * 2;
 	unsigned char* outbuf = new unsigned char[outlen];
 	int res = UTF8Toisolat1(outbuf, &outlen, (unsigned char*)intext, &inlen);
-	if(res < 0){
+
+	if (res < 0)
+	{
 		delete[] outbuf;
 		return false;
 	}
@@ -157,8 +170,11 @@ bool utf8ToLatin1(char* intext, std::string& outtext)
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
-	if(nodeValue){
-		if(!utf8ToLatin1(nodeValue, value)){
+
+	if (nodeValue)
+	{
+		if (!utf8ToLatin1(nodeValue, value))
+		{
 			value = nodeValue;
 		}
 
@@ -172,8 +188,11 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 bool readXMLContentString(xmlNodePtr node, std::string& value)
 {
 	char* nodeValue = (char*)xmlNodeGetContent(node);
-	if(nodeValue){
-		if(!utf8ToLatin1(nodeValue, value)){
+
+	if (nodeValue)
+	{
+		if (!utf8ToLatin1(nodeValue, value))
+		{
 			value = nodeValue;
 		}
 
@@ -190,12 +209,13 @@ std::vector<std::string> explodeString(const std::string& inString, const std::s
 	std::string::size_type start = 0;
 	std::string::size_type end = 0;
 
-	while((end=inString.find (separator, start)) != std::string::npos){
-		returnVector.push_back (inString.substr (start, end-start));
-		start = end+separator.size();
+	while ((end = inString.find(separator, start)) != std::string::npos)
+	{
+		returnVector.push_back(inString.substr(start, end - start));
+		start = end + separator.size();
 	}
 
-	returnVector.push_back (inString.substr (start));
+	returnVector.push_back(inString.substr(start));
 	return returnVector;
 }
 
@@ -207,50 +227,52 @@ bool hasBitSet(const uint32_t& flag, const uint32_t& flags)
 #define RAND_MAX24 16777216
 uint32_t rand24b()
 {
-	return ((rand() << 12) ^ ((rand()) & (0xFFFFFF)) );
+	return ((rand() << 12) ^((rand()) & (0xFFFFFF)));
 }
 
 float box_muller(const float& m, const float& s)
 {
 	// normal random variate generator
 	// mean m, standard deviation s
-
 	float x1, x2, w, y1;
 	static float y2;
 	static int use_last = 0;
 
-	if(use_last)			// use value from previous call
+	if (use_last)			// use value from previous call
 	{
 		y1 = y2;
 		use_last = 0;
 	}
 	else
 	{
-		do {
+		do
+		{
 			double r1 = (((float)(rand()) / RAND_MAX));
 			double r2 = (((float)(rand()) / RAND_MAX));
-
 			x1 = 2.0 * r1 - 1.0;
 			x2 = 2.0 * r2 - 1.0;
 			w = x1 * x1 + x2 * x2;
-		} while ( w >= 1.0 );
+		}
+		while (w >= 1.0);
 
-		w = sqrt( (-2.0 * log( w ) ) / w );
+		w = sqrt((-2.0 * log(w)) / w);
 		y1 = x1 * w;
 		y2 = x2 * w;
 		use_last = 1;
 	}
 
-	return( m + y1 * s );
+	return(m + y1 * s);
 }
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_UNIFORM*/, float deviation /*= 0.25*/)
 {
-	if(highest_number == lowest_number){
+	if (highest_number == lowest_number)
+	{
 		return lowest_number;
 	}
 
-	if(lowest_number > highest_number){
+	if (lowest_number > highest_number)
+	{
 		int nTmp = highest_number;
 		highest_number = lowest_number;
 		lowest_number = nTmp;
@@ -258,39 +280,56 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 
 	int range = highest_number - lowest_number;
 
-	if(type == DISTRO_UNIFORM){
+	if (type == DISTRO_UNIFORM)
+	{
 		int r = rand24b() % (range + 1);
 		return lowest_number + r;
 	}
-	else if(type == DISTRO_NORMAL){
+	else if (type == DISTRO_NORMAL)
+	{
 		float value = box_muller(0.5, deviation);
 
-		if(value < 0){
+		if (value < 0)
+		{
 			value = 0;
-		}else if(value > 1){
+		}
+		else if (value > 1)
+		{
 			value = 1;
 		}
 
 		return lowest_number + (int)((float)range * value);
 	}
-	else{
-		float r = 1.f - sqrt((1.f*rand24b())/RAND_MAX24);
+	else
+	{
+		float r = 1.f - sqrt((1.f * rand24b()) / RAND_MAX24);
 		return lowest_number + (int)((float)range * r);
 	}
 }
 
 // dump a part of the memory to stderr.
-void hexdump(unsigned char *_data, int _len) {
+void hexdump(unsigned char* _data, int _len)
+{
 	int i;
-	for(; _len > 0; _data += 16, _len -= 16) {
+
+	for (; _len > 0; _data += 16, _len -= 16)
+	{
 		for (i = 0; i < 16 && i < _len; ++i)
+		{
 			fprintf(stderr, "%02x ", _data[i]);
-		for(; i < 16; ++i)
+		}
+
+		for (; i < 16; ++i)
+		{
 			fprintf(stderr, "   ");
+		}
 
 		fprintf(stderr, " ");
-		for(i = 0; i < 16 && i < _len; ++i)
+
+		for (i = 0; i < 16 && i < _len; ++i)
+		{
 			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
+		}
 
 		fprintf(stderr, "\n");
 	}
@@ -299,9 +338,11 @@ void hexdump(unsigned char *_data, int _len) {
 // Upcase a char.
 char upchar(char c)
 {
-	if((c >= 97 && c <= 122) || (c <= -1 && c >= -32)){
-		return c-32;
+	if ((c >= 97 && c <= 122) || (c <= -1 && c >= -32))
+	{
+		return c - 32;
 	}
+
 	return c;
 }
 
@@ -314,77 +355,92 @@ std::string urlEncode(const char* str)
 {
 	std::string out;
 	const char* it;
-	for(it = str; *it != 0; ++it){
+
+	for (it = str; *it != 0; ++it)
+	{
 		char ch = *it;
-		if(!(ch >= '0' && ch <= '9') &&
-			!(ch >= 'A' && ch <= 'Z') &&
-			!(ch >= 'a' && ch <= 'z')){
-				char tmp[4];
-				sprintf(tmp, "%%%02X", ch);
-				out = out + tmp;
-			}
-		else{
+
+		if (!(ch >= '0' && ch <= '9') &&
+		        !(ch >= 'A' && ch <= 'Z') &&
+		        !(ch >= 'a' && ch <= 'z'))
+		{
+			char tmp[4];
+			sprintf(tmp, "%%%02X", ch);
+			out = out + tmp;
+		}
+		else
+		{
 			out = out + *it;
 		}
 	}
+
 	return out;
 }
 
-bool passwordTest(std::string plain, std::string &hash)
+bool passwordTest(std::string plain, std::string& hash)
 {
 	// Salt it beforehand
 	plain += g_config.getString(ConfigManager::PASSWORD_SALT);
 
-	switch(g_config.getNumber(ConfigManager::PASSWORD_TYPE)){
-	case PASSWORD_TYPE_PLAIN:
+	switch (g_config.getNumber(ConfigManager::PASSWORD_TYPE))
 	{
-		if(plain == hash){
-			return true;
+		case PASSWORD_TYPE_PLAIN:
+		{
+			if (plain == hash)
+			{
+				return true;
+			}
+
+			break;
 		}
-		break;
+		case PASSWORD_TYPE_MD5:
+		{
+			MD5_CTX m_md5;
+			std::stringstream hexStream;
+			MD5Init(&m_md5, 0);
+			MD5Update(&m_md5, (const unsigned char*)plain.c_str(), plain.length());
+			MD5Final(&m_md5);
+			hexStream.flags(std::ios::hex | std::ios::uppercase);
+
+			for (uint32_t i = 0; i < 16; ++i)
+			{
+				hexStream << std::setw(2) << std::setfill('0') << (uint32_t)m_md5.digest[i];
+			}
+
+			std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
+
+			if (hexStream.str() == hash)
+			{
+				return true;
+			}
+
+			break;
+		}
+		case PASSWORD_TYPE_SHA1:
+		{
+			SHA1 sha1;
+			unsigned sha1Hash[5];
+			std::stringstream hexStream;
+			sha1.Input((const unsigned char*)plain.c_str(), plain.length());
+			sha1.Result(sha1Hash);
+			hexStream.flags(std::ios::hex | std::ios::uppercase);
+
+			for (uint32_t i = 0; i < 5; ++i)
+			{
+				hexStream << std::setw(8) << std::setfill('0') << (uint32_t)sha1Hash[i];
+			}
+
+			std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
+
+			if (hexStream.str() == hash)
+			{
+				return true;
+			}
+
+			break;
+		}
 	}
-	case PASSWORD_TYPE_MD5:
-	{
-		MD5_CTX m_md5;
-		std::stringstream hexStream;
 
-		MD5Init(&m_md5, 0);
-		MD5Update(&m_md5, (const unsigned char*)plain.c_str(), plain.length());
-		MD5Final(&m_md5);
-
-		hexStream.flags(std::ios::hex | std::ios::uppercase);
-		for(uint32_t i = 0; i < 16; ++i){
-			hexStream << std::setw(2) << std::setfill('0') << (uint32_t)m_md5.digest[i];
-		}
-
-		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
-		if(hexStream.str() == hash){
-			return true;
-		}
-		break;
-	}
-	case PASSWORD_TYPE_SHA1:
-	{
-		SHA1 sha1;
-		unsigned sha1Hash[5];
-		std::stringstream hexStream;
-
-		sha1.Input((const unsigned char*)plain.c_str(), plain.length());
-		sha1.Result(sha1Hash);
-
-		hexStream.flags(std::ios::hex | std::ios::uppercase);
-		for(uint32_t i = 0; i < 5; ++i){
-			hexStream << std::setw(8) << std::setfill('0') << (uint32_t)sha1Hash[i];
-		}
-
-		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
-		if(hexStream.str() == hash){
-			return true;
-		}
-
-		break;
-	}
-	}
 	return false;
 }
 
@@ -399,11 +455,14 @@ std::string convertIPToString(const uint32_t& ip)
 void formatDate(const time_t& time, char* buffer)
 {
 	const tm* tms = localtime(&time);
-	if(tms){
+
+	if (tms)
+	{
 		sprintf(buffer, "%02d/%02d/%04d %02d:%02d:%02d", tms->tm_mday, tms->tm_mon + 1, tms->tm_year + 1900,
-			tms->tm_hour, tms->tm_min, tms->tm_sec);
+		        tms->tm_hour, tms->tm_min, tms->tm_sec);
 	}
-	else{
+	else
+	{
 		sprintf(buffer, "UNIX Time : %d", (int)time);
 	}
 }
@@ -412,35 +471,43 @@ void formatDate(const time_t& time, char* buffer)
 void formatDateShort(const time_t& time, char* buffer)
 {
 	const tm* tms = localtime(&time);
-	if(tms){
+
+	if (tms)
+	{
 		strftime(buffer, 12, "%d %b %Y", tms);
 	}
-	else{
+	else
+	{
 		sprintf(buffer, "UNIX Time : %d", (int)time);
 	}
 }
 
-struct MagicEffectNames{
+struct MagicEffectNames
+{
 	const char* name;
 	MagicEffectClasses effect;
 };
 
-struct ShootTypeNames{
+struct ShootTypeNames
+{
 	const char* name;
 	ShootType_t shoot;
 };
 
-struct AmmoTypeNames{
+struct AmmoTypeNames
+{
 	const char* name;
 	Ammo_t ammoType;
 };
 
-struct AmmoActionNames{
+struct AmmoActionNames
+{
 	const char* name;
 	AmmoAction_t ammoAction;
 };
 
-MagicEffectNames magicEffectNames[] = {
+MagicEffectNames magicEffectNames[] =
+{
 	{"redspark",          NM_ME_DRAW_BLOOD},
 	{"bluebubble",        NM_ME_LOSE_ENERGY},
 	{"poff",              NM_ME_PUFF},
@@ -514,7 +581,8 @@ MagicEffectNames magicEffectNames[] = {
 	{"dragonhead",        NM_ME_DRAGONHEAD}
 };
 
-ShootTypeNames shootTypeNames[] = {
+ShootTypeNames shootTypeNames[] =
+{
 	{"spear",             NM_SHOOT_SPEAR},
 	{"bolt",              NM_SHOOT_BOLT},
 	{"arrow",             NM_SHOOT_ARROW},
@@ -559,7 +627,8 @@ ShootTypeNames shootTypeNames[] = {
 	{"cake",              NM_SHOOT_CAKE}
 };
 
-AmmoTypeNames ammoTypeNames[] = {
+AmmoTypeNames ammoTypeNames[] =
+{
 	{"spear",          AMMO_SPEAR},
 	{"bolt",           AMMO_BOLT},
 	{"arrow",          AMMO_ARROW},
@@ -585,7 +654,8 @@ AmmoTypeNames ammoTypeNames[] = {
 	{"eartharrow",     AMMO_ARROW}
 };
 
-AmmoActionNames ammoActionNames[] = {
+AmmoActionNames ammoActionNames[] =
+{
 	{"move",          AMMOACTION_MOVE},
 	{"moveback",      AMMOACTION_MOVEBACK},
 	{"removecharge",  AMMOACTION_REMOVECHARGE},
@@ -594,47 +664,59 @@ AmmoActionNames ammoActionNames[] = {
 
 MagicEffectClasses getMagicEffect(const std::string& strValue)
 {
-	for(uint32_t i = 0; i < sizeof(magicEffectNames)/sizeof(MagicEffectNames); ++i){
-		if(boost::algorithm::iequals(strValue.c_str(), magicEffectNames[i].name)){
+	for (uint32_t i = 0; i < sizeof(magicEffectNames) / sizeof(MagicEffectNames); ++i)
+	{
+		if (boost::algorithm::iequals(strValue.c_str(), magicEffectNames[i].name))
+		{
 			return magicEffectNames[i].effect;
 		}
 	}
+
 	return NM_ME_UNK;
 }
 
 ShootType_t getShootType(const std::string& strValue)
 {
-	for(uint32_t i = 0; i < sizeof(shootTypeNames)/sizeof(ShootTypeNames); ++i){
-		if(boost::algorithm::iequals(strValue.c_str(), shootTypeNames[i].name)){
+	for (uint32_t i = 0; i < sizeof(shootTypeNames) / sizeof(ShootTypeNames); ++i)
+	{
+		if (boost::algorithm::iequals(strValue.c_str(), shootTypeNames[i].name))
+		{
 			return shootTypeNames[i].shoot;
 		}
 	}
+
 	return NM_SHOOT_UNK;
 }
 
 Ammo_t getAmmoType(const std::string& strValue)
 {
-	for(uint32_t i = 0; i < sizeof(ammoTypeNames)/sizeof(AmmoTypeNames); ++i){
-		if(boost::algorithm::iequals(strValue.c_str(), ammoTypeNames[i].name)){
+	for (uint32_t i = 0; i < sizeof(ammoTypeNames) / sizeof(AmmoTypeNames); ++i)
+	{
+		if (boost::algorithm::iequals(strValue.c_str(), ammoTypeNames[i].name))
+		{
 			return ammoTypeNames[i].ammoType;
 		}
 	}
+
 	return AMMO_NONE;
 }
 
 AmmoAction_t getAmmoAction(const std::string& strValue)
 {
-	for(uint32_t i = 0; i < sizeof(ammoActionNames)/sizeof(AmmoActionNames); ++i){
-		if(boost::algorithm::iequals(strValue.c_str(), ammoActionNames[i].name)){
+	for (uint32_t i = 0; i < sizeof(ammoActionNames) / sizeof(AmmoActionNames); ++i)
+	{
+		if (boost::algorithm::iequals(strValue.c_str(), ammoActionNames[i].name))
+		{
 			return ammoActionNames[i].ammoAction;
 		}
 	}
+
 	return AMMOACTION_NONE;
 }
 
 std::string getViolationReasonString(const int32_t& reasonId)
 {
-	switch(reasonId)
+	switch (reasonId)
 	{
 		case 0:
 			return "Offensive Name";
@@ -684,7 +766,8 @@ std::string getViolationReasonString(const int32_t& reasonId)
 std::string getViolationActionString(const violationAction_t& actionId, bool ipBanishment)
 {
 	std::string action;
-	switch(actionId)
+
+	switch (actionId)
 	{
 		case ACTION_NOTATION:
 			action = "Notation";
@@ -713,57 +796,69 @@ std::string getViolationActionString(const violationAction_t& actionId, bool ipB
 			break;
 	}
 
-	if(ipBanishment)
+	if (ipBanishment)
+	{
 		action += " + IP Banishment";
+	}
 
 	return action;
 }
 
 std::string playerSexAdjectiveString(const PlayerSex_t& sex)
 {
-	if(sex % 2 == 0){
+	if (sex % 2 == 0)
+	{
 		return "her";
 	}
-	else{
+	else
+	{
 		return "his";
 	}
 }
 
 std::string playerSexSubjectString(const PlayerSex_t& sex)
 {
-	if(sex % 2 == 0){
+	if (sex % 2 == 0)
+	{
 		return "She";
 	}
-	else{
+	else
+	{
 		return "He";
 	}
 }
 
 #define MOD_ADLER 65521
-uint32_t adlerChecksum(uint8_t *data, int32_t len)
+uint32_t adlerChecksum(uint8_t* data, int32_t len)
 {
-	if(len > NETWORKMESSAGE_MAXSIZE)
+	if (len > NETWORKMESSAGE_MAXSIZE)
+	{
 		return 0;
-		
-	if(len < 0){
+	}
+
+	if (len < 0)
+	{
 		std::cout << "[Error] adlerChecksum. len < 0" << std::endl;
 		return 0;
 	}
 
 	uint32_t a = 1, b = 0;
+
 	while (len > 0)
 	{
 		size_t tlen = len > 5552 ? 5552 : len;
 		len -= tlen;
+
 		do
 		{
 			a += *data++;
 			b += a;
-		} while (--tlen);
+		}
+		while (--tlen);
 
 		a %= MOD_ADLER;
 		b %= MOD_ADLER;
-		}
+	}
 
 	return (b << 16) | a;
 }
