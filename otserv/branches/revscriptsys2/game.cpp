@@ -220,20 +220,13 @@ void Game::loadGameState()
 	Database* db = Database::instance();
 	DBQuery query;
 
-	DBResult* result = db->storeQuery("SELECT `id`, `value` FROM `global_storage`");
-	if(!result){
-		// No global storage at all
-		return;
-	}
-	
 	globalStorage.clear();
 
-	do{
+	for (DBResult_ptr result = db->storeQuery("SELECT `id`, `value` FROM `global_storage`"); !result->empty(); result->advance()) {
 		std::string key = result->getDataString("id");
 		std::string value = result->getDataString("value");
 		globalStorage[key] = value;
-	}while(result->next());
-	db->freeResult(result);
+	}
 }
 
 bool Game::saveGameState()
@@ -252,7 +245,7 @@ bool Game::saveGameState()
 
 	for(StorageMap::const_iterator giter = globalStorage.begin(); giter != globalStorage.end(); ++giter){
 		query << db->escapeString(giter->first) << ", " << db->escapeString(giter->second);
-		if(!global_stmt.addRow(query)){
+		if(!global_stmt.addRowAndReset(query)){
 			return false;
 		}
 	}

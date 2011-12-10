@@ -143,7 +143,7 @@ bool DatabaseODBC::commit()
 	// return RETURN_SUCCESS(ret);
 }
 
-bool DatabaseODBC::executeQuery(const std::string &query)
+bool DatabaseODBC::internalQuery(const std::string &query)
 {
 	if(!m_connected)
 		return false;
@@ -172,7 +172,7 @@ bool DatabaseODBC::executeQuery(const std::string &query)
 	return true;
 }
 
-DBResult* DatabaseODBC::storeQuery(const std::string &query)
+DBResult* DatabaseODBC::internalStoreQuery(const std::string &query)
 {
 	if(!m_connected)
 		return NULL;
@@ -366,15 +366,22 @@ const char* ODBCResult::getDataStream(const std::string &s, unsigned long &size)
 	return 0; // Failed
 }
 
-bool ODBCResult::next()
+bool ODBCResult::advance()
 {
 	SQLRETURN ret = SQLFetch(m_handle);
-	return RETURN_SUCCESS(ret);
+	m_rowAvailable = RETURN_SUCCESS(ret);
+	return m_rowAvailable;
+}
+
+bool ODBCResult::empty()
+{
+	return !m_rowAvailable;
 }
 
 ODBCResult::ODBCResult(SQLHSTMT stmt)
 {
 	m_handle = stmt;
+	m_rowAvailable = false;
 
 	int16_t numCols;
 	SQLNumResultCols(m_handle, &numCols);

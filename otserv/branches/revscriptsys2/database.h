@@ -24,13 +24,12 @@
 #include "definitions.h"
 
 #ifdef MULTI_SQL_DRIVERS
-#define DATABASE_VIRTUAL virtual
+#define virtual virtual
 #define DATABASE_CLASS _Database
 #define DBRES_CLASS _DBResult
 class _Database;
 class _DBResult;
 #else
-#define DATABASE_VIRTUAL
 
 #if defined(__USE_MYSQL__)
 #define DATABASE_CLASS DatabaseMySQL
@@ -61,6 +60,7 @@ class PgSQLResult;
 
 typedef DATABASE_CLASS Database;
 typedef DBRES_CLASS DBResult;
+typedef shared_ptr<DBResult> DBResult_ptr;
 
 class DBQuery;
 
@@ -74,9 +74,9 @@ public:
 	/**
 	* Singleton implementation.
 	*
-	* Retruns instance of database handler. Don't create database (or drivers) instances in your code - instead of it use Database::instance(). This method stores static instance of connection class internaly to make sure exacly one instance of connection is created for entire system.
+	* Returns instance of database handler. Don't create database (or drivers) instances in your code - instead of it use Database::instance(). This method stores static instance of connection class internaly to make sure exacly one instance of connection is created for entire system.
 	*
-	* @return database connection handler singletor
+	* @return database connection handler singleton
 	*/
 	static Database* instance();
 
@@ -88,7 +88,7 @@ public:
 	* @param DBParam_t parameter to get
 	* @return suitable for given parameter
 	*/
-	DATABASE_VIRTUAL bool getParam(DBParam_t param) { return false; }
+	virtual bool getParam(DBParam_t param) { return false; }
 
 	/**
 	* Database connected.
@@ -103,16 +103,16 @@ protected:
 	/**
 	* Transaction related methods.
 	*
-	* Methods for starting, commiting and rolling back transaction. Each of the returns boolean value.
+	* Methods for starting, committing and rolling back transaction. Each of the returns boolean value.
 	*
 	* @return true on success, false on error
 	* @note
 	*	If your database system doesn't support transactions you should return true - it's not feature test, code should work without transaction, just will lack integrity.
 	*/
 	friend class DBTransaction;
-	DATABASE_VIRTUAL bool beginTransaction() { return 0; }
-	DATABASE_VIRTUAL bool rollback() { return 0; }
-	DATABASE_VIRTUAL bool commit() { return 0; }
+	virtual bool beginTransaction() { return 0; }
+	virtual bool rollback() { return 0; }
+	virtual bool commit() { return 0; }
 
 public:
 	/**
@@ -123,14 +123,15 @@ public:
 	* @param std::string query command
 	* @return true on success, false on error
 	*/
-	DATABASE_VIRTUAL bool executeQuery(const std::string &query) { return 0; }
+	bool executeQuery(const std::string &query);
+	bool executeQuery(DBQuery &query);
 
 	/**
 	 * Returns ID of last inserted row
 	 *
 	 * @return id of last inserted row, 0 if last query did not result in any rows with auto_increment keys
 	 */
-	DATABASE_VIRTUAL uint64_t getLastInsertedRowID() {return 0;}
+	virtual uint64_t getLastInsertedRowID() {return 0;}
 
 	/**
 	* Queries database.
@@ -140,7 +141,8 @@ public:
 	* @param std::string query
 	* @return results object (null on error)
 	*/
-	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query) { return 0; }
+	DBResult_ptr storeQuery(const std::string &query);
+	DBResult_ptr storeQuery(DBQuery &query);
 
 	/**
 	* Escapes string for query.
@@ -150,7 +152,7 @@ public:
 	* @param std::string string to be escaped
 	* @return quoted string
 	*/
-	DATABASE_VIRTUAL std::string escapeString(const std::string &s) { return "''"; }
+	virtual std::string escapeString(const std::string &s) { return "''"; }
 	/**
 	* Escapes binary stream for query.
 	*
@@ -160,18 +162,25 @@ public:
 	* @param long stream length
 	* @return quoted string
 	*/
-	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length) { return "''"; };
+	virtual std::string escapeBlob(const char* s, uint32_t length) { return "''"; };
 
+protected:
 	/**
 	* Resource freeing.
+	* Used as argument to shared_ptr, you need not call this directly
 	*
 	* @param DBResult* resource to be freed
 	*/
-	DATABASE_VIRTUAL void freeResult(DBResult *res) {};
+	virtual void freeResult(DBResult *res);
 
-protected:
+	/**
+	 * Executes a query directly
+	 */
+	virtual bool internalQuery(const std::string &query) { return NULL; }
+	virtual DBResult* internalStoreQuery(const std::string &query) { return NULL; }
+
 	_Database() : m_connected(false) {};
-	DATABASE_VIRTUAL ~_Database() {};
+	virtual ~_Database() {};
 
 	DBResult* verifyResult(DBResult* result);
 
@@ -183,46 +192,49 @@ private:
 
 class _DBResult
 {
-	// unused at the moment
-	//friend class Database;
-
 public:
 	/** Get the Integer value of a field in database
 	*\return The Integer value of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s) { return 0; }
+	virtual int32_t getDataInt(const std::string &s) { return 0; }
 	/** Get the Unsigned Integer value of a field in database
 	*\return The Integer value of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL uint32_t getDataUInt(const std::string &s) { return 0; }
+	virtual uint32_t getDataUInt(const std::string &s) { return 0; }
 	/** Get the Long value of a field in database
 	*\return The Long value of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s) { return 0; }
+	virtual int64_t getDataLong(const std::string &s) { return 0; }
 	/** Get the String of a field in database
 	*\return The String of the selected field and row
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL std::string getDataString(const std::string &s) { return "''"; }
+	virtual std::string getDataString(const std::string &s) { return "''"; }
 	/** Get the blob of a field in database
 	*\return a PropStream that is initiated with the blob data field, if not exist it returns NULL.
 	*\param s The name of the field
 	*/
-	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size) { return 0; }
+	virtual const char* getDataStream(const std::string &s, unsigned long &size) { return 0; }
 
 	/**
 	* Moves to next result in set.
 	*
 	* \return true if moved, false if there are no more results.
 	*/
-	DATABASE_VIRTUAL bool next() {return false;}
+	virtual bool advance() {return false;}
+
+	/**
+	 * Are there any more rows to be fetched
+	 * \return true if there are no more rows
+	 */
+	virtual bool empty() {return true;}
 
 protected:
 	_DBResult() {};
-	DATABASE_VIRTUAL ~_DBResult() {};
+	virtual ~_DBResult() {};
 };
 
 /**
@@ -230,13 +242,15 @@ protected:
  *
  * By using this class for your queries you lock and unlock database for threads.
 */
-class DBQuery : public std::stringstream
+class DBQuery : public std::ostringstream
 {
 	friend class _Database;
 
 public:
 	DBQuery();
 	~DBQuery();
+
+	void reset() {str("");}
 
 protected:
 	static boost::recursive_mutex database_lock;
@@ -275,8 +289,9 @@ public:
 	bool addRow(const std::string& row);
 	/**
 	* Allows to use addRow() with stringstream as parameter.
+	* This also clears the stringstream!
 	*/
-	bool addRow(std::stringstream& row);
+	bool addRowAndReset(std::ostringstream& row);
 
 	/**
 	* Executes current buffer.
@@ -293,7 +308,7 @@ protected:
 	bool m_multiLine;
 	uint32_t m_rows;
 	std::string m_query;
-	std::string m_buf;
+	std::ostringstream m_buf;
 };
 
 

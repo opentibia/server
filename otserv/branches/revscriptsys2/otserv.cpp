@@ -630,7 +630,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 
 	// Load world
-	DBResult* world_result;
+	DBResult_ptr world_result;
 	std::string world_id;
 	{
 		std::ostringstream id;
@@ -643,7 +643,6 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	std::string world_name = world_result->getDataString("name");
 	int game_port = world_result->getDataInt("port");
-	db->freeResult(world_result);
 
 	if(world_name == "" || game_port == 0){
 		ErrorMessage("The specified world was not found in the database.");

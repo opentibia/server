@@ -1,3 +1,28 @@
+-- WORLD
+CREATE TABLE `worlds` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(32) NOT NULL DEFAULT "OTServ",
+	`ip` INT UNSIGNED NOT NULL DEFAULT 0,
+	`port` INT(5) UNSIGNED NOT NULL DEFAULT 7172,
+	PRIMARY KEY (`id`),
+	KEY (`name`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `global_storage` (
+	`id` TEXT NOT NULL,
+	`value` TEXT NOT NULL,
+	KEY(`id`(20))
+) ENGINE = InnoDB;
+
+CREATE TABLE `schema_info` (
+	`name` VARCHAR(255) NOT NULL,
+	`value` VARCHAR(255) NOT NULL,
+	PRIMARY KEY (`name`)
+) ENGINE = InnoDB;
+
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 25);
+
+-- Player-related
 CREATE TABLE `groups` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COMMENT 'group name',
@@ -12,7 +37,7 @@ CREATE TABLE `groups` (
 CREATE TABLE `accounts` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(32) NOT NULL,
-	`password` VARCHAR(255) NOT NULL/* VARCHAR(32) NOT NULL COMMENT 'MD5'*//* VARCHAR(40) NOT NULL COMMENT 'SHA1'*/,
+	`password` VARCHAR(255) NOT NULL,
 	`email` VARCHAR(255) NOT NULL DEFAULT '',
 	`premend` INT UNSIGNED NOT NULL DEFAULT 0,
 	`blocked` TINYINT(1) NOT NULL DEFAULT FALSE,
@@ -21,31 +46,7 @@ CREATE TABLE `accounts` (
 	UNIQUE (`name`)
 ) ENGINE = InnoDB;
 
-CREATE TABLE `world` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`name` VARCHAR(32) NOT NULL DEFAULT "OTServ",
-	`ip` INT UNSIGNED NOT NULL DEFAULT 0,
-	`port` INT(5) UNSIGNED NOT NULL DEFAULT 7172,
-	PRIMARY KEY (`id`),
-	KEY (`name`)
-) ENGINE = InnoDB;
-
-CREATE TABLE `guilds` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`name` VARCHAR(255) NOT NULL COMMENT 'guild name - nothing else needed here',
-	`ownerid` INT NOT NULL,
-	`creationdata` INT NOT NULL,
-	PRIMARY KEY (`id`)
-) ENGINE = InnoDB;
-
-CREATE TABLE `guild_ranks` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`guild_id` INT UNSIGNED NOT NULL COMMENT 'guild',
-	`name` VARCHAR(255) NOT NULL COMMENT 'rank name',
-	`level` INT NOT NULL COMMENT 'rank level - leader, vice, member, maybe something else',
-	PRIMARY KEY (`id`),
-	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB;
+-- Player-related
 
 CREATE TABLE `players` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -53,9 +54,6 @@ CREATE TABLE `players` (
 	`account_id` INT UNSIGNED NOT NULL,
 	`group_id` INT UNSIGNED NOT NULL COMMENT 'users group',
 	`world_id` INT UNSIGNED NOT NULL,
-
-	`rank_id` INT UNSIGNED DEFAULT NULL COMMENT 'by this field everything with guilds is done - player has a rank which belongs to certain guild',
-	`guildnick` VARCHAR(255) NOT NULL DEFAULT '',
 	`town_id` INT NOT NULL COMMENT 'old masterpos, temple spawn point position',
 
 	`sex` INT UNSIGNED NOT NULL DEFAULT 0,
@@ -68,7 +66,7 @@ CREATE TABLE `players` (
 	`healthmax` INT UNSIGNED NOT NULL DEFAULT 100,
 	`mana` INT UNSIGNED NOT NULL DEFAULT 100,
 	`manamax` INT UNSIGNED NOT NULL DEFAULT 100,
-	`manaspent` INT UNSIGNED NOT NULL DEFAULT,
+	`manaspent` INT UNSIGNED NOT NULL DEFAULT 0,
 	`soul` INT UNSIGNED NOT NULL DEFAULT 0,
 	`cap` INT NOT NULL DEFAULT 0,
 	`stamina` INT NOT NULL DEFAULT 151200000 COMMENT 'player stamina in milliseconds',
@@ -95,7 +93,6 @@ CREATE TABLE `players` (
 	`loss_skills` INT NOT NULL DEFAULT 100,
 	`loss_items` INT NOT NULL DEFAULT 10,
 	`loss_containers` INT NOT NULL DEFAULT 100,
-	`balance` INT NOT NULL DEFAULT 0 COMMENT 'money balance of the player for houses paying',
 
 	`online` TINYINT(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
@@ -103,7 +100,6 @@ CREATE TABLE `players` (
 	KEY (`online`),
 	FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
-	FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`) ON DELETE SET NULL,
 	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
@@ -112,12 +108,6 @@ CREATE TABLE `player_viplist` (
 	`vip_id` INT UNSIGNED NOT NULL COMMENT 'id of target player of viplist entry',
 	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`vip_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB;
-
-CREATE TABLE `player_spells` (
-	`player_id` INT UNSIGNED NOT NULL,
-	`name` VARCHAR(255) NOT NULL,
-	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_storage` (
@@ -131,109 +121,10 @@ CREATE TABLE `player_storage` (
 
 CREATE TABLE `player_skills` (
 	`player_id` INT UNSIGNED NOT NULL,
-	`skillid` INT UNSIGNED NOT NULL,
+	`skill_id` INT UNSIGNED NOT NULL,
 	`value` INT UNSIGNED NOT NULL DEFAULT 0,
 	`count` INT UNSIGNED NOT NULL DEFAULT 0,
 	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB;
-
-CREATE TABLE `player_items` (
-	`player_id` INT UNSIGNED NOT NULL,
-	`sid` INT NOT NULL,
-	`pid` INT NOT NULL DEFAULT 0,
-	`itemtype` INT NOT NULL,
-	`count` INT NOT NULL DEFAULT 0,
-	`attributes` BLOB COMMENT 'replaces unique_id, action_id, text, special_desc',
-	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
-	UNIQUE (`player_id`, `sid`)
-) ENGINE = InnoDB;
-
-CREATE TABLE `houses` (
-	`id` INT UNSIGNED NOT NULL,
-	`world_id` INT UNSIGNED NOT NULL,
-	`map_id` INT UNSIGNED NOT NULL COMMENT 'house id in map editor',
-	`town_id` INT UNSIGNED NOT NULL DEFAULT 0,
-	`name` VARCHAR(100) NOT NULL,
-	`rent` INT UNSIGNED NOT NULL DEFAULT 0,
-	`guildhall` TINYINT(1) NOT NULL DEFAULT 0,
-	`tiles` INT UNSIGNED NOT NULL DEFAULT 0,
-	`doors` INT UNSIGNED NOT NULL DEFAULT 0,
-	`beds` INT UNSIGNED NOT NULL DEFAULT 0,
-	`owner` INT NOT NULL DEFAULT 0,
-	`paid` INT UNSIGNED NOT NULL DEFAULT 0,
-	`clear` TINYINT(1) NOT NULL DEFAULT 0,
-	`warnings` INT NOT NULL DEFAULT 0,
-	`lastwarning` INT UNSIGNED NOT NULL DEFAULT 0,
-	PRIMARY KEY (`id`),
-	KEY (`map_id`),
-	KEY (`town_id`),
-	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB;
-
-CREATE TABLE `house_auctions` (
-	`house_id` INT UNSIGNED NOT NULL,
-	`player_id` INT UNSIGNED NOT NULL,
-	`bid` INT UNSIGNED NOT NULL DEFAULT 0,
-	`limit` INT UNSIGNED NOT NULL DEFAULT 0,
-	`endtime` INT UNSIGNED NOT NULL DEFAULT 0,
-	FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE,
-	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB;
-
-CREATE TABLE `house_lists` (
-	`house_id` INT UNSIGNED NOT NULL,
-	`listid` INT NOT NULL,
-	`list` TEXT NOT NULL,
-	FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB;
-
-CREATE TABLE `bans` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`type` INT NOT NULL COMMENT 'this field defines if its ip, account, player, or any else ban',
-	`value` INT UNSIGNED NOT NULL COMMENT 'ip, player guid, account number',
-	`param` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'mask',
-	`active` TINYINT(1) NOT NULL DEFAULT TRUE,
-	`expires` INT NOT NULL,
-	`added` INT UNSIGNED NOT NULL,
-	`admin_id` INT UNSIGNED NOT NULL DEFAULT 0,
-	`comment` VARCHAR(1024) NOT NULL DEFAULT '',
-	`reason` INT UNSIGNED NOT NULL DEFAULT 0,
-	`action` INT UNSIGNED NOT NULL DEFAULT 0,
-	`statement` VARCHAR(255) NOT NULL DEFAULT '',
-	PRIMARY KEY  (`id`),
-	KEY (`type`, `value`),
-	KEY (`expires`)
-) ENGINE = InnoDB;
-
-CREATE TABLE `tiles` (
-	`id` INT UNSIGNED NOT NULL,
-	`world_id` INT UNSIGNED NOT NULL,
-	`house_id` INT UNSIGNED NOT NULL DEFAULT 0,
-	`x` INT(5) UNSIGNED NOT NULL,
-	`y` INT(5) UNSIGNED NOT NULL,
-	`z` INT(2) UNSIGNED NOT NULL,
-	PRIMARY KEY(`id`),
-	KEY(`x`, `y`, `z`),
-	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
-) ENGINE = InnoDB;
-
-CREATE TABLE `tile_items` (
-	`tile_id` INT UNSIGNED NOT NULL,
-	`sid` INT NOT NULL,
-	`pid` INT NOT NULL DEFAULT 0,
-	`itemtype` INT NOT NULL,
-	`count` INT NOT NULL DEFAULT 0,
-	`attributes` BLOB NOT NULL,
-	FOREIGN KEY (`tile_id`) REFERENCES `tiles` (`id`) ON DELETE CASCADE,
-	INDEX (`sid`)
-) ENGINE = InnoDB;
-
-CREATE TABLE `map_store` (
-	`house_id` INT UNSIGNED NOT NULL,
-	`world_id` INT UNSIGNED NOT NULL,
-	`data` LONGBLOB NOT NULL,
-	KEY(`house_id`),
-	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_deaths` (
@@ -270,33 +161,157 @@ CREATE TABLE `player_killers` (
 	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE `player_depotitems` (
+-- GUILDS
+CREATE TABLE `guilds` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL COMMENT 'guild name - nothing else needed here',
+	`owner_id` INT UNSIGNED NOT NULL,
+	`creation_time` INT NOT NULL,
+	PRIMARY KEY (`id`),
+	KEY (`name`),
+	FOREIGN KEY (`owner_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `guild_ranks` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`guild_id` INT UNSIGNED NOT NULL COMMENT 'guild',
+	`name` VARCHAR(255) NOT NULL COMMENT 'rank name',
+	`level` INT NOT NULL COMMENT 'rank level - leader, vice, member, maybe something else',
+	PRIMARY KEY (`id`),
+	KEY (`level`),
+	FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `guild_members` (
 	`player_id` INT UNSIGNED NOT NULL,
-	`sid` INT NOT NULL COMMENT 'any given range eg 0-100 will be reserved for depot lockers and all > 100 will be then normal items inside depots',
-	`pid` INT NOT NULL DEFAULT 0,
-	`itemtype` INT NOT NULL,
-	`count` INT NOT NULL DEFAULT 0,
-	`attributes` BLOB NOT NULL,
-	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
-	UNIQUE (`player_id`, `sid`)
+	`rank_id` INT UNSIGNED NOT NULL,
+	`nick` VARCHAR(256) NOT NULL DEFAULT '',
+	FOREIGN KEY (`rank_id`) REFERENCES `guild_ranks` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE `global_storage` (
-	`id` TEXT NOT NULL,
-	`value` TEXT NOT NULL,
-	KEY(`id`(20))
+-- HOUSES
+CREATE TABLE `houses` (
+	`id` INT UNSIGNED NOT NULL,
+	`world_id` INT UNSIGNED NOT NULL,
+	`map_id` INT UNSIGNED NOT NULL COMMENT 'house id in map editor',
+	`town_id` INT UNSIGNED NOT NULL DEFAULT 0,
+	`owner_id` INT UNSIGNED DEFAULT NULL,
+	`name` VARCHAR(100) NOT NULL,
+	`rent` INT UNSIGNED NOT NULL DEFAULT 0,
+	`guildhall` TINYINT(1) NOT NULL DEFAULT 0,
+	`tiles` INT UNSIGNED NOT NULL DEFAULT 0,
+	`doors` INT UNSIGNED NOT NULL DEFAULT 0,
+	`beds` INT UNSIGNED NOT NULL DEFAULT 0,
+	`paid` INT UNSIGNED NOT NULL DEFAULT 0,
+	`clear` TINYINT(1) NOT NULL DEFAULT 0,
+	`warnings` INT NOT NULL DEFAULT 0,
+	`lastwarning` INT UNSIGNED NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`),
+	KEY (`map_id`),
+	KEY (`town_id`),
+	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`owner_id`) REFERENCES `players` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB;
 
-CREATE TABLE `schema_info` (
-	`name` VARCHAR(255) NOT NULL,
-	`value` VARCHAR(255) NOT NULL,
-	PRIMARY KEY (`name`)
+CREATE TABLE `house_auctions` (
+	`house_id` INT UNSIGNED NOT NULL,
+	`player_id` INT UNSIGNED NOT NULL,
+	`bid` INT UNSIGNED NOT NULL DEFAULT 0,
+	`limit` INT UNSIGNED NOT NULL DEFAULT 0,
+	`endtime` INT UNSIGNED NOT NULL DEFAULT 0,
+	FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 25);
+CREATE TABLE `house_lists` (
+	`house_id` INT UNSIGNED NOT NULL,
+	`listid` INT NOT NULL,
+	`list` TEXT NOT NULL,
+	FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+-- BANS
+CREATE TABLE `bans` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`expires` INT UNSIGNED NOT NULL,
+	`added` INT UNSIGNED NOT NULL,
+	`active` TINYINT(1) NOT NULL DEFAULT 0,
+	`admin_id` INT UNSIGNED DEFAULT NULL COMMENT 'account that issued the ban',
+	`comment` TEXT,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`admin_id`) REFERENCES `accounts`(`id`) ON DELETE SET NULL
+) ENGINE = InnoDB;
+
+CREATE TABLE `account_bans` (
+	`ban_id` INT UNSIGNED NOT NULL,
+	`account_id` INT UNSIGNED NOT NULL,
+	FOREIGN KEY (`ban_id`) REFERENCES `bans`(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `ip_bans` (
+	`ban_id` INT UNSIGNED NOT NULL,
+	`ip` INT UNSIGNED NOT NULL,
+	`mask` INT UNSIGNED NOT NULL,
+	FOREIGN KEY (`ban_id`) REFERENCES `bans`(`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `player_bans` (
+	`ban_id` INT UNSIGNED NOT NULL,
+	`player_id` INT UNSIGNED NOT NULL,
+	FOREIGN KEY (`ban_id`) REFERENCES `bans`(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+-- MAP
+CREATE TABLE `item_containers` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `items` (
+	`container_id` INT UNSIGNED NOT NULL,
+	`id` INT NOT NULL COMMENT 'not unique',
+	`parent_id` INT DEFAULT NULL,
+	`count` INT(5) NOT NULL,
+	`attributes` BLOB,
+	KEY (`id`),
+	FOREIGN KEY (`container_id`) REFERENCES `item_containers` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `tiles` (
+	`world_id` INT UNSIGNED NOT NULL,
+	`house_id` INT UNSIGNED DEFAULT NULL,
+	`container_id` INT UNSIGNED NOT NULL,
+	`x` INT(5) UNSIGNED NOT NULL,
+	`y` INT(5) UNSIGNED NOT NULL,
+	`z` INT(2) UNSIGNED NOT NULL,
+	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`container_id`) REFERENCES `item_containers` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE SET NULL,
+	KEY (`x`, `y`, `z`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `player_items` (
+	`player_id` INT UNSIGNED NOT NULL,
+	`container_id` INT UNSIGNED NOT NULL,
+	FOREIGN KEY (`container_id`) REFERENCES `item_containers` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE `player_depots` (
+	`depot_id` INT UNSIGNED NOT NULL,
+	`player_id` INT UNSIGNED NOT NULL,
+	`container_id` INT UNSIGNED NOT NULL,
+	KEY (`depot_id`),
+	FOREIGN KEY (`container_id`) REFERENCES `item_containers` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
 
 # The default world
-INSERT INTO `world` VALUES (1, "OTServ", 0, 7172);
+INSERT INTO `worlds` VALUES (1, "OTServ", 0, 7172);
 
 INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
 	VALUES ('1', 'Player', 0, 0, 1000, 50);
@@ -316,41 +331,6 @@ INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxvipl
 	VALUES ('8', 'Server Administrator', 821982896120, 3, 2000, 300);
 	
 DELIMITER |
-
-CREATE TRIGGER `ondelete_accounts`
-BEFORE DELETE
-ON `accounts`
-FOR EACH ROW
-BEGIN
-	DELETE FROM `bans` WHERE `type` = 3 AND `value` = OLD.`id`;
-END|
-
-CREATE TRIGGER `ondelete_guilds`
-BEFORE DELETE
-ON `guilds`
-FOR EACH ROW
-BEGIN
-	UPDATE `players` SET `guildnick` = '', `rank_id` = 0 WHERE `rank_id` IN (SELECT `id` FROM `guild_ranks` WHERE `guild_id` = OLD.`id`);
-END|
-
-CREATE TRIGGER `ondelete_players`
-BEFORE DELETE
-ON `players`
-FOR EACH ROW
-BEGIN
-	DELETE FROM `bans` WHERE `type` = 2 AND `value` = OLD.`id`;
-	UPDATE `houses` SET `owner` = 0 WHERE `owner` = OLD.`id`;
-END|
-
-CREATE TRIGGER `oncreate_guilds`
-AFTER INSERT
-ON `guilds`
-FOR EACH ROW
-BEGIN
-	INSERT INTO `guild_ranks` (`name`, `level`, `guild_id`) VALUES ('Leader', 3, NEW.`id`);
-	INSERT INTO `guild_ranks` (`name`, `level`, `guild_id`) VALUES ('Vice-Leader', 2, NEW.`id`);
-	INSERT INTO `guild_ranks` (`name`, `level`, `guild_id`) VALUES ('Member', 1, NEW.`id`);
-END|
 
 CREATE TRIGGER `oncreate_players`
 AFTER INSERT

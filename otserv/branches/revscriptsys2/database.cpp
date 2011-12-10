@@ -69,16 +69,43 @@ Database* _Database::instance(){
 	return _instance;
 }
 
+bool _Database::executeQuery(DBQuery &query)
+{
+	return internalQuery(query.str());
+}
+
+bool _Database::executeQuery(const std::string &query)
+{
+	return internalQuery(query);
+}
+
+DBResult_ptr _Database::storeQuery(const std::string &query)
+{
+	return DBResult_ptr(internalStoreQuery(query), boost::bind(&_Database::freeResult, this, _1));
+}
+
+DBResult_ptr _Database::storeQuery(DBQuery &query)
+{
+	return storeQuery(query.str());
+}
+
+void _Database::freeResult(DBResult *res)
+{
+	throw std::runtime_error("No database driver loaded, yet a DBResult was freed.");
+}
+
 DBResult* _Database::verifyResult(DBResult* result)
 {
-	if(!result->next()){
-		_instance->freeResult(result);
+	if(!result->advance()){
+		((_Database*)_instance)->freeResult(result);
 		return NULL;
 	}
 	else{
 		return result;
 	}
 }
+
+// DBQuery
 
 DBQuery::DBQuery()
 {
@@ -90,19 +117,21 @@ DBQuery::~DBQuery()
 	database_lock.unlock();
 }
 
+// DBInsert
+
 DBInsert::DBInsert(Database* db)
 {
 	m_db = db;
 	m_rows = 0;
 
-	// checks if current database engine supports multiline INSERTs
+	// checks if current database engine supports multi line INSERTs
 	m_multiLine = m_db->getParam(DBPARAM_MULTIINSERT) != 0;
 }
 
 void DBInsert::setQuery(const std::string& query)
 {
 	m_query = query;
-	m_buf = "";
+	m_buf.str("");
 	m_rows = 0;
 }
 
@@ -110,20 +139,20 @@ bool DBInsert::addRow(const std::string& row)
 {
 	if(m_multiLine){
 		m_rows++;
-		size_t size = m_buf.length();
+		size_t size = m_buf.tellp();
 
 		// adds new row to buffer
 		if(size == 0){
-			m_buf = "(" + row + ")";
+			m_buf << "(" << row << ")";
 		}
 		else if(size > 8192){
 			if(!execute())
 				return false;
-
-			m_buf = "(" + row + ")";
+			
+			m_buf << "(" << row << ")";
 		}
 		else{
-				m_buf += ",(" + row + ")";
+				m_buf << ",(" + row + ")";
 		}
 
 		return true;
@@ -134,7 +163,7 @@ bool DBInsert::addRow(const std::string& row)
 	}
 }
 
-bool DBInsert::addRow(std::stringstream& row)
+bool DBInsert::addRowAndReset(std::ostringstream& row)
 {
 	bool ret = addRow(row.str());
 	row.str("");
@@ -143,17 +172,17 @@ bool DBInsert::addRow(std::stringstream& row)
 
 bool DBInsert::execute()
 {
-	if(m_multiLine && m_buf.length() > 0){
+	if(m_multiLine && m_buf.tellp() > 0){
 		if(m_rows == 0){
 			//no rows to execute
 			return true;
 		}
-
-		m_rows = 0;
-
 		// executes buffer
-		bool res = m_db->executeQuery(m_query + m_buf);
-		m_buf = "";
+		bool res = m_db->executeQuery(m_query + m_buf.str());
+
+		// Reset counters
+		m_rows = 0;
+		m_buf.str("");
 		return res;
 	}
 	else{

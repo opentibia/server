@@ -74,7 +74,7 @@ bool DatabasePgSQL::commit()
 	return executeQuery("COMMIT");
 }
 
-bool DatabasePgSQL::executeQuery(const std::string &query)
+bool DatabasePgSQL::internalQuery(const std::string &query)
 {
 	if(!m_connected)
 		return false;
@@ -98,7 +98,7 @@ bool DatabasePgSQL::executeQuery(const std::string &query)
 	return true;
 }
 
-DBResult* DatabasePgSQL::storeQuery(const std::string &query)
+DBResult* DatabasePgSQL::internalStoreQuery(const std::string &query)
 {
 	if(!m_connected)
 		return NULL;
@@ -242,13 +242,18 @@ const char* PgSQLResult::getDataStream(const std::string &s, unsigned long &size
 	return value;
 }
 
-bool PgSQLResult::next()
+bool PgSQLResult::advance()
 {
 	if(m_cursor >= m_rows)
 		return false;
 
 	m_cursor++;
 	return true;
+}
+
+bool PgSQLResult::empty()
+{
+	return m_cursor >= m_rows;
 }
 
 PgSQLResult::PgSQLResult(PGresult* results)

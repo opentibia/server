@@ -46,10 +46,10 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 
 	Database* db = Database::instance();
 	DBQuery query;
-	DBResult* result;
+	DBResult_ptr result;
 
 	query << "SELECT `id`, `name`, `password`, `premend`, `warnings` FROM `accounts` WHERE `name` = " << db->escapeString(accountName);
-	if(!(result = db->storeQuery(query.str()))){
+	if(!(result = db->storeQuery(query))){
 		return acc;
 	}
 
@@ -58,33 +58,28 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 	acc.premiumEnd = result->getDataInt("premend");
 	acc.name = result->getDataString("name");
 	acc.warnings = result->getDataInt("warnings");
-	db->freeResult(result);
 
 	if(preLoad)
 		return acc;
 
-	query.str("");
+	query.reset();
 	query << "SELECT " <<
 			"`players`.`name` AS `name`, `worlds`.`name` AS `world`, " <<
 			"`worlds`.`port` AS `port`, `worlds`.`ip` AS `ip` " <<
 		"FROM `players` " <<
 		"LEFT JOIN `worlds` ON `worlds`.`id` = `players`.`world_id` " <<
 		"WHERE `account_id` = " << acc.number;
-	if(!(result = db->storeQuery(query.str()))){
-		return acc;
-	}
 
-	do {
+	for(result = db->storeQuery(query); !result->empty(); result->advance()) {
 		AccountCharacter c;
 		c.name = result->getDataString("name");
 		c.world = result->getDataString("world");
 		c.port = (uint16_t)result->getDataInt("port");
 		c.ip = (uint32_t)result->getDataLong("ip");
 		acc.charList.push_back(c);
-	} while(result->next());
+	}
 
 	acc.charList.sort(predicateAccountCharactersByName);
-	db->freeResult(result);
 	return acc;
 }
 
@@ -94,21 +89,20 @@ bool IOAccount::saveAccount(const Account& acc)
 	DBQuery query;
 
 	query << "UPDATE `accounts` SET `premend` = " << acc.premiumEnd << ", `warnings` = " << acc.warnings << " WHERE `id` = " << acc.number;
-	return db->executeQuery(query.str());
+	return db->executeQuery(query);
 }
 
 bool IOAccount::getPassword(const std::string& accountName, const std::string& playerName, std::string& password)
 {
 	Database* db = Database::instance();
 	DBQuery query;
-	DBResult* result;
+	DBResult_ptr result;
 
 	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` " <<
 		"WHERE `accounts`.`name` = " << db->escapeString(accountName) << 
 		" AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(playerName);
 	if((result = db->storeQuery(query.str()))){
 		password = result->getDataString("password");
-		db->freeResult(result);
 		return true;
 	}
 

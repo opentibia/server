@@ -121,7 +121,7 @@ std::string DatabaseSQLite::_parse(const std::string &s)
 	return query;
 }
 
-bool DatabaseSQLite::executeQuery(const std::string &query)
+bool DatabaseSQLite::internalQuery(const std::string &query)
 {
 	boost::recursive_mutex::scoped_lock lockClass(sqliteLock);
 
@@ -156,7 +156,7 @@ bool DatabaseSQLite::executeQuery(const std::string &query)
 	return true;
 }
 
-DBResult* DatabaseSQLite::storeQuery(const std::string &query)
+DBResult* DatabaseSQLite::internalSelectQuery(const std::string &query)
 {
 	boost::recursive_mutex::scoped_lock lockClass(sqliteLock);
 
@@ -280,15 +280,22 @@ const char* SQLiteResult::getDataStream(const std::string &s, unsigned long &siz
 	return NULL; // Failed
 }
 
-bool SQLiteResult::next()
+bool SQLiteResult::advance()
 {
 	// checks if after moving to next step we have a row result
-	return sqlite3_step(m_handle) == SQLITE_ROW;
+	bool m_rowAvailable = (sqlite3_step(m_handle) == SQLITE_ROW);
+	return m_rowAvailable;
+}
+
+bool SQLiteResult::empty()
+{
+	return !om_rowAvailable;
 }
 
 SQLiteResult::SQLiteResult(sqlite3_stmt* stmt)
 {
 	m_handle = stmt;
+	m_rowAvailable = false;
 	m_listNames.clear();
 
 	int32_t fields = sqlite3_column_count(m_handle);

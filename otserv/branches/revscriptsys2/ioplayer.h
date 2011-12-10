@@ -64,11 +64,11 @@ public:
 	int32_t getPlayerUnjustKillCount(const Player* player, UnjustKillPeriod_t period);
 	bool sendMail(Creature* actor, const std::string name, uint32_t depotId, Item* item);
 
-	bool getGuidByName(uint32_t& guid, std::string& name);
-	bool getAccountByName(uint32_t& acc, std::string& name);
+	bool getGuidByName(uint32_t& guid, std::string& player_name);
+	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, const std::string& player_name);
+	bool getAccountByName(uint32_t& acc, const std::string& name);
 	bool getWorldByName(uint32_t& world_id, std::string& name);
-	bool getAccountByName(std::string& acc, std::string& name);
-	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
+	bool getAccountByName(std::string& acc, const std::string& player_name);
 	bool getDefaultTown(std::string& name, uint32_t& townId);
 	bool getNameByGuid(uint32_t guid, std::string& name);
 	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);

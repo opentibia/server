@@ -39,25 +39,24 @@ class DatabaseMySQL : public _Database
 {
 public:
 	DatabaseMySQL();
-	DATABASE_VIRTUAL ~DatabaseMySQL();
+	virtual ~DatabaseMySQL();
 
-	DATABASE_VIRTUAL bool getParam(DBParam_t param);
+	virtual bool getParam(DBParam_t param);
 
-	DATABASE_VIRTUAL bool beginTransaction();
-	DATABASE_VIRTUAL bool rollback();
-	DATABASE_VIRTUAL bool commit();
+	virtual bool beginTransaction();
+	virtual bool rollback();
+	virtual bool commit();
 
-	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
-	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
+	virtual uint64_t getLastInsertedRowID();
 
-	DATABASE_VIRTUAL uint64_t getLastInsertedRowID();
-
-	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
-	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length);
-
-	DATABASE_VIRTUAL void freeResult(DBResult *res);
+	virtual std::string escapeString(const std::string &s);
+	virtual std::string escapeBlob(const char* s, uint32_t length);
 
 protected:
+	virtual bool internalQuery(const std::string &query);
+	virtual DBResult* internalStoreQuery(const std::string &query);
+	virtual void freeResult(DBResult *res);
+
 	MYSQL m_handle;
 };
 
@@ -66,17 +65,18 @@ class MySQLResult : public _DBResult
 	friend class DatabaseMySQL;
 
 public:
-	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);
-	DATABASE_VIRTUAL uint32_t getDataUInt(const std::string &s);
-	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s);
-	DATABASE_VIRTUAL std::string getDataString(const std::string &s);
-	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size);
+	virtual int32_t getDataInt(const std::string &s);
+	virtual uint32_t getDataUInt(const std::string &s);
+	virtual int64_t getDataLong(const std::string &s);
+	virtual std::string getDataString(const std::string &s);
+	virtual const char* getDataStream(const std::string &s, unsigned long &size);
 
-	DATABASE_VIRTUAL bool next();
+	virtual bool advance();
+	virtual bool empty();
 
 protected:
 	MySQLResult(MYSQL_RES* res);
-	DATABASE_VIRTUAL ~MySQLResult();
+	virtual ~MySQLResult();
 
 	typedef std::map<const std::string, uint32_t> listNames_t;
 	listNames_t m_listNames;

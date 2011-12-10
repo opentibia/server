@@ -67,15 +67,14 @@ DatabaseMySQL::DatabaseMySQL()
 		DBQuery query;
 		query << "SHOW variables LIKE 'max_allowed_packet';";
 
-		DBResult* result;
+		DBResult_ptr result;
 		if((result = storeQuery(query.str()))){
 			int32_t max_query = result->getDataInt("Value");
-			freeResult(result);
 
 			if(max_query < 16777216){
 				std::cout << std::endl << "[Warning] max_allowed_packet might be set too low for binary map storage." << std::endl;
-				std::cout << "Use the following query to raise max_allow_packet: ";
-				std::cout << "SET GLOBAL max_allowed_packet = 16777216;";
+				std::cout << "Use the following query to raise max_allow_packet: " << std::endl;
+				std::cout << "\tSET GLOBAL max_allowed_packet = 16777216;" << std::endl;
 			}
 		}
 	}
@@ -136,7 +135,7 @@ bool DatabaseMySQL::commit()
 	return true;
 }
 
-bool DatabaseMySQL::executeQuery(const std::string &query)
+bool DatabaseMySQL::internalQuery(const std::string &query)
 {
 	if(!m_connected)
 		return false;
@@ -169,7 +168,7 @@ bool DatabaseMySQL::executeQuery(const std::string &query)
 	return state;
 }
 
-DBResult* DatabaseMySQL::storeQuery(const std::string &query)
+DBResult* DatabaseMySQL::internalStoreQuery(const std::string &query)
 {
 	if(!m_connected)
 		return NULL;
@@ -329,10 +328,15 @@ const char* MySQLResult::getDataStream(const std::string &s, unsigned long &size
 	return NULL;
 }
 
-bool MySQLResult::next()
+bool MySQLResult::advance()
 {
 	m_row = mysql_fetch_row(m_handle);
 	return m_row != NULL;
+}
+
+bool MySQLResult::empty()
+{
+	return m_row == NULL;
 }
 
 MySQLResult::MySQLResult(MYSQL_RES* res)
