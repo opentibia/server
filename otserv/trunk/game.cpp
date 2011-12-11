@@ -2032,7 +2032,8 @@ uint32_t Game::getMoney(const Cylinder* cylinder)
 		{
 			if (item->getWorth() != 0)
 			{
-				moneyCount += item->getWorth();
+				if (!safeIncrUint32_t(moneyCount, item->getWorth())) //overflow
+					return std::numeric_limits<uint32_t>::max();
 			}
 		}
 	}
