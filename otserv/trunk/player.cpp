@@ -6432,14 +6432,18 @@ bool Player::withdrawMoney(const uint32_t& amount)
 
 bool Player::depositMoney(const uint32_t& amount)
 {
-	bool ret = g_game.removeMoney(this, amount);
-
-	if (ret)
-	{
-		balance += amount;
+	if (safeIncrUInt32_t(balance, amount))
+		{
+			if (!g_game.removeMoney(this, amount))
+			{
+				balance -= amount; //undo the change in balance
+				return false;
+			}
 	}
+	else
+		return false;
 
-	return ret;
+	return true;
 }
 
 bool Player::transferMoneyTo(const std::string& name, const uint32_t& amount)
@@ -6453,10 +6457,9 @@ bool Player::transferMoneyTo(const std::string& name, const uint32_t& amount)
 
 	bool result = false;
 
-	if (balance >= amount)
+	if (balance >= amount && safeIncrUInt32_t(target->balance, amount))
 	{
 		balance -= amount;
-		target->balance += amount;
 		result = true;
 	}
 

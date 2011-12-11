@@ -29,6 +29,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <climits>
 #include <boost/algorithm/string/predicate.hpp>
 
 extern ConfigManager g_config;
@@ -222,6 +223,20 @@ std::vector<std::string> explodeString(const std::string& inString, const std::s
 bool hasBitSet(const uint32_t& flag, const uint32_t& flags)
 {
 	return ((flags & flag) == flag);
+}
+
+//safely adds incr to x, checking for overflow
+bool safeIncrUInt32_t(uint32_t& x, uint32_t incr)
+{
+	const static uint32_t MAXUINT32 = std::numeric_limits<uint32_t>::max();
+
+	if(MAXUINT32 - incr >= x)
+	{
+		x += incr;
+		return true;
+	}
+
+	return false;
 }
 
 #define RAND_MAX24 16777216
