@@ -80,7 +80,7 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 bool readXMLContentString(xmlNodePtr node, std::string& value);
 std::vector<std::string> explodeString(const std::string& inString, const std::string& separator);
 bool hasBitSet(const uint32_t& flag, const uint32_t& flags);
-bool safeIncrUint32_t(uint32_t &x, uint32_t incr);
+bool safeIncrUInt32_t(uint32_t &x, uint32_t incr);
 
 uint32_t rand24b();
 float box_muller(const float& m, const float& s);
