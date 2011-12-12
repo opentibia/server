@@ -222,7 +222,7 @@ void Game::loadGameState()
 
 	globalStorage.clear();
 
-	for (DBResult_ptr result = db->storeQuery("SELECT `id`, `value` FROM `global_storage`"); !result->empty(); result->advance()) {
+	for (DBResult_ptr result = db->storeQuery("SELECT `id`, `value` FROM `global_storage`"); result; result = result->advance()) {
 		std::string key = result->getDataString("id");
 		std::string value = result->getDataString("value");
 		globalStorage[key] = value;

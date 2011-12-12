@@ -70,7 +70,7 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 		"LEFT JOIN `worlds` ON `worlds`.`id` = `players`.`world_id` " <<
 		"WHERE `account_id` = " << acc.number;
 
-	for(result = db->storeQuery(query); !result->empty(); result->advance()) {
+	for(result = db->storeQuery(query); result; result = result->advance()) {
 		AccountCharacter c;
 		c.name = result->getDataString("name");
 		c.world = result->getDataString("world");

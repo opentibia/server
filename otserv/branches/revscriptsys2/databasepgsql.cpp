@@ -98,10 +98,10 @@ bool DatabasePgSQL::internalQuery(const std::string &query)
 	return true;
 }
 
-DBResult* DatabasePgSQL::internalStoreQuery(const std::string &query)
+DBResult_ptr DatabasePgSQL::internalStoreQuery(const std::string &query)
 {
 	if(!m_connected)
-		return NULL;
+		return DBResult_ptr();
 
 	#ifdef __DEBUG_SQL__
 	std::cout << "PGSQL QUERY: " << query << std::endl;
@@ -114,11 +114,11 @@ DBResult* DatabasePgSQL::internalStoreQuery(const std::string &query)
 	if(stat != PGRES_COMMAND_OK && stat != PGRES_TUPLES_OK){
 		std::cout << "PQexec(): " << query << ": " << PQresultErrorMessage(res) << std::endl;
 		PQclear(res);
-		return false;
+		return DBResult_ptr();
 	}
 
 	// everything went fine
-	DBResult* results = new PgSQLResult(res);
+	DBResult_ptr results(new PgSQLResult(res), boost::bind(&_Database::freeResult, this, _1));
 	return verifyResult(results);
 }
 
@@ -242,13 +242,13 @@ const char* PgSQLResult::getDataStream(const std::string &s, unsigned long &size
 	return value;
 }
 
-bool PgSQLResult::advance()
+DBResult_ptr PgSQLResult::advance()
 {
 	if(m_cursor >= m_rows)
-		return false;
+		return DBResult_ptr();
 
 	m_cursor++;
-	return true;
+	return shared_from_this();
 }
 
 bool PgSQLResult::empty()

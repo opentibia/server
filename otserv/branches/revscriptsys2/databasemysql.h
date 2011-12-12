@@ -54,7 +54,7 @@ public:
 
 protected:
 	virtual bool internalQuery(const std::string &query);
-	virtual DBResult* internalStoreQuery(const std::string &query);
+	virtual DBResult_ptr internalStoreQuery(const std::string &query);
 	virtual void freeResult(DBResult *res);
 
 	MYSQL m_handle;
@@ -71,7 +71,7 @@ public:
 	virtual std::string getDataString(const std::string &s);
 	virtual const char* getDataStream(const std::string &s, unsigned long &size);
 
-	virtual bool advance();
+	virtual DBResult_ptr advance();
 	virtual bool empty();
 
 protected:

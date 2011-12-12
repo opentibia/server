@@ -23,12 +23,13 @@
 
 #include "definitions.h"
 
+class _Database;
+class _DBResult;
+
 #ifdef MULTI_SQL_DRIVERS
 #define virtual virtual
 #define DATABASE_CLASS _Database
 #define DBRES_CLASS _DBResult
-class _Database;
-class _DBResult;
 #else
 
 #if defined(__USE_MYSQL__)
@@ -60,7 +61,7 @@ class PgSQLResult;
 
 typedef DATABASE_CLASS Database;
 typedef DBRES_CLASS DBResult;
-typedef shared_ptr<DBResult> DBResult_ptr;
+typedef shared_ptr<_DBResult> DBResult_ptr;
 
 class DBQuery;
 
@@ -164,7 +165,6 @@ public:
 	*/
 	virtual std::string escapeBlob(const char* s, uint32_t length) { return "''"; };
 
-protected:
 	/**
 	* Resource freeing.
 	* Used as argument to shared_ptr, you need not call this directly
@@ -173,16 +173,17 @@ protected:
 	*/
 	virtual void freeResult(DBResult *res);
 
+protected:
 	/**
 	 * Executes a query directly
 	 */
 	virtual bool internalQuery(const std::string &query) { return NULL; }
-	virtual DBResult* internalStoreQuery(const std::string &query) { return NULL; }
+	virtual DBResult_ptr internalStoreQuery(const std::string &query) { return DBResult_ptr(); }
 
 	_Database() : m_connected(false) {};
 	virtual ~_Database() {};
 
-	DBResult* verifyResult(DBResult* result);
+	DBResult_ptr verifyResult(DBResult_ptr result);
 
 	bool m_connected;
 
@@ -190,7 +191,7 @@ private:
 	static Database* _instance;
 };
 
-class _DBResult
+class _DBResult : public boost::enable_shared_from_this<_DBResult>
 {
 public:
 	/** Get the Integer value of a field in database
@@ -224,7 +225,7 @@ public:
 	*
 	* \return true if moved, false if there are no more results.
 	*/
-	virtual bool advance() {return false;}
+	virtual DBResult_ptr advance() {return DBResult_ptr();}
 
 	/**
 	 * Are there any more rows to be fetched

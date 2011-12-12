@@ -202,7 +202,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	// so we query the skill table
 	query.reset();
 	query << "SELECT `skill_id`, `value`, `count` FROM `player_skills` WHERE `player_id` = " << player->getGUID();
-	for(result = db->storeQuery(query); !result->empty(); result->advance()){
+	for(result = db->storeQuery(query); result; result = result->advance()){
 		//now iterate over the skills
 		try {
 			SkillType skillid = SkillType::fromInteger(result->getDataInt("skill_id"));
@@ -297,7 +297,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	//load storage map
 	query.str("");
 	query << "SELECT `id`, `value` FROM `player_storage` WHERE `player_id` = " << player->getGUID();
-	for(result = db->storeQuery(query); !result->empty(); result->advance()){
+	for(result = db->storeQuery(query); result; result = result->advance()){
 		std::string key = result->getDataString("id");
 		std::string value = result->getDataString("value");
 		player->setCustomValue(key, value);
@@ -306,7 +306,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	//load vips
 	query.str("");
 	query << "SELECT `vip_id` FROM `player_viplist` WHERE `player_id` = " << player->getGUID();
-	for(result = db->storeQuery(query); !result->empty(); result->advance()){
+	for(result = db->storeQuery(query); result; result = result->advance()){
 		uint32_t vip_id = result->getDataInt("vip_id");
 		std::string dummy_str;
 		if(storeNameByGuid(*db, vip_id))
@@ -763,7 +763,7 @@ int32_t IOPlayer::getPlayerUnjustKillCount(const Player* player, UnjustKillPerio
 
 	int64_t expireTime = 0;
 	uint32_t count = 0;
-	for(result = db->storeQuery(query); !result->empty(); result->advance()){
+	for(result = db->storeQuery(query); result; result = result->advance()){
 		if(count == 0){
 			expireTime = result->getDataLong("date");
 		}

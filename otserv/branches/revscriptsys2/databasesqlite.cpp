@@ -156,12 +156,12 @@ bool DatabaseSQLite::internalQuery(const std::string &query)
 	return true;
 }
 
-DBResult* DatabaseSQLite::internalSelectQuery(const std::string &query)
+DBResult_ptr DatabaseSQLite::internalSelectQuery(const std::string &query)
 {
 	boost::recursive_mutex::scoped_lock lockClass(sqliteLock);
 
 	if(!m_connected)
-		return NULL;
+		return DBResult_ptr();
 
 	#ifdef __DEBUG_SQL__
 	std::cout << "SQLITE QUERY: " << query << std::endl;
@@ -173,10 +173,10 @@ DBResult* DatabaseSQLite::internalSelectQuery(const std::string &query)
 	if( OTS_SQLITE3_PREPARE(m_handle, buf.c_str(), buf.length(), &stmt, NULL) != SQLITE_OK){
 		sqlite3_finalize(stmt);
 		std::cout << "OTS_SQLITE3_PREPARE(): SQLITE ERROR: " << sqlite3_errmsg(m_handle)  << " (" << buf << ")" << std::endl;
-		return NULL;
+		return DBResult_ptr();
 	}
 
-	DBResult* results = new SQLiteResult(stmt);
+	DBResult_ptr results(new SQLiteResult(stmt), boost::bind(&_Database::freeResult, this, _1));
 	return verifyResult(results);
 }
 
@@ -280,11 +280,11 @@ const char* SQLiteResult::getDataStream(const std::string &s, unsigned long &siz
 	return NULL; // Failed
 }
 
-bool SQLiteResult::advance()
+DBResult_ptr SQLiteResult::advance()
 {
 	// checks if after moving to next step we have a row result
 	bool m_rowAvailable = (sqlite3_step(m_handle) == SQLITE_ROW);
-	return m_rowAvailable;
+	return m_rowAvailable ? shared_from_this() : DBResult_ptr();
 }
 
 bool SQLiteResult::empty()

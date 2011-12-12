@@ -168,10 +168,10 @@ bool DatabaseMySQL::internalQuery(const std::string &query)
 	return state;
 }
 
-DBResult* DatabaseMySQL::internalStoreQuery(const std::string &query)
+DBResult_ptr DatabaseMySQL::internalStoreQuery(const std::string &query)
 {
 	if(!m_connected)
-		return NULL;
+		return DBResult_ptr();
 
 	#ifdef __DEBUG_SQL__
 	std::cout << "MYSQL QUERY: " << query << std::endl;
@@ -201,11 +201,11 @@ DBResult* DatabaseMySQL::internalStoreQuery(const std::string &query)
 			m_connected = false;
 		}
 
-		return NULL;
+		return DBResult_ptr();
 	}
 
 	// retriving results of query
-	DBResult* res = new MySQLResult(m_res);
+	DBResult_ptr res(new MySQLResult(m_res), boost::bind(&_Database::freeResult, this, _1));
 	return verifyResult(res);
 }
 
@@ -328,10 +328,10 @@ const char* MySQLResult::getDataStream(const std::string &s, unsigned long &size
 	return NULL;
 }
 
-bool MySQLResult::advance()
+DBResult_ptr MySQLResult::advance()
 {
 	m_row = mysql_fetch_row(m_handle);
-	return m_row != NULL;
+	return m_row != NULL ? shared_from_this() : DBResult_ptr();
 }
 
 bool MySQLResult::empty()

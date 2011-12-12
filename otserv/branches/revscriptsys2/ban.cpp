@@ -390,7 +390,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 			"(`expires` >= " << std::time(NULL) << " OR `expires` = 0)";
 
 	std::vector<Ban> vec;
-	for (DBResult_ptr result = db->storeQuery(query.str()); !result->empty(); result->advance()) {
+	for (DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()) {
 		Ban ban;
 		ban.type = type;
 		ban.id = result->getDataInt("id");

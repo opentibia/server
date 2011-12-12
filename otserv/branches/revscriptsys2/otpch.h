@@ -28,6 +28,7 @@
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 //std
 #include <algorithm>

@@ -412,7 +412,7 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 	DBResult_ptr result;
 
 	query << "SELECT * FROM `map_store` WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
-	for (result = db->storeQuery(query); !result->empty(); result->advance()){
+	for (result = db->storeQuery(query); result; result = result->advance()){
 		int32_t houseid = result->getDataInt("house_id");
 		House* house = Houses::getInstance().getHouse(houseid);
 
@@ -797,7 +797,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 	DBResult_ptr result;
 
 	query << "SELECT * FROM `houses` WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
-	for(result = db->storeQuery(query); !result->empty(); result->advance()){
+	for(result = db->storeQuery(query); result; result = result->advance()){
 		int32_t houseid = result->getDataInt("map_id");
 		House* house = Houses::getInstance().getHouse(houseid);
 		if(house){
@@ -828,7 +828,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 				"LEFT JOIN `houses` ON `house_lists`.`house_id` = `houses`.`id` "
 				"WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `house_id` = " << house->getHouseId();
 
-			for(result = db->storeQuery(query); !result->empty(); result->advance()){
+			for(result = db->storeQuery(query); result; result = result->advance()){
 				int32_t listid = result->getDataInt("listid");
 				std::string list = result->getDataString("list");
 				house->setAccessList(listid, list);

@@ -81,7 +81,7 @@ bool _Database::executeQuery(const std::string &query)
 
 DBResult_ptr _Database::storeQuery(const std::string &query)
 {
-	return DBResult_ptr(internalStoreQuery(query), boost::bind(&_Database::freeResult, this, _1));
+	return internalStoreQuery(query);
 }
 
 DBResult_ptr _Database::storeQuery(DBQuery &query)
@@ -94,11 +94,10 @@ void _Database::freeResult(DBResult *res)
 	throw std::runtime_error("No database driver loaded, yet a DBResult was freed.");
 }
 
-DBResult* _Database::verifyResult(DBResult* result)
+DBResult_ptr _Database::verifyResult(DBResult_ptr result)
 {
 	if(!result->advance()){
-		((_Database*)_instance)->freeResult(result);
-		return NULL;
+		return DBResult_ptr();
 	}
 	else{
 		return result;

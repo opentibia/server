@@ -50,7 +50,7 @@ public:
 
 protected:
 	virtual bool internalQuery(const std::string &query);
-	virtual DBResult* internalStoreQuery(const std::string &query);
+	virtual DBResult_ptr internalStoreQuery(const std::string &query);
 	virtual void freeResult(DBResult *res);
 
 	std::string _parse(const std::string &s);
@@ -69,8 +69,8 @@ public:
 	virtual std::string getDataString(const std::string &s);
 	virtual const char* getDataStream(const std::string &s, unsigned long &size);
 
-	virtual bool advance();
-	virtual bool empty();o
+	virtual DBResult_ptr advance();
+	virtual bool empty();
 
 protected:
 	PgSQLResult(PGresult* results);

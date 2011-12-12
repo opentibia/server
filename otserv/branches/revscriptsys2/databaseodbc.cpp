@@ -172,10 +172,10 @@ bool DatabaseODBC::internalQuery(const std::string &query)
 	return true;
 }
 
-DBResult* DatabaseODBC::internalStoreQuery(const std::string &query)
+DBResult_ptr DatabaseODBC::internalStoreQuery(const std::string &query)
 {
 	if(!m_connected)
-		return NULL;
+		return DBResult_ptr();
 
 	#ifdef __DEBUG_SQL__
 	std::cout << "ODBC QUERY: " << query << std::endl;
@@ -188,17 +188,17 @@ DBResult* DatabaseODBC::internalStoreQuery(const std::string &query)
 	SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_STMT, m_handle, &stmt);
 	if(!RETURN_SUCCESS(ret)){
 		std::cout << "Failed to allocate ODBC SQLHSTMT statement." << std::endl;
-		return NULL;
+		return DBResult_ptr();
 	}
 
 	ret = SQLExecDirect(stmt, (SQLCHAR*)buf.c_str(), buf.length() );
 
 	if(!RETURN_SUCCESS(ret)){
 		std::cout << "SQLExecDirect(): " << query << ": ODBC ERROR." << std::endl;
-		return NULL;
+		return DBResult_ptr();
 	}
 
-	DBResult* results = new ODBCResult(stmt);
+	DBResult_ptr results(new ODBCResult(stmt), boost::bind(&_Database::freeResult, this, _1));
 	return verifyResult(results);
 }
 
@@ -370,7 +370,7 @@ bool ODBCResult::advance()
 {
 	SQLRETURN ret = SQLFetch(m_handle);
 	m_rowAvailable = RETURN_SUCCESS(ret);
-	return m_rowAvailable;
+	return m_rowAvailable ? shared_from_this() : DBResult_ptr();
 }
 
 bool ODBCResult::empty()
