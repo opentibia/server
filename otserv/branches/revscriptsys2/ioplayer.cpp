@@ -47,10 +47,9 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		`groups`.`name` AS `groupname`, `groups`.`flags` AS `groupflags`, `groups`.`access` AS `access`, \
 		`groups`.`maxviplist` AS `maxviplist`, `groups`.`maxdepotitems` AS `maxdepotitems`, `groups`.`violation` AS `violationaccess`, \
 		`healthmax`, `mana`, `manamax`, `manaspent`, `soul`, `direction`, `lookbody`, \
-		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, \
-		`posz`, `cap`, `lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, \
-		`skull_type`, `stamina`, `loss_experience`, `loss_mana`, `loss_skills`, \
-		`loss_items`, `loss_containers` \
+		`lookfeet`, `lookhead`, `looklegs`, `looktype`, `lookaddons`, `posx`, `posy`, `posz`, `cap`, \
+		`lastlogin`, `lastlogout`, `lastip`, `conditions`, `skull_time`, `skull_type`, `stamina`, \
+		`loss_experience`, `loss_mana`, `loss_skills`, `loss_items`, `loss_containers` \
 		FROM `players` \
 		LEFT JOIN `accounts` ON `account_id` = `accounts`.`id`\
 		LEFT JOIN `groups` ON `groups`.`id` = `players`.`group_id` \
@@ -175,17 +174,19 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	query << 
 		"SELECT "
 		"	`guild_ranks`.`name` as `rank`, `guild_ranks`.`guild_id` as `guildid`, "
-		"	`guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname` "
-		"FROM `guild_ranks` "
+		"	`guild_ranks`.`level` as `level`, `guilds`.`name` as `guildname`, "
+		"	`guild_members`.`nick` AS `nick` "
+		"FROM `guild_members` "
+		"LEFT JOIN `guild_ranks` ON `guild_ranks`.`id` = `guild_members`.`rank_id` "
 		"LEFT JOIN `guilds` ON `guilds`.`id` = `guild_ranks`.`guild_id` "
-		"LEFT JOIN `players` ON `players`.`id` = `guild_ranks`.`player_id` "
-		"WHERE `players`.`id` = " << player->getGUID();
+		"WHERE `guild_members`.`player_id` = " << player->getGUID();
 
 	if(result = db->storeQuery(query)){
 		player->guildName = result->getDataString("guildname");
 		player->guildLevel = result->getDataInt("level");
 		player->guildId = result->getDataInt("guildid");
 		player->guildRank = result->getDataString("rank");
+		player->guildNick = result->getDataString("nick");
 	}
 
 	//get password
