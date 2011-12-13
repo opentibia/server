@@ -29,7 +29,7 @@
 
 #include <libpq-fe.h>
 
-class DatabasePgSQL : public _Database
+class DatabasePgSQL : public DatabaseDriver
 {
 public:
 	DatabasePgSQL();
@@ -58,7 +58,7 @@ protected:
 	PGconn* m_handle;
 };
 
-class PgSQLResult : public _DBResult
+class PgSQLResult : public DBResult
 {
 	friend class DatabasePgSQL;
 

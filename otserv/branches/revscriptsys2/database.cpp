@@ -34,18 +34,15 @@
 #include "databasepgsql.h"
 #endif
 
-#if defined MULTI_SQL_DRIVERS
 #include "configmanager.h"
 extern ConfigManager g_config;
-#endif
 
 boost::recursive_mutex DBQuery::database_lock;
 
-Database* _Database::_instance = NULL;
+DatabaseDriver* DatabaseDriver::_instance = NULL;
 
-Database* _Database::instance(){
+DatabaseDriver* DatabaseDriver::instance(){
 	if(!_instance){
-#if defined MULTI_SQL_DRIVERS
 #ifdef __USE_MYSQL__
 		if(g_config.getString(ConfigManager::SQL_TYPE) == "mysql")
 			_instance = new DatabaseMySQL;
@@ -62,39 +59,36 @@ Database* _Database::instance(){
 		if(g_config.getString(ConfigManager::SQL_TYPE) == "pgsql")
 			_instance = new DatabasePgSQL;
 #endif
-#else
-		_instance = new Database;
-#endif
 	}
 	return _instance;
 }
 
-bool _Database::executeQuery(DBQuery &query)
+bool DatabaseDriver::executeQuery(DBQuery &query)
 {
 	return internalQuery(query.str());
 }
 
-bool _Database::executeQuery(const std::string &query)
+bool DatabaseDriver::executeQuery(const std::string &query)
 {
 	return internalQuery(query);
 }
 
-DBResult_ptr _Database::storeQuery(const std::string &query)
+DBResult_ptr DatabaseDriver::storeQuery(const std::string &query)
 {
 	return internalStoreQuery(query);
 }
 
-DBResult_ptr _Database::storeQuery(DBQuery &query)
+DBResult_ptr DatabaseDriver::storeQuery(DBQuery &query)
 {
 	return storeQuery(query.str());
 }
 
-void _Database::freeResult(DBResult *res)
+void DatabaseDriver::freeResult(DBResult *res)
 {
 	throw std::runtime_error("No database driver loaded, yet a DBResult was freed.");
 }
 
-DBResult_ptr _Database::verifyResult(DBResult_ptr result)
+DBResult_ptr DatabaseDriver::verifyResult(DBResult_ptr result)
 {
 	if(!result->advance()){
 		return DBResult_ptr();
@@ -118,7 +112,7 @@ DBQuery::~DBQuery()
 
 // DBInsert
 
-DBInsert::DBInsert(Database* db)
+DBInsert::DBInsert(DatabaseDriver* db)
 {
 	m_db = db;
 	m_rows = 0;

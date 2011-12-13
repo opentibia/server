@@ -118,7 +118,7 @@ DBResult_ptr DatabasePgSQL::internalStoreQuery(const std::string &query)
 	}
 
 	// everything went fine
-	DBResult_ptr results(new PgSQLResult(res), boost::bind(&_Database::freeResult, this, _1));
+	DBResult_ptr results(new PgSQLResult(res), boost::bind(&DatabaseDriver::freeResult, this, _1));
 	return verifyResult(results);
 }
 

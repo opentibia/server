@@ -176,7 +176,7 @@ DBResult_ptr DatabaseSQLite::internalSelectQuery(const std::string &query)
 		return DBResult_ptr();
 	}
 
-	DBResult_ptr results(new SQLiteResult(stmt), boost::bind(&_Database::freeResult, this, _1));
+	DBResult_ptr results(new SQLiteResult(stmt), boost::bind(&DatabaseDriver::freeResult, this, _1));
 	return verifyResult(results);
 }
 

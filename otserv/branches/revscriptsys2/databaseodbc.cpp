@@ -198,7 +198,7 @@ DBResult_ptr DatabaseODBC::internalStoreQuery(const std::string &query)
 		return DBResult_ptr();
 	}
 
-	DBResult_ptr results(new ODBCResult(stmt), boost::bind(&_Database::freeResult, this, _1));
+	DBResult_ptr results(new ODBCResult(stmt), boost::bind(&DatabaseDriver::freeResult, this, _1));
 	return verifyResult(results);
 }
 

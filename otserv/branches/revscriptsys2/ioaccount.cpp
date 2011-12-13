@@ -44,7 +44,7 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 		return acc;
 	}
 
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result;
 
@@ -85,7 +85,7 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 
 bool IOAccount::saveAccount(const Account& acc)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 
 	query << "UPDATE `accounts` SET `premend` = " << acc.premiumEnd << ", `warnings` = " << acc.warnings << " WHERE `id` = " << acc.number;
@@ -94,7 +94,7 @@ bool IOAccount::saveAccount(const Account& acc)
 
 bool IOAccount::getPassword(const std::string& accountName, const std::string& playerName, std::string& password)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result;
 

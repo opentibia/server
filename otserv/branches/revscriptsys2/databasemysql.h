@@ -35,7 +35,7 @@
 #include <mysql/mysql.h>
 #endif
 
-class DatabaseMySQL : public _Database
+class DatabaseMySQL : public DatabaseDriver
 {
 public:
 	DatabaseMySQL();
@@ -60,7 +60,7 @@ protected:
 	MYSQL m_handle;
 };
 
-class MySQLResult : public _DBResult
+class MySQLResult : public DBResult
 {
 	friend class DatabaseMySQL;
 

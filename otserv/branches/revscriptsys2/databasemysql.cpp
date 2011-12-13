@@ -205,7 +205,7 @@ DBResult_ptr DatabaseMySQL::internalStoreQuery(const std::string &query)
 	}
 
 	// retriving results of query
-	DBResult_ptr res(new MySQLResult(m_res), boost::bind(&_Database::freeResult, this, _1));
+	DBResult_ptr res(new MySQLResult(m_res), boost::bind(&DatabaseDriver::freeResult, this, _1));
 	return verifyResult(res);
 }
 

@@ -49,7 +49,7 @@
 /**
 	@author Bruno R Ferreira <brf_coldf@yahoo.com.br>
 */
-class DatabaseODBC : public _Database
+class DatabaseODBC : public DatabaseDriver
 {
 public:
 	DatabaseODBC();
@@ -77,7 +77,7 @@ protected:
 	SQLHENV m_env;
 };
 
-class ODBCResult : public _DBResult
+class ODBCResult : public DBResult
 {
 	friend class DatabaseODBC;
 

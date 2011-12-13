@@ -30,7 +30,7 @@ extern ConfigManager g_config;
 
 bool BanManager::clearTemporaryBans() const
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	return db->executeQuery("UPDATE `bans` SET `active` = 0 WHERE `expires` = 0");
 }
@@ -100,7 +100,7 @@ bool BanManager::isIpDisabled(uint32_t clientip)
 bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/) const
 {
 	if(clientip == 0) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
 	query <<
@@ -124,7 +124,7 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 
 bool BanManager::isPlayerBanished(uint32_t playerId) const
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
 	query <<
@@ -156,7 +156,7 @@ bool BanManager::isPlayerBanished(const std::string& name) const
 
 bool BanManager::isAccountBanished(uint32_t accountId) const
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
 	query <<
@@ -211,7 +211,7 @@ bool BanManager::addIpBan(uint32_t ip, uint32_t mask, int32_t time,
 	uint32_t adminid, std::string comment) const
 {
 	if(ip == 0 || mask == 0) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBInsert stmt(db);
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `param`, `expires`, `added`, `admin_id`, `comment`) VALUES ");
@@ -230,7 +230,7 @@ bool BanManager::addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid,
 	std::string comment, std::string statement, uint32_t reason, ViolationAction action) const
 {
 	if(playerId == 0) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBInsert stmt(db);
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
@@ -257,7 +257,7 @@ bool BanManager::addPlayerStatement(uint32_t playerId, uint32_t adminid, std::st
 	std::string statement, uint32_t reason, ViolationAction action) const
 {
 	if(playerId == 0) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBInsert stmt(db);
 	stmt.setQuery("INSERT INTO `bans` (`type`, `value`, `expires`, `added`, `admin_id`, `comment`, `statement`, `reason`, `action`) VALUES ");
@@ -275,7 +275,7 @@ bool BanManager::addAccountBan(uint32_t account, int32_t time, uint32_t adminid,
 	std::string comment, std::string statement, uint32_t reason, ViolationAction action) const
 {
 	if(account == 0) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBInsert stmt(db);
 	DBQuery query;
@@ -292,7 +292,7 @@ bool BanManager::addAccountNotation(uint32_t account, uint32_t adminid, std::str
 	std::string statement, uint32_t reason, ViolationAction action) const
 {
 	if(account == 0) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBInsert stmt(db);
 	DBQuery query;
@@ -308,7 +308,7 @@ bool BanManager::addAccountNotation(uint32_t account, uint32_t adminid, std::str
 bool BanManager::removeIpBans(uint32_t ip, uint32_t mask) const
 {
 	if(!isIpBanished(ip, mask)) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
 	query << "UPDATE `bans` SET `active` = 0 WHERE `type` = " << BAN_IPADDRESS << " AND (`value` & `param` & " << mask << ") = (" << ip << " & `param` & " << mask << ")" << " AND `active` = 1";
@@ -318,7 +318,7 @@ bool BanManager::removeIpBans(uint32_t ip, uint32_t mask) const
 bool BanManager::removePlayerBans(uint32_t guid) const
 {
 	if(!isPlayerBanished(guid)) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
 	query << "UPDATE `bans` SET `active` = 0 WHERE `type` = " << BAN_PLAYER << " AND `value` = " << guid << " AND `active` = 1";
@@ -336,7 +336,7 @@ bool BanManager::removePlayerBans(const std::string& name) const
 bool BanManager::removeAccountBans(uint32_t accno) const
 {
 	if(!isAccountBanished(accno)) return false;
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
 	query << "UPDATE `bans` SET `active` = 0 WHERE `type` = " << BAN_ACCOUNT << " AND `value` = " << accno << " AND `active` = 1";
@@ -345,7 +345,7 @@ bool BanManager::removeAccountBans(uint32_t accno) const
 
 bool BanManager::removeNotations(uint32_t accno) const
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 
 	query << "UPDATE `bans` SET `active` = 0 WHERE `type` = " << BAN_NOTATION << " AND `value` = " << accno << " AND `active` = 1";
@@ -354,7 +354,7 @@ bool BanManager::removeNotations(uint32_t accno) const
 
 uint32_t BanManager::getNotationsCount(uint32_t account)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 
 	DBQuery query;
@@ -369,7 +369,7 @@ uint32_t BanManager::getNotationsCount(uint32_t account)
 std::vector<Ban> BanManager::getBans(BanType_t type)
 {
 	assert(type == BAN_IPADDRESS || type == BAN_PLAYER || type == BAN_ACCOUNT || type == BAN_NOTATION);
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
 	query <<

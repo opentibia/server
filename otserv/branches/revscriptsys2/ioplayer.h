@@ -81,7 +81,7 @@ public:
 	bool cleanOnlineInfo();
 
 protected:
-	bool storeNameByGuid(Database &mysql, uint32_t guid);
+	bool storeNameByGuid(DatabaseDriver &mysql, uint32_t guid);
 
 	struct StringCompareCase
 	{

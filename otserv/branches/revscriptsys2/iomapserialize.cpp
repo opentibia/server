@@ -66,7 +66,7 @@ bool IOMapSerialize::saveMap(Map* map)
 
 bool IOMapSerialize::loadMapRelational(Map* map)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	/*
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
@@ -171,7 +171,7 @@ bool IOMapSerialize::loadMapRelational(Map* map)
 	return true;
 }
 
-bool IOMapSerialize::loadItems(Database* db, DBResult* result, Cylinder* parent, bool depotTransfer /*= false*/)
+bool IOMapSerialize::loadItems(DatabaseDriver* db, DBResult* result, Cylinder* parent, bool depotTransfer /*= false*/)
 {
 	/*
 	typedef std::map<int32_t,std::pair<Item*,int32_t> > ItemMap;
@@ -310,7 +310,7 @@ bool IOMapSerialize::saveMapRelational(Map* map)
 	return true;
 }
 
-bool IOMapSerialize::saveItems(Database* db, uint32_t houseId, const Tile* tile)
+bool IOMapSerialize::saveItems(DatabaseDriver* db, uint32_t houseId, const Tile* tile)
 {
 	/*
 	typedef std::list<std::pair<Container*, int32_t> > ContainerStackList;
@@ -407,7 +407,7 @@ bool IOMapSerialize::saveItems(Database* db, uint32_t houseId, const Tile* tile)
 
 bool IOMapSerialize::loadMapBinary(Map* map)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result;
 
@@ -587,7 +587,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent, bool dep
 
 bool IOMapSerialize::saveMapBinary(Map* map)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBTransaction transaction(db);
 	DBInsert stmt(db);
@@ -697,7 +697,7 @@ bool IOMapSerialize::saveTile(PropWriteStream& stream, const Tile* tile)
 
 bool IOMapSerialize::updateHouseInfo()
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
@@ -757,7 +757,7 @@ bool IOMapSerialize::updateHouseInfo()
 
 bool IOMapSerialize::processHouseAuctions()
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result_set;
 
@@ -792,7 +792,7 @@ bool IOMapSerialize::processHouseAuctions()
 
 bool IOMapSerialize::loadHouseInfo(Map* map)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result;
 
@@ -841,7 +841,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 
 bool IOMapSerialize::saveHouseInfo(Map* map)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBTransaction transaction(db);
 

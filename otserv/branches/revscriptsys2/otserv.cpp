@@ -471,7 +471,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << "[done]" << std::endl;
 
 	std::cout << ":: Checking Connection to Database " << g_config.getString(ConfigManager::SQL_DB) << "... ";
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	if(db == NULL || !db->isConnected())
 	{
 		ErrorMessage("Database Connection Failed!");

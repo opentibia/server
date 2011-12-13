@@ -38,7 +38,7 @@ extern Game g_game;
 
 bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload /*= false*/)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result;
 
@@ -391,7 +391,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 {
 	player->preSave();
 
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result;
 
@@ -582,7 +582,7 @@ bool IOPlayer::savePlayer(Player* player, bool shallow)
 	return transaction.commit();
 }
 
-bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
+bool IOPlayer::storeNameByGuid(DatabaseDriver &db, uint32_t guid)
 {
 	DBQuery query;
 	DBResult_ptr result;
@@ -602,7 +602,7 @@ bool IOPlayer::storeNameByGuid(Database &db, uint32_t guid)
 
 bool IOPlayer::addPlayerDeath(Player* dying_player, const DeathList& dlist)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	
 	DBQuery query;
 	DBTransaction transaction(db);
@@ -742,7 +742,7 @@ int32_t IOPlayer::getPlayerUnjustKillCount(const Player* player, UnjustKillPerio
 		}
 	}
 
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result;
 
@@ -837,7 +837,7 @@ bool IOPlayer::getNameByGuid(uint32_t guid, std::string& name)
 		return true;
 	}
 
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	DBResult_ptr result;
 
@@ -860,7 +860,7 @@ bool IOPlayer::getGuidByName(uint32_t &guid, std::string& name)
 		return true;
 	}
 
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 	DBQuery query;
 
@@ -880,7 +880,7 @@ bool IOPlayer::getGuidByName(uint32_t &guid, std::string& name)
 
 bool IOPlayer::getAccountByName(uint32_t& account, const std::string& name)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 	DBQuery query;
 
@@ -898,7 +898,7 @@ bool IOPlayer::getAccountByName(uint32_t& account, const std::string& name)
 
 bool IOPlayer::getAccountByName(std::string& account, const std::string& player_name)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 	DBQuery query;
 
@@ -915,7 +915,7 @@ bool IOPlayer::getAccountByName(std::string& account, const std::string& player_
 
 bool IOPlayer::getGuidByNameEx(uint32_t& guid, bool& specialVip, const std::string& player_name)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 	DBQuery query;
 
@@ -933,7 +933,7 @@ bool IOPlayer::getGuidByNameEx(uint32_t& guid, bool& specialVip, const std::stri
 
 bool IOPlayer::getDefaultTown(std::string& name, uint32_t& depotId)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 	DBQuery query;
 
@@ -950,7 +950,7 @@ bool IOPlayer::getDefaultTown(std::string& name, uint32_t& depotId)
 
 bool IOPlayer::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 	DBQuery query;
 
@@ -968,7 +968,7 @@ bool IOPlayer::getGuildIdByName(uint32_t& guildId, const std::string& guildName)
 
 bool IOPlayer::playerExists(std::string name)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 	DBQuery query;
 
@@ -981,7 +981,7 @@ bool IOPlayer::playerExists(std::string name)
 
 bool IOPlayer::isPlayerOnlineByAccount(uint32_t acc)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 	DBQuery query;
 
@@ -1028,7 +1028,7 @@ void IOPlayer::loadItems(ItemMap& itemMap, DBResult* result)
 
 bool IOPlayer::hasFlag(PlayerFlags flag, uint32_t guid)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 
 	DBQuery query;
@@ -1046,7 +1046,7 @@ bool IOPlayer::hasFlag(PlayerFlags flag, uint32_t guid)
 
 bool IOPlayer::getLastIP(uint32_t& ip, uint32_t guid)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;
 
 	DBQuery query;
@@ -1063,7 +1063,7 @@ bool IOPlayer::getLastIP(uint32_t& ip, uint32_t guid)
 
 void IOPlayer::updateLoginInfo(Player* player)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	
 	query << "UPDATE `players` SET `lastlogin` = " << player->lastLoginSaved
@@ -1076,7 +1076,7 @@ void IOPlayer::updateLoginInfo(Player* player)
 
 void IOPlayer::updateLogoutInfo(Player* player)
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	
 	query << "UPDATE `players` SET `lastlogout` = " << player->lastLogout
@@ -1088,7 +1088,7 @@ void IOPlayer::updateLogoutInfo(Player* player)
 
 bool IOPlayer::cleanOnlineInfo()
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	query << "UPDATE `players` SET `online` = 0 WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
 	return db->executeQuery(query);

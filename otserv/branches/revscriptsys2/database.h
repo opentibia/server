@@ -23,53 +23,17 @@
 
 #include "definitions.h"
 
-class _Database;
-class _DBResult;
-
-#ifdef MULTI_SQL_DRIVERS
-#define virtual virtual
-#define DATABASE_CLASS _Database
-#define DBRES_CLASS _DBResult
-#else
-
-#if defined(__USE_MYSQL__)
-#define DATABASE_CLASS DatabaseMySQL
-#define DBRES_CLASS MySQLResult
-class DatabaseMySQL;
-class MySQLResult;
-
-#elif defined(__USE_SQLITE__)
-#define DATABASE_CLASS DatabaseSQLite
-#define DBRES_CLASS SQLiteResult
-class DatabaseSQLite;
-class SQLiteResult;
-
-#elif defined(__USE_ODBC__)
-#define DATABASE_CLASS DatabaseODBC
-#define DBRES_CLASS ODBCResult
-class DatabaseODBC;
-class ODBCResult;
-
-#elif defined(__USE_PGSQL__)
-#define DATABASE_CLASS DatabasePgSQL
-#define DBRES_CLASS PgSQLResult
-class DatabasePgSQL;
-class PgSQLResult;
-
-#endif
-#endif
-
-typedef DATABASE_CLASS Database;
-typedef DBRES_CLASS DBResult;
-typedef shared_ptr<_DBResult> DBResult_ptr;
-
+class DatabaseDriver;
+class DBResult;
 class DBQuery;
+
+typedef shared_ptr<DBResult> DBResult_ptr;
 
 enum DBParam_t{
 	DBPARAM_MULTIINSERT = 1
 };
 
-class _Database
+class DatabaseDriver
 {
 public:
 	/**
@@ -79,7 +43,7 @@ public:
 	*
 	* @return database connection handler singleton
 	*/
-	static Database* instance();
+	static DatabaseDriver* instance();
 
 	/**
 	* Database information.
@@ -111,9 +75,9 @@ protected:
 	*	If your database system doesn't support transactions you should return true - it's not feature test, code should work without transaction, just will lack integrity.
 	*/
 	friend class DBTransaction;
-	virtual bool beginTransaction() { return 0; }
-	virtual bool rollback() { return 0; }
-	virtual bool commit() { return 0; }
+	virtual bool beginTransaction() = 0;
+	virtual bool rollback() = 0;
+	virtual bool commit() = 0;
 
 public:
 	/**
@@ -132,7 +96,7 @@ public:
 	 *
 	 * @return id of last inserted row, 0 if last query did not result in any rows with auto_increment keys
 	 */
-	virtual uint64_t getLastInsertedRowID() {return 0;}
+	virtual uint64_t getLastInsertedRowID() = 0;
 
 	/**
 	* Queries database.
@@ -153,7 +117,7 @@ public:
 	* @param std::string string to be escaped
 	* @return quoted string
 	*/
-	virtual std::string escapeString(const std::string &s) { return "''"; }
+	virtual std::string escapeString(const std::string &s) = 0;
 	/**
 	* Escapes binary stream for query.
 	*
@@ -163,7 +127,7 @@ public:
 	* @param long stream length
 	* @return quoted string
 	*/
-	virtual std::string escapeBlob(const char* s, uint32_t length) { return "''"; };
+	virtual std::string escapeBlob(const char* s, uint32_t length) = 0;
 
 	/**
 	* Resource freeing.
@@ -177,21 +141,21 @@ protected:
 	/**
 	 * Executes a query directly
 	 */
-	virtual bool internalQuery(const std::string &query) { return NULL; }
-	virtual DBResult_ptr internalStoreQuery(const std::string &query) { return DBResult_ptr(); }
+	virtual bool internalQuery(const std::string &query) = 0;
+	virtual DBResult_ptr internalStoreQuery(const std::string &query) = 0;
 
-	_Database() : m_connected(false) {};
-	virtual ~_Database() {};
+	DatabaseDriver() : m_connected(false) {};
+	virtual ~DatabaseDriver() {};
 
 	DBResult_ptr verifyResult(DBResult_ptr result);
 
 	bool m_connected;
 
 private:
-	static Database* _instance;
+	static DatabaseDriver* _instance;
 };
 
-class _DBResult : public boost::enable_shared_from_this<_DBResult>
+class DBResult : public boost::enable_shared_from_this<DBResult>
 {
 public:
 	/** Get the Integer value of a field in database
@@ -234,8 +198,8 @@ public:
 	virtual bool empty() {return true;}
 
 protected:
-	_DBResult() {};
-	virtual ~_DBResult() {};
+	DBResult() {};
+	virtual ~DBResult() {};
 };
 
 /**
@@ -245,7 +209,7 @@ protected:
 */
 class DBQuery : public std::ostringstream
 {
-	friend class _Database;
+	friend class DatabaseDriver;
 
 public:
 	DBQuery();
@@ -270,7 +234,7 @@ public:
 	*
 	* @param Database* database wrapper
 	*/
-	DBInsert(Database* db);
+	DBInsert(DatabaseDriver* db);
 	~DBInsert() {};
 
 	/**
@@ -305,7 +269,7 @@ public:
 	uint64_t getInsertID();
 
 protected:
-	Database* m_db;
+	DatabaseDriver* m_db;
 	bool m_multiLine;
 	uint32_t m_rows;
 	std::string m_query;
@@ -328,7 +292,7 @@ protected:
 class DBTransaction
 {
 public:
-	DBTransaction(Database* database)
+	DBTransaction(DatabaseDriver* database)
 	{
 		m_database = database;
 		m_state = STATE_NO_START;
@@ -365,7 +329,7 @@ private:
 		STEATE_COMMIT
 	};
 	TransactionStates_t m_state;
-	Database* m_database;
+	DatabaseDriver* m_database;
 };
 
 #endif

@@ -29,7 +29,7 @@
 
 #include <sqlite3.h>
 
-class DatabaseSQLite : public _Database
+class DatabaseSQLite : public DatabaseDriver
 {
 public:
 	DatabaseSQLite();
@@ -60,7 +60,7 @@ protected:
 	sqlite3* m_handle;
 };
 
-class SQLiteResult : public _DBResult
+class SQLiteResult : public DBResult
 {
 	friend class DatabaseSQLite;
 

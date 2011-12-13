@@ -217,7 +217,7 @@ bool Game::saveServer(ServerSaveType saveType)
 
 void Game::loadGameState()
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 
 	globalStorage.clear();
@@ -231,7 +231,7 @@ void Game::loadGameState()
 
 bool Game::saveGameState()
 {
-	Database* db = Database::instance();
+	DatabaseDriver* db = DatabaseDriver::instance();
 	
 	DBQuery q;
 	DBTransaction transaction(db);
