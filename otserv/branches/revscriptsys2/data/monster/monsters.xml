@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monsters>
+<![CDATA[
 	<!-- Amazons -->
 	<monster name="Amazon" file="Amazons/amazon.xml"/>
 	<monster name="Valkyrie" file="Amazons/valkyrie.xml"/>
@@ -458,6 +459,7 @@
 	<monster name="Plaguethrower" file="Traps/plaguethrower.xml"/>
 	<monster name="Poisonthrower" file="Traps/poisonthrower.xml"/>
 	<monster name="Shredderthrower" file="Traps/shredderthrower.xml"/>
+]]>
 
 	<!-- Trolls -->
 	<monster name="Frost Troll" file="Trolls/frost troll.xml"/>
