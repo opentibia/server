@@ -22,7 +22,7 @@
 #define __OTSERV_IOMAPSERIALIZE_H__
 
 #include "classes.h"
-#include "database.h"
+#include "database_driver.h"
 
 class IOMapSerialize{
 public:

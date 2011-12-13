@@ -24,7 +24,7 @@
 #include "tools.h"
 #include "configmanager.h"
 #include "ioplayer.h"
-#include "database.h"
+#include "database_driver.h"
 
 extern ConfigManager g_config;
 

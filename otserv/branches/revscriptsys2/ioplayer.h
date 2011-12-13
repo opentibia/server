@@ -23,7 +23,7 @@
 
 #include "classes.h"
 #include "creature.h"
-#include "database.h"
+#include "database_driver.h"
 
 enum UnjustKillPeriod_t{
 	UNJUST_KILL_PERIOD_DAY,
