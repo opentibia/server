@@ -340,6 +340,11 @@ bool Monsters::loadFromXml(const std::string& _datadir, bool reloading /*= false
 	return loaded;
 }
 
+bool Monsters::isLoaded() const
+{
+	return loaded;
+}
+
 bool Monsters::reload()
 {
 	return loadFromXml(datadir, true);

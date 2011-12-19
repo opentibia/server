@@ -165,10 +165,7 @@ public:
 	~Monsters();
 
 	bool loadFromXml(const std::string& _datadir, bool reloading = false);
-	bool isLoaded() const
-	{
-		return loaded;
-	}
+	bool isLoaded() const;
 	bool reload();
 
 	MonsterType* getMonsterType(const std::string& name);

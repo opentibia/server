@@ -6433,15 +6433,17 @@ bool Player::withdrawMoney(const uint32_t& amount)
 bool Player::depositMoney(const uint32_t& amount)
 {
 	if (safeIncrUInt32_t(balance, amount))
+	{
+		if (!g_game.removeMoney(this, amount))
 		{
-			if (!g_game.removeMoney(this, amount))
-			{
-				balance -= amount; //undo the change in balance
-				return false;
-			}
+			balance -= amount; //undo the change in balance
+			return false;
+		}
 	}
 	else
+	{
 		return false;
+	}
 
 	return true;
 }

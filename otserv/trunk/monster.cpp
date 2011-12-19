@@ -203,7 +203,7 @@ void Monster::onAttackedCreature(Creature* target)
 	}
 }
 
-void Monster::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
+void Monster::onAttackedCreatureDrainHealth(Creature* target, const int32_t& points)
 {
 	Creature::onAttackedCreatureDrainHealth(target, points);
 
@@ -213,7 +213,7 @@ void Monster::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 	}
 }
 
-void Monster::onAttackedCreatureDrainMana(Creature* target, int32_t points)
+void Monster::onAttackedCreatureDrainMana(Creature* target, const int32_t& points)
 {
 	Creature::onAttackedCreatureDrainMana(target, points);
 
@@ -552,7 +552,7 @@ void Monster::onCreatureLeave(Creature* creature)
 	}
 }
 
-bool Monster::searchTarget(TargetSearchType_t searchType /*= TARGETSEARCH_DEFAULT*/)
+bool Monster::searchTarget(const TargetSearchType_t& searchType /*= TARGETSEARCH_DEFAULT*/)
 {
 #ifdef __DEBUG__
 	std::cout << "Searching target... " << std::endl;
@@ -665,8 +665,8 @@ void Monster::onFollowCreatureComplete(const Creature* creature)
 	}
 }
 
-BlockType_t Monster::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
-                              bool checkDefense /* = false*/, bool checkArmor /* = false*/)
+BlockType_t Monster::blockHit(Creature* attacker, const CombatType_t& combatType,
+	int32_t& damage, bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
 	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
@@ -868,7 +868,7 @@ void Monster::onEndCondition(ConditionType_t type, bool lastCondition)
 }
 
 
-void Monster::onThink(uint32_t interval)
+void Monster::onThink(const uint32_t& interval)
 {
 	updateHadRecentBattleVar();
 	Creature::onThink(interval);
@@ -933,7 +933,7 @@ void Monster::onThink(uint32_t interval)
 	}
 }
 
-void Monster::doAttacking(uint32_t interval)
+void Monster::doAttacking(const uint32_t& interval)
 {
 	if (!attackedCreature || (isSummon() && attackedCreature == this))
 	{
@@ -1030,7 +1030,7 @@ bool Monster::canUseAttack(const Position& pos, const Creature* target) const
 }
 
 bool Monster::canUseSpell(const Position& pos, const Position& targetPos,
-                          const spellBlock_t& sb, uint32_t interval, bool& inRange)
+	const spellBlock_t& sb, const uint32_t& interval, bool& inRange)
 {
 	inRange = true;
 
@@ -1058,7 +1058,7 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos,
 	return true;
 }
 
-void Monster::onThinkTarget(uint32_t interval)
+void Monster::onThinkTarget(const uint32_t& interval)
 {
 	if (!isSummon())
 	{
@@ -1107,7 +1107,7 @@ void Monster::onThinkTarget(uint32_t interval)
 	}
 }
 
-void Monster::onThinkDefense(uint32_t interval)
+void Monster::onThinkDefense(const uint32_t& interval)
 {
 	resetTicks = true;
 	defenseTicks += interval;
@@ -1184,7 +1184,7 @@ void Monster::onThinkDefense(uint32_t interval)
 	}
 }
 
-void Monster::onThinkYell(uint32_t interval)
+void Monster::onThinkYell(const uint32_t& interval)
 {
 	if (mType->yellSpeedTicks > 0)
 	{
@@ -1217,7 +1217,7 @@ void Monster::onWalk()
 	Creature::onWalk();
 }
 
-bool Monster::pushItem(Item* item, int32_t radius)
+bool Monster::pushItem(Item* item, const int32_t& radius)
 {
 	const Position& centerPos = item->getPosition();
 	typedef std::pair<int32_t, int32_t> relPair;
@@ -1571,34 +1571,35 @@ bool Monster::isInSpawnRange(const Position& toPos)
 	return !inDespawnRange(toPos);
 }
 
-bool Monster::canWalkTo(Position pos, Direction dir)
+bool Monster::canWalkTo(const Position& pos, const Direction& dir)
 {
+	Position newPos = pos;
 	switch (dir)
 	{
 		case NORTH:
-			pos.y += -1;
+			newPos.y += -1;
 			break;
 		case WEST:
-			pos.x += -1;
+			newPos.x += -1;
 			break;
 		case EAST:
-			pos.x += 1;
+			newPos.x += 1;
 			break;
 		case SOUTH:
-			pos.y += 1;
+			newPos.y += 1;
 			break;
 		default:
 			break;
 	}
 
-	if (isInSpawnRange(pos))
+	if (isInSpawnRange(newPos))
 	{
-		if (getWalkCache(pos) == 0)
+		if (getWalkCache(newPos) == 0)
 		{
 			return false;
 		}
 
-		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+		Tile* tile = g_game.getTile(newPos.x, newPos.y, newPos.z);
 
 		if (tile && !tile->getTopVisibleCreature(this) && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR)
 		{
@@ -1824,7 +1825,7 @@ bool Monster::useCacheMap() const
 	return true;
 }
 
-bool Monster::isImmune(CombatType_t type) const
+bool Monster::isImmune(const CombatType_t& type) const
 {
 	ElementMap::iterator it = mType->elementMap.find(type);
 
@@ -1875,7 +1876,7 @@ void Monster::setNormalCreatureLight()
 	internalLight.color = mType->lightColor;
 }
 
-void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
+void Monster::drainHealth(Creature* attacker, const CombatType_t& combatType, const int32_t& damage)
 {
 	Creature::drainHealth(attacker, combatType, damage);
 
@@ -1885,7 +1886,7 @@ void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t d
 	}
 }
 
-void Monster::changeHealth(int32_t healthChange)
+void Monster::changeHealth(const int32_t& healthChange)
 {
 	//In case a player with ignore flag set attacks the monster
 	setIdle(false);

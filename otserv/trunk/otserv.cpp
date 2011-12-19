@@ -271,6 +271,7 @@ int main(int argc, char** argv)
 	}
 
 	mainExceptionHandler.RemoveHandler();
+	
 	return EXIT_SUCCESS;
 }
 

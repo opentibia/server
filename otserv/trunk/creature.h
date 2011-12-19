@@ -89,31 +89,15 @@ struct DeathEntry
 {
 	// Death can be either a name (for fields) or a creature (for anything substantial)
 	// Fields are only counted if they are the final hit killer
-	DeathEntry(std::string name, int32_t dmg) : data(name), damage(dmg), isUnjust(false) {}
-	DeathEntry(Creature* killer, int32_t dmg, bool unjust) : data(killer), damage(dmg), isUnjust(unjust) {}
+	DeathEntry(const std::string& name, const int32_t& dmg);
+	DeathEntry(Creature* killer, const int32_t& dmg, bool unjust);
 
-	bool isCreatureKill() const
-	{
-		return data.type() == typeid(Creature*);
-	}
-	bool isNameKill() const
-	{
-		return !isCreatureKill();
-	}
-	bool isUnjustKill() const
-	{
-		return isUnjust;
-	}
-
-	Creature* getKillerCreature() const
-	{
-		return boost::any_cast<Creature*>(data);
-	}
-	std::string getKillerName() const
-	{
-		return boost::any_cast<std::string>(data);
-	}
-
+	bool isCreatureKill() const;
+	bool isNameKill() const;
+	bool isUnjustKill() const;
+	Creature* getKillerCreature() const;
+	std::string getKillerName() const;
+	
 protected:
 	boost::any data;
 	int32_t damage;
@@ -151,7 +135,7 @@ class FrozenPathingConditionCall
 {
 public:
 	FrozenPathingConditionCall(const Position& _targetPos);
-	virtual ~FrozenPathingConditionCall() {}
+	virtual ~FrozenPathingConditionCall();
 
 	virtual bool operator()(const Position& startPos, const Position& testPos,
 	                        const FindPathParams& fpp, int32_t& bestMatchDist) const;
@@ -171,61 +155,28 @@ class Creature : public AutoID, virtual public Thing
 {
 protected:
 	Creature();
+	
 public:
 	virtual ~Creature();
 
-	virtual Creature* getCreature()
-	{
-		return this;
-	};
-	virtual const Creature* getCreature()const
-	{
-		return this;
-	};
-	virtual Player* getPlayer()
-	{
-		return NULL;
-	};
-	virtual const Player* getPlayer() const
-	{
-		return NULL;
-	};
-	virtual Npc* getNpc()
-	{
-		return NULL;
-	};
-	virtual const Npc* getNpc() const
-	{
-		return NULL;
-	};
-	virtual Monster* getMonster()
-	{
-		return NULL;
-	};
-	virtual const Monster* getMonster() const
-	{
-		return NULL;
-	};
-
+	virtual Creature* getCreature();
+	virtual const Creature* getCreature()const;
+	virtual Player* getPlayer();
+	virtual const Player* getPlayer() const;
+	virtual Npc* getNpc();
+	virtual const Npc* getNpc() const;
+	virtual Monster* getMonster();
+	virtual const Monster* getMonster() const;
 	virtual const std::string& getName() const = 0;
 	virtual const std::string& getNameDescription() const = 0;
 	virtual std::string getXRayDescription() const;
 	virtual std::string getDescription(const int32_t& lookDistance) const;
 
-	void setID()
-	{
-		this->id = auto_id | this->idRange();
-	}
-	void setRemoved()
-	{
-		isInternalRemoved = true;
-	}
-
+	void setID();	
+	const uint32_t& getID() const;
+	
+	void setRemoved();
 	virtual uint32_t idRange() = 0;
-	uint32_t getID() const
-	{
-		return id;
-	}
 	virtual void removeList() = 0;
 	virtual void addList() = 0;
 	virtual void onRemoved();
@@ -235,148 +186,42 @@ public:
 	virtual bool canBeSeen(const Creature* viewer, bool checkVisibility = true) const;
 	virtual bool canWalkthrough(const Creature* creature) const;
 
-	virtual RaceType_t getRace() const
-	{
-		return RACE_NONE;
-	}
-	Direction getDirection() const
-	{
-		return direction;
-	}
-	void setDirection(Direction dir)
-	{
-		direction = dir;
-	}
-
-	const Position& getMasterPos() const
-	{
-		return masterPos;
-	}
-	virtual void setMasterPos(const Position& pos, uint32_t radius = 1)
-	{
-		masterPos = pos;
-		masterRadius = radius;
-	}
-
-	virtual int getThrowRange() const
-	{
-		return 1;
-	};
-	virtual bool isPushable() const
-	{
-		return (getWalkDelay() <= 0);
-	};
+	virtual RaceType_t getRace() const;
+	const Direction& getDirection() const;
+	void setDirection(const Direction& dir);
+	const Position& getMasterPos() const;
+	virtual void setMasterPos(const Position& pos, const uint32_t& radius = 1);
+	virtual int getThrowRange() const;
+	virtual bool isPushable() const;
 	virtual bool canBePushedBy(const Player* player) const;
-	virtual bool isRemoved() const
-	{
-		return isInternalRemoved;
-	};
-	virtual bool canSeeInvisibility() const
-	{
-		return false;
-	}
+	virtual bool isRemoved() const;
+	virtual bool canSeeInvisibility() const;
 
-	int32_t getWalkDelay(Direction dir) const;
+	int32_t getWalkDelay(const Direction& dir) const;
 	int32_t getWalkDelay() const;
 	int64_t getTimeSinceLastMove() const;
 
 	int64_t getEventStepTicks(bool onlyDelay = false) const;
-	int32_t getStepDuration(Direction dir) const;
+	int32_t getStepDuration(const Direction& dir) const;
 	int32_t getStepDuration() const;
-	virtual int32_t getStepSpeed() const
-	{
-		return getSpeed();
-	}
-	int32_t getSpeed() const
-	{
-		return getBaseSpeed() + varSpeed;
-	}
-	void setSpeed(int32_t varSpeedDelta)
-	{
-		int32_t oldSpeed = getSpeed();
-		varSpeed = varSpeedDelta;
+	virtual int32_t getStepSpeed() const;
+	int32_t getSpeed() const;
+	void setSpeed(const int32_t& varSpeedDelta);
 
-		if (getSpeed() <= 0)
-		{
-			stopEventWalk();
-			cancelNextWalk = true;
-		}
-		else if (oldSpeed <= 0 && !listWalkDir.empty())
-		{
-			addEventWalk();
-		}
-	}
+	void setBaseSpeed(const uint32_t& newBaseSpeed);
+	const uint32_t& getBaseSpeed() const;
 
-	void setBaseSpeed(uint32_t newBaseSpeed)
-	{
-		baseSpeed = newBaseSpeed;
-	}
-	uint32_t getBaseSpeed() const
-	{
-		return baseSpeed;
-	}
+	virtual int32_t getHealth() const;
+	virtual int32_t getMaxHealth() const;
+	virtual int32_t getMana() const;
+	virtual int32_t getMaxMana() const;
+	virtual bool hasHiddenHealth() const;
 
-	virtual int32_t getHealth() const
-	{
-		if (health < 0)
-		{
-			return 0;
-		}
-
-		return health;
-	}
-	virtual int32_t getMaxHealth() const
-	{
-		if (healthMax < 0)
-		{
-			return 0;
-		}
-
-		return healthMax;
-	}
-	virtual int32_t getMana() const
-	{
-		if (mana < 0)
-		{
-			return 0;
-		}
-
-		return mana;
-	}
-	virtual int32_t getMaxMana() const
-	{
-		if (manaMax < 0)
-		{
-			return 0;
-		}
-
-		return manaMax;
-	}
-	virtual bool hasHiddenHealth() const
-	{
-		return false;
-	}
-
-	const Outfit_t getCurrentOutfit() const
-	{
-		return currentOutfit;
-	}
-	void setCurrentOutfit(Outfit_t outfit)
-	{
-		currentOutfit = outfit;
-	}
-	const Outfit_t getDefaultOutfit() const
-	{
-		return defaultOutfit;
-	}
-	bool isInvisible() const
-	{
-		return hasCondition(CONDITION_INVISIBLE, false);
-	}
-	ZoneType_t getZone() const
-	{
-		return getTile()->getZone();
-	}
+	const Outfit_t& getCurrentOutfit() const;
+	void setCurrentOutfit(const Outfit_t& outfit);
+	const Outfit_t& getDefaultOutfit() const;
+	bool isInvisible() const;
+	ZoneType_t getZone() const;
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -386,260 +231,158 @@ public:
 
 	//walk events
 	virtual void onWalk(Direction& dir);
-	virtual void onWalkAborted() {};
-	virtual void onWalkComplete() {};
+	virtual void onWalkAborted();
+	virtual void onWalkComplete();
 
 	//follow functions
-	virtual Creature* getFollowCreature() const
-	{
-		return followCreature;
-	};
+	virtual Creature* getFollowCreature() const;
 	virtual bool setFollowCreature(Creature* creature, bool fullPathSearch = false);
 
 	//follow events
-	virtual void onFollowCreature(const Creature* creature) {};
-	virtual void onFollowCreatureComplete(const Creature* creature) {};
+	virtual void onFollowCreature(const Creature* creature);
+	virtual void onFollowCreatureComplete(const Creature* creature);
 
 	//combat functions
-	Creature* getAttackedCreature()
-	{
-		return attackedCreature;
-	}
+	Creature* getAttackedCreature();
+	
 	virtual bool setAttackedCreature(Creature* creature);
-	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
-	                             bool checkDefense = false, bool checkArmor = false);
+	virtual BlockType_t blockHit(Creature* attacker, const CombatType_t& combatType,
+		int32_t& damage, bool checkDefense = false, bool checkArmor = false);
 
-	void setMaster(Creature* creature)
-	{
-		master = creature;
-	}
-	Creature* getMaster()
-	{
-		return master;
-	}
-	bool isSummon() const
-	{
-		return master;
-	}
-	bool isPlayerSummon() const
-	{
-		return master && master->getPlayer();
-	}
-	Player* getPlayerMaster() const
-	{
-		return (isPlayerSummon() ? master->getPlayer() : NULL);
-	}
-	Player* getPlayerInCharge()
-	{
-		return (getPlayer() ? getPlayer() : getPlayerMaster());
-	}
-	const Player* getPlayerInCharge() const
-	{
-		return (getPlayer() ? getPlayer() : getPlayerMaster());
-	}
-	const Creature* getMaster() const
-	{
-		return master;
-	}
+	void setMaster(Creature* creature);
+	Creature* getMaster();
+	bool isSummon() const;
+	bool isPlayerSummon() const;
+	Player* getPlayerMaster() const;
+	Player* getPlayerInCharge();
+	const Player* getPlayerInCharge() const;
+	const Creature* getMaster() const;
 
 	virtual void addSummon(Creature* creature);
 	virtual void removeSummon(const Creature* creature);
 	void destroySummons();
-	const std::list<Creature*>& getSummons()
-	{
-		return summons;
-	}
-
-	virtual int32_t getArmor() const
-	{
-		return 0;
-	}
-	virtual int32_t getDefense() const
-	{
-		return 0;
-	}
-	virtual float getAttackFactor() const
-	{
-		return 1.0f;
-	}
-	virtual float getDefenseFactor() const
-	{
-		return 1.0f;
-	}
+	const std::list<Creature*>& getSummons();
+	virtual int32_t getArmor() const;
+	virtual int32_t getDefense() const;
+	virtual float getAttackFactor() const;
+	virtual float getDefenseFactor() const;
 
 	bool addCondition(Condition* condition);
 	bool addCombatCondition(Condition* condition);
-	void removeCondition(ConditionType_t type, ConditionId_t id);
-	void removeCondition(ConditionType_t type);
+	void removeCondition(const ConditionType_t& type, const ConditionId_t& id);
+	void removeCondition(const ConditionType_t& type);
 	void removeCondition(Condition* condition);
-	void removeCondition(const Creature* attacker, ConditionType_t type);
-	Condition* getCondition(ConditionType_t type, ConditionId_t id, uint32_t subId) const;
-	void executeConditions(uint32_t interval);
-	bool hasCondition(ConditionType_t type, bool checkTime = true) const;
-	virtual bool isImmune(ConditionType_t type, bool aggressive = true) const;
-	virtual bool isImmune(CombatType_t type) const;
-	virtual bool isSuppress(ConditionType_t type) const;
+	void removeCondition(const Creature* attacker, const ConditionType_t& type);
+	Condition* getCondition(const ConditionType_t& type, const ConditionId_t& id, const uint32_t& subId) const;
+	void executeConditions(const uint32_t& interval);
+	bool hasCondition(const ConditionType_t& type, bool checkTime = true) const;
+	virtual bool isImmune(const ConditionType_t& type, bool aggressive = true) const;
+	virtual bool isImmune(const CombatType_t& type) const;
+	virtual bool isSuppress(const ConditionType_t& type) const;
 	virtual const uint32_t& getDamageImmunities() const;
 	virtual const uint32_t& getConditionImmunities() const;
 	virtual const uint32_t& getConditionSuppressions() const;
-	virtual bool isAttackable() const
-	{
-		return true;
-	}
-	virtual void changeHealth(int32_t healthChange);
-	virtual void changeMana(int32_t manaChange);
+	virtual bool isAttackable() const;
+	virtual void changeHealth(const int32_t& healthChange);
+	virtual void changeMana(const int32_t& manaChange);
 
-	virtual void gainHealth(Creature* caster, int32_t healthGain);
-	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t points);
+	virtual void gainHealth(Creature* caster, const int32_t& healthGain);
+	virtual void drainHealth(Creature* attacker, const CombatType_t& combatType, const int32_t& damage);
+	virtual void drainMana(Creature* attacker, const int32_t& points);
 
-	virtual bool challengeCreature(Creature* creature)
-	{
-		return false;
-	};
-	virtual bool convinceCreature(Creature* creature)
-	{
-		return false;
-	};
+	virtual bool challengeCreature(Creature* creature);
+	virtual bool convinceCreature(Creature* creature);
 
 	virtual void onDie();
 	virtual void die();
 
 	virtual uint64_t getGainedExperience(Creature* attacker) const;
-	void addDamagePoints(Creature* attacker, int32_t damagePoints);
-	void addHealPoints(Creature* caster, int32_t healthPoints);
-	bool hasBeenAttacked(uint32_t attackerId) const;
+	void addDamagePoints(Creature* attacker, const int32_t& damagePoints);
+	void addHealPoints(Creature* caster, const int32_t& healthPoints);
+	bool hasBeenAttacked(const uint32_t& attackerId) const;
 
 	//combat event functions
-	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
-	virtual void onAddCombatCondition(ConditionType_t type, bool hadCondition);
-	virtual void onEndCondition(ConditionType_t type, bool lastCondition);
-	virtual void onTickCondition(ConditionType_t type, int32_t interval, bool& bRemove);
+	virtual void onAddCondition(const ConditionType_t& type, bool hadCondition);
+	virtual void onAddCombatCondition(const ConditionType_t& type, bool hadCondition);
+	virtual void onEndCondition(const ConditionType_t& type, bool lastCondition);
+	virtual void onTickCondition(const ConditionType_t& type, const int32_t& interval, bool& bRemove);
 	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
-	virtual void onAttackedCreature(Creature* target) {};
-	virtual void onSummonAttackedCreature(Creature* summon, Creature* target) {};
-	virtual void onAttacked() {};
-	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
-	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points) {};
-	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points) {};
-	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points) {};
-	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
+	virtual void onAttackedCreature(Creature* target);
+	virtual void onSummonAttackedCreature(Creature* summon, Creature* target);
+	virtual void onAttacked();
+	virtual void onAttackedCreatureDrainHealth(Creature* target, const int32_t& points);
+	virtual void onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, const int32_t& points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, const int32_t& points);
+	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, const int32_t& points);
+	virtual void onTargetCreatureGainHealth(Creature* target, const int32_t& points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target, bool lastHit);
-	virtual void onGainExperience(uint64_t gainExp, bool fromMonster);
-	virtual void onGainSharedExperience(uint64_t gainExp, bool fromMonster);
-	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
-	virtual void onBlockHit(BlockType_t blockType);
-	virtual void onChangeZone(ZoneType_t zone);
-	virtual void onAttackedCreatureChangeZone(ZoneType_t zone);
+	virtual void onGainExperience(const uint64_t& gainExp, bool fromMonster);
+	virtual void onGainSharedExperience(const uint64_t& gainExp, bool fromMonster);
+	virtual void onAttackedCreatureBlockHit(Creature* target, const BlockType_t& blockType);
+	virtual void onBlockHit(const BlockType_t& blockType);
+	virtual void onChangeZone(const ZoneType_t& zone);
+	virtual void onAttackedCreatureChangeZone(const ZoneType_t& zone);
 	virtual void onIdleStatus();
 
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
-	void setCreatureLight(LightInfo& light)
-	{
-		internalLight = light;
-	}
+	void setCreatureLight(const LightInfo& light);
 
-	virtual void onThink(uint32_t interval);
-	virtual void onAttacking(uint32_t interval);
+	virtual void onThink(const uint32_t& interval);
+	virtual void onAttacking(const uint32_t& interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 
 	virtual void onAddTileItem(const Tile* tile, const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Tile* tile, const Position& pos,
-	                              const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
+		const Item* oldItem, const ItemType& oldType, const Item* newItem, const ItemType& newType);
 	virtual void onRemoveTileItem(const Tile* tile, const Position& pos,
-	                              const ItemType& iType, const Item* item);
+		const ItemType& iType, const Item* item);
 	virtual void onUpdateTile(const Tile* tile, const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-	                            const Tile* oldTile, const Position& oldPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Tile* newTile,
+		const Position& newPos, const Tile* oldTile, const Position& oldPos, bool teleport);
 
-	virtual void onAttackedCreatureDissapear(bool isLogout) {};
-	virtual void onFollowCreatureDissapear(bool isLogout) {};
+	virtual void onAttackedCreatureDissapear(bool isLogout);
+	virtual void onFollowCreatureDissapear(bool isLogout);
 
-	virtual void onCreatureTurn(const Creature* creature) { };
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
+	virtual void onCreatureTurn(const Creature* creature);
+	virtual void onCreatureSay(const Creature* creature, const SpeakClasses& type, const std::string& text);
 
-	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
-	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature) {};
+	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
+	virtual void onCreatureConvinced(const Creature* convincer, const Creature* creature);
 	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
-	virtual void onPlacedCreature() {};
-	virtual void onRemovedCreature() {};
+	virtual void onPlacedCreature();
+	virtual void onRemovedCreature();
 
-	virtual WeaponType_t getWeaponType()
-	{
-		return WEAPON_NONE;
-	}
-	virtual bool getCombatValues(int32_t& min, int32_t& max)
-	{
-		return false;
-	}
-
-	size_t getSummonCount() const
-	{
-		return summons.size();
-	}
-	uint32_t getSummonCount(const std::string& _type)
-	{
-		uint32_t count = 0;
-		const std::list<Creature*>& summons = getSummons();
-		std::list<Creature*>::const_iterator it = summons.begin();
-
-		for (; it != summons.end(); ++it)
-			if ((*it)->getName() == _type)
-			{
-				count++;
-			}
-
-		return count;
-	};
-	void setDropLoot(bool _lootDrop)
-	{
-		lootDrop = _lootDrop;
-	}
-	void setLossSkill(bool _skillLoss)
-	{
-		skillLoss = _skillLoss;
-	}
+	virtual WeaponType_t getWeaponType();
+	virtual bool getCombatValues(int32_t& min, int32_t& max);
+	size_t getSummonCount() const;
+	uint32_t getSummonCount(const std::string& _type);
+	void setDropLoot(bool _lootDrop);
+	void setLossSkill(bool _skillLoss);
 
 	//creature script events
 	bool registerCreatureEvent(const std::string& name);
 
-	virtual void setParent(Cylinder* cylinder)
-	{
-		_tile = dynamic_cast<Tile*>(cylinder);
-		Thing::setParent(cylinder);
-	}
-
-	virtual const Position& getPosition() const
-	{
-		return _tile->getTilePosition();
-	}
-	virtual Tile* getTile()
-	{
-		return _tile;
-	}
-	virtual const Tile* getTile() const
-	{
-		return _tile;
-	}
+	virtual void setParent(Cylinder* cylinder);
+	virtual const Position& getPosition() const;
+	virtual Tile* getTile();
+	virtual const Tile* getTile() const;
 	int32_t getWalkCache(const Position& pos) const;
 
-	static bool canSee(const Position& myPos, const Position& pos, uint32_t viewRangeX, uint32_t viewRangeY);
+	static bool canSee(const Position& myPos, const Position& pos,
+		const uint32_t& viewRangeX, const uint32_t& viewRangeY);
 
 protected:
 	static const int32_t mapWalkWidth = Map::maxViewportX * 2 + 1;
 	static const int32_t mapWalkHeight = Map::maxViewportY * 2 + 1;
 	bool localMapCache[mapWalkHeight][mapWalkWidth];
 
-	virtual bool useCacheMap() const
-	{
-		return false;
-	}
+	virtual bool useCacheMap() const;
 
 	Tile* _tile;
 	uint32_t id;
@@ -701,14 +444,11 @@ protected:
 	uint32_t blockTicks;
 
 	//creature script events
-	bool hasEventRegistered(CreatureEventType_t event)
-	{
-		return (0 != (scriptEventsBitField & ((uint32_t)1 << event)));
-	}
+	bool hasEventRegistered(const CreatureEventType_t& event);
 	uint32_t scriptEventsBitField;
 	typedef std::list<CreatureEvent*> CreatureEventList;
 	CreatureEventList eventsList;
-	CreatureEventList getCreatureEvents(CreatureEventType_t type);
+	CreatureEventList getCreatureEvents(const CreatureEventType_t& type);
 	void onDieEvent(Item* corpse);
 	void onKillEvent(Creature* target, bool lastHit);
 
@@ -717,22 +457,15 @@ protected:
 	void validateMapCache();
 #endif
 	void updateTileCache(const Tile* tile);
-	void updateTileCache(const Tile* tile, int32_t dx, int32_t dy);
+	void updateTileCache(const Tile* tile, const int32_t& dx, const int32_t& dy);
 	void updateTileCache(const Tile* tile, const Position& pos);
 	void internalCreatureDisappear(const Creature* creature, bool isLogout);
-	virtual void doAttacking(uint32_t interval) {};
-	virtual bool hasExtraSwing()
-	{
-		return false;
-	}
-
-	virtual uint64_t getLostExperience() const
-	{
-		return 0;
-	};
+	virtual void doAttacking(const uint32_t& interval);
+	virtual bool hasExtraSwing();
+	virtual uint64_t getLostExperience() const;
 	virtual double getDamageRatio(Creature* attacker) const;
-	DeathList getKillers(int32_t assist_count = 1);
-	virtual void dropLoot(Container* corpse) {};
+	DeathList getKillers(const int32_t& assist_count = 1);
+	virtual void dropLoot(Container* corpse);
 	virtual const uint16_t& getLookCorpse() const;
 	virtual void getPathSearchParams(const Creature* creature, FindPathParams& fpp) const;
 	virtual Item* dropCorpse();

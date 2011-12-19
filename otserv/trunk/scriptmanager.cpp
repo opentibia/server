@@ -54,9 +54,10 @@ ScriptingManager::ScriptingManager()
 	g_globalEvents = new GlobalEvents();
 }
 
-ScriptingManager::~ScriptingManager()
+ScriptingManager* ScriptingManager::getInstance()
 {
-	//
+	static ScriptingManager instance;
+	return &instance;
 }
 
 bool ScriptingManager::loadScriptSystems()

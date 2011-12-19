@@ -73,7 +73,7 @@ public:
 	virtual int32_t getDefense() const;
 	virtual bool isPushable() const;
 	virtual bool isAttackable() const;
-	virtual bool isImmune(CombatType_t type) const;
+	virtual bool isImmune(const CombatType_t& type) const;
 
 	bool canPushItems() const;
 	bool canPushCreatures() const;
@@ -85,22 +85,22 @@ public:
 	virtual void onAttackedCreatureDissapear(bool isLogout);
 	virtual void onFollowCreatureDissapear(bool isLogout);
 	virtual void onAttackedCreature(Creature* target);
-	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
-	virtual void onAttackedCreatureDrainMana(Creature* target, int32_t points);
+	virtual void onAttackedCreatureDrainHealth(Creature* target, const int32_t& points);
+	virtual void onAttackedCreatureDrainMana(Creature* target, const int32_t& points);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Tile* newTile, const Position& newPos,
-	                            const Tile* oldTile, const Position& oldPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Tile* newTile,
+		const Position& newPos, const Tile* oldTile, const Position& oldPos, bool teleport);
 
-	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
-	virtual void changeHealth(int32_t healthChange);
+	virtual void drainHealth(Creature* attacker, const CombatType_t& combatType, const int32_t& damage);
+	virtual void changeHealth(const int32_t& healthChange);
 
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir, uint32_t& flags);
 	virtual void onFollowCreatureComplete(const Creature* creature);
 
-	virtual void onThink(uint32_t interval);
+	virtual void onThink(const uint32_t& interval);
 
 	virtual bool challengeCreature(Creature* creature);
 	virtual bool convinceCreature(Creature* creature);
@@ -108,10 +108,10 @@ public:
 	virtual void setNormalCreatureLight();
 	virtual bool getCombatValues(int32_t& min, int32_t& max);
 
-	virtual void doAttacking(uint32_t interval);
+	virtual void doAttacking(const uint32_t& interval);
 	virtual bool hasExtraSwing();
 
-	bool searchTarget(TargetSearchType_t searchType = TARGETSEARCH_DEFAULT);
+	bool searchTarget(const TargetSearchType_t& searchType = TARGETSEARCH_DEFAULT);
 	bool selectTarget(Creature* creature);
 
 	const CreatureList& getTargetList();
@@ -125,8 +125,8 @@ public:
 
 	virtual bool hasHiddenHealth() const;
 
-	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
-	                             bool checkDefense = false, bool checkArmor = false);
+	virtual BlockType_t blockHit(Creature* attacker, const CombatType_t& combatType,
+		int32_t& damage, bool checkDefense = false, bool checkArmor = false);
 
 private:
 	CreatureList targetList;
@@ -178,21 +178,21 @@ private:
 
 	bool canUseAttack(const Position& pos, const Creature* target) const;
 	bool canUseSpell(const Position& pos, const Position& targetPos,
-	                 const spellBlock_t& sb, uint32_t interval, bool& inRange);
+		const spellBlock_t& sb, const uint32_t& interval, bool& inRange);
 	bool getRandomStep(const Position& creaturePos, Direction& dir);
 	bool getDanceStep(const Position& creaturePos, Direction& dir,
-	                  bool keepAttack = true, bool keepDistance = true);
+		bool keepAttack = true, bool keepDistance = true);
 	bool isInSpawnRange(const Position& toPos);
-	bool canWalkTo(Position pos, Direction dir);
+	bool canWalkTo(const Position& pos, const Direction& dir);
 
-	bool pushItem(Item* item, int32_t radius);
+	bool pushItem(Item* item, const int32_t& radius);
 	void pushItems(Tile* tile);
 	bool pushCreature(Creature* creature);
 	void pushCreatures(Tile* tile);
 
-	void onThinkTarget(uint32_t interval);
-	void onThinkYell(uint32_t interval);
-	void onThinkDefense(uint32_t interval);
+	void onThinkTarget(const uint32_t& interval);
+	void onThinkYell(const uint32_t& interval);
+	void onThinkDefense(const uint32_t& interval);
 
 	bool isFriend(const Creature* creature);
 	bool isOpponent(const Creature* creature);
