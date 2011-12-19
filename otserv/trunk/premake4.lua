@@ -1,34 +1,93 @@
 
-solution "Otserv"
+-- Visual Studio libraries directories
+local vs_libdirs = 
+	{
+		"$(BOOST_LIB_PATH)",
+		"$(GMP_LIB_PATH)",
+		"$(LIBXML_LIB_PATH)",
+		"$(MYSQL_LIB_PATH)",
+		"$(SQLITE_LIB_PATH)",
+		"$(PSQL_LIB_PATH)",
+		"$(LUA_LIB_PATH)"
+	}
+	
+-- Visual Studio includes directories
+local vs_includedirs =
+	{
+		"$(BOOST_INCLUDE_PATH)",
+		"$(GMP_INCLUDE_PATH)",
+		"$(LIBXML_INCLUDE_PATH)",
+		"$(MYSQL_INCLUDE_PATH)",
+		"$(SQLITE_INCLUDE_PATH)",
+		"$(PSQL_INCLUDE_PATH)",
+		"$(LUA_INCLUDE_PATH)"
+	}
+	
+-- Visual Studio preprocessor definitions
+local vs_defines =
+	{
+		"_WIN32_WINNT=0x0501",
+		"_CRT_SECURE_NO_DEPRECATE",
+		"_CRT_SECURE_NO_WARNINGS",
+		"_CRT_NON_CONFORMING_SWPRINTFS",
+		"NOMINMAX"
+	}
+	
+-- Build options
+local options =
+	{
+		"mysql",
+		"sqlite",
+		"postgre",
+		"odbc"
+	}
+
+solution "otserv"
 	configurations { "Release", "Debug" }
 	
-project "Otserv"
+project "otserv"
 	targetname "otserv"
 	language "C++"
 	kind "ConsoleApp"
-	
-	files { "*.cpp", "*.h" }
+	location "build"
+	files
+	{
+		"*.cpp",
+		"*.h"
+	}
 	
 	configuration "Release"
 		targetdir "build/release"
-		defines "NDEBUG"
-		flags { "Optmize" }
-		
-	configuration "Debug"
-		targedit "build/debug"
-		defines "__DEBUG__"
-		flags { "Symbols" }
-		
-	configuration "vs*
-		defines 
+		flags
 		{
-			"_CRT_SECURE_NO_DEPRECATE",
-			"_CRT_SECURE_NO_WARNINGS",
-			"_CRT_NON_CONFORMING_SWPRINTFS",
-			"NOMINMAX"
+			"OptimizeSpeed",
+			"NoFramePointer",
+			-- SSE2 is present in any AMD/INTEL CPU since 2004. It
+			-- won't hurt anyone if enabled.
+			"EnableSSE2"
 		}
 		
-	configuration { "linux", "gmake" }
+	configuration "Debug"
+		targetdir "build/debug"
+		flags { "Symbols" }
+	
+	-- Configuration for Visual Studio projects
+	configuration { "vs* or windows" }
+		defines { vs_defines }
+		includedirs { vs_includedirs }
+		libdirs { vs_libdirs }
+	
+	-- Configurations built on top of GCC/G++
+	configuration { "linux or codelite or codeblocks or gmake" }
+		buildoptions
+		{
+			"-std=c++0x",
+			"-pedantic",
+			"-W",
+			"-Wall",
+			"-Wextra",
+			"-Wno-unused-parameter"			
+		}
 		links
 		{
 			"lua5.1",
@@ -40,4 +99,21 @@ project "Otserv"
 			"boost_thread",
 			"boost_regex"
 		}
+	
+	-- Mac OS X support for Xcode.
+	configuration { "macosx" }
+		links
+		{
+			"lua",
+			"xml2",
+			"mysqlclient",
+			"boost_thread-mt",
+			"boost_regex-mt",
+			"boost_system"
+		}
+		
+	-- Get rid of the build folder along with the generated files
+	if _ACTION == "clean" then
+		os.rmdir("build")
+	end
 
