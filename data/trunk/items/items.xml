@@ -2485,27 +2485,27 @@
 		<attribute key="weight" value="250"/>
 		<attribute key="pickupable" value="1"/>
 	</item>
-	<item id="2016" article="a" name="water splash">
+	<item id="2016" article="a" name="pool">
 		<attribute key="decayTo" value="2017"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="2017" article="a" name="water splash">
+	<item id="2017" article="a" name="pool">
 		<attribute key="decayTo" value="2018"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="2018" article="a" name="water splash">
+	<item id="2018" article="a" name="pool">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="600"/>
 	</item>
-	<item id="2019" article="a" name="water splash">
+	<item id="2019" article="a" name="pool">
 		<attribute key="decayTo" value="2020"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="2020" article="a" name="water splash">
+	<item id="2020" article="a" name="pool">
 		<attribute key="decayTo" value="2021"/>
 		<attribute key="duration" value="45"/>
 	</item>
-	<item id="2021" article="a" name="water splash">
+	<item id="2021" article="a" name="pool">
 		<attribute key="decayTo" value="0"/>
 		<attribute key="duration" value="60"/>
 	</item>

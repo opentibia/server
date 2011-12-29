@@ -61,7 +61,7 @@ project "otserv"
 		flags
 		{
 			"OptimizeSpeed",
-			"NoFramePointer",
+			--"NoFramePointer",
 			-- SSE2 is present in any AMD/INTEL CPU since 2004. It
 			-- won't hurt anyone if enabled.
 			"EnableSSE2"
