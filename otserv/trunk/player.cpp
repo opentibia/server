@@ -2115,12 +2115,12 @@ bool Player::hasShopItemForSale(const uint32_t& itemId, const uint8_t& subType)
 		{
 			const ItemType& iit = Item::items[itemId];
 
-			if (iit.isFluidContainer() || iit.isSplash())
-			{
-				return it->subType == subType;
+			if(iit.isFluidContainer() || iit.isSplash()){
+				if (it->subType == subType)
+					return true;
 			}
-
-			return true;
+			else
+				return true;
 		}
 	}
 

@@ -1,24 +1,10 @@
 local ITEM_RUM_FLASK = 5553
 local ITEM_POOL = 2016
 
-local TYPE_EMPTY = 0
-local TYPE_WATER = 1
-local TYPE_BLOOD = 2
-local TYPE_BEER = 3
-local TYPE_SLIME = 4
-local TYPE_MANA_FLUID = 7
-local TYPE_LIFE_FLUID = 10
-local TYPE_OIL = 11
-local TYPE_WINE = 15
-local TYPE_MUD = 19
-local TYPE_RUM = 27
-local TYPE_SWAMP = 28
-local TYPE_TEA = 35
-
 local oilLamps = {[2046] = 2044}
 
-local alcoholDrinks = {TYPE_BEER, TYPE_WINE, TYPE_RUM}
-local poisonDrinks = {TYPE_SLIME, TYPE_SWAMP}
+local alcoholDrinks = {FLUID_BEER, FLUID_WINE, FLUID_RUM, FLUID_MEAD}
+local poisonDrinks = {FLUID_SLIME}
 
 local drunk = createConditionObject(CONDITION_DRUNK)
 setConditionParam(drunk, CONDITION_PARAM_TICKS, 60000)
@@ -31,8 +17,25 @@ setConditionParam(poison, CONDITION_PARAM_STARTVALUE, -5) -- The damage the cond
 setConditionParam(poison, CONDITION_PARAM_TICKINTERVAL, 4000) -- Delay between damages
 setConditionParam(poison, CONDITION_PARAM_FORCEUPDATE, true) -- Re-update condition when adding it(ie. min/max value)
 
+
+local lifeFluidCombat = createCombatObject()
+setCombatParam(lifeFluidCombat, COMBAT_PARAM_TYPE, COMBAT_HEALING)
+setCombatParam(lifeFluidCombat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
+setCombatParam(lifeFluidCombat, COMBAT_PARAM_AGGRESSIVE, false)
+setCombatParam(lifeFluidCombat, COMBAT_PARAM_DISPEL, CONDITION_PARALYZE)
+
+function onGetLifeFluidFormulaValues(cid, level, maglevel)
+	return 40, 70
+end
+
+setCombatCallback(lifeFluidCombat, CALLBACK_PARAM_LEVELMAGICVALUE, "onGetLifeFluidFormulaValues")
+
+
 local exhaust = createConditionObject(CONDITION_EXHAUST_POTION)
 setConditionParam(exhaust, CONDITION_PARAM_TICKS, getConfigInfo('minactionexinterval'))
+
+
+
 
 function onUse(cid, item, frompos, item2, topos)
 	if(topos.x == 0 and topos.y == 0 and topos.z == 0) then
@@ -41,7 +44,7 @@ function onUse(cid, item, frompos, item2, topos)
 	end
 
 	if(item2.uid == cid) then -- Player is using on himself
-		if(item.type == TYPE_EMPTY) then
+		if(item.type == FLUID_NONE) then
 			doPlayerSendCancel(cid, "It is empty.")
 			return true
 		end
@@ -51,14 +54,14 @@ function onUse(cid, item, frompos, item2, topos)
 			return true
 		end
 
-		if(item.type == TYPE_MANA_FLUID) then
+		if(item.type == FLUID_MANA) then
 			if not doPlayerAddMana(cid, math.random(80, 160)) then
 				return false
 			end
 			doCreatureSay(cid, "Aaaah...", TALKTYPE_ORANGE_1)
 			doSendMagicEffect(topos, CONST_ME_MAGIC_BLUE)
-		elseif(item.type == TYPE_LIFE_FLUID) then
-			if not doPlayerAddHealth(cid, math.random(40, 75)) then
+		elseif(item.type == FLUID_LIFE) then
+			if not doCombat(cid, lifeFluidCombat, numberToVariant(cid)) then
 				return false
 			end
 			doCreatureSay(cid, "Aaaah...", TALKTYPE_ORANGE_1)
@@ -76,12 +79,12 @@ function onUse(cid, item, frompos, item2, topos)
 			doCreatureSay(cid, "Gulp.", TALKTYPE_ORANGE_1)
 		end
 		doAddCondition(cid, exhaust)
-		doChangeTypeItem(item.uid, TYPE_EMPTY)
+		doChangeTypeItem(item.uid, FLUID_NONE)
 		return true
 	end
 
 	if(isCreature(item2.uid) == false) then
-		if(item.type == TYPE_EMPTY) then
+		if(item.type == FLUID_NONE) then
 			if(item.itemid == ITEM_RUM_FLASK and isInArray(DISTILLERY, item2.itemid) ) then
 				if(item2.actionid == DISTILLERY_FULL) then
 					doSetItemSpecialDescription(item2.uid, '')
@@ -93,9 +96,9 @@ function onUse(cid, item, frompos, item2, topos)
 				return true
 			end
 
-			if(isItemFluidContainer(item2.itemid) and item2.type ~= TYPE_EMPTY) then
+			if(isItemFluidContainer(item2.itemid) and item2.type ~= FLUID_NONE) then
 				doChangeTypeItem(item.uid, item2.type)
-				doChangeTypeItem(item2.uid, TYPE_EMPTY)
+				doChangeTypeItem(item2.uid, FLUID_NONE)
 				return true
 			end
 
@@ -110,9 +113,9 @@ function onUse(cid, item, frompos, item2, topos)
 			return true
 		end
 
-		if(item.type == TYPE_OIL and oilLamps[item2.itemid] ~= nil) then
+		if(item.type == FLUID_OIL and oilLamps[item2.itemid] ~= nil) then
 			doTransformItem(item2.uid, oilLamps[item2.itemid])
-			doChangeTypeItem(item.uid, TYPE_NONE)
+			doChangeTypeItem(item.uid, FLUID_NONE)
 			return true
 		end
 
@@ -128,6 +131,6 @@ function onUse(cid, item, frompos, item2, topos)
 	local splash = doCreateItem(ITEM_POOL, item.type, topos)
 	doDecayItem(splash)
 
-	doChangeTypeItem(item.uid, TYPE_EMPTY)
+	doChangeTypeItem(item.uid, FLUID_NONE)
 	return true
 end

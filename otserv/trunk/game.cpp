@@ -483,12 +483,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos,
 
 			if (it.isFluidContainer())
 			{
-				int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
-
-				if (index < maxFluidType)
-				{
-					subType = reverseFluidMap[index];
-				}
+				subType = index;
 			}
 
 			return findItemOfType(player, it.id, true, subType);
@@ -3763,18 +3758,8 @@ bool Game::playerPurchaseItem(const uint32_t& playerId, const uint16_t& spriteId
 
 	uint8_t subType = 0;
 
-	if (it.isFluidContainer())
-	{
-		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
-
-		if (count < maxFluidType)
-		{
-			subType = (uint8_t)reverseFluidMap[count];
-		}
-	}
-	else
-	{
-		subType = count;
+	if(it.isFluidContainer()){
+		subType = ItemType::getFluidTypeFromClientType(ClientFluidTypes_t(count));
 	}
 
 	if (!player->hasShopItemForSale(it.id, subType))
@@ -3813,19 +3798,8 @@ bool Game::playerSellItem(const uint32_t& playerId, const uint16_t& spriteId,
 	}
 
 	uint8_t subType = 0;
-
-	if (it.isFluidContainer())
-	{
-		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
-
-		if (count < maxFluidType)
-		{
-			subType = (uint8_t)reverseFluidMap[count];
-		}
-	}
-	else
-	{
-		subType = count;
+	if(it.isFluidContainer()){
+		subType = ItemType::getFluidTypeFromClientType(ClientFluidTypes_t(count));
 	}
 
 	merchant->onPlayerTrade(player, SHOPEVENT_SELL, onSell, it.id, subType, amount, ignoreEquipped, false);
@@ -5112,7 +5086,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 							case RACE_VENOM:
 								textColor = TEXTCOLOR_LIGHTGREEN;
 								hitEffect = NM_ME_POISON;
-								splash = Item::CreateItem(ITEM_SMALLSPLASH, FLUID_GREEN);
+								splash = Item::CreateItem(ITEM_SMALLSPLASH, FLUID_SLIME);
 								break;
 							case RACE_BLOOD:
 								textColor = TEXTCOLOR_RED;

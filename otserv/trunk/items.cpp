@@ -122,22 +122,106 @@ ItemType::~ItemType()
 	delete condition;
 }
 
+
+// the proper way to implement this would be to use ClientFluidTypes_t only, but that would break compatibility with
+// old scripts, so we instead will use the old FluidTypes_t and these functions,
+// which maps the oldTypes into the new ones (and vice-versa)
+ClientFluidTypes_t ItemType::getClientFluidType(FluidTypes_t f)
+{
+	switch(f){
+		case FLUID_EMPTY:
+			return CFLUID_EMPTY;
+		case FLUID_WATER:
+			return CFLUID_WATER;
+		case FLUID_BLOOD:
+			return CFLUID_BLOOD;
+		case FLUID_BEER:
+			return CFLUID_BEER;
+		case FLUID_SLIME:
+			return CFLUID_SLIME;
+		case FLUID_LEMONADE:
+			return CFLUID_LEMONADE;
+		case FLUID_MILK:
+			return CFLUID_MILK;
+		case FLUID_MANA:
+			return CFLUID_MANA;
+		case FLUID_LIFE:
+			return CFLUID_LIFE;
+		case FLUID_OIL:
+			return CFLUID_OIL;
+		case FLUID_URINE:
+			return CFLUID_URINE;
+		case FLUID_COCONUTMILK:
+			return CFLUID_COCONUTMILK;
+		case FLUID_WINE:
+			return CFLUID_WINE;
+		case FLUID_MUD:
+			return CFLUID_MUD;
+		case FLUID_FRUITJUICE:
+			return CFLUID_FRUITJUICE;
+		case FLUID_RUM:
+			return CFLUID_RUM;
+		case FLUID_TEA:
+			return CFLUID_TEA;
+		case FLUID_MEAD:
+			return CFLUID_MEAD;
+	    default:
+			//perharps we should print a warning message here?
+			return CFLUID_EMPTY;
+	}
+}
+
+FluidTypes_t ItemType::getFluidTypeFromClientType(ClientFluidTypes_t c)
+{
+	switch(c){
+		case CFLUID_EMPTY:
+			return FLUID_EMPTY;
+		case CFLUID_WATER:
+			return FLUID_WATER;
+		case CFLUID_BLOOD:
+			return FLUID_BLOOD;
+		case CFLUID_BEER:
+			return FLUID_BEER;
+		case CFLUID_SLIME:
+			return FLUID_SLIME;
+		case CFLUID_LEMONADE:
+			return FLUID_LEMONADE;
+		case CFLUID_MILK:
+			return FLUID_MILK;
+		case CFLUID_MANA:
+			return FLUID_MANA;
+		case CFLUID_LIFE:
+			return FLUID_LIFE;
+		case CFLUID_OIL:
+			return FLUID_OIL;
+		case CFLUID_URINE:
+			return FLUID_URINE;
+		case CFLUID_COCONUTMILK:
+			return FLUID_COCONUTMILK;
+		case CFLUID_WINE:
+			return FLUID_WINE;
+		case CFLUID_MUD:
+			return FLUID_MUD;
+		case CFLUID_FRUITJUICE:
+			return FLUID_FRUITJUICE;
+		case CFLUID_RUM:
+			return FLUID_RUM;
+		case CFLUID_TEA:
+			return FLUID_TEA;
+		case CFLUID_MEAD:
+			return FLUID_MEAD;
+	    default:
+			//perharps we should print a warning message here?
+			return FLUID_EMPTY;
+	}
+}
+
 std::string ItemType::getDescription(uint8_t count) const
 {
-	int32_t subType = 0;
+	int32_t subType = count;
 
-	if (isFluidContainer())
-	{
-		int32_t maxFluidType = sizeof(reverseFluidMap) / sizeof(uint8_t);
-
-		if (count < maxFluidType)
-		{
-			subType = reverseFluidMap[count];
-		}
-	}
-	else
-	{
-		subType = count;
+	if(isFluidContainer()){
+		subType = ItemType::getFluidTypeFromClientType(ClientFluidTypes_t(count));
 	}
 
 	return Item::getDescription(*this, 1, NULL, subType);
@@ -937,17 +1021,9 @@ bool Items::loadFromXml(const std::string& datadir)
 								{
 									it.fluidSource = FLUID_FRUITJUICE;
 								}
-								else if (asLowerCaseString(strValue) == "lava")
-								{
-									it.fluidSource = FLUID_LAVA;
-								}
 								else if (asLowerCaseString(strValue) == "rum")
 								{
 									it.fluidSource = FLUID_RUM;
-								}
-								else if (asLowerCaseString(strValue) == "swamp")
-								{
-									it.fluidSource = FLUID_SWAMP;
 								}
 								else
 								{

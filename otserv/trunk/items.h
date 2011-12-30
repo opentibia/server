@@ -152,6 +152,9 @@ public:
 	bool isBed() const;
 	bool isLevelDoor() const;
 
+	static ClientFluidTypes_t getClientFluidType(FluidTypes_t f);
+	static FluidTypes_t getFluidTypeFromClientType(ClientFluidTypes_t f);
+
 	Direction bedPartnerDir;
 	uint16_t maleSleeperID;
 	uint16_t femaleSleeperID;
