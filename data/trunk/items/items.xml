@@ -71,7 +71,6 @@
 		<attribute key="description" value="It seems to be inactive."/>
 	</item>
 	<item id="389" article="a" name="lava hole">
-		<attribute key="fluidsource" value="lava"/>
 		<attribute key="description" value="It emits heat and light."/>
 	</item>
 	<item id="390" name="stalagmites"/>
