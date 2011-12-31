@@ -2120,6 +2120,10 @@ std::string Item::getDescription(const ItemType& it, const int32_t& lookDistance
 	{
 		s << std::endl << it.description;
 	}
+	else if(it.isFluidContainer() && subType > 0 && items[subType].description.length() && lookDistance <= 1)
+	{
+		s << std::endl << items[subType].description;
+	}
 
 	return s.str();
 }
