@@ -144,6 +144,17 @@ ChatChannel::~ChatChannel()
 	// Virtual Destructor
 }
 
+bool ChatChannel::isUserIn(Player* player)
+{
+	UsersMap::iterator it = m_users.find(player->getID());
+	if (it != m_users.end())
+	{
+		return true;
+	}
+	
+	return false;
+}
+
 bool ChatChannel::addUser(Player* player)
 {
 	UsersMap::iterator it = m_users.find(player->getID());

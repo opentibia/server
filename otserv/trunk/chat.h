@@ -51,6 +51,7 @@ public:
 	ChatChannel(const uint16_t& channelId, const std::string& channelName);
 	virtual ~ChatChannel();
 
+	bool isUserIn(Player* player);
 	bool addUser(Player* player);
 	bool removeUser(Player* player, bool sendCloseChannel = false);
 

@@ -2545,15 +2545,14 @@ bool Game::playerOpenChannel(const uint32_t& playerId, const uint16_t& channelId
 	{
 		return false;
 	}
-
-	if (!g_chat.addUserToChannel(player, channelId))
+	
+	ChatChannel* channel = g_chat.getChannel(player, channelId);
+	if (!channel)
 	{
 		return false;
 	}
 
-	ChatChannel* channel = g_chat.getChannel(player, channelId);
-
-	if (!channel)
+	if (!channel->isUserIn(player) && !channel->addUser(player)) //isUserIn will be called first and if it checks (false) then addUser will be called - if player is already added we don't have to add him again, let's just send him a channel open.
 	{
 		return false;
 	}
