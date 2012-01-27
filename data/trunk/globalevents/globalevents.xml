@@ -5,9 +5,16 @@
 	
 	<!--
 	EXAMPLES
-	<globalevent name="something" interval="20000" script="something.lua"/>  -- execute script every 20 seconds the interval is in ms , 1sec = 1000ms .
+	execute something.lua every 20 seconds the interval is in ms , 1sec = 1000ms 
+	<globalevent name="something" interval="20000" script="something.lua"/> 
+	
+	execute my_script.lua at 12:00
 	<globalevent name="timer_example" time="12:00:00" script="my_script.lua"/>
+	
+	execute shutdown.lua at the moment of shutdown 
 	<globalevent name="shutdown" type="shutdown" script="shutdown.lua"/>
+	
+	execute startup.lua at start of the server
 	<globalevent name="startup" type="startup" script="startup.lua"/>
 	-->
 </globalevents>
