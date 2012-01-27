@@ -28,6 +28,7 @@ AC_ARG_ENABLE(server-diag, [  --enable-server-diag      enable server diagnostic
 AC_ARG_ENABLE(guild-wars-reload, [  --enable-guild-wars-reload     enable guild wars reload], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__GUILDWARSLUARELOAD__"])
 
 # check if we want old guild system enabled (rank_id and nickname instead of guild_members)
+# currently it is enabled by default.
 AC_ARG_ENABLE(old-guild-system, [  --enable-old-guild-system     enable old guild system], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__OLD_GUILD_SYSTEM__"])
 
 

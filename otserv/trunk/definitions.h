@@ -25,15 +25,8 @@
 #define OTSERV_NAME "OTServ"
 #define OTSERV_CLIENT_VERSION "8.61"
 
-#ifndef __OLD_GUILD_SYSTEM__
-#define __OLD_GUILD_SYSTEM__
-#endif
 
-#ifdef __OLD_GUILD_SYSTEM__
 #define CURRENT_SCHEMA_VERSION 24
-#else
-#define CURRENT_SCHEMA_VERSION 22
-#endif
 
 #ifdef __USE_SQLITE__
 #define SINGLE_SQL_DRIVER
