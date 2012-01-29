@@ -1571,12 +1571,12 @@ void MatrixArea::getCenter(uint32_t& y, uint32_t& x) const
 	y = centerY;
 }
 
-const size_t& MatrixArea::getRows() const
+const uint32_t& MatrixArea::getRows() const
 {
 	return rows;
 }
 
-const size_t& MatrixArea::getCols() const
+const uint32_t& MatrixArea::getCols() const
 {
 	return cols;
 }
@@ -2180,3 +2180,67 @@ void MagicField::onStepInField(Creature* creature, bool purposeful/*= true*/)
 		}
 	}
 }
+
+std::string CombatTypeName(const CombatType_t& combat)
+{
+	switch (combat)
+	{
+		case COMBAT_NONE:
+			return "unknown";
+		case COMBAT_PHYSICALDAMAGE:
+			return "physical";
+		case COMBAT_ENERGYDAMAGE:
+			return "energy";
+		case COMBAT_EARTHDAMAGE:
+			return "earth";
+		case COMBAT_FIREDAMAGE:
+			return "fire";
+		case COMBAT_UNDEFINEDDAMAGE:
+			return "undefined";
+		case COMBAT_LIFEDRAIN:
+			return "life drain";
+		case COMBAT_MANADRAIN:
+			return "mana drain";
+		case COMBAT_HEALING:
+			return "healing";
+		case COMBAT_DROWNDAMAGE:
+			return "drown";
+		case COMBAT_ICEDAMAGE:
+			return "ice";
+		case COMBAT_HOLYDAMAGE:
+			return "holy";
+		case COMBAT_DEATHDAMAGE:
+			return "death";
+	}
+
+	return "none";
+}
+
+int32_t CombatTypeToIndex(const CombatType_t& combat)
+{
+	if (combat == COMBAT_NONE)
+	{
+		return 0;
+	}
+
+	for (int32_t c = 0; c < COMBAT_COUNT; ++c)
+	{
+		if (combat & (1 << c))
+		{
+			return c + 1;
+		}
+	}
+
+	return 0;
+}
+
+CombatType_t CombatIndexToType(const int& combatindex)
+{
+	if (combatindex == 0)
+	{
+		return COMBAT_NONE;
+	}
+
+	return static_cast<CombatType_t>(1 << (combatindex - 1));
+}
+

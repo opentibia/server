@@ -129,8 +129,8 @@ public:
 	void setCenter(const uint32_t& y, const uint32_t& x);
 	void getCenter(uint32_t& y, uint32_t& x) const;
 
-	const size_t& getRows() const;
-	const size_t& getCols() const;
+	const uint32_t& getRows() const;
+	const uint32_t& getCols() const;
 
 	const bool* operator[](const uint32_t& i) const;
 	bool* operator[](const uint32_t& i);
@@ -293,67 +293,8 @@ private:
 	int64_t createTime;
 };
 
-inline std::string CombatTypeName(const CombatType_t& combat)
-{
-	switch (combat)
-	{
-		case COMBAT_NONE:
-			return "unknown";
-		case COMBAT_PHYSICALDAMAGE:
-			return "physical";
-		case COMBAT_ENERGYDAMAGE:
-			return "energy";
-		case COMBAT_EARTHDAMAGE:
-			return "earth";
-		case COMBAT_FIREDAMAGE:
-			return "fire";
-		case COMBAT_UNDEFINEDDAMAGE:
-			return "undefined";
-		case COMBAT_LIFEDRAIN:
-			return "life drain";
-		case COMBAT_MANADRAIN:
-			return "mana drain";
-		case COMBAT_HEALING:
-			return "healing";
-		case COMBAT_DROWNDAMAGE:
-			return "drown";
-		case COMBAT_ICEDAMAGE:
-			return "ice";
-		case COMBAT_HOLYDAMAGE:
-			return "holy";
-		case COMBAT_DEATHDAMAGE:
-			return "death";
-	}
-
-	return "none";
-}
-
-inline int32_t CombatTypeToIndex(const CombatType_t& combat)
-{
-	if (combat == COMBAT_NONE)
-	{
-		return 0;
-	}
-
-	for (int32_t c = 0; c < COMBAT_COUNT; ++c)
-	{
-		if (combat & (1 << c))
-		{
-			return c + 1;
-		}
-	}
-
-	return 0;
-}
-
-inline CombatType_t CombatIndexToType(const int& combatindex)
-{
-	if (combatindex == 0)
-	{
-		return COMBAT_NONE;
-	}
-
-	return (CombatType_t)(1 << (combatindex - 1));
-}
+std::string CombatTypeName(const CombatType_t& combat);
+int32_t CombatTypeToIndex(const CombatType_t& combat);
+CombatType_t CombatIndexToType(const int& combatindex);
 
 #endif // __OTSERV_COMBAT_H__
