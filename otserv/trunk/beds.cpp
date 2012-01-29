@@ -88,7 +88,7 @@ void BedItem::setHouse(House* h)
 	house = h;
 }
 
-Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue BedItem::readAttr(const AttrTypes_t& attr, PropStream& propStream)
 {
 	switch (attr)
 	{

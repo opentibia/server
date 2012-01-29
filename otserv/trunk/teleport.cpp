@@ -48,7 +48,7 @@ const Teleport* Teleport::getTeleport() const
 	return this;
 }
 
-Attr_ReadValue Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue Teleport::readAttr(const AttrTypes_t& attr, PropStream& propStream)
 {
 	if (ATTR_TELE_DEST == attr)
 	{
@@ -61,7 +61,9 @@ Attr_ReadValue Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
 			return ATTR_READ_ERROR;
 		}
 
-		setDestPos(Position(tele_dest._x, tele_dest._y, tele_dest._z));
+		Position pos(tele_dest._x, tele_dest._y, tele_dest._z);
+		setDestPos(pos);
+
 		return ATTR_READ_CONTINUE;
 	}
 	else

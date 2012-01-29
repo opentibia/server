@@ -126,7 +126,7 @@ const std::string& ItemAttributes::getWriter() const
 
 void ItemAttributes::setActionId(const uint16_t& n)
 {
-	setIntAttr(ATTR_ITEM_ACTIONID, n > 100 ? n : 100);
+	setIntAttr(ATTR_ITEM_ACTIONID, n > 100U ? n : 100U);
 }
 
 uint16_t ItemAttributes::getActionId() const

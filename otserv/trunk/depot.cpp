@@ -46,7 +46,7 @@ const Depot* Depot::getDepot() const
 	return this;
 }
 
-Attr_ReadValue Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue Depot::readAttr(const AttrTypes_t& attr, PropStream& propStream)
 {
 	if (ATTR_DEPOT_ID == attr)
 	{

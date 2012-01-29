@@ -402,9 +402,9 @@ public:
 	void addAttacked(const Player* attacked);
 	void clearAttacked();
 	void addUnjustifiedDead(const Player* attacked);
-	void setSkull(Skulls_t newSkull);
+	void setSkull(const Skulls_t& newSkull);
 	void sendCreatureSkull(const Creature* creature) const;
-	void checkSkullTicks(int32_t ticks);
+	void checkSkullTicks(const int32_t& ticks);
 
 #ifdef __GUILDWARSLUARELOAD__
 	void sendCreatureEmblem(const Creature* creature);
@@ -496,13 +496,13 @@ public:
 	void sendCancelWalk() const;
 	void sendChangeSpeed(const Creature* creature, const uint32_t& newSpeed) const;
 	void sendCreatureHealth(const Creature* creature) const;
-	void sendDistanceShoot(const Position& from, const Position& to, const uint8_t type) const;
+	void sendDistanceShoot(const Position& from, const Position& to, const uint8_t& type) const;
 	void sendHouseWindow(House* house, const uint32_t& listId) const;
 	void sendOutfitWindow() const;
 	void sendCreatePrivateChannel(const uint16_t& channelId, const std::string& channelName);
 	void sendClosePrivate(const uint16_t& channelId) const;
 	void sendIcons() const;
-	void sendMagicEffect(const Position& pos, const uint8_t type) const;
+	void sendMagicEffect(const Position& pos, const uint8_t& type) const;
 	void sendStats();
 	void sendSkills() const;
 	void sendTextMessage(const MessageClasses& mclass, const std::string& message) const;

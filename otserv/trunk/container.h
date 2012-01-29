@@ -66,7 +66,7 @@ public:
 	virtual Depot* getDepot();
 	virtual const Depot* getDepot() const;
 
-	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
+	Attr_ReadValue readAttr(const AttrTypes_t& attr, PropStream& propStream);
 	bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 	std::string getContentDescription() const;
 

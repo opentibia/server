@@ -832,7 +832,7 @@ void Player::sendIcons() const
 	}
 }
 
-void Player::sendMagicEffect(const Position& pos, const uint8_t type) const
+void Player::sendMagicEffect(const Position& pos, const uint8_t& type) const
 {
 	if (client)
 	{
@@ -2851,7 +2851,7 @@ void Player::sendCreatureHealth(const Creature* creature) const
 	}
 }
 
-void Player::sendDistanceShoot(const Position& from, const Position& to, const uint8_t type) const
+void Player::sendDistanceShoot(const Position& from, const Position& to, const uint8_t& type) const
 {
 	if (client)
 	{
@@ -3001,7 +3001,7 @@ uint32_t Player::getMuteTime()
 		}
 	}
 
-	return ((uint32_t)muteTicks / 1000);
+	return ((uint32_t)muteTicks / 1000U);
 }
 
 void Player::addMessageBuffer()
@@ -6189,7 +6189,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 }
 
-void Player::setSkull(Skulls_t newSkull)
+void Player::setSkull(const Skulls_t& newSkull)
 {
 	skullType = newSkull;
 }
@@ -6202,7 +6202,7 @@ void Player::sendCreatureSkull(const Creature* creature) const
 	}
 }
 
-void Player::checkSkullTicks(int32_t ticks)
+void Player::checkSkullTicks(const int32_t& ticks)
 {
 	if (!hasCondition(CONDITION_INFIGHT) && getSkull() != SKULL_NONE)
 	{

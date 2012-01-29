@@ -1006,7 +1006,7 @@ House* Door::getHouse()
 	return house;
 }
 
-Attr_ReadValue Door::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue Door::readAttr(const AttrTypes_t& attr, PropStream& propStream)
 {
 	if (ATTR_HOUSEDOORID == attr)
 	{

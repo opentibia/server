@@ -33,7 +33,7 @@ public:
 	virtual const Depot* getDepot() const;
 
 	//serialization
-	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(const AttrTypes_t& attr, PropStream& propStream);
 
 	const uint32_t& getDepotId() const;
 	void setMaxDepotLimit(const uint32_t& maxitems);

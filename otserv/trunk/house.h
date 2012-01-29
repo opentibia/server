@@ -73,7 +73,7 @@ public:
 	House* getHouse();
 
 	//serialization
-	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(const AttrTypes_t& attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	void setDoorId(const uint32_t& _doorId);

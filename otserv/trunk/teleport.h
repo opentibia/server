@@ -34,7 +34,7 @@ public:
 	virtual const Teleport* getTeleport() const;
 
 	//serialization
-	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(const AttrTypes_t& attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	void setDestPos(const Position& pos);

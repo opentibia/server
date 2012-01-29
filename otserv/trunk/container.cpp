@@ -113,7 +113,7 @@ void Container::addItem(Item* item)
 	item->setParent(this);
 }
 
-Attr_ReadValue Container::readAttr(AttrTypes_t attr, PropStream& propStream)
+Attr_ReadValue Container::readAttr(const AttrTypes_t& attr, PropStream& propStream)
 {
 	switch (attr)
 	{
