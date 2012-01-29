@@ -136,7 +136,7 @@ uint16_t ItemAttributes::getActionId() const
 
 void ItemAttributes::setUniqueId(const uint16_t& n)
 {
-	setIntAttr(ATTR_ITEM_UNIQUEID, n > 1000 ? n : 1000);
+	setIntAttr(ATTR_ITEM_UNIQUEID, n > 1000U ? n : 1000);
 }
 
 uint16_t ItemAttributes::getUniqueId() const
@@ -1684,7 +1684,7 @@ const uint8_t& Item::getItemCount() const
 
 void Item::setItemCount(const uint8_t& n)
 {
-	count = n > 1 ? n : 0;
+	count = n >= 1U ? n : 0;
 }
 
 uint32_t Item::countByType(const Item* i, const int32_t& subType)
@@ -2112,7 +2112,7 @@ std::string Item::getDescription(const ItemType& it, const int32_t& lookDistance
 		}
 	}
 
-	if (item && item->getSpecialDescription() != "")
+	if (item && !item->getSpecialDescription().empty())
 	{
 		s << std::endl << item->getSpecialDescription().c_str();
 	}
@@ -2199,7 +2199,7 @@ std::string Item::getWeightDescription(const ItemType& it, double weight, const 
 {
 	std::stringstream ss;
 
-	if (it.stackable && count > 1)
+	if (it.stackable && count > 1U)
 	{
 		ss << "They weigh " << std::fixed << std::setprecision(2) << weight << " oz.";
 	}
