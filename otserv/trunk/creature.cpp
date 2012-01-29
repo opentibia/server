@@ -1963,7 +1963,7 @@ void Creature::onGainExperience(const uint64_t& gainExp, bool fromMonster)
 {
 	if (gainExp > 0)
 	{
-		std::uint64_t experience = gainExp;
+		uint64_t experience = gainExp;
 		if (getMaster())
 		{
 			experience = gainExp / 2;

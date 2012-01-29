@@ -94,7 +94,7 @@ public:
 	virtual void onCreatureAppear(const Creature* creature) {};
 	virtual void onCreatureDisappear(const Creature* creature) {};
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos) {};
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text) {};
+	virtual void onCreatureSay(const Creature* creature, const SpeakClasses& type, const std::string& text) {};
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
 	                           uint8_t count, uint8_t amount, bool ignore = false, bool buyWithBackpack = false) {};
 	virtual void onPlayerCloseChannel(const Player* player) {};
@@ -118,7 +118,7 @@ public:
 	virtual void onCreatureAppear(const Creature* creature);
 	virtual void onCreatureDisappear(const Creature* creature);
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, const Position& newPos);
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
+	virtual void onCreatureSay(const Creature* creature, const SpeakClasses& type, const std::string& text);
 	virtual void onPlayerTrade(const Player* player, int32_t callback, uint16_t itemid,
 	                           uint8_t count, uint8_t amount, bool ignore, bool buyWithBackpack);
 	virtual void onPlayerCloseChannel(const Player* player);
@@ -654,7 +654,7 @@ protected:
 	                            const Tile* oldTile, const Position& oldPos, bool teleport);
 	virtual void onPlacedCreature();
 	virtual void onCreatureTurn(const Creature* creature);
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	virtual void onCreatureSay(const Creature* creature, const SpeakClasses& type, const std::string& text);
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 	virtual void onThink(uint32_t interval);
 	virtual std::string getDescription(const int32_t& lookDistance) const;

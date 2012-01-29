@@ -216,52 +216,26 @@ public:
 	static VirtualCylinder* virtualCylinder;
 
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	                               uint32_t flags) const
-	{
-		return RET_NOTPOSSIBLE;
-	}
+								uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	                                    uint32_t& maxQueryCount, uint32_t flags) const
-	{
-		return RET_NOTPOSSIBLE;
-	}
-	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const
-	{
-		return (thing->getParent() == this ? RET_NOERROR : RET_NOTPOSSIBLE);
-	}
+								uint32_t& maxQueryCount, uint32_t flags) const;
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const;
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-	                                     uint32_t& flags)
-	{
-		return NULL;
-	}
-
-	virtual void __addThing(Thing* thing) {}
-	virtual void __addThing(int32_t index, Thing* thing) {}
-	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count) {}
-	virtual void __replaceThing(uint32_t index, Thing* thing) {}
-	virtual void __removeThing(Thing* thing, uint32_t count) {}
-
-	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER, bool isNewItem = true) {}
+	                                     uint32_t& flags);
+	virtual void __addThing(Thing* thing);
+	virtual void __addThing(int32_t index, Thing* thing);
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
+	virtual void __replaceThing(uint32_t index, Thing* thing);
+	virtual void __removeThing(Thing* thing, uint32_t count);
+	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index,
+								cylinderlink_t link = LINK_OWNER, bool isNewItem = true);
 	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval,
-	                                    cylinderlink_t link = LINK_OWNER) {}
+								cylinderlink_t link = LINK_OWNER);
 
-	virtual bool isPushable() const
-	{
-		return false;
-	}
-	virtual int getThrowRange() const
-	{
-		return 1;
-	}
-	virtual std::string getDescription(const int32_t& lookDistance) const
-	{
-		return "";
-	}
-
-	virtual bool isRemoved() const
-	{
-		return false;
-	}
+	virtual bool isPushable() const;
+	virtual int getThrowRange() const;
+	virtual std::string getDescription(const int32_t& lookDistance) const;
+	virtual bool isRemoved() const;
 };
 
 

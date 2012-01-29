@@ -1775,7 +1775,7 @@ void Npc::onCreatureTurn(const Creature* creature)
 	Creature::onCreatureTurn(creature);
 }
 
-void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+void Npc::onCreatureSay(const Creature* creature, const SpeakClasses& type, const std::string& text)
 {
 	if (creature->getID() == this->getID())
 	{
@@ -4650,7 +4650,7 @@ void NpcScript::onCreatureMove(const Creature* creature, const Position& oldPos,
 	}
 }
 
-void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+void NpcScript::onCreatureSay(const Creature* creature, const SpeakClasses& type, const std::string& text)
 {
 	if (m_onCreatureSay == -1)
 	{

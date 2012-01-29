@@ -42,8 +42,7 @@ typedef std::list<Player*> PlayerList;
 typedef std::map<Position, boost::shared_ptr<SpectatorVec> > SpectatorCache;
 typedef std::vector<Item*> ItemVector;
 
-enum tileflags_t :
-uint32_t
+enum tileflags_t
 {
 	TILESTATE_NONE						= 0,
 	TILESTATE_PROTECTIONZONE			= 1 << 0,

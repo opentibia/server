@@ -32,6 +32,7 @@
 #include "status.h"
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/ref.hpp>
 
 bool Connection::m_logError = true;
 
@@ -54,7 +55,8 @@ Connection_ptr ConnectionManager::createConnection(boost::asio::ip::tcp::socket*
 #ifdef __DEBUG_NET_DETAIL__
 	std::cout << "Create new Connection" << std::endl;
 #endif
-	Connection_ptr connection = boost::make_shared<Connection>(socket, io_service, servicer);
+	Connection_ptr connection =
+		boost::make_shared<Connection>(socket, boost::ref(io_service), servicer);
 	boost::recursive_mutex::scoped_lock lockClass(m_connectionManagerLock);
 	m_connections.push_back(connection);
 	return connection;
