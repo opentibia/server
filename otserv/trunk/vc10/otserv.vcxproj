@@ -20,14 +20,12 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -40,22 +38,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\otlibs\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(BOOST_INCLUDE_PATH);$(LIBXML_INCLUDE_PATH);$(MYSQL_INCLUDE_PATH);$(LUA_INCLUDE_PATH);$(MPIR_INCLUDE_PATH);$(LIBICONV_INCLUDE_PATH);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>C:\otlibs\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BOOST_LIB_PATH);$(LIBXML_LIB_PATH);$(MYSQL_LIB_PATH);$(LUA_LIB_PATH);$(MPIR_LIB_PATH);$(LIBICONV_LIB_PATH);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\otlibs\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(BOOST_INCLUDE_PATH);$(LIBXML_INCLUDE_PATH);$(MYSQL_INCLUDE_PATH);$(LUA_INCLUDE_PATH);$(MPIR_INCLUDE_PATH);$(LIBICONV_INCLUDE_PATH);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>C:\otlibs\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BOOST_LIB_PATH);$(LIBXML_LIB_PATH);$(MYSQL_LIB_PATH);$(LUA_LIB_PATH);$(MPIR_LIB_PATH);$(LIBICONV_LIB_PATH);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>__USE_OTPCH__;__USE_MYSQL__;__USE_SQLITE__;__OLD_GUILD_SYSTEM__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
