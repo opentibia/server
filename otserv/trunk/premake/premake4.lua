@@ -98,7 +98,8 @@ project "otserv"
 			"mysqlclient",
 			"boost_system",
 			"boost_thread",
-			"boost_regex"
+			"boost_regex",
+			"pthread"
 		}
 	
 	-- Mac OS X support for Xcode.
