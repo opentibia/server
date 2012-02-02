@@ -105,7 +105,7 @@ CREATE TABLE `guild_ranks` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `guild_members` (
-	`player_id` INT UNSIGNED NOT NULL COMMENT 'if you doesn't use new guild system you are free to delete this table',
+	`player_id` INT UNSIGNED NOT NULL COMMENT 'if you doesnt use new guild system you are free to delete this table',
 	`rank_id` INT UNSIGNED NOT NULL COMMENT 'a rank which belongs to certain guild',
 
 	`nick` VARCHAR(255) NOT NULL DEFAULT '',
