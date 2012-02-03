@@ -1180,7 +1180,11 @@ ReturnValue Game::internalMoveCreature(Creature* creature,
 				if (tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID))
 				{
 					newFlags = flags | FLAG_IGNOREBLOCKITEM | FLAG_IGNOREBLOCKCREATURE;
-					destPos.z -= 1;
+
+					if (!tmpTile->floorChange())
+					{
+						destPos.z -= 1;
+					}
 				}
 			}
 		}
