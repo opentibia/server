@@ -65,6 +65,9 @@ ScriptEnviroment::CombatMap ScriptEnviroment::m_combatMap;
 uint32_t ScriptEnviroment::m_lastCombatId = 0;
 ScriptEnviroment::ConditionMap ScriptEnviroment::m_conditionMap;
 uint32_t ScriptEnviroment::m_lastConditionId = 0;
+ScriptEnviroment::DBResultMap ScriptEnviroment::m_tempResults;
+uint32_t ScriptEnviroment::m_lastResultId = 0;
+
 ScriptEnviroment::StorageMap ScriptEnviroment::m_globalStorageMap;
 ScriptEnviroment::TempItemListMap ScriptEnviroment::m_tempItems;
 
@@ -108,8 +111,19 @@ void ScriptEnviroment::resetEnv()
 			}
 		}
 	}
-
 	m_tempItems.clear();
+	
+	if(!m_tempResults.empty())
+	{
+		Database* db = Database::instance();
+		for(DBResultMap::iterator it = m_tempResults.begin(); it != m_tempResults.end(); ++it)
+		{
+			if(it->second)
+				db->freeResult(it->second);
+		}
+	}
+	
+	m_tempResults.clear();
 
 	m_realPos.x = 0;
 	m_realPos.y = 0;
@@ -439,6 +453,37 @@ void ScriptEnviroment::removeTempItem(Item* item)
 	}
 }
 
+uint32_t ScriptEnviroment::addResult(DBResult* res)
+{
+	uint32_t newResultId = m_lastResultId + 1;
+	m_tempResults[newResultId] = res;
+
+	m_lastResultId++;
+	return m_lastResultId;
+}
+
+bool ScriptEnviroment::removeResult(uint32_t id)
+{
+	DBResultMap::iterator it = m_tempResults.find(id);
+	if(it == m_tempResults.end())
+		return false;
+
+	if(it->second)
+		Database::instance()->freeResult(it->second);
+
+	m_tempResults.erase(it);
+	return true;
+}
+
+DBResult* ScriptEnviroment::getResultByID(uint32_t id)
+{
+	DBResultMap::iterator it = m_tempResults.find(id);
+	if(it != m_tempResults.end())
+		return it->second;
+
+	return NULL;
+}
+
 void ScriptEnviroment::addGlobalStorageValue(const uint32_t key, const int32_t value)
 {
 	m_globalStorageMap[key] = value;
@@ -726,7 +771,6 @@ bool LuaScriptInterface::initState()
 	//And here you load both "safe" and "unsafe" libraries
 	luaL_openlibs(m_luaState);
 #endif
-
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 
 	registerFunctions();
@@ -2007,7 +2051,13 @@ void LuaScriptInterface::registerFunctions()
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
 	luaL_register(m_luaState, "bit", LuaScriptInterface::luaBitReg);
+	
+	//db table
+	luaL_register(m_luaState, "db", LuaScriptInterface::luaDatabaseTable);
 
+	//result table
+	luaL_register(m_luaState, "result", LuaScriptInterface::luaResultTable);
+	
 	//isGmInvisible(cid)
 	lua_register(m_luaState, "isGmInvisible", LuaScriptInterface::luaIsGmInvisible);
 
@@ -8978,6 +9028,209 @@ SHIFTOP(int32_t, LeftShift, <<)
 SHIFTOP(int32_t, RightShift, >>)
 SHIFTOP(uint32_t, ULeftShift, <<)
 SHIFTOP(uint32_t, URightShift, >>)
+
+
+const luaL_Reg LuaScriptInterface::luaDatabaseTable[] =
+{
+	{"query", LuaScriptInterface::luaDatabaseExecute},
+	{"storeQuery", LuaScriptInterface::luaDatabaseStoreQuery},
+	{"escapeString", LuaScriptInterface::luaDatabaseEscapeString},
+	{"escapeBlob", LuaScriptInterface::luaDatabaseEscapeBlob},
+	{"lastInsertId", LuaScriptInterface::luaDatabaseLastInsertId},
+	{"stringComparer", LuaScriptInterface::luaDatabaseStringComparer},
+	{"updateLimiter", LuaScriptInterface::luaDatabaseUpdateLimiter},
+	{"connected", LuaScriptInterface::luaDatabaseConnected},
+	{"tableExists", LuaScriptInterface::luaDatabaseTableExists},
+	{NULL,NULL}
+};
+
+int32_t LuaScriptInterface::luaDatabaseExecute(lua_State* L)
+{
+	DBQuery query;
+	lua_pushboolean(L, Database::instance()->executeQuery(popString(L)));
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaDatabaseStoreQuery(lua_State* L)
+{
+	ScriptEnviroment* env = getScriptEnv();
+
+	DBQuery query;
+	if(DBResult* res = Database::instance()->storeQuery(popString(L)))
+		lua_pushnumber(L, env->addResult(res));
+	else
+		lua_pushboolean(L, false);
+
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaDatabaseEscapeString(lua_State* L)
+{
+	DBQuery query;
+	lua_pushstring(L, Database::instance()->escapeString(popString(L)).c_str());
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaDatabaseEscapeBlob(lua_State* L)
+{
+	uint32_t length = popNumber(L);
+	DBQuery query;
+
+	lua_pushstring(L, Database::instance()->escapeBlob(popString(L).c_str(), length).c_str());
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaDatabaseLastInsertId(lua_State* L)
+{
+	DBQuery query;
+	lua_pushnumber(L, Database::instance()->getLastInsertId());
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaDatabaseStringComparer(lua_State* L)
+{
+	lua_pushstring(L, Database::instance()->getStringComparer().c_str());
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaDatabaseUpdateLimiter(lua_State* L)
+{
+	lua_pushstring(L, Database::instance()->getUpdateLimiter().c_str());
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaDatabaseConnected(lua_State* L)
+{
+	lua_pushboolean(L, Database::instance()->isConnected());
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaDatabaseTableExists(lua_State* L)
+{
+	//lua_pushboolean(L, DatabaseManager::getInstance()->tableExists(popString(L)));
+	lua_pushboolean(L, true);
+	return 1;
+}
+
+const luaL_Reg LuaScriptInterface::luaResultTable[] =
+{
+	{"getDataInt", LuaScriptInterface::luaResultGetDataInt},
+	{"getDataLong", LuaScriptInterface::luaResultGetDataLong},
+	{"getDataString", LuaScriptInterface::luaResultGetDataString},
+	{"getDataStream", LuaScriptInterface::luaResultGetDataStream},
+	{"getAllData", LuaScriptInterface::luaResultGetAllData},
+	{"next", LuaScriptInterface::luaResultNext},
+	{"free", LuaScriptInterface::luaResultFree},
+	{NULL, NULL}
+};
+
+int32_t LuaScriptInterface::luaResultGetDataInt(lua_State* L)
+{
+	const std::string& s = popString(L);
+	ScriptEnviroment* env = getScriptEnv();
+
+	DBResult* res = env->getResultByID(popNumber(L));
+	if(!res)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_pushnumber(L, res->getDataInt(s));
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaResultGetDataLong(lua_State* L)
+{
+	const std::string& s = popString(L);
+	ScriptEnviroment* env = getScriptEnv();
+
+	DBResult* res = env->getResultByID(popNumber(L));
+	if(!res)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_pushnumber(L, res->getDataLong(s));
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaResultGetDataString(lua_State* L)
+{
+	const std::string& s = popString(L);
+	ScriptEnviroment* env = getScriptEnv();
+
+	DBResult* res = env->getResultByID(popNumber(L));
+	if(!res)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_pushstring(L, res->getDataString(s).c_str());
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaResultGetDataStream(lua_State* L)
+{
+	const std::string& s = popString(L);
+	ScriptEnviroment* env = getScriptEnv();
+
+	DBResult* res = env->getResultByID(popNumber(L));
+	if(!res)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	unsigned long length = 0;
+	lua_pushstring(L, res->getDataStream(s, length));
+	lua_pushnumber(L, length);
+	return 2;
+}
+
+int32_t LuaScriptInterface::luaResultGetAllData(lua_State* L)
+{
+	ScriptEnviroment* env = getScriptEnv();
+
+	DBResult* res = env->getResultByID(popNumber(L));
+	if(!res)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_newtable(L);
+	listNames_t listNames = res->getListNames();
+	for(listNames_t::iterator it = listNames.begin(); it != listNames.end(); ++it)
+		setField(L, it->first.c_str(), res->getDataString(it->first));
+
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaResultNext(lua_State* L)
+{
+	ScriptEnviroment* env = getScriptEnv();
+
+	DBResult* res = env->getResultByID(popNumber(L));
+	if(!res)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_pushboolean(L, res->next());
+	return 1;
+}
+
+int32_t LuaScriptInterface::luaResultFree(lua_State* L)
+{
+	ScriptEnviroment* env = getScriptEnv();
+	lua_pushboolean(L, env->removeResult(popNumber(L)));
+	return 1;
+}
+
 
 int LuaScriptInterface::luaGetItemWeaponType(lua_State *L)
 {

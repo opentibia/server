@@ -10,6 +10,9 @@ dofile(getDataDir() .. 'game_classes/calculator.lua')
 -- Load Exp Stages
 dofile(getDataDir() .. 'exp_stages.lua')
 
+-- Load db file
+dofile(getDataDir() .. 'db.lua')
+
 -- Storages consts
 STORAGE_RUM_MACHINE = 100000
 STORAGE_PROMOTION = 15000

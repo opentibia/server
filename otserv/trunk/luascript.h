@@ -24,6 +24,7 @@
 
 #include "definitions.h"
 #include "position.h"
+#include "database.h"
 #include <string>
 #include <map>
 #include <list>
@@ -109,6 +110,10 @@ public:
 	uint32_t addThing(Thing* thing);
 	void insertThing(uint32_t uid, Thing* thing);
 
+	DBResult* getResultByID(uint32_t id);
+	uint32_t addResult(DBResult* res);
+	bool removeResult(uint32_t id);
+	
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
 	bool eraseGlobalStorageValue(const uint32_t key);
@@ -151,6 +156,7 @@ private:
 	typedef std::map<uint32_t, Combat*> CombatMap;
 	typedef std::map<uint32_t, Condition*> ConditionMap;
 	typedef std::list<Item*> ItemList;
+	typedef std::map<uint32_t, DBResult*> DBResultMap;
 
 	//script file id
 	int32_t m_scriptId;
@@ -186,6 +192,10 @@ private:
 	static uint32_t m_lastConditionId;
 	static ConditionMap m_conditionMap;
 
+	//result map
+	static uint32_t m_lastResultId;
+	static DBResultMap m_tempResults;	
+	
 	//for npc scripts
 	Npc* m_curNpc;
 
@@ -683,9 +693,28 @@ protected:
 	static int luaBitULeftShift(lua_State *L);
 	static int luaBitURightShift(lua_State *L);
 
+	static const luaL_Reg luaDatabaseTable[10];
+	static int32_t luaDatabaseExecute(lua_State* L);
+	static int32_t luaDatabaseStoreQuery(lua_State* L);
+	static int32_t luaDatabaseEscapeString(lua_State* L);
+	static int32_t luaDatabaseEscapeBlob(lua_State* L);
+	static int32_t luaDatabaseLastInsertId(lua_State* L);
+	static int32_t luaDatabaseStringComparer(lua_State* L);
+	static int32_t luaDatabaseUpdateLimiter(lua_State* L);
+	static int32_t luaDatabaseConnected(lua_State* L);
+	static int32_t luaDatabaseTableExists(lua_State* L);
+
+	static const luaL_Reg luaResultTable[8];
+	static int32_t luaResultGetDataInt(lua_State* L);
+	static int32_t luaResultGetDataLong(lua_State* L);
+	static int32_t luaResultGetDataString(lua_State* L);
+	static int32_t luaResultGetDataStream(lua_State* L);
+	static int32_t luaResultGetAllData(lua_State* L);
+	static int32_t luaResultNext(lua_State* L);
+	static int32_t luaResultFree(lua_State* L);
+	
 	static int luaGetItemWeaponType(lua_State *L);
 	static int luaGetItemAttack(lua_State *L);
-	static int luaGetItemDefense(lua_State *L);
 	static int luaGetItemExtraDef(lua_State *L);
 	static int luaGetItemArmor(lua_State *L);
 	static int luaGetItemWeaponTypeByUID(lua_State *L);

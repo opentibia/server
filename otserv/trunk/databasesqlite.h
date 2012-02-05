@@ -54,6 +54,11 @@ public:
 
 	DATABASE_VIRTUAL void freeResult(DBResult *res);
 
+	DATABASE_VIRTUAL uint64_t getLastInsertId() {return (uint64_t)sqlite3_last_insert_rowid(m_handle);}
+
+	DATABASE_VIRTUAL std::string getStringComparer() {return "LIKE ";}
+	DATABASE_VIRTUAL std::string getUpdateLimiter() {return ";";}
+	
 protected:
 	std::string _parse(const std::string &s);
 

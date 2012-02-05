@@ -64,6 +64,8 @@ class PgSQLResult;
 typedef DATABASE_CLASS Database;
 typedef DBRES_CLASS DBResult;
 
+typedef std::map<const std::string, uint32_t> listNames_t;
+
 class DBQuery;
 
 enum DBParam_t{
@@ -171,6 +173,21 @@ public:
 	*/
 	DATABASE_VIRTUAL void freeResult(DBResult *res) {};
 
+	/**
+	 * Retrieve id of last inserted row
+	 *
+	 * @return id on success, 0 if last query did not result on any rows with auto_increment keys
+	 */
+	DATABASE_VIRTUAL uint64_t getLastInsertId() {return 0;}
+	
+	/**
+	* Get case insensitive string comparison operator
+	*
+	* @return the case insensitive operator
+	*/
+	DATABASE_VIRTUAL std::string getStringComparer() {return "= ";}
+	DATABASE_VIRTUAL std::string getUpdateLimiter() {return " LIMIT 1;";}	
+		
 protected:
 	_Database() : m_connected(false) {};
 	DATABASE_VIRTUAL ~_Database() {};
@@ -216,10 +233,14 @@ public:
 	* \return true if moved, false if there are no more results.
 	*/
 	DATABASE_VIRTUAL bool next() {return false;};
+	
+	listNames_t getListNames() const {return m_listNames;}
 
 protected:
 	_DBResult() {};
 	DATABASE_VIRTUAL ~_DBResult() {};
+	
+	listNames_t m_listNames;
 };
 
 /**
