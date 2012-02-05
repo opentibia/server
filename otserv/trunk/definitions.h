@@ -25,50 +25,48 @@
 #define OTSERV_NAME "OTServ"
 #define OTSERV_CLIENT_VERSION "8.61"
 
-
 #define CURRENT_SCHEMA_VERSION 24
 
 #ifdef __USE_SQLITE__
-#define SINGLE_SQL_DRIVER
+	#define SINGLE_SQL_DRIVER
 #endif
 
 //This is an code fully tested and shouldn't cause weird errors but marked it under flag for easier removing.
 #ifndef __GLOBALEVENTS__
-#define __GLOBALEVENTS__
+	#define __GLOBALEVENTS__
 #endif
 
 #ifdef __USE_MYSQL__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
-#endif
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
 
 #ifdef __USE_ODBC__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
-#endif
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
 
 #ifdef __USE_PGSQL__
-#ifdef SINGLE_SQL_DRIVER
-#define MULTI_SQL_DRIVERS
-#else
-#define SINGLE_SQL_DRIVER
-#endif
+	#ifdef SINGLE_SQL_DRIVER
+		#define MULTI_SQL_DRIVERS
+	#else
+		#define SINGLE_SQL_DRIVER
+	#endif
 #endif
 
 //Default sql driver
 #if !defined(SINGLE_SQL_DRIVER) && !defined(MULTI_SQL_DRIVERS)
-#define __USE_SQLITE__
-#define SINGLE_SQL_DRIVER
+	#define __USE_SQLITE__
+	#define SINGLE_SQL_DRIVER
 #endif
 
-enum passwordType_t
-{
+enum passwordType_t{
 	PASSWORD_TYPE_PLAIN = 0,
 	PASSWORD_TYPE_MD5,
 	PASSWORD_TYPE_SHA1
@@ -78,7 +76,7 @@ enum passwordType_t
 #define BOOST_ASIO_ENABLE_CANCELIO 1
 
 #ifndef __FUNCTION__
-#define	__FUNCTION__ __func__
+	#define	__FUNCTION__ __func__
 #endif
 
 #define xmake_str(str) #str
@@ -88,9 +86,9 @@ enum passwordType_t
 	Compiler setup
 */
 #if defined __GNUC__
-#include "compiler/gcc.h"
+	#include "compiler/gcc.h"
 #elif defined(_MSC_VER)
-#include "compiler/msvc.h"
+	#include "compiler/msvc.h"
 #endif
 
 /*
@@ -98,15 +96,15 @@ enum passwordType_t
 	call some of the useful headers.
 */
 #ifdef __OTSERV_CXX0X__
-#include <cstdint>
-#include <unordered_map>
-#include <unordered_set>
+	#include <cstdint>
+	#include <unordered_map>
+	#include <unordered_set>
 #else
-#include "compiler/workarounds.h"
+	#include "compiler/workarounds.h"
 #endif
 
 #ifdef _WIN32_WINNT
-#undef _WIN32_WINNT
+	#undef _WIN32_WINNT
 #endif
 //Windows 2000	0x0500
 //Windows Xp	0x0501
@@ -115,11 +113,16 @@ enum passwordType_t
 //Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
 
-#define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+ #define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+
+// OpenTibia configuration
+#if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)
+	#define __SKULLSYSTEM__
+#endif
 
 // Boost exception handling must be enabled
 #ifdef BOOST_NO_EXCEPTIONS
-#error "Boost exception handling must be enabled."
+	#error "Boost exception handling must be enabled."
 #endif
 
 #endif

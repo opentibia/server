@@ -30,13 +30,13 @@ extern "C"
 #include <lauxlib.h>
 }
 
-class ConfigManager
-{
+
+class ConfigManager {
 public:
 	ConfigManager();
+	~ConfigManager();
 
-	enum string_config_t
-	{
+	enum string_config_t {
 		DUMMY_STR = 0,
 		CONFIG_FILE,
 		DATA_DIRECTORY,
@@ -67,8 +67,7 @@ public:
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 
-	enum integer_config_t
-	{
+	enum integer_config_t {
 		LOGIN_TRIES = 0,
 		GAME_PORT,
 		ADMIN_PORT,
@@ -157,9 +156,9 @@ public:
 		CAN_PASS_THROUGH,
 		MIN_PVP_LEVEL,
 		MW_DISAPPEAR_ON_WALK,
-#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+		#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 		MIN_PVP_LEVEL_APPLIES_TO_SUMMONS,
-#endif
+		#endif
 		HEIGHT_MINIMUM_FOR_IDLE,
 		EXPERIENCE_STAGES,
 		PUSH_INTERVAL,
@@ -179,8 +178,7 @@ public:
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
-	enum float_config_t
-	{
+	enum float_config_t {
 		STAMINA_EXTRA_EXPERIENCE_RATE,
 		LAST_FLOAT_CONFIG /* this must be the last one */
 	};
@@ -190,19 +188,19 @@ public:
 	bool reload();
 
 	void getConfigValue(const std::string& key, lua_State* _L);
-	const std::string& getString(const uint32_t& _what) const;
-	double getFloat(const uint32_t& _what) const;
-	int64_t getNumber(const uint32_t& _what) const;
-	bool getBoolean(const uint32_t& _what) const;
-	bool setNumber(const uint32_t& _what, const int64_t& _value);
-	bool setString(const uint32_t& _what, const std::string& _value);
+	const std::string& getString(uint32_t _what) const;
+	double getFloat(uint32_t _what) const;
+	int64_t getNumber(uint32_t _what) const;
+	bool getBoolean(uint32_t _what) const { return getNumber(_what) != 0; }
+	bool setNumber(uint32_t _what, int64_t _value);
+	bool setString(uint32_t _what, const std::string& _value);
 
 private:
 	static void moveValue(lua_State* fromL, lua_State* toL);
-	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default = "");
-	int64_t getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default = 0);
-	double getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default = 0.0);
-	bool getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default = false);
+	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
+	int64_t getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default=0);
+	double getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default=0.0);
+	bool getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default=false);
 
 	lua_State* L;
 	bool m_isLoaded;

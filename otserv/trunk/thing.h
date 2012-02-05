@@ -27,8 +27,7 @@
 #include <sstream>
 
 /*Notice: remember to add new error codes to global.lua*/
-enum ReturnValue
-{
+enum ReturnValue{
 	RET_NOERROR = 1,
 	RET_NOTPOSSIBLE = 2,
 	RET_NOTENOUGHROOM = 3,
@@ -104,24 +103,35 @@ class Cylinder;
 class Item;
 class Creature;
 
-class Thing
-{
+class Thing {
 protected:
 	Thing();
 
 public:
 	virtual ~Thing();
 
-	void useThing2();
-	void releaseThing2() ;
+	void useThing2() {++useCount;}
+	void releaseThing2() {
+		--useCount;
+		if(useCount <= 0)
+			delete this;
+	}
 
-	virtual std::string getDescription(const int32_t& lookDistance) const = 0;
-	virtual std::string getXRayDescription() const;
+	virtual std::string getDescription(int32_t lookDistance) const = 0;
+	virtual std::string getXRayDescription() const {
+		if(isRemoved()){
+			return "Thing you looked at seems to be removed.";
+		}
+		std::stringstream ret;
+		ret << "Position: [";
+		ret << getPosition().x << ", " << getPosition().y << ", " << getPosition().z << "]";
+		return ret.str();
+	}
 
-	Cylinder* getParent();
-	const Cylinder* getParent() const;
+	Cylinder* getParent() {return parent;};
+	const Cylinder* getParent() const {return parent;};
 
-	virtual void setParent(Cylinder* cylinder);
+	virtual void setParent(Cylinder* cylinder) {parent = cylinder;};
 
 	Cylinder* getTopParent(); //returns Tile/Container or a Player
 	const Cylinder* getTopParent() const;
@@ -129,18 +139,17 @@ public:
 	virtual Tile* getTile();
 	virtual const Tile* getTile() const;
 
-	virtual const Position& getPosition() const;
+	virtual Position getPosition() const;
 	virtual int getThrowRange() const = 0;
 	virtual bool isPushable() const = 0;
 
-	virtual Item* getItem();
-	virtual const Item* getItem() const;
-	virtual Creature* getCreature();
-	virtual const Creature* getCreature() const;
+	virtual Item* getItem() {return NULL;};
+	virtual const Item* getItem() const {return NULL;};
+	virtual Creature* getCreature() {return NULL;};
+	virtual const Creature* getCreature() const {return NULL;};
 
 	virtual bool isRemoved() const;
-	virtual const uint32_t& getTotalAmountOfItemsInside() const;
-
+	virtual uint32_t getTotalAmountOfItemsInside() const { return 1; } //includes the item itself
 private:
 	Cylinder* parent;
 	int32_t useCount;

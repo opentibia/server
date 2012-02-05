@@ -29,8 +29,7 @@
 #include "house.h"
 #include <string>
 
-class IOMap
-{
+class IOMap{
 public:
 	IOMap() {}
 	virtual ~IOMap() {}
@@ -54,11 +53,10 @@ public:
 	*/
 	bool loadSpawns(Map* map)
 	{
-		if (map->spawnfile.empty())
-		{
+		if(map->spawnfile.empty()){
 			return true;
 		}
-
+		
 		return Spawns::getInstance()->loadFromXml(map->spawnfile);
 	}
 
@@ -68,11 +66,9 @@ public:
 	*/
 	bool loadHouses(Map* map)
 	{
-		if (!map->housefile.empty())
-		{
+		if(!map->housefile.empty()){
 			return Houses::getInstance().loadHousesXML(map->housefile);
 		}
-
 		return true;
 	}
 

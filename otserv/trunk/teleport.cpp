@@ -25,8 +25,7 @@
 
 extern Game g_game;
 
-Teleport::Teleport(const uint16_t& _type)
-	: Item(_type)
+Teleport::Teleport(uint16_t _type) : Item(_type)
 {
 	destPos.x = 0;
 	destPos.y = 0;
@@ -38,68 +37,44 @@ Teleport::~Teleport()
 	//
 }
 
-Teleport* Teleport::getTeleport()
+Attr_ReadValue Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
-	return this;
-}
-
-const Teleport* Teleport::getTeleport() const
-{
-	return this;
-}
-
-Attr_ReadValue Teleport::readAttr(const AttrTypes_t& attr, PropStream& propStream)
-{
-	if (ATTR_TELE_DEST == attr)
-	{
+	if(ATTR_TELE_DEST == attr){
 		TeleportDest tele_dest;
-
-		if (!propStream.GET_UINT16(tele_dest._x) ||
-		        !propStream.GET_UINT16(tele_dest._y) ||
-		        !propStream.GET_UINT8(tele_dest._z))
+		if(		!propStream.GET_UINT16(tele_dest._x) ||
+				!propStream.GET_UINT16(tele_dest._y) ||
+				!propStream.GET_UINT8(tele_dest._z))
 		{
 			return ATTR_READ_ERROR;
 		}
 
-		Position pos(tele_dest._x, tele_dest._y, tele_dest._z);
-		setDestPos(pos);
-
+		setDestPos(Position(tele_dest._x, tele_dest._y, tele_dest._z));
 		return ATTR_READ_CONTINUE;
 	}
 	else
-	{
 		return Item::readAttr(attr, propStream);
-	}
 }
 
 bool Teleport::serializeAttr(PropWriteStream& propWriteStream) const
 {
 	bool ret = Item::serializeAttr(propWriteStream);
+
 	propWriteStream.ADD_UINT8(ATTR_TELE_DEST);
+
 	propWriteStream.ADD_UINT16((uint16_t)destPos.x);
 	propWriteStream.ADD_UINT16((uint16_t)destPos.y);
 	propWriteStream.ADD_UINT8((uint8_t)destPos.z);
 	return ret;
 }
 
-void Teleport::setDestPos(const Position& pos)
-{
-	destPos = pos;
-}
-
-const Position& Teleport::getDestPos() const
-{
-	return destPos;
-}
-
 ReturnValue Teleport::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-                                 uint32_t flags) const
+	uint32_t flags) const
 {
 	return RET_NOTPOSSIBLE;
 }
 
 ReturnValue Teleport::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-                                      uint32_t& maxQueryCount, uint32_t flags) const
+	uint32_t& maxQueryCount, uint32_t flags) const
 {
 	return RET_NOTPOSSIBLE;
 }
@@ -110,7 +85,7 @@ ReturnValue Teleport::__queryRemove(const Thing* thing, uint32_t count, uint32_t
 }
 
 Cylinder* Teleport::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-                                       uint32_t& flags)
+	uint32_t& flags)
 {
 	return this;
 }
@@ -123,16 +98,12 @@ void Teleport::__addThing(Thing* thing)
 void Teleport::__addThing(int32_t index, Thing* thing)
 {
 	Tile* destTile = g_game.getTile(getDestPos().x, getDestPos().y, getDestPos().z);
-
-	if (destTile)
-	{
-		if (Creature* creature = thing->getCreature())
-		{
+	if(destTile){
+		if(Creature* creature = thing->getCreature()){
 			creature->getTile()->moveCreature(creature, destTile, true);
 			g_game.addMagicEffect(destTile->getPosition(), NM_ME_TELEPORT);
 		}
-		else if (Item* item = thing->getItem())
-		{
+		else if(Item* item = thing->getItem()){
 			g_game.internalMoveItem(getTile(), destTile, INDEX_WHEREEVER, item, item->getItemCount(), NULL);
 		}
 	}

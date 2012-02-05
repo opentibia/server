@@ -43,8 +43,7 @@
 #define	SLOTP_DEPOT 1024
 #define	SLOTP_TWO_HAND 2048
 
-enum ItemTypes_t
-{
+enum ItemTypes_t {
 	ITEM_TYPE_NONE = 0,
 	ITEM_TYPE_DEPOT,
 	ITEM_TYPE_MAILBOX,
@@ -59,30 +58,27 @@ enum ItemTypes_t
 	ITEM_TYPE_LAST
 };
 
-struct Abilities
-{
+struct Abilities{
 	Abilities();
 
-	struct Absorb
-	{
-		int16_t resistances[COMBAT_COUNT];
+	struct Absorb {
+			int16_t resistances[COMBAT_COUNT];
 
-		bool any() const;
-		bool reduce(CombatType_t type, int32_t& dmg) const;
-		std::ostream& getDescription(std::ostream& os) const;
+			bool any() const;
+			bool reduce(CombatType_t type, int32_t& dmg) const;
+			std::ostream& getDescription(std::ostream& os) const;
 	protected:
-		std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
+			std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
 	} absorb;
 
 	//extra skill modifiers
-	struct Skill
-	{
-		int16_t upgrades[SKILL_LAST + 1];
+	struct Skill {
+			int16_t upgrades[SKILL_LAST+1];
 
-		bool any() const;
-		std::ostream& getDescription(std::ostream& os) const;
+			bool any() const;
+			std::ostream& getDescription(std::ostream& os) const;
 	protected:
-		std::ostream& getDescription(std::ostream& os, bool& first, int32_t type) const;
+			std::ostream& getDescription(std::ostream& os, bool& first, int32_t type) const;
 	} skill;
 
 	//field damage
@@ -90,7 +86,7 @@ struct Abilities
 
 	//condition manipulating
 	uint16_t conditionCount;
-
+	
 	//elemental damage
 	CombatType_t elementType;
 	int16_t elementDamage;
@@ -119,11 +115,10 @@ struct Abilities
 
 class Condition;
 
-class ItemType
-{
+class ItemType {
 private:
 	//It is private because calling it can cause unexpected results
-	ItemType(const ItemType& it);
+	ItemType(const ItemType& it){};
 
 public:
 	ItemType();
@@ -134,31 +129,35 @@ public:
 
 	std::string getDescription(uint8_t count) const;
 
-	bool isGroundTile() const;
-	bool isContainer() const;
-	bool isSplash() const;
-	bool isFluidContainer() const;
+	bool isGroundTile() const {return (group == ITEM_GROUP_GROUND);}
+	bool isContainer() const {return (group == ITEM_GROUP_CONTAINER);}
+	bool isSplash() const {return (group == ITEM_GROUP_SPLASH);}
+	bool isFluidContainer() const {return (group == ITEM_GROUP_FLUID);}
 
-	bool isDoor() const;
-	bool isMagicField() const;
-	bool isTeleport() const;
-	bool isKey() const;
-	bool isDepot() const;
-	bool isMailbox() const;
-	bool isTrashHolder() const;
-	bool isRune() const;
-	bool hasSubType() const;
-	bool isSolidForItems() const;
-	bool isBed() const;
-	bool isLevelDoor() const;
+	bool isDoor() const {return (type == ITEM_TYPE_DOOR);}
+	bool isMagicField() const {return (type == ITEM_TYPE_MAGICFIELD);}
+	bool isTeleport() const {return (type == ITEM_TYPE_TELEPORT);}
+	bool isKey() const {return (type == ITEM_TYPE_KEY);}
+	bool isDepot() const {return (type == ITEM_TYPE_DEPOT);}
+	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
+	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
+	bool isRune() const {return (type == ITEM_TYPE_RUNE);}
+	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
+	bool isSolidForItems() const { return id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE;}
+
+	//[ added for beds system
+	bool isBed() const {return type == ITEM_TYPE_BED;}
+
+	bool isLevelDoor() const {return id == 1227 || id == 1229 || id == 1245 || id == 1247 || id == 1259 || id == 1261 || id == 3540 || id == 3549 || id == 5103 || id == 5112 || id == 5121 || id == 5130 || id == 5292 || id == 5294 || id == 6206 || id == 6208 || id == 6263 || id == 6265 || id == 6896 || id == 6905 || id == 7038 || id == 7047 || id == 8555 || id == 8557 || id == 9179 || id == 9181 || id == 9281 || id == 9283 || id == 10282 || id == 10284 || id == 10473 ||  id == 10482 ||  id == 10780 || id == 10789; }
 
 	static ClientFluidTypes_t getClientFluidType(FluidTypes_t f);
-	static FluidTypes_t getFluidTypeFromClientType(ClientFluidTypes_t f);
-
+    static FluidTypes_t getFluidTypeFromClientType(ClientFluidTypes_t f);
+	
 	Direction bedPartnerDir;
 	uint16_t maleSleeperID;
 	uint16_t femaleSleeperID;
 	uint16_t noSleeperID;
+	//]
 
 	uint16_t id;
 	uint16_t clientId;
@@ -168,7 +167,7 @@ public:
 	std::string    pluralName;
 	std::string    description;
 	uint16_t       maxItems;
-	double          weight;
+	float          weight;
 	bool           showCount;
 	WeaponType_t   weaponType;
 	Ammo_t         amuType;
@@ -178,7 +177,7 @@ public:
 	int32_t        defense;
 	int32_t        extraDef;
 	int32_t        armor;
-	uint32_t       slot_position;
+	uint16_t       slot_position;
 	uint16_t       wield_position;
 	bool           isVertical;
 	bool           isHorizontal;
@@ -229,7 +228,7 @@ public:
 	bool blockProjectile;
 	bool blockPathFind;
 	bool allowPickupable;
-
+	
 	unsigned short transformEquipTo;
 	unsigned short transformDeEquipTo;
 	bool showDuration;
@@ -252,12 +251,11 @@ public:
 };
 
 template<typename A>
-class Array
-{
+class Array{
 public:
 	Array(uint32_t n)
 	{
-		m_data = (A*)malloc(sizeof(A) * n);
+		m_data = (A*)malloc(sizeof(A)*n);
 		memset(m_data, 0, sizeof(A)*n);
 		m_size = n;
 	}
@@ -268,61 +266,53 @@ public:
 
 	A getElement(uint32_t id)
 	{
-		if (id < m_size)
-		{
+		if(id < m_size){
 			return m_data[id];
 		}
-
 		return 0;
 	}
 
 	const A getElement(uint32_t id) const
 	{
-		if (id < m_size)
-		{
+		if(id < m_size){
 			return m_data[id];
 		}
-
 		return 0;
 	}
 
 	void addElement(A a, uint32_t pos)
 	{
 		static const int INCREMENT = 5000;
-
-		if (pos >= m_size)
-		{
-			m_data = (A*)realloc(m_data, sizeof(A) * (pos + INCREMENT));
-			memset(m_data + m_size, 0, sizeof(A) * (pos + INCREMENT - m_size));
+		if(pos >= m_size){
+			m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
+			memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
 			m_size = pos + INCREMENT;
 		}
-
 		m_data[pos] = a;
 	}
 
-	uint32_t size() const
-	{
-		return m_size;
-	}
+	uint32_t size() const {return m_size;}
 private:
 	A* m_data;
 	uint32_t m_size;
 };
 
-class Items
-{
+
+
+class Items{
 public:
 	Items();
+	~Items();
 
 	bool reload();
 	void clear();
 
-	int loadFromOtb(const std::string& file);
+	int loadFromOtb(std::string);
 
-	const ItemType& operator[](const int32_t& id) const;
-	const ItemType& getItemType(const int32_t& id) const;
-	ItemType& getItemType(const int32_t& id);
-	const ItemType& getItemIdByClientId(const int32_t& spriteId) const;
+	const ItemType& operator[](int32_t id) const {return getItemType(id);}
+	const ItemType& getItemType(int32_t id) const;
+	ItemType& getItemType(int32_t id);
+	const ItemType& getItemIdByClientId(int32_t spriteId) const;
 
 	int32_t getItemIdByName(const std::string& name);
 
@@ -332,8 +322,10 @@ public:
 
 	bool loadFromXml(const std::string& datadir);
 
-	const ItemType* getElement(const uint32_t& id) const;
-	uint32_t size() const;
+	void addItemType(ItemType* iType);
+
+	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
+	uint32_t size() {return items.size();}
 
 	std::map<uint32_t, ItemType*> currencyMap;
 

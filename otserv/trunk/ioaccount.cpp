@@ -32,13 +32,13 @@ extern ConfigManager g_config;
 Account IOAccount::loadAccount(const std::string& name, bool preLoad/* = false*/)
 {
 	Account acc;
+
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
-	query << "SELECT `id`, `name`, `password`, `premend`, `warnings` FROM `accounts` WHERE `name` = " << db->escapeString(name);
 
-	if (!(result = db->storeQuery(query.str())))
-	{
+	query << "SELECT `id`, `name`, `password`, `premend`, `warnings` FROM `accounts` WHERE `name` = " << db->escapeString(name);
+	if(!(result = db->storeQuery(query.str()))){
 		return acc;
 	}
 
@@ -49,28 +49,20 @@ Account IOAccount::loadAccount(const std::string& name, bool preLoad/* = false*/
 	acc.warnings = result->getDataInt("warnings");
 	db->freeResult(result);
 
-	if (preLoad)
-	{
+	if(preLoad)
 		return acc;
-	}
 
 	query.str("");
 	query << "SELECT `name` FROM `players` WHERE `account_id` = " << acc.number;
-
-	if (!(result = db->storeQuery(query.str())))
-	{
+	if(!(result = db->storeQuery(query.str()))){
 		return acc;
 	}
 
-	do
-	{
-		acc.characters.push_back(result->getDataString("name"));
-	}
-	while (result->next());
+	do {
+		acc.charList.push_back(result->getDataString("name"));
+	} while(result->next());
 
-	// Sort the character list
-	std::vector<std::string>& charVector = acc.characters;
-	std::sort(charVector.begin(), charVector.end());
+	acc.charList.sort();
 	db->freeResult(result);
 	return acc;
 }
@@ -79,19 +71,19 @@ bool IOAccount::saveAccount(Account acc)
 {
 	Database* db = Database::instance();
 	DBQuery query;
+
 	query << "UPDATE `accounts` SET `premend` = " << acc.premEnd << ", `warnings` = " << acc.warnings << " WHERE `id` = " << acc.number;
 	return db->executeQuery(query.str());
 }
 
-bool IOAccount::getPassword(const std::string& accountname, const std::string& name, std::string& password)
+bool IOAccount::getPassword(const std::string& accountname, const std::string &name, std::string &password)
 {
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
-	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`name` = " << db->escapeString(accountname) << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
 
-	if ((result = db->storeQuery(query.str())))
-	{
+	query << "SELECT `accounts`.`password` AS `password` FROM `accounts`, `players` WHERE `accounts`.`name` = " << db->escapeString(accountname) << " AND `accounts`.`id` = `players`.`account_id` AND `players`.`name` = " << db->escapeString(name);
+	if((result = db->storeQuery(query.str()))){
 		password = result->getDataString("password");
 		db->freeResult(result);
 		return true;
@@ -100,15 +92,14 @@ bool IOAccount::getPassword(const std::string& accountname, const std::string& n
 	return false;
 }
 
-bool IOAccount::getAccountName(uint32_t accountId, std::string& accountName)
+bool IOAccount::getAccountName(uint32_t accountId, std::string &accountName)
 {
 	Database* db = Database::instance();
 	DBQuery query;
 	DBResult* result;
-	query << "SELECT `accounts`.`name` AS `name` FROM `accounts` WHERE `accounts`.`id` = " << accountId;
 
-	if ((result = db->storeQuery(query.str())))
-	{
+	query << "SELECT `accounts`.`name` AS `name` FROM `accounts` WHERE `accounts`.`id` = " << accountId;
+	if((result = db->storeQuery(query.str()))){
 		accountName = result->getDataString("name");
 		db->freeResult(result);
 		return true;

@@ -30,8 +30,7 @@ class Creature;
 
 #define INDEX_WHEREEVER -1
 
-enum cylinderflags_t
-{
+enum cylinderflags_t {
 	FLAG_NOLIMIT = 1,				//Bypass limits like capacity/container limits, blocking items/creatures etc.
 	FLAG_IGNOREBLOCKITEM = 2,		//Bypass moveable blocking item checks.
 	FLAG_IGNOREBLOCKCREATURE = 4,	//Bypass creature checks.
@@ -42,16 +41,14 @@ enum cylinderflags_t
 	FLAG_IGNOREAUTOSTACK   = 128	//__queryDestination will not try to stack items together
 };
 
-enum cylinderlink_t
-{
+enum cylinderlink_t{
 	LINK_OWNER,
 	LINK_PARENT,
 	LINK_TOPPARENT,
 	LINK_NEAR
 };
 
-class Cylinder : virtual public Thing
-{
+class Cylinder : virtual public Thing{
 public:
 	/**
 	  * Query if the cylinder can add an object
@@ -64,7 +61,7 @@ public:
 	  * \return ReturnValue holds the return value
 	  */
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* Item, uint32_t count,
-	                               uint32_t flags) const = 0;
+		uint32_t flags) const = 0;
 
 	/**
 	  * Query the cylinder how much it can accept
@@ -77,7 +74,7 @@ public:
 	  * \return ReturnValue holds the return value
 	  */
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
-	                                    uint32_t flags) const = 0;
+		uint32_t flags) const = 0;
 
 	/**
 	  * Query if the cylinder can remove an object
@@ -99,7 +96,7 @@ public:
 	  * \return Cylinder returns the destination cylinder
 	  */
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-	                                     uint32_t& flags) = 0;
+		uint32_t& flags) = 0;
 
 	/**
 	  * Add the object to the cylinder
@@ -216,26 +213,28 @@ public:
 	static VirtualCylinder* virtualCylinder;
 
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-								uint32_t flags) const;
+		uint32_t flags) const {return RET_NOTPOSSIBLE;}
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-								uint32_t& maxQueryCount, uint32_t flags) const;
-	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const;
+		uint32_t& maxQueryCount, uint32_t flags) const {return RET_NOTPOSSIBLE;}
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const {return (thing->getParent() == this ? RET_NOERROR : RET_NOTPOSSIBLE);}
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-	                                     uint32_t& flags);
-	virtual void __addThing(Thing* thing);
-	virtual void __addThing(int32_t index, Thing* thing);
-	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
-	virtual void __replaceThing(uint32_t index, Thing* thing);
-	virtual void __removeThing(Thing* thing, uint32_t count);
-	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index,
-								cylinderlink_t link = LINK_OWNER, bool isNewItem = true);
-	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval,
-								cylinderlink_t link = LINK_OWNER);
+		uint32_t& flags) {return NULL;}
 
-	virtual bool isPushable() const;
-	virtual int getThrowRange() const;
-	virtual std::string getDescription(const int32_t& lookDistance) const;
-	virtual bool isRemoved() const;
+	virtual void __addThing(Thing* thing) {}
+	virtual void __addThing(int32_t index, Thing* thing) {}
+	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count) {}
+	virtual void __replaceThing(uint32_t index, Thing* thing) {}
+	virtual void __removeThing(Thing* thing, uint32_t count) {}
+
+	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER, bool isNewItem = true) {}
+	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval,
+		cylinderlink_t link = LINK_OWNER) {}
+
+	virtual bool isPushable() const {return false;}
+	virtual int getThrowRange() const {return 1;}
+	virtual std::string getDescription(int32_t lookDistance) const {return "";}
+
+	virtual bool isRemoved() const {return false;}
 };
 
 

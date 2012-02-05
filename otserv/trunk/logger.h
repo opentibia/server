@@ -26,33 +26,30 @@
 #include <fstream>
 
 #if defined __GNUC__
-#define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
+	#define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
 #elif defined _MSC_VER
-#define __OTSERV_PRETTY_FUNCTION__ __FUNCDNAME__
+	#define __OTSERV_PRETTY_FUNCTION__ __FUNCDNAME__
 #endif
 
 #define LOG_MESSAGE(channel, type, level, message) \
 	Logger::getInstance()->logMessage(channel, type, level, message, __OTSERV_PRETTY_FUNCTION__);
 
-enum eLogType
-{
+enum eLogType {
 	LOGTYPE_EVENT,
 	LOGTYPE_WARNING,
 	LOGTYPE_ERROR
 };
 
-class Logger
-{
+class Logger {
 public:
 	~Logger();
-	static Logger* getInstance()
-	{
+	static Logger* getInstance(){
 		static Logger instance;
 		return &instance;
 	}
 
 	void logMessage(const char* channel, eLogType type, int level,
-	                std::string message, const char* func);
+			std::string message, const char* func);
 private:
 	std::ofstream m_file;
 	bool m_registering;

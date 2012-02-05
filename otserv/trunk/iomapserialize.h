@@ -30,8 +30,7 @@ class Map;
 #include "map.h"
 #include <string>
 
-class IOMapSerialize
-{
+class IOMapSerialize{
 public:
 	static IOMapSerialize* getInstance()
 	{
@@ -80,7 +79,7 @@ protected:
 	// Relational storage uses a row for each item/tile
 	bool loadMapRelational(Map* map);
 	bool saveMapRelational(Map* map);
-
+	
 	bool saveItems(Database* db, uint32_t tileId, uint32_t houseId, const Tile* tile);
 	bool loadItems(Database* db, DBResult* result, Cylinder* parent, bool depotTransfer = false);
 

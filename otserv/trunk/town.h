@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,26 +19,32 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_TOWN_H__
-#define __OTSERV_TOWN_H__
+#ifndef __TOWN_H__
+#define __TOWN_H__
 
 #include "definitions.h"
 #include "position.h"
-#include <boost/noncopyable.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <string>
+#include <list>
 #include <map>
 
 class Town
 {
 public:
-	explicit Town(const uint32_t& _townid);
+	Town(uint32_t _townid)
+	{
+		townid = _townid;
+	}
+	
+	~Town(){};
+	
+	const Position& getTemplePosition() const {return posTemple;};
+	const std::string& getName() const {return townName;};
 
-	const Position& getTemplePosition() const;
-	const std::string& getName() const;
-
-	void setTemplePos(const Position& pos);
-	void setName(const std::string& _townName);
-	const uint32_t& getTownID() const;
+	void setTemplePos(const Position& pos) {posTemple = pos;};
+	void setName(std::string _townName) {townName = _townName;};
+	uint32_t getTownID() const {return townid;};
 
 private:
 	uint32_t townid;
@@ -48,21 +54,54 @@ private:
 
 typedef std::map<uint32_t, Town*> TownMap;
 
-class Towns : boost::noncopyable
+class Towns
 {
-	Towns();
-
 public:
-	static Towns& getInstance();
+	static Towns& getInstance()
+	{
+		static Towns instance;
+		return instance;
+	}
 
-	bool addTown(const uint32_t& _townid, Town* town);
-	Town* getTown(const std::string& townname);
-	Town* getTown(const uint32_t& _townid);
-	TownMap::const_iterator getTownBegin() const;
-	TownMap::const_iterator getTownEnd() const;
+	bool addTown(uint32_t _townid, Town* town)
+	{
+		TownMap::iterator it = townMap.find(_townid);
+		
+		if(it != townMap.end()){
+			return false;
+		}
+
+		townMap[_townid] = town;
+		return true;
+	}
+	
+	Town* getTown(const std::string& townname)
+	{
+		for(TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it){
+			if(boost::algorithm::iequals(it->second->getName(), townname)){
+				return it->second;
+			}
+		}
+
+		return NULL;
+	}
+
+	Town* getTown(uint32_t _townid)
+	{
+		TownMap::iterator it = townMap.find(_townid);
+		
+		if(it != townMap.end()){
+			return it->second;
+		}
+
+		return NULL;
+	}
+
+	TownMap::const_iterator getTownBegin() const{return townMap.begin();}
+	TownMap::const_iterator getTownEnd() const{return townMap.end();}
 
 private:
 	TownMap townMap;
 };
 
-#endif // __OTSERV_TOWN_H__
+#endif

@@ -31,6 +31,7 @@
 class Player;
 class Creature;
 class Container;
+class Party;
 
 typedef std::vector<Player*> PlayerVector;
 
@@ -38,9 +39,10 @@ class Party
 {
 public:
 	Party(Player* _leader);
+	~Party();
 
-	Player* getLeader() const;
-	void setLeader(Player* _leader);
+	Player* getLeader() const {return leader;}
+	void setLeader(Player* _leader) {leader = _leader;}
 
 	void disband();
 	bool invitePlayer(Player* player);
@@ -56,21 +58,21 @@ public:
 	void updateAllPartyIcons();
 	void updatePartyIcons(Player* player);
 	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
-	bool disbandParty() const;
-	bool canOpenCorpse(const uint32_t& ownerId);
+	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
+	bool canOpenCorpse(uint32_t ownerId);
 
-	void shareExperience(const uint64_t& experience, bool fromMonster);
+	void shareExperience(uint64_t experience, bool fromMonster);
 	bool setSharedExperience(Player* player, bool _sharedExpActive);
-	bool isSharedExperienceActive() const;
-	bool isSharedExperienceEnabled() const;
+	bool isSharedExperienceActive() const {return sharedExpActive;}
+	bool isSharedExperienceEnabled() const {return sharedExpEnabled;}
 	bool canUseSharedExperience(const Player* player) const;
 	void updateSharedExperience();
 
-	void addPlayerHealedMember(Player* player, const uint32_t& points);
-	void addPlayerDamageMonster(Player* player, const uint32_t& points);
+	void addPlayerHealedMember(Player* player, uint32_t points);
+	void addPlayerDamageMonster(Player* player, uint32_t points);
 	void clearPlayerPoints(Player* player);
 
-	const PlayerVector& getMemberList() const;
+	const PlayerVector& getMemberList() const {return memberList;}
 
 protected:
 	bool sharedExpActive;
@@ -80,8 +82,7 @@ protected:
 	PlayerVector memberList;
 	PlayerVector inviteList;
 
-	struct CountBlock_t
-	{
+	struct CountBlock_t{
 		int32_t totalHeal;
 		int32_t totalDamage;
 		int64_t ticks;

@@ -32,8 +32,7 @@ class Party;
 
 typedef std::map<uint32_t, Player*> UsersMap;
 
-enum ChannelID
-{
+enum ChannelID {
 	CHANNEL_GUILD      = 0x00,
 	CHANNEL_RULE_REP   = 0x03,
 	CHANNEL_GAME_CHAT  = 0x04,
@@ -48,21 +47,20 @@ enum ChannelID
 class ChatChannel
 {
 public:
-	ChatChannel(const uint16_t& channelId, const std::string& channelName);
-	virtual ~ChatChannel();
+	ChatChannel(uint16_t channelId, std::string channelName);
+	virtual ~ChatChannel(){}
 
-	bool isUserIn(Player* player);
 	bool addUser(Player* player);
 	bool removeUser(Player* player, bool sendCloseChannel = false);
 
 	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time = 0);
-	bool sendInfo(const SpeakClasses& type, const std::string& text, uint32_t time = 0);
+	bool sendInfo(SpeakClasses type, const std::string& text, uint32_t time = 0);
 
-	const std::string& getName() const;
-	const uint16_t& getId() const;
-	const UsersMap& getUsers() const;
+	const std::string& getName() const { return m_name; }
+	const uint16_t getId() const { return m_id; }
+	const UsersMap& getUsers() const { return m_users; }
 
-	virtual const uint32_t& getOwner() const;
+	virtual const uint32_t getOwner(){ return 0; }
 
 protected:
 	UsersMap m_users;
@@ -73,11 +71,11 @@ protected:
 class PrivateChatChannel : public ChatChannel
 {
 public:
-	PrivateChatChannel(const uint16_t& channelId, const std::string& channelName);
-	virtual ~PrivateChatChannel();
+	PrivateChatChannel(uint16_t channelId, std::string channelName);
+	virtual ~PrivateChatChannel(){};
 
-	virtual const uint32_t& getOwner() const;
-	void setOwner(const uint32_t& id);
+	virtual const uint32_t getOwner(){return m_owner;}
+	void setOwner(uint32_t id){m_owner = id;}
 
 	bool isInvited(const Player* player);
 
@@ -103,29 +101,27 @@ class Chat
 public:
 	Chat();
 	~Chat();
-
-	ChatChannel* createChannel(Player* player, const uint16_t& channelId);
-	bool deleteChannel(Player* player, const uint16_t& channelId);
+	ChatChannel* createChannel(Player* player, uint16_t channelId);
+	bool deleteChannel(Player* player, uint16_t channelId);
 	bool deleteChannel(Party* party);
 
-	bool addUserToChannel(Player* player, const uint16_t& channelId);
-	bool removeUserFromChannel(Player* player, const uint16_t& channelId);
+	bool addUserToChannel(Player* player, uint16_t channelId);
+	bool removeUserFromChannel(Player* player, uint16_t channelId);
 	void removeUserFromAllChannels(Player* player);
 
 	uint16_t getFreePrivateChannelId();
-	bool isPrivateChannel(const uint16_t& channelId) const;
-	bool isMuteableChannel(const uint16_t& channelId, const SpeakClasses& type);
+	bool isPrivateChannel(uint16_t channelId);
+	bool isMuteableChannel(uint16_t channelId, SpeakClasses type);
 
-	bool talkToChannel(Player* player, const SpeakClasses& type,
-	                   const std::string& text, const uint16_t& channelId);
+	bool talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 
-	std::string getChannelName(Player* player, const uint16_t& channelId);
+	std::string getChannelName(Player* player, uint16_t channelId);
 	ChannelList getChannelList(Player* player);
 
 	ChatChannel* getChannel(Party* party);
-	ChatChannel* getChannel(Player* player, const uint16_t& channelId);
-	ChatChannel* getChannelById(const uint16_t& channelId);
-	ChatChannel* getGuildChannel(const uint32_t& guildId);
+	ChatChannel* getChannel(Player* player, uint16_t channelId);
+	ChatChannel* getChannelById(uint16_t channelId);
+	ChatChannel* getGuildChannel(uint32_t guildId);
 	PrivateChatChannel* getPrivateChannel(Player* player);
 
 private:

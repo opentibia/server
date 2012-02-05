@@ -29,16 +29,14 @@
 #include <list>
 #include <string>
 
-enum TalkActionResult_t
-{
+enum TalkActionResult_t{
 	//TALKACTION_NOTFOUND,
 	TALKACTION_CONTINUE,
 	TALKACTION_BREAK,
 	TALKACTION_FAILED
 };
 
-enum TalkActionFilterType
-{
+enum TalkActionFilterType{
 	TALKACTION_MATCH_QUOTATION,
 	TALKACTION_MATCH_FIRST_WORD
 };
@@ -55,7 +53,7 @@ public:
 
 protected:
 	virtual LuaScriptInterface& getScriptInterface();
-	virtual const std::string& getScriptBaseName() const;
+	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	virtual void clear();
@@ -77,25 +75,25 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 
-	const std::string& getWords() const;
-	TalkActionFilterType getFilterType() const;
-	TalkActionFunction* getFunction() const;
-	bool isCaseSensitive() const;
-	const int16_t& getAccessLevel() const;
-	bool isScripted() const;
+	std::string getWords() const {return commandString;}
+	TalkActionFilterType getFilterType() const {return filterType;}
+	TalkActionFunction* getFunction() const {return function;}
+	bool isCaseSensitive() const {return caseSensitive;}
+	int16_t getAccessLevel() const {return accessLevel;}
+	bool isScripted() const {return m_scripted;}
 
 	//scripting
 	bool executeSay(Player* player, const std::string& words, const std::string& param);
 
 protected:
-	virtual const std::string& getScriptEventName() const;
+	virtual std::string getScriptEventName();
 
 	static TalkActionFunction placeNpc;
 	static TalkActionFunction sellHouse;
 	static TalkActionFunction forceRaid;
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	#ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static TalkActionFunction serverDiag;
-#endif
+	#endif
 
 	std::string commandString;
 	TalkActionFilterType filterType;

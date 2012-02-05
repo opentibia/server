@@ -23,38 +23,38 @@
 
 #include "container.h"
 
-class Depot : public Container
-{
+class Depot : public Container{
 public:
-	Depot(const uint16_t& _type);
-	virtual ~Depot();
+	Depot(uint16_t _type);
+	~Depot();
 
-	virtual Depot* getDepot();
-	virtual const Depot* getDepot() const;
+	virtual Depot* getDepot() {return this;};
+	virtual const Depot* getDepot() const {return this;};
 
 	//serialization
-	virtual Attr_ReadValue readAttr(const AttrTypes_t& attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 
-	const uint32_t& getDepotId() const;
-	void setMaxDepotLimit(const uint32_t& maxitems);
-	void setDepotId(const uint32_t& id);
+	uint32_t getDepotId() const {return depotId;};
+	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
+	void setDepotId(uint32_t id) {depotId = id;};
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	                               uint32_t flags) const;
+		uint32_t flags) const;
 
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	                                    uint32_t& maxQueryCount, uint32_t flags) const;
+		uint32_t& maxQueryCount, uint32_t flags) const;
 
 	virtual void postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER, bool isNewItem = true);
 	virtual void postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	//overrides
-	virtual bool canRemove() const;
+	virtual bool canRemove() const {return false;}
 
 private:
 	uint32_t maxDepotLimit;
 	uint32_t depotId;
 };
 
-#endif // __OTSERV_DEPOT_H__
+#endif
+

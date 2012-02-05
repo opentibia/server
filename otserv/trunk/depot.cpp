@@ -23,8 +23,8 @@
 #include "tools.h"
 #include <sstream>
 
-Depot::Depot(const uint16_t& _type)
-	: Container(_type)
+Depot::Depot(uint16_t _type) :
+Container(_type)
 {
 	depotId = 0;
 	maxSize = 30;
@@ -33,27 +33,14 @@ Depot::Depot(const uint16_t& _type)
 
 Depot::~Depot()
 {
-	// Virtual Destructor
+	//
 }
 
-Depot* Depot::getDepot()
+Attr_ReadValue Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
-	return this;
-}
-
-const Depot* Depot::getDepot() const
-{
-	return this;
-}
-
-Attr_ReadValue Depot::readAttr(const AttrTypes_t& attr, PropStream& propStream)
-{
-	if (ATTR_DEPOT_ID == attr)
-	{
+	if(ATTR_DEPOT_ID == attr){
 		uint16_t _depotId;
-
-		if (!propStream.GET_UINT16(_depotId))
-		{
+		if(!propStream.GET_UINT16(_depotId)){
 			return ATTR_READ_ERROR;
 		}
 
@@ -61,61 +48,36 @@ Attr_ReadValue Depot::readAttr(const AttrTypes_t& attr, PropStream& propStream)
 		return ATTR_READ_CONTINUE;
 	}
 	else
-	{
 		return Item::readAttr(attr, propStream);
-	}
-}
-
-const uint32_t& Depot::getDepotId() const
-{
-	return depotId;
-}
-
-void Depot::setMaxDepotLimit(const uint32_t& maxitems)
-{
-	maxDepotLimit = maxitems;
-}
-
-void Depot::setDepotId(const uint32_t& id)
-{
-	depotId = id;
 }
 
 ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-                              uint32_t flags) const
+	uint32_t flags) const
 {
 	const Item* item = thing->getItem();
-
-	if (!item)
-	{
+	if(item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
 
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
 
-	if (!skipLimit)
-	{
+	if(!skipLimit){
 		int addCount = 0;
 
-		if ((item->isStackable() && item->getItemCount() != count))
-		{
+		if((item->isStackable() && item->getItemCount() != count)){
 			addCount = 1;
 		}
 
-		if (item->getTopParent() != this)
-		{
-			if (const Container* container = item->getContainer())
-			{
+		if(item->getTopParent() != this){
+			if(const Container* container = item->getContainer()){
 				addCount = container->getItemHoldingCount() + 1;
 			}
-			else
-			{
+			else{
 				addCount = 1;
 			}
 		}
 
-		if (getItemHoldingCount() + addCount > maxDepotLimit)
-		{
+		if(getItemHoldingCount() + addCount > maxDepotLimit){
 			return RET_DEPOTISFULL;
 		}
 	}
@@ -124,28 +86,21 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 }
 
 ReturnValue Depot::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-                                   uint32_t& maxQueryCount, uint32_t flags) const
+	uint32_t& maxQueryCount, uint32_t flags) const
 {
 	return Container::__queryMaxCount(index, thing, count, maxQueryCount, flags);
 }
 
 void Depot::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
 {
-	if (getParent())
-	{
+	if(getParent() != NULL){
 		getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT, isNewItem);
 	}
 }
 
 void Depot::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	if (getParent())
-	{
+	if(getParent() != NULL){
 		getParent()->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 	}
-}
-
-bool Depot::canRemove() const
-{
-	return false;
 }

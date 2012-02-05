@@ -24,35 +24,24 @@
 
 extern Game g_game;
 
-TrashHolder::TrashHolder(uint16_t _type, MagicEffectClasses _effect /*= NM_ME_NONE*/)
-	: Item(_type)
+TrashHolder::TrashHolder(uint16_t _type, MagicEffectClasses _effect /*= NM_ME_NONE*/) : Item(_type)
 {
 	effect = _effect;
 }
 
 TrashHolder::~TrashHolder()
 {
-	// Virtual Destructor
-}
-
-TrashHolder* TrashHolder::getTrashHolder()
-{
-	return this;
-}
-
-const TrashHolder* TrashHolder::getTrashHolder() const
-{
-	return this;
+	//
 }
 
 ReturnValue TrashHolder::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-                                    uint32_t flags) const
+	uint32_t flags) const
 {
 	return RET_NOERROR;
 }
 
 ReturnValue TrashHolder::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-        uint32_t& maxQueryCount, uint32_t flags) const
+	uint32_t& maxQueryCount, uint32_t flags) const
 {
 	maxQueryCount = std::max((uint32_t)1, count);
 	return RET_NOERROR;
@@ -64,7 +53,7 @@ ReturnValue TrashHolder::__queryRemove(const Thing* thing, uint32_t count, uint3
 }
 
 Cylinder* TrashHolder::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-        uint32_t& flags)
+	uint32_t& flags)
 {
 	return this;
 }
@@ -76,14 +65,10 @@ void TrashHolder::__addThing(Thing* thing)
 
 void TrashHolder::__addThing(int32_t index, Thing* thing)
 {
-	if (Item* item = thing->getItem())
-	{
-		if (item != this && (item->isPickupable() || item->isPushable() || item->isMoveable()))
-		{
+	if(Item* item = thing->getItem()){
+		if(item != this && (item->isPickupable() || item->isPushable() || item->isMoveable())){
 			g_game.internalRemoveItem(item);
-
-			if (effect != NM_ME_NONE)
-			{
+			if(effect != NM_ME_NONE){
 				g_game.addMagicEffect(getPosition(), effect);
 			}
 		}

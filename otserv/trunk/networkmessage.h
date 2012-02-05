@@ -41,52 +41,126 @@ public:
 	enum { xtea_multiple = 8 };
 	enum { max_body_length = NETWORKMESSAGE_MAXSIZE - header_length - crypto_length - xtea_multiple };
 
-	NetworkMessage();
-	virtual ~NetworkMessage();
+	// constructor/destructor
+	NetworkMessage(){
+		Reset();
+	}
+	virtual ~NetworkMessage(){};
+
+	// resets the internal buffer to an empty message
+protected:
+	void Reset(){
+		m_MsgSize = 0;
+		m_ReadPos = 8;
+	}
+public:
 
 	// simply read functions for incoming message
-	uint8_t GetByte();
-	uint16_t GetU16();
-	uint32_t GetU32();
-	uint32_t PeekU32();
+	uint8_t  GetByte(){return m_MsgBuf[m_ReadPos++];}
 
-	uint16_t GetSpriteId();
+#ifndef __SWAP_ENDIAN__
+	uint16_t GetU16(){
+		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
+		m_ReadPos += 2;
+		return v;
+	}
+	uint32_t GetU32(){
+		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+		m_ReadPos += 4;
+		return v;
+	}
+	uint32_t PeekU32(){
+		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+		return v;
+	}
+#else
+	uint16_t GetU16(){
+		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
+		m_ReadPos += 2;
+		return swap_uint16(v);
+	}
+	uint32_t GetU32(){
+		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+		m_ReadPos += 4;
+		return swap_uint32(v);
+	}
+	uint32_t PeekU32(){
+		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+		return swap_uint32(v);
+	}
+#endif
+
+	uint16_t GetSpriteId(){
+		return GetU16();
+	}
 
 	std::string GetString();
 	std::string GetRaw();
 	Position GetPosition();
 
 	// skips count unknown/unused bytes in an incoming message
-	void SkipBytes(const int& count);
+	void SkipBytes(int count){m_ReadPos += count;}
 
 	// simply write functions for outgoing message
-	void AddByte(const uint8_t& value);
-	void AddU16(const uint16_t& value);
-	void AddU32(const uint32_t& value);
-	void AddBytes(const char* bytes, const uint32_t& size);
-	void AddPaddingBytes(const uint32_t& n);
+	void AddByte(uint8_t  value){
+		if(!canAdd(1))
+			return;
+		m_MsgBuf[m_ReadPos++] = value;
+		m_MsgSize++;
+	}
 
-	void AddString(const std::string& value);
+#ifndef __SWAP_ENDIAN__
+	void AddU16(uint16_t value){
+		if(!canAdd(2))
+			return;
+		*(uint16_t*)(m_MsgBuf + m_ReadPos) = value;
+		m_ReadPos += 2; m_MsgSize += 2;
+	}
+	void AddU32(uint32_t value){
+		if(!canAdd(4))
+			return;
+		*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
+		m_ReadPos += 4; m_MsgSize += 4;
+	}
+#else
+	void AddU16(uint16_t value){
+		if(!canAdd(2))
+			return;
+		*(uint16_t*)(m_MsgBuf + m_ReadPos) = swap_uint16(value);
+		m_ReadPos += 2; m_MsgSize += 2;
+	}
+	void AddU32(uint32_t value){
+		if(!canAdd(4))
+			return;
+		*(uint32_t*)(m_MsgBuf + m_ReadPos) = swap_uint32(value);
+		m_ReadPos += 4; m_MsgSize += 4;
+	}
+#endif
+
+	void AddBytes(const char* bytes, uint32_t size);
+	void AddPaddingBytes(uint32_t n);
+
+	void AddString(const std::string& value){AddString(value.c_str());}
 	void AddString(const char* value);
 
-	// write functions for complex types
-	void AddPosition(const Position& pos);
-	void AddItem(const uint16_t& id, const uint8_t& count);
-	void AddItem(const Item* item);
-	void AddItemId(const Item* item);
-	void AddItemId(const uint16_t& itemId);
-	void AddCreature(const Creature* creature, bool known, unsigned int remove);
 
-	const int32_t& getMessageLength() const;
-	void setMessageLength(const int32_t& newSize);
-	const int32_t& getReadPos() const;
-	void setReadPos(const int32_t& pos);
+	// write functions for complex types
+	void AddPosition(const Position &pos);
+	void AddItem(uint16_t id, uint8_t count);
+	void AddItem(const Item *item);
+	void AddItemId(const Item *item);
+	void AddItemId(uint16_t itemId);
+	void AddCreature(const Creature *creature, bool known, unsigned int remove);
+
+	int32_t getMessageLength() const { return m_MsgSize; }
+	void setMessageLength(int32_t newSize) { m_MsgSize = newSize; }
+	int32_t getReadPos() const { return m_ReadPos; }
+	void setReadPos(int32_t pos) {m_ReadPos = pos; }
 
 	int32_t decodeHeader();
 
-	char* getBuffer();
-	const char* getBuffer() const;
-	char* getBodyBuffer();
+	char* getBuffer() { return (char*)&m_MsgBuf[0]; }
+	char* getBodyBuffer() { m_ReadPos = 2; return (char*)&m_MsgBuf[header_length]; }
 
 #ifdef __TRACK_NETWORK__
 	virtual void Track(std::string file, long line, std::string func) {};
@@ -95,8 +169,10 @@ public:
 
 
 protected:
-	void Reset();
-	bool canAdd(const uint32_t& size) const;
+	inline bool canAdd(uint32_t size)
+	{
+		return (size + m_ReadPos < max_body_length);
+	};
 
 	int32_t m_MsgSize;
 	int32_t m_ReadPos;

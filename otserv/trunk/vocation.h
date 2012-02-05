@@ -30,29 +30,43 @@
 class Vocation
 {
 public:
-	const std::string& getName() const;
-	const std::string& getDescription() const;
+	~Vocation();
 
-	const uint32_t& getReqSkillTries(const int32_t& skill, const int32_t& level);
-	const uint32_t& getReqMana(const int32_t& magLevel);
-	const uint32_t& getHPGain() const;
-	const uint32_t& getManaGain() const;
-	const uint32_t& getCapGain() const;
-	const uint32_t& getManaGainTicks() const;
-	const uint32_t& getManaGainAmount() const;
-	const uint32_t& getHealthGainTicks() const;
-	const uint32_t& getHealthGainAmount() const;
-	const uint16_t& getSoulMax() const;
-	const uint16_t& getSoulGainTicks() const;
-	const uint32_t& getAttackSpeed() const;
+	const std::string& getName() const {return name;}
+	const std::string& getDescription() const {return description;}
 
-	const float& getMeleeBaseDamage(const WeaponType_t& weaponType) const;
+	uint32_t getReqSkillTries(int32_t skill, int32_t level);
+	uint32_t getReqMana(int32_t magLevel);
+	uint32_t getHPGain() const {return gainHP;};
+	uint32_t getManaGain() const {return gainMana;};
+	uint32_t getCapGain() const {return gainCap;};
+	uint32_t getManaGainTicks() const {return gainManaTicks;};
+	uint32_t getManaGainAmount() const {return gainManaAmount;};
+	uint32_t getHealthGainTicks() const {return gainHealthTicks;};
+	uint32_t getHealthGainAmount() const {return gainHealthAmount;};
+	uint16_t getSoulMax() const {return maxSoul;};
+	uint16_t getSoulGainTicks() const {return gainSoulTicks;};
+	uint32_t getAttackSpeed() const {return attackSpeed;};
 
-	const float& getMagicBaseDamage() const;
-	const float& getWandBaseDamage() const;
-	const float& getHealingBaseDamage() const;
-	const float& getBaseDefense() const;
-	const float& getArmorDefense() const;
+	float getMeleeBaseDamage(WeaponType_t weaponType) const
+	{
+		if(weaponType == WEAPON_SWORD)
+			return swordBaseDamage;
+		else if(weaponType == WEAPON_AXE)
+			return axeBaseDamage;
+		else if(weaponType == WEAPON_CLUB)
+			return clubBaseDamage;
+		else if(weaponType == WEAPON_DIST)
+			return distBaseDamage;
+		else
+			return fistBaseDamage;
+	};
+
+	float getMagicBaseDamage() const {return magicBaseDamage;};
+	float getWandBaseDamage() const {return wandBaseDamage;};
+	float getHealingBaseDamage() const {return healingBaseDamage;};
+	float getBaseDefense() const {return baseDefense;};
+	float getArmorDefense() const {return armorDefense;};
 
 	void debugVocation();
 
@@ -93,6 +107,7 @@ protected:
 	cacheMap cacheMana;
 	cacheMap cacheSkill[SKILL_LAST + 1];
 };
+
 
 class Vocations
 {

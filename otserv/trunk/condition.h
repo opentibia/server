@@ -31,8 +31,7 @@ class Creature;
 class Player;
 class PropStream;
 
-enum ConditionType_t
-{
+enum ConditionType_t {
 	CONDITION_NONE           = 0,
 	CONDITION_POISON         = 1 << 0,
 	CONDITION_FIRE           = 1 << 1,
@@ -63,16 +62,14 @@ enum ConditionType_t
 	CONDITION_EXHAUST_OTHERS = 1 << 26
 };
 
-enum ConditionEnd_t
-{
+enum ConditionEnd_t{
 	CONDITIONEND_CLEANUP,
 	CONDITIONEND_DIE,
 	CONDITIONEND_TICKS,
 	CONDITIONEND_ABORT
 };
 
-enum ConditionAttr_t
-{
+enum ConditionAttr_t{
 	CONDITIONATTR_TYPE = 1,
 	CONDITIONATTR_ID = 2,
 	CONDITIONATTR_TICKS = 3,
@@ -106,45 +103,42 @@ enum ConditionAttr_t
 	CONDITIONATTR_END      = 254
 };
 
-struct IntervalInfo
-{
+struct IntervalInfo{
 	int32_t timeLeft;
 	int32_t value;
 	int32_t interval;
 };
 
-class Condition
-{
+class Condition{
 public:
-	Condition(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~Condition();
+	Condition(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~Condition(){};
 
 	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, const int32_t& interval);
-	virtual void endCondition(Creature* creature, const ConditionEnd_t& reason) = 0;
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason) = 0;
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
 	virtual uint16_t getIcons() const;
-	const ConditionId_t& getId() const;
-	const uint32_t& getSubId() const;
+	ConditionId_t getId() const {return id;}
+	uint32_t getSubId() const {return subId;}
 
 	virtual Condition* clone() const = 0;
 
-	const ConditionType_t& getType() const;
-	const int64_t& getEndTime() const;
-	const int32_t& getTicks() const;
-	void setTicks(const int32_t& newTicks);
+	ConditionType_t getType() const { return conditionType;}
+	int64_t getEndTime() const {return ticks == -1? 0 : endTime;}
+	int32_t getTicks() const { return ticks; }
+	void setTicks(int32_t newTicks);
 
-	static bool canBeAggressive(const ConditionType_t& type);
-	static Condition* createCondition(const ConditionId_t& _id, const ConditionType_t& _type,
-	                                  const int32_t& ticks, const int32_t& param = 0);
+	static bool canBeAggressive(ConditionType_t type);
+	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param = 0);
 	static Condition* createCondition(PropStream& propStream);
 
-	virtual bool setParam(const ConditionParam_t& param, const int32_t& value);
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
 	bool unserialize(PropStream& propStream);
 	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(const ConditionAttr_t& attr, PropStream& propStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 	bool isPersistent() const;
 
@@ -162,43 +156,45 @@ protected:
 class ConditionGeneric: public Condition
 {
 public:
-	ConditionGeneric(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~ConditionGeneric();
+	ConditionGeneric(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionGeneric(){};
 
-	virtual void endCondition(Creature* creature, const ConditionEnd_t& reason);
+	virtual bool startCondition(Creature* creature);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint16_t getIcons() const;
 
-	virtual ConditionGeneric* clone() const;
+	virtual ConditionGeneric* clone()  const { return new ConditionGeneric(*this); }
 };
 
 class ConditionManaShield : public ConditionGeneric
 {
 public:
-	ConditionManaShield(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~ConditionManaShield();
+	ConditionManaShield(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) : ConditionGeneric(_id, _type, _ticks) {};
+	virtual ~ConditionManaShield(){};
 
-	virtual ConditionManaShield* clone() const;
+	virtual ConditionManaShield* clone()  const { return new ConditionManaShield(*this); }
 };
 
 class ConditionAttributes : public ConditionGeneric
 {
 public:
-	ConditionAttributes(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~ConditionAttributes() {};
+	ConditionAttributes(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionAttributes(){};
 
 	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, const int32_t& interval);
-	virtual void endCondition(Creature* creature, const ConditionEnd_t& reason);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 
-	virtual ConditionAttributes* clone() const;
+	virtual ConditionAttributes* clone()  const { return new ConditionAttributes(*this); }
 
-	virtual bool setParam(const ConditionParam_t& param, const int32_t& value);
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(const ConditionAttr_t& attr, PropStream& propStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
 	int32_t skills[SKILL_LAST + 1];
@@ -217,18 +213,18 @@ protected:
 class ConditionRegeneration : public ConditionGeneric
 {
 public:
-	ConditionRegeneration(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~ConditionRegeneration();
+	ConditionRegeneration(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionRegeneration(){};
 	virtual void addCondition(Creature* creature, const Condition* addCondition);
-	virtual bool executeCondition(Creature* creature, const int32_t& interval);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
 
-	virtual ConditionRegeneration* clone() const;
+	virtual ConditionRegeneration* clone()  const { return new ConditionRegeneration(*this); }
 
-	virtual bool setParam(const ConditionParam_t& param, const int32_t& value);
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(const ConditionAttr_t& attr, PropStream& propStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
 	uint32_t internalHealthTicks;
@@ -243,18 +239,18 @@ protected:
 class ConditionSoul : public ConditionGeneric
 {
 public:
-	ConditionSoul(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~ConditionSoul();
+	ConditionSoul(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionSoul(){};
 	virtual void addCondition(Creature* creature, const Condition* addCondition);
-	virtual bool executeCondition(Creature* creature, const int32_t& interval);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
 
-	virtual ConditionSoul* clone() const;
+	virtual ConditionSoul* clone()  const { return new ConditionSoul(*this); }
 
-	virtual bool setParam(const ConditionParam_t& param, const int32_t& value);
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(const ConditionAttr_t& attr, PropStream& propStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
 	uint32_t internalSoulTicks;
@@ -265,46 +261,57 @@ protected:
 class ConditionInvisible: public ConditionGeneric
 {
 public:
-	ConditionInvisible(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~ConditionInvisible();
+	ConditionInvisible(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionInvisible(){};
 
 	virtual bool startCondition(Creature* creature);
-	virtual void endCondition(Creature* creature, const ConditionEnd_t& reason);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 
-	virtual ConditionInvisible* clone() const;
+	virtual ConditionInvisible* clone()  const { return new ConditionInvisible(*this); }
 };
 
 class ConditionDamage: public Condition
 {
 public:
-	ConditionDamage(const ConditionId_t& _id, const ConditionType_t& _type);
-	virtual ~ConditionDamage();
+	ConditionDamage(ConditionId_t _id, ConditionType_t _type);
+	virtual ~ConditionDamage(){};
 
-	static void generateDamageList(const int32_t& amount, const int32_t& start, std::list<int32_t>& list);
+	static void generateDamageList(int32_t amount, int32_t start, std::list<int32_t>& list);
 
 	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, const int32_t& interval);
-	virtual void endCondition(Creature* creature, const ConditionEnd_t& reason);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint16_t getIcons() const;
 
-	virtual ConditionDamage* clone() const;
+	virtual ConditionDamage* clone()  const { return new ConditionDamage(*this); }
 
-	virtual bool setParam(const ConditionParam_t& param, const int32_t& value);
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 
-	bool addDamage(const int32_t& rounds, const int32_t& time, const int32_t& value);
-	bool doForceUpdate() const;
+	bool addDamage(int32_t rounds, int32_t time, int32_t value);
+	bool doForceUpdate() const { return forceUpdate;}
 	int32_t getTotalDamage() const;
 
-	size_t getLength() const;
-
-	IntervalInfo popBackDamage();
-	IntervalInfo popFrontDamage();
-	void clearDamageList();
+	int32_t getLength() const
+	{
+		return damageList.size();
+	}
+	
+	IntervalInfo popBackDamage() {
+		IntervalInfo info = damageList.back();
+		damageList.pop_back();
+		return info;
+	}
+	IntervalInfo popFrontDamage() {
+		IntervalInfo info = damageList.front();
+		damageList.pop_front();
+		return info;
+	}
+	void clearDamageList() { damageList.clear(); }
 
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(const ConditionAttr_t& attr, PropStream& propStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
 	int32_t maxDamage;
@@ -324,35 +331,34 @@ protected:
 	DamageList damageList;
 
 	bool getNextDamage(int32_t& damage);
-	bool doDamage(Creature* creature, const int32_t& damage);
+	bool doDamage(Creature* creature, int32_t damage);
 	bool updateCondition(const ConditionDamage* addCondition);
 };
 
 class ConditionSpeed: public Condition
 {
 public:
-	ConditionSpeed(const ConditionId_t& _id, const ConditionType_t& _type,
-	               const int32_t& _ticks, const int32_t& changeSpeed);
-	virtual ~ConditionSpeed();
+	ConditionSpeed(ConditionId_t _id, ConditionType_t _type, int32_t _ticks, int32_t changeSpeed);
+	virtual ~ConditionSpeed(){};
 
 	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, const int32_t& interval);
-	virtual void endCondition(Creature* creature, const ConditionEnd_t& reason);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint16_t getIcons() const;
 
-	virtual ConditionSpeed* clone() const;
+	virtual ConditionSpeed* clone()  const { return new ConditionSpeed(*this); }
 
-	virtual bool setParam(const ConditionParam_t& param, const int32_t& value);
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 
-	void setFormulaVars(const float& _mina, const float& _minb, const float& _maxa, const float& _maxb);
+	void setFormulaVars(float _mina, float _minb, float _maxa, float _maxb);
 
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(const ConditionAttr_t& attr, PropStream& propStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
-	void getFormulaValues(const int32_t& var, int32_t& min, int32_t& max) const;
+	void getFormulaValues(int32_t var, int32_t& min, int32_t& max) const;
 
 	int32_t speedDelta;
 
@@ -366,47 +372,46 @@ protected:
 class ConditionOutfit: public Condition
 {
 public:
-	ConditionOutfit(const ConditionId_t& _id, const ConditionType_t& _type, const int32_t& _ticks);
-	virtual ~ConditionOutfit();
+	ConditionOutfit(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionOutfit(){};
 
 	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, const int32_t& interval);
-	virtual void endCondition(Creature* creature, const ConditionEnd_t& reason);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 
-	virtual ConditionOutfit* clone() const;
+	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
 
-	void addOutfit(const Outfit_t& outfit);
+	void addOutfit(Outfit_t outfit);
 
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(const ConditionAttr_t& attr, PropStream& propStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
 	std::vector<Outfit_t> outfits;
 
-	void changeOutfit(Creature* creature, const int32_t& index = -1);
+	void changeOutfit(Creature* creature, int32_t index = -1);
 };
 
-class ConditionLight : public Condition
+class ConditionLight: public Condition
 {
 public:
-	ConditionLight(const ConditionId_t& _id, const ConditionType_t& _type,
-	               const int32_t& _ticks, const int32_t& _lightlevel, const int32_t& _lightcolor);
-	virtual ~ConditionLight();
+	ConditionLight(ConditionId_t _id, ConditionType_t _type, int32_t _ticks, int32_t _lightlevel, int32_t _lightcolor);
+	virtual ~ConditionLight(){};
 
 	virtual bool startCondition(Creature* creature);
-	virtual bool executeCondition(Creature* creature, const int32_t& interval);
-	virtual void endCondition(Creature* creature, const ConditionEnd_t& reason);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, ConditionEnd_t reason);
 	virtual void addCondition(Creature* creature, const Condition* addCondition);
 
-	virtual ConditionLight* clone() const;
+	virtual ConditionLight* clone()  const { return new ConditionLight(*this); }
 
-	virtual bool setParam(const ConditionParam_t& param, const int32_t& value);
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 	//serialization
 	virtual bool serialize(PropWriteStream& propWriteStream);
-	virtual bool unserializeProp(const ConditionAttr_t& attr, PropStream& propStream);
+	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 protected:
 	LightInfo lightInfo;

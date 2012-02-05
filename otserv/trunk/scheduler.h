@@ -33,40 +33,53 @@
 
 class SchedulerTask : public Task
 {
-protected:
-	SchedulerTask(const uint32_t& delay, const boost::function<void (void)>& f);
-
 public:
-	virtual ~SchedulerTask();
+	~SchedulerTask() {}
 
-	void setEventId(const uint32_t& eventid);
-	const uint32_t& getEventId() const;
+	void setEventId(uint32_t eventid) {m_eventid = eventid;}
+	uint32_t getEventId() const {return m_eventid;}
 
-	const boost::system_time& getCycle() const;
-	bool operator<(const SchedulerTask& other) const;
+	boost::system_time getCycle() const {return m_expiration;}
 
-protected:
-	uint32_t m_eventid;
-
-	friend SchedulerTask* createSchedulerTask(const uint32_t&, const boost::function<void (void)>&);
-};
-
-inline SchedulerTask* createSchedulerTask(const uint32_t& delay, const boost::function<void (void)>& f)
-{
-	assert(delay != 0);
-
-	if (delay < SCHEDULER_MINTICKS)
+	bool operator<(const SchedulerTask& other) const
 	{
-		return new SchedulerTask(SCHEDULER_MINTICKS, f);
+		return getCycle() > other.getCycle();
 	}
 
+protected:
+
+	SchedulerTask(uint32_t delay, const boost::function<void (void)>& f) : Task(delay, f) {
+		m_eventid = 0;
+	}
+
+	uint32_t m_eventid;
+
+	friend SchedulerTask* createSchedulerTask(uint32_t, const boost::function<void (void)>&);
+};
+
+inline SchedulerTask* createSchedulerTask(uint32_t delay, const boost::function<void (void)>& f)
+{
+	assert(delay != 0);
+	if(delay < SCHEDULER_MINTICKS){
+		delay = SCHEDULER_MINTICKS;
+	}
 	return new SchedulerTask(delay, f);
 }
+
+class lessSchedTask : public std::binary_function<SchedulerTask*&, SchedulerTask*&, bool>
+{
+public:
+	bool operator()(SchedulerTask*& t1, SchedulerTask*& t2)
+	{
+		return (*t1) < (*t2);
+	}
+};
 
 class Scheduler
 {
 public:
 	Scheduler();
+	~Scheduler() {}
 
 	uint32_t addEvent(SchedulerTask* task);
 	bool stopEvent(uint32_t eventId);
@@ -75,23 +88,13 @@ public:
 	void stop();
 	void shutdown();
 
-	enum SchedulerState
-	{
+	enum SchedulerState{
 		STATE_RUNNING,
 		STATE_CLOSING,
 		STATE_TERMINATED
 	};
 
 protected:
-
-	struct lessSchedTask : public std::binary_function<SchedulerTask*&, SchedulerTask*&, bool>
-	{
-		bool operator()(SchedulerTask*& t1, SchedulerTask*& t2) const
-		{
-			return (*t1) < (*t2);
-		}
-	};
-
 	static void schedulerThread(void* p);
 
 	boost::mutex m_eventLock;

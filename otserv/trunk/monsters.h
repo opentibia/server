@@ -28,8 +28,7 @@
 #define MAX_LOOTCHANCE 100000
 #define MAX_STATICWALK 100
 
-struct LootBlock
-{
+struct LootBlock{
 	uint16_t id;
 	uint32_t countmax;
 	uint32_t chance;
@@ -43,11 +42,11 @@ struct LootBlock
 	LootItems childLoot;
 	bool dropEmpty;
 
-	LootBlock()
-	{
+	LootBlock(){
 		id = 0;
 		countmax = 0;
 		chance = 0;
+
 		subType = -1;
 		actionId = -1;
 		text = "";
@@ -55,8 +54,7 @@ struct LootBlock
 	}
 };
 
-struct summonBlock_t
-{
+struct summonBlock_t{
 	std::string name;
 	uint32_t chance;
 	uint32_t speed;
@@ -65,8 +63,7 @@ struct summonBlock_t
 
 class BaseSpell;
 
-struct spellBlock_t
-{
+struct spellBlock_t{
 	BaseSpell* spell;
 	uint32_t chance;
 	uint32_t speed;
@@ -77,8 +74,7 @@ struct spellBlock_t
 	bool isMelee;
 };
 
-struct voiceBlock_t
-{
+struct voiceBlock_t{
 	std::string text;
 	bool yellText;
 };
@@ -90,8 +86,7 @@ typedef std::vector<voiceBlock_t> VoiceVector;
 typedef std::list<std::string> MonsterScriptList;
 typedef std::map<CombatType_t, int32_t> ElementMap;
 
-class MonsterType
-{
+class MonsterType{
 public:
 	MonsterType();
 	~MonsterType();
@@ -118,8 +113,8 @@ public:
 
 	Outfit_t outfit;
 	uint16_t lookCorpse;
-	uint32_t conditionImmunities;
-	uint32_t damageImmunities;
+	int conditionImmunities;
+	int damageImmunities;
 	RaceType_t race;
 	bool isSummonable;
 	bool isIllusionable;
@@ -155,17 +150,16 @@ public:
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
 	std::list<Item*> createLootItem(const LootBlock& lootblock);
 
-	bool getParameter(const std::string& key, std::string& value);
+	bool getParameter(const std::string key, std::string& value);
 };
 
-class Monsters
-{
+class Monsters{
 public:
 	Monsters();
 	~Monsters();
 
 	bool loadFromXml(const std::string& _datadir, bool reloading = false);
-	bool isLoaded() const;
+	bool isLoaded(){return loaded;}
 	bool reload();
 
 	MonsterType* getMonsterType(const std::string& name);
@@ -174,11 +168,11 @@ public:
 
 	static uint32_t getLootRandom();
 
-	void pushSpellParameters(const std::string& name, LuaScriptInterface* env);
+	void pushSpellParameters(const std::string name, LuaScriptInterface* env);
 
 private:
 	ConditionDamage* getDamageCondition(ConditionType_t conditionType,
-	                                    int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
+		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
 	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* mType, const std::string& description = "");
 	void deserializeParameters(xmlNodePtr node, MonsterType* mType, bool fromSpell = false);
 

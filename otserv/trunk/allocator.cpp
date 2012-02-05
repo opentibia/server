@@ -34,13 +34,12 @@ void* operator new[](size_t bytes)
 	return PoolManager::getInstance().allocate(bytes);
 }
 
-void operator delete(void* p)
+void operator delete(void *p)
 {
 	PoolManager::getInstance().deallocate(p);
 }
 
-void operator delete[](void* p)
-{
+void operator delete[](void *p){
 	PoolManager::getInstance().deallocate(p);
 }
 
@@ -67,10 +66,8 @@ void operator delete[](void* p, int dummy)
 #endif
 
 #ifdef __OTSERV_ALLOCATOR_STATS__
-void allocatorStatsThread(void* a)
-{
-	while (1)
-	{
+void allocatorStatsThread(void *a){
+	while(1){
 		boost::this_thread::sleep(boost::posix_time::milliseconds(30000));
 		PoolManager::getInstance().dumpStats();
 		//PoolManager::getInstance().releaseMemory();

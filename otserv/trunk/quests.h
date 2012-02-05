@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -37,84 +37,81 @@ typedef std::list<Quest*> QuestsList;
 
 class MissionState
 {
-public:
-	MissionState(const std::string& _description, const uint32_t& _missionID);
+	public:
+		MissionState(std::string _description, uint32_t _missionID);
+		uint32_t getMissionID() { return missionID; }
+		std::string getMissionDescription() { return description; }
 
-	const uint32_t& getMissionID() const;
-	const std::string& getMissionDescription() const;
-
-private:
-	const std::string description;
-	const uint32_t missionID;
+	private:
+		std::string description;
+		uint32_t missionID;
 };
 
 class Mission
 {
-public:
-	Mission(const std::string& _missionName, const uint32_t& _storageID,
-	        const uint32_t& _startValue, const int32_t& _endValue);
-	~Mission();
+	public:
+		Mission(std::string _missionName, uint32_t _storageID, uint32_t _startValue, int32_t _endValue);
+		~Mission();
+		bool isCompleted(Player* player) const;
+		bool isStarted(Player* player) const;
+		std::string getName(Player* player);
+		std::string getDescription(Player* player);
 
-	bool isCompleted(Player* player) const;
-	bool isStarted(Player* player) const;
-	std::string getName(Player* player);
-	std::string getDescription(Player* player);
+		MissionState* mainState;
+		StateList state;
 
-	MissionState* mainState;
-	StateList state;
-
-private:
-	std::string missionName;
-	uint32_t storageID;
-	uint32_t startValue;
-	uint32_t endValue;
+	private:
+		std::string missionName;
+		uint32_t storageID, startValue, endValue;
 };
 
 class Quest
 {
-public:
-	Quest(const std::string& _name, const uint16_t& _id,
-	      const uint32_t& _startStorageID, const uint32_t& _startStorageValue);
-	~Quest();
+	public:
+		Quest(std::string _name, uint16_t _id, uint32_t _startStorageID, uint32_t _startStorageValue);
+		~Quest();
+		
+		bool isCompleted(Player* player);
+		bool isStarted(Player* player) const;
+		uint16_t getID() const {return id;}
+		std::string getName() {return name;}
+		uint16_t getMissionsCount(Player* player) const;
 
-	bool isCompleted(Player* player);
-	bool isStarted(Player* player) const;
-	const uint16_t& getID() const;
-	const std::string& getName() const;
-	uint16_t getMissionsCount(Player* player) const;
+		void addMission(Mission* mission) {missions.push_back(mission);}
 
-	void addMission(Mission* mission);
+		MissionsList::const_iterator getFirstMission() const {return missions.begin();}
+		MissionsList::const_iterator getEndMission() const {return missions.end();}
 
-	MissionsList::const_iterator getFirstMission() const;
-	MissionsList::const_iterator getEndMission() const;
-
-private:
-	std::string name;
-	uint16_t id;
-	uint32_t startStorageID;
-	uint32_t startStorageValue;
-	MissionsList missions;
+	private:
+		std::string name;
+		uint16_t id;
+		uint32_t startStorageID, startStorageValue;
+		MissionsList missions;
 };
 
 class Quests
 {
-	Quests();
-public:
-	~Quests();
+	public:
+		Quests();
+		~Quests();
 
-	static Quests* getInstance();
+		static Quests* getInstance()
+		{
+			static Quests instance;
+			return &instance;
+		}
 
-	QuestsList::const_iterator getFirstQuest() const;
-	QuestsList::const_iterator getEndQuest() const;
+		QuestsList::const_iterator getFirstQuest() const {return quests.begin();}
+		QuestsList::const_iterator getEndQuest() const {return quests.end();}
 
-	bool loadFromXml(const std::string& _filename);
-	Quest* getQuestByID(const uint16_t& id);
-	uint16_t getQuestsCount(Player* player);
-	bool reload();
+		bool loadFromXml(const std::string& _filename);
+		Quest* getQuestByID(uint16_t id);
+		uint16_t getQuestsCount(Player* player);
+		bool reload();
 
-private:
-	std::string filename;
-	QuestsList quests;
+	private:
+		std::string filename;
+		QuestsList quests;
 };
 
 #endif

@@ -30,8 +30,7 @@
 #define MONSTER_ID_RANGE 0x40000000
 #define NPC_ID_RANGE 0x80000000
 
-enum MagicEffectClasses
-{
+enum MagicEffectClasses {
 	NM_ME_DRAW_BLOOD       = 0x00,
 	NM_ME_LOSE_ENERGY      = 0x01,
 	NM_ME_PUFF             = 0x02,
@@ -108,8 +107,7 @@ enum MagicEffectClasses
 	NM_ME_UNK              = 0xFFFF
 };
 
-enum ShootType_t
-{
+enum ShootType_t {
 	NM_SHOOT_SPEAR          = 0x00,
 	NM_SHOOT_BOLT           = 0x01,
 	NM_SHOOT_ARROW          = 0x02,
@@ -158,8 +156,7 @@ enum ShootType_t
 	NM_SHOOT_UNK            = 0xFFFF
 };
 
-enum SpeakClasses
-{
+enum SpeakClasses {
 	SPEAK_SAY               = 0x01,	//normal talk
 	SPEAK_WHISPER           = 0x02,	//whispering - #w text
 	SPEAK_YELL              = 0x03,	//yelling - #y text
@@ -179,11 +176,10 @@ enum SpeakClasses
 	SPEAK_RVR_CHANNEL       = 0xFF + 1, //Reporting rule violation - Ctrl+R
 	SPEAK_RVR_ANSWER        = 0xFF + 2, //Answering report
 	SPEAK_RVR_CONTINUE	    = 0xFF + 3, //Answering the answer of the report
-	SPEAK_CHANNEL_R2        = 0xFF + 4	//Talk red anonymously on chat - #d
+	SPEAK_CHANNEL_R2        = 0xFF + 4,	//Talk red anonymously on chat - #d
 };
 
-enum MessageClasses
-{
+enum MessageClasses {
 	MSG_CLASS_FIRST				= 0x0D,
 	MSG_STATUS_CONSOLE_ORANGE2	= MSG_CLASS_FIRST, //Orange message in the console
 	MSG_STATUS_CONSOLE_ORANGE	= 0x0E, //Orange message in the console
@@ -241,14 +237,12 @@ enum FluidTypes_t {
 	FLUID_MEAD = 36
 };
 
-enum SquareColor_t
-{
+enum SquareColor_t {
 	SQ_COLOR_NONE   = 256,
 	SQ_COLOR_BLACK  = 0
 };
 
-enum TextColor_t
-{
+enum TextColor_t {
 	TEXTCOLOR_BLUE        = 5,
 	TEXTCOLOR_GREEN       = 18,
 	TEXTCOLOR_LIGHTBLUE   = 35,
@@ -264,8 +258,7 @@ enum TextColor_t
 	TEXTCOLOR_UNK         = 256
 };
 
-enum Icons_t
-{
+enum Icons_t{
 	ICON_NONE       = 0,
 	ICON_POISON     = 1,
 	ICON_BURN       = 2,
@@ -284,8 +277,7 @@ enum Icons_t
 	ICON_PZ         = 16384
 };
 
-enum WeaponType_t
-{
+enum WeaponType_t {
 	WEAPON_NONE     = 0,
 	WEAPON_SWORD    = 1,
 	WEAPON_CLUB     = 2,
@@ -296,8 +288,7 @@ enum WeaponType_t
 	WEAPON_AMMO     = 7
 };
 
-enum Ammo_t
-{
+enum Ammo_t {
 	AMMO_NONE           = 0,
 	AMMO_BOLT           = 1,
 	AMMO_ARROW          = 2,
@@ -308,8 +299,7 @@ enum Ammo_t
 	AMMO_SNOWBALL       = 7
 };
 
-enum AmmoAction_t
-{
+enum AmmoAction_t{
 	AMMOACTION_NONE,
 	AMMOACTION_REMOVECOUNT,
 	AMMOACTION_REMOVECHARGE,
@@ -317,16 +307,14 @@ enum AmmoAction_t
 	AMMOACTION_MOVEBACK
 };
 
-enum WieldInfo_t
-{
+enum WieldInfo_t{
 	WIELDINFO_LEVEL     = 1,
 	WIELDINFO_MAGLV     = 2,
 	WIELDINFO_VOCREQ    = 4,
 	WIELDINFO_PREMIUM   = 8
 };
 
-enum Skulls_t
-{
+enum Skulls_t{
 	SKULL_NONE      = 0,
 	SKULL_YELLOW    = 1,
 	SKULL_GREEN     = 2,
@@ -336,8 +324,7 @@ enum Skulls_t
 	SKULL_LAST
 };
 
-enum PartyShields_t
-{
+enum PartyShields_t{
 	SHIELD_NONE = 0,
 	SHIELD_WHITEYELLOW = 1,
 	SHIELD_WHITEBLUE = 2,
@@ -351,16 +338,14 @@ enum PartyShields_t
 	SHIELD_YELLOW_NOSHAREDEXP = 10
 };
 
-enum GuildEmblems_t
-{
+enum GuildEmblems_t{
 	EMBLEM_NONE = 0,
 	EMBLEM_GREEN = 1,
 	EMBLEM_RED = 2,
 	EMBLEM_BLUE = 3
 };
 
-enum item_t
-{
+enum item_t {
 	ITEM_FIREFIELD        = 1492,
 	ITEM_FIREFIELD_SAFE   = 1500,
 	ITEM_FIREFIELD_NOT_DECAYING = 1487,
@@ -410,8 +395,7 @@ enum item_t
 	ITEM_DOCUMENT_RO      = 1968 //read-only
 };
 
-enum PlayerFlags
-{
+enum PlayerFlags{
 	//Add the flag's numbers to get the groupFlags number you need
 	PlayerFlag_CannotUseCombat = 0,         //2^0 = 1
 	PlayerFlag_CannotAttackPlayer,          //2^1 = 2

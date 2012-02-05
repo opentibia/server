@@ -44,19 +44,19 @@ public:
 	virtual ~Spells();
 
 	Spell* getSpellByName(const std::string& name);
-	RuneSpell* getRuneSpell(const uint32_t& id);
+	RuneSpell* getRuneSpell(uint32_t id);
 	RuneSpell* getRuneSpellByName(const std::string& name);
 
 	InstantSpell* getInstantSpell(const std::string& words);
-	InstantSpell* getInstantSpellByName(const std::string& name);
+	InstantSpell* getInstantSpellByName(std::string name);
 
 	uint32_t getInstantSpellCount(const Player* player);
-	InstantSpell* getInstantSpellByIndex(const Player* player, const uint32_t& index);
+	InstantSpell* getInstantSpellByIndex(const Player* player, uint32_t index);
 
 	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, std::string& words);
 
 	static Position getCasterPosition(Creature* creature, Direction dir);
-	virtual const std::string& getScriptBaseName() const;
+	virtual std::string getScriptBaseName();
 
 protected:
 
@@ -76,67 +76,69 @@ typedef bool (InstantSpellFunction)(const InstantSpell* spell, Creature* creatur
 typedef bool (ConjureSpellFunction)(const ConjureSpell* spell, Creature* creature, const std::string& param);
 typedef bool (RuneSpellFunction)(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo);
 
-class BaseSpell
-{
+class BaseSpell{
 public:
-	virtual ~BaseSpell();
+	BaseSpell() {};
+	virtual ~BaseSpell(){};
 
 	virtual bool castSpell(Creature* creature) = 0;
 	virtual bool castSpell(Creature* creature, Creature* target) = 0;
 
 	//used by some child classes, like CombatSpell and InstantSpell
-	bool internalExecuteCastSpell(Event* event, Creature* creature, const LuaVariant& var, bool& result);
+	bool internalExecuteCastSpell(Event *event, Creature* creature, const LuaVariant& var, bool &result);
 };
 
-class CombatSpell : public Event, public BaseSpell
-{
+class CombatSpell : public Event, public BaseSpell{
 public:
 	CombatSpell(Combat* _combat, bool _needTarget, bool _needDirection);
 	virtual ~CombatSpell();
 
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);
-	virtual bool configureEvent(xmlNodePtr p);
+	virtual bool configureEvent(xmlNodePtr p) {return true;}
 
 	//scripting
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
 	bool loadScriptCombat();
-	Combat* getCombat();
+	Combat* getCombat() {return combat;}
 
 protected:
-	virtual const std::string& getScriptEventName() const;
+	virtual std::string getScriptEventName() {return "onCastSpell";}
 	bool needDirection;
 	bool needTarget;
 	Combat* combat;
 };
 
-class Spell : public BaseSpell
-{
+class Spell : public BaseSpell{
 public:
 	Spell();
-	virtual ~Spell();
+	virtual ~Spell(){};
 
 	bool configureSpell(xmlNodePtr xmlspell);
-	const std::string& getName() const;
+	const std::string& getName() const {return name;}
 
 	void postCastSpell(Player* player, bool finishedSpell = true, bool payCost = true) const;
-	void postCastSpell(Player* player, const uint32_t& manaCost, const uint32_t& soulCost) const;
+	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;
 
 	int32_t getManaCost(const Player* player) const;
-	const int32_t& getSoulCost(const Player* player) const;
-	const uint32_t& getLevel() const;
-	const uint32_t& getMagicLevel() const;
-	const int32_t& getMana() const;
-	static bool playerHasEnoughManaToCast(const Player* p, const int32_t& manaCost);
-	const int32_t& getManaPercent() const;
-	bool isPremium() const;
-	bool hasArea() const;
-	void setArea(bool b);
+	int32_t getSoulCost(const Player* player) const;
+	uint32_t getLevel() const {return level;}
+	uint32_t getMagicLevel() const {return magLevel;}
+	int32_t getMana() const {return mana;}
+	static bool playerHasEnoughManaToCast(const Player *p, int32_t manaCost)
+	{
+		return (p->getMana() >= manaCost || p->hasFlag(PlayerFlag_IgnoreSpellCheck)
+				 || p->hasFlag(PlayerFlag_HasInfiniteMana));
+	}
+	int32_t getManaPercent() const {return manaPercent;}
+	const bool isPremium() const {return premium;}
+	bool hasArea() const {return areaSpell;}
+	void setArea(bool b) {areaSpell = b;}
 	virtual bool isInstant() const = 0;
-	bool isLearnable() const;
+	bool isLearnable() const {return learnable;}
 
-	static ReturnValue CreateIllusion(Creature* creature, const Outfit_t& outfit, int32_t time);
+	static ReturnValue CreateIllusion(Creature* creature, const Outfit_t outfit, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, const std::string& name, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, uint32_t itemId, int32_t time);
 
@@ -190,13 +192,13 @@ public:
 	virtual bool loadScript(const std::string& scriptFile, bool reserveEnviroment = true);
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
-	virtual bool isInstant() const;
-	bool getHasParam() const;
+	virtual bool isInstant() const { return true;}
+	bool getHasParam() const { return hasParam;}
 	bool canCast(const Player* player) const;
 	bool canThrowSpell(const Creature* creature, const Creature* target) const;
 
 protected:
-	virtual const std::string& getScriptEventName() const;
+	virtual std::string getScriptEventName();
 
 	static InstantSpellFunction HouseGuestList;
 	static InstantSpellFunction HouseSubOwnerList;
@@ -229,15 +231,15 @@ public:
 
 	virtual bool playerCastInstant(Player* player, const std::string& param);
 
-	virtual bool castSpell(Creature* creature);
-	virtual bool castSpell(Creature* creature, Creature* target);
+	virtual bool castSpell(Creature* creature) {return false;}
+	virtual bool castSpell(Creature* creature, Creature* target) {return false;}
 
-	const uint32_t& getConjureId() const;
-	const uint32_t& getConjureCount() const;
-	const uint32_t& getReagentId() const;
+	uint32_t getConjureId() const {return conjureId;}
+	uint32_t getConjureCount() const {return conjureCount;}
+	uint32_t getReagentId() const {return conjureReagentId;}
 
 protected:
-	virtual const std::string& getScriptEventName() const;
+	virtual std::string getScriptEventName();
 
 	static ReturnValue internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount);
 	static ReturnValue internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount, uint32_t reagentId, bool test = false);
@@ -265,10 +267,10 @@ public:
 	virtual bool loadFunction(const std::string& functionName);
 
 	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
-	virtual bool hasOwnErrorHandler();
+	virtual bool hasOwnErrorHandler() {return true;}
 
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom,
-	                        const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
+		const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
 
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);
@@ -277,11 +279,11 @@ public:
 	virtual bool loadScript(const std::string& scriptFile, bool reserveEnviroment = true);
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 
-	virtual bool isInstant() const;
-	const uint32_t& getRuneItemId();
+	virtual bool isInstant() const { return false;}
+	uint32_t getRuneItemId(){return runeId;};
 
 protected:
-	virtual const std::string& getScriptEventName() const;
+	virtual std::string getScriptEventName();
 
 	static RuneSpellFunction Illusion;
 	static RuneSpellFunction Convince;

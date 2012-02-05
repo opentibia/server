@@ -42,41 +42,64 @@ typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
 #ifdef __DEBUG_NET__
 #define PRINT_ASIO_ERROR(desc) \
 	std::cout << "Error: [" << __FUNCTION__ << "] " << desc << " - Error: " <<  \
-	          error.value() << " Desc: " << error.message() << std::endl;
+		error.value() << " Desc: " << error.message() << std::endl;
 #else
 #define PRINT_ASIO_ERROR(desc)
 #endif
 
 class ConnectionManager
 {
-	ConnectionManager();
-
 public:
-	static ConnectionManager* getInstance();
+	~ConnectionManager()
+	{
+	}
+
+	static ConnectionManager* getInstance(){
+		static ConnectionManager instance;
+		return &instance;
+	}
 
 	Connection_ptr createConnection(boost::asio::ip::tcp::socket* socket,
-	                                boost::asio::io_service& io_service, ServicePort_ptr servicers);
+		boost::asio::io_service& io_service, ServicePort_ptr servicers);
 	void releaseConnection(Connection_ptr connection);
 	void closeAll();
 
-private:
+protected:
+
+	ConnectionManager()
+	{
+	}
+
 	std::list<Connection_ptr> m_connections;
 	boost::recursive_mutex m_connectionManagerLock;
 };
 
 class Connection : public boost::enable_shared_from_this<Connection>, boost::noncopyable
 {
-	friend class ConnectionManager;
-
 public:
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	static uint32_t connectionCount;
+#endif
+
+	enum { write_timeout = 30 };
+	enum { read_timeout = 30 };
+
+	enum ConnectionState_t {
+		CONNECTION_STATE_OPEN = 0,
+		CONNECTION_STATE_REQUEST_CLOSE = 1,
+		CONNECTION_STATE_CLOSING = 2,
+		CONNECTION_STATE_CLOSED = 3
+	};
+
+private:
 	Connection(boost::asio::ip::tcp::socket* socket,
-	           boost::asio::io_service& io_service,
-	           ServicePort_ptr service_port) :
-		m_socket(socket),
-		m_readTimer(io_service),
-		m_writeTimer(io_service),
-		m_io_service(io_service),
-		m_service_port(service_port)
+		boost::asio::io_service& io_service,
+		ServicePort_ptr service_port) :
+			m_socket(socket),
+			m_readTimer(io_service),
+			m_writeTimer(io_service),
+			m_io_service(io_service),
+			m_service_port(service_port)
 	{
 		m_refCount = 0;
 		m_protocol = NULL;
@@ -86,37 +109,22 @@ public:
 		m_receivedFirst = false;
 		m_writeError = false;
 		m_readError = false;
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		connectionCount++;
 #endif
 	}
+	friend class ConnectionManager;
 
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+public:
 	~Connection()
 	{
-		connectionCount--;
-	}
-#endif
-
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	static uint32_t connectionCount;
+		connectionCount--;
 #endif
-
-	enum { write_timeout = 30 };
-	enum { read_timeout = 30 };
-
-	enum ConnectionState_t
-	{
-		CONNECTION_STATE_OPEN = 0,
-		CONNECTION_STATE_REQUEST_CLOSE = 1,
-		CONNECTION_STATE_CLOSING = 2,
-		CONNECTION_STATE_CLOSED = 3
-	};
-
-	boost::asio::ip::tcp::socket& getHandle()
-	{
-		return *m_socket;
 	}
+
+	boost::asio::ip::tcp::socket& getHandle() { return *m_socket; }
 
 	void closeConnection();
 	// Used by protocols that require server to send first
@@ -127,14 +135,8 @@ public:
 
 	uint32_t getIP() const;
 
-	int32_t addRef()
-	{
-		return ++m_refCount;
-	}
-	int32_t unRef()
-	{
-		return --m_refCount;
-	}
+	int32_t addRef() {return ++m_refCount;}
+	int32_t unRef() {return --m_refCount;}
 
 private:
 	void parseHeader(const boost::system::error_code& error);

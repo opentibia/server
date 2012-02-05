@@ -57,50 +57,56 @@ protected:
 class Container : public Item, public Cylinder
 {
 public:
-	Container(const uint16_t& _type);
+	Container(uint16_t _type);
 	virtual ~Container();
 	virtual Item* clone() const;
 
-	virtual Container* getContainer();
-	virtual const Container* getContainer() const;
-	virtual Depot* getDepot();
-	virtual const Depot* getDepot() const;
+	virtual Container* getContainer() {return this;};
+	virtual const Container* getContainer() const {return this;};
+	virtual Depot* getDepot() {return NULL;};
+	virtual const Depot* getDepot() const {return NULL;};
 
-	Attr_ReadValue readAttr(const AttrTypes_t& attr, PropStream& propStream);
+	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 	std::string getContentDescription() const;
 
-	size_t size() const;
+	uint32_t size() const {return (uint32_t)itemlist.size();}
+	bool full() const
+	{
+		if(maxSize){
+			return itemlist.size() >= maxSize;
+		}
 
-	bool full() const;
-	bool empty() const;
+		return true;
+	}
+	bool empty() const {return itemlist.empty();}
 
 	ContainerIterator begin();
 	ContainerIterator end();
 	ContainerIterator begin() const;
 	ContainerIterator end() const;
 
-	ItemList::const_iterator getItems() const;
-	ItemList::const_iterator getEnd() const;
-	ItemList::const_reverse_iterator getReversedItems() const;
-	ItemList::const_reverse_iterator getReversedEnd() const;
+	ItemList::const_iterator getItems() const {return itemlist.begin();}
+	ItemList::const_iterator getEnd() const {return itemlist.end();}
+	ItemList::const_reverse_iterator getReversedItems() const {return itemlist.rbegin();}
+	ItemList::const_reverse_iterator getReversedEnd() const {return itemlist.rend();}
 
 	void addItem(Item* item);
-	Item* getItem(const uint32_t& index);
+	Item* getItem(uint32_t index);
 	bool isHoldingItem(const Item* item) const;
 
-	uint32_t capacity() const;
+	uint32_t capacity() const {return maxSize ? maxSize : std::min(255, (int32_t)itemlist.size() + 1);}
 	uint32_t getItemHoldingCount() const;
 	virtual double getWeight() const;
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	                               uint32_t flags) const;
+		uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
-	                                    uint32_t flags) const;
+		uint32_t flags) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const;
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-	                                     uint32_t& flags);
+		uint32_t& flags);
 
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
@@ -123,14 +129,13 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 	virtual void __startDecaying();
-	virtual const uint32_t& getTotalAmountOfItemsInside() const;
-	const uint16_t& getDeepness() const;
-	void setDeepness(const uint16_t& newDeepness);
-
+	virtual uint32_t getTotalAmountOfItemsInside() const { return amountOfItems; } //includes the item itself
+	uint16_t getDeepness() const { return deepness; }
+	void setDeepness(uint16_t newDeepness) { deepness = newDeepness; }
 private:
 	void onAddContainerItem(Item* item);
 	void onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemType& oldType,
-	                           Item* newItem, const ItemType& newType);
+		Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(uint32_t index, Item* item);
 	void updateAmountOfItems(int32_t diff);
 	const Container* getParentContainer() const;
@@ -150,4 +155,5 @@ protected:
 	friend class IOMapSerialize;
 };
 
-#endif // __OTSERV_CONTAINER_H__
+#endif
+

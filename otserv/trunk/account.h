@@ -18,20 +18,29 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+
 #ifndef __OTSERV_ACCOUNT_H__
 #define __OTSERV_ACCOUNT_H__
 
 #include "definitions.h"
-#include <vector>
+#include <list>
 #include <string>
 #include <ctime>
+#include <cmath>
 
 class Account
 {
 public:
-	Account();
+	Account() : number(0), warnings(0), premEnd(0){}
+	~Account(){}
 
-	static uint16_t getPremiumDaysLeft(const int32_t& _premEnd);
+	static uint16_t getPremiumDaysLeft(int32_t _premEnd)
+	{
+		if(_premEnd < time(NULL)){
+			return 0;
+		}
+		return (uint16_t)std::ceil(((double)(_premEnd - time(NULL))) / 86400.);
+	}
 
 	uint32_t number;
 	uint32_t warnings;
@@ -39,7 +48,7 @@ public:
 	std::string	password;
 
 	time_t premEnd; // < current time is none, (time_t)(-1) is infinite.
-	std::vector<std::string> characters;
+	std::list<std::string> charList;
 };
 
-#endif  // __OTSERV_ACCOUNT_H__
+#endif  // #ifndef __ACCOUNT_H__

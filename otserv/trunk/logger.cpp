@@ -26,17 +26,14 @@
 Logger::Logger()
 {
 	m_file.open("otlog.txt", std::ios::app);
-
-	if (m_file.good())
-	{
+	if(m_file.good()){
 		m_registering = true;
 	}
 }
 
 Logger::~Logger()
 {
-	if (m_registering)
-	{
+	if(m_registering){
 		m_file.close();
 	}
 }
@@ -47,8 +44,7 @@ void Logger::logMessage(const char* channel, eLogType type, int level, std::stri
 	// if should be save decide where and how
 
 	//check if the file is open, if not, avoid writting to file
-	if (!m_registering)
-	{
+	if(!m_registering){
 		return;
 	}
 
@@ -59,32 +55,30 @@ void Logger::logMessage(const char* channel, eLogType type, int level, std::stri
 	m_file << buffer << std::endl;
 
 	//write channel generating the message
-	if (channel)
-	{
+	if(channel){
 		m_file << " [" << channel << "] ";
 	}
 
 	//write message type
 	std::string type_str;
-
-	switch (type)
-	{
-		case LOGTYPE_EVENT:
-			type_str = "event";
-			break;
-		case LOGTYPE_WARNING:
-			type_str = "warning";
-			break;
-		case LOGTYPE_ERROR:
-			type_str = "ERROR";
-			break;
-		default:
-			type_str = "???";
-			break;
+	switch(type){
+	case LOGTYPE_EVENT:
+		type_str = "event";
+		break;
+	case LOGTYPE_WARNING:
+		type_str = "warning";
+		break;
+	case LOGTYPE_ERROR:
+		type_str = "ERROR";
+		break;
+	default:
+		type_str = "???";
+		break;
 	}
-
 	m_file << " " << type_str << ":";
+
 	//write the message
 	m_file << " " << message << std::endl;
+
 	m_file.flush();
 }

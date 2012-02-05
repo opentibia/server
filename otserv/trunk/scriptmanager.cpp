@@ -54,88 +54,76 @@ ScriptingManager::ScriptingManager()
 	g_globalEvents = new GlobalEvents();
 }
 
-ScriptingManager* ScriptingManager::getInstance()
+ScriptingManager::~ScriptingManager()
 {
-	static ScriptingManager instance;
-	return &instance;
+	//
 }
 
 bool ScriptingManager::loadScriptSystems()
 {
 	std::cout << ":: Loading Script Systems" << std::endl;
+
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
+
 	//load weapons data
 	std::cout << ":: Loading Weapons ...";
-
-	if (!g_weapons->loadFromXml(datadir))
-	{
+	if(!g_weapons->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Weapons!");
 		return false;
 	}
 
 	g_weapons->loadDefaults();
 	std::cout << "[done]" << std::endl;
+
 	//load spells data
 	std::cout << ":: Loading Spells ...";
-
-	if (!g_spells->loadFromXml(datadir))
-	{
+	if(!g_spells->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Spells!");
 		return false;
 	}
-
 	std::cout << "[done]" << std::endl;
+
 	//load actions data
 	std::cout << ":: Loading Actions ...";
-
-	if (!g_actions->loadFromXml(datadir))
-	{
+	if(!g_actions->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Actions!");
 		return false;
 	}
-
 	std::cout << "[done]" << std::endl;
+
 	//load talkactions data
 	std::cout << ":: Loading Talkactions ...";
-
-	if (!g_talkactions->loadFromXml(datadir))
-	{
+	if(!g_talkactions->loadFromXml(datadir)){
 		ErrorMessage("Unable to load Talkactions!");
 		return false;
 	}
-
 	std::cout << "[done]" << std::endl;
+
 	//load moveEvents
 	std::cout << ":: Loading MoveEvents ...";
-
-	if (!g_moveEvents->loadFromXml(datadir))
-	{
+	if(!g_moveEvents->loadFromXml(datadir)){
 		ErrorMessage("Unable to load MoveEvents!");
 		return false;
 	}
-
 	std::cout << "[done]" << std::endl;
+
 	//load creature events
 	std::cout << ":: Loading CreatureEvents ...";
-
-	if (!g_creatureEvents->loadFromXml(datadir))
-	{
+	if(!g_creatureEvents->loadFromXml(datadir)){
 		ErrorMessage("Unable to load CreatureEvents!");
 		return false;
 	}
-
 	std::cout << "[done]" << std::endl;
-#ifdef __GLOBALEVENTS__
+	
+	#ifdef __GLOBALEVENTS__
 	//load global events
 	std::cout << ":: Loading GlobalEvents ...";
-
-	if (!g_globalEvents->loadFromXml(datadir))
-	{
+	if(!g_globalEvents->loadFromXml(datadir)){
 		ErrorMessage("Unable to load GlobalEvents!");
 		return false;
 	}
-
 	std::cout << "[done]" << std::endl;
-#endif
+	#endif
+	
 	return true;
 }

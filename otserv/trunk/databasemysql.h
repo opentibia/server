@@ -31,9 +31,9 @@
 #include "otsystem.h"
 
 #ifdef __MYSQL_ALT_INCLUDE__
-#include <mysql.h>
+	#include <mysql.h>
 #else
-#include <mysql/mysql.h>
+	#include <mysql/mysql.h>
 #endif
 #include <sstream>
 #include <map>
@@ -50,15 +50,15 @@ public:
 	DATABASE_VIRTUAL bool rollback();
 	DATABASE_VIRTUAL bool commit();
 
-	DATABASE_VIRTUAL bool executeQuery(const std::string& query);
-	DATABASE_VIRTUAL DBResult* storeQuery(const std::string& query);
+	DATABASE_VIRTUAL bool executeQuery(const std::string &query);
+	DATABASE_VIRTUAL DBResult* storeQuery(const std::string &query);
 
 	DATABASE_VIRTUAL uint64_t getLastInsertedRowID();
 
-	DATABASE_VIRTUAL std::string escapeString(const std::string& s);
+	DATABASE_VIRTUAL std::string escapeString(const std::string &s);
 	DATABASE_VIRTUAL std::string escapeBlob(const char* s, uint32_t length);
 
-	DATABASE_VIRTUAL void freeResult(DBResult* res);
+	DATABASE_VIRTUAL void freeResult(DBResult *res);
 
 protected:
 	MYSQL m_handle;
@@ -69,10 +69,10 @@ class MySQLResult : public _DBResult
 	friend class DatabaseMySQL;
 
 public:
-	DATABASE_VIRTUAL int32_t getDataInt(const std::string& s);
-	DATABASE_VIRTUAL int64_t getDataLong(const std::string& s);
-	DATABASE_VIRTUAL std::string getDataString(const std::string& s);
-	DATABASE_VIRTUAL const char* getDataStream(const std::string& s, unsigned long& size);
+	DATABASE_VIRTUAL int32_t getDataInt(const std::string &s);
+	DATABASE_VIRTUAL int64_t getDataLong(const std::string &s);
+	DATABASE_VIRTUAL std::string getDataString(const std::string &s);
+	DATABASE_VIRTUAL const char* getDataStream(const std::string &s, unsigned long &size);
 
 	DATABASE_VIRTUAL bool next();
 

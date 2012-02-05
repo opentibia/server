@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_BEDS_H__
-#define __OTSERV_BEDS_H__
+#ifndef __OTS_BEDS_H__
+#define __OTS_BEDS_H__
 
 #include "definitions.h"
 #include "item.h"
@@ -31,30 +31,31 @@
 class House;
 class Player;
 
+
 class BedItem : public Item
 {
 public:
-	BedItem(const uint16_t& id);
+	BedItem(uint16_t id);
 	virtual ~BedItem();
 
-	virtual BedItem* getBed();
-	virtual const BedItem* getBed() const;
+	virtual BedItem* getBed(){ return this; }
+	virtual const BedItem* getBed() const { return this; }
 
 	//serialization
-	virtual Attr_ReadValue readAttr(const AttrTypes_t& attr, PropStream& propStream);
+	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	//override
-	virtual bool canRemove() const;
+	virtual bool canRemove() const {return (house == NULL); }
 
-	const uint32_t& getSleeper() const;
-	void setSleeper(const uint32_t& guid);
+	uint32_t getSleeper() const { return sleeperGUID; }
+	void setSleeper(uint32_t guid){ sleeperGUID = guid; }
 
-	const time_t& getSleepStart() const;
-	void setSleepStart(const time_t& now);
+	time_t getSleepStart() const { return sleepStart; }
+	void setSleepStart(time_t now){ sleepStart = now; }
 
-	House* getHouse() const;
-	void setHouse(House* h);
+	House* getHouse() const { return house; }
+	void setHouse(House* h){ house = h; }
 
 	bool canUse(Player* player);
 	void sleep(Player* player);
@@ -75,16 +76,18 @@ protected:
 
 class Beds
 {
-	Beds();
-
 public:
+	~Beds(){}
+
 	static Beds& instance();
 
-	BedItem* getBedBySleeper(const uint32_t& guid);
-	void setBedSleeper(BedItem* bed, const uint32_t& guid);
+	BedItem* getBedBySleeper(uint32_t guid);
+	void setBedSleeper(BedItem* bed, uint32_t guid);
 
 protected:
+	Beds(){ BedSleepersMap.clear(); }
+
 	std::map<uint32_t, BedItem*> BedSleepersMap;
 };
 
-#endif // __OTSERV_BEDS_H__
+#endif

@@ -33,8 +33,7 @@ class Action;
 class Container;
 class ItemType;
 
-enum ActionType_t
-{
+enum ActionType_t{
 	ACTION_ANY,
 	ACTION_UNIQUEID,
 	ACTION_ACTIONID,
@@ -50,7 +49,7 @@ public:
 
 	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item, bool isHotkey);
 	bool useItemEx(Player* player, const Position& fromPos, const Position& toPos,
-	               uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
+		uint8_t toStackPos, Item* item, bool isHotkey, uint32_t creatureId = 0);
 
 	ReturnValue canUse(const Player* player, const Position& pos);
 	ReturnValue canUse(const Player* player, const Position& pos, const Item* item);
@@ -60,16 +59,16 @@ public:
 protected:
 	bool executeUse(Action* action, Player* player, Item* item, const PositionEx& posEx, uint32_t creatureId);
 	ReturnValue internalUseItem(Player* player, const Position& pos,
-	                            uint8_t index, Item* item, uint32_t creatureId);
+		uint8_t index, Item* item, uint32_t creatureId);
 
 	bool executeUseEx(Action* action, Player* player, Item* item, const PositionEx& fromPosEx,
-	                  const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId);
+		const PositionEx& toPosEx, bool isHotkey, uint32_t creatureId);
 	ReturnValue internalUseItemEx(Player* player, const PositionEx& fromPosEx, const PositionEx& toPosEx,
-	                              Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
+		Item* item, bool isHotkey, uint32_t creatureId, bool& isSuccess);
 
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
-	virtual const std::string& getScriptBaseName() const;
+	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
 	virtual bool registerEvent(Event* event, xmlNodePtr p);
 
@@ -91,25 +90,25 @@ public:
 	Action(LuaScriptInterface* _interface);
 	virtual ~Action();
 
-	Action* clone() const;
+	Action* clone() const { return new Action(*this); }
 
 	virtual bool configureEvent(xmlNodePtr p);
 
 	//scripting
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom,
-	                        const PositionEx& posTo, bool extendedUse, const uint32_t& creatureId);
+	const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
 
-	bool getAllowFarUse() const;
-	void setAllowFarUse(bool v);
+	bool getAllowFarUse() const {return allowFarUse;};
+	void setAllowFarUse(bool v){allowFarUse = v;};
 
-	bool getCheckLineOfSight() const;
-	void setCheckLineOfSight(bool v);
+	bool getCheckLineOfSight() const {return checkLineOfSight;};
+	void setCheckLineOfSight(bool v){checkLineOfSight = v;};
 
 	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
-	virtual bool hasOwnErrorHandler();
+	virtual bool hasOwnErrorHandler() {return false;}
 
 protected:
-	virtual const std::string& getScriptEventName() const;
+	virtual std::string getScriptEventName();
 
 	bool allowFarUse;
 	bool checkLineOfSight;
