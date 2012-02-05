@@ -180,7 +180,6 @@
     <ClInclude Include="..\weapons.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\account.cpp" />
     <ClCompile Include="..\actions.cpp" />
     <ClCompile Include="..\admin.cpp" />
     <ClCompile Include="..\allocator.cpp" />
@@ -255,7 +254,6 @@
     <ClCompile Include="..\thing.cpp" />
     <ClCompile Include="..\tile.cpp" />
     <ClCompile Include="..\tools.cpp" />
-    <ClCompile Include="..\town.cpp" />
     <ClCompile Include="..\trashholder.cpp" />
     <ClCompile Include="..\vocation.cpp" />
     <ClCompile Include="..\waitlist.cpp" />
