@@ -715,6 +715,7 @@ protected:
 	
 	static int luaGetItemWeaponType(lua_State *L);
 	static int luaGetItemAttack(lua_State *L);
+	static int luaGetItemDefense(lua_State *L);
 	static int luaGetItemExtraDef(lua_State *L);
 	static int luaGetItemArmor(lua_State *L);
 	static int luaGetItemWeaponTypeByUID(lua_State *L);
