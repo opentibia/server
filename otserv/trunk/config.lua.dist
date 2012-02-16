@@ -240,7 +240,7 @@ wands_interrupt_swing = true
 
 -- maximum amount of items inside of a container (including the items inside of any container inside of it)
 -- Use 0 for infinite
-max_amount_items_inside_containers = 5000
+max_amount_items_inside_containers = 200
 
 --maximal length for chains of containers (i.e, a container inside of a container which is inside of a container...)
 max_deepness_of_chain_of_containers = 500
