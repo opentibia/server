@@ -567,6 +567,27 @@ bool Action::configureEvent(xmlNodePtr p)
 	return true;
 }
 
+bool Action::loadFunction(const std::string& functionName)
+{
+	std::string tmpFunctionName = asLowerCaseString(functionName);
+	if(tmpFunctionName == "market")
+		function = enterMarket;
+	else
+	{
+		std::cout << "[Warning - Action::loadFunction] Function \"" << functionName << "\" does not exist." << std::endl;
+		return false;
+	}
+
+	m_scripted = false;
+	return true;
+}
+
+bool Action::enterMarket(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse, uint32_t creatureId)
+{
+	player->sendMarketEnter(item);
+	return true;
+}
+
 std::string Action::getScriptEventName()
 {
 	return "onUse";

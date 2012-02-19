@@ -141,7 +141,14 @@ private:
 	void parseLookInTrade(NetworkMessage& msg);
 	void parseAcceptTrade(NetworkMessage& msg);
 	void parseCloseTrade();
-
+	
+	//market methods
+	void parseMarketLeave();
+	void parseMarketBrowse(NetworkMessage& msg);
+	void parseMarketCreateOffer(NetworkMessage& msg);
+	void parseMarketCancelOffer(NetworkMessage& msg);
+	void parseMarketAcceptOffer(NetworkMessage& msg);
+	
 	//VIP methods
 	void parseAddVip(NetworkMessage& msg);
 	void parseRemoveVip(NetworkMessage& msg);
@@ -203,6 +210,7 @@ private:
 	void sendCloseShop();
 	void sendPlayerCash(uint32_t amount);
 	void sendSaleItemList(const std::list<ShopInfo>& shop);
+	void sendMarketEnter(Item* item);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	void sendQuestLog();

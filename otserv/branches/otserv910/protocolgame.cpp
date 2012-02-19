@@ -699,7 +699,27 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 	case 0xF2:
 		parseRuleViolationReport(msg);
 		break;
-	
+		
+	case 0xF4:
+		parseMarketLeave();
+		break;
+
+	case 0xF5:
+		parseMarketBrowse(msg);
+		break;
+
+	case 0xF6:
+		parseMarketCreateOffer(msg);
+		break;
+
+	case 0xF7:
+		parseMarketCancelOffer(msg);
+		break;
+
+	case 0xF8:
+		parseMarketAcceptOffer(msg);
+		break;
+		
 	default:
 #ifdef __DEBUG__
 		printf("unknown packet header: %x \n", recvbyte);
@@ -1504,6 +1524,42 @@ void ProtocolGame::parseDebugAssert(NetworkMessage& msg)
 	}
 }
 
+void ProtocolGame::parseMarketLeave()
+{
+}
+
+void ProtocolGame::parseMarketBrowse(NetworkMessage& msg)
+{
+	//uint16_t clientId = msg.GetU16();
+	// send offers
+}
+
+void ProtocolGame::parseMarketCreateOffer(NetworkMessage& msg)
+{
+	/*
+	char kind = msg.GetByte(); // buy or sell
+	uint16_t clientId = msg.GetU16();
+	uint16_t amount = msg.GetU16();
+	uint32_t price = msg.GetU32();
+	bool anonymous = (msg.GetByte() != 0);
+	*/
+}
+
+void ProtocolGame::parseMarketCancelOffer(NetworkMessage& msg)
+{
+	//uint32_t timestamp = msg.GetU32();
+	//uint16_t counter = msg.GetU16();
+}
+
+void ProtocolGame::parseMarketAcceptOffer(NetworkMessage& msg)
+{
+	/*
+	uint32_t timestamp = msg.GetU32();
+	uint16_t counter = msg.GetU16();
+	uint16_t amount = msg.GetU16();
+	*/
+}
+
 //********************** Send methods  *******************************
 void ProtocolGame::sendOpenPrivateChannel(const std::string& receiver)
 {
@@ -1884,11 +1940,11 @@ void ProtocolGame::sendShop(Npc* npc, const std::list<ShopInfo>& shop)
 		TRACK_MESSAGE(msg);
 		msg->AddByte(0x7A);
 		msg->AddString(npc->getName());
-		msg->AddByte(std::min((size_t)255, shop.size()));
+		msg->AddU16(std::min((size_t)65535, shop.size()));
 
 		std::list<ShopInfo>::const_iterator it;
 		uint32_t i = 0;
-		for(it = shop.begin(); it != shop.end() && i < 255; ++it, ++i){
+		for(it = shop.begin(); it != shop.end() && i < 65535; ++it, ++i){
 			AddShopItem(msg, (*it));
 		}
 	}
@@ -1973,6 +2029,47 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 			msg->AddByte(std::min((uint32_t)255, it->second));
 		}
 	}
+}
+
+void ProtocolGame::sendMarketEnter(Item* item)
+{
+	NetworkMessage_ptr msg = getOutputBuffer();
+	if(!msg)
+		return;
+
+	TRACK_MESSAGE(msg);
+	msg->AddByte(0xF6);
+	msg->AddU32(g_game.getMoney(player)); // should be bank balance
+	msg->AddByte(player->getVocationId());
+	msg->AddByte(0x00); // active offers
+
+	Depot* depot = NULL;
+	if(Thing* thing = item->getParent())
+	{
+		if(Item* parentItem = thing->getItem())
+		{
+			if(Container* parentContainer = parentItem->getContainer())
+				depot = parentContainer->getDepot();
+		}
+	}
+
+	if(depot)
+	{
+		std::map<uint16_t, uint32_t> depotItems;
+		for(ContainerIterator it = depot->begin(), end = depot->end(); it != end; ++it)
+			depotItems[(*it)->getID()] += Item::countByType(*it, -1);
+
+		msg->AddU16(std::min((size_t)65535, depotItems.size()));
+
+		uint16_t i = 0;
+		for(std::map<uint16_t, uint32_t>::const_iterator it = depotItems.begin(), end = depotItems.end(); it != end && i < 65535; ++it, ++i)
+		{
+			msg->AddItemId(it->first);
+			msg->AddU16(std::min((uint32_t)65535, it->second));
+		}
+	}
+	else
+		msg->AddU16(0x00);
 }
 
 void ProtocolGame::sendTradeItemRequest(const Player* player, const Item* item, bool ack)
@@ -2141,7 +2238,7 @@ void ProtocolGame::sendPing()
 
 void ProtocolGame::sendDistanceShoot(const Position& from, const Position& to, uint8_t type)
 {
-	if(canSee(from) || canSee(to)){
+	if(type <= NM_SHOOT_LAST && type != NM_SHOOT_UNK1 && type != NM_SHOOT_UNK2 && (canSee(from) || canSee(to))){
 		NetworkMessage_ptr msg = getOutputBuffer();
 		if(msg){
 			TRACK_MESSAGE(msg);

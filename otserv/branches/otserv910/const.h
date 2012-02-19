@@ -100,10 +100,14 @@ enum MagicEffectClasses {
 	NM_ME_BATS             = 0x42, //66
 	NM_ME_SMOKE            = 0x43, //67
 	NM_ME_INSECTS          = 0x44, //68
-	NM_ME_DRAGONHEAD	= 0x45, //69
-	NM_ME_ORCSHAMAN		= 0x46, //70
+	NM_ME_DRAGONHEAD		= 0x45, //69
+	NM_ME_ORCSHAMAN			= 0x46, //70
 	NM_ME_ORCSHAMAN_FIRE	= 0x47, //71
-	NM_ME_LAST		= NM_ME_ORCSHAMAN_FIRE,
+	NM_ME_THUNDER          = 0x48, //72
+    NM_ME_FERUMBRAS        = 0x49, //73
+    NM_ME_CONFETTI_HORIZONTAL	= 0x4A, //74
+    NM_ME_CONFETTI_VERTICAL	= 0x4B, //75
+    NM_ME_LAST             = NM_ME_CONFETTI_VERTICAL,
 
 	//for internal use, dont send to client
 	NM_ME_NONE             = 0xFF,
@@ -152,7 +156,13 @@ enum ShootType_t {
 	NM_SHOOT_SMALLEARTH     = 0x26, //38
 	NM_SHOOT_EARTHARROW     = 0x27, //39
 	NM_SHOOT_EXPLOSION      = 0x28, //40
-	NM_SHOOT_CAKE	        = 0x29, //41
+	NM_SHOOT_CAKE		= 0x29, //41
+	NM_SHOOT_UNK1		= 0x2A, //42 DEBUG!
+	NM_SHOOT_TARSALARROW	= 0x2B, //43
+	NM_SHOOT_VORTEXBOLT	= 0x2C, //44
+	NM_SHOOT_UNK2		= 0x2D, //45 DEBUG!
+	NM_SHOOT_FOOTBALL	= 0x2E, //46
+	NM_SHOOT_LAST		= NM_SHOOT_FOOTBALL,
 	//for internal use, dont send to client
 	NM_SHOOT_WEAPONTYPE     = 0xFE, //254
 	NM_SHOOT_NONE           = 0xFF,
@@ -599,8 +609,12 @@ enum item_t {
 
 	ITEM_DEPOT            = 2594,
 	ITEM_LOCKER1          = 2589,
+	
 	ITEM_GLOWING_SWITCH   = 11063,
 
+	ITEM_INBOX            = 14404,
+    ITEM_MARKET           = 14405,
+	
 	ITEM_MALE_CORPSE      = 6080,
 	ITEM_FEMALE_CORPSE    = 6081,
 

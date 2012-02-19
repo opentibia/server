@@ -129,22 +129,27 @@
 		<list type="female" looktype="433" name="Elementalist"/>
 		<list type="male" looktype="432" name="Elementalist"/>
 	</outfit>
+	
+	<outfit id="27" premium="1" default="0">
+		<list type="female" looktype="471" name="Red Baroness"/>
+		<list type="male" looktype="472" name="Red Baron"/>
+	</outfit>
 
-	<outfit id="27">
+	<outfit id="40">
 		<list type="femalegod" looktype="75" name="Gamemaster"/>
 		<list type="malegod" looktype="75" name="Gamemaster"/>
 		<list type="femalegm" looktype="75" name="Gamemaster"/>
 		<list type="malegm" looktype="75" name="Gamemaster"/>
 	</outfit>
 
-	<outfit id="28">
+	<outfit id="41">
 		<list type="femalegod" looktype="266" name="Community Manager"/>
 		<list type="malegod" looktype="266" name="Community Manager"/>
 		<list type="femalecm" looktype="266" name="Community Manager"/>
 		<list type="malecm" looktype="266" name="Community Manager"/>
 	</outfit>
 
-	<outfit id="29">
+	<outfit id="42">
 		<list type="femalegod" looktype="302" name="God"/>
 		<list type="malegod" looktype="302" name="God"/>
 		<list type="femalecm" looktype="302" name="God"/>

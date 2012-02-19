@@ -15,7 +15,7 @@ if you type attackspeed="-500" you will have to wait 0.5 secs MORE before you ca
    <mount id="10" looktype="377" name="Rapid Boar" attackspeed="0" premium="1" default="0" speed="20"/>
    <mount id="11" looktype="378" name="Stampor" attackspeed="0" premium="1" default="0" speed="20"/>
    <mount id="12" looktype="379" name="Undead Cavebear" attackspeed="0" default="0" premium="1" speed="20"/>
-   <mount id="13" looktype="387" name="Mule" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="13" looktype="387" name="Donkey" attackspeed="0" default="0" premium="1" speed="20" />
    <mount id="14" looktype="388" name="Tiger Slug" attackspeed="0" default="0" premium="1" speed="20" />
    <mount id="15" looktype="389" name="Uniwheel" attackspeed="0" default="0" premium="1" speed="20" />
    <mount id="16" looktype="390" name="Crystal Wolf" attackspeed="0" default="0" premium="1" speed="20" />
@@ -26,6 +26,9 @@ if you type attackspeed="-500" you will have to wait 0.5 secs MORE before you ca
    <mount id="21" looktype="406" name="Sandstone Scorpion" attackspeed="0" default="0" premium="1" speed="20" />
    <mount id="22" looktype="421" name="Rented Horse" attackspeed="0" default="0" premium="0" speed="20"/>
    <mount id="23" looktype="426" name="Fire War Horse" attackspeed="0" default="0" premium="1" speed="20" />
-   <mount id="24" looktype="437" name="Rented Horse" attackspeed="0" default="0" premium="0" speed="20" />
-   <mount id="25" looktype="438" name="Rented Horse" attackspeed="0" default="0" premium="0" speed="20" />
+   <mount id="24" looktype="427" name="Shadow Draptor" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="25" looktype="437" name="Rented Horse" attackspeed="0" default="0" premium="0" speed="20" />
+   <mount id="26" looktype="438" name="Rented Horse" attackspeed="0" default="0" premium="0" speed="20" />
+   <mount id="27" looktype="447" name="Ladybug" attackspeed="0" default="0" premium="1" speed="20" />
+   <mount id="28" looktype="450" name="Manta" attackspeed="0" default="0" premium="1" speed="20" />
 </mounts>

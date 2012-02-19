@@ -263,8 +263,8 @@ uint32_t Vocation::getReqSkillTries(int32_t skill, int32_t level)
 	if(skill < SKILL_FIRST || skill > SKILL_LAST){
 		return 0;
 	}
-	cacheMap& skillMap = cacheSkill[skill];
-	cacheMap::iterator it = skillMap.find(level);
+	skillCacheMap& skillMap = cacheSkill[skill];
+	skillCacheMap::iterator it = skillMap.find(level);
 	if(it != cacheSkill[skill].end()){
 		return it->second;
 	}
@@ -275,7 +275,7 @@ uint32_t Vocation::getReqSkillTries(int32_t skill, int32_t level)
 
 uint32_t Vocation::getReqMana(int32_t magLevel)
 {
-	cacheMap::iterator it = cacheMana.find(magLevel);
+	manaCacheMap::iterator it = cacheMana.find(magLevel);
 	if(it != cacheMana.end()){
 		return it->second;
 	}

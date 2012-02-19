@@ -203,6 +203,7 @@ public:
 
 	bool setVocation(uint32_t vocId);
 	uint32_t getVocationId() const;
+	const DepotMap& getDepots() const { return depots; }
 	Vocation* getVocation() const {return vocation;};
 
 	PlayerSex_t getSex() const {return sex;}
@@ -643,6 +644,8 @@ public:
 		{if(client) client->sendSaleItemList(shopItemList);}
 	void sendCloseShop() const
 		{if(client) client->sendCloseShop();}
+	void sendMarketEnter(Item* item) const
+		{if(client) client->sendMarketEnter(item);}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const

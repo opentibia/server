@@ -3194,17 +3194,16 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 		//subtype already supplied, count then is the amount
 		itemCount = count;
 	}
-	else{
-		if(it.hasSubType()){
-			if(it.stackable){
+	else if(it.hasSubType())
+	{
+			if(it.stackable)
 				itemCount = (int32_t)std::ceil((float)count / 100);
-			}
 
 			subType = count;
-		}
+	}
 		else{
 			itemCount = std::max((int32_t)1, (int32_t)count);
-		}
+		
 	}
 
 	while(itemCount > 0){

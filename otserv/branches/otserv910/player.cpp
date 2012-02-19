@@ -28,6 +28,7 @@
 #include "combat.h"
 #include "movement.h"
 #include "weapons.h"
+#include "quests.h"
 #include "creatureevent.h"
 #include "status.h"
 #include "beds.h"
@@ -1023,7 +1024,9 @@ void Player::addStorageValue(const uint32_t key, const int32_t value)
 	}
 	else{
 		storageMap[key] = value;
-	}
+		if(Quests::getInstance()->isQuestStorage(key, value))
+			sendTextMessage(MSG_EVENT_ADVANCE, "Your questlog has been updated.");     
+		}
 }
 
 bool Player::getStorageValue(const uint32_t key, int32_t& value) const
@@ -1185,6 +1188,13 @@ Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 		Depot* depot = NULL;
 		Item* tmpDepot = Item::CreateItem(ITEM_LOCKER1);
 		if(tmpDepot->getContainer() && (depot = tmpDepot->getContainer()->getDepot())){
+			Item* market = Item::CreateItem(ITEM_MARKET);
+			depot->__internalAddThing(market);
+
+			Item* inbox = Item::CreateItem(ITEM_INBOX);
+			depot->__internalAddThing(inbox);
+			depot->setInbox(inbox->getContainer());
+		
 			Item* depotChest = Item::CreateItem(ITEM_DEPOT);
 			depot->__internalAddThing(depotChest);
 
@@ -1208,6 +1218,15 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 		return false;
 	}
 
+	if(!depot->getInbox())
+	{
+		depot->__internalAddThing(Item::CreateItem(ITEM_MARKET));
+
+		Item* inbox = Item::CreateItem(ITEM_INBOX);
+		depot->__internalAddThing(inbox);
+		depot->setInbox(inbox->getContainer());
+	}
+	
 	depots[depotId] = depot;
 	depot->setMaxDepotLimit(maxDepotLimit);
 	return true;
@@ -2533,8 +2552,8 @@ void Player::die()
 			double lostPercent = 1. - (double(experience - expLost) / double(experience)); // 0.1 if 10% was lost
 
 			//Magic level loss
-			uint32_t sumMana = 0;
-			int32_t lostMana = 0;
+			uint64_t sumMana = 0;
+			uint64_t lostMana = 0;
 
 			for(uint32_t i = 1; i <= magLevel; ++i){
 				sumMana += vocation->getReqMana(i);
@@ -2543,15 +2562,15 @@ void Player::die()
 			sumMana += manaSpent;
 
 			double lostPercentMana = lostPercent * lossPercent[LOSS_MANASPENT] / 100;
-			lostMana = (int32_t)std::ceil(sumMana * lostPercentMana);
+			lostMana = (uint64_t)std::ceil(sumMana * lostPercentMana);
 
-			while((uint32_t)lostMana > manaSpent && magLevel > 0){
+			while((uint64_t)lostMana > manaSpent && magLevel > 0){
 				lostMana -= manaSpent;
 				manaSpent = vocation->getReqMana(magLevel);
 				magLevel--;
 			}
 
-			manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
+			manaSpent = std::max((uint64_t)0, (int32_t)manaSpent - lostMana);
 			magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
 
 			//Skill loss

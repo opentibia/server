@@ -124,7 +124,7 @@ bool Mailbox::sendItemTo(const std::string& name, uint32_t depotId, Item* item)
 	bool result = false;
 	Depot* depot = player->getDepot(depotId, true);
 	if(depot){
-		if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
+		if(g_game.internalMoveItem(item->getParent(), depot->getInbox(), INDEX_WHEREEVER,
 			item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
 		{
 			if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){

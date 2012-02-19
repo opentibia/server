@@ -349,8 +349,8 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
 
-	if(index == INDEX_WHEREEVER && !skipLimit){
-		if(size() >= capacity())
+	if(!skipLimit){
+		if(id == ITEM_INBOX || (index == INDEX_WHEREEVER && size() >= capacity()))
 			return RET_CONTAINERNOTENOUGHROOM;
 	}
 

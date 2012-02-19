@@ -611,9 +611,35 @@ void IOPlayer::loadDepot(Player* player, DBResult* result)
 			if(it2 != itemMap.end())
 				if(Container* container = it2->second.first->getContainer()){
 					container->__internalAddThing(item);
+					
+					Depot* depot;
+					if (item->getID() == ITEM_INBOX && (depot = container->getDepot())) {
+						depot->setInbox(item->getContainer());	
+					}
 				}
 		}
 	}
+		
+	// Move all items from locker to inbox
+	DepotMap depots = player->getDepots();
+	for (DepotMap::const_iterator it = depots.begin(), end = depots.end(); it != end; ++it) {
+		Depot* depot = it->second;
+		if (depot->size() > 3 && depot->getInbox()) {
+			ItemList::const_reverse_iterator _it = depot->getReversedItems(), end = depot->getReversedEnd();
+			while (_it != end) {
+				Item* item = (*_it);
+				if (item->getID() != ITEM_INBOX && item->getID() != ITEM_MARKET && item->getID() != ITEM_DEPOT) {
+					g_game.internalMoveItem(item->getParent(), depot->getInbox(), INDEX_WHEREEVER, item, item->getItemCount(), NULL, FLAG_NOLIMIT);
+
+					_it = depot->getReversedItems();
+					end = depot->getReversedEnd();
+				} else {
+					++_it;
+				}
+			}
+		}
+	}
+	
 }
 
 void IOPlayer::loadInventory(Player* player, DBResult* result)
