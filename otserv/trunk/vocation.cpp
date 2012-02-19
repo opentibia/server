@@ -258,7 +258,7 @@ Vocation::~Vocation()
 	}
 }
 
-uint32_t Vocation::getReqSkillTries(int32_t skill, int32_t level)
+uint64_t Vocation::getReqSkillTries(int32_t skill, int32_t level)
 {
 	if(skill < SKILL_FIRST || skill > SKILL_LAST){
 		return 0;
@@ -268,19 +268,19 @@ uint32_t Vocation::getReqSkillTries(int32_t skill, int32_t level)
 	if(it != cacheSkill[skill].end()){
 		return it->second;
 	}
-	uint32_t tries = (uint32_t)(skillBases[skill] * std::pow((float)skillMultipliers[skill], (float)(level - 11)));
+	uint64_t tries = (uint64_t)(skillBases[skill] * std::pow((float)skillMultipliers[skill], (float)(level - 11)));
 	skillMap[level] = tries;
 	return tries;
 }
 
-uint32_t Vocation::getReqMana(int32_t magLevel)
+uint64_t Vocation::getReqMana(int32_t magLevel)
 {
 	manaCacheMap::iterator it = cacheMana.find(magLevel);
 	if(it != cacheMana.end()){
 		return it->second;
 	}
 
-	uint32_t reqMana = (uint32_t)(1600*std::pow(manaMultiplier, magLevel-1));
+	uint64_t reqMana = (uint64_t)(1600*std::pow(manaMultiplier, magLevel-1));
 	cacheMana[magLevel] = reqMana;
 
 	return reqMana;

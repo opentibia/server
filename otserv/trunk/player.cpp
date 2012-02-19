@@ -2235,7 +2235,7 @@ void Player::drainMana(Creature* attacker, int32_t points)
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
-void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
+void Player::addManaSpent(uint64_t amount, bool useMultiplier /*= true*/)
 {
 	if(amount != 0 && !hasFlag(PlayerFlag_NotGainMana)){
 		if(useMultiplier){
@@ -2245,7 +2245,10 @@ void Player::addManaSpent(uint32_t amount, bool useMultiplier /*= true*/)
 
 		uint32_t origLevel = magLevel;
 
-		uint32_t reqMana = vocation->getReqMana(origLevel + 1);
+		uint64_t reqMana = vocation->getReqMana(origLevel + 1);
+		if(reqMana == 0)
+			return;
+
 		while(manaSpent >= reqMana){
 			manaSpent -= reqMana;
 			magLevel++;
@@ -2622,7 +2625,7 @@ void Player::die()
 				magLevel--;
 			}
 
-			manaSpent = std::max((uint64_t)0, (int32_t)manaSpent - lostMana);
+			manaSpent = std::max((uint64_t)0, (uint64_t)manaSpent - lostMana);
 			magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
 
 			//Skill loss

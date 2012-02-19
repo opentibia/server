@@ -138,8 +138,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->manaMax = result->getDataInt("manamax");
 	player->magLevel = result->getDataInt("maglevel");
 
-	uint32_t nextManaCount = (uint32_t)player->vocation->getReqMana(player->magLevel + 1);
-	uint32_t manaSpent = (uint32_t)result->getDataInt("manaspent");
+	uint64_t nextManaCount = (uint64_t)player->vocation->getReqMana(player->magLevel + 1);
+	uint64_t manaSpent = (uint64_t)result->getDataInt("manaspent");
 	if(manaSpent > nextManaCount){
 		//make sure its not out of bound
 		manaSpent = 0;
@@ -372,8 +372,8 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->manaMax = result->getDataInt("manamax");
 	player->magLevel = result->getDataInt("maglevel");
 
-	uint32_t nextManaCount = (uint32_t)player->vocation->getReqMana(player->magLevel + 1);
-	uint32_t manaSpent = (uint32_t)result->getDataInt("manaspent");
+	uint64_t nextManaCount = (uint64_t)player->vocation->getReqMana(player->magLevel + 1);
+	uint64_t manaSpent = (uint64_t)result->getDataInt("manaspent");
 	if(manaSpent > nextManaCount){
 		//make sure its not out of bound
 		manaSpent = 0;
@@ -550,9 +550,9 @@ void IOPlayer::loadSkills(Player* player, DBResult* result)
 		int skillid = result->getDataInt("skillid");
 		if(skillid >= SKILL_FIRST && skillid <= SKILL_LAST){
 			uint32_t skillLevel = result->getDataInt("value");
-			uint32_t skillCount = result->getDataInt("count");
+			uint64_t skillCount = result->getDataInt("count");
 
-			uint32_t nextSkillCount = player->vocation->getReqSkillTries(skillid, skillLevel + 1);
+			uint64_t nextSkillCount = player->vocation->getReqSkillTries(skillid, skillLevel + 1);
 			if(skillCount > nextSkillCount){
 				//make sure its not out of bound
 				skillCount = 0;

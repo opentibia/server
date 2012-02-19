@@ -388,7 +388,7 @@ public:
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t points);
-	void addManaSpent(uint32_t amount, bool useMultiplier = true);
+	void addManaSpent(uint64_t amount, bool useMultiplier = true);
 	void addSkillAdvance(skills_t skill, uint32_t count, bool useMultiplier = true);
 
 	virtual int32_t getArmor() const;
@@ -783,7 +783,7 @@ protected:
 	uint32_t conditionSuppressions;
 	uint32_t condition;
 	int32_t stamina;
-	uint32_t manaSpent;
+	uint64_t manaSpent;
 	Vocation_t vocation_id;
 	Vocation* vocation;
 	PlayerSex_t sex;

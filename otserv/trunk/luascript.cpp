@@ -3130,7 +3130,7 @@ int LuaScriptInterface::luaDoPlayerAddManaSpent(lua_State *L)
 		useMultiplier = (popNumber(L, true) >= 1);
 	}
 
-	uint32_t mana = popNumber(L);
+	uint64_t mana = popNumber(L);
 	uint32_t cid = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
