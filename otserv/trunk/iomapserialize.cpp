@@ -200,7 +200,7 @@ bool IOMapSerialize::loadItems(Database* db, DBResult* result, Cylinder* parent,
 					}
 				}
 				else{
-					std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile()" << std::endl;
+					std::cout << "WARNING: Serialize error in IOMapSerialize::loadTile() at " << tile->getPosition() << ". id = " << id << ", sid = " << sid << ", pid = " << pid << std::endl;
 				}
 			}
 			else
@@ -240,7 +240,7 @@ bool IOMapSerialize::loadItems(Database* db, DBResult* result, Cylinder* parent,
 				}
 			}
 			else{
-				std::cout << "WARNING: Serialize error in IOMapSerialize::loadItems()" << std::endl;
+				std::cout << "WARNING: Serialize error in IOMapSerialize::loadItems() at " << tile->getPosition() << ". id = " << id << ", sid = " << sid << ", pid = " << pid << std::endl;
 			}
 		}
 		else{
