@@ -2996,6 +2996,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 
 	bool childIsOwner = ((flags & FLAG_CHILDISOWNER) == FLAG_CHILDISOWNER);
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
+	
+	if(item->getContainer() && !canAddContainer(item->getContainer()))
+		return RET_NOTPOSSIBLE;
 
 	if(childIsOwner){
 		//a child container is querying the player, just check if enough capacity
@@ -5062,4 +5065,51 @@ void Player::toogleGmInvisible()
 	}
 
 	//TODO: fire StepIn/StepOut events
+}
+
+bool Player::canAddContainer(const Container* container) const
+{
+	//We start searching for containers: if limit is reached, return false already, if not, keeps going
+	//Let's start by the container that player is puting in his inventory
+	uint32_t containers = 1; //the container itself counts
+	for(ContainerIterator iter = container->begin(), end = container->end(); iter != end; ++iter)
+	{
+		if((*iter)->getContainer())
+		{
+			containers++;
+			if(containers > g_config.getNumber(ConfigManager::MAX_CONTAINERS_INSIDE_PLAYER_INVENTORY)) //If already reached the limit, should stop searching now
+				return false;
+		}
+	}
+
+	//The container that the player is trying to add to his inventory did not exceed the limit of containers itself
+	//But let's check if the contnier + player inventory containers won't either
+	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
+		Item* item = inventory[i];
+
+		if(item)
+		{
+			Container* pcontainer = item->getContainer();
+			if(pcontainer)
+			{
+				//We found a container in inventory
+				containers++;
+				if(containers > g_config.getNumber(ConfigManager::MAX_CONTAINERS_INSIDE_PLAYER_INVENTORY)) //If already reached the limit, should stop searching now
+					return false;
+
+				//Check inside the container
+				for(ContainerIterator iter = pcontainer->begin(), end = pcontainer->end(); iter != end; ++iter)
+				{
+					if((*iter)->getContainer())
+					{
+						containers++;
+						if(containers > g_config.getNumber(ConfigManager::MAX_CONTAINERS_INSIDE_PLAYER_INVENTORY)) //If already reached the limit, should stop searching now
+							return false;
+					}
+				}
+			}
+		}
+	}
+
+	return true;
 }

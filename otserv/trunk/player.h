@@ -161,7 +161,7 @@ public:
 	bool canSeeGmInvisible(const Player* player) const { return (player->getAccessLevel() <= getAccessLevel()); }
 	bool hasSomeInvisibilityFlag() const { return hasFlag(PlayerFlag_CannotBeSeen) || isGmInvisible(); }
 	//]
-
+	
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
@@ -465,7 +465,8 @@ public:
 	bool canLogout();
 	void broadcastLoot(Creature* creature, Container* corpse);
 	bool checkPzBlock(Player* targetPlayer);
-
+	bool canAddContainer(const Container* container) const;
+	
 	//creature events
 	void onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
 	bool onLookEvent(Thing* target, uint32_t itemId);

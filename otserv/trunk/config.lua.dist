@@ -240,7 +240,11 @@ wands_interrupt_swing = true
 
 -- maximum amount of items inside of a container (including the items inside of any container inside of it)
 -- Use 0 for infinite
-max_amount_items_inside_containers = 200
+max_amount_items_inside_containers = 2000
+
+-- maximum amount of containers inside of a player inventory
+-- it fixes some CPU bug so it's not recommended to change this value to very high
+max_containers_inside_player_inventory = 100
 
 --maximal length for chains of containers (i.e, a container inside of a container which is inside of a container...)
 max_deepness_of_chain_of_containers = 500
@@ -316,7 +320,7 @@ npc_max_nonestackable_sell_amount = 100
 
 -- if you doesn't wish to see errors like this: "Error: Expected an integer/boolean parameter"
 --(it means that you are missing an return somewhere but this is not so important and is just spamming your console on a production server) then set this to false
-lua_excepted_type_errors_enabled = true
+lua_excepted_type_errors_enabled = false
 
 -- motd (the message box that you sometimes get before you choose characters)
 motd = "Welcome to OTServ 0.6.3!"

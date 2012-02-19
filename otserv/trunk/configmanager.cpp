@@ -214,10 +214,12 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[TILE_LIMIT] = getGlobalNumber(L, "tile_limit", 0);
 	m_confInteger[PROTECTION_TILE_LIMIT] = getGlobalNumber(L, "protection_tile_limit", 0);
 	m_confInteger[HOUSE_TILE_LIMIT]	= getGlobalNumber(L, "house_tile_limit", 0);
-	m_confInteger[LUA_EXCEPTED_TYPE_ERRORS_ENABLED]	= getGlobalBoolean(L, "lua_excepted_type_errors_enabled", true);
-	m_confInteger[MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS] = getGlobalNumber(L, "max_amount_items_inside_containers", 200);
+	m_confInteger[LUA_EXCEPTED_TYPE_ERRORS_ENABLED]	= getGlobalBoolean(L, "lua_excepted_type_errors_enabled", false);
+	m_confInteger[MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS] = getGlobalNumber(L, "max_amount_items_inside_containers", 2000);
 	m_confInteger[MAX_DEEPNESS_OF_CHAIN_OF_CONTAINERS] = getGlobalNumber(L, "max_deepness_of_chain_of_containers", 500);
 	m_confInteger[BIND_ONLY_GLOBAL_ADDRESS]	= getGlobalBoolean(L, "bind_only_global_address", false);
+	m_confInteger[MAX_CONTAINERS_INSIDE_PLAYER_INVENTORY] = getGlobalNumber(L, "max_containers_inside_player_inventory", 100);
+	
 	m_isLoaded = true;
 	return true;
 }
