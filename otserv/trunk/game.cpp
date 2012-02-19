@@ -2866,8 +2866,11 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 				Cylinder* cylinder1 = tradeItem1->getParent();
 				Cylinder* cylinder2 = tradeItem2->getParent();
 
-				internalMoveItem(cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, tradeItem1->getItemCount(), NULL);
-				internalMoveItem(cylinder2, player, INDEX_WHEREEVER, tradeItem2, tradeItem2->getItemCount(), NULL);
+				uint32_t count1 = tradeItem1->getItemCount();
+				uint32_t count2 = tradeItem2->getItemCount();
+				
+				internalMoveItem(cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, count1, NULL);
+				internalMoveItem(cylinder2, player, INDEX_WHEREEVER, tradeItem2, count2, NULL);
 
 				tradeItem1->onTradeEvent(ON_TRADE_TRANSFER, tradePartner);
 				tradeItem2->onTradeEvent(ON_TRADE_TRANSFER, player);
@@ -4248,7 +4251,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, MagicEffectClasses custom
 
 					case COMBAT_ICEDAMAGE:
 					{
-						textColor = TEXTCOLOR_LIGHTBLUE;
+						textColor = TEXTCOLOR_SKYBLUE;
 						hitEffect = NM_ME_ICEATTACK;
 						break;
 					}

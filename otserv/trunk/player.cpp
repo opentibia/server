@@ -2604,8 +2604,8 @@ void Player::die()
 			double lostPercent = 1. - (double(experience - expLost) / double(experience)); // 0.1 if 10% was lost
 
 			//Magic level loss
-			uint32_t sumMana = 0;
-			int32_t lostMana = 0;
+			uint64_t sumMana = 0;
+			uint64_t lostMana = 0;
 
 			for(uint32_t i = 1; i <= magLevel; ++i){
 				sumMana += vocation->getReqMana(i);
@@ -2614,15 +2614,15 @@ void Player::die()
 			sumMana += manaSpent;
 
 			double lostPercentMana = lostPercent * lossPercent[LOSS_MANASPENT] / 100;
-			lostMana = (int32_t)std::ceil(sumMana * lostPercentMana);
+			lostMana = (uint64_t)std::ceil(sumMana * lostPercentMana);
 
-			while((uint32_t)lostMana > manaSpent && magLevel > 0){
+			while((uint64_t)lostMana > manaSpent && magLevel > 0){
 				lostMana -= manaSpent;
 				manaSpent = vocation->getReqMana(magLevel);
 				magLevel--;
 			}
 
-			manaSpent = std::max((int32_t)0, (int32_t)manaSpent - lostMana);
+			manaSpent = std::max((uint64_t)0, (int32_t)manaSpent - lostMana);
 			magLevelPercent = Player::getPercentLevel(manaSpent, vocation->getReqMana(magLevel + 1));
 
 			//Skill loss

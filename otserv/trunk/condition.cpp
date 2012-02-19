@@ -1563,7 +1563,7 @@ void ConditionDamage::generateDamageList(int32_t amount, int32_t start, std::lis
 
 	int32_t med;
 	int32_t sum = 0;
-	float x1, x2;
+	double x1, x2;
 
 	for(int32_t i = start; i > 0; --i){
 		int32_t n = start + 1 - i;
