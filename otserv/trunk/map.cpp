@@ -524,14 +524,14 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool 
 		return false;
 	}
 
-	if(fromPos.z - fromPos.z > 2){
+	int deltaz = std::abs(fromPos.z - toPos.z);
+	if(deltaz > 2){
 		return false;
 	}
 
-	int deltax, deltay, deltaz;
+	int deltax, deltay;
 	deltax = std::abs(fromPos.x - toPos.x);
 	deltay = std::abs(fromPos.y - toPos.y);
-	deltaz = std::abs(fromPos.z - toPos.z);
 
 	//distance checks
 	if(deltax - deltaz > rangex || deltay - deltaz > rangey){
