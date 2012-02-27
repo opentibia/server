@@ -420,6 +420,8 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 	if((player->isRemoved() || player->getHealth() <= 0) && recvbyte != 0x14){
 		return;
 	}
+	
+	bool kickPlayer = false;
 
 	switch(recvbyte){
 	case 0x14: // logout
@@ -692,8 +694,17 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 
 	default:
 		printf("unknown packet header: %x, player %s \n", recvbyte, player->getName());
-		player->kickPlayer();
+		kickPlayer = true;
 		break;
+	}
+	
+	if(msg.isOvverrun()){ //we've got a badass over here
+		printf("msg.isOvverrun() == true, player %s \n", player->getName());
+		kickPlayer = true;
+	}
+	
+	if(kickPlayer){
+		player->kickPlayer();
 	}
 }
 
