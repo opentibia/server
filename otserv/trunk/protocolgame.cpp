@@ -698,7 +698,7 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 	}
 	
-	if(msg.isOvverrun()){ //we've got a badass over here
+	if(msg.isOverrun()){ //we've got a badass over here
 		printf("msg.isOvverrun() == true, player %s \n", player->getName());
 		kickPlayer = true;
 	}

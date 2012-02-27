@@ -190,7 +190,7 @@ public:
 
 	int32_t decodeHeader();
 	
-	bool isOvverrun(){ return m_overrun; };
+	bool isOverrun(){ return m_overrun; };
 
 	char* getBuffer() { return (char*)&m_MsgBuf[0]; }
 	char* getBodyBuffer() { m_ReadPos = 2; return (char*)&m_MsgBuf[header_length]; }
