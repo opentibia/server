@@ -56,35 +56,65 @@ protected:
 public:
 
 	// simply read functions for incoming message
-	uint8_t  GetByte(){return m_MsgBuf[m_ReadPos++];}
+	uint8_t  GetByte(){
+		if(sizeof(uint8_t) >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
+			return 0xFF;
+		}
+		
+		return m_MsgBuf[m_ReadPos++];
+	}
 
 #ifndef __SWAP_ENDIAN__
 	uint16_t GetU16(){
+		if(sizeof(uint16_t) >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
+			return 0xFFFF;
+		}
+		
 		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
 		m_ReadPos += 2;
 		return v;
 	}
 	uint32_t GetU32(){
+		if(sizeof(uint32_t) >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
+			return 0xFFFFFFFF;
+		}
+		
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		m_ReadPos += 4;
 		return v;
 	}
 	uint32_t PeekU32(){
+		if(sizeof(uint32_t) >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
+			return 0xFFFFFFFF;
+		}
+		
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		return v;
 	}
 #else
 	uint16_t GetU16(){
+		if(sizeof(uint16_t) >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
+			return 0xFFFF;
+		}
+		
 		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
 		m_ReadPos += 2;
 		return swap_uint16(v);
 	}
 	uint32_t GetU32(){
+		if(sizeof(uint32_t) >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
+			return 0xFFFFFFFF;
+		}
+		
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		m_ReadPos += 4;
 		return swap_uint32(v);
 	}
 	uint32_t PeekU32(){
+		if(sizeof(uint32_t) >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
+			return 0xFFFFFFFF;
+		}
+		
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		return swap_uint32(v);
 	}

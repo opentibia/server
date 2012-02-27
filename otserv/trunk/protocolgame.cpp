@@ -691,10 +691,8 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	default:
-#ifdef __DEBUG__
-		printf("unknown packet header: %x \n", recvbyte);
-		parseDebug(msg);
-#endif
+		printf("unknown packet header: %x, player %s \n", recvbyte, player->getName());
+		player->kickPlayer();
 		break;
 	}
 }
