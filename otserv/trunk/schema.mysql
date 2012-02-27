@@ -331,6 +331,37 @@ CREATE TABLE `player_depotitems` (
 	UNIQUE (`player_id`, `sid`)
 ) ENGINE = InnoDB;
 
+CREATE TABLE `market_offers` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`player_id` INT UNSIGNED NOT NULL,
+
+	`sale` TINYINT(1) NOT NULL DEFAULT 0,
+	`itemtype` INT NOT NULL,
+	`amount` INT NOT NULL,
+
+	`created` INT NOT NULL,
+	`anonymous` TINYINT(1) DEFAULT 0,
+	`price` INT NOT NULL DEFAULT 0,
+
+	PRIMARY KEY (`id`),
+	KEY (`sale`, `itemtype`),
+	KEY (`created`),
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
+ 
+CREATE TABLE `market_statistics` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+	`sale` TINYINT(1) NOT NULL,
+	`itemtype` INT NOT NULL,
+	`price` INT NOT NULL,
+	`amount` INT NOT NULL,
+	`when` INT NOT NULL,
+
+	PRIMARY KEY(`id`),
+	KEY(`sale`, `itemtype`, `when`)
+) ENGINE = InnoDB;
+
 CREATE TABLE `global_storage` (
 	`key` INT UNSIGNED NOT NULL,
 	`value` INT NOT NULL,
