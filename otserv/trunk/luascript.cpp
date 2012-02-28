@@ -299,12 +299,12 @@ Thing* ScriptEnviroment::getThingByUID(uint32_t uid)
 {
 	ThingMap::iterator it = m_localMap.find(uid);
 	if(it != m_localMap.end() && !it->second->isRemoved()){
-		return tmp;
+		return it->second;
 	}
 	
-	ThingMap::iterator it = m_globalMap.find(uid);
+	it = m_globalMap.find(uid);
 	if(it != m_globalMap.end() && !it->second->isRemoved()){
-		return tmp;
+		return it->second;
 	}
 	
 	if(uid >= PLAYER_ID_RANGE){ //is a creature id

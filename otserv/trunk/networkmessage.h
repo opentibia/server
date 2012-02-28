@@ -206,7 +206,7 @@ protected:
 		return (size + m_ReadPos < max_body_length);
 	};
 	
-	inline bool expectRead(uint32_t size){
+	inline bool expectRead(int32_t size){
 		if(size >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
 			m_overrun = true;
 			return false;
