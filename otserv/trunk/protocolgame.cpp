@@ -693,13 +693,13 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		break;
 
 	default:
-		printf("unknown packet header: %x, player %s \n", recvbyte, player->getName().c_str());
+		std::cout << "Unknown packet header: " << std::hex << (int)recvbyte << std::dec << ", player " << player->getName() << std::endl;
 		kickPlayer = true;
 		break;
 	}
 	
 	if(msg.isOverrun()){ //we've got a badass over here
-		printf("msg.isOvverrun() == true, player %s \n", player->getName().c_str());
+		std::cout << "msg.isOvverrun() == true, player " << player->getName() << std::endl;
 		kickPlayer = true;
 	}
 	
