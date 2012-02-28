@@ -221,8 +221,8 @@ void ScriptEnviroment::addUniqueThing(Thing* thing)
 	if(item && item->getUniqueId() != 0 ){
 		int32_t uid = item->getUniqueId();
 
-		Thing* tmp = m_globalMap[uid];
-		if(!tmp){
+		ThingMap::iterator it = m_globalMap.find(uid);
+		if(it == m_globalMap.end()){
 			m_globalMap[uid] = thing;
 		}
 		else{
@@ -286,7 +286,8 @@ uint32_t ScriptEnviroment::addThing(Thing* thing)
 
 void ScriptEnviroment::insertThing(uint32_t uid, Thing* thing)
 {
-	if(!m_localMap[uid]){
+	ThingMap::iterator it = m_localMap.find(uid);
+	if(it == m_localMap.end()){
 		m_localMap[uid] = thing;
 	}
 	else{
@@ -296,21 +297,24 @@ void ScriptEnviroment::insertThing(uint32_t uid, Thing* thing)
 
 Thing* ScriptEnviroment::getThingByUID(uint32_t uid)
 {
-	Thing* tmp = m_localMap[uid];
-	if(tmp && !tmp->isRemoved()){
+	ThingMap::iterator it = m_localMap.find(uid);
+	if(it != m_localMap.end() && !it->second->isRemoved()){
 		return tmp;
 	}
-	tmp = m_globalMap[uid];
-	if(tmp && !tmp->isRemoved()){
+	
+	ThingMap::iterator it = m_globalMap.find(uid);
+	if(it != m_globalMap.end() && !it->second->isRemoved()){
 		return tmp;
 	}
+	
 	if(uid >= PLAYER_ID_RANGE){ //is a creature id
-		tmp = g_game.getCreatureByID(uid);
-		if(tmp && !tmp->isRemoved()){
-			m_localMap[uid] = tmp;
-			return tmp;
+		Thing* thing = g_game.getCreatureByID(uid);
+		if(thing && !thing->isRemoved()){
+			m_localMap[uid] = thing;
+			return thing;
 		}
 	}
+	
 	return NULL;
 }
 
@@ -318,9 +322,11 @@ Item* ScriptEnviroment::getItemByUID(uint32_t uid)
 {
 	Thing* tmp = getThingByUID(uid);
 	if(tmp){
-		if(Item* item = tmp->getItem())
+		if(Item* item = tmp->getItem()){
 			return item;
+		}
 	}
+	
 	return NULL;
 }
 
