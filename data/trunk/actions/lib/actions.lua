@@ -250,6 +250,7 @@ function usePick(cid, item, fromPosition, itemEx, toPosition)
 
 local FRAGILE_ICE	=	7200
 local ICE_FISHHOLE	=	7236
+local MUD_HOLE = 392
 local duration = 5 * 60000 -- 5 minutes
 
 	local itemGround = getThingFromPos({x = toPosition.x, y = toPosition.y, z = toPosition.z + 1, stackpos = STACKPOS_GROUND})
