@@ -1525,7 +1525,7 @@ void ProtocolGame::sendCreatureSkull(const Creature* creature)
 		}
 	}
 }
-#ifdef __GUILDWARSLUARELOAD__
+
 void ProtocolGame::sendCreatureEmblem(const Creature* creature)
 {
 	if(!canSee(creature))
@@ -1554,7 +1554,7 @@ void ProtocolGame::sendCreatureEmblem(const Creature* creature)
 			AddTileCreature(msg, creature->getPosition(), stackpos, creature);
 	}
 }
-#endif
+
 void ProtocolGame::sendCreatureShield(const Creature* creature)
 {
 	if(canSee(creature)){

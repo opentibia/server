@@ -125,4 +125,17 @@ enum passwordType_t{
 	#error "Boost exception handling must be enabled."
 #endif
 
+//Enable multi-byte character set under MSVC
+#ifdef _MSC_VER
+	#ifndef _MBCS
+		#define _MBCS
+	#endif
+	#ifdef _UNICODE
+		#undef _UNICODE 
+	#endif
+	#ifdef UNICODE
+		#undef UNICODE
+	#endif
+#endif
+
 #endif

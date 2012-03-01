@@ -2094,10 +2094,8 @@ void LuaScriptInterface::registerFunctions()
 	//getPlayerModes(cid)
 	lua_register(m_luaState, "getPlayerModes", LuaScriptInterface::luaGetPlayerModes);
 
-	#ifdef __GUILDWARSLUARELOAD__
-	//doUpdateGuildWar
+	//doUpdateGuildWar(warId)
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
-	#endif
 }
 
 int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
@@ -9767,35 +9765,18 @@ int LuaScriptInterface::luaDoEraseGlobalStorageValue(lua_State *L)
 	return 1;
 }
 
-#ifdef __GUILDWARSLUARELOAD__
-int32_t LuaScriptInterface::luaDoUpdateGuildWar(lua_State* L)
+int LuaScriptInterface::luaDoUpdateGuildWar(lua_State* L)
 {
 	//doUpdateGuildWar(warId)
 	uint32_t warId = popNumber(L);
-	bool isSuccess = g_guilds.loadWar(warId);
+	int32_t newStatus = g_guilds.updateWar(warId);
 
-	GuildWarsMap& guildWarMap = g_guilds.getWars();
-	GuildWarsMap::iterator wit = guildWarMap.find(warId);
+	//If war has started, we should update the emblems
+	//Emblems are automatically updated when war ends, so we don't need it here
+	if(newStatus == 1)
+		g_guilds.updateWarEmblems(warId);
 
-	if(wit == guildWarMap.end()){
-		//warId doesnt exist so we didnt succeed.
-		lua_pushboolean(L, false);
-		return 1;
-	}
-
-	uint32_t guild1 = wit->second.guildId;
-	uint32_t guild2 = wit->second.opponentId;
-
-	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		if(it->second->isRemoved())
-			continue;
-
-		if(it->second->getGuildId() == guild1 || it->second->getGuildId() == guild2){
-			g_game.updateCreatureEmblem(it->second);
-		}
-	}
-
-	lua_pushboolean(L, isSuccess);
+	//return the new status of the war
+	lua_pushnumber(L, newStatus);
 	return 1;
 }
-#endif

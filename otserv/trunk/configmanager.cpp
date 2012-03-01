@@ -219,6 +219,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[MAX_DEEPNESS_OF_CHAIN_OF_CONTAINERS] = getGlobalNumber(L, "max_deepness_of_chain_of_containers", 500);
 	m_confInteger[BIND_ONLY_GLOBAL_ADDRESS]	= getGlobalBoolean(L, "bind_only_global_address", false);
 	m_confInteger[MAX_CONTAINERS_INSIDE_PLAYER_INVENTORY] = getGlobalNumber(L, "max_containers_inside_player_inventory", 100);
+	m_confInteger[GUILD_WARS_END_ONLY_ON_STARTUP] = getGlobalBoolean(L, "guild_wars_end_only_on_startup", true);
 	
 	m_isLoaded = true;
 	return true;

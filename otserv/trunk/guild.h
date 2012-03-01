@@ -61,6 +61,7 @@ public:
 
 	uint32_t isEnemy(uint32_t enemyId) const;
 	void addEnemy(uint32_t enemyId, uint32_t warId);
+	void removeEnemy(uint32_t guildId);
 	
 protected:
 	uint32_t id;
@@ -74,13 +75,17 @@ class Guilds
 {
 public:
 	void loadWars();
-	#ifdef __GUILDWARSLUARELOAD__
-	bool loadWar(uint32_t warId);
-	#endif
+	int32_t updateWar(uint32_t warId);
+	int32_t processWar(DBResult* result, bool loadWar);
+
+	void unsetEnemies(uint32_t warId);
+	bool updateWarEmblems(uint32_t warId);
 	void endWar(uint32_t warId);
+	void endWar(const GuildWar& war);
+
 	bool transferMoney(uint32_t guildId, uint32_t opponentId, int32_t guildFee, int32_t opponentFee);
 	bool setWarStatus(uint32_t warId, int32_t statusId);
-	void broadcastKill(uint32_t guildId, Player* player, const DeathList& killers);
+	void processKill(uint32_t guildId, Player* player, const DeathList& killers);
 	GuildWarsMap& getWars() { return guildWars; }
 
 	Guild* getGuildById(uint32_t guildId);

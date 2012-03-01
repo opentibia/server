@@ -322,6 +322,10 @@ npc_max_nonestackable_sell_amount = 100
 --(it means that you are missing an return somewhere but this is not so important and is just spamming your console on a production server) then set this to false
 lua_excepted_type_errors_enabled = false
 
+-- if this is set to false, guild wars end immediatelly when frag_limit is reached (it ends in-game)
+-- (on cipsoft tibia the guild wars just end when server (re)starts - set this to true to emulate original tibia)
+guild_wars_end_only_on_startup = true
+
 -- motd (the message box that you sometimes get before you choose characters)
 motd = "Welcome to OTServ 0.6.3!"
 motdnum = "1"

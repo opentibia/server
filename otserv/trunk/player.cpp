@@ -2554,7 +2554,7 @@ void Player::onDie()
 					if(getGuild() && attackerPlayer->getGuild()){
 						if(tmpList.find(attackerPlayer->getGuildId()) == tmpList.end()){
 							if(attackerPlayer->getGuild()->addFrag(getGuildId()))
-								g_guilds.broadcastKill(attackerPlayer->getGuildId(), this, killers);
+								g_guilds.processKill(attackerPlayer->getGuildId(), this, killers);
 
 							tmpList.insert(attackerPlayer->getGuildId());
 						}

@@ -749,7 +749,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	if(item->isStackable() && count != item->getItemCount()){
 		uint8_t newCount = (uint8_t)std::max((int32_t)0, (int32_t)(item->getItemCount() - count));
 		if(newCount == 0){
-			updateAmountOfItems(-item->getTotalAmountOfItemsInside());
+			updateAmountOfItems(-(int32_t)item->getTotalAmountOfItemsInside());
 		}
 		const double old_weight = -item->getWeight();
 		item->setItemCount(newCount);
@@ -773,7 +773,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 			}
 			onRemoveContainerItem(index, item);
 		}
-		updateAmountOfItems(-item->getTotalAmountOfItemsInside());
+		updateAmountOfItems(-(int32_t)item->getTotalAmountOfItemsInside());
 		total_weight -= item->getWeight();
 		item->setParent(NULL);
 		itemlist.erase(cit);

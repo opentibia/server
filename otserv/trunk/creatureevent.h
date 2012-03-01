@@ -48,7 +48,7 @@ public:
 	bool playerLogIn(Player* player);
 	bool playerLogOut(Player* player);
 
-	CreatureEvent* getEventByName(const std::string& name, bool forceLoaded = true);
+	CreatureEvent* getEventByName(const std::string& name);
 
 protected:
 
@@ -75,10 +75,6 @@ public:
 
 	CreatureEventType_t getEventType() const { return m_type; }
 	const std::string& getName() const { return m_eventName; }
-	bool isLoaded() const { return m_isLoaded; }
-
-	void clearEvent();
-	void copyEvent(CreatureEvent* creatureEvent);
 
 	//scripting
 	bool executeOnLogin(Player* player);
@@ -94,7 +90,6 @@ protected:
 
 	std::string m_eventName;
 	CreatureEventType_t m_type;
-	bool m_isLoaded;
 };
 
 

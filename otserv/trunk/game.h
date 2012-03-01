@@ -497,9 +497,8 @@ public:
 #ifdef __SKULLSYSTEM__
 	void updateCreatureSkull(Player* player);
 #endif
-#ifdef __GUILDWARSLUARELOAD__
+
 	void updateCreatureEmblem(Creature* creature);
-#endif
 	GameState_t getGameState();
 	void setGameState(GameState_t newState);
 	bool saveServer(bool payHouses, bool shallowSave = false);

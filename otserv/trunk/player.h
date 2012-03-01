@@ -453,10 +453,8 @@ public:
 	void checkSkullTicks(int32_t ticks);
 #endif
 
-#ifdef __GUILDWARSLUARELOAD__
 	void sendCreatureEmblem(const Creature* creature)
 		{if(client) client->sendCreatureEmblem(creature);}
-#endif
 
 	void checkRecentlyGainedExperience(uint32_t interval);
 	bool canWearOutfit(uint32_t outfitId, uint32_t addons);
