@@ -531,6 +531,7 @@ protected:
 	static int luaGetPlayerStamina(lua_State* L);
 	static int luaGetPlayerModes(lua_State* L);
 	static int luaDoUpdateGuildWar(lua_State* L);
+	static int luaDoSavePlayer(lua_State *L);
 
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);

@@ -2096,6 +2096,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//doUpdateGuildWar(warId)
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
+	
+	//doSavePlayer(cid)
+	lua_register(m_luaState, "doSavePlayer", LuaScriptInterface::luaDoSavePlayer);
 }
 
 int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
@@ -9779,4 +9782,26 @@ int LuaScriptInterface::luaDoUpdateGuildWar(lua_State* L)
 	//return the new status of the war
 	lua_pushnumber(L, newStatus);
 	return 1;
+}
+
+//doSavePlayer(cid)
+int LuaScriptInterface::luaDoSavePlayer(lua_State *L)
+{
+	uint32_t cid = popNumber(L);
+	ScriptEnviroment* env = getScriptEnv();
+ 
+	Player* player = env->getPlayerByUID(cid);
+ 
+	if (player){
+		if (IOPlayer::instance()->savePlayer(player)){
+			lua_pushboolean(L, true);
+			return 1;
+		} else {
+			lua_pushboolean(L, false);
+		}
+	} else {
+		lua_pushboolean(L, false);
+	}
+ 
+	return 0;
 }
