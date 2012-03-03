@@ -70,6 +70,83 @@ enum passwordType_t{
 	PASSWORD_TYPE_SHA1
 };
 
+// Figure out build type
+// __DEBUG__ / __RELEASE__ is the prefered form
+
+#if defined _DEBUG
+	#ifndef __DEBUG__
+		#define __DEBUG__ 1
+	#endif
+#endif
+
+#if defined DEBUG
+	#ifndef __DEBUG__
+		#define __DEBUG__ 1
+	#endif
+#elif defined __DEBUG__
+	#ifndef DEBUG
+		#define DEBUG 1
+	#endif
+#endif
+
+#if defined RELEASE
+	#ifndef __RELEASE__
+		#define __RELEASE__ 1
+	#endif
+#elif defined __RELEASE__
+	#ifndef RELEASE
+		#define RELEASE 1
+	#endif
+#endif
+
+#if defined __DEBUG__ && defined __RELEASE__
+	#error "A build cannot be both debug and release, use either -D__DEBUG__ or -D__RELEASE__"
+#endif
+
+#if !defined __DEBUG__ && !defined __RELEASE__
+	// Default to release
+	#define __RELEASE__ 1
+#endif
+
+#ifdef __DEBUG__
+	#define NDEBUG // Disabled assert
+#endif
+
+// Create assert macros
+
+#include <assert.h>
+
+#ifdef ASSERT
+	#undef ASSERT
+#endif
+#ifdef ASSERT_MSG
+	#undef ASSERT_MSG
+#endif
+
+#ifdef __DEBUG__
+	// Debug break for when it's needed
+	#ifdef _MSC_VER
+		#define DEBUGBREAK() __debugbreak()
+	#else
+		#define DEBUGBREAK() exit(EXIT_FAILURE)
+	#endif
+	
+	// Simple assert macro which also supports passing a message
+	#define ASSERT_MSG(expr, msg) \
+		do { \
+			if (! (expr)) { \
+				std::cerr << "Assertion `" << msg << "` failed" << std:: endl \
+					<< __FILE__ << ": " << __LINE__ << " in function " << __FUNCTION__ << std::endl; \
+				DEBUGBREAK(); \
+			} \
+		} \
+		while (false)
+#else
+	#define ASSERT_MSG(expr) (void)0
+#endif
+
+#define ASSERT(expr) ASSERT_MSG(expr, #expr)
+
 // Boost won't complain about non-working function
 #define BOOST_ASIO_ENABLE_CANCELIO 1
 
@@ -93,8 +170,6 @@ enum passwordType_t{
 #elif defined(_MSC_VER)
 	#include "compiler/msvc.h"
 #endif
-
-
 
 /*
     If the compiler supports the upcoming standard,
