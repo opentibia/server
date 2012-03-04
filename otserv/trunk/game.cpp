@@ -2291,9 +2291,6 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	}
 
 	Thing* thing = internalGetThing(player, fromPos, fromStackPos, fromSpriteId, STACKPOS_USEITEM);
-		player->stopEventWalk();
-		player->stopWalk();
-		player->sendCancelWalk();
 	
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -2391,9 +2388,6 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	}
 
 	Thing* thing = internalGetThing(player, pos, stackPos, spriteId, STACKPOS_USEITEM);
-	    player->stopEventWalk();
-		player->stopWalk();
-		player->sendCancelWalk();
 	
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -2477,9 +2471,6 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 	}
 
 	Thing* thing = internalGetThing(player, fromPos, fromStackPos, spriteId, STACKPOS_USE);
-		player->stopEventWalk();
-		player->stopWalk();
-		player->sendCancelWalk();
 	
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -3461,8 +3452,17 @@ bool Game::playerRequestAddVip(uint32_t playerId, const std::string& vip_name)
 		player->sendTextMessage(MSG_STATUS_SMALL, "You can not add this player.");
 		return false;
 	}
-
+	
+	if(player->hasCondition(CONDITION_EXHAUST_YELL, 1))
+	{
+		player->sendTextMessage(MSG_STATUS_SMALL, "Please wait few seconds before adding new player to your vip list.");
+		return false;
+	}
+	
 	bool online = (getPlayerByName(real_name) != NULL);
+	
+	if(Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_YELL, 3000, 0))
+	player->addCondition(condition);
 	return player->addVIP(guid, real_name, online);
 }
 
@@ -3472,6 +3472,14 @@ bool Game::playerRequestRemoveVip(uint32_t playerId, uint32_t guid)
 	if(!player || player->isRemoved())
 		return false;
 
+	if(player->hasCondition(CONDITION_EXHAUST_YELL, 1))
+	{
+		player->sendTextMessage(MSG_STATUS_SMALL, "Please wait few seconds before deleting next player from your vip list.");
+		return false;
+	}
+	
+	if(Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_YELL, 3000, 0))
+	player->addCondition(condition);	
 	player->removeVIP(guid);
 	return true;
 }
