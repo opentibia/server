@@ -1317,10 +1317,10 @@ bool Items::loadFromXml(const std::string& datadir)
 									conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_DROWN);
 									combatType = COMBAT_DROWNDAMAGE;
 								}
-								//else if(asLowerCaseString(strValue) == "physical"){
-								//	damageCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_PHYSICAL);
-								//	combatType = COMBAT_PHYSICALDAMAGE;
-								//}
+								/*else if(asLowerCaseString(strValue) == "physical"){
+									damageCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_PHYSICAL);
+									combatType = COMBAT_PHYSICALDAMAGE;
+								}*/
 								else{
 									std::cout << "Warning: [Items::loadFromXml] " << "Unknown field value " << strValue  << std::endl;
 								}
