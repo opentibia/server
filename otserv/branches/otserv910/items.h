@@ -246,6 +246,8 @@ public:
 	Condition* condition;
 	CombatType_t combatType;
 	bool replaceable;
+
+	bool ware;
 };
 
 template<typename A>

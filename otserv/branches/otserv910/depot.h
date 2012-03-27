@@ -33,8 +33,10 @@ public:
 
 	void setInbox(Container* container) { inbox = container; }
 	Container* getInbox() const { return inbox; }
-	
-	
+
+	void setChest(Container* container) { chest = container; }
+	Container* getChest() const { return chest; }
+
 	//serialization
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 
@@ -59,7 +61,7 @@ private:
 	uint32_t maxDepotLimit;
 	uint32_t depotId;
 	
-	Container* inbox;
+	Container* inbox, *chest;
 };
 
 #endif

@@ -826,6 +826,70 @@ SimpleUpdateQuery updateQueries[] = {
 		{// SQLite
 			NULL
 		}
+	{26,
+		{// PgSQL
+			NULL
+		},
+		{// MySQL
+		"CREATE TABLE `market_offers` (\n\
+			`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\n\
+			`player_id` INT NOT NULL,\n\
+			`sale` TINYINT(1) NOT NULL DEFAULT 0,\n\
+			`itemtype` INT UNSIGNED NOT NULL,\n\
+			`amount` SMALLINT UNSIGNED NOT NULL,\n\
+			`created` BIGINT UNSIGNED NOT NULL,\n\
+			`anonymous` TINYINT(1) NOT NULL DEFAULT 0,\n\
+			`price` INT UNSIGNED NOT NULL DEFAULT 0,\n\
+			PRIMARY KEY (`id`),\n\
+			KEY(`sale`, `itemtype`),\n\
+			KEY(`created`),\n\
+			FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE\n\
+		) ENGINE = InnoDB;",
+		"CREATE TABLE `market_history` (\n\
+			`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\n\
+			`player_id` INT NOT NULL,\n\
+			`sale` TINYINT(1) NOT NULL DEFAULT 0,\n\
+			`itemtype` INT UNSIGNED NOT NULL,\n\
+			`amount` SMALLINT UNSIGNED NOT NULL,\n\
+			`price` INT UNSIGNED NOT NULL DEFAULT 0,\n\
+			`expires_at` BIGINT UNSIGNED NOT NULL,\n\
+			`inserted` BIGINT UNSIGNED NOT NULL,\n\
+			`state` TINYINT(1) UNSIGNED NOT NULL,\n\
+			PRIMARY KEY(`id`),\n\
+			KEY(`player_id`, `sale`),\n\
+			FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE\n\
+		) ENGINE = InnoDB;",
+			NULL
+		},
+		{// SQLite
+		"CREATE TABLE `market_offers` (\n\
+			`id` INTEGER PRIMARY KEY NOT NULL,\n\
+			`player_id` INTEGER NOT NULL,\n\
+			`sale` BOOLEAN NOT NULL DEFAULT 0,\n\
+			`itemtype` UNSIGNED INTEGER NOT NULL,\n\
+			`amount` UNSIGNED INTEGER NOT NULL,\n\
+			`created` UNSIGNED INTEGER NOT NULL,\n\
+			`anonymous` BOOLEAN NOT NULL DEFAULT 0,\n\
+			`price` UNSIGNED INTEGER NOT NULL DEFAULT 0,\n\
+			FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE\n\
+		);",
+		"CREATE INDEX market_offers_idx ON market_offers(created);",
+		"CREATE INDEX market_offers_idx2 ON market_offers(sale, itemtype);",
+		"CREATE TABLE `market_history` (\n\
+			`id` INTEGER PRIMARY KEY NOT NULL,\n\
+			`player_id` INTEGER NOT NULL,\n\
+			`sale` BOOLEAN NOT NULL DEFAULT 0,\n\
+			`itemtype` UNSIGNED INTEGER NOT NULL,\n\
+			`amount` UNSIGNED INTEGER NOT NULL,\n\
+			`price` UNSIGNED INTEGER NOT NULL DEFAULT 0,\n\
+			`expires_at` UNSIGNED INTEGER NOT NULL,\n\
+			`inserted` UNSIGNED INTEGER NOT NULL,\n\
+			`state` UNSIGNED INTEGER NOT NULL,\n\
+			FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE\n\
+		);",
+		"CREATE INDEX market_history_idx ON market_history(player_id, sale);",
+			NULL
+		}
 	},
 };
 

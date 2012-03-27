@@ -173,6 +173,13 @@ public:
 	Player* getPlayerByID(uint32_t id);
 
 	/**
+	  * Returns a player based on guid
+	  * \param guid
+	  * \returns A Pointer to the player
+	  */
+	Player* getPlayerByGUID(const uint32_t& guid);
+
+	/**
 	  * Returns a creature based on a string name identifier
 	  * \param s is the name identifier
 	  * \return A Pointer to the creature
@@ -468,6 +475,14 @@ public:
 	bool playerReportBug(uint32_t playerId, std::string comment);
 	bool playerMountCreature(uint32_t playerId, bool mount);
 	bool playerRegisterWalkAction(uint32_t playerId, SchedulerTask* task);
+	bool playerLeaveMarket(uint32_t playerId);
+	bool playerBrowseMarket(uint32_t playerId, uint16_t spriteId);
+	bool playerBrowseMarketOwnOffers(uint32_t playerId);
+	bool playerBrowseMarketOwnHistory(uint32_t playerId);
+	bool playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spriteId, uint16_t amount, uint32_t price, bool anonymous);
+	bool playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter);
+	bool playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
+	void checkExpiredMarketOffers();
 
 	void cleanup();
 	void shutdown();

@@ -284,6 +284,9 @@ public:
 	double getRateValue(levelTypes_t rateType) const {return rateValue[rateType];}
 	void setRateValue(levelTypes_t rateType, double value){rateValue[rateType] = value;}
 
+	void setMarketDepotId(int16_t newId) { marketDepotId = newId; }
+	int16_t getMarketDepotId() const { return marketDepotId; }
+
 	uint32_t getLossPercent(lossTypes_t lossType) const {return lossPercent[lossType];}
 	void setLossPercent(lossTypes_t lossType, uint32_t newPercent)
 	{
@@ -644,8 +647,22 @@ public:
 		{if(client) client->sendSaleItemList(shopItemList);}
 	void sendCloseShop() const
 		{if(client) client->sendCloseShop();}
-	void sendMarketEnter(Item* item) const
-		{if(client) client->sendMarketEnter(item);}
+	void sendMarketEnter(uint32_t depotId) const
+		{if(client) client->sendMarketEnter(depotId);}
+	void sendMarketLeave()
+		{marketDepotId = -1; if(client) client->sendMarketLeave();}
+	void sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers, const MarketOfferList& sellOffers) const
+		{if(client) client->sendMarketBrowseItem(itemId, buyOffers, sellOffers);}
+	void sendMarketBrowseOwnOffers(const MarketOfferList& buyOffers, const MarketOfferList& sellOffers) const
+		{if(client) client->sendMarketBrowseOwnOffers(buyOffers, sellOffers);}
+	void sendMarketBrowseOwnHistory(const HistoryMarketOfferList& buyOffers, const HistoryMarketOfferList& sellOffers) const
+		{if(client) client->sendMarketBrowseOwnHistory(buyOffers, sellOffers);}
+	void sendMarketDetail(uint16_t itemId) const
+		{if(client) client->sendMarketDetail(itemId);}
+	void sendMarketAcceptOffer(MarketOfferEx offer) const
+		{if(client) client->sendMarketAcceptOffer(offer);}
+	void sendMarketCancelOffer(MarketOfferEx offer) const
+		{if(client) client->sendMarketCancelOffer(offer);}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{if(client) client->sendTradeItemRequest(player, item, ack);}
 	void sendTradeClose() const
@@ -935,6 +952,8 @@ protected:
 	typedef std::set<uint32_t> AttackedSet;
 	AttackedSet attackedSet;
 #endif
+
+	int16_t marketDepotId;
 
 	void updateItemsLight(bool internal = false);
 	virtual int32_t getStepSpeed() const;

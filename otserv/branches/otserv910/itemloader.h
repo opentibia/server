@@ -123,6 +123,9 @@ enum itemattrib_t {
 	ITEM_ATTR_LIGHT2,
 	ITEM_ATTR_TOPORDER,
 	ITEM_ATTR_WRITEABLE3,		/*deprecated*/
+
+	ITEM_ATTR_WAREID,
+
 	ITEM_ATTR_LAST
 };
 

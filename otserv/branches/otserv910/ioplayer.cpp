@@ -1399,3 +1399,10 @@ bool IOPlayer::cleanOnlineInfo()
 	DBQuery query;
 	return db->executeQuery("UPDATE `players` SET `online` = 0");
 }
+
+void IOPlayer::increaseBankBalance(uint32_t guid, uint64_t bankBalance)
+{
+	DBQuery query;
+	query << "UPDATE `players` SET `balance` = `balance` + " << bankBalance << " WHERE `id` = " << guid << ";";
+	Database::instance()->executeQuery(query.str());
+}

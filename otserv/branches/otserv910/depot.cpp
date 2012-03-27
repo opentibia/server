@@ -30,6 +30,7 @@ Container(_type)
 	maxSize = 3;
 	maxDepotLimit = 1500;
 	inbox = NULL;
+	chest = NULL;
 }
 
 Depot::~Depot()

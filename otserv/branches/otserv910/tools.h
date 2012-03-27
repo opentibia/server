@@ -136,4 +136,6 @@ uint32_t parseTime(const std::string& time);
 std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end);
 std::string ucfirst(std::string);
 
+std::string getWeaponName(WeaponType_t weaponType);
+
 #endif

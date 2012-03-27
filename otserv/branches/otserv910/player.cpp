@@ -1197,6 +1197,7 @@ Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 		
 			Item* depotChest = Item::CreateItem(ITEM_DEPOT);
 			depot->__internalAddThing(depotChest);
+			depot->setChest(depotChest->getContainer());
 
 			addDepot(depot, depotId);
 			return depot;
@@ -1226,8 +1227,22 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 		depot->__internalAddThing(inbox);
 		depot->setInbox(inbox->getContainer());
 	}
-	
+
+	if(!depot->getChest())
+	{
+		for(ItemList::const_iterator it = depot->getItems(), end = depot->getEnd(); it != end; ++it)
+		{
+			Item* item = *it;
+			if(item->getID() == ITEM_DEPOT)
+			{
+				depot->setChest(item->getContainer());
+				break;
+			}
+		}
+	}
+
 	depots[depotId] = depot;
+	depot->setDepotId(depotId);
 	depot->setMaxDepotLimit(maxDepotLimit);
 	return true;
 }

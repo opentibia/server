@@ -104,6 +104,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[SQL_TYPE] = getGlobalString(L, "sql_type");
 		m_confInteger[SQL_PORT] = getGlobalNumber(L, "sql_port");
 		m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
+		m_confInteger[MARKET_OFFER_DURATION] = getGlobalNumber(L, "market_offer_duration",  30 * 24 * 60 * 60);
 	}
 
 	m_confString[LOGIN_MSG] = getGlobalString(L, "loginmsg", "Welcome.");
@@ -223,6 +224,11 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS] = getGlobalNumber(L, "max_amount_items_inside_containers", 5000);
 	m_confInteger[MAX_DEEPNESS_OF_CHAIN_OF_CONTAINERS] = getGlobalNumber(L, "max_deepness_of_chain_of_containers", 500);
 	m_confInteger[BIND_ONLY_GLOBAL_ADDRESS]	= getGlobalBoolean(L, "bind_only_global_address", false);
+	m_confInteger[MARKET_ENABLED] = getGlobalBoolean(L, "market_enabled", true);
+	m_confInteger[MARKET_PREMIUM] = getGlobalBoolean(L, "premium_to_create_market_offer", true);
+	m_confInteger[CHECK_EXPIRED_MARKET_OFFERS_EACH_MINUTES] = getGlobalNumber(L, "check_expired_market_offers_minutes", 60);
+	m_confInteger[MAX_MARKET_OFFERS_AT_A_TIME_PER_PLAYER] = getGlobalNumber(L, "max_market_offers_per_player", 100);
+
 	m_isLoaded = true;
 	return true;
 }

@@ -391,6 +391,13 @@ house_level = 1
 -- PS: This info is going to be shown just if house has no owner
 show_house_prices = false
 
+-- Market configuration
+market_enabled = true
+premium_to_create_market_offer = true
+market_offer_duration = 30 * 24 * 60 * 60
+check_expired_market_offers_minutes = 60
+max_market_offers_per_player = 100
+
 -- SQL type
 -- options: mysql, sqlite, odbc or pgsql
 sql_type = "sqlite"

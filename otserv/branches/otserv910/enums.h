@@ -21,7 +21,32 @@
 #ifndef __OTSERV_ENUMS_H__
 #define __OTSERV_ENUMS_H__
 
+#include <list>
+#include <string>
+
 #include "definitions.h"
+
+enum MarketAction_t
+{
+	MARKETACTION_BUY = 0,
+	MARKETACTION_SELL = 1
+};
+
+enum MarketRequest_t
+{
+	MARKETREQUEST_OWN_OFFERS = 0xFFFE,
+	MARKETREQUEST_OWN_HISTORY = 0xFFFF
+};
+
+enum MarketOfferState_t
+{
+	OFFERSTATE_ACTIVE = 0,
+	OFFERSTATE_CANCELLED = 1,
+	OFFERSTATE_EXPIRED = 2,
+	OFFERSTATE_ACCEPTED = 3,
+
+	OFFERSTATE_ACCEPTEDEX = 255
+};
 
 enum ChannelEvent_t
 {
@@ -339,5 +364,65 @@ enum reloadTypes_t {
 	RELOAD_TYPE_GLOBALEVENTS = 12,
 	RELOAD_TYPE_LAST = RELOAD_TYPE_GLOBALEVENTS
 };
+
+struct MarketOffer
+{
+	uint32_t price;
+	uint32_t timestamp;
+	uint16_t amount;
+	uint16_t counter;
+	uint16_t itemId;
+	std::string playerName;
+};
+
+struct MarketOfferEx
+{
+	uint32_t playerId;
+	uint32_t timestamp;
+	uint32_t price;
+	uint16_t amount;
+	uint16_t counter;
+	uint16_t itemId;
+	MarketAction_t type;
+	std::string playerName;
+};
+
+struct ExpiredMarketOffer
+{
+	uint32_t id;
+	uint32_t price;
+	uint16_t amount;
+	uint16_t itemId;
+	uint32_t playerId;
+};
+
+struct HistoryMarketOffer
+{
+	uint32_t timestamp;
+	uint32_t price;
+	uint16_t itemId;
+	uint16_t amount;
+	MarketOfferState_t state;
+};
+
+struct MarketStatistics
+{
+	MarketStatistics()
+	{
+		numTransactions = 0;
+		highestPrice = 0;
+		totalPrice = 0;
+		lowestPrice = 0;
+	}
+
+	uint32_t numTransactions;
+	uint32_t highestPrice;
+	uint64_t totalPrice;
+	uint32_t lowestPrice;
+};
+
+typedef std::list<MarketOffer> MarketOfferList;
+typedef std::list<ExpiredMarketOffer> ExpiredMarketOfferList;
+typedef std::list<HistoryMarketOffer> HistoryMarketOfferList;
 
 #endif

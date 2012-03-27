@@ -210,7 +210,14 @@ private:
 	void sendCloseShop();
 	void sendPlayerCash(uint32_t amount);
 	void sendSaleItemList(const std::list<ShopInfo>& shop);
-	void sendMarketEnter(Item* item);
+	void sendMarketEnter(uint32_t depotId);
+	void sendMarketLeave();
+	void sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers, const MarketOfferList& sellOffers);
+	void sendMarketAcceptOffer(MarketOfferEx offer);
+	void sendMarketBrowseOwnOffers(const MarketOfferList& buyOffers, const MarketOfferList& sellOffers);
+	void sendMarketCancelOffer(MarketOfferEx offer);
+	void sendMarketBrowseOwnHistory(const HistoryMarketOfferList& buyOffers, const HistoryMarketOfferList& sellOffers);
+	void sendMarketDetail(uint16_t itemId);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	void sendQuestLog();
