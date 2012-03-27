@@ -184,6 +184,8 @@ Creature()
 	setParty(NULL);
 	setGuild(NULL);
 
+	marketDepotId = -1;
+
 #ifdef __SKULLSYSTEM__
 	lastSkullTime = 0;
 	skullType = SKULL_NONE;
