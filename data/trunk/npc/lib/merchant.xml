@@ -37,11 +37,17 @@
   <itemlist listid="vials">
     <!--If no name tag is used the default name from items.xml is used.-->
     <!--With fluid containers it would be "vial", so we override that description here-->
-    <item keywords="vial;water" id="2006" subtype="1" sellprice="100" name="a vial of water" pname="vials of water"/>
-    <item keywords="vial;blood" id="2006" subtype="2" sellprice="100" name="a vial of blood" pname="vials of blood"/>
-    <item keywords="vial;beer" id="2006" subtype="3" sellprice="100" name="a vial of beer" pname="vials of beer"/>
-    <item keywords="vial;slime" id="2006" subtype="4" sellprice="100" name="a vial of slime" pname="vials of slime"/>
-    <item keywords="vial;lemonade" id="2006" subtype="5" sellprice="100" name="a vial of lemonade" pname="vials of lemonade"/>
+    <!--item keywords="vial;water" id="11396" subtype="1" sellprice="90" buyprice="50" name="a vial of water" pname="vials of water"/-->
+    <item keywords="vial;slime" id="11396" subtype="4" sellprice="90" buyprice="50" name="a vial of slime" pname="vials of slime"/>
+    <item keywords="vial;lifefluid" id="11396" subtype="10" buyprice="30" name="a vial of lifefluid" pname="vials of lifefluid"/>
+    <item keywords="vial;blood" id="11396" subtype="2" buyprice="20" name="a vial of blood" pname="vials of blood"/>
+    <item keywords="vial;beer" id="11396" subtype="3" buyprice="10" name="a vial of beer" pname="vials of beer"/>
+    <!--item keywords="vial;blood" id="11396" subtype="2" sellprice="100" buyprice="10" name="a vial of blood" pname="vials of blood"/>
+    <item keywords="vial;beer" id="11396" subtype="3" sellprice="100" buyprice="10" name="a vial of beer" pname="vials of beer"/>
+    <item keywords="vial;slime" id="11396" subtype="4" sellprice="100" buyprice="10" name="a vial of slime" pname="vials of slime"/>
+    <item keywords="vial;lemonade" id="11396" subtype="5" sellprice="100" buyprice="10" name="a vial of lemonade" pname="vials of lemonade"/>
+    <item keywords="vial;urine" id="11396" subtype="13" sellprice="100" buyprice="10" name="a vial of urine" pname="vials of urine"/>
+    <item keywords="vial;rum" id="11396" subtype="27" sellprice="100" buyprice="10" name="a vial of beer" pname="vials of beer"/-->
   </itemlist>
 
   <!--backpack list-->

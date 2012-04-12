@@ -25725,21 +25725,25 @@
 		<attribute key="description" value="They will expire within a short time, sell them back to Esrik before they do."/>
 		<attribute key="weight" value="2500"/>
 	</item>
-	<item id="20001" name="water"/>
-	<item id="20002" name="blood"/>
-	<item id="20003" name="beer"/>
-	<item id="20004" name="slime"/>
-	<item id="20005" name="lemonade"/>
-	<item id="20006" name="milk"/>
-	<item id="20007" name="manafluid"/>
-	<item id="20010" name="lifefluid"/>
-	<item id="20011" name="oil"/>
-	<item id="20013" name="urine"/>
-	<item id="20014" name="coconut milk"/>
-	<item id="20015" name="wine"/>
-	<item id="20019" name="mud"/>
-	<item id="20021" name="fruit juice"/>
-	<item id="20027" name="rum"/>
-	<item id="20035" name="tea"/>
-	<item id="20036" name="mead"/>
+	<item id="20001" name="water" fluidClient="1"/>
+	<item id="20002" name="blood" fluidClient="5"/>
+	<item id="20003" name="beer" fluidClient="3"/>
+	<item id="20004" name="slime" fluidClient="6"/>
+	<item id="20005" name="lemonade" fluidClient="8"/>
+	<item id="20006" name="milk" fluidClient="9"/>
+	<item id="20007" name="manafluid" fluidClient="2"/>
+	<item id="20010" name="lifefluid" fluidClient="11"/>
+	<item id="20011" name="oil" fluidClient="4"/>
+	<item id="20013" name="urine" fluidClient="12"/>
+	<item id="20014" name="coconut milk" fluidClient="15"/>
+	<item id="20015" name="wine" fluidClient="10"/>
+	<item id="20019" name="mud" fluidClient="7"/>
+	<item id="20021" name="fruit juice" fluidClient="14"/>
+	<item id="20027" name="rum" fluidClient="13"/>
+	<item id="20035" name="tea" fluidClient="16"/>
+	<item id="20036" name="mead" fluidClient="17"/>
+	
+	<!--examples of custom fluid - remember that custom fluids shouldn't be sold by NPCs using trade windows system -->
+	<!--item id="20040" name="weird green fluid" fluidClient="6" customFluid="1"/-->
+	<!--item id="20041" name="weird green fluid2" fluidClient="13" customFluid="1"/-->
 </items>
