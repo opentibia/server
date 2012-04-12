@@ -86,7 +86,7 @@ struct Abilities{
 
 	//condition manipulating
 	uint16_t conditionCount;
-	
+
 	//elemental damage
 	CombatType_t elementType;
 	int16_t elementDamage;
@@ -150,9 +150,6 @@ public:
 
 	bool isLevelDoor() const {return id == 1227 || id == 1229 || id == 1245 || id == 1247 || id == 1259 || id == 1261 || id == 3540 || id == 3549 || id == 5103 || id == 5112 || id == 5121 || id == 5130 || id == 5292 || id == 5294 || id == 6206 || id == 6208 || id == 6263 || id == 6265 || id == 6896 || id == 6905 || id == 7038 || id == 7047 || id == 8555 || id == 8557 || id == 9179 || id == 9181 || id == 9281 || id == 9283 || id == 10282 || id == 10284 || id == 10473 ||  id == 10482 ||  id == 10780 || id == 10789; }
 
-	static ClientFluidTypes_t getClientFluidType(FluidTypes_t f);
-    static FluidTypes_t getFluidTypeFromClientType(ClientFluidTypes_t f);
-	
 	Direction bedPartnerDir;
 	uint16_t maleSleeperID;
 	uint16_t femaleSleeperID;
@@ -228,7 +225,7 @@ public:
 	bool blockProjectile;
 	bool blockPathFind;
 	bool allowPickupable;
-	
+
 	unsigned short transformEquipTo;
 	unsigned short transformDeEquipTo;
 	bool showDuration;
@@ -240,6 +237,8 @@ public:
 	uint32_t shootRange;
 	AmmoAction_t ammoAction;
 	int32_t fluidSource;
+	ClientFluidTypes_t clientFluidType; //for the special ids who are related to fluids
+	bool isCustomFluidType; //for the special ids who are related to fluids
 
 	uint32_t currency;
 
@@ -327,6 +326,11 @@ public:
 	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
 	uint32_t size() {return items.size();}
 
+	//a map and two specials functions used for fluids ids
+	static std::map<ClientFluidTypes_t, FluidTypes_t> reverseCustomFluidMap;
+	ClientFluidTypes_t getClientFluidType(FluidTypes_t f);
+	FluidTypes_t getFluidTypeFromClientType(ClientFluidTypes_t f);
+
 	std::map<uint32_t, ItemType*> currencyMap;
 
 protected:
@@ -334,6 +338,7 @@ protected:
 	ReverseItemMap reverseItemMap;
 
 	Array<ItemType*> items;
+
 	std::string m_datadir;
 };
 

@@ -35,6 +35,7 @@ uint32_t Items::dwMinorVersion = 0;
 uint32_t Items::dwBuildNumber = 0;
 
 extern Spells* g_spells;
+extern std::map<ClientFluidTypes_t, FluidTypes_t> Items::reverseCustomFluidMap;
 
 ItemType::ItemType()
 {
@@ -72,6 +73,8 @@ ItemType::ItemType()
 	speed		  = 0;
 	id            = 0;
 	clientId      = 100;
+	clientFluidType = CFLUID_EMPTY;
+	isCustomFluidType = false;
 	maxItems      = 8;  // maximum size if this is a container
 	weight        = 0;  // weight of the item, e.g. throwing distance depends on it
 	showCount     = true;
@@ -134,108 +137,16 @@ ItemType::~ItemType()
 	delete condition;
 }
 
-// the proper way to implement this would be to use ClientFluidTypes_t only, but that would break compatibility with
-// old scripts, so we instead will use the old FluidTypes_t and these functions,
-// which maps the oldTypes into the new ones (and vice-versa)
-ClientFluidTypes_t ItemType::getClientFluidType(FluidTypes_t f)
-{
-	switch(f){
-		case FLUID_EMPTY:
-			return CFLUID_EMPTY;
-		case FLUID_WATER:
-			return CFLUID_WATER;
-		case FLUID_BLOOD:
-			return CFLUID_BLOOD;
-		case FLUID_BEER:
-			return CFLUID_BEER;
-		case FLUID_SLIME:
-			return CFLUID_SLIME;
-		case FLUID_LEMONADE:
-			return CFLUID_LEMONADE;
-		case FLUID_MILK:
-			return CFLUID_MILK;
-		case FLUID_MANA:
-			return CFLUID_MANA;
-		case FLUID_LIFE:
-			return CFLUID_LIFE;
-		case FLUID_OIL:
-			return CFLUID_OIL;
-		case FLUID_URINE:
-			return CFLUID_URINE;
-		case FLUID_COCONUTMILK:
-			return CFLUID_COCONUTMILK;
-		case FLUID_WINE:
-			return CFLUID_WINE;
-		case FLUID_MUD:
-			return CFLUID_MUD;
-		case FLUID_FRUITJUICE:
-			return CFLUID_FRUITJUICE;
-		case FLUID_RUM:
-			return CFLUID_RUM;
-		case FLUID_TEA:
-			return CFLUID_TEA;
-		case FLUID_MEAD:
-			return CFLUID_MEAD;
-	    default:
-			//perharps we should print a warning message here?
-			return CFLUID_EMPTY;
-	}
-}
 
-FluidTypes_t ItemType::getFluidTypeFromClientType(ClientFluidTypes_t c)
-{
-	switch(c){
-		case CFLUID_EMPTY:
-			return FLUID_EMPTY;
-		case CFLUID_WATER:
-			return FLUID_WATER;
-		case CFLUID_BLOOD:
-			return FLUID_BLOOD;
-		case CFLUID_BEER:
-			return FLUID_BEER;
-		case CFLUID_SLIME:
-			return FLUID_SLIME;
-		case CFLUID_LEMONADE:
-			return FLUID_LEMONADE;
-		case CFLUID_MILK:
-			return FLUID_MILK;
-		case CFLUID_MANA:
-			return FLUID_MANA;
-		case CFLUID_LIFE:
-			return FLUID_LIFE;
-		case CFLUID_OIL:
-			return FLUID_OIL;
-		case CFLUID_URINE:
-			return FLUID_URINE;
-		case CFLUID_COCONUTMILK:
-			return FLUID_COCONUTMILK;
-		case CFLUID_WINE:
-			return FLUID_WINE;
-		case CFLUID_MUD:
-			return FLUID_MUD;
-		case CFLUID_FRUITJUICE:
-			return FLUID_FRUITJUICE;
-		case CFLUID_RUM:
-			return FLUID_RUM;
-		case CFLUID_TEA:
-			return FLUID_TEA;
-		case CFLUID_MEAD:
-			return FLUID_MEAD;
-	    default:
-			//perharps we should print a warning message here?
-			return FLUID_EMPTY;
-	}
-}
-
+//this function is used to show description of items who aren't really in game (like those shown at trade NPC window)
 std::string ItemType::getDescription(uint8_t count) const
 {
 	int32_t subType = count;
 
 	if(isFluidContainer()){
-		subType = ItemType::getFluidTypeFromClientType(ClientFluidTypes_t(count));
+		subType = Item::items.getFluidTypeFromClientType(ClientFluidTypes_t(count));
 	}
-
-	return Item::getDescription(*this, 1, NULL, subType);
+    return Item::getDescription(*this, 1, NULL, subType);
 }
 
 
@@ -254,6 +165,7 @@ Items::~Items()
 void Items::clear()
 {
 	currencyMap.clear();
+	reverseCustomFluidMap.clear();
 	//TODO. clear items?
 }
 
@@ -537,7 +449,7 @@ bool Items::loadFromXml(const std::string& datadir)
 		xmlFreeDoc(doc);
 		return false;
 	}
-	
+
 	std::map<uint16_t, bool> itemsLoaded;
 	xmlNodePtr itemNode = root->children;
 	while(itemNode){
@@ -545,14 +457,29 @@ bool Items::loadFromXml(const std::string& datadir)
 			if(readXMLInteger(itemNode, "id", intValue)){
 				id = intValue;
 
-				if(id > 20000 && id < 20100){
+				if(id > 20000 && id < 20100){ //fluids
 					id = id - 20000;
 
 					ItemType* iType = new ItemType();
 					iType->id = id;
+					if(readXMLInteger(itemNode, "fluidClient", intValue)){
+					    iType->clientFluidType = ClientFluidTypes_t(intValue);
+					}
+					if(readXMLInteger(itemNode, "customFluid", intValue)){
+					    iType->isCustomFluidType = (intValue == 1);
+					}
+					if (!iType->isCustomFluidType){ //customTypes aren't included at the map
+					    std::map<ClientFluidTypes_t, FluidTypes_t>::iterator it = reverseCustomFluidMap.find(iType->clientFluidType);
+                        if (it == reverseCustomFluidMap.end()){
+                            reverseCustomFluidMap[iType->clientFluidType] = FluidTypes_t(id);
+                        }
+                        else{
+                            std::cout << "Warning! Fluids with id " << id << " and " << reverseCustomFluidMap[iType->clientFluidType] << " are using the same clientId. Forgot the customFluid parameter?" << std::endl;
+                        }
+					}
 					items.addElement(iType, iType->id);
 				}
-				
+
 				else if(itemsLoaded[id]){
 					std::cout << std::endl << "Duplicate itemid \"" << intValue << "\"";
 					itemNode = itemNode->next;
@@ -560,7 +487,7 @@ bool Items::loadFromXml(const std::string& datadir)
 				}
 
 				itemsLoaded[id] = true;
-				
+
 				ItemType& it = Item::items.getItemType(id);
 
 				if(readXMLString(itemNode, "name", strValue)){
@@ -1542,6 +1469,117 @@ bool Items::loadFromXml(const std::string& datadir)
 
 	return true;
 }
+
+// the proper way to implement this would be to use ClientFluidTypes_t only, but that would break compatibility with
+// old scripts, so we instead will use the old FluidTypes_t and these functions,
+// which maps the oldTypes into the new ones (and vice-versa)
+ClientFluidTypes_t Items::getClientFluidType(FluidTypes_t f)
+{
+    return getItemType(int(f)).clientFluidType;
+	/*switch(f){
+		case FLUID_EMPTY:
+			return CFLUID_EMPTY;
+		case FLUID_WATER:
+			return CFLUID_WATER;
+		case FLUID_BLOOD:
+			return CFLUID_BLOOD;
+		case FLUID_BEER:
+			return CFLUID_BEER;
+		case FLUID_SLIME:
+			return CFLUID_SLIME;
+		case FLUID_LEMONADE:
+			return CFLUID_LEMONADE;
+		case FLUID_MILK:
+			return CFLUID_MILK;
+		case FLUID_MANA:
+			return CFLUID_MANA;
+		case FLUID_LIFE:
+			return CFLUID_LIFE;
+		case FLUID_OIL:
+			return CFLUID_OIL;
+		case FLUID_URINE:
+			return CFLUID_URINE;
+		case FLUID_COCONUTMILK:
+			return CFLUID_COCONUTMILK;
+		case FLUID_WINE:
+			return CFLUID_WINE;
+		case FLUID_MUD:
+			return CFLUID_MUD;
+		case FLUID_FRUITJUICE:
+			return CFLUID_FRUITJUICE;
+		case FLUID_RUM:
+			return CFLUID_RUM;
+		case FLUID_TEA:
+			return CFLUID_TEA;
+		case FLUID_MEAD:
+			return CFLUID_MEAD;
+	    default:
+			//a custom fluid - so we make sure that it returns a ClientFluidTypes_t which isn't taken yet
+			//return ClientFluidTypes_t(int(CFLUID_LAST) + int(f));
+			std::cout << "CEMPTY\n";
+			return CFLUID_EMPTY;
+	}*/
+}
+
+FluidTypes_t Items::getFluidTypeFromClientType(ClientFluidTypes_t c)
+{
+
+    std::map<ClientFluidTypes_t, FluidTypes_t>::iterator it = reverseCustomFluidMap.find(c);
+    if (it != reverseCustomFluidMap.end()){
+        return it->second;
+    }
+    else{
+        std::cout << "Something is wrong. ClienteFluidType " << c << " isn't at map of Items::getFluidTypeFromClientType." << std::endl;
+        std::cout << "Have you included a custom fluid to be sold/bought at a NPC trough the trade window?! The client can't recognize it!" << std::endl;
+        return FLUID_EMPTY;
+    }
+
+    /*
+    switch(c){
+		case CFLUID_EMPTY:
+			return FLUID_EMPTY;
+		case CFLUID_WATER:
+			return FLUID_WATER;
+		case CFLUID_BLOOD:
+			return FLUID_BLOOD;
+		case CFLUID_BEER:
+			return FLUID_BEER;
+		case CFLUID_SLIME:
+			return FLUID_SLIME;
+		case CFLUID_LEMONADE:
+			return FLUID_LEMONADE;
+		case CFLUID_MILK:
+			return FLUID_MILK;
+		case CFLUID_MANA:
+			return FLUID_MANA;
+		case CFLUID_LIFE:
+			return FLUID_LIFE;
+		case CFLUID_OIL:
+			return FLUID_OIL;
+		case CFLUID_URINE:
+			return FLUID_URINE;
+		case CFLUID_COCONUTMILK:
+			return FLUID_COCONUTMILK;
+		case CFLUID_WINE:
+			return FLUID_WINE;
+		case CFLUID_MUD:
+			return FLUID_MUD;
+		case CFLUID_FRUITJUICE:
+			return FLUID_FRUITJUICE;
+		case CFLUID_RUM:
+			return FLUID_RUM;
+		case CFLUID_TEA:
+			return FLUID_TEA;
+		case CFLUID_MEAD:
+			return FLUID_MEAD;
+	    default:
+			//a custom fluid
+			//return FLUID_CUSTOM;
+			std::cout << "EMPTY\n";
+			return FLUID_EMPTY;
+	}*/
+}
+
 
 ItemType& Items::getItemType(int32_t id)
 {

@@ -420,7 +420,7 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 	if((player->isRemoved() || player->getHealth() <= 0) && recvbyte != 0x14){
 		return;
 	}
-	
+
 	bool kickPlayer = false;
 
 	switch(recvbyte){
@@ -697,12 +697,12 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		kickPlayer = true;
 		break;
 	}
-	
+
 	if(msg.isOverrun()){ //we've got a badass over here
 		std::cout << "msg.isOvverrun() == true, player " << player->getName() << std::endl;
 		kickPlayer = true;
 	}
-	
+
 	if(kickPlayer){
 		player->kickPlayer();
 	}
@@ -1779,7 +1779,6 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 					if(it.hasSubType() && !it.stackable){
 						subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
 					}
-
 					uint32_t count = player->__getItemTypeCount(sInfo.itemId, subtype);
 					if(count > 0){
 						saleMap[sInfo.itemId] = count;
@@ -1805,7 +1804,6 @@ void ProtocolGame::sendSaleItemList(const std::list<ShopInfo>& shop)
 					if(it.hasSubType() && !it.stackable){
 						subtype = (sInfo.subType == 0 ? -1 :sInfo.subType);
 					}
-
 					if(subtype != -1){
 						// This shop item requires extra checks
 						uint32_t count = player->__getItemTypeCount(sInfo.itemId, subtype);
@@ -2975,7 +2973,7 @@ void ProtocolGame::AddShopItem(NetworkMessage_ptr msg, const ShopInfo item)
 		msg->AddByte(item.subType);
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		msg->AddByte(ItemType::getClientFluidType(FluidTypes_t(item.subType)));
+		msg->AddByte(Item::items.getClientFluidType(FluidTypes_t(item.subType)));
 	}
 	else{
 		msg->AddByte(1);

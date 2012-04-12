@@ -213,10 +213,12 @@ enum ClientFluidTypes_t {
 	CFLUID_FRUITJUICE,
 	CFLUID_COCONUTMILK,
 	CFLUID_TEA,
-	CFLUID_MEAD
+	CFLUID_MEAD,
+	CFLUID_CUSTOM
 };
 
 enum FluidTypes_t {
+	//notice that FluidType aren't supposed to be negative, or you will get into troubles!
 	FLUID_EMPTY = 0,
 	FLUID_WATER = 1,
 	FLUID_BLOOD = 2,
@@ -234,7 +236,7 @@ enum FluidTypes_t {
 	FLUID_FRUITJUICE = 21,
 	FLUID_RUM = 27,
 	FLUID_TEA = 35,
-	FLUID_MEAD = 36
+	FLUID_MEAD = 36,
 };
 
 enum SquareColor_t {

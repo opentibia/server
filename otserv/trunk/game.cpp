@@ -1881,10 +1881,10 @@ Item* Game::transformItem(Item* item, uint16_t newId, int32_t newCount /*= -1*/)
 		else{
 			newItem = Item::CreateItem(newId, newCount);
 		}
-		
+
 		if(!newItem)
 			return NULL;
-			
+
 		newItem->copyAttributes(item);
 
 		ret = internalAddItem(cylinder, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
@@ -2291,7 +2291,7 @@ bool Game::playerUseItemEx(uint32_t playerId, const Position& fromPos, uint8_t f
 	}
 
 	Thing* thing = internalGetThing(player, fromPos, fromStackPos, fromSpriteId, STACKPOS_USEITEM);
-	
+
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
@@ -2388,7 +2388,7 @@ bool Game::playerUseItem(uint32_t playerId, const Position& pos, uint8_t stackPo
 	}
 
 	Thing* thing = internalGetThing(player, pos, stackPos, spriteId, STACKPOS_USEITEM);
-	
+
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
@@ -2471,7 +2471,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, const Position& fromPos, uin
 	}
 
 	Thing* thing = internalGetThing(player, fromPos, fromStackPos, spriteId, STACKPOS_USE);
-	
+
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
@@ -2874,7 +2874,7 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 
 				uint32_t count1 = tradeItem1->getItemCount();
 				uint32_t count2 = tradeItem2->getItemCount();
-				
+
 				internalMoveItem(cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, count1, NULL);
 				internalMoveItem(cylinder2, player, INDEX_WHEREEVER, tradeItem2, count2, NULL);
 
@@ -3104,7 +3104,7 @@ bool Game::playerPurchaseItem(uint32_t playerId, uint16_t spriteId, uint8_t coun
 
 	uint8_t subType = 0;
 	if(it.isFluidContainer()){
-		subType = ItemType::getFluidTypeFromClientType(ClientFluidTypes_t(count));
+		subType = Item::items.getFluidTypeFromClientType(ClientFluidTypes_t(count));
 	}
 
 	if(!player->hasShopItemForSale(it.id, subType)){
@@ -3135,7 +3135,7 @@ bool Game::playerSellItem(uint32_t playerId, uint16_t spriteId, uint8_t count, u
 
 	uint8_t subType = 0;
 	if(it.isFluidContainer()){
-		subType = ItemType::getFluidTypeFromClientType(ClientFluidTypes_t(count));
+		subType = Item::items.getFluidTypeFromClientType(ClientFluidTypes_t(count));
 	}
 
 	merchant->onPlayerTrade(player, SHOPEVENT_SELL, onSell, it.id, subType, amount, ignoreEquipped, false);
@@ -3452,15 +3452,15 @@ bool Game::playerRequestAddVip(uint32_t playerId, const std::string& vip_name)
 		player->sendTextMessage(MSG_STATUS_SMALL, "You can not add this player.");
 		return false;
 	}
-	
+
 	if(player->hasCondition(CONDITION_EXHAUST_YELL, 1))
 	{
 		player->sendTextMessage(MSG_STATUS_SMALL, "Please wait few seconds before adding new player to your vip list.");
 		return false;
 	}
-	
+
 	bool online = (getPlayerByName(real_name) != NULL);
-	
+
 	if(Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_YELL, 3000, 0))
 	player->addCondition(condition);
 	return player->addVIP(guid, real_name, online);
@@ -3477,9 +3477,9 @@ bool Game::playerRequestRemoveVip(uint32_t playerId, uint32_t guid)
 		player->sendTextMessage(MSG_STATUS_SMALL, "Please wait few seconds before deleting next player from your vip list.");
 		return false;
 	}
-	
+
 	if(Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUST_YELL, 3000, 0))
-	player->addCondition(condition);	
+	player->addCondition(condition);
 	player->removeVIP(guid);
 	return true;
 }
@@ -5032,7 +5032,7 @@ void Game::reloadInfo(reloadTypes_t info)
 		case RELOAD_TYPE_ITEMS:
 			Item::items.reload();
 			break;
-		case RELOAD_TYPE_GLOBALEVENTS:	
+		case RELOAD_TYPE_GLOBALEVENTS:
 			g_globalEvents->reload();
 			break;
 	}

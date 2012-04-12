@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="All" />
+	<File name="../LICENSE" open="0" top="0" tabpos="0">
+		<Cursor position="17205" topLine="311" />
+	</File>
+	<File name="../beds.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="236" topLine="0" />
+	</File>
+	<File name="../configmanager.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="15416" topLine="291" />
+	</File>
+	<File name="../const.h" open="1" top="1" tabpos="8">
+		<Cursor position="8413" topLine="242" />
+	</File>
+	<File name="../game.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="80252" topLine="3096" />
+	</File>
+	<File name="../game.h" open="1" top="0" tabpos="9">
+		<Cursor position="0" topLine="519" />
+	</File>
+	<File name="../item.h" open="1" top="0" tabpos="5">
+		<Cursor position="7470" topLine="244" />
+	</File>
+	<File name="../items.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="50365" topLine="1579" />
+	</File>
+	<File name="../items.h" open="1" top="0" tabpos="3">
+		<Cursor position="8787" topLine="318" />
+	</File>
+	<File name="../networkmessage.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="3533" topLine="119" />
+	</File>
+	<File name="../npc.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="95052" topLine="3506" />
+	</File>
+	<File name="../npc.h" open="1" top="0" tabpos="10">
+		<Cursor position="2485" topLine="66" />
+	</File>
+	<File name="../player.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="34279" topLine="1525" />
+	</File>
+	<File name="../player.h" open="1" top="0" tabpos="11">
+		<Cursor position="25147" topLine="617" />
+	</File>
+	<File name="../protocolgame.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="42610" topLine="1763" />
+	</File>
+	<File name="../weapons.cpp" open="1" top="0" tabpos="13">
+		<Cursor position="13739" topLine="586" />
+	</File>
+</CodeBlocks_layout_file>

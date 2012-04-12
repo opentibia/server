@@ -1505,7 +1505,7 @@ void Npc::onThink(uint32_t interval)
 	if(m_npcEventHandler){
 		m_npcEventHandler->onThink();
 	}
-	
+
 	std::vector<Player*> list;
 	Player* tmpPlayer = NULL;
 
@@ -1544,10 +1544,12 @@ void Npc::onThink(uint32_t interval)
 		}
 	}
 
+
+	/* TODO: This code does nothing. Check if nothing was left undone.
 	bool idleResponse = false;
 	if((uint32_t)(MAX_RAND_RANGE / idleInterval) >= (uint32_t)random_range(0, MAX_RAND_RANGE))
-		idleResponse = true;
-		
+		idleResponse = true; */
+
 	if (getTimeSinceLastMove() >= walkTicks)
 		addEventWalk();
 
@@ -3476,6 +3478,7 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->scriptVars.s2 = getFieldString(L, "s2");
 	state->scriptVars.s3 = getFieldString(L, "s3");
 }
+
 
 int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 {
