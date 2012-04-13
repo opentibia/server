@@ -35,7 +35,7 @@ uint32_t Items::dwMinorVersion = 0;
 uint32_t Items::dwBuildNumber = 0;
 
 extern Spells* g_spells;
-extern std::map<ClientFluidTypes_t, FluidTypes_t> Items::reverseCustomFluidMap;
+std::map<ClientFluidTypes_t, FluidTypes_t> Items::reverseCustomFluidMap;
 
 ItemType::ItemType()
 {
