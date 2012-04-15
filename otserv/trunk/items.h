@@ -326,8 +326,6 @@ public:
 	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
 	uint32_t size() {return items.size();}
 
-	//a map and two specials functions used for fluids ids
-	static std::map<ClientFluidTypes_t, FluidTypes_t> reverseCustomFluidMap;
 	ClientFluidTypes_t getClientFluidType(FluidTypes_t f);
 	FluidTypes_t getFluidTypeFromClientType(ClientFluidTypes_t f);
 
@@ -336,6 +334,9 @@ public:
 protected:
 	typedef std::map<int32_t, int32_t> ReverseItemMap;
 	ReverseItemMap reverseItemMap;
+
+	//a map and two specials functions used for fluids ids
+	static std::map<ClientFluidTypes_t, FluidTypes_t> reverseCustomFluidMap;
 
 	Array<ItemType*> items;
 
