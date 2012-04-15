@@ -130,6 +130,7 @@
     <ClInclude Include="..\iomap.h" />
     <ClInclude Include="..\iomapotbm.h" />
     <ClInclude Include="..\iomapserialize.h" />
+	<ClInclude Include="..\iomarket.h" />
     <ClInclude Include="..\ioplayer.h" />
     <ClInclude Include="..\item.h" />
     <ClInclude Include="..\itemloader.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="..\ioaccount.cpp" />
     <ClCompile Include="..\iomapotbm.cpp" />
     <ClCompile Include="..\iomapserialize.cpp" />
+	<ClCompile Include="..\iomarket.cpp" />
     <ClCompile Include="..\ioplayer.cpp" />
     <ClCompile Include="..\item.cpp" />
     <ClCompile Include="..\items.cpp" />

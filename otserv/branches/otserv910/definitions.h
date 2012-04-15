@@ -23,7 +23,7 @@
 
 #define OTSERV_VERSION "0.6.3_SVN"
 #define OTSERV_NAME "OTServ"
-#define OTSERV_CLIENT_VERSION "9.46"
+#define OTSERV_CLIENT_VERSION "9.52"
 
 #ifndef __OLD_GUILD_SYSTEM__
 #define __OLD_GUILD_SYSTEM__
