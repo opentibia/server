@@ -256,6 +256,8 @@ int main(int argc, char** argv)
 		std::cout << "[done]" << std::endl;
 		std::cout << ":: Server Running..." << std::endl;
 		servicer.run();
+		g_scheduler.join();
+		g_dispatcher.join();
 	}
 	else{
 		ErrorMessage("No services running. Server is not online.");

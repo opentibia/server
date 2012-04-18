@@ -84,6 +84,7 @@ public:
 	void start();
 	void stop();
 	void shutdown();
+	void join();
 
 	enum DispatcherState{
 		STATE_RUNNING,
@@ -97,6 +98,7 @@ protected:
 
 	void flush();
 
+	boost::thread m_thread;
 	boost::mutex m_taskLock;
 	boost::condition_variable m_taskSignal;
 
