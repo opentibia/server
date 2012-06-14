@@ -188,7 +188,7 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 			pos.x = atoi(posList[0].c_str());
 			pos.y = atoi(posList[1].c_str());
 			pos.z = atoi(posList[2].c_str());
-			addEvent(moveEvent, pos, m_positionMap);
+			addEvent(moveEvent->clone(), pos, m_positionMap);
 		}
 	}
 	else{
