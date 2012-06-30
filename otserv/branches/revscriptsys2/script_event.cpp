@@ -1579,9 +1579,7 @@ bool OnSpawn::Event::dispatch(Manager& state, Environment& environment)
 	if(eiter != environment.Generic.OnSpawn.end())
 		return dispatchEvent<OnSpawn::Event>
 			(this, state, environment, eiter->second);
-
-	// Default is success
-	return true;
+	return false;
 }
 
 void OnSpawn::Event::push_instance(LuaState& state, Environment& environment)

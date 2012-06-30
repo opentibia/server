@@ -1432,9 +1432,9 @@ bool Game::onMoveItem(Creature* actor, Item* item, Tile* tile, bool addItem)
 bool Game::onSpawn(Actor* actor)
 {
 	if(!script_system)
-		return true; // Not handled
+		return false; // Not handled
 	Script::OnSpawn::Event evt(actor);
-	return script_system->dispatchEvent(evt); // If handled, we don't spawn
+	return script_system->dispatchEvent(evt);
 }
 
 void Game::onSpotCreature(Creature* creature, Creature* spotted)

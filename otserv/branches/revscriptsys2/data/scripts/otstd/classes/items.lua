@@ -2,14 +2,14 @@ Items = {}
 setmetatable(Items, {
 	__index = 
 		function(t, itemid)
-			local t = rawget(t, itemid)
-			if not t then
-				t = getItemType(itemid)
-				if t then
-					rawset(t, itemid, t)
+			local item = rawget(t, itemid)
+			if not item then
+				item = getItemType(itemid)
+				if item then
+					rawset(t, itemid, item)
 				end
 			end
-			return t
+			return item
 		end;
 })
 

@@ -337,6 +337,7 @@ bool Spawn::spawnMonster(uint32_t spawnId, CreatureType* mType, const Position& 
 	monster->setMasterPos(pos, radius);
 
 	if(g_game.onSpawn(monster)){
+		// If event was handled, don't spawn
 		g_game.removeCreature(monster);
 		return false;
 	}
@@ -470,6 +471,7 @@ bool Spawn::addNPC(const std::string& name, const Position& pos, Direction dir)
 	}
 
 	if(g_game.onSpawn(actor)){
+		// If event was handled, don't spawn
 		g_game.removeCreature(actor);
 		return false;
 	}
