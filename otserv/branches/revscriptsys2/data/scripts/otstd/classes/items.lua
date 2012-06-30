@@ -1,13 +1,13 @@
-
-local internalGetItemType = getItemType
-
 Items = {}
 setmetatable(Items, {
 	__index = 
-		function(o, itemid)
-			local t = internalGetItemType(itemid)
-			if t then
-				o[t] = t
+		function(t, itemid)
+			local t = rawget(t, itemid)
+			if not t then
+				t = getItemType(itemid)
+				if t then
+					rawset(t, itemid, t)
+				end
 			end
 			return t
 		end;

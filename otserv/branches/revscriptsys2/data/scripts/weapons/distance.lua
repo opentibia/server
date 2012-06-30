@@ -1,15 +1,15 @@
 local distanceWeapons = {
 	-- Bows and Crossbows
-	[8849] = {vocation = {"Paladin", "Royal Paladin"}, level = 45, unproperly = true}; -- Modified Crossbow
-	[8850] = {vocation = {"Paladin", "Royal Paladin"}, level = 60, unproperly = true}; -- Chain Bolter
-	[8853] = {vocation = {"Paladin", "Royal Paladin"}, level = 80, unproperly = true}; -- Ironworker
-	[8852] = {vocation = {"Paladin", "Royal Paladin"}, level = 100, unproperly = true}; -- Devileye
-	[8851] = {vocation = {"Paladin", "Royal Paladin"}, level = 130, unproperly = true}; -- Royal Crossbow
-	[8857] = {vocation = {"Paladin", "Royal Paladin"}, level = 40, unproperly = true}; -- Silkweaver Bow
-	[8855] = {vocation = {"Paladin", "Royal Paladin"}, level = 50, unproperly = true}; -- Composite Hornbow
-	[8856] = {vocation = {"Paladin", "Royal Paladin"}, level = 60, unproperly = true}; -- Yol's Bow
-	[8858] = {vocation = {"Paladin", "Royal Paladin"}, level = 70, unproperly = true}; -- Elethriel's Elemental Bow
-	[8854] = {vocation = {"Paladin", "Royal Paladin"}, level = 80, unproperly = true}; -- Warsinger Bow
+	[8849] = {vocation = {"Paladin", "Royal Paladin"}, level = 45}; -- Modified Crossbow
+	[8850] = {vocation = {"Paladin", "Royal Paladin"}, level = 60}; -- Chain Bolter
+	[8853] = {vocation = {"Paladin", "Royal Paladin"}, level = 80}; -- Ironworker
+	[8852] = {vocation = {"Paladin", "Royal Paladin"}, level = 100}; -- Devileye
+	[8851] = {vocation = {"Paladin", "Royal Paladin"}, level = 130}; -- Royal Crossbow
+	[8857] = {vocation = {"Paladin", "Royal Paladin"}, level = 40}; -- Silkweaver Bow
+	[8855] = {vocation = {"Paladin", "Royal Paladin"}, level = 50}; -- Composite Hornbow
+	[8856] = {vocation = {"Paladin", "Royal Paladin"}, level = 60}; -- Yol's Bow
+	[8858] = {vocation = {"Paladin", "Royal Paladin"}, level = 70}; -- Elethriel's Elemental Bow
+	[8854] = {vocation = {"Paladin", "Royal Paladin"}, level = 80}; -- Warsinger Bow
 
 	[2455] = {}; -- Crossbow
 	[2456] = {}; -- Bow

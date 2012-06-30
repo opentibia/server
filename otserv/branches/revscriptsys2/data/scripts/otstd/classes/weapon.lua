@@ -19,7 +19,6 @@ function Weapon:new(weaponID)
 		soul = 0,
 		exhaustion = false,
 		premium = false,
-		unproperly = false,
 
 		-- Combat params
 		combatType = COMBAT_PHYSICALDAMAGE,
@@ -85,7 +84,7 @@ function otstd.onUseWeapon(event)
 	local weapon = event.weapon
 
 	if not typeof(event.player, "Player") then
-		error("onUseWeapon event triggered by an actor?")
+		error("onUseWeapon not triggered by a Player!")
 	end
 
 	if not weapon then
@@ -93,15 +92,13 @@ function otstd.onUseWeapon(event)
 		otstd.internalUseFist(event)
 	else
 		local internalWeapon = otstd.weapons[weapon:getItemID()]
-		--if not internalWeapon then
-			-- error("onUseWeapon event triggered with an unknown weapon. (ItemID: " .. weapon:getItemID() .. ")")
-		--end
+		if not internalWeapon then
+			error("onUseWeapon event triggered with unknown weapon. (ItemID: " .. weapon:getItemID() .. ")")
+		end
 
 		event.internalWeapon = internalWeapon
 		event.target = event.attacked
 		event.damageModifier = 100
-
-		-- damage modifier will be used only if weaponcheck returns ok
 		if otstd.onWeaponCheck(event) then
 			if internalWeapon and internalWeapon.onUseWeapon then
 				internalWeapon:onUseWeapon(event)
@@ -217,29 +214,19 @@ function otstd.onWeaponCheck(event)
 			return false
 		end
 
-		-- Wielded unproperly
-
+		-- check if wielded properly
 		-- level
 		if internalWeapon.level > player:getLevel() then
-			if internalWeapon.unproperly then
-				local penalty = (internalWeapon.level - player:getLevel()) * 0.02
-				if penalty > 0.5 then
-					penalty = 0.5
-				end
-
-				event.damageModifier = event.damageModifier - (event.damageModifier * penalty)
-			else
-				return false
+			local penalty = (internalWeapon.level - player:getLevel()) * 0.02
+			if penalty > 0.5 then
+				penalty = 0.5
 			end
+			event.damageModifier = event.damageModifier - (event.damageModifier * penalty)
 		end
 
 		-- magic level
 		if internalWeapon.magicLevel > player:getMagicLevel() then
-			if internalWeapon.unproperly then
-				event.damageModifier = event.damageModifier / 2
-			else
-				return false
-			end
+			event.damageModifier = event.damageModifier / 2
 		end
 	end
 
@@ -254,17 +241,14 @@ function otstd.internalUseWeapon(event)
 	local weapon = event.weapon
 	local internalWeapon = event.internalWeapon
 
-	-- get max min damages
 	local damage = 0
 	if internalWeapon and internalWeapon.damageFormula then
 		damage = internalWeapon:damageFormula(player, target, weapon)
 	else
 		damage = otstd.damageFormula(player, target, weapon)
 	end
-
 	damage = (damage * event.damageModifier) / 100
 
-	-- do the damage
 	if internalWeapon then
 		internalCastSpell(
 			internalWeapon.combatType, player, target, damage,
@@ -275,7 +259,7 @@ function otstd.internalUseWeapon(event)
 			true, true)
 	end
 	
-	-- if weapon has a shoot effect send it
+	-- send effect
 	local shootType = weapon:getShootType()
 	if shootType ~= SHOOT_EFFECT_NONE then
 		sendDistanceEffect(player:getPosition(), target:getPosition(), shootType)
@@ -308,14 +292,12 @@ end
 
 function Weapon:register()
 	self:unregister()
-
 	if otstd.weapons[self.id] ~= nil then
 		error("Duplicate weapon id \"" .. self.id .. "\"")
+	else
+		self.onUseWeaponHandler = registerOnUseWeapon(self.id, "itemid", otstd.onUseWeapon)
+		otstd.weapons[self.id] = self
 	end
-
-	self.onUseWeaponHandler = registerOnUseWeapon(self.id, "itemid", otstd.onUseWeapon)
-
-	otstd.weapons[self.id] = self
 end
 
 function Weapon:unregister()
@@ -323,7 +305,6 @@ function Weapon:unregister()
 		stopListener(self.onUseWeaponHandler)
 		self.onUseWeaponHandler = nil
 	end
-
 	otstd.weapons[self.id] = nil
 end
 
