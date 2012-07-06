@@ -185,7 +185,7 @@ bool Items::reload()
 int Items::loadFromOtb(std::string file)
 {
 	FileLoader f;
-	if(!f.openFile(file.c_str(), false, true)){
+	if(!f.openFile(file.c_str(), "OTBI", false, true)){
 		return f.getError();
 	}
 

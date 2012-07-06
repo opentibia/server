@@ -55,7 +55,7 @@ FileLoader::~FileLoader()
 	}
 }
 
-bool FileLoader::openFile(const char* filename, bool write, bool caching /*= false*/)
+bool FileLoader::openFile(const char* filename, const char* accept_identifier, bool write, bool caching /*= false*/)
 {
 	if(write) {
 		m_file = fopen(filename, "wb");
@@ -72,8 +72,17 @@ bool FileLoader::openFile(const char* filename, bool write, bool caching /*= fal
 	else {
 		m_file = fopen(filename, "rb");
 		if(m_file){
-			uint32_t version;
-			if(fread(&version, sizeof(version), 1, m_file) && version > 0){
+			char identifier[4];
+			if(fread(identifier, 1, 4, m_file) < 4){
+				fclose(m_file);
+				m_file = NULL;
+				m_lastError = ERROR_INVALID_FILE_VERSION;
+				return false;
+			}
+			// Accept 0x00000000 as wildcard
+			else if (memcmp(identifier, accept_identifier, 4) != 0 &&
+					 memcmp(identifier, "\0\0\0\0", 4) != 0)
+			{
 				fclose(m_file);
 				m_file = NULL;
 				m_lastError = ERROR_INVALID_FILE_VERSION;

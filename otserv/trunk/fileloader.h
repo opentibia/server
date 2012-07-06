@@ -103,7 +103,7 @@ public:
 	FileLoader();
 	virtual ~FileLoader();
 
-	bool openFile(const char* filename, bool write, bool caching = false);
+	bool openFile(const char* filename, const char* identifier, bool write, bool caching = false);
 	const unsigned char* getProps(const NODE, unsigned long &size);
 	bool getProps(const NODE, PropStream& props);
 	const NODE getChildNode(const NODE parent, unsigned long &type);
