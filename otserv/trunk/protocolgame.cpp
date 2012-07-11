@@ -332,7 +332,8 @@ bool ProtocolGame::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	if(g_game.getGameState() == GAME_STATE_STARTUP){
-		disconnectClient(0x14, "Gameworld is starting up. Please wait.");
+		std::string clientMessage = g_config.getString(ConfigManager::WORLD_NAME) + " is starting up. Please wait.";
+		disconnectClient(0x14, clientMessage.c_str());
 		return false;
 	}
 
