@@ -665,7 +665,7 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
-		if(player->getLevel() < level){
+		if(g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && player->getLevel() < level){
 			player->sendCancelMessage(RET_NOTENOUGHLEVEL);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
@@ -2115,7 +2115,8 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 
 	hasCharges = (charges > 0);
 
-	if(magLevel != 0 || level != 0){
+	if(magLevel != 0 || 
+		(g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && level != 0)){
 		//Change information in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);
 		iType.runeSpellName = getName();

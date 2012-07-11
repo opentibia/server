@@ -21,6 +21,7 @@
 
 #include "item.h"
 #include "container.h"
+#include "configmanager.h"
 #include "depot.h"
 #include "teleport.h"
 #include "trashholder.h"
@@ -38,6 +39,7 @@
 
 extern Game g_game;
 extern Weapons* g_weapons;
+extern ConfigManager g_config;
 
 Items Item::items;
 
@@ -768,9 +770,10 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 	if(it.isRune()){
 		s << " (\"" << it.runeSpellName << "\").";
-		if(it.runeLevel > 0 || it.runeMagLevel > 0){
+		if((g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && it.runeLevel > 0) || 
+			it.runeMagLevel > 0){
 			s << std::endl << "It can only be used with";
-			if(it.runeLevel > 0){
+			if(g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && it.runeLevel > 0){
 				s << " level " << it.runeLevel;
 			}
 			if(it.runeMagLevel > 0){
