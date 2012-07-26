@@ -1,1 +1,0 @@
-default dir/ after you check copy the monster to the right directory
