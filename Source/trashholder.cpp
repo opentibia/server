@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,7 +24,7 @@
 
 extern Game g_game;
 
-TrashHolder::TrashHolder(uint16_t _type, MagicEffectClasses _effect /*= NM_ME_NONE*/) : Item(_type)
+TrashHolder::TrashHolder(uint16_t _type, MagicEffect _effect /*= MAGIC_EFFECT_NONE*/) : Item(_type)
 {
 	effect = _effect;
 }
@@ -58,44 +58,46 @@ Cylinder* TrashHolder::__queryDestination(int32_t& index, const Thing* thing, It
 	return this;
 }
 
-void TrashHolder::__addThing(Thing* thing)
+void TrashHolder::__addThing(Creature* actor, Thing* thing)
 {
-	return __addThing(0, thing);
+	return __addThing(actor, 0, thing);
 }
 
-void TrashHolder::__addThing(int32_t index, Thing* thing)
+void TrashHolder::__addThing(Creature* actor, int32_t index, Thing* thing)
 {
 	if(Item* item = thing->getItem()){
-		if(item != this && (item->isPickupable() || item->isPushable() || item->isMoveable())){
-			g_game.internalRemoveItem(item);
-			if(effect != NM_ME_NONE){
+		if(item != this && (item->isPickupable()
+							|| item->isPushable()
+							|| item->isMoveable())){
+			g_game.internalRemoveItem(actor, item);
+			if(effect != MAGIC_EFFECT_NONE){
 				g_game.addMagicEffect(getPosition(), effect);
 			}
 		}
 	}
 }
 
-void TrashHolder::__updateThing(Thing* thing, uint16_t itemId, uint32_t count)
+void TrashHolder::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count)
 {
 	//
 }
 
-void TrashHolder::__replaceThing(uint32_t index, Thing* thing)
+void TrashHolder::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 {
 	//
 }
 
-void TrashHolder::__removeThing(Thing* thing, uint32_t count)
+void TrashHolder::__removeThing(Creature* actor, Thing* thing, uint32_t count)
 {
 	//
 }
 
-void TrashHolder::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
+void TrashHolder::postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT, isNewItem);
+	getParent()->postAddNotification(actor, thing, oldParent, index, LINK_PARENT);
 }
 
-void TrashHolder::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void TrashHolder::postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_PARENT);
+	getParent()->postRemoveNotification(actor, thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 }

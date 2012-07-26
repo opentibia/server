@@ -21,24 +21,19 @@
 #ifndef __OTSERV_SERVER_H__
 #define __OTSERV_SERVER_H__
 
-#include "definitions.h"
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
+#include "classes.h"
 #include <boost/utility.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <iostream>
-#include <list>
-
-class Connection;
-typedef boost::shared_ptr<Connection> Connection_ptr;
-class Protocol;
-class NetworkMessage;
 
 class ServiceBase;
 class ServicePort;
-
 typedef boost::shared_ptr<ServiceBase> Service_ptr;
+typedef boost::shared_ptr<boost::asio::ip::tcp::acceptor> Acceptor_ptr;
 typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
+typedef boost::shared_ptr<Connection> Connection_ptr;
+
+typedef boost::asio::ip::address IPAddress;
+typedef std::vector<IPAddress> IPAddressList;
 
 // The Service class is very thin, it's only real job is to create dynamic
 // dispatch of the protocol attributes, which would otherwise be very hard,
@@ -79,8 +74,8 @@ public:
 	ServicePort(boost::asio::io_service& io_service);
 	~ServicePort();
 
-	static void openAcceptor(boost::weak_ptr<ServicePort> weak_service, uint16_t port);
-	void open(uint16_t port);
+	static void openAcceptor(boost::weak_ptr<ServicePort> weak_service, IPAddress ip, uint16_t port);
+	void open(IPAddressList ips, uint16_t port);
 	void close();
 	bool is_single_socket() const;
 	std::string get_protocol_names() const;
@@ -89,13 +84,13 @@ public:
 	Protocol* make_protocol(bool checksummed, NetworkMessage& msg) const;
 
 	void onStopServer();
-	void onAccept(boost::asio::ip::tcp::socket* socket, const boost::system::error_code& error);
+	void onAccept(Acceptor_ptr acceptor, boost::asio::ip::tcp::socket* socket, const boost::system::error_code& error);
 
 protected:
-	void accept();
+	void accept(Acceptor_ptr acceptor);
 
 	boost::asio::io_service& m_io_service;
-	boost::asio::ip::tcp::acceptor* m_acceptor;
+	std::vector<Acceptor_ptr> m_tcp_acceptors;
 	std::vector<Service_ptr> m_services;
 
 	uint16_t m_serverPort;
@@ -119,9 +114,9 @@ public:
 
 	// Adds a new service to be managed
 	template <typename ProtocolType>
-	bool add(uint16_t port);
+	bool add(uint16_t port, IPAddressList ips);
 
-	bool is_running() const {return !m_acceptors.empty();}
+	bool is_running() const {return m_acceptors.empty() == false;}
 	std::list<uint16_t> get_ports() const;
 protected:
 	void die();
@@ -134,10 +129,10 @@ protected:
 };
 
 template <typename ProtocolType>
-bool ServiceManager::add(uint16_t port)
+bool ServiceManager::add(uint16_t port, IPAddressList ips)
 {
 	if(port == 0){
-		std::cout << "ERROR: No port provided for service " << ProtocolType::protocol_name() << ". Service disabled." << std::endl;
+		std::cout << "NOTICE: No port provided for service " << ProtocolType::protocol_name() << ". Service disabled." << std::endl;
 		return false;
 	}
 	ServicePort_ptr service_port;
@@ -147,7 +142,7 @@ bool ServiceManager::add(uint16_t port)
 
 	if(finder == m_acceptors.end()){
 		service_port.reset(new ServicePort(m_io_service));
-		service_port->open(port);
+		service_port->open(ips, port);
 		m_acceptors[port] = service_port;
 	}
 	else{

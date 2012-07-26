@@ -18,17 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_PROTOCOL_LOGIN_H__
-#define __OTSERV_PROTOCOL_LOGIN_H__
+#ifndef __OTSERV_PROTOCOLLOGIN_H__
+#define __OTSERV_PROTOCOLLOGIN_H__
 
-#include "definitions.h"
+#include "classes.h"
 #include "protocol.h"
-#include <vector>
-
-typedef std::vector<std::pair<uint32_t, uint32_t> > IPList;
-
-class NetworkMessage;
-class OutputMessage;
 
 class ProtocolLogin : public Protocol
 {

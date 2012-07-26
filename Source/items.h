@@ -18,30 +18,14 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_ITEMS_H__
 #define __OTSERV_ITEMS_H__
 
-#include "definitions.h"
+#include "classes.h"
 #include "const.h"
 #include "enums.h"
+#include "condition_attributes.h"
 #include "itemloader.h"
-#include "position.h"
-#include <map>
-
-#define SLOTP_WHEREEVER 0xFFFFFFFF
-#define SLOTP_HEAD 1
-#define	SLOTP_NECKLACE 2
-#define	SLOTP_BACKPACK 4
-#define	SLOTP_ARMOR 8
-#define	SLOTP_RIGHT 16
-#define	SLOTP_LEFT 32
-#define	SLOTP_LEGS 64
-#define	SLOTP_FEET 128
-#define	SLOTP_RING 256
-#define	SLOTP_AMMO 512
-#define	SLOTP_DEPOT 1024
-#define	SLOTP_TWO_HAND 2048
 
 enum ItemTypes_t {
 	ITEM_TYPE_NONE = 0,
@@ -62,38 +46,26 @@ struct Abilities{
 	Abilities();
 
 	struct Absorb {
-			int16_t resistances[COMBAT_COUNT];
+			int16_t resistances[CombatType::size];
 
 			bool any() const;
-			bool reduce(CombatType_t type, int32_t& dmg) const;
+			bool reduce(CombatType type, int32_t& dmg) const;
 			std::ostream& getDescription(std::ostream& os) const;
 	protected:
-			std::ostream& getDescription(std::ostream& os, bool& first, int32_t combat_type) const;
+			std::ostream& getDescription(std::ostream& os, bool& first, CombatType combat_type) const;
 	} absorb;
-
-	//extra skill modifiers
-	struct Skill {
-			int16_t upgrades[SKILL_LAST+1];
-
-			bool any() const;
-			std::ostream& getDescription(std::ostream& os) const;
-	protected:
-			std::ostream& getDescription(std::ostream& os, bool& first, int32_t type) const;
-	} skill;
-
-	//field damage
-	std::map<uint16_t, int16_t> absorbFieldDamage;
-
-	//condition manipulating
-	uint16_t conditionCount;
+	bool cure[ConditionId::size];
 
 	//elemental damage
-	CombatType_t elementType;
+	CombatType elementType;
 	int16_t elementDamage;
 
+	//extra skill modifiers
+	int32_t skills[SkillType::size];
+
 	//stats modifiers
-	int32_t stats[STAT_LAST + 1];
-	int32_t statsPercent[STAT_LAST + 1];
+	int32_t stats[SkillType::size];
+	int32_t statsPercent[SkillType::size];
 
 	int32_t speed;
 	bool manaShield;
@@ -106,14 +78,11 @@ struct Abilities{
 	uint32_t manaGain;
 	uint32_t manaTicks;
 
-	uint32_t conditionImmunities;
-	uint32_t conditionSuppressions;
+	MechanicType mechanicImmunities;
 
 	bool preventItemLoss;
 	bool preventSkillLoss;
 };
-
-class Condition;
 
 class ItemType {
 private:
@@ -126,8 +95,6 @@ public:
 
 	itemgroup_t group;
 	ItemTypes_t type;
-
-	std::string getDescription(uint8_t count) const;
 
 	bool isGroundTile() const {return (group == ITEM_GROUP_GROUND);}
 	bool isContainer() const {return (group == ITEM_GROUP_CONTAINER);}
@@ -142,19 +109,8 @@ public:
 	bool isMailbox() const {return (type == ITEM_TYPE_MAILBOX);}
 	bool isTrashHolder() const {return (type == ITEM_TYPE_TRASHHOLDER);}
 	bool isRune() const {return (type == ITEM_TYPE_RUNE);}
+	bool isBed() const {return (type == ITEM_TYPE_BED);}
 	bool hasSubType() const {return (isFluidContainer() || isSplash() || stackable || charges != 0);}
-	bool isSolidForItems() const { return id == ITEM_MAGICWALL_SAFE || id == ITEM_WILDGROWTH_SAFE;}
-
-	//[ added for beds system
-	bool isBed() const {return type == ITEM_TYPE_BED;}
-
-	bool isLevelDoor() const {return id == 1227 || id == 1229 || id == 1245 || id == 1247 || id == 1259 || id == 1261 || id == 3540 || id == 3549 || id == 5103 || id == 5112 || id == 5121 || id == 5130 || id == 5292 || id == 5294 || id == 6206 || id == 6208 || id == 6263 || id == 6265 || id == 6896 || id == 6905 || id == 7038 || id == 7047 || id == 8555 || id == 8557 || id == 9179 || id == 9181 || id == 9281 || id == 9283 || id == 10282 || id == 10284 || id == 10473 ||  id == 10482 ||  id == 10780 || id == 10789; }
-
-	Direction bedPartnerDir;
-	uint16_t maleSleeperID;
-	uint16_t femaleSleeperID;
-	uint16_t noSleeperID;
-	//]
 
 	uint16_t id;
 	uint16_t clientId;
@@ -166,65 +122,66 @@ public:
 	uint16_t       maxItems;
 	float          weight;
 	bool           showCount;
-	WeaponType_t   weaponType;
-	Ammo_t         amuType;
-	ShootType_t    shootType;
-	MagicEffectClasses magicEffect;
+	WeaponType     weaponType;
+	AmmunitionType ammoType;
+	ShootEffect    shootType;
+	MagicEffect    magicEffect;
 	int32_t        attack;
 	int32_t        defense;
-	int32_t        extraDef;
+	int32_t        extraDefense;
 	int32_t        armor;
-	uint16_t       slot_position;
-	uint16_t       wield_position;
-	bool           isVertical;
-	bool           isHorizontal;
-	bool           isHangable;
-	bool           allowDistRead;
-	bool           lookThrough;
+	SlotPosition   slotPosition;
+	SlotType       wieldPosition;
 	uint16_t       speed;
 	int32_t        decayTo;
 	uint32_t       decayTime;
 	bool           stopTime;
-	RaceType_t     corpseType;
+	RaceType       corpseType;
 
-	bool           canReadText;
-	bool           canWriteText;
 	uint16_t       maxTextLen;
 	uint16_t       writeOnceItemId;
-
-	bool           stackable;
-	bool           useable;
-	bool           moveable;
-	bool           alwaysOnTop;
 	int32_t        alwaysOnTopOrder;
-	bool           pickupable;
-	bool           rotable;
 	int32_t        rotateTo;
-
-	int32_t        runeMagLevel;
+	int32_t        runeMagicLevel;
 	int32_t        runeLevel;
 	std::string    runeSpellName;
 
-	uint32_t       wieldInfo;
+	WieldInformation wieldInfo;
 	std::string    vocationString;
-	uint32_t       minReqLevel;
-	uint32_t       minReqMagicLevel;
+	uint32_t       minRequiredLevel;
+	uint32_t       minRequiredMagicLevel;
 
 	int32_t lightLevel;
 	int32_t lightColor;
+	
+	Direction bedPartnerDirection;
+	uint16_t maleSleeperID;
+	uint16_t femaleSleeperID;
+	uint16_t noSleeperID;
 
+	bool blockSolid;
+	bool blockProjectile;
+	bool blockPathFind;
+	bool allowPickupable;
+	bool hasHeight;
+	bool isVertical;
+	bool isHorizontal;
+	bool isHangable;
+	bool lookThrough;
+	bool pickupable;
+	bool rotateable;
+	bool stackable;
+	bool useable;
+	bool moveable;
+	bool alwaysOnTop;
+	bool canReadText;
+	bool canWriteText;
 	bool floorChangeDown;
 	bool floorChangeNorth;
 	bool floorChangeSouth;
 	bool floorChangeEast;
 	bool floorChangeWest;
-	bool hasHeight;
-
-	bool blockSolid;
-	bool blockPickupable;
-	bool blockProjectile;
-	bool blockPathFind;
-	bool allowPickupable;
+	bool allowDistRead;
 
 	unsigned short transformEquipTo;
 	unsigned short transformDeEquipTo;
@@ -235,62 +192,28 @@ public:
 	int32_t hitChance;
 	int32_t maxHitChance;
 	uint32_t shootRange;
-	AmmoAction_t ammoAction;
-	int32_t fluidSource;
-	ClientFluidTypes_t clientFluidType; //for the special ids who are related to fluids
-	bool isCustomFluidType; //for the special ids who are related to fluids
+	AmmunitionAction ammoAction;
+	FluidType fluidSource;
 
 	uint32_t currency;
 
 	Abilities abilities;
-
-	Condition* condition;
-	CombatType_t combatType;
+	CombatType combatType;
 	bool replaceable;
 };
 
 template<typename A>
 class Array{
 public:
-	Array(uint32_t n)
-	{
-		m_data = (A*)malloc(sizeof(A)*n);
-		memset(m_data, 0, sizeof(A)*n);
-		m_size = n;
-	}
-	~Array()
-	{
-		free(m_data);
-	}
+	Array(uint32_t n);
+	~Array();
 
-	A getElement(uint32_t id)
-	{
-		if(id < m_size){
-			return m_data[id];
-		}
-		return 0;
-	}
+	A getElement(uint32_t id);
+	const A getElement(uint32_t id) const;
+	void addElement(A a, uint32_t pos);
 
-	const A getElement(uint32_t id) const
-	{
-		if(id < m_size){
-			return m_data[id];
-		}
-		return 0;
-	}
+	uint32_t size() {return m_size;}
 
-	void addElement(A a, uint32_t pos)
-	{
-		static const int INCREMENT = 5000;
-		if(pos >= m_size){
-			m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
-			memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
-			m_size = pos + INCREMENT;
-		}
-		m_data[pos] = a;
-	}
-
-	uint32_t size() const {return m_size;}
 private:
 	A* m_data;
 	uint32_t m_size;
@@ -324,10 +247,8 @@ public:
 	void addItemType(ItemType* iType);
 
 	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
+	ItemType* getElement(uint32_t id) {return items.getElement(id);}
 	uint32_t size() {return items.size();}
-
-	ClientFluidTypes_t getClientFluidType(FluidTypes_t f);
-	FluidTypes_t getFluidTypeFromClientType(ClientFluidTypes_t f);
 
 	std::map<uint32_t, ItemType*> currencyMap;
 
@@ -335,12 +256,59 @@ protected:
 	typedef std::map<int32_t, int32_t> ReverseItemMap;
 	ReverseItemMap reverseItemMap;
 
-	//a map and two specials functions used for fluids ids
-	static std::map<ClientFluidTypes_t, FluidTypes_t> reverseCustomFluidMap;
-
 	Array<ItemType*> items;
-
 	std::string m_datadir;
 };
+
+
+
+template<typename A>
+inline Array<A>::Array(uint32_t n)
+{
+	m_data = (A*)malloc(sizeof(A)*n);
+	memset(m_data, 0, sizeof(A)*n);
+	m_size = n;
+}
+
+template<typename A>
+inline Array<A>::~Array()
+{
+	free(m_data);
+}
+
+template<typename A>
+inline A Array<A>::getElement(uint32_t id)
+{
+	if(id < m_size){
+		return m_data[id];
+	}
+	else{
+		return 0;
+	}
+}
+
+template<typename A>
+inline const A Array<A>::getElement(uint32_t id) const
+{
+	if(id < m_size){
+		return m_data[id];
+	}
+	else{
+		return 0;
+	}
+}
+
+template<typename A>
+inline void Array<A>::addElement(A a, uint32_t pos)
+{
+#define INCREMENT 5000
+	if(pos >= m_size){
+		m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
+		memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
+		m_size = pos + INCREMENT;
+	}
+	m_data[pos] = a;
+}
+
 
 #endif

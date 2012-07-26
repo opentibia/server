@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Quara Predator Scout" nameDescription="a quara predator scout" race="blood" experience="400" speed="290" manacost="0">
 	<health now="890" max="890"/>
 	<look type="20" corpse="6067"/>
@@ -18,12 +18,15 @@
 		<flag runonhealth="0"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="30" attack="95"/>
+		<attack name="melee" interval="2000" skill="100" attack="95"/>
 	</attacks>
-	<defenses armor="20" defense="29"/>
+	<defenses armor="20" defense="29">
+		<defense name="healing" interval="1000" chance="15" min="113" max="180">
+			<attribute key="areaEffect" value="blueshimmer"/>
+		</defense>
+	</defenses>
 	<elements>
-		<element energyPercent="-10"/>
-		<element earthPercent="-10"/>
+		<element energyPercent="-25"/>
 	</elements>
 	<immunities>
 		<immunity ice="1"/>
@@ -32,40 +35,20 @@
 		<immunity paralyze="1"/>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="9">
+	<voices interval="5000" chance="10">
 		<voice sentence="Gnarrr!"/>
 	</voices>
 	<loot>
-    <item id="2145" chance="1500" /><!-- small diamond -->
-    <item id="2483" chance="1825" /><!-- scale armor -->
-    <item id="5895" countmax="3" chance="1250" /><!-- fish fin -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="2148" countmax="100" chance="28775" /><!-- gold coin -->
-            <item id="2148" countmax="10" chance="28775" /><!-- gold coin -->
-            <item id="2387" chance="1375" /><!-- double axe -->
-            <item id="12447" chance="3725" /><!-- quara bone -->
-        </inside>
-    </item>
-</loot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		<item id="2670" countmax="5" chance="20000"/><!-- shrimp -->
+		<item id="5895" countmax="1" chance="2000"/><!-- fish fin -->
+		<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+		<item id="2387" chance="2000"/><!-- double axe -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2473" chance="3333"/><!-- viking helmet -->
+				<item id="2145" countmax="1" chance="1429"/><!-- small diamond -->
+				<item id="2483" chance="4000"/><!-- scale armor -->
+			</inside>
+		</item>
+	</loot>
 </monster>

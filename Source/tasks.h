@@ -22,7 +22,6 @@
 #ifndef __OTSERV_TASKS_H__
 #define __OTSERV_TASKS_H__
 
-#include "definitions.h"
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 
@@ -84,7 +83,6 @@ public:
 	void start();
 	void stop();
 	void shutdown();
-	void join();
 
 	enum DispatcherState{
 		STATE_RUNNING,
@@ -98,7 +96,6 @@ protected:
 
 	void flush();
 
-	boost::thread m_thread;
 	boost::mutex m_taskLock;
 	boost::condition_variable m_taskSignal;
 
@@ -109,3 +106,4 @@ protected:
 extern Dispatcher g_dispatcher;
 
 #endif
+

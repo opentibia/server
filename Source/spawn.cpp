@@ -20,16 +20,15 @@
 #include "otpch.h"
 
 #include "spawn.h"
+#include "scheduler.h"
 #include "game.h"
+#include "actor.h"
 #include "player.h"
-#include "npc.h"
-#include "tools.h"
 #include "configmanager.h"
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+#include "creature_manager.h"
 
 extern ConfigManager g_config;
-extern Monsters g_monsters;
+extern CreatureManager g_creature_types;
 extern Game g_game;
 
 #define MINSPAWN_INTERVAL 10000
@@ -158,7 +157,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-
+						
 						if(interval >= MINSPAWN_INTERVAL){
 							spawn->addMonster(name, pos, dir, interval);
 						}
@@ -167,15 +166,11 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						}
 					}
 					else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"npc") == 0){
-
+						std::string name;
 						Direction direction = NORTH;
-						std::string name = "";
-						Position placePos = centerPos;
-
-						if(readXMLString(tmpNode, "name", strValue)){
-							name = strValue;
-						}
-						else{
+						Position pos = centerPos;
+						
+						if(!readXMLString(tmpNode, "name", name)){
 							tmpNode = tmpNode->next;
 							continue;
 						}
@@ -190,7 +185,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						}
 
 						if(readXMLInteger(tmpNode, "x", intValue)){
-							placePos.x += intValue;
+							pos.x += intValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
@@ -198,22 +193,14 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						}
 
 						if(readXMLInteger(tmpNode, "y", intValue)){
-							placePos.y += intValue;
+							pos.y += intValue;
 						}
 						else{
 							tmpNode = tmpNode->next;
 							continue;
 						}
-
-						Npc* npc = Npc::createNpc(name);
-						if(!npc){
-							tmpNode = tmpNode->next;
-							continue;
-						}
-
-						npc->setDirection(direction);
-						npc->setMasterPos(placePos, radius);
-						npcList.push_back(npc);
+						
+						spawn->addNPC(name, pos, direction);
 					}
 
 					tmpNode = tmpNode->next;
@@ -235,11 +222,6 @@ void Spawns::startup()
 {
 	if(!isLoaded() || isStarted())
 		return;
-
-	for(NpcList::iterator it = npcList.begin(); it != npcList.end(); ++it){
-		g_game.placeCreature((*it), (*it)->getMasterPos(), false, true);
-	}
-	npcList.clear();
 
 	for(SpawnList::iterator it = spawnList.begin(); it != spawnList.end(); ++it){
 		(*it)->startup();
@@ -284,11 +266,13 @@ Spawn::Spawn(const Position& _pos, int32_t _radius)
 	radius = _radius;
 	interval = DEFAULTSPAWN_INTERVAL;
 	checkSpawnEvent = 0;
+	despawnRange = 0;
+	despawnRadius = 0;
 }
 
 Spawn::~Spawn()
 {
-	Monster* monster;
+	Actor* monster;
 	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end(); ++it){
 		monster = it->second;
 		it->second = NULL;
@@ -317,7 +301,7 @@ bool Spawn::findPlayer(const Position& pos)
 			return true;
 		}
 	}
-
+	
 	return false;
 }
 
@@ -326,12 +310,13 @@ bool Spawn::isInSpawnZone(const Position& pos)
 	return Spawns::getInstance()->isInZone(centerPos, radius, pos);
 }
 
-bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& pos, Direction dir, bool startup /*= false*/)
+bool Spawn::spawnMonster(uint32_t spawnId, CreatureType* mType, const Position& pos, Direction dir, bool startup /*= false*/)
 {
-	Monster* monster = Monster::createMonster(mType);
+	Actor* monster = Actor::create(*mType);
 	if(!monster){
 		return false;
 	}
+
 
 	if(startup){
 		//No need to send out events to the surrounding since there is no one out there to listen!
@@ -350,7 +335,13 @@ bool Spawn::spawnMonster(uint32_t spawnId, MonsterType* mType, const Position& p
 	monster->setDirection(dir);
 	monster->setSpawn(this);
 	monster->setMasterPos(pos, radius);
-	monster->useThing2();
+
+	if(g_game.onSpawn(monster)){
+		// If event was handled, don't spawn
+		g_game.removeCreature(monster);
+		return false;
+	}
+	monster->addRef();
 
 	spawnedMap.insert(spawned_pair(spawnId, monster));
 	spawnMap[spawnId].lastSpawn = OTSYS_TIME();
@@ -374,11 +365,12 @@ void Spawn::checkSpawn()
 #endif
 	checkSpawnEvent = 0;
 
+	uint32_t spawnId;
+	uint32_t spawnCount = 0;
 
 	cleanup();
 
-	uint32_t spawnCount = 0;
-	uint32_t spawnId;
+	
 	for(SpawnMap::iterator it = spawnMap.begin(); it != spawnMap.end(); ++it) {
 		spawnId = it->first;
 		spawnBlock_t& sb = it->second;
@@ -413,28 +405,26 @@ void Spawn::checkSpawn()
 
 void Spawn::cleanup()
 {
-	Monster* monster;
+	Actor* monster;
 	uint32_t spawnId;
+
 	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end();){
 		spawnId = it->first;
 		monster = it->second;
 
-		if(monster->isRemoved()){
+		if(monster->isRemoved()) {
 			if(spawnId != 0) {
 				spawnMap[spawnId].lastSpawn = OTSYS_TIME();
 			}
 
-			monster->releaseThing2();
+			monster->unRef();
+			spawnedMap.erase(it++);
+		}
+		else if(!isInSpawnZone(monster->getPosition()) && spawnId != 0) {
+			spawnedMap.insert(spawned_pair(0, monster));
 			spawnedMap.erase(it++);
 		}
 		else{
-			/*
-			 * This completely messes up luring, and also moves creatures into the view of online players without checks.
-			if(spawnId != 0 && !isInSpawnZone(monster->getPosition()) && monster->getIdleStatus()) {
-				g_game.internalTeleport(monster, monster->getMasterPos(), FLAG_NOLIMIT);
-			}
-			*/
-
 			++it;
 		}
 	}
@@ -442,22 +432,10 @@ void Spawn::cleanup()
 
 bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction _dir, uint32_t _interval)
 {
-	MonsterType* mType = g_monsters.getMonsterType(_name);
+	CreatureType* mType = g_creature_types.getMonsterType(_name);
 	if(!mType){
 		std::cout << "[Spawn::addMonster] Can not find " << _name << std::endl;
 		return false;
-	}
-
-	static uint8_t qtdWarnings = 0; //how many msgs of monsters at invalid places until now
-	if(qtdWarnings < 10){ //we stop spamming the screen with errors after the 10th message
-		Tile* tile = g_game.getTile(_pos);
-		if(!tile || tile->isMoveableBlocking()){
-			std::cout << "Warning: [Spawn::addMonster] Position " << _pos << " is not valid. Could not place " << _name << "." << std::endl;
-			qtdWarnings++;
-			if (qtdWarnings == 10){
-				std::cout << "Too many monsters at invalid positions. We will skip informing you of further errors." << std::endl;
-			}
-		}
 	}
 
 	if(_interval < interval){
@@ -477,11 +455,35 @@ bool Spawn::addMonster(const std::string& _name, const Position& _pos, Direction
 	return true;
 }
 
-void Spawn::removeMonster(Monster* monster)
+bool Spawn::addNPC(const std::string& name, const Position& pos, Direction dir)
+{
+	CreatureType ct;
+	OutfitType ot;
+	ot.lookType = 130;
+	ct.outfit(ot);
+
+	Actor* actor = Actor::create(ct);
+	actor->getType().name(name);
+
+	if(!g_game.placeCreature(actor, pos, false, true)){
+		delete actor;
+		return false;
+	}
+
+	if(g_game.onSpawn(actor)){
+		// If event was handled, don't spawn
+		g_game.removeCreature(actor);
+		return false;
+	}
+
+	return true;
+}
+
+void Spawn::removeMonster(Actor* monster)
 {
 	for(SpawnedMap::iterator it = spawnedMap.begin(); it != spawnedMap.end(); ++it){
 		if(it->second == monster){
-			monster->releaseThing2();
+			monster->unRef();
 			spawnedMap.erase(it);
 			break;
 		}

@@ -18,15 +18,12 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_IOACCOUNT_H__
 #define __OTSERV_IOACCOUNT_H__
 
-#include "definitions.h"
+#include "classes.h"
 #include "account.h"
-#include <string>
 
-/** Baseclass for all Player-Loaders */
 class IOAccount {
 public:
 	IOAccount() {}
@@ -37,11 +34,11 @@ public:
 		return &instance;
 	}
 
-	Account loadAccount(const std::string& name, bool preLoad = false);
-	bool saveAccount(Account account);
-
-	bool getPassword(const std::string& accountname, const std::string& name, std::string& password);
-	bool getAccountName(uint32_t accountId, std::string &accountName);
+	Account loadAccount(const std::string& accountName, bool preLoad = false);
+	bool saveAccount(const Account& account);
+	bool getPassword(const std::string& accountName, const std::string& playerName, std::string& password);
+	
+	static uint16_t getPremiumDaysLeft(uint32_t time);
 };
 
 #endif

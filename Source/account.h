@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Account class
+// Classes for Account & Account Character
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,37 +18,32 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_ACCOUNT_H__
 #define __OTSERV_ACCOUNT_H__
 
-#include "definitions.h"
-#include <list>
-#include <string>
-#include <ctime>
-#include <cmath>
 
-class Account
+struct AccountCharacter
 {
-public:
-	Account() : number(0), warnings(0), premEnd(0){}
-	~Account(){}
+	AccountCharacter() : ip(0), port(7172) {}
 
-	static uint16_t getPremiumDaysLeft(int32_t _premEnd)
-	{
-		if(_premEnd < time(NULL)){
-			return 0;
-		}
-		return (uint16_t)std::ceil(((double)(_premEnd - time(NULL))) / 86400.);
-	}
-
-	uint32_t number;
-	uint32_t warnings;
 	std::string name;
-	std::string	password;
-
-	time_t premEnd; // < current time is none, (time_t)(-1) is infinite.
-	std::list<std::string> charList;
+	std::string world;
+	uint32_t ip;
+	uint16_t port;
 };
 
-#endif  // #ifndef __ACCOUNT_H__
+struct Account
+{
+	Account() : number(0), premiumEnd(0), warnings(0) {}
+	~Account() {};
+
+	std::string name;
+	uint32_t number;
+	std::string password;
+	time_t premiumEnd;
+	uint32_t warnings;
+	std::list<AccountCharacter> charList;
+};
+
+#endif
+

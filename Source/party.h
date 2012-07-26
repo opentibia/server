@@ -21,17 +21,8 @@
 #ifndef __OTSERV_PARTY_H__
 #define __OTSERV_PARTY_H__
 
-#include "definitions.h"
+#include "classes.h"
 #include "const.h"
-#include <list>
-#include <vector>
-#include <map>
-#include <string>
-
-class Player;
-class Creature;
-class Container;
-class Party;
 
 typedef std::vector<Player*> PlayerVector;
 
@@ -57,7 +48,7 @@ public:
 	bool isPlayerInvited(const Player* player) const;
 	void updateAllPartyIcons();
 	void updatePartyIcons(Player* player);
-	void broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations = false);
+	void broadcastPartyMessage(MessageClass msgClass, const std::string& msg, bool sendToInvitations = false);
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 	bool canOpenCorpse(uint32_t ownerId);
 
@@ -72,7 +63,7 @@ public:
 	void addPlayerDamageMonster(Player* player, uint32_t points);
 	void clearPlayerPoints(Player* player);
 
-	const PlayerVector& getMemberList() const {return memberList;}
+	const PlayerVector& getMemberList() {return memberList;}
 
 protected:
 	bool sharedExpActive;
@@ -98,3 +89,4 @@ protected:
 };
 
 #endif
+

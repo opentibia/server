@@ -18,18 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _CONFIG_MANAGER_H
-#define _CONFIG_MANAGER_H
-
-#include "definitions.h"
-#include <string>
-
-extern "C"
-{
-#include <lua.h>
-#include <lauxlib.h>
-}
-
+#ifndef __OTSERV_CONFIGMANAGER_H__
+#define __OTSERV_CONFIGMANAGER_H__
 
 class ConfigManager {
 public:
@@ -41,18 +31,15 @@ public:
 		CONFIG_FILE,
 		DATA_DIRECTORY,
 		MAP_FILE,
-		MAP_STORE_FILE,
-		HOUSE_STORE_FILE,
 		HOUSE_RENT_PERIOD,
-		MAP_KIND,
 		LOGIN_MSG,
 		SERVER_NAME,
-		WORLD_NAME,
 		OWNER_NAME,
 		OWNER_EMAIL,
 		URL,
 		LOCATION,
 		IP,
+		USE_LOCAL_IP,
 		MOTD,
 		PASSWORD_TYPE_STR,
 		PASSWORD_SALT,
@@ -63,13 +50,12 @@ public:
 		SQL_DB,
 		SQL_TYPE,
 		MAP_STORAGE_TYPE,
-		DEATH_MSG,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 
 	enum integer_config_t {
 		LOGIN_TRIES = 0,
-		GAME_PORT,
+		WORLD_ID,
 		ADMIN_PORT,
 		LOGIN_PORT,
 		STATUS_PORT,
@@ -118,13 +104,17 @@ public:
 		REMOVE_AMMUNITION,
 		REMOVE_RUNE_CHARGES,
 		REMOVE_WEAPON_CHARGES,
-		USE_BALANCE_HOUSE_PAYING,
+		USE_ACCBALANCE,
+		MAXIMUM_SCRIPT_RECURSION_DEPTH,
+		DETAIL_SCRIPT_ERRORS,
 		LOGIN_ATTACK_DELAY,
+		SHOW_CRASH_WINDOW,
 		STAMINA_EXTRA_EXPERIENCE_DURATION,
 		STAMINA_EXTRA_EXPERIENCE_ONLYPREM,
 		STAIRHOP_EXHAUSTED,
 		IDLE_TIME,
 		IDLE_TIME_WARNING,
+		ATTACK_SPEED,
 		HOUSE_ONLY_PREMIUM,
 		HOUSE_LEVEL,
 		HOUSE_TILE_PRICE,
@@ -139,45 +129,11 @@ public:
 		ALLOW_GAMEMASTER_MULTICLIENT,
 		DISTANCE_WEAPON_INTERRUPT_SWING,
 		DEATH_ASSIST_COUNT,
-		LAST_HIT_PZBLOCK_ONLY,
 		DEFENSIVE_PZ_LOCK,
 		NPC_MAX_NONESTACKABLE_SELL_AMOUNT,
 		RATES_FOR_PLAYER_KILLING,
 		RATE_EXPERIENCE_PVP,
 		ADDONS_ONLY_FOR_PREMIUM,
-		FIST_STRENGTH,
-		GUILD_WAR_FEE,
-		SHOW_NEW_SKILL_LEVEL,
-		SHOW_HEALING,
-		ORANGE_SPELL_TEXT,
-		SHOW_DEATH_WINDOW,
-		CAN_ROPE_CREATURES,
-		CAN_ATTACK_INVISIBLE,
-		CAN_PASS_THROUGH,
-		MIN_PVP_LEVEL,
-		MW_DISAPPEAR_ON_WALK,
-		#ifdef __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
-		MIN_PVP_LEVEL_APPLIES_TO_SUMMONS,
-		#endif
-		HEIGHT_MINIMUM_FOR_IDLE,
-		EXPERIENCE_STAGES,
-		PUSH_INTERVAL,
-		WANDS_INTERRUPT_SWING,
-		MOVEITEM_TIME,
-		MAX_STACK_SIZE,
-		PVP_DAMAGE,
-		PVP_DAMAGE_AT_BLACK_SKULLS,
-		PLAYER_QUERYDESTINATION_DEEPNESS,
-		TILE_LIMIT,
-		PROTECTION_TILE_LIMIT,
-		HOUSE_TILE_LIMIT,
-		LUA_EXCEPTED_TYPE_ERRORS_ENABLED,
-		MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS,
-		MAX_DEEPNESS_OF_CHAIN_OF_CONTAINERS,
-		BIND_ONLY_GLOBAL_ADDRESS,
-		MAX_CONTAINERS_INSIDE_PLAYER_INVENTORY,
-		GUILD_WARS_END_ONLY_ON_STARTUP,
-		USE_RUNE_LEVEL_REQUIREMENTS,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
@@ -194,9 +150,10 @@ public:
 	const std::string& getString(uint32_t _what) const;
 	double getFloat(uint32_t _what) const;
 	int64_t getNumber(uint32_t _what) const;
-	bool getBoolean(uint32_t _what) const { return getNumber(_what) != 0; }
 	bool setNumber(uint32_t _what, int64_t _value);
 	bool setString(uint32_t _what, const std::string& _value);
+
+	std::vector<std::string> getIPServerList();
 
 private:
 	static void moveValue(lua_State* fromL, lua_State* toL);

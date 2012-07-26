@@ -22,21 +22,24 @@
 #include "thing.h"
 #include "cylinder.h"
 #include "tile.h"
-#include "creature.h"
-#include "item.h"
-#include "player.h"
 
-Thing::Thing()
+// Avoid unnecessary includes!
+extern void g_gameUnscriptThing(Thing* thing);
+
+Thing::Thing() :
+	parent(NULL),
+	m_refCount(0)
 {
-	parent = NULL;
-	useCount = 0;
+	//
 }
-
 
 Thing::~Thing()
 {
 	//
 	//std::cout << "thing destructor " << this << std::endl;
+
+	// Kind of ugly to put it here, but what choice is there?
+	g_gameUnscriptThing(this);
 }
 
 Cylinder* Thing::getTopParent()
@@ -81,13 +84,13 @@ const Cylinder* Thing::getTopParent() const
 	return aux;
 }
 
-Tile* Thing::getTile()
+Tile* Thing::getParentTile()
 {
 	Cylinder* cylinder = getTopParent();
 
 	#ifdef __DEBUG__MOVESYS__
 	if(!cylinder){
-		std::cout << "Failure: [Thing::getTile()],  NULL tile" << std::endl;
+		std::cout << "Failure: [Thing::getParentTile()],  NULL tile" << std::endl;
 		DEBUG_REPORT
 		return &(Tile::null_tile);
 	}
@@ -100,13 +103,13 @@ Tile* Thing::getTile()
 	return dynamic_cast<Tile*>(cylinder);
 }
 
-const Tile* Thing::getTile() const
+const Tile* Thing::getParentTile() const
 {
 	const Cylinder* cylinder = getTopParent();
 
 	#ifdef __DEBUG__MOVESYS__
 	if(!cylinder){
-		std::cout << "Failure: [Thing::getTile() const],  NULL tile" << std::endl;
+		std::cout << "Failure: [Thing::getParentTile() const],  NULL tile" << std::endl;
 		DEBUG_REPORT
 		return &(Tile::null_tile);
 	}
@@ -121,16 +124,16 @@ const Tile* Thing::getTile() const
 
 Position Thing::getPosition() const
 {
-	const Tile* tile = getTile();
+	const Tile* tile = getParentTile();
 	if(tile){
-		return tile->getTilePosition();
+		return tile->getPosition();
 	}
 	else{
 		#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Thing::getPosition],  NULL tile" << std::endl;
 		DEBUG_REPORT
 		#endif
-		return Tile::null_tile.getTilePosition();
+		return Tile::null_tile.getPosition();
 	}
 }
 

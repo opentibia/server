@@ -21,23 +21,17 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
-#include "definitions.h"
-#include <cstdio>
-#include <cstring>
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
+#include "classes.h"
 
-class NetworkMessage;
-class OutputMessage;
-class Connection;
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;
-class RSA;
 
-#define CLIENT_VERSION_MIN 861
-#define CLIENT_VERSION_MAX 861
+#define NETWORKMESSAGE_MAXSIZE 15340
 
-#define STRING_CLIENT_VERSION "This server requires client version " OTSERV_CLIENT_VERSION "."
+const int32_t Map_maxViewportX = 11;		//min value: maxClientViewportX + 1
+const int32_t Map_maxViewportY = 11;		//min value: maxClientViewportY + 1
+const int32_t Map_maxClientViewportX = 8;
+const int32_t Map_maxClientViewportY = 6;
 
 class Protocol : boost::noncopyable
 {

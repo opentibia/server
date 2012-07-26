@@ -18,12 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __WAITLIST_H__
-#define __WAITLIST_H__
+#ifndef __OTSERV_WAITLIST_H__
+#define __OTSERV_WAITLIST_H__
 
-#include "definitions.h"
-#include "game.h"
-#include "networkmessage.h"
+#include "classes.h"
 
 struct Wait{
 	uint32_t acc;
@@ -39,8 +37,6 @@ typedef WaitList::iterator WaitListIterator;
 class WaitingList
 {
 public:
-	~WaitingList();
-
 	static WaitingList* getInstance()
 	{
 		static WaitingList waitingList;
@@ -52,7 +48,12 @@ public:
 	static int32_t getTime(int32_t slot);
 
 protected:
-	WaitingList();
+	WaitingList(){};
+	~WaitingList()
+	{
+		waitList.clear();
+	}
+
 	WaitList priorityWaitList;
 	WaitList waitList;
 

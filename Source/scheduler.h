@@ -21,15 +21,12 @@
 #ifndef __OTSERV_SCHEDULER_H__
 #define __OTSERV_SCHEDULER_H__
 
-#include "definitions.h"
 #include "tasks.h"
 #include "otsystem.h"
-#include <boost/bind.hpp>
-#include <vector>
 #include <queue>
 #include <set>
 
-#define SCHEDULER_MINTICKS 50
+#define SCHEDULER_MINTICKS 20
 
 class SchedulerTask : public Task
 {
@@ -87,7 +84,6 @@ public:
 	void start();
 	void stop();
 	void shutdown();
-	void join();
 
 	enum SchedulerState{
 		STATE_RUNNING,
@@ -98,7 +94,6 @@ public:
 protected:
 	static void schedulerThread(void* p);
 
-	boost::thread m_thread;
 	boost::mutex m_eventLock;
 	boost::condition_variable m_eventSignal;
 
@@ -112,3 +107,4 @@ protected:
 extern Scheduler g_scheduler;
 
 #endif
+

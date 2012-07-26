@@ -20,18 +20,19 @@
 #include "otpch.h"
 
 #include "admin.h"
+#include "tasks.h"
 #include "game.h"
+#include "player.h"
 #include "connection.h"
 #include "ioplayer.h"
 #include "outputmessage.h"
-#include "networkmessage.h"
-#include "configmanager.h"
 #include "house.h"
 #include "ban.h"
 #include "tools.h"
+#include "town.h"
 #include "rsa.h"
-#include "mailbox.h"
 #include "logger.h"
+#include "configmanager.h"
 
 static void addLogLine(ProtocolAdmin* conn, eLogType type, int level, std::string message);
 
@@ -51,7 +52,7 @@ Protocol(connection)
 	m_state = NO_CONNECTED;
 	m_loginTries = 0;
 	m_lastCommand = 0;
-	m_startTime = std::time(NULL);
+	m_startTime = time(NULL);
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	protocolAdminCount++;
@@ -101,7 +102,7 @@ void ProtocolAdmin::onRecvFirstMessage(NetworkMessage& msg)
 		OutputMessagePool::getInstance()->send(output);
 	}
 
-	m_lastCommand = std::time(NULL);
+	m_lastCommand = time(NULL);
 	m_state = ENCRYPTION_NO_SET;
 }
 
@@ -194,7 +195,7 @@ void ProtocolAdmin::parsePacket(NetworkMessage& msg)
 			return;
 		}
 
-		m_lastCommand = std::time(NULL);
+		m_lastCommand = time(NULL);
 
 		switch(recvbyte){
 		case AP_MSG_LOGIN:
@@ -472,7 +473,7 @@ void ProtocolAdmin::adminCommandPayHouses()
 	}
 }
 
-Item* ProtocolAdmin::createMail(const std::string& xmlData, std::string& name, uint32_t& depotId)
+Item* ProtocolAdmin::createMail(const std::string xmlData, std::string& name, uint32_t& depotId)
 {
 	xmlDocPtr doc = xmlParseMemory(xmlData.c_str(), strlen(xmlData.c_str()));
 	if(!doc){
@@ -495,9 +496,10 @@ Item* ProtocolAdmin::createMail(const std::string& xmlData, std::string& name, u
 	}
 
 	if(readXMLString(root, "town", strValue)){
-		if(!Mailbox::getDepotId(strValue, depotId)){
+		Town* town = Towns::getInstance().getTown(strValue);
+		if(!town)
 			return false;
-		}
+		depotId = town->getTownID();
 	}
 	else{
 		//use the players default town
@@ -544,7 +546,7 @@ void ProtocolAdmin::adminCommandSendMail(const std::string& xmlData)
 		Item* mailItem = createMail(xmlData, name, depotId);
 
 		if(mailItem){
-			if(Mailbox::sendItemTo(name, depotId, mailItem)){
+			if(IOPlayer::instance()->sendMail(NULL, name, depotId, mailItem)){
 				output->AddByte(AP_MSG_COMMAND_OK);
 			}
 			else{
@@ -586,7 +588,7 @@ void ProtocolAdmin::adminCommandKickPlayer(const std::string& name)
 
 void ProtocolAdmin::adminCommandSaveServer(bool shallow)
 {
-	g_game.saveServer(false, shallow);
+	g_game.saveServer(shallow ? SERVER_SAVE_SHALLOW : SERVER_SAVE_NORMAL);
 	addLogLine(this, LOGTYPE_EVENT, 1, "save server ok");
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
@@ -599,11 +601,7 @@ void ProtocolAdmin::adminCommandSaveServer(bool shallow)
 
 void ProtocolAdmin::adminCommandRelationalSaveServer()
 {
-	std::string old_type = g_config.getString(ConfigManager::MAP_STORAGE_TYPE);
-	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, "relational");
-	g_game.saveServer(false);
-	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, old_type);
-	addLogLine(this, LOGTYPE_EVENT, 1, "relational save server ok");
+	g_game.saveServer(SERVER_SAVE_RELATIONAL);
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
 	if(output){
@@ -734,12 +732,12 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 	return true;
 }
 
-bool AdminProtocolConfig::isEnabled() const
+bool AdminProtocolConfig::isEnabled()
 {
 	return m_enabled;
 }
 
-bool AdminProtocolConfig::onlyLocalHost() const
+bool AdminProtocolConfig::onlyLocalHost()
 {
 	return m_onlyLocalHost;
 }
@@ -797,12 +795,12 @@ bool AdminProtocolConfig::allowIP(uint32_t ip)
 	}
 }
 
-bool AdminProtocolConfig::requireLogin() const
+bool AdminProtocolConfig::requireLogin()
 {
 	return m_requireLogin;
 }
 
-bool AdminProtocolConfig::requireEncryption() const
+bool AdminProtocolConfig::requireEncryption()
 {
 	return m_requireEncryption;
 }

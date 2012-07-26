@@ -76,13 +76,8 @@
 //		message(string)
 //
 
-#include "definitions.h"
-#include "player.h"
-#include "logger.h"
-#include <string>
-
-class NetworkMessage;
-class RSA;
+#include "classes.h"
+#include "protocol.h"
 
 enum{
 	//
@@ -143,14 +138,14 @@ public:
 
 	bool loadXMLConfig(const std::string& directory);
 
-	bool isEnabled() const;
+	bool isEnabled();
 
-	bool onlyLocalHost() const;
+	bool onlyLocalHost();
 	bool addConnection();
 	void removeConnection();
 
-	bool requireLogin() const;
-	bool requireEncryption() const;
+	bool requireLogin();
+	bool requireEncryption();
 
 	uint16_t getProtocolPolicy();
 	uint32_t getProtocolOptions();
@@ -209,7 +204,7 @@ protected:
 	void adminCommandSendMail(const std::string& xmlData);
 	void adminCommandKickPlayer(const std::string& name);
 
-	Item* createMail(const std::string& xmlData, std::string& name, uint32_t& depotId);
+	Item* createMail(const std::string xmlData, std::string& name, uint32_t& depotId);
 
 	enum ConnectionState_t{
 		NO_CONNECTED,

@@ -20,17 +20,12 @@
 #include "otpch.h"
 
 #include "status.h"
-#include "configmanager.h"
-#include "game.h"
-#include "connection.h"
-#include "networkmessage.h"
 #include "outputmessage.h"
-#include "tools.h"
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <sstream>
+#include "game.h"
+#include "player.h"
+#include "configmanager.h"
 
-#ifndef __WINDOWS__
+#ifndef WIN32
 	#define SOCKET_ERROR -1
 	#define INVALID_SOCKET -1
 #endif
@@ -46,8 +41,7 @@ enum RequestedInfo_t{
 	REQUEST_MAP_INFO           = 0x10,
 	REQUEST_EXT_PLAYERS_INFO   = 0x20,
 	REQUEST_PLAYER_STATUS_INFO = 0x40,
-	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80,
-	//REQUEST_RATES_SERVER_INFO  = 0xFF,
+	REQUEST_SERVER_SOFTWARE_INFORMATION = 0x80
 };
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
@@ -115,6 +109,7 @@ void ProtocolStatus::deleteProtocolTask()
 Status::Status()
 {
 	m_playersonline = 0;
+	m_playersmax = 0;
 	m_playerspeak = 0;
 	m_start = OTSYS_TIME();
 }
@@ -131,81 +126,77 @@ void Status::removePlayer()
 	m_playersonline--;
 }
 
-template <typename T>
-void addXMLProperty(xmlNodePtr p, const std::string& tag, T val)
-{
-	std::ostringstream os;
-	os << val;
-	xmlSetProp(p, (const xmlChar*)tag.c_str(), (const xmlChar*)os.str().c_str());
-}
-
-template <>
-void addXMLProperty(xmlNodePtr p, const std::string& tag, const std::string& val)
-{
-	xmlSetProp(p, (const xmlChar*)tag.c_str(), (const xmlChar*)val.c_str());
-}
-
 std::string Status::getStatusString() const
 {
 	std::string xml;
+
+	std::stringstream ss;
 
 	xmlDocPtr doc;
 	xmlNodePtr p, root;
 
 	doc = xmlNewDoc((const xmlChar*)"1.0");
 	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"tsqp", NULL);
-	root = doc->children;
+	root=doc->children;
 
-	addXMLProperty(root, "version", "1.0");
+	xmlSetProp(root, (const xmlChar*) "version", (const xmlChar*)"1.0");
 
-	// generic info
-	p = xmlNewNode(NULL, (const xmlChar*)"serverinfo");
-	addXMLProperty(p, "uptime", getUptime());
-	addXMLProperty(p, "ip", g_config.getString(ConfigManager::IP));
-	addXMLProperty(p, "servername", g_config.getString(ConfigManager::SERVER_NAME));
-	addXMLProperty(p, "port", g_config.getNumber(ConfigManager::LOGIN_PORT));
-	addXMLProperty(p, "location", g_config.getString(ConfigManager::LOCATION));
-	addXMLProperty(p, "url", g_config.getString(ConfigManager::URL));
-	addXMLProperty(p, "server", OTSERV_NAME);
-	addXMLProperty(p, "version", OTSERV_VERSION);
-	addXMLProperty(p, "client", OTSERV_CLIENT_VERSION);
+
+	p = xmlNewNode(NULL,(const xmlChar*)"serverinfo");
+	ss << getUpTime();
+	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getString(ConfigManager::IP).c_str());
+	xmlSetProp(p, (const xmlChar*) "servername", (const xmlChar*)g_config.getString(ConfigManager::SERVER_NAME).c_str());
+
+	ss << g_config.getNumber(ConfigManager::LOGIN_PORT);
+	xmlSetProp(p, (const xmlChar*) "port", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+
+	xmlSetProp(p, (const xmlChar*) "location", (const xmlChar*)g_config.getString(ConfigManager::LOCATION).c_str());
+	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getString(ConfigManager::URL).c_str());
+	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)OTSERV_NAME);
+	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)OTSERV_VERSION);
+	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)CLIENT_VERSION_STRING);
 	xmlAddChild(root, p);
 
-	// owner info
-	p = xmlNewNode(NULL, (const xmlChar*)"owner");
-	addXMLProperty(p, "name", g_config.getString(ConfigManager::OWNER_NAME));
-	addXMLProperty(p, "email", g_config.getString(ConfigManager::OWNER_EMAIL));
+	p = xmlNewNode(NULL,(const xmlChar*)"owner");
+	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)g_config.getString(ConfigManager::OWNER_NAME).c_str());
+	xmlSetProp(p, (const xmlChar*) "email", (const xmlChar*)g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
 	xmlAddChild(root, p);
 
-	// players
-	p = xmlNewNode(NULL, (const xmlChar*)"players");
-	addXMLProperty(p, "online", m_playersonline);
-	addXMLProperty(p, "max", g_config.getNumber(ConfigManager::MAX_PLAYERS));
-	addXMLProperty(p, "peak", m_playerspeak);
+	p = xmlNewNode(NULL,(const xmlChar*)"players");
+	ss << m_playersonline;
+	xmlSetProp(p, (const xmlChar*) "online", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+	ss << m_playersmax;
+	xmlSetProp(p, (const xmlChar*) "max", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+	ss << m_playerspeak;
+	xmlSetProp(p, (const xmlChar*) "peak", (const xmlChar*)ss.str().c_str());
+	ss.str("");
 	xmlAddChild(root, p);
 
-	// monsters
-	p = xmlNewNode(NULL, (const xmlChar*)"monsters");
-	addXMLProperty(p, "total", g_game.getMonstersOnline());
+	/*
+	p = xmlNewNode(NULL,(const xmlChar*)"monsters");
+	ss << g_game.getMonstersOnline();
+	xmlSetProp(p, (const xmlChar*) "total", (const xmlChar*)ss.str().c_str());
+	ss.str("");
 	xmlAddChild(root, p);
+	*/
 
-	// map
+	p = xmlNewNode(NULL,(const xmlChar*)"map");
+	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)m_mapname.c_str());
+	xmlSetProp(p, (const xmlChar*) "author", (const xmlChar*)m_mapauthor.c_str());
+
 	uint32_t mapWidth, mapHeight;
 	g_game.getMapDimensions(mapWidth, mapHeight);
-
-	p = xmlNewNode(NULL, (const xmlChar*)"map");
-	addXMLProperty(p, "name", m_mapname.c_str());
-	addXMLProperty(p, "author", m_mapauthor.c_str());
-	addXMLProperty(p, "width", mapWidth);
-	addXMLProperty(p, "height", mapHeight);
-	xmlAddChild(root, p);
-
-	p = xmlNewNode(NULL, (const xmlChar*)"rates");
-	addXMLProperty(p, "experience", g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
-	addXMLProperty(p, "magic", g_config.getNumber(ConfigManager::RATE_MAGIC));
-	addXMLProperty(p, "skill", g_config.getNumber(ConfigManager::RATE_SKILL));
-	addXMLProperty(p, "loot", g_config.getNumber(ConfigManager::RATE_LOOT));
-	addXMLProperty(p, "spawn", g_config.getNumber(ConfigManager::RATE_SPAWN));
+	ss.str("");
+	ss << mapWidth;
+	xmlSetProp(p, (const xmlChar*) "width", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+	ss << mapHeight;
+	xmlSetProp(p, (const xmlChar*) "height", (const xmlChar*)ss.str().c_str());
 	xmlAddChild(root, p);
 
 	xmlNewTextChild(root, NULL, (const xmlChar*)"motd", (const xmlChar*)g_config.getString(ConfigManager::MOTD).c_str());
@@ -221,7 +212,7 @@ std::string Status::getStatusString() const
 		xml = "";
 	}
 
-	xmlFree(s);
+	xmlFreeOTSERV(s);
 	xmlFreeDoc(doc);
 
 	return xml;
@@ -233,7 +224,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 	// sent back, so we'll save some bandwidth and
 	// make many
 	std::stringstream ss;
-	uint64_t running = getUptime();
+	uint64_t running = getUpTime();
 	// since we haven't all the things on the right place like map's
 	// creator/info and other things, i'll put the info chunked into
 	// operators, so the httpd server will only receive the existing
@@ -263,21 +254,10 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddU32((uint32_t)(running));       // since servers can be online for months ;)
 	}
 
-	/*
-	// COMPLETELY breaks backwards-compatibility
-	if(requestedInfo & REQUEST_RATES_SERVER_INFO){
-		output->AddByte(0x13); // server info - rates
-		output->AddU16(g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
-		output->AddU16(g_config.getNumber(ConfigManager::RATE_MAGIC));
-		output->AddU16(g_config.getNumber(ConfigManager::RATE_SKILL));
-		output->AddU16(g_config.getNumber(ConfigManager::RATE_LOOT));
-		output->AddU16(g_config.getNumber(ConfigManager::RATE_SPAWN));
-	}
-	*/
 	if(requestedInfo & REQUEST_PLAYERS_INFO){
 		output->AddByte(0x20); // players info
 		output->AddU32(m_playersonline);
-		output->AddU32(g_config.getNumber(ConfigManager::MAX_PLAYERS));
+		output->AddU32(m_playersmax);
 		output->AddU32(m_playerspeak);
 	}
 
@@ -316,7 +296,7 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 		output->AddByte(0x23); // server software info
 		output->AddString(OTSERV_NAME);
 		output->AddString(OTSERV_VERSION);
-		output->AddString(OTSERV_CLIENT_VERSION);
+		output->AddString(CLIENT_VERSION_STRING);
 	}
 
 	return;
@@ -324,10 +304,10 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 
 bool Status::hasSlot() const
 {
-	return m_playersonline < g_config.getNumber(ConfigManager::MAX_PLAYERS);
+	return m_playersonline < m_playersmax;
 }
 
-uint64_t Status::getUptime() const
+uint64_t Status::getUpTime() const
 {
 	return (OTSYS_TIME() - m_start)/1000;
 }

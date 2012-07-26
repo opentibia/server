@@ -18,17 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_IOMAPSERIALIZE_H__
 #define __OTSERV_IOMAPSERIALIZE_H__
 
-class Map;
-
-#include "definitions.h"
-#include "iomapserialize.h"
-#include "database.h"
-#include "map.h"
-#include <string>
+#include "classes.h"
+#include "database_driver.h"
 
 class IOMapSerialize{
 public:
@@ -80,8 +74,8 @@ protected:
 	bool loadMapRelational(Map* map);
 	bool saveMapRelational(Map* map);
 	
-	bool saveItems(Database* db, uint32_t tileId, uint32_t houseId, const Tile* tile);
-	bool loadItems(Database* db, DBResult* result, Cylinder* parent, bool depotTransfer = false);
+	bool saveItems(DatabaseDriver* db, uint32_t houseId, const Tile* tile);
+	bool loadItems(DatabaseDriver* db, DBResult* result, Cylinder* parent, bool depotTransfer = false);
 
 	// Binary storage uses a giant BLOB field for storing everything
 	bool loadMapBinary(Map* map);

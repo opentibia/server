@@ -7,8 +7,6 @@
 // Definitions should be global.
 #include "definitions.h"
 
-#ifdef __USE_OTPCH__
-
 #ifdef __WINDOWS__
 #include <winerror.h>
 #endif
@@ -17,20 +15,29 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/threads.h>
+#include <libxml/xmlschemas.h>
 //boost
 #include <boost/config.hpp>
-#include <boost/shared_ptr.hpp>
+#include "boost_common.h"
+#include <boost/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/regex.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <boost/foreach.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/enable_shared_from_this.hpp>
+
 //std
+#include <algorithm>
 #include <list>
 #include <vector>
 #include <map>
 #include <string>
+#include <iostream>
+#include <fstream>
 //lua
 extern "C"
 {
@@ -39,7 +46,19 @@ extern "C"
 	#include <lualib.h>
 }
 //otserv
+#include "position.h"
 #include "thing.h"
-
-#endif
+#include "ban.h"
+#include "party.h"
+#include "cylinder.h"
+#include "fileloader.h"
+#include "exception.h"
+#include "logger.h"
+#include "md5.h"
+#include "sha1.h"
+#include "rsa.h"
+#include "scheduler.h"
+#include "tasks.h"
+#include "server.h"
+#include "status.h"
 

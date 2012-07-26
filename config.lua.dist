@@ -3,10 +3,10 @@
 ----------------------------
 
 -- data directory location
-datadir = "Data/"
+data_directory = "Data/"
 
 -- map location
-map = "Data/world/map.otbm"
+map_file = "Data/world/map.otbm"
 
 -- Type of map storage,
 -- 'relational' - Slower, but possible to run database queries to change all items to another id for example.
@@ -15,69 +15,62 @@ map = "Data/world/map.otbm"
 -- type /reload config and the save the server with /closeserver serversave
 map_store_type = "binary"
 
--- mapkind
--- options: OTBM for binary map, XML for OTX map
-mapkind = "OTBM"
+-- Bind to all available local IP addresses
+use_local_ip = false
 
--- server name
-servername = "OTServ"
+-- server ip (the ip that this server on)
+-- Can be "auto" to fetch the global ip automatically
+ip = "auto"
 
--- server location
-location = "Germany"
-
--- server ip (the ip that server listens on)
-ip = "127.0.0.1"
+-- ID of the world in the database, world name / port is fetched from the database
+world_id = 1
 
 -- login server port
 -- This should be the port used for connecting with IP changers etc.
-login_port = "7171"
-
--- game server port
--- game server must be on it's own port (due to limits of the protocol)
-game_port = "7172"
+login_port = 7171
 
 -- status port
 -- Used by status protocol connections, should be same as login
 -- to work correctly with server lists etc.
-status_port = "7171"
+status_port = 7171
 
 -- admin port
 -- Port used by the OTAdmin protocol
-admin_port = "7171"
+admin_port = 7171
 
 -- server url
-url = "http://otfans.net"
+server_url = "http://otfans.net"
 
 -- server owner name
-ownername = "Tliff"
+server_owner_name = "Tliff"
 
 -- server owner email
-owneremail = "otserv@tibia.de"
-
--- world name
-worldname = "OpenTibia"
+server_owner_email = "otserv@tibia.de"
 
 -- world type
--- options: openpvp/pvp, optionalpvp/no-pvp, hardcorepvp/pvp-enforced
-worldtype = "openpvp"
+-- options: pvp, no-pvp, pvp-enforced
+game_world_type = "pvp"
 
 -- does player rate (from lua functions) count on experience gained from killings players on pvp-e worlds?
 rates_for_player_killing = false
 
 -- exhausted time in ms (1000 = 1 second) for "yell" speak type
-exhausted = 30000
+yell_exhausted = 1000
 
 -- exhausted time in ms (1000 = 1 second) for aggressive spells/weapons
-fightexhausted = 2000
+fight_exhausted = 2000
 
 -- exhausted time in ms (1000 = 1 second) for none-aggressive spells
-healexhausted = 1000
+heal_exhausted = 1000
 
 -- exhausted time in ms (1000 = 1 second) for floor changing
 stairhop_exhausted = 2000
 
+-- attack speed using melee (1000 = 1 second)
+attack_speed = 2000
+
 -- how many ms to add if the player is already exhausted and tries to cast a spell/yells (1000 = 1 second)
-exhaustedadd = 5000
+exhausted_add = 200
 
 -- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1 second)
 in_fight_duration = 60000
@@ -88,27 +81,24 @@ field_ownership_duration = 5000
 -- When a player dies, how many of the assisting players (ie. how many of those who made damage) should be stored in database?
 death_assist_count = 19
 
--- Should only the player who did the last hit get the 15-minute pz lock?
-last_hit_pzblock_only = true
-
 -- enable (advanced, item based) hotkeys?
-enablehotkeys = true
+enable_hotkeys = true
 
 -- minimum amount of time between actions ('Use') (1000 = 1 second)
-minactioninterval = 200
+minimum_action_interval = 200
 
 -- minimum amount of time between extended actions ('Use with...') (1000 = 1 second)
-minactionexinterval = 1000
+minimum_extended_action_interval = 1000
 
 -- house rent period
 -- options: daily, weekly, monthly
-houserentperiod = "monthly"
+house_rent_period = "monthly"
 
 -- whether or not to check for premium accounts when using beds
-premonlybeds = true
+bed_only_premium = true
 
 -- Should the server use account balance system or depot system for paying houses?
-use_balance_house_paying = true
+use_account_balance = true
 
 -- How long time the red skull will last in seconds (default 30 days)
 red_skull_duration = 30*24*60*60
@@ -135,10 +125,10 @@ kills_per_week_black_skull = 10
 kills_per_month_black_skull = 20
 
 -- Broadcast violation window banishments
-broadcast_banishments = "no"
+broadcast_banishments = false
 
 -- Violation window config
-max_violation_comment_size = 255
+maximum_violation_comment_size = 255
 notations_to_banishment = 3
 warnings_to_final_banishment = 4
 warnings_to_deletion = 5
@@ -147,77 +137,48 @@ final_banishment_length = 30*86400 --seconds
 ip_banishment_length = 86400 --seconds
 
 -- Extra experience % per player when sharing experience
-party_exp_mul = 5
+party_experience_multiplier = 5
 
 -- Anti-MageBomb system
 -- This system works as in Tibia, time in milliseconds
 login_attack_delay = 10*1000
 
+-- Show error window when server crashes?
+show_crash_window = true
+
 -- AFK Configuration (in milliseconds, but use values for minutes)
 -- Maximum time a player can stay away from keyboard before being kicked
-max_idle_time = 16*60*1000
+maximum_idle_time = 16*60*1000
 -- Player will be warned about being kicked at this time
-max_idle_time_warning = 15*60*1000
+maximum_idle_time_warning = 15*60*1000
 
 -- Should just premium players be able to use addons?
 addons_only_for_premium = true
 
--- Exp Stages configuration is in /data/exp_stages.lua
-experience_stages = false
-
 -- rates (experience, skill, magic level, loot and spawn)
-rate_exp = 1
-rate_exp_pvp = 0
+rate_experience = 1
+rate_experience_pvp = 1
 rate_skill = 1
-rate_mag = 1
-rate_loot = 1
-rate_spawn = 1
-
---Displays the skill advanced to when advancing in skills (melee) [default: "no"]
---Example: "You advanced to sword fighting 17. "
-show_new_skill_level = false
-
---Displays amount of health healed.
---Similar to the way damage is shown, except in green numbers (Example: +17) [default: "no"]
-show_healing = false
-
---Use orange text for spells rather than traditional text [default: "no"]
---NOTE: The orange text will not be displayed on the default channel
-orange_spell_text = false
-
--- Configuration for death messages
--- Should the client show the popup window after a death? [default: "yes"]
-show_death_window = true
--- What message should be sent for the player, after its own death? Use "" to disable.
-death_msg = "You are dead."
-
---should players be able to rope creatures (like at older versions of tibia)?
-can_rope_creatures = true
-
---how many floors away of a player should a monster be to become idle?
---WARNING: setting this as any number bigger than 3 may increase CPU usage and
---setting this to any value smaller than 2 will make nearly impossible to rope monsters from a hole
-height_minimum_for_idle = 3
+rate_magic_level = 1
+rate_monster_loot = 1
+rate_monster_spawn = 1
 
 -- Stamina Configuration
 -- Gain stamina rate - 1 second offline = X milliseconds of stamina
 rate_stamina_gain = 334
 -- Slow gain stamina rate. This is used if you are gaining stamina that gives extra experience
 -- 1 second offline = X milliseconds of stamina
-slow_rate_stamina_gain = 100
+rate_stamina_gain_slow = 84
 -- Loss stamina rate - works as other rates
 rate_stamina_loss = 1
 -- For how many milliseconds (from 42 hours) you get extra experience from monsters
-stamina_extra_experience_duration = 2 * 60 * 60 * 1000
+stamina_extra_experience_duration = 60 * 60 * 1000
 -- How much extra XP you get 0.5 is 50% extra
 stamina_extra_experience_rate = 0.5
 -- If true, only premium players gain extra experience
 stamina_extra_experience_onlyprem = true
 -- For how many milliseconds after killing a monster stamina will keep being removed
 hunting_kill_duration = pzlocked
-
--- Should the level requirements on runes be used [default: true]
-use_rune_level_requirements = true
 
 -- Remove ammunition
 -- If false, ammunition will not be removed when using distance weapons
@@ -237,143 +198,62 @@ remove_weapon_charges = true
 -- Should exhaustion and action time be checked for using a distance weapon?
 distance_weapon_interrupt_swing = true
 
--- Wands configuration exhaustion
--- Should exhaustion and action time be checked for using wands?
-wands_interrupt_swing = true
-
--- maximum amount of items inside of a container (including the items inside of any container inside of it)
--- Use 0 for infinite
-max_amount_items_inside_containers = 2000
-
--- maximum amount of containers inside of a player inventory
--- it fixes some CPU bug so it's not recommended to change this value to very high
-max_containers_inside_player_inventory = 100
-
---maximal length for chains of containers (i.e, a container inside of a container which is inside of a container...)
-max_deepness_of_chain_of_containers = 500
-
---should OTServ bind only global IP address ?
-bind_only_global_address = false
-
--- How many items can be stacked in a single tile (all type of tiles)(client side)? DO NOT CHANGE IT UNLESS THAT YOU KNOW WHAT YOU ARE DOING
-max_stack_size = 1000
-
--- How many items can be stacked in a normal tile ? (0 = max_stack_size)
-tile_limit = 0
-
--- How many items can be stacked in a protection zone tile ? (0 = max_stack_size)
-protection_tile_limit = 0
-
--- How many items can be stacked in a house zone tile ? (0 = max_stack_size)
-house_tile_limit = 0
-
-
--- fist fighting configuration
--- How strong should be the attack using bare hands (fist fighting)?
-fist_strength = 7
-
--- Guild War Fee
--- The addition 'war charge' to start a guild war (default: 1000)
--- To disable set to 0
-guild_war_fee = 1000
-
 -- Allow gamemaster multiclient login to everybody?
 allow_gamemaster_multiclient = false
 
 -- despawn configs
 -- how many floors can a monster go from his spawn before despawning
-despawnrange = 2
+monster_despawn_range = 2
 -- how many square metters can a monster be far from his spawn before despawning
-despawnradius = 50
-
---should players be able to hit invisible creatures using not AOE runes? (default: false)
-can_attack_invisible = false
-
---should players be able to pass through each other if they can't attack each other (non-pvp servers/tiles or levels too low for PvP)?
---this option also controls if they can pass through magic wall/wild growth casted by players with those restrictions
-can_pass_through = true
-
---should magic walls (and wild growth) disappear when a player walks upon it? (non-pvp servers/tiles or casted by chars who are too low)?
-magic_wall_disappear_on_walk = true
-
---players with a level smaller than this number can't be attacked by other players. Set it to to 0 to disable
-min_pvp_level = 0
-
---how much % of the total damage players actually receive when attacked by other players?
-pvp_damage = 50
-
---how much % of the total damage black skulled players actually receive when attacked by other players?
-pvp_damage_at_black_skulls = 100
-
---should pvp restrictions apply to summons too?
--- (experimental code - requires otserv to be compiled with flag __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__)
-min_pvp_level_applies_to_summons = true
-
--- How many milliseconds (1 sec = 1000) we should wait until the player will be pushed by another player.
-push_interval = 2000
-
--- How many milliseconds a player should wait until he can move another item after moving one (0 disables it)
-move_item_interval = 500
+monster_despawn_radius = 50
 
 -- max number of messages a player can say before getting muted (default 4), set to 0 to disable muting
-maxmessagebuffer = 4
+maximum_message_buffer = 4
 
 -- max amount of none stackable items that a NPC will sell to a player at the same time
-npc_max_nonestackable_sell_amount = 100
-
--- if you doesn't wish to see errors like this: "Error: Expected an integer/boolean parameter"
---(it means that you are missing an return somewhere but this is not so important and is just spamming your console on a production server) then set this to false
-lua_excepted_type_errors_enabled = false
-
--- if this is set to false, guild wars end immediatelly when frag_limit is reached (it ends in-game)
--- (on cipsoft tibia the guild wars just end when server (re)starts - set this to true to emulate original tibia)
-guild_wars_end_only_on_startup = true
+npc_maximum_nonestackable_sell_amount = 100
 
 -- motd (the message box that you sometimes get before you choose characters)
-motd = "Welcome to OTServ 0.6.3!"
-motdnum = "1"
+message_of_the_day = "Welcome to OTServ 0.7.0!"
+message_of_the_day_number = "1"
 
 -- login message
-loginmsg = "Welcome to OTServ 0.6.3. For help visit http://otfans.net."
+login_message = "Welcome to OTServ 0.7.0 (revscriptsys). For help visit http://otfans.net."
 
 -- how many logins attempts until ip is temporary disabled
 -- set to 0 to disable
-logintries = 5
+maximum_login_tries = 5
 
 -- how long the retry timeout until a new login can be made (without disabling the ip)
-retrytimeout = 5000
+login_retry_timeout = 5000
 
 -- how long the player need to wait until the ip is allowed again
-logintimeout = 60 * 1000
-
--- how deep queryDestination should look for free slots (default -1, infinite)
-player_querydestination_deepness = -1
+login_unlock_timeout = 60 * 1000
 
 -- allow clones (multiple logins of the same char)
-allowclones = false
+allow_character_clones = false
 
 -- only one player online per account
-checkaccounts = true
+one_player_per_account = true
 
 -- max number of players allowed
-maxplayers = "900"
+maximum_players = "900"
 
 -- save client debug assertion reports
--- to use this option you have to create file called client_assertions.txt and make sure after client crash to change IP to otserv one then click "send".
-saveclientdebug = true
+save_client_debug = true
 
 -- Set the max query interval for retrieving status information
 -- default: 5 minutes / IP
 -- set to 0 to disable
-statustimeout = 30 * 1000
+status_information_timeout = 30 * 1000
 
 -- accounts password type
 -- options: plain, md5, sha1
-passwordtype = "plain"
+password_type = "plain"
 
 -- Password salt
 -- Offers better security against rainbow table attacks etc.
-passwordsalt = ""
+password_salt = ""
 
 -- House configuration (game_class)
 -- House tile price
@@ -386,18 +266,33 @@ house_level = 1
 -- PS: This info is going to be shown just if house has no owner
 show_house_prices = false
 
+-- Server will pick one of these at random to fetch the global IP address
+ip_server_list = {
+	"http://remeresmapeditor.com/echo_ip.php",
+	"http://otfans.net/otserv/ip.php",
+	"http://classictibia.com/echo_ip.php",
+}
+
 -- SQL type
+-- The amount of events that can be called inside eachother
+script_recursion_depth = 16
+
+-- Include extra information when a script encounters an error.
+-- HIGHLY RECOMMENDED if you are editing scripts
+detailed_script_errors = true
+
+-- Database configuration
 -- options: mysql, sqlite, odbc or pgsql
-sql_type = "sqlite"
+database_type = "mysql"
 
 -- SQL connection part
-sql_db   = "db.s3db"
---  "otserv" -- use this for MySQL/PgSQL
---  "Your Source" -- ODBC
+database_schema = "revscriptsys"
+-- database_schema = "otserv" -- use this for MySQL/PgSQL
+-- database_schema = "Your Source" -- ODBC
 
--- Additional connection settings for mysql, pgsql and odbc
-sql_host = "127.0.0.1"
-sql_port = 3306
--- 5432 -- use this port for PgSQL
-sql_user = "root"
-sql_pass = ""
+-- there settings are not used by SQLite
+database_host = "localhost"
+database_port = 3306
+-- database_port = 5432 -- use this for PgSQL
+database_username = "root"
+database_password = ""

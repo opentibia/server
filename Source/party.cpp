@@ -23,9 +23,7 @@
 #include "player.h"
 #include "game.h"
 #include "chat.h"
-#include "tools.h"
 #include "configmanager.h"
-#include <sstream>
 
 extern Game g_game;
 extern Chat g_chat;
@@ -88,7 +86,7 @@ bool Party::invitePlayer(Player* player)
 	}
 
 	std::stringstream ss;
-
+	
 	if(!(inviteList.empty() && memberList.empty())) {
 		ss << player->getName() << " has been invited.";
 	} else {
@@ -318,7 +316,7 @@ void Party::updateAllPartyIcons()
 	getLeader()->sendPlayerPartyIcons(getLeader());
 }
 
-void Party::broadcastPartyMessage(MessageClasses msgClass, const std::string& msg, bool sendToInvitations /*= false*/)
+void Party::broadcastPartyMessage(MessageClass msgClass, const std::string& msg, bool sendToInvitations /*= false*/)
 {
 	PlayerVector::iterator it;
 	if(!memberList.empty()){
@@ -380,12 +378,12 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 void Party::shareExperience(uint64_t experience, bool fromMonster)
 {
 	double member_factor = g_config.getNumber(ConfigManager::PARTY_MEMBER_EXP_BONUS);
-	double xpgained = (experience + (experience * (member_factor / 100.))) / (memberList.size() + 1);
+	double xpgained = experience / (memberList.size() + 1) + experience * (member_factor / 100.);
 
 	if(xpgained < 0)
 		return;
 	uint64_t shareExp = (uint64_t)std::ceil(xpgained);
-
+	
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
 		(*it)->onGainSharedExperience(shareExp, fromMonster);
 	}
@@ -395,12 +393,6 @@ void Party::shareExperience(uint64_t experience, bool fromMonster)
 
 bool Party::canUseSharedExperience(const Player* player) const
 {
-	//Player should not be able to gain bonus on shared experience
-	//if there's no one in his party - this occurs when invitation is not accepted
-	if(!memberList.size()){
-		return false;
-	}
-
 	uint32_t highestLevel = getLeader()->getLevel();
 	for(PlayerVector::const_iterator it = memberList.begin(); it != memberList.end(); ++it){
 		if( (*it)->getLevel() > highestLevel){
@@ -428,7 +420,7 @@ bool Party::canUseSharedExperience(const Player* player) const
 		}
 
 		uint64_t timeDiff = OTSYS_TIME() - it->second.ticks;
-		if(timeDiff > (uint32_t)g_config.getNumber(ConfigManager::IN_FIGHT_DURATION)){
+		if(timeDiff > g_game.getInFightTicks()){
 			//player has not attacked or healed anyone for a period of infight ticks
 			return false;
 		}

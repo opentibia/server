@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Frost Troll" nameDescription="a frost troll" race="blood" experience="23" speed="190" manacost="300">
 	<health now="55" max="55"/>
 	<look type="53" corpse="5998"/>
@@ -18,49 +18,32 @@
 		<flag runonhealth="10"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="30" attack="10"/>
+		<attack name="melee" interval="2000" skill="19" attack="11"/>
 	</attacks>
 	<defenses armor="7" defense="9"/>
 	<elements>
-		<element firePercent="40"/>
-		<element holyPercent="10"/>
-		<element earthPercent="-10"/>
-		<element energyPercent="-15"/>
-		<element deathPercent="-10"/>
+		<element firePercent="7"/>
+		<element holyPercent="5"/>
+		<element earthPercent="-3"/>
+		<element energyPercent="-4"/>
+		<element deathPercent="-5"/>
 	</elements>
-	<voices interval="5000" chance="9">
+	<voices interval="5000" chance="10">
 		<voice sentence="Brrrr"/>
 		<voice sentence="Broar!"/>
 	</voices>
 	<loot>
-    <item id="2245" chance="9900" /><!-- twigs -->
-    <item id="2148" countmax="12" chance="28375" /><!-- gold coin -->
-    <item id="2512" chance="15475" /><!-- wooden shield -->
-    <item id="2389" chance="20025" /><!-- spear -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="2667" chance="16750" /><!-- fish -->
-            <item id="2384" chance="16300" /><!-- rapier -->
-            <item id="2651" chance="9750" /><!-- coat -->
-            <item id="10565" chance="2350" /><!-- frosty ear of a troll -->
-        </inside>
-    </item>
-</loot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="12" chance="100000"/><!-- gold coin -->
+		<item id="2382" chance="33333"/><!-- club -->
+		<item id="2512" chance="10000"/><!-- wooden shield -->
+		<item id="2651" chance="20000"/><!-- coat -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2384" chance="6666"/><!-- rapier -->
+				<item id="2667" countmax="2" chance="20000"/><!-- fish -->
+				<item id="2448" chance="40000"/><!-- studded club -->
+			</inside>
+		</item>
+	</loot>
 </monster>

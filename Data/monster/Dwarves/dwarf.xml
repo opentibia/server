@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Dwarf" nameDescription="a dwarf" race="blood" experience="45" speed="170" manacost="320">
 	<health now="90" max="90"/>
 	<look type="69" corpse="6007"/>
@@ -18,51 +18,30 @@
 		<flag runonhealth="0"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="20" attack="20"/>
+		<attack name="melee" interval="2000" skill="23" attack="14"/>
 	</attacks>
 	<defenses armor="8" defense="10"/>
 	<elements>
-		<element earthPercent="10"/>
-		<element firePercent="5"/>
-		<element deathPercent="-5"/>
+		<element earthPercent="70"/>
+		<element firePercent="-5"/>
+		<element deathPercent="-3"/>
 	</elements>
-	<voices interval="5000" chance="9">
+	<voices interval="5000" chance="10">
 		<voice sentence="Hail Durin!"/>
 	</voices>
 	<loot>
-    <item id="2388" chance="24925" /><!-- hatchet -->
-    <item id="2649" chance="11600" /><!-- leather legs -->
-    <item id="2787" chance="48350" /><!-- white mushroom -->
-    <item id="2148" countmax="8" chance="19650" /><!-- gold coin -->
-    <item id="2484" chance="6825" /><!-- studded armor -->
-    <item id="2386" chance="16900" /><!-- axe -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="2597" chance="8300" /><!-- letter -->
-            <item id="2553" chance="10750" /><!-- pick -->
-            <item id="2530" chance="10750" /><!-- copper shield -->
-            <item id="5880" countmax="3" chance="600" /><!-- iron ore -->
-            <item id="2213" chance="675" /><!-- dwarven ring -->
-        </inside>
-    </item>
-</loot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="15" chance="100000"/><!-- gold coin -->
+		<item id="2388" chance="6666"/><!-- hatchet -->
+		<item id="2386" chance="5000"/><!-- axe -->
+		<item id="2484" chance="20000"/><!-- studded armor -->
+		<item id="2530" chance="6666"/><!-- copper shield -->
+		<item id="2649" chance="10000"/><!-- leather legs -->
+		<item id="5880" chance="2500" countmax="2"/><!-- iron ore -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2787" countmax="2" chance="20000"/><!-- white mushroom -->
+			</inside>
+		</item>
+	</loot>
 </monster>

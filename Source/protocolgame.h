@@ -18,32 +18,16 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_PROTOCOLGAME_H__
 #define __OTSERV_PROTOCOLGAME_H__
 
-#include "definitions.h"
+#include "classes.h"
 #include "protocol.h"
 #include "enums.h"
-#include "creature.h"
-#include <string>
+#include "const.h"
 
-enum connectResult_t{
-	CONNECT_SUCCESS = 1,
-	CONNECT_TOMANYPLAYERS = 2,
-	CONNECT_MASTERPOSERROR = 3,
-	CONNECT_INTERNALERROR = 4
-};
-
-class NetworkMessage;
+typedef std::list<ShopItem> ShopItemList;
 typedef boost::shared_ptr<NetworkMessage> NetworkMessage_ptr;
-class Player;
-class Game;
-class House;
-class Container;
-class Tile;
-class Connection;
-class Quest;
 
 class ProtocolGame : public Protocol
 {
@@ -101,6 +85,7 @@ private:
 
 	void parseRequestOutfit(NetworkMessage& msg);
 	void parseSetOutfit(NetworkMessage& msg);
+	void parseMount(NetworkMessage &msg);
 	void parseSay(NetworkMessage& msg);
 	void parseLookAt(NetworkMessage& msg);
 	void parseFightModes(NetworkMessage& msg);
@@ -120,9 +105,9 @@ private:
 
 	//shop methods
 	void parseLookInShop(NetworkMessage& msg);
-	void parsePlayerPurchase(NetworkMessage& msg);
-	void parsePlayerSale(NetworkMessage& msg);
-	void parseCloseShop(NetworkMessage& msg);
+	void parseShopPurchase(NetworkMessage& msg);
+	void parseShopSale(NetworkMessage& msg);
+	void parseShopClose(NetworkMessage& msg);
 
 	//party methods
 	void parseInviteToParty(NetworkMessage& msg);
@@ -155,13 +140,11 @@ private:
 	void parseOpenPriv(NetworkMessage& msg);
 	void parseCloseChannel(NetworkMessage& msg);
 	void parseCloseNpc(NetworkMessage& msg);
-	void parseProcessRuleViolation(NetworkMessage& msg);
-	void parseCloseRuleViolation(NetworkMessage& msg);
-	void parseCancelRuleViolation(NetworkMessage& msg);
 
 	//etc
 	void parseViolationWindow(NetworkMessage& msg);
 	void parseBugReport(NetworkMessage& msg);
+	void parseViolationReport(NetworkMessage &msg);
 	void parseDebugAssert(NetworkMessage& msg);
 	void parseDebug(NetworkMessage& msg);
 
@@ -171,12 +154,8 @@ private:
 
 	void sendChannelsDialog();
 	void sendChannel(uint16_t channelId, const std::string& channelName);
-	void sendRuleViolationsChannel(uint16_t channelId);
 	void sendOpenPrivateChannel(const std::string& receiver);
-	void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId, uint32_t time = 0);
-	void sendRemoveReport(const std::string& name);
-	void sendLockRuleViolation();
-	void sendRuleViolationCancel(const std::string& name);
+	void sendToChannel(const Creature* creature, SpeakClass type, const std::string& text, uint16_t channelId, uint32_t time = 0);
 	void sendIcons(uint16_t icons);
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
@@ -186,20 +165,20 @@ private:
 	void sendSkills();
 	void sendPing();
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
-	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	void sendCreatureSay(const Creature* creature, SpeakClass type, const std::string& text);
 
 	void sendCancel(const std::string& message);
 	void sendCancelWalk();
 	void sendChangeSpeed(const Creature* creature, uint32_t speed);
 	void sendCancelTarget();
-	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
+	void sendCreatureOutfit(const Creature* creature, const OutfitType& outfit);
 	void sendStats();
-	void sendTextMessage(MessageClasses mclass, const std::string& message);
+	void sendTextMessage(MessageClass mclass, const std::string& message);
 
-	void sendShop(const std::list<ShopInfo>& shop);
-	void sendCloseShop();
-	void sendPlayerCash(uint32_t amount);
-	void sendSaleItemList(const std::list<ShopInfo>& shop);
+	void sendShopWindow(const ShopItemList& list);
+	void sendShopSaleList(const ShopItemList& list);
+	void sendShopClose();
+	void sendMoney(uint32_t amount);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	void sendQuestLog();
@@ -208,7 +187,7 @@ private:
 	void sendTextWindow(uint32_t windowTextId, Item* item, uint16_t maxlen, bool canWrite);
 	void sendTextWindow(uint32_t windowTextId, uint32_t itemId, const std::string& text);
 	void sendHouseWindow(uint32_t windowTextId, House* house, uint32_t listId, const std::string& text);
-	void sendOutfitWindow();
+	void sendOutfitWindow(const std::list<Outfit>& outfitList);
 
 	void sendVIPLogIn(uint32_t guid);
 	void sendVIPLogOut(uint32_t guid);
@@ -223,8 +202,7 @@ private:
 
 	void sendCreatureSkull(const Creature* creature);
 	void sendCreatureShield(const Creature* creature);
-	void sendCreatureEmblem(const Creature* creature);
-	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
+	void sendCreatureSquare(const Creature* creature, SquareColor color);
 
 	//tiles
 	void sendAddTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
@@ -246,9 +224,9 @@ private:
 	void sendCloseContainer(uint32_t cid);
 
 	//inventory
-	void sendAddInventoryItem(slots_t slot, const Item* item);
-	void sendUpdateInventoryItem(slots_t slot, const Item* item);
-	void sendRemoveInventoryItem(slots_t slot);
+	void sendAddInventoryItem(SlotType slot, const Item* item);
+	void sendUpdateInventoryItem(SlotType slot, const Item* item);
+	void sendRemoveInventoryItem(SlotType slot);
 
 	//Help functions
 
@@ -264,15 +242,16 @@ private:
 		int32_t width, int32_t height, NetworkMessage_ptr msg);
 
 	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
-	void AddTextMessage(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message);
+	void AddTextMessage(NetworkMessage_ptr msg, MessageClass mclass, const std::string& message);
 	void AddAnimatedText(NetworkMessage_ptr msg,const Position& pos, unsigned char color, const std::string& text);
 	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, unsigned char type);
+	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, MagicEffect type) {AddMagicEffect(msg, pos, type.value());}
 	void AddDistanceShoot(NetworkMessage_ptr msg,const Position& from, const Position& to, uint8_t type);
 	void AddCreature(NetworkMessage_ptr msg,const Creature* creature, bool known, uint32_t remove);
 	void AddPlayerStats(NetworkMessage_ptr msg);
-	void AddCreatureSpeak(NetworkMessage_ptr msg, const Creature* creature, SpeakClasses type, std::string text, uint16_t channelId, uint32_t time = 0);
+	void AddCreatureSpeak(NetworkMessage_ptr msg, const Creature* creature, SpeakClass type, std::string text, uint16_t channelId, uint32_t time = 0);
 	void AddCreatureHealth(NetworkMessage_ptr msg,const Creature* creature);
-	void AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const Outfit_t& outfit);
+	void AddCreatureOutfit(NetworkMessage_ptr msg, const Creature* creature, const OutfitType& outfit);
 	void AddCreatureInvisible(NetworkMessage_ptr msg, const Creature* creature);
 	void AddPlayerSkills(NetworkMessage_ptr msg);
 	void AddWorldLight(NetworkMessage_ptr msg, const LightInfo& lightInfo);
@@ -295,12 +274,12 @@ private:
 	void RemoveContainerItem(NetworkMessage_ptr msg, uint8_t cid, uint8_t slot);
 
 	//inventory
-	void AddInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item);
-	void UpdateInventoryItem(NetworkMessage_ptr msg, slots_t slot, const Item* item);
-	void RemoveInventoryItem(NetworkMessage_ptr msg, slots_t slot);
+	void AddInventoryItem(NetworkMessage_ptr msg, SlotType slot, const Item* item);
+	void UpdateInventoryItem(NetworkMessage_ptr msg, SlotType slot, const Item* item);
+	void RemoveInventoryItem(NetworkMessage_ptr msg, SlotType slot);
 
 	//shop
-	void AddShopItem(NetworkMessage_ptr msg, const ShopInfo item);
+	void AddShopItem(NetworkMessage_ptr msg, const ShopItem& shopItem);
 
 	friend class Player;
 
@@ -319,3 +298,4 @@ private:
 };
 
 #endif
+

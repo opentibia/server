@@ -21,22 +21,7 @@
 
 #include "waitlist.h"
 #include "status.h"
-#include "configmanager.h"
-#include <iostream>
-#include <sstream>
-#include <boost/algorithm/string/predicate.hpp>
-
-extern ConfigManager g_config;
-
-WaitingList::WaitingList()
-{
-	//
-}
-
-WaitingList::~WaitingList()
-{
-	waitList.clear();
-}
+#include "player.h"
 
 WaitListIterator WaitingList::findClient(const Player* player, uint32_t& slot)
 {
@@ -84,7 +69,7 @@ bool WaitingList::clientLogin(const Player* player)
 		return true;
 	}
 
-	if(waitList.empty() && Status::instance()->getPlayersOnline() < g_config.getNumber(ConfigManager::MAX_PLAYERS)){
+	if(waitList.empty() && Status::instance()->getPlayersOnline() < Status::instance()->getMaxPlayersOnline()){
 		//no waiting list and enough room
 		return true;
 	}
@@ -94,7 +79,7 @@ bool WaitingList::clientLogin(const Player* player)
 	uint32_t slot;
 	WaitListIterator it = findClient(player, slot);
 	if(it != waitList.end()){
-		if((Status::instance()->getPlayersOnline() + slot) <= g_config.getNumber(ConfigManager::MAX_PLAYERS)){
+		if((Status::instance()->getPlayersOnline() + slot) <= Status::instance()->getMaxPlayersOnline()){
 			//should be able to login now
 #ifdef __DEBUG__WATINGLIST__
 			std::cout << "Name: " << (*it)->name << " can now login" << std::endl;

@@ -21,8 +21,6 @@
 
 #include "protocolold.h"
 #include "outputmessage.h"
-#include "connection.h"
-#include "rsa.h"
 #include "game.h"
 
 extern Game g_game;
@@ -63,7 +61,7 @@ bool ProtocolOld::parseFirstPacket(NetworkMessage& msg)
 	msg.SkipBytes(12);
 
 	if(version <= 760){
-		disconnectClient(0x0A, STRING_CLIENT_VERSION);
+		disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
 	}
 
 	if(!RSA_decrypt(msg)){
@@ -83,7 +81,7 @@ bool ProtocolOld::parseFirstPacket(NetworkMessage& msg)
 		disableChecksum();
 	}
 
-	disconnectClient(0x0A, STRING_CLIENT_VERSION);
+	disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
 	return false;
 }
 

@@ -18,13 +18,12 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __IOPLAYER_H
-#define __IOPLAYER_H
+#ifndef __OTSERV_IOPLAYER_H__
+#define __OTSERV_IOPLAYER_H__
 
-#include "definitions.h"
-#include "player.h"
-#include "database.h"
-#include <string>
+#include "classes.h"
+#include "creature.h"
+#include "database_driver.h"
 
 enum UnjustKillPeriod_t{
 	UNJUST_KILL_PERIOD_DAY,
@@ -63,22 +62,26 @@ public:
 
 	bool addPlayerDeath(Player* dying_player, const DeathList& dl);
 	int32_t getPlayerUnjustKillCount(const Player* player, UnjustKillPeriod_t period);
+	bool sendMail(Creature* actor, const std::string name, uint32_t depotId, Item* item);
 
-	bool getGuidByName(uint32_t& guid, std::string& name);
-	bool getAccountByName(uint32_t& acc, std::string& name);
-	bool getAccountByName(std::string& acc, std::string& name);
-	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, std::string& name);
+	bool getGuidByName(uint32_t& guid, std::string& player_name);
+	bool getGuidByNameEx(uint32_t& guid, bool& specialVip, const std::string& player_name);
+	bool getAccountByName(uint32_t& acc, const std::string& name);
+	bool getWorldByName(uint32_t& world_id, std::string& name);
+	bool getAccountByName(std::string& acc, const std::string& player_name);
 	bool getDefaultTown(std::string& name, uint32_t& townId);
 	bool getNameByGuid(uint32_t guid, std::string& name);
+	bool getGuildIdByName(uint32_t& guildId, const std::string& guildName);
 	bool playerExists(std::string name);
 	bool getLastIP(uint32_t& ip, uint32_t guid);
 	bool hasFlag(PlayerFlags flag, uint32_t guid);
 	void updateLoginInfo(Player* player);
 	void updateLogoutInfo(Player* player);
+	bool isPlayerOnlineByAccount(uint32_t acc);
 	bool cleanOnlineInfo();
 
 protected:
-	bool storeNameByGuid(Database &mysql, uint32_t guid);
+	bool storeNameByGuid(DatabaseDriver &mysql, uint32_t guid);
 
 	struct StringCompareCase
 	{
@@ -89,13 +92,6 @@ protected:
 	};
 
 	typedef std::map<int,std::pair<Item*,int> > ItemMap;
-
-	void loadVip(Player* player, DBResult* result);
-	void loadOutfit(Player* player, DBResult* result);
-	void loadSkills(Player* player, DBResult* result);
-	void loadDepot(Player* player, DBResult* result);
-	void loadInventory(Player* player, DBResult* result);
-	void loadConditions(Player* player, DBResult* result);
 
 	void loadItems(ItemMap& itemMap, DBResult* result);
 	bool saveItems(Player* player, const ItemBlockList& itemList, DBInsert& query_insert);

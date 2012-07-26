@@ -20,26 +20,15 @@
 #include "otpch.h"
 
 #include "item.h"
+#include "tile.h"
+#include "creature.h"
+#include "house.h"
+#include "beds.h"
 #include "container.h"
-#include "configmanager.h"
 #include "depot.h"
 #include "teleport.h"
 #include "trashholder.h"
-#include "mailbox.h"
-#include "house.h"
-#include "game.h"
-#include "luascript.h"
-#include "actions.h"
-#include "combat.h"
-#include "weapons.h"
-#include "beds.h"
-#include <iostream>
-#include <sstream>
 #include <iomanip>
-
-extern Game g_game;
-extern Weapons* g_weapons;
-extern ConfigManager g_config;
 
 Items Item::items;
 
@@ -54,10 +43,6 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 		std::cout << "Error: [Item::CreateItem] Item id " << it.id << " has been declared deprecated."  << std::endl;
 #endif
 		return NULL;
-	}
-
-	if(it.stackable && !_count){
-		_count = 1;
 	}
 
 	if(it.id != 0){
@@ -79,9 +64,6 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 		else if(it.isTrashHolder()){
 			newItem = new TrashHolder(_type, it.magicEffect);
 		}
-		else if(it.isMailbox()){
-			newItem = new Mailbox(_type);
-		}
 		else if(it.isBed()){
 			newItem = new BedItem(_type);
 		}
@@ -89,7 +71,7 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 			newItem = new Item(_type, _count);
 		}
 
-		newItem->useThing2();
+		newItem->addRef();
 	}
 	return newItem;
 }
@@ -97,7 +79,7 @@ Item* Item::CreateItem(const uint16_t _type, uint16_t _count /*= 0*/)
 Item* Item::CreateItem(PropStream& propStream)
 {
 	uint16_t _id;
-	if(!propStream.GET_UINT16(_id)){
+	if(!propStream.GET_USHORT(_id)){
 		return NULL;
 	}
 
@@ -107,11 +89,11 @@ Item* Item::CreateItem(PropStream& propStream)
 
 bool Item::loadItem(xmlNodePtr node, Container* parent)
 {
-	if(xmlStrcmp(node->name, (const xmlChar*)"item") == 0){
-		int32_t intValue;
-		std::string strValue;
-		Item* item = NULL;
+	int32_t intValue;
+	std::string strValue;
 
+	if(xmlStrcmp(node->name, (const xmlChar*)"item") == 0){
+		Item* item = NULL;
 		if(readXMLInteger(node, "id", intValue)){
 			item = Item::CreateItem(intValue);
 		}
@@ -189,12 +171,8 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 		}
 	}
 	else if(it.charges != 0){
-		//if count is higher than 1, override default charges
-		if(_count > 1){
+		if(_count != 0){
 			setCharges(_count);
-		}
-		else{
-			setCharges(it.charges);
 		}
 	}
 
@@ -202,24 +180,19 @@ Item::Item(const uint16_t _type, uint16_t _count /*= 0*/) :
 }
 
 Item::Item(const Item &i) :
-	Thing(), ItemAttributes()
+	Thing(), ItemAttributes(i)
 {
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
-
-	m_attributes = i.m_attributes;
-	if(i.m_firstAttr){
-		m_firstAttr = new Attribute(*i.m_firstAttr);
-	}
 }
 
 Item* Item::clone() const
 {
 	Item* _item = Item::CreateItem(id, count);
-	_item->m_attributes = m_attributes;
-	if(m_firstAttr){
-		_item->m_firstAttr = new Attribute(*m_firstAttr);
+	if(attributes){
+		_item->attributes = new AttributeMap();
+		*_item->attributes = *attributes;
 	}
 
 	return _item;
@@ -227,18 +200,17 @@ Item* Item::clone() const
 
 void Item::copyAttributes(Item* item)
 {
-	m_attributes = item->m_attributes;
-	if(item->m_firstAttr){
-		m_firstAttr = new Attribute(*item->m_firstAttr);
+	if(item->attributes){
+		attributes = new AttributeMap();
+		*attributes = *item->attributes;
 	}
 
-	removeAttribute(ATTR_ITEM_DECAYING);
-	removeAttribute(ATTR_ITEM_DURATION);
+	eraseAttribute("decaying");
+	eraseAttribute("duration");
 }
 
 Item::~Item()
 {
-	//std::cout << "Item destructor " << this << std::endl;
 }
 
 void Item::setDefaultSubtype()
@@ -258,11 +230,6 @@ void Item::setDefaultSubtype()
 
 void Item::onRemoved()
 {
-	ScriptEnviroment::removeTempItem(this);
-
-	if(getUniqueId() != 0){
-		ScriptEnviroment::removeUniqueThing(this);
-	}
 }
 
 void Item::setID(uint16_t newid)
@@ -274,17 +241,32 @@ void Item::setID(uint16_t newid)
 	uint32_t newDuration = it.decayTime * 1000;
 
 	if(newDuration == 0 && !it.stopTime && it.decayTo == -1){
-		removeAttribute(ATTR_ITEM_DECAYING);
-		removeAttribute(ATTR_ITEM_DURATION);
+		eraseAttribute("decaying");
+		eraseAttribute("duration");
 	}
 
-	if(hasAttribute(ATTR_ITEM_CORPSEOWNER)){
-		removeAttribute(ATTR_ITEM_CORPSEOWNER);
-	}
+	eraseAttribute("corpseowner");
 
-	if(newDuration > 0 && (!prevIt.stopTime || !hasAttribute(ATTR_ITEM_DURATION)) ){
+	if(newDuration > 0 && (!prevIt.stopTime || getIntegerAttribute("duration") == NULL) ){
 		setDecaying(DECAYING_FALSE);
 		setDuration(newDuration);
+	}
+
+	if(getParent()){
+		if(Tile* tile = getParent()->getParentTile()){
+			tile->items_onItemModified(this);
+		}
+	}
+}
+
+void Item::setActionId(int32_t n)
+{
+	setAttribute("aid", n);
+
+	if(getParent()){
+		if(Tile* tile = getParent()->getTile()){
+			tile->items_onItemModified(this);
+		}
 	}
 }
 
@@ -352,7 +334,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_COUNT:
 		{
 			uint8_t _count = 0;
-			if(!propStream.GET_UINT8(_count)){
+			if(!propStream.GET_UCHAR(_count)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -363,7 +345,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_ACTION_ID:
 		{
 			uint16_t _actionid = 0;
-			if(!propStream.GET_UINT16(_actionid)){
+			if(!propStream.GET_USHORT(_actionid)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -374,11 +356,11 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_UNIQUE_ID:
 		{
 			uint16_t _uniqueid;
-			if(!propStream.GET_UINT16(_uniqueid)){
+			if(!propStream.GET_USHORT(_uniqueid)){
 				return ATTR_READ_ERROR;
 			}
 
-			setUniqueId(_uniqueid);
+			setAttribute("uid", (int32_t)_uniqueid);
 			break;
 		}
 
@@ -396,7 +378,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_WRITTENDATE:
 		{
 			uint32_t _writtenDate;
-			if(!propStream.GET_UINT32(_writtenDate)){
+			if(!propStream.GET_ULONG(_writtenDate)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -429,7 +411,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_RUNE_CHARGES:
 		{
 			uint8_t _charges = 1;
-			if(!propStream.GET_UINT8(_charges)){
+			if(!propStream.GET_UCHAR(_charges)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -440,7 +422,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_CHARGES:
 		{
 			uint16_t _charges = 1;
-			if(!propStream.GET_UINT16(_charges)){
+			if(!propStream.GET_USHORT(_charges)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -451,7 +433,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_DURATION:
 		{
 			uint32_t duration = 0;
-			if(!propStream.GET_UINT32(duration)){
+			if(!propStream.GET_ULONG(duration)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -465,7 +447,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_DECAYING_STATE:
 		{
 			uint8_t state = 0;
-			if(!propStream.GET_UINT8(state)){
+			if(!propStream.GET_UCHAR(state)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -483,7 +465,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_DEPOT_ID:
 		{
 			uint16_t _depotId;
-			if(!propStream.GET_UINT16(_depotId)){
+			if(!propStream.GET_USHORT(_depotId)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -494,7 +476,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_HOUSEDOORID:
 		{
 			uint8_t _doorId;
-			if(!propStream.GET_UINT8(_doorId)){
+			if(!propStream.GET_UCHAR(_doorId)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -505,7 +487,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_SLEEPERGUID:
 		{
 			uint32_t _guid;
-			if(!propStream.GET_UINT32(_guid)){
+			if(!propStream.GET_ULONG(_guid)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -515,7 +497,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_SLEEPSTART:
 		{
 			uint32_t sleep_start;
-			if(!propStream.GET_UINT32(sleep_start)){
+			if(!propStream.GET_ULONG(sleep_start)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -525,11 +507,8 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		//Teleport class
 		case ATTR_TELE_DEST:
 		{
-			TeleportDest tele_dest;
-			if(		!propStream.GET_UINT16(tele_dest._x) ||
-					!propStream.GET_UINT16(tele_dest._y) ||
-					!propStream.GET_UINT8(tele_dest._z))
-			{
+			TeleportDest* tele_dest;
+			if(!propStream.GET_STRUCT(tele_dest)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -540,7 +519,7 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		case ATTR_CONTAINER_ITEMS:
 		{
 			uint32_t count;
-			if(!propStream.GET_UINT32(count)){
+			if(!propStream.GET_ULONG(count)){
 				return ATTR_READ_ERROR;
 			}
 
@@ -559,15 +538,21 @@ Attr_ReadValue Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 
 bool Item::unserializeAttr(PropStream& propStream)
 {
+	// Backwards-compatible reading of attributes
 	uint8_t attr_type;
-	while(propStream.GET_UINT8(attr_type) && attr_type != 0){
-		Attr_ReadValue ret = readAttr((AttrTypes_t)attr_type, propStream);
-		if(ret == ATTR_READ_ERROR){
-			return false;
-			break;
+	while(propStream.GET_UCHAR(attr_type) && attr_type != 0){
+		if(attr_type == ATTR_ATTRIBUTE_MAP){
+			if(!ItemAttributes::unserializeAttributeMap(propStream))
+				return false;
 		}
-		else if(ret == ATTR_READ_END){
-			return true;
+		else{
+			Attr_ReadValue ret = readAttr((AttrTypes_t)attr_type, propStream);
+			if(ret == ATTR_READ_ERROR){
+				return false;
+			}
+			else if(ret == ATTR_READ_END){
+				return true;
+			}
 		}
 	}
 
@@ -583,132 +568,111 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream) const
 {
 	if(isStackable() || isFluidContainer() || isSplash()){
 		uint8_t _count = getSubType();
-		propWriteStream.ADD_UINT8(ATTR_COUNT);
-		propWriteStream.ADD_UINT8(_count);
+		propWriteStream.ADD_UCHAR(ATTR_COUNT);
+		propWriteStream.ADD_UCHAR(_count);
 	}
 
-	if(hasCharges()){
-		uint16_t _count = getCharges();
-		propWriteStream.ADD_UINT8(ATTR_CHARGES);
-		propWriteStream.ADD_UINT16(_count);
-	}
-
-	if(!isNotMoveable() /*moveable*/){
-		uint16_t _actionId = getActionId();
-		if(_actionId){
-			propWriteStream.ADD_UINT8(ATTR_ACTION_ID);
-			propWriteStream.ADD_UINT16(_actionId);
-		}
-	}
-
-	const std::string& _text = getText();
-	if(_text.length() > 0){
-		propWriteStream.ADD_UINT8(ATTR_TEXT);
-		propWriteStream.ADD_STRING(_text);
-	}
-
-	const time_t _writtenDate = getWrittenDate();
-	if(_writtenDate > 0){
-		propWriteStream.ADD_UINT8(ATTR_WRITTENDATE);
-		propWriteStream.ADD_UINT32(_writtenDate);
-	}
-
-	const std::string& _writer = getWriter();
-	if(_writer.length() > 0){
-		propWriteStream.ADD_UINT8(ATTR_WRITTENBY);
-		propWriteStream.ADD_STRING(_writer);
-	}
-
-	const std::string& _specialDesc = getSpecialDescription();
-	if(_specialDesc.length() > 0){
-		propWriteStream.ADD_UINT8(ATTR_DESC);
-		propWriteStream.ADD_STRING(_specialDesc);
-	}
-
-	if(hasAttribute(ATTR_ITEM_DURATION)){
-		uint32_t duration = getDuration();
-		propWriteStream.ADD_UINT8(ATTR_DURATION);
-		propWriteStream.ADD_UINT32(duration);
-	}
-
-	uint32_t decayState = getDecaying();
-	if(decayState == DECAYING_TRUE || decayState == DECAYING_PENDING){
-		propWriteStream.ADD_UINT8(ATTR_DECAYING_STATE);
-		propWriteStream.ADD_UINT8(decayState);
+	if(attributes && attributes->size()){
+		propWriteStream.ADD_UCHAR(ATTR_ATTRIBUTE_MAP);
+		serializeAttributeMap(propWriteStream);
 	}
 
 	return true;
 }
 
-bool Item::hasProperty(enum ITEMPROPERTY prop) const
+bool Item::hasProperty(uint32_t props) const
 {
 	const ItemType& it = items[id];
 
-	switch(prop){
-		case BLOCKSOLID:
-			if(it.blockSolid)
-				return true;
-			break;
-
-		case MOVEABLE:
-			if(it.moveable && getUniqueId() == 0)
-				return true;
-			break;
-
-		case HASHEIGHT:
-			if(it.hasHeight)
-				return true;
-			break;
-
-		case BLOCKPROJECTILE:
-			if(it.blockProjectile)
-				return true;
-			break;
-
-		case BLOCKPATH:
-			if(it.blockPathFind)
-				return true;
-			break;
-
-		case ISVERTICAL:
-			if(it.isVertical)
-				return true;
-			break;
-
-		case ISHORIZONTAL:
-			if(it.isHorizontal)
-				return true;
-			break;
-
-		case IMMOVABLEBLOCKSOLID:
-			if(it.blockSolid && (!it.moveable || getUniqueId() != 0))
-				return true;
-			break;
-
-		case IMMOVABLEBLOCKPATH:
-			if(it.blockPathFind && (!it.moveable || getUniqueId() != 0))
-				return true;
-			break;
-
-		case SUPPORTHANGABLE:
-			if(it.isHorizontal || it.isVertical)
-				return true;
-			break;
-
-		case IMMOVABLENOFIELDBLOCKPATH:
-			if(!it.isMagicField() && it.blockPathFind && (!it.moveable || getUniqueId() != 0))
-				return true;
-			break;
-
-		case NOFIELDBLOCKPATH:
-			if(!it.isMagicField() && it.blockPathFind)
-				return true;
-			break;
-
-		default:
-			return false;
+	if(hasBitSet(ITEMPROP_BLOCKSOLID, props) && !it.blockSolid){
+		return false;
 	}
-	return false;
+
+	if(hasBitSet(ITEMPROP_BLOCKPATHFIND, props) && !it.blockPathFind){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_BLOCKPROJECTILE, props) && !it.blockProjectile){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_ALLOWPICKUPABLE, props) && !it.allowPickupable){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_HASHEIGHT, props) && !it.hasHeight){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_ISVERTICAL, props) && !it.isVertical){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_ISHORIZONTAL, props) && !it.isHorizontal){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_LOOKTHROUGH, props) && !it.lookThrough){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_PICKUPABLE, props) && !it.pickupable){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_ROTATEABLE, props) && !it.rotateable){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_STACKABLE, props) && !it.stackable){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_USEABLE, props) && !it.useable){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_MOVEABLE, props) && !it.moveable){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_ALWAYSONTOP, props) && !it.alwaysOnTop){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_CANREADTEXT, props) && !it.canReadText){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_CANWRITETEXT, props) && !it.canWriteText){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_FLOORCHANGEDOWN, props) && !it.floorChangeDown){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_FLOORCHANGENORTH, props) && !it.floorChangeNorth){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_FLOORCHANGESOUTH, props) && !it.floorChangeSouth){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_FLOORCHANGEEAST, props) && !it.floorChangeEast){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_FLOORCHANGEWEST, props) && !it.floorChangeWest){
+		return false;
+	}
+
+	if(hasBitSet(ITEMPROP_ALLOWDISTREAD, props) && !it.allowDistRead){
+		return false;
+	}
+
+	return true;
 }
 
 double Item::getWeight() const
@@ -729,23 +693,27 @@ std::string Item::getLongName(const ItemType& it, int32_t lookDistance,
 		subType = item->getSubType();
 	}
 
-	if(it.name.length()){
+	const std::string& name = (item? item->getName() : it.name);
+	const std::string& plural = (item? item->getPluralName() : it.pluralName);
+	const std::string& article = (item? item->getArticle() : it.article);
+
+	if(name.length()){
 		if(it.stackable && subType > 1){
 			if(it.showCount){
 				s << subType << " ";
 			}
 
-			s << it.pluralName;
+			s << plural;
 		}
 		else{
-			if(addArticle && !it.article.empty()){
-				s << it.article << " ";
+			if(addArticle && !article.empty()){
+				s << article << " ";
 			}
-			s << it.name;
+			s << name;
 		}
 	}
 	else{
-		s << "an item of type " << it.id << ", please report it to gamemaster";
+		s << "an item of type " << it.id;
 	}
 
 	return s.str();
@@ -768,67 +736,58 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 	s << getLongName(it, lookDistance, item, subType, addArticle);
 
+	int armor = (item? item->getArmor() : it.armor);
+
 	if(it.isRune()){
 		s << " (\"" << it.runeSpellName << "\").";
-		if((g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && it.runeLevel > 0) || 
-			it.runeMagLevel > 0){
+		if(it.runeLevel > 0 || it.runeMagicLevel > 0){
 			s << std::endl << "It can only be used with";
-			if(g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && it.runeLevel > 0){
+			if(it.runeLevel > 0){
 				s << " level " << it.runeLevel;
 			}
-			if(it.runeMagLevel > 0){
+			if(it.runeMagicLevel > 0){
 				if(it.runeLevel > 0){
 					s << " and";
 				}
-				s << " magic level " << it.runeMagLevel;
+				s << " magic level " << it.runeMagicLevel;
 			}
 			s << " or higher.";
 		}
 	}
 	else if(it.weaponType != WEAPON_NONE){
-		if(it.weaponType == WEAPON_DIST && it.amuType != AMMO_NONE){
+		if(it.weaponType == WEAPON_DIST && it.ammoType != AMMO_NONE){
 			s << " (Range:" << it.shootRange;
 			if(it.attack != 0){
 				s << ", Atk" << std::showpos << it.attack << std::noshowpos;
 			}
-			if(it.hitChance > 0){ //excludes both cases it.hitchance 0 and -1
+			if(it.hitChance != 0){
 				s << ", Hit%" << std::showpos << it.hitChance << std::noshowpos;
 			}
 			s << ")";
 		}
 		else if(it.weaponType != WEAPON_AMMO && it.weaponType != WEAPON_WAND){ // Arrows and Bolts doesn't show atk
 			s << " (";
-			if(it.attack != 0){
-				s << "Atk:" << (int32_t)it.attack;
+			int attack = (item? item->getAttack() : it.attack);
+			if(attack != 0)
+				s << "Atk:" << attack;
 
-				if(it.abilities.elementDamage != 0){
-					s << " " << "physical + ";
-
-					switch(it.abilities.elementType){
-						case COMBAT_ICEDAMAGE: s << it.abilities.elementDamage << " Ice,"; break;
-						case COMBAT_EARTHDAMAGE: s << it.abilities.elementDamage << " Earth,"; break;
-						case COMBAT_FIREDAMAGE: s << it.abilities.elementDamage << " Fire,"; break;
-						case COMBAT_ENERGYDAMAGE: s << it.abilities.elementDamage << " Energy,"; break;
-						default: s << it.abilities.elementDamage << " Unknown,"; break;
-					}
-				}
-			}
-
-			if(it.defense != 0 || it.extraDef != 0){
-				if(it.attack != 0)
+			int defense = (item? item->getDefense() : it.defense);
+			int extraDefense = (item? item->getExtraDef() : it.extraDefense);
+			if(defense != 0 || extraDefense != 0){
+				if(attack != 0)
 					s << " ";
 
-				s << "Def:" << (int32_t)it.defense;
-				if(it.extraDef != 0){
-					s << " " << std::showpos << (int32_t)it.extraDef << std::noshowpos;
+				s << "Def:" << (int32_t)defense;
+				if(extraDefense != 0){
+					s << " " << std::showpos << (int)extraDefense << std::noshowpos;
 				}
 			}
 
-			if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
-				if(it.attack != 0 || it.defense != 0 || it.extraDef != 0)
+			if(it.abilities.stats[*STAT_MAGICPOINTS] != 0){
+				if(it.attack != 0 || it.defense != 0 || it.extraDefense != 0)
 					s << ", ";
 
-				s << "magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
+				s << "magic level " << std::showpos << (int32_t)it.abilities.stats[*STAT_MAGICPOINTS] << std::noshowpos;
 			}
 			s << ")";
 		}
@@ -844,7 +803,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		s << ".";
 	}
-	else if(it.armor != 0 || it.abilities.skill.any() || it.abilities.absorb.any() || it.abilities.stats[STAT_MAGICPOINTS] != 0 || it.abilities.speed != 0 || it.defense != 0 ){
+	else if(armor != 0 || it.abilities.absorb.any()){
 		if(it.showCharges){
 			if(subType > 1){
 				s << " that has " << (int32_t)subType << " charges left";
@@ -853,80 +812,13 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 				s << " that has 1 charge left";
 			}
 		}
-		else if(it.showDuration){
-			if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
-				int32_t duration = item->getDuration() / 1000;
-				s << " that has energy for ";
 
-				if(duration >= 120){
-					s << duration / 60 << " minutes left.";
-				}
-				else if(duration > 60){
-					s << "1 minute left.";
-				}
-				else{
-					s << "less than a minute left.";
-				}
-			}
-			else{
-				s << " that is brand-new.";
-			}
-		}
-
-		s << " (";
-		bool prevDesc = false;
-		if(it.armor != 0){
-			// as it is the first desc it isn't
-			// really necessary to add it here
-			//if(prevDesc)
-			//	s << ", ";
-			s << "Arm:" << it.armor;
-			prevDesc = true;
-		}
-
-		if(it.abilities.skill.any()){
-			if(prevDesc)
-				s << ", ";
-
-			it.abilities.skill.getDescription(s);
-			prevDesc = true;
-		}
+		s << " (Arm:" << armor;
 
 		if(it.abilities.absorb.any()){
-			if(prevDesc)
-				s << ", ";
-
-			s << "protection";
+			s << ", protection";
 			it.abilities.absorb.getDescription(s);
-			prevDesc = true;
 		}
-
-		if(it.abilities.stats[STAT_MAGICPOINTS] != 0){
-			if(prevDesc)
-				s << ", ";
-
-			s << "magic level " << std::showpos << (int32_t)it.abilities.stats[STAT_MAGICPOINTS] << std::noshowpos;
-			prevDesc = true;
-		}
-
-		if(it.defense != 0){
-			if(prevDesc)
-				s << ", ";
-
-			s << "defense " << std::showpos << (int32_t)it.defense << std::noshowpos;
-			prevDesc = true;
-		}
-
-		if(it.abilities.speed != 0){
-			if(prevDesc)
-				s << ", ";
-
-			s << "speed " << std::showpos << (int32_t)(it.abilities.speed / 2) << std::noshowpos;
-
-			// last desc... same thing as the first
-			//prevDesc = true;
-		}
-
 		s << ").";
 	}
 	else if(it.isFluidContainer()){
@@ -987,9 +879,6 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			s << "Nothing is written on it.";
 		}
 	}
-	else if(it.isLevelDoor() && item && item->getActionId() >= 1000)
-		s << " for level " << item->getActionId() - 1000;
-
 	else if(it.showCharges){
 		if(subType > 1){
 			s << " that has " << (int32_t)subType << " charges left.";
@@ -999,7 +888,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 	}
 	else if(it.showDuration){
-		if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
+		if(item && item->hasIntegerAttribute("duration")){
 			int32_t duration = item->getDuration() / 1000;
 			s << " that has energy for ";
 
@@ -1029,13 +918,14 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 		if(it.wieldInfo & WIELDINFO_VOCREQ){
 			s << it.vocationString;
+
 		}
 		else{
 			s << "players";
 		}
 
 		if(it.wieldInfo & WIELDINFO_LEVEL){
-			s << " of level " << (int32_t)it.minReqLevel << " or higher";
+			s << " of level " << (int)it.minRequiredLevel << " or higher";
 		}
 
 		if(it.wieldInfo & WIELDINFO_MAGLV){
@@ -1045,7 +935,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			else{
 				s << " of";
 			}
-			s << " magic level " << (int32_t)it.minReqMagicLevel << " or higher";
+			s << " magic level " << (int)it.minRequiredMagicLevel << " or higher";
 		}
 
 		s << ".";
@@ -1058,17 +948,20 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 	}
 
+	if(it.abilities.elementType != COMBAT_NONE && it.charges != 0){
+		s << " It is temporarily enchanted with ";
+		std::string strElement = combatTypeToString(it.abilities.elementType);
+		int32_t elementDamage = it.abilities.elementDamage;
+		s << strElement << " (" << it.attack - elementDamage << " physical + " << elementDamage << " " << strElement << " damage).";
+	}
+
 	if(item && item->getSpecialDescription() != ""){
 		s << std::endl << item->getSpecialDescription().c_str();
 	}
 	else if(it.description.length() && lookDistance <= 1){
 		s << std::endl << it.description;
 	}
-    else if(it.isFluidContainer() && subType > 0 && items[subType].description.length() && lookDistance <= 1)
-    {
-		s << std::endl << items[subType].description;
-    }
-	
+
 	return s.str();
 }
 
@@ -1079,25 +972,6 @@ std::string Item::getDescription(int32_t lookDistance) const
 
 	s << getDescription(it, lookDistance, this);
 	return s.str();
-}
-
-std::string Item::getXRayDescription() const
-{
-	std::stringstream ret;
-
-	ret << "ID: " << getID() << std::endl;
-	uint16_t actionId = getActionId();
-	uint16_t uniqueId = getUniqueId();
-	if(actionId > 0)
-		ret << "Action ID: " << actionId << std::endl;
-	if(uniqueId > 0)
-		ret << "Unique ID: " << uniqueId << std::endl;
-	#ifdef __DEBUG__
-	if (getContainer())
-		ret << "There are " << getContainer()->getTotalAmountOfItemsInside() - 1 << " things inside of this." << std::endl;
-	#endif
-	ret << Thing::getXRayDescription();
-	return ret.str();
 }
 
 std::string Item::getWeightDescription() const
@@ -1129,23 +1003,15 @@ std::string Item::getWeightDescription(const ItemType& it, double weight, uint32
 	return ss.str();
 }
 
-
-void Item::setUniqueId(uint16_t n)
-{
-	if(getUniqueId() != 0)
-		return;
-
-	ItemAttributes::setUniqueId(n);
-	ScriptEnviroment::addUniqueThing(this);
-}
-
 bool Item::canDecay()
 {
 	if(isRemoved()){
 		return false;
 	}
 
-	if(getUniqueId() != 0){
+	const bool* candecay = getBooleanAttribute("canDecay");
+
+	if(candecay && *candecay == false){
 		return false;
 	}
 
@@ -1170,251 +1036,9 @@ void Item::getLight(LightInfo& lightInfo)
 	lightInfo.level = it.lightLevel;
 }
 
-std::string ItemAttributes::emptyString("");
 
-const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
-{
-	if(!validateStrAttrType(type))
-		return emptyString;
 
-	//this will *NOT* create the attribute if it does not exist
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return *(std::string*)attr->value;
-	}
-	else{
-		return emptyString;
-	}
-}
 
-void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
-{
-	if(!validateStrAttrType(type))
-		return;
 
-	if(value.length() == 0)
-		return;
 
-	//this will create the attribute if it does not exist
-	Attribute* attr = getAttr(type);
-	if(attr){
-		//if has a previous value delete it
-		if(attr->value){
-			delete (std::string*)attr->value;
-		}
-		//create the new value as string
-		attr->value = (void*)new std::string(value);
-	}
-}
 
-bool ItemAttributes::hasAttribute(itemAttrTypes type) const
-{
-	if(!validateIntAttrType(type))
-		return false;
-
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return true;
-	}
-
-	return false;
-}
-
-void ItemAttributes::removeAttribute(itemAttrTypes type)
-{
-	//check if we have it
-	if((type & m_attributes) != 0){
-		//go trough the linked list until find it
-		Attribute* prevAttr = NULL;
-		Attribute* curAttr = m_firstAttr;
-		while(curAttr != NULL){
-			if(curAttr->type == type){
-				//found so remove it from the linked list
-				if(prevAttr){
-					prevAttr->next = curAttr->next;
-				}
-				else{
-					m_firstAttr = curAttr->next;
-				}
-				//remove it from flags
-				m_attributes = m_attributes & ~type;
-
-				//delete string if it is string type
-				if(validateStrAttrType(type)){
-					delete (std::string*)curAttr->value;
-				}
-				//finally delete the attribute and return
-				delete curAttr;
-				return;
-			}
-
-			//advance in the linked list
-			prevAttr = curAttr;
-			curAttr = curAttr->next;
-		}
-	}
-}
-
-uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
-{
-	if(!validateIntAttrType(type))
-		return 0;
-
-	Attribute* attr = getAttrConst(type);
-	if(attr){
-		return static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value));
-	}
-	else{
-		return 0;
-	}
-}
-
-void ItemAttributes::setIntAttr(itemAttrTypes type, int32_t value)
-{
-	if(!validateIntAttrType(type))
-		return;
-
-	Attribute* attr = getAttr(type);
-	if(attr){
-		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(value));
-	}
-}
-
-void ItemAttributes::increaseIntAttr(itemAttrTypes type, int32_t value)
-{
-	if(!validateIntAttrType(type))
-		return;
-
-	Attribute* attr = getAttr(type);
-	if(attr){
-		attr->value = reinterpret_cast<void*>(static_cast<ptrdiff_t>(static_cast<uint32_t>(0xFFFFFFFF & reinterpret_cast<ptrdiff_t>(attr->value)) + value));
-	}
-}
-
-bool ItemAttributes::validateIntAttrType(itemAttrTypes type)
-{
-	//list of numeric type attributes
-	switch(type){
-	case ATTR_ITEM_ACTIONID:
-	case ATTR_ITEM_UNIQUEID:
-	case ATTR_ITEM_OWNER:
-	case ATTR_ITEM_DURATION:
-	case ATTR_ITEM_DECAYING:
-	case ATTR_ITEM_WRITTENDATE:
-	case ATTR_ITEM_CORPSEOWNER:
-	case ATTR_ITEM_CHARGES:
-	case ATTR_ITEM_FLUIDTYPE:
-	case ATTR_ITEM_DOORID:
-		return true;
-		break;
-
-	default:
-		return false;
-		break;
-	}
-	return false;
-}
-
-bool ItemAttributes::validateStrAttrType(itemAttrTypes type)
-{
-	//list of text type attributes
-	switch(type){
-	case ATTR_ITEM_DESC:
-	case ATTR_ITEM_TEXT:
-	case ATTR_ITEM_WRITTENBY:
-		return true;
-		break;
-	default:
-		return false;
-		break;
-	}
-	return false;
-}
-
-void ItemAttributes::addAttr(Attribute* attr)
-{
-	//add an attribute to the linked list
-	if(m_firstAttr){
-		//is not the first, so look for the end of the list
-		Attribute* curAttr = m_firstAttr;
-		while(curAttr->next){
-			curAttr = curAttr->next;
-		}
-		//and add it at the end
-		curAttr->next = attr;
-	}
-	else{
-		//is the first
-		m_firstAttr = attr;
-	}
-	//add it to flags
-	m_attributes = m_attributes | attr->type;
-}
-
-ItemAttributes::Attribute* ItemAttributes::getAttrConst(itemAttrTypes type) const
-{
-	//check flags
-	if((type & m_attributes) == 0){
-		return NULL;
-	}
-	//it is here, so search it in the linked list
-	Attribute* curAttr = m_firstAttr;
-	while(curAttr){
-		if(curAttr->type == type){
-			//found
-			return curAttr;
-		}
-		curAttr = curAttr->next;
-	}
-	//not found?
-	std::cout << "Warning: [ItemAttributes::getAttrConst] (type & m_attributes) != 0 but attribute not found" << std::endl;
-	return NULL;
-}
-
-ItemAttributes::Attribute* ItemAttributes::getAttr(itemAttrTypes type)
-{
-	Attribute* curAttr;
-	if((type & m_attributes) == 0){
-		//if that type was not present add it
-		curAttr = new Attribute(type);
-		addAttr(curAttr);
-		return curAttr;
-	}
-	else{
-		//was present, search and return it
-		curAttr = m_firstAttr;
-		while(curAttr){
-			if(curAttr->type == type){
-				return curAttr;
-			}
-			curAttr = curAttr->next;
-		}
-	}
-	std::cout << "Warning: [ItemAttributes::getAttr] (type & m_attributes) != 0 but attribute not found" << std::endl;
-	curAttr = new Attribute(type);
-	addAttr(curAttr);
-	return curAttr;
-}
-
-void ItemAttributes::deleteAttrs(Attribute* attr)
-{
-	//deletes all attributes recursively
-	if(attr){
-		//if is string type, delete the allocated string
-		if(validateStrAttrType(attr->type)){
-			delete (std::string*)attr->value;
-		}
-		Attribute* next_attr = attr->next;
-		attr->next = NULL;
-		//delete next while it was not NULL
-		if(next_attr){
-			deleteAttrs(next_attr);
-		}
-		delete attr;
-	}
-}
-
-void Item::__startDecaying()
-{
-	g_game.startDecay(this);
-}

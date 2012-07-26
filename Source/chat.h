@@ -21,14 +21,8 @@
 #ifndef __OTSERV_CHAT_H__
 #define __OTSERV_CHAT_H__
 
-#include "definitions.h"
-#include <map>
-#include <list>
-#include <string>
+#include "classes.h"
 #include "const.h"
-
-class Player;
-class Party;
 
 typedef std::map<uint32_t, Player*> UsersMap;
 
@@ -48,22 +42,30 @@ class ChatChannel
 {
 public:
 	ChatChannel(uint16_t channelId, std::string channelName);
-	virtual ~ChatChannel(){}
+	virtual ~ChatChannel();
 
 	bool addUser(Player* player);
 	bool removeUser(Player* player, bool sendCloseChannel = false);
 
-	bool talk(Player* fromPlayer, SpeakClasses type, const std::string& text, uint32_t time = 0);
-	bool sendInfo(SpeakClasses type, const std::string& text, uint32_t time = 0);
+	bool talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time = 0);
+	bool sendInfo(SpeakClass type, const std::string& text, uint32_t time = 0);
 
-	const std::string& getName() const { return m_name; }
-	const uint16_t getId() const { return m_id; }
-	const UsersMap& getUsers() const { return m_users; }
+	const std::string& getName(){ return m_name; }
+	const uint16_t getId(){ return m_id; }
+	const UsersMap& getUsers(){ return m_users; }
 
 	virtual const uint32_t getOwner(){ return 0; }
 
+	// Block a player from hearing messages, required for the lua events to work properly
+	// this is to prevent the player from hearing a message before he has been sent the
+	// channel contents. ONLY ONE PLAYER CAN BE DEAF AT A TIME
+	// Call with NULL to make everyone hear again.
+	void makePlayerDeaf(Player* p)
+		{m_deaf_user = p;}
+
 protected:
 	UsersMap m_users;
+	Player* m_deaf_user;
 	std::string m_name;
 	uint16_t m_id;
 };
@@ -72,7 +74,7 @@ class PrivateChatChannel : public ChatChannel
 {
 public:
 	PrivateChatChannel(uint16_t channelId, std::string channelName);
-	virtual ~PrivateChatChannel(){};
+	virtual ~PrivateChatChannel(){}
 
 	virtual const uint32_t getOwner(){return m_owner;}
 	void setOwner(uint32_t id){m_owner = id;}
@@ -111,9 +113,9 @@ public:
 
 	uint16_t getFreePrivateChannelId();
 	bool isPrivateChannel(uint16_t channelId);
-	bool isMuteableChannel(uint16_t channelId, SpeakClasses type);
+	bool isMuteableChannel(uint16_t channelId, SpeakClass type);
 
-	bool talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
+	bool talkToChannel(Player* player, SpeakClass type, const std::string& text, unsigned short channelId);
 
 	std::string getChannelName(Player* player, uint16_t channelId);
 	ChannelList getChannelList(Player* player);
@@ -121,7 +123,6 @@ public:
 	ChatChannel* getChannel(Party* party);
 	ChatChannel* getChannel(Player* player, uint16_t channelId);
 	ChatChannel* getChannelById(uint16_t channelId);
-	ChatChannel* getGuildChannel(uint32_t guildId);
 	PrivateChatChannel* getPrivateChannel(Player* player);
 
 private:

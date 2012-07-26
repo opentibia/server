@@ -17,24 +17,17 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
 
 #include "tools.h"
-#include "configmanager.h"
 #include "md5.h"
 #include "sha1.h"
-#include <cmath>
-#include <sstream>
-#include <iostream>
+#include "configmanager.h"
 #include <iomanip>
-#include <algorithm>
-#include <limits>
-#include <boost/algorithm/string/predicate.hpp>
 
 extern ConfigManager g_config;
 
-void replaceString(std::string& str, const std::string sought, const std::string replacement)
+void replaceString(std::string& str, const std::string& sought, const std::string& replacement)
 {
 	size_t pos = 0;
 	size_t start = 0;
@@ -86,18 +79,12 @@ std::string asUpperCaseString(const std::string& source)
 	return s;
 }
 
-bool booleanString(std::string source)
-{
-	toLowerCaseString(source);
-	return (source == "yes" || source == "true" || atoi(source.c_str()) > 0);
-}
-
 bool readXMLInteger(xmlNodePtr node, const char* tag, int32_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = atoi(nodeValue);
-		xmlFree(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 		return true;
 	}
 
@@ -109,7 +96,7 @@ bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = ATOI64(nodeValue);
-		xmlFree(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 		return true;
 	}
 
@@ -121,7 +108,7 @@ bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = atof(nodeValue);
-		xmlFree(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 		return true;
 	}
 
@@ -136,7 +123,7 @@ bool utf8ToLatin1(char* intext, std::string& outtext)
 		return false;
 	}
 
-	int inlen = strlen(intext);
+	int inlen  = strlen(intext);
 	if(inlen == 0){
 		return false;
 	}
@@ -163,7 +150,7 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 			value = nodeValue;
 		}
 
-		xmlFree(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 		return true;
 	}
 
@@ -178,7 +165,7 @@ bool readXMLContentString(xmlNodePtr node, std::string& value)
 			value = nodeValue;
 		}
 
-		xmlFree(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 		return true;
 	}
 
@@ -205,20 +192,6 @@ bool hasBitSet(uint32_t flag, uint32_t flags)
 	return ((flags & flag) == flag);
 }
 
- //safely adds incr to x, checking for overflow
-bool safeIncrUInt32_t(uint32_t& x, uint32_t incr)
-{
-    const static uint32_t MAXUINT32 = std::numeric_limits<uint32_t>::max();
- 
-    if(MAXUINT32 - incr >= x)
-    {
-        x += incr;
-        return true;
-    }
- 
-    return false;
-}
-
 #define RAND_MAX24 16777216
 uint32_t rand24b()
 {
@@ -230,17 +203,18 @@ float box_muller(float m, float s)
 	// normal random variate generator
 	// mean m, standard deviation s
 
-	float x1, x2, w, y1;
+	float y1;
 	static float y2;
 	static int use_last = 0;
 
-	if(use_last)			// use value from previous call
-	{
+	if(use_last){
+		// use value from previous call
 		y1 = y2;
 		use_last = 0;
 	}
-	else
-	{
+	else{
+		double w = 0.00;
+		float x1, x2;
 		do {
 			double r1 = (((float)(rand()) / RAND_MAX));
 			double r2 = (((float)(rand()) / RAND_MAX));
@@ -256,10 +230,10 @@ float box_muller(float m, float s)
 		use_last = 1;
 	}
 
-	return( m + y1 * s );
+	return m + y1 * s;
 }
 
-int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_UNIFORM*/, float deviation /*= 0.25*/)
+int random_range(int lowest_number, int highest_number, DistributionType_t type /*= DISTRO_UNIFORM*/)
 {
 	if(highest_number == lowest_number){
 		return lowest_number;
@@ -278,7 +252,7 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 		return lowest_number + r;
 	}
 	else if(type == DISTRO_NORMAL){
-		float value = box_muller(0.5, deviation);
+		float value = box_muller(0.5, 0.25);
 
 		if(value < 0){
 			value = 0;
@@ -298,14 +272,14 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 void hexdump(unsigned char *_data, int _len) {
 	int i;
 	for(; _len > 0; _data += 16, _len -= 16) {
-		for (i = 0; i < 16 && i < _len; ++i)
+		for (i = 0; i < 16 && i < _len; i++)
 			fprintf(stderr, "%02x ", _data[i]);
-		for(; i < 16; ++i)
+		for(; i < 16; i++)
 			fprintf(stderr, "   ");
 
 		fprintf(stderr, " ");
-		for(i = 0; i < 16 && i < _len; ++i)
-			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
+		for(i = 0; i < 16 && i < _len; i++)
+			fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '?' : _data[i]);
 
 		fprintf(stderr, "\n");
 	}
@@ -318,31 +292,6 @@ char upchar(char c)
 		return c-32;
 	}
 	return c;
-}
-
-std::string urlEncode(const std::string& str)
-{
-	return urlEncode(str.c_str());
-}
-
-std::string urlEncode(const char* str)
-{
-	std::string out;
-	const char* it;
-	for(it = str; *it != 0; ++it){
-		char ch = *it;
-		if(!(ch >= '0' && ch <= '9') &&
-			!(ch >= 'A' && ch <= 'Z') &&
-			!(ch >= 'a' && ch <= 'z')){
-				char tmp[4];
-				sprintf(tmp, "%%%02X", ch);
-				out = out + tmp;
-			}
-		else{
-			out = out + *it;
-		}
-	}
-	return out;
 }
 
 bool passwordTest(std::string plain, std::string &hash)
@@ -435,218 +384,6 @@ void formatDateShort(time_t time, char* buffer)
 	}
 }
 
-struct MagicEffectNames{
-	const char* name;
-	MagicEffectClasses effect;
-};
-
-struct ShootTypeNames{
-	const char* name;
-	ShootType_t shoot;
-};
-
-struct AmmoTypeNames{
-	const char* name;
-	Ammo_t ammoType;
-};
-
-struct AmmoActionNames{
-	const char* name;
-	AmmoAction_t ammoAction;
-};
-
-MagicEffectNames magicEffectNames[] = {
-	{"redspark",          NM_ME_DRAW_BLOOD},
-	{"bluebubble",        NM_ME_LOSE_ENERGY},
-	{"poff",              NM_ME_PUFF},
-	{"yellowspark",       NM_ME_BLOCKHIT},
-	{"explosionarea",     NM_ME_EXPLOSION_AREA},
-	{"explosion",         NM_ME_EXPLOSION_DAMAGE},
-	{"firearea",          NM_ME_FIRE_AREA},
-	{"yellowbubble",      NM_ME_YELLOW_RINGS},
-	{"greenbubble",       NM_ME_POISON_RINGS},
-	{"blackspark",        NM_ME_HIT_AREA},
-	{"teleport",          NM_ME_TELEPORT},
-	{"energy",            NM_ME_ENERGY_DAMAGE},
-	{"blueshimmer",       NM_ME_MAGIC_ENERGY},
-	{"redshimmer",        NM_ME_MAGIC_BLOOD},
-	{"greenshimmer",      NM_ME_MAGIC_POISON},
-	{"fire",              NM_ME_HITBY_FIRE},
-	{"earth",             NM_ME_POISON},
-	{"greenspark",        NM_ME_POISON},
-	{"mortarea",          NM_ME_MORT_AREA},
-	{"greennote",         NM_ME_SOUND_GREEN},
-	{"rednote",           NM_ME_SOUND_RED},
-	{"poison",            NM_ME_POISON_AREA},
-	{"yellownote",        NM_ME_SOUND_YELLOW},
-	{"purplenote",        NM_ME_SOUND_PURPLE},
-	{"bluenote",          NM_ME_SOUND_BLUE},
-	{"whitenote",         NM_ME_SOUND_WHITE},
-	{"bubbles",           NM_ME_BUBBLES},
-	{"dice",              NM_ME_CRAPS},
-	{"giftwraps",         NM_ME_GIFT_WRAPS},
-	{"yellowfirework",    NM_ME_FIREWORK_YELLOW},
-	{"redfirework",       NM_ME_FIREWORK_RED},
-	{"bluefirework",      NM_ME_FIREWORK_BLUE},
-	{"stun",              NM_ME_STUN},
-	{"sleep",             NM_ME_SLEEP},
-	{"watercreature",     NM_ME_WATERCREATURE},
-	{"groundshaker",      NM_ME_GROUNDSHAKER},
-	{"hearts",            NM_ME_HEARTS},
-	{"fireattack",        NM_ME_FIREATTACK},
-	{"energyarea",        NM_ME_ENERGY_AREA},
-	{"smallclouds",       NM_ME_SMALLCLOUDS},
-	{"holydamage",        NM_ME_HOLYDAMAGE},
-	{"bigclouds",         NM_ME_BIGCLOUDS},
-	{"icearea",           NM_ME_ICEAREA},
-	{"icetornado",        NM_ME_ICETORNADO},
-	{"iceattack",         NM_ME_ICEATTACK},
-	{"stones",            NM_ME_STONES},
-	{"smallplants",       NM_ME_SMALLPLANTS},
-	{"carniphila",        NM_ME_CARNIPHILA},
-	{"purpleenergy",      NM_ME_PURPLEENERGY},
-	{"yellowenergy",      NM_ME_YELLOWENERGY},
-	{"holyarea",          NM_ME_HOLYAREA},
-	{"bigplants",         NM_ME_BIGPLANTS},
-	{"cake",              NM_ME_CAKE},
-	{"giantice",          NM_ME_GIANTICE},
-	{"watersplash",       NM_ME_WATERSPLASH},
-	{"plantattack",       NM_ME_PLANTATTACK},
-	{"tutorialarrow",     NM_ME_TUTORIALARROW},
-	{"tutorialsquare",    NM_ME_TUTORIALSQUARE},
-	{"mirrorhorizontal",  NM_ME_MIRRORHORIZONTAL},
-	{"mirrorvertical",    NM_ME_MIRRORVERTICAL},
-	{"skullhorizontal",   NM_ME_SKULLHORIZONTAL},
-	{"skullvertical",     NM_ME_SKULLVERTICAL},
-	{"assassin",          NM_ME_ASSASSIN},
-	{"stepshorizontal",   NM_ME_STEPSHORIZONTAL},
-	{"bloodysteps",       NM_ME_BLOODYSTEPS},
-	{"stepsvertical",     NM_ME_STEPSVERTICAL},
-	{"yalaharighost",     NM_ME_YALAHARIGHOST},
-	{"bats",              NM_ME_BATS},
-	{"smoke",             NM_ME_SMOKE},
-	{"insects",           NM_ME_INSECTS},
-	{"dragonhead",        NM_ME_DRAGONHEAD}
-};
-
-ShootTypeNames shootTypeNames[] = {
-	{"spear",             NM_SHOOT_SPEAR},
-	{"bolt",              NM_SHOOT_BOLT},
-	{"arrow",             NM_SHOOT_ARROW},
-	{"fire",              NM_SHOOT_FIRE},
-	{"energy",            NM_SHOOT_ENERGY},
-	{"poisonarrow",       NM_SHOOT_POISONARROW},
-	{"burstarrow",        NM_SHOOT_BURSTARROW},
-	{"throwingstar",      NM_SHOOT_THROWINGSTAR},
-	{"throwingknife",     NM_SHOOT_THROWINGKNIFE},
-	{"smallstone",        NM_SHOOT_SMALLSTONE},
-	{"death",             NM_SHOOT_DEATH},
-	{"largerock",         NM_SHOOT_LARGEROCK},
-	{"snowball",          NM_SHOOT_SNOWBALL},
-	{"powerbolt",         NM_SHOOT_POWERBOLT},
-	{"poison",            NM_SHOOT_POISONFIELD},
-	{"infernalbolt",      NM_SHOOT_INFERNALBOLT},
-	{"huntingspear",      NM_SHOOT_HUNTINGSPEAR},
-	{"enchantedspear",    NM_SHOOT_ENCHANTEDSPEAR},
-	{"redstar",           NM_SHOOT_REDSTAR},
-	{"greenstar",         NM_SHOOT_GREENSTAR},
-	{"royalspear",        NM_SHOOT_ROYALSPEAR},
-	{"sniperarrow",       NM_SHOOT_SNIPERARROW},
-	{"onyxarrow",         NM_SHOOT_ONYXARROW},
-	{"piercingbolt",      NM_SHOOT_PIERCINGBOLT},
-	{"whirlwindsword",    NM_SHOOT_WHIRLWINDSWORD},
-	{"whirlwindaxe",      NM_SHOOT_WHIRLWINDAXE},
-	{"whirlwindclub",     NM_SHOOT_WHIRLWINDCLUB},
-	{"etherealspear",     NM_SHOOT_ETHEREALSPEAR},
-	{"ice",               NM_SHOOT_ICE},
-	{"earth",             NM_SHOOT_EARTH},
-	{"holy",              NM_SHOOT_HOLY},
-	{"suddendeath",       NM_SHOOT_SUDDENDEATH},
-	{"flasharrow",        NM_SHOOT_FLASHARROW},
-	{"flammingarrow",     NM_SHOOT_FLAMMINGARROW},
-	{"shiverarrow",       NM_SHOOT_SHIVERARROW},
-	{"energyball",        NM_SHOOT_ENERGYBALL},
-	{"smallice",          NM_SHOOT_SMALLICE},
-	{"smallholy",         NM_SHOOT_SMALLHOLY},
-	{"smallearth",        NM_SHOOT_SMALLEARTH},
-	{"eartharrow",        NM_SHOOT_EARTHARROW},
-	{"explosion",         NM_SHOOT_EXPLOSION},
-	{"cake",              NM_SHOOT_CAKE}
-};
-
-AmmoTypeNames ammoTypeNames[] = {
-	{"spear",          AMMO_SPEAR},
-	{"bolt",           AMMO_BOLT},
-	{"arrow",          AMMO_ARROW},
-	{"poisonarrow",    AMMO_ARROW},
-	{"burstarrow",     AMMO_ARROW},
-	{"throwingstar",   AMMO_THROWINGSTAR},
-	{"throwingknife",  AMMO_THROWINGKNIFE},
-	{"smallstone",     AMMO_STONE},
-	{"largerock",      AMMO_STONE},
-	{"snowball",       AMMO_SNOWBALL},
-	{"powerbolt",      AMMO_BOLT},
-	{"infernalbolt",   AMMO_BOLT},
-	{"huntingspear",   AMMO_SPEAR},
-	{"enchantedspear", AMMO_SPEAR},
-	{"royalspear",     AMMO_SPEAR},
-	{"sniperarrow",    AMMO_ARROW},
-	{"onyxarrow",      AMMO_ARROW},
-	{"piercingbolt",   AMMO_BOLT},
-	{"etherealspear",  AMMO_SPEAR},
-	{"flasharrow",     AMMO_ARROW},
-	{"flammingarrow",  AMMO_ARROW},
-	{"shiverarrow",    AMMO_ARROW},
-	{"eartharrow",     AMMO_ARROW}
-};
-
-AmmoActionNames ammoActionNames[] = {
-	{"move",          AMMOACTION_MOVE},
-	{"moveback",      AMMOACTION_MOVEBACK},
-	{"removecharge",  AMMOACTION_REMOVECHARGE},
-	{"removecount",   AMMOACTION_REMOVECOUNT}
-};
-
-MagicEffectClasses getMagicEffect(const std::string& strValue)
-{
-	for(uint32_t i = 0; i < sizeof(magicEffectNames)/sizeof(MagicEffectNames); ++i){
-		if(boost::algorithm::iequals(strValue.c_str(), magicEffectNames[i].name)){
-			return magicEffectNames[i].effect;
-		}
-	}
-	return NM_ME_UNK;
-}
-
-ShootType_t getShootType(const std::string& strValue)
-{
-	for(uint32_t i = 0; i < sizeof(shootTypeNames)/sizeof(ShootTypeNames); ++i){
-		if(boost::algorithm::iequals(strValue.c_str(), shootTypeNames[i].name)){
-			return shootTypeNames[i].shoot;
-		}
-	}
-	return NM_SHOOT_UNK;
-}
-
-Ammo_t getAmmoType(const std::string& strValue)
-{
-	for(uint32_t i = 0; i < sizeof(ammoTypeNames)/sizeof(AmmoTypeNames); ++i){
-		if(boost::algorithm::iequals(strValue.c_str(), ammoTypeNames[i].name)){
-			return ammoTypeNames[i].ammoType;
-		}
-	}
-	return AMMO_NONE;
-}
-
-AmmoAction_t getAmmoAction(const std::string& strValue)
-{
-	for(uint32_t i = 0; i < sizeof(ammoActionNames)/sizeof(AmmoActionNames); ++i){
-		if(boost::algorithm::iequals(strValue.c_str(), ammoActionNames[i].name)){
-			return ammoActionNames[i].ammoAction;
-		}
-	}
-	return AMMOACTION_NONE;
-}
-
 std::string getViolationReasonString(int32_t reasonId)
 {
 	switch(reasonId)
@@ -696,70 +433,62 @@ std::string getViolationReasonString(int32_t reasonId)
 	return "Unknown Reason";
 }
 
-std::string getViolationActionString(violationAction_t actionId, bool ipBanishment)
+std::string getViolationActionString(ViolationAction actionId, bool ipBanishment)
 {
 	std::string action;
-	switch(actionId)
-	{
-		case ACTION_NOTATION:
-			action = "Notation";
-			break;
-		case ACTION_NAMEREPORT:
-			action = "Name Report";
-			break;
-		case ACTION_BANREPORT:
-			action = "Name Report + Banishment";
-			break;
-		case ACTION_BANFINAL:
-			action = "Banishment + Final Warning";
-			break;
-		case ACTION_BANREPORTFINAL:
-			action = "Name Report + Banishment + Final Warning";
-			break;
-		case ACTION_STATEMENT:
-			action = "Statement Report";
-			break;
-		case ACTION_DELETION:
-			action = "Deletion";
-			break;
-		case ACTION_BANISHMENT:
-		default:
-			action = "Banishment";
-			break;
-	}
 
+	if(actionId == ACTION_NOTATION)
+		action = "Notation";
+	else if(actionId == ACTION_NAMEREPORT)
+		action = "Name Report";
+	else if(actionId == ACTION_BANREPORT)
+		action = "Name Report + Banishment";
+	else if(actionId == ACTION_BANFINAL)
+		action = "Banishment + Final Warning";
+	else if(actionId == ACTION_BANREPORTFINAL)
+		action = "Name Report + Banishment + Final Warning";
+	else if(actionId == ACTION_STATEMENT)
+		action = "Statement Report";
+	else if(actionId == ACTION_DELETION)
+		action = "Deletion";
+	else if(actionId == ACTION_BANISHMENT)
+			action = "Banishment";
+	
 	if(ipBanishment)
 		action += " + IP Banishment";
 
 	return action;
 }
 
-std::string playerSexAdjectiveString(PlayerSex_t sex)
+std::string playerSexAdjectiveString(PlayerSex sex)
 {
-	if(sex % 2 == 0){
+	if(sex.value() % 2 == 0)
 		return "her";
-	}
-	else{
+	else
 		return "his";
-	}
 }
 
-std::string playerSexSubjectString(PlayerSex_t sex)
+std::string playerSexSubjectString(PlayerSex sex)
 {
-	if(sex % 2 == 0){
+	if(sex.value() % 2 == 0)
 		return "She";
-	}
-	else{
+	else
 		return "He";
+}
+
+std::string combatTypeToString(CombatType type)
+{
+	std::vector<std::string> vector = type.toStrings();
+	if(vector.empty()){
+		return "";
 	}
+
+	return (vector.size() == 1 ? vector[0] : vector[1]);
 }
 
 #define MOD_ADLER 65521
 uint32_t adlerChecksum(uint8_t *data, int32_t len)
 {
-	if(len > NETWORKMESSAGE_MAXSIZE)
-		return 0;
-		
 	if(len < 0){
 		std::cout << "[Error] adlerChecksum. len < 0" << std::endl;
 		return 0;
@@ -782,82 +511,3 @@ uint32_t adlerChecksum(uint8_t *data, int32_t len)
 
 	return (b << 16) | a;
 }
-
-void showTime(std::stringstream& str, uint32_t time)
-{
-	if(time == 0xFFFFFFFF){
-		str << "permanent";
-	}
-	else if(time == 0){
-		str << "serversave";
-	}
-	else{
-		char buffer[32];
-		formatDate((time_t)time, buffer);
-		str << buffer;
-	}
-}
-
-uint32_t parseTime(const std::string& time)
-{
-	if(time == "serversave" || time == "shutdown"){
-		return 0;
-	}
-	if(time == "permanent"){
-		return 0xFFFFFFFF;
-	}
-	else{
-		boost::char_separator<char> sep("+");
-		tokenizer timetoken(time, sep);
-		tokenizer::iterator timeit = timetoken.begin();
-		if(timeit == timetoken.end()){
-			return 0;
-		}
-		uint32_t number = atoi(timeit->c_str());
-		uint32_t multiplier = 0;
-		++timeit;
-		if(timeit == timetoken.end()){
-			return 0;
-		}
-		if(*timeit == "m") //minute
-			multiplier = 60;
-		if(*timeit == "h") //hour
-			multiplier = 60*60;
-		if(*timeit == "d") //day
-			multiplier = 60*60*24;
-		if(*timeit == "w") //week
-			multiplier = 60*60*24*7;
-		if(*timeit == "o") //month
-			multiplier = 60*60*24*30;
-		if(*timeit == "y") //year
-			multiplier = 60*60*24*365;
-
-		uint32_t currentTime = std::time(NULL);
-		return currentTime + number*multiplier;
-	}
-}
-
-std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end)
-{
-	std::string tmp;
-	if(it == end){
-		return "";
-	}
-	else{
-		tmp = *it;
-		++it;
-		if(tmp[0] == '"'){
-			tmp.erase(0,1);
-			while(it != end && tmp[tmp.length() - 1] != '"'){
-				tmp += " " + *it;
-				++it;
-			}
-
-			if(tmp.length() > 0 && tmp[tmp.length() - 1] == '"'){
-				tmp.erase(tmp.length() - 1);
-			}
-		}
-		return tmp;
-	}
-}
-

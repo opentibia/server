@@ -21,34 +21,33 @@
 #ifndef __OTSERV_VOCATION_H__
 #define __OTSERV_VOCATION_H__
 
-#include "definitions.h"
 #include "enums.h"
 #include "const.h"
-#include <string>
-#include <map>
 
 class Vocation
 {
-public:
+	Vocation(uint32_t id);
 	~Vocation();
+public:
+	uint32_t getID() const {return id;}
+	const std::string& getVocName() const {return name;}
+	const std::string& getVocDescription() const {return description;}
+	uint32_t getReqSkillTries(SkillType skill, int32_t level);
+	uint32_t getReqMana(int32_t magLevel);
 
-	const std::string& getName() const {return name;}
-	const std::string& getDescription() const {return description;}
+	uint32_t getHPGain() const {return gainHP;}
+	uint32_t getManaGain() const {return gainMana;}
+	uint32_t getCapGain() const {return gainCap;}
 
-	uint64_t getReqSkillTries(int32_t skill, int32_t level);
-	uint64_t getReqMana(int32_t magLevel);
-	uint32_t getHPGain() const {return gainHP;};
-	uint32_t getManaGain() const {return gainMana;};
-	uint32_t getCapGain() const {return gainCap;};
-	uint32_t getManaGainTicks() const {return gainManaTicks;};
-	uint32_t getManaGainAmount() const {return gainManaAmount;};
-	uint32_t getHealthGainTicks() const {return gainHealthTicks;};
-	uint32_t getHealthGainAmount() const {return gainHealthAmount;};
-	uint16_t getSoulMax() const {return maxSoul;};
-	uint16_t getSoulGainTicks() const {return gainSoulTicks;};
-	uint32_t getAttackSpeed() const {return attackSpeed;};
+	uint32_t getManaGainTicks() const {return gainManaTicks;}
+	uint32_t getManaGainAmount() const {return gainManaAmount;}
+	uint32_t getHealthGainTicks() const {return gainHealthTicks;}
+	uint32_t getHealthGainAmount() const {return gainHealthAmount;}
 
-	float getMeleeBaseDamage(WeaponType_t weaponType) const
+	uint16_t getSoulMax() const {return maxSoul;}
+	uint16_t getSoulGainTicks() const {return gainSoulTicks;}
+
+	float getMeleeBaseDamage(WeaponType weaponType) const
 	{
 		if(weaponType == WEAPON_SWORD)
 			return swordBaseDamage;
@@ -62,18 +61,17 @@ public:
 			return fistBaseDamage;
 	};
 
-	float getMagicBaseDamage() const {return magicBaseDamage;};
-	float getWandBaseDamage() const {return wandBaseDamage;};
-	float getHealingBaseDamage() const {return healingBaseDamage;};
-	float getBaseDefense() const {return baseDefense;};
-	float getArmorDefense() const {return armorDefense;};
+	float getMagicBaseDamage() const {return magicBaseDamage;}
+	float getWandBaseDamage() const {return wandBaseDamage;}
+	float getHealingBaseDamage() const {return healingBaseDamage;}
+
+	float getBaseDefense() const {return baseDefense;}
+	float getArmorDefense() const {return armorDefense;}
 
 	void debugVocation();
 
 protected:
-	friend class Vocations;
-	Vocation();
-
+	uint32_t id;
 	std::string name;
 	std::string description;
 
@@ -81,33 +79,36 @@ protected:
 	uint32_t gainHealthAmount;
 	uint32_t gainManaTicks;
 	uint32_t gainManaAmount;
+
 	uint32_t gainCap;
 	uint32_t gainMana;
 	uint32_t gainHP;
+
 	uint16_t maxSoul;
 	uint16_t gainSoulTicks;
 
-	uint32_t skillBases[SKILL_LAST + 1];
-	float skillMultipliers[SKILL_LAST + 1];
+	uint32_t skillBases[SkillType::size];
+	float skillMultipliers[SkillType::size];
 	float manaMultiplier;
-	uint32_t attackSpeed;
 
 	float swordBaseDamage;
 	float axeBaseDamage;
 	float clubBaseDamage;
 	float distBaseDamage;
 	float fistBaseDamage;
+
 	float magicBaseDamage;
 	float wandBaseDamage;
 	float healingBaseDamage;
+
 	float baseDefense;
 	float armorDefense;
 
-	typedef std::map<uint32_t, uint64_t> manaCacheMap;
-	manaCacheMap cacheMana;
-
-	typedef std::map<uint32_t, uint32_t> skillCacheMap;
-	skillCacheMap cacheSkill[SKILL_LAST + 1];
+	typedef std::map<uint32_t, uint32_t> cacheMap;
+	cacheMap cacheMana;
+	cacheMap cacheSkill[SkillType::size];
+	
+	friend class Vocations;
 };
 
 
@@ -118,8 +119,8 @@ public:
 	~Vocations();
 
 	bool loadFromXml(const std::string& datadir);
-	bool getVocation(const uint32_t& vocationId, Vocation*& vocation);
-	bool getVocationId(const std::string& name, int32_t& vocationId) const;
+	Vocation* getVocation(uint32_t vocId);
+	int32_t getVocationId(const std::string& name);
 
 private:
 	typedef std::map<uint32_t, Vocation*> VocationsMap;

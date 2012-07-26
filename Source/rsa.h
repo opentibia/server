@@ -18,14 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_RSA_H__
 #define __OTSERV_RSA_H__
 
-#include "definitions.h"
 #include "gmp.h"
-#include <string.h>
-#include <boost/thread.hpp>
 
 class RSA{
 public:

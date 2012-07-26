@@ -1,6 +1,5 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
-//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,12 +16,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#include "definitions.h"
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <map>
+#ifndef __OTSERV_WAYPOINTS_H__
+#define __OTSERV_WAYPOINTS_H__
 
-class Waypoint {
+#include <boost/enable_shared_from_this.hpp>
+#include "tools.h"
+
+class Waypoint : public boost::enable_shared_from_this<Waypoint> {
 public:
 	Waypoint(const std::string& name, const Position& pos) :
 		name(name), pos(pos) {}
@@ -48,14 +48,17 @@ protected:
 
 inline void Waypoints::addWaypoint(Waypoint_ptr wp)
 {
-	waypoints.insert(std::make_pair(wp->name, wp));
+	waypoints.insert(std::make_pair(asUpperCaseString(wp->name), wp));
 }
 
 inline Waypoint_ptr Waypoints::getWaypointByName(const std::string& name) const
 {
-	WaypointMap::const_iterator f = waypoints.find(name);
+	std::string s = asUpperCaseString(name);
+	WaypointMap::const_iterator f = waypoints.find(s);
 	if(f == waypoints.end()) {
 		return Waypoint_ptr();
 	}
 	return f->second;
 }
+
+#endif

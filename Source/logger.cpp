@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,20 +21,18 @@
 
 #include "logger.h"
 #include "tools.h"
-#include <ctime>
 
 Logger::Logger()
 {
-	m_file.open("otlog.txt", std::ios::app);
-	if(m_file.good()){
-		m_registering = true;
-	}
+	m_file = fopen("otlog.txt", "a");
+	if(!m_file)
+		m_file = stderr;
 }
 
 Logger::~Logger()
 {
-	if(m_registering){
-		m_file.close();
+	if(m_file){
+		fclose(m_file);
 	}
 }
 
@@ -42,25 +40,19 @@ void Logger::logMessage(const char* channel, eLogType type, int level, std::stri
 {
 	//TODO: decide if should be saved or not depending on channel type and level
 	// if should be save decide where and how
-
-	//check if the file is open, if not, avoid writting to file
-	if(!m_registering){
-		return;
-	}
-
+	
 	//write timestamp of the event
 	char buffer[32];
-	time_t now = std::time(NULL);
-	formatDate(now, buffer);
-	m_file << buffer << std::endl;
-
+	time_t tmp = time(NULL);
+	formatDate(tmp, buffer);
+	fprintf(m_file, "%s", buffer);
 	//write channel generating the message
 	if(channel){
-		m_file << " [" << channel << "] ";
+		fprintf(m_file, " [%s] ", channel);
 	}
 
 	//write message type
-	std::string type_str;
+	const char* type_str;
 	switch(type){
 	case LOGTYPE_EVENT:
 		type_str = "event";
@@ -75,10 +67,9 @@ void Logger::logMessage(const char* channel, eLogType type, int level, std::stri
 		type_str = "???";
 		break;
 	}
-	m_file << " " << type_str << ":";
-
+	fprintf(m_file, " %s:", type_str);
 	//write the message
-	m_file << " " << message << std::endl;
+	fprintf(m_file, " %s\n", message.c_str());
 
-	m_file.flush();
+	fflush(m_file);
 }

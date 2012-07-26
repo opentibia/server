@@ -8,7 +8,6 @@ CREATE TABLE "groups" (
 	"maxviplist" INT NOT NULL,
 	PRIMARY KEY ("id")
 );
-INSERT INTO "groups" VALUES (1, 'Player', 0, 0, 0, 2000, 100),(2, 'Tutor', 16777216, 0, 0, 2000, 100),(3, 'Sennior Tutor', 274894684160, 0, 0, 2000, 100),(4, 'Community Manager', 69681547968463, 2, 0, 1000, 100),(5, 'Game Master', 69681547968463, 2, 0, 1000, 100),(6, 'GOD/OWNER', 57171953819640, 3, 0, 2000, 100);
 
 CREATE TABLE "accounts" (
 	"id" SERIAL,
@@ -21,7 +20,6 @@ CREATE TABLE "accounts" (
 	PRIMARY KEY ("id"),
 	UNIQUE ("name")
 );
-INSERT INTO "accounts" VALUES (1, 'tibia', 'tibia', '', 0, 0, 0);
 
 CREATE TABLE "players" (
 	"id" SERIAL,
@@ -57,17 +55,17 @@ CREATE TABLE "players" (
 	"conditions" BYTEA NOT NULL,
 	"skull_type" SMALLINT NOT NULL DEFAULT 0,
 	"skull_time" BIGINT NOT NULL DEFAULT 0,
+	"guildnick" VARCHAR(255) NOT NULL DEFAULT '',
 	"loss_experience" INT NOT NULL DEFAULT 100,
 	"loss_mana" INT NOT NULL DEFAULT 100,
 	"loss_skills" INT NOT NULL DEFAULT 100,
 	"loss_items" INT NOT NULL DEFAULT 10,
-	"loss_containers" INT NOT NULL DEFAULT 100
+	"loss_containers" INT NOT NULL DEFAULT 100,
+	"rank_id" INT NOT NULL,
 	"town_id" INT NOT NULL,
 	"balance" INT NOT NULL DEFAULT 0,
 	"stamina" INT NOT NULL DEFAULT 151200000,
 	"online" SMALLINT NOT NULL DEFAULT 0,
-	"rank_id" INT NOT NULL,
-	"guildnick" VARCHAR(255) NOT NULL,
 	PRIMARY KEY ("id"),
 	UNIQUE ("name"),
 	KEY ("online"),
@@ -78,11 +76,9 @@ CREATE TABLE "players" (
 CREATE TABLE "guilds" (
 	"id" SERIAL,
 	"name" VARCHAR(255) NOT NULL,
-	"owner_id" INT NOT NULL,
-	"creationdate" INT NOT NULL,
-	PRIMARY KEY ("id"),
-	UNIQUE ("name"),
-	FOREIGN KEY ("owner_id") REFERENCES "players" ("id") ON DELETE CASCADE
+	"ownerid" INT NOT NULL,
+	"creationdata" INT NOT NULL,
+	PRIMARY KEY ("id")
 );
 
 CREATE TABLE "guild_ranks" (
@@ -93,42 +89,6 @@ CREATE TABLE "guild_ranks" (
 	PRIMARY KEY ("id"),
 	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
 );
-
-CREATE TABLE "guild_members" (
-	"player_id" INT NOT NULL,
-	"rank_id" INT NOT NULL,
-	"guild_nick" VARCHAR(255) NOT NULL DEFAULT '',
-	UNIQUE ("player_id"),
-	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id") ON DELETE CASCADE
-);
-
-CREATE TABLE "guild_invites" (
-	"player_id" INT NOT NULL,
-	"guild_id" INT NOT NULL,
-	
-	UNIQUE ("player_id"),
-	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
-);
-
-CREATE TABLE "guild_wars" (
-	"id" SERIAL,
-	"guild_id" INT NOT NULL,
-	"opponent_id" INT NOT NULL,
-	"frag_limit" BIGINT NOT NULL DEFAULT 10,
-	"declaration_date" BIGINT NOT NULL,
-	"end_date" BIGINT NOT NULL,
-	"guild_fee" BIGINT NOT NULL DEFAULT 1000,
-	"opponent_fee" BIGINT NOT NULL DEFAULT 1000,
-	"guild_frags" BIGINT NOT NULL DEFAULT 0,
-	"opponent_frags" BIGINT NOT NULL DEFAULT 0,
-	"comment" VARCHAR(255) NOT NULL DEFAULT '',
-	"status" SMALLINT NOT NULL DEFAULT 0,
-	PRIMARY KEY ("id"),
-	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("opponent_id") REFERENCES "guilds" ("id") ON DELETE CASCADE
-);	
 
 CREATE TABLE "player_viplist" (
 	"player_id" INT NOT NULL,
@@ -145,8 +105,9 @@ CREATE TABLE "player_spells" (
 
 CREATE TABLE "player_storage" (
 	"player_id" INT NOT NULL,
-	"key" INT NOT NULL,
-	"value" INT NOT NULL,
+	"id" TEXT NOT NULL,
+	"value" TEXT NOT NULL,
+	PRIMARY KEY("player_id", "id"(10))
 	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE
 );
 
@@ -187,15 +148,13 @@ CREATE TABLE "houses" (
 );
 
 CREATE TABLE "house_auctions" (
-	"id" SERIAL,
 	"house_id" INT NOT NULL,
 	"player_id" INT NOT NULL,
 	"bid" INT NOT NULL DEFAULT 0,
 	"limit" INT NOT NULL DEFAULT 0,
 	"endtime" BIGINT NOT NULL DEFAULT 0,
 	FOREIGN KEY ("house_id") REFERENCES "houses" ("id") ON DELETE CASCADE,
-	FOREIGN KEY ("player_id") REFERENCES "players" ("id") ON DELETE CASCADE,
-	PRIMARY KEY ("id")
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE "house_lists" (
@@ -212,7 +171,7 @@ CREATE TABLE "bans" (
 	"active" SMALLINT DEFAULT 0,
 	"expires" BIGINT NOT NULL,
 	"added" BIGINT NOT NULL,
-	"admin_id" INT,
+	"admin_id" INT DEFAULT 0,
 	"comment" VARCHAR(1024) NOT NULL DEFAULT '',
 	"reason" INT DEFAULT 0,
 	"action" INT DEFAULT 0,
@@ -227,7 +186,7 @@ CREATE TABLE "tiles" (
 	"y" INT(6) NOT NULL,
 	"z" INT(3) NOT NULL,
 	PRIMARY KEY("id"),
-	FOREIGN KEY ("house_id") REFERENCES "houses" ("id") ON DELETE NO ACTION
+	UNIQUE("x", "y", "z")
 );
 
 CREATE TABLE "tile_items" (
@@ -302,7 +261,24 @@ CREATE TABLE "schema_info" (
 	PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 24);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 19);
+
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('1', 'Player', 0, 0, 1000, 50);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('2', 'Premium Player', 0, 0, 2000, 100);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('3', 'Tutor', 16777216, 0, 1000, 50);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('4', 'Premium Tutor', 16777216, 0, 2000, 100);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('5', 'Gamemaster', 217768239050, 1, 2000, 300);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('6', 'Senior Gamemaster', 269307846602, 2, 2000, 300);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('7', 'Community Manager', 272227082232, 3, 2000, 300);
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+	VALUES ('8', 'Server Administrator', 821982896120, 3, 2000, 300);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
@@ -318,6 +294,22 @@ BEFORE DELETE
 ON "accounts"
 FOR EACH ROW
 EXECUTE PROCEDURE "ondelete_accounts"();
+
+CREATE FUNCTION "ondelete_guilds"()
+RETURNS TRIGGER
+AS $$
+BEGIN
+	UPDATE "players" SET "guildnick" = '', "rank_id" = 0 WHERE "rank_id" IN (SELECT "id" FROM "guild_ranks" WHERE "guild_id" = OLD."id");
+
+	RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER "ondelete_guilds"
+BEFORE DELETE
+ON "guilds"
+FOR EACH ROW
+EXECUTE PROCEDURE "ondelete_guilds"();
 
 CREATE FUNCTION "ondelete_players"()
 RETURNS TRIGGER
@@ -375,8 +367,3 @@ AFTER INSERT
 ON "players"
 FOR EACH ROW
 EXECUTE PROCEDURE "oncreate_players"();
-
-INSERT INTO "players" VALUES (1, 'Administrator', 1, 6, 2, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
-INSERT INTO "players" VALUES (2, 'Player', 1, 1, 1, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
-
-# to add your own privileges for players/gms please use this flag generator http://hem.bredband.net/johannesrosen/playerflags.html

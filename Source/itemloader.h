@@ -21,8 +21,8 @@
 #ifndef __OTSERV_ITEMLOADER_H__
 #define __OTSERV_ITEMLOADER_H__
 
-#include "definitions.h"
 #include "fileloader.h"
+#include "definitions.h"
 
 typedef uint8_t attribute_t;
 typedef uint16_t datasize_t;
@@ -73,12 +73,6 @@ enum clientVersion_t{
 	CLIENT_VERSION_861 = 21,
 	CLIENT_VERSION_862 = 22,
 	CLIENT_VERSION_870 = 23,
-	CLIENT_VERSION_871 = 24,
-	CLIENT_VERSION_872 = 25,
-	CLIENT_VERSION_873 = 26,
-	CLIENT_VERSION_900 = 27,
-	CLIENT_VERSION_910 = 28,
-	CLIENT_VERSION_920 = 29
 };
 
 enum rootattrib_t{
@@ -144,7 +138,7 @@ enum itemflags_t {
 	FLAG_CANNOTDECAY = 524288,
 	FLAG_ALLOWDISTREAD = 1048576,
 	FLAG_UNUSED = 2097152,
-	FLAG_CLIENTCHARGES = 4194304, /*deprecated*/
+	FLAG_CLIENTCHARGES = 4194304, // deprecated
 	FLAG_LOOKTHROUGH = 8388608
 };
 
@@ -166,3 +160,4 @@ struct lightBlock2{
 #pragma pack()
 /////////OTB specific//////////////
 #endif
+

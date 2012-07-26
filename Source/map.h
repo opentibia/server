@@ -21,31 +21,12 @@
 #ifndef __OTSERV_MAP_H__
 #define __OTSERV_MAP_H__
 
-#include "definitions.h"
-#include "position.h"
-#include "item.h"
-#include "iomapserialize.h"
-#include "fileloader.h"
-#include "tools.h"
+#include "classes.h"
 #include "tile.h"
 #include "waypoints.h"
-#include <boost/shared_ptr.hpp>
-#include <queue>
 #include <bitset>
-#include <map>
-
-using boost::shared_ptr;
-
-class Creature;
-class Player;
-class Game;
-struct FindPathParams;
 
 #define MAP_MAX_LAYERS 16
-
-class Tile;
-class Map;
-class IOMap;
 
 struct AStarNode{
 	int32_t x, y;
@@ -102,7 +83,6 @@ struct Floor{
 };
 
 class FrozenPathingConditionCall;
-class QTreeLeafNode;
 
 class QTreeNode{
 public:
@@ -171,7 +151,7 @@ public:
 	* \param type map type "OTBM", "XML"
 	* \return true if the map was loaded successfully
 	*/
-	bool loadMap(const std::string& identifier, const std::string& type);
+	bool loadMap(const std::string& identifier);
 
 	/**
 	* Save a map.
@@ -184,8 +164,8 @@ public:
 	* Get a single tile.
 	* \return A pointer to that tile.
 	*/
-	Tile* getTile(int32_t x, int32_t y, int32_t z);
-	Tile* getTile(const Position& pos);
+	Tile* getParentTile(int32_t x, int32_t y, int32_t z);
+	Tile* getParentTile(const Position& pos);
 
 	QTreeLeafNode* getLeaf(uint16_t x, uint16_t y){ return root.getLeaf(x, y);}
 
@@ -194,9 +174,10 @@ public:
 	* \param a tile to set for the position
 	*/
 	void setTile(int32_t _x, int32_t _y, int32_t _z, Tile* newtile);
-	void setTile(const Position& pos, Tile* newtile) {
-		setTile(pos.x, pos.y, pos.z, newtile);
-	}
+	void setTile(const Position& pos, Tile* newtile) {setTile(pos.x, pos.y, pos.z, newtile);}
+	void reAssignTile(int32_t x, int32_t y, int32_t z, Tile* newtile);
+
+	void makeTileIndexed(const Position& pos);
 
 	/**
 	* Place a creature on the map
@@ -223,7 +204,7 @@ public:
 	*	\return The result if you can throw there or not
 	*/
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos, bool checkLineOfSight = true,
-		int32_t rangex = Map::maxClientViewportX, int32_t rangey = Map::maxClientViewportY);
+		int32_t rangex = Map_maxClientViewportX, int32_t rangey = Map_maxClientViewportY);
 
 	/**
 	* Checks if path is clear from fromPos to toPos
@@ -285,7 +266,7 @@ protected:
 	QTreeNode root;
 
 	struct RefreshBlock_t{
-		TileItemVector list;
+		ItemVector list;
 		uint64_t lastRefresh;
 	};
 
@@ -300,7 +281,6 @@ protected:
 };
 
 inline void QTreeLeafNode::addCreature(Creature* c) {
-	assert(c != NULL);
 	creature_list.push_back(c);
 }
 

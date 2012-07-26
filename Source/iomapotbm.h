@@ -21,9 +21,14 @@
 #ifndef __OTSERV_IOMAPOTBM_H__
 #define __OTSERV_IOMAPOTBM_H__
 
-#include "definitions.h"
 #include "iomap.h"
-#include "item.h"
+
+enum OTBM_Version {
+	OTBM_1 = 0,
+	OTBM_2 = 1,
+	OTBM_3 = 2,
+	OTBM_4 = 3,
+};
 
 enum OTBM_AttrTypes_t{
 	OTBM_ATTR_DESCRIPTION = 1,
@@ -111,12 +116,12 @@ struct OTBM_HouseTile_coords{
 #pragma pack()
 
 class IOMapOTBM : public IOMap{
-	static Tile* createTile(Item*& ground, Item* item, int px, int py, int pz);
+	static Tile* createTile(Item*& ground, Item* item, const Position& p);
 public:
 	IOMapOTBM(){};
 	~IOMapOTBM(){};
 
-	virtual const char* getSourceDescription(){ return "OTBM";};
+	virtual const char* getSourceDescription(){ return "OTBM";}
 	virtual bool loadMap(Map* map, const std::string& identifier);
 };
 

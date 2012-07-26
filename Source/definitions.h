@@ -21,19 +21,17 @@
 #ifndef __OTSERV_DEFINITIONS_H__
 #define __OTSERV_DEFINITIONS_H__
 
-#define OTSERV_VERSION "0.6.3_SVN"
-#define OTSERV_NAME "OTServ"
-#define OTSERV_CLIENT_VERSION "8.61"
 
-#define CURRENT_SCHEMA_VERSION 24
+#define OTSERV_VERSION "0.7.0_SVN"
+#define OTSERV_NAME "OTServ (branch revscriptsys)"
+#define CURRENT_SCHEMA_VERSION 25
+
+#define CLIENT_VERSION_MIN 870
+#define CLIENT_VERSION_MAX 870
+#define CLIENT_VERSION_STRING "8.70"
 
 #ifdef __USE_SQLITE__
 	#define SINGLE_SQL_DRIVER
-#endif
-
-//This is an code fully tested and shouldn't cause weird errors but marked it under flag for easier removing.
-#ifndef __GLOBALEVENTS__
-	#define __GLOBALEVENTS__
 #endif
 
 #ifdef __USE_MYSQL__
@@ -72,6 +70,83 @@ enum passwordType_t{
 	PASSWORD_TYPE_SHA1
 };
 
+// Figure out build type
+// __DEBUG__ / __RELEASE__ is the prefered form
+
+#if defined _DEBUG
+	#ifndef __DEBUG__
+		#define __DEBUG__ 1
+	#endif
+#endif
+
+#if defined DEBUG
+	#ifndef __DEBUG__
+		#define __DEBUG__ 1
+	#endif
+#elif defined __DEBUG__
+	#ifndef DEBUG
+		#define DEBUG 1
+	#endif
+#endif
+
+#if defined RELEASE
+	#ifndef __RELEASE__
+		#define __RELEASE__ 1
+	#endif
+#elif defined __RELEASE__
+	#ifndef RELEASE
+		#define RELEASE 1
+	#endif
+#endif
+
+#if defined __DEBUG__ && defined __RELEASE__
+	#error "A build cannot be both debug and release, use either -D__DEBUG__ or -D__RELEASE__"
+#endif
+
+#if !defined __DEBUG__ && !defined __RELEASE__
+	// Default to release
+	#define __RELEASE__ 1
+#endif
+
+#ifdef __DEBUG__
+	#define NDEBUG // Disabled assert
+#endif
+
+// Create assert macros
+
+#include <assert.h>
+
+#ifdef ASSERT
+	#undef ASSERT
+#endif
+#ifdef ASSERT_MSG
+	#undef ASSERT_MSG
+#endif
+
+#ifdef __DEBUG__
+	// Debug break for when it's needed
+	#ifdef _MSC_VER
+		#define DEBUGBREAK() __debugbreak()
+	#else
+		#define DEBUGBREAK() exit(EXIT_FAILURE)
+	#endif
+	
+	// Simple assert macro which also supports passing a message
+	#define ASSERT_MSG(expr, msg) \
+		do { \
+			if (! (expr)) { \
+				std::cerr << "Assertion `" << msg << "` failed" << std:: endl \
+					<< __FILE__ << ": " << __LINE__ << " in function " << __FUNCTION__ << std::endl; \
+				DEBUGBREAK(); \
+			} \
+		} \
+		while (false)
+#else
+	#define ASSERT_MSG(expr) (void)0
+#endif
+
+#define ASSERT(expr) ASSERT_MSG(expr, #expr)
+
 // Boost won't complain about non-working function
 #define BOOST_ASIO_ENABLE_CANCELIO 1
 
@@ -83,17 +158,22 @@ enum passwordType_t{
 #define make_str(str) xmake_str(str)
 
 /*
-	Compiler setup
+    Compiler setup
 */
 #if defined __GNUC__
 	#include "compiler/gcc.h"
+	#ifdef __MINGW32__
+		#include "compiler/mingw32.h"
+	#elif defined __CYGWIN__
+		#include "compiler/cygwin.h"
+	#endif
 #elif defined(_MSC_VER)
 	#include "compiler/msvc.h"
 #endif
 
 /*
-	If the compiler supports the upcoming standard,
-	call some of the useful headers.
+    If the compiler supports the upcoming standard,
+    call some of the useful headers.
 */
 #ifdef __OTSERV_CXX0X__
 	#include <cstdint>
@@ -113,29 +193,28 @@ enum passwordType_t{
 //Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
 
- #define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
+#ifdef __DEBUG_EXCEPTION_REPORT__
+	#define DEBUG_REPORT int *a = NULL; *a = 1;
+#else
+	#ifdef __EXCEPTION_TRACER__
+		#include "exception.h"
+		#define DEBUG_REPORT ExceptionHandler::dumpStack();
+	#else
+		#define DEBUG_REPORT
+	#endif
+#endif
+
+#ifdef XML_GCC_FREE
+	#define xmlFreeOTSERV(s)	free(s)
+#else
+	#define xmlFreeOTSERV(s)	xmlFree(s)
+#endif
+
+//#define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__ //experimental
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)
 	#define __SKULLSYSTEM__
-#endif
-
-// Boost exception handling must be enabled
-#ifdef BOOST_NO_EXCEPTIONS
-	#error "Boost exception handling must be enabled."
-#endif
-
-//Enable multi-byte character set under MSVC
-#ifdef _MSC_VER
-	#ifndef _MBCS
-		#define _MBCS
-	#endif
-	#ifdef _UNICODE
-		#undef _UNICODE 
-	#endif
-	#ifdef UNICODE
-		#undef UNICODE
-	#endif
 #endif
 
 #endif

@@ -19,9 +19,11 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <iostream>
 #include "scheduler.h"
+
+#if defined __EXCEPTION_TRACER__
 #include "exception.h"
+#endif
 
 Scheduler::Scheduler()
 {
@@ -32,15 +34,19 @@ Scheduler::Scheduler()
 void Scheduler::start()
 {
 	m_threadState = STATE_RUNNING;
-	m_thread = boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)this));
+	boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)this));
 }
 
 void Scheduler::schedulerThread(void* p)
 {
 	Scheduler* scheduler = (Scheduler*)p;
-
+	#if defined __EXCEPTION_TRACER__
 	ExceptionHandler schedulerExceptionHandler;
 	schedulerExceptionHandler.InstallHandler();
+	#endif
+	#ifdef __DEBUG_SCHEDULER__
+	std::cout << "Starting Scheduler" << std::endl;
+	#endif
 
 	// NOTE: second argument defer_lock is to prevent from immediate locking
 	boost::unique_lock<boost::mutex> eventLockUnique(scheduler->m_eventLock, boost::defer_lock);
@@ -71,7 +77,7 @@ void Scheduler::schedulerThread(void* p)
 		#endif
 
 		// the mutex is locked again now...
-		if(!ret && (scheduler->m_threadState != STATE_TERMINATED)){
+		if(ret == false && (scheduler->m_threadState != STATE_TERMINATED)){
 			// ok we had a timeout, so there has to be an event we have to execute...
 			task = scheduler->m_eventList.top();
 			scheduler->m_eventList.pop();
@@ -104,8 +110,9 @@ void Scheduler::schedulerThread(void* p)
 			}
 		}
 	}
-
+#if defined __EXCEPTION_TRACER__
 	schedulerExceptionHandler.RemoveHandler();
+#endif
 }
 
 uint32_t Scheduler::addEvent(SchedulerTask* task)
@@ -205,7 +212,3 @@ void Scheduler::shutdown()
 	m_eventLock.unlock();
 }
 
-void Scheduler::join()
-{
-	m_thread.join();
-}

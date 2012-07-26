@@ -18,14 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_STATUS_H
-#define __OTSERV_STATUS_H
+#ifndef __OTSERV_STATUS_H__
+#define __OTSERV_STATUS_H__
 
-#include "definitions.h"
-#include "networkmessage.h"
 #include "protocol.h"
-#include <string>
-#include <map>
 
 class ProtocolStatus : public Protocol
 {
@@ -79,15 +75,20 @@ public:
 
 	std::string getStatusString() const;
 	void getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const;
+
 	uint32_t getPlayersOnline() const {return m_playersonline;}
-	uint64_t getUptime() const;
+	uint32_t getMaxPlayersOnline() const {return m_playersmax;}
+
+	void setMaxPlayersOnline(int max){m_playersmax = max;}
+
+	uint64_t getUpTime() const;
 
 protected:
 	Status();
 
 private:
 	uint64_t m_start;
-	int m_playersonline, m_playerspeak;
+	int m_playersmax, m_playersonline, m_playerspeak;
 	std::string m_mapname, m_mapauthor;
 
 };

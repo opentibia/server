@@ -17,11 +17,9 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
 #include "otpch.h"
 
 #include "fileloader.h"
-#include <cmath>
 
 FileLoader::FileLoader()
 {
@@ -49,13 +47,13 @@ FileLoader::~FileLoader()
 	NodeStruct::clearNet(m_root);
 	delete[] m_buffer;
 
-	for(int i = 0; i < CACHE_BLOCKS; ++i){
+	for(int i = 0; i < CACHE_BLOCKS; i++){
 		if(m_cached_data[i].data)
 			delete[] m_cached_data[i].data;
 	}
 }
 
-bool FileLoader::openFile(const char* filename, const char* accept_identifier, bool write, bool caching /*= false*/)
+bool FileLoader::openFile(const char* filename, bool write, bool caching /*= false*/)
 {
 	if(write) {
 		m_file = fopen(filename, "wb");
@@ -72,17 +70,8 @@ bool FileLoader::openFile(const char* filename, const char* accept_identifier, b
 	else {
 		m_file = fopen(filename, "rb");
 		if(m_file){
-			char identifier[4];
-			if(fread(identifier, 1, 4, m_file) < 4){
-				fclose(m_file);
-				m_file = NULL;
-				m_lastError = ERROR_INVALID_FILE_VERSION;
-				return false;
-			}
-			// Accept 0x00000000 as wildcard
-			else if (memcmp(identifier, accept_identifier, 4) != 0 &&
-					 memcmp(identifier, "\0\0\0\0", 4) != 0)
-			{
+			uint32_t version;
+			if(fread(&version, sizeof(version), 1, m_file) && version > 0){
 				fclose(m_file);
 				m_file = NULL;
 				m_lastError = ERROR_INVALID_FILE_VERSION;
@@ -216,11 +205,11 @@ const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
 {
 	if(node){
 		while(node->propsSize >= m_buffer_size){
-            delete[] m_buffer;
-            while (node->propsSize >= m_buffer_size)
+			delete[] m_buffer;
+			while (node->propsSize >= m_buffer_size)
 				m_buffer_size *= 2;
-            m_buffer = new unsigned char[m_buffer_size];
-        }
+			m_buffer = new unsigned char[m_buffer_size];
+		}
 		//get buffer
 		if(readBytes(m_buffer, node->propsSize, node->start + 2)){
 			//unscape buffer
@@ -489,7 +478,7 @@ inline unsigned long FileLoader::getCacheBlock(unsigned long pos)
 	bool found = false;
 	unsigned long i;
 	unsigned long base_pos = pos & ~(m_cache_size - 1);
-	for(i = 0; i < CACHE_BLOCKS; ++i){
+	for(i = 0; i < CACHE_BLOCKS; i++){
 		if(m_cached_data[i].loaded){
 			if(m_cached_data[i].base == base_pos){
 				found = true;
@@ -508,14 +497,14 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 	long i;
 	long loading_cache = -1;
 	long base_pos = pos & ~(m_cache_size - 1);
-	for(i = 0; i < CACHE_BLOCKS; ++i){
+	for(i = 0; i < CACHE_BLOCKS; i++){
 		if(!m_cached_data[i].loaded){
 			loading_cache = i;
 			break;
 		}
 	}
 	if(loading_cache == -1){
-		for(i = 0; i < CACHE_BLOCKS; ++i){
+		for(i = 0; i < CACHE_BLOCKS; i++){
 			if((long)(labs((long)m_cached_data[i].base - base_pos)) > (long)(2*m_cache_size)){
 				loading_cache = i;
 				break;

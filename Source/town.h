@@ -18,16 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#ifndef __OTSERV_TOWN_H__
+#define __OTSERV_TOWN_H__
 
-#ifndef __TOWN_H__
-#define __TOWN_H__
-
-#include "definitions.h"
 #include "position.h"
-#include <boost/algorithm/string/predicate.hpp>
-#include <string>
-#include <list>
-#include <map>
 
 class Town
 {
@@ -39,12 +33,12 @@ public:
 	
 	~Town(){};
 	
-	const Position& getTemplePosition() const {return posTemple;};
-	const std::string& getName() const {return townName;};
+	const Position& getTemplePosition() const {return posTemple;}
+	const std::string& getName() const {return townName;}
 
-	void setTemplePos(const Position& pos) {posTemple = pos;};
-	void setName(std::string _townName) {townName = _townName;};
-	uint32_t getTownID() const {return townid;};
+	void setTemplePos(const Position& pos) {posTemple = pos;}
+	void setName(std::string _townName) {townName = _townName;}
+	uint32_t getTownID() const {return townid;}
 
 private:
 	uint32_t townid;

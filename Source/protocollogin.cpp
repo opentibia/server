@@ -21,17 +21,13 @@
 
 #include "protocollogin.h"
 #include "outputmessage.h"
-#include "connection.h"
-#include "rsa.h"
-#include "configmanager.h"
-#include "tools.h"
 #include "ioaccount.h"
 #include "ban.h"
 #include "game.h"
+#include "configmanager.h"
 #include <iomanip>
 
 extern ConfigManager g_config;
-extern IPList serverIPs;
 extern BanManager g_bans;
 extern Game g_game;
 
@@ -73,7 +69,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	msg.SkipBytes(12);
 
 	if(version <= 760){
-		disconnectClient(0x0A, STRING_CLIENT_VERSION);
+		disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
 	}
 
 	if(!RSA_decrypt(msg)){
@@ -100,7 +96,7 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 	}
 
 	if(version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX){
-		disconnectClient(0x0A, STRING_CLIENT_VERSION);
+		disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
 		return false;
 	}
 
@@ -118,14 +114,15 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		disconnectClient(0x0A, "Your IP is banished!");
 		return false;
 	}
-
+	/*
 	uint32_t serverip = serverIPs[0].first;
-	for(uint32_t i = 0; i < serverIPs.size(); ++i){
+	for(uint32_t i = 0; i < serverIPs.size(); i++){
 		if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
 			serverip = serverIPs[i].first;
 			break;
 		}
 	}
+	*/
 
 	Account account = IOAccount::instance()->loadAccount(accname);
 	if(!(asLowerCaseString(account.name) == asLowerCaseString(accname) &&
@@ -151,15 +148,15 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		//Add char list
 		output->AddByte(0x64);
 		output->AddByte((uint8_t)account.charList.size());
-		std::list<std::string>::iterator it;
-		for(it = account.charList.begin(); it != account.charList.end(); ++it){
-			output->AddString((*it));
-			output->AddString(g_config.getString(ConfigManager::WORLD_NAME));
-			output->AddU32(serverip);
-			output->AddU16(g_config.getNumber(ConfigManager::GAME_PORT));
+		std::list<AccountCharacter>::iterator it;
+		for(it = account.charList.begin(); it != account.charList.end(); it++){
+			const AccountCharacter& character = *it;
+			output->AddString(character.name);
+			output->AddString(character.world);
+			output->AddU32(character.ip);
+			output->AddU16(character.port);
 		}
-		//Add premium days
-		output->AddU16(Account::getPremiumDaysLeft(account.premEnd));//output->AddU16(0);
+		output->AddU16(IOAccount::getPremiumDaysLeft(account.premiumEnd));
 
 		OutputMessagePool::getInstance()->send(output);
 	}

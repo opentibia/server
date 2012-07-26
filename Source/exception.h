@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,15 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __EXCEPTION_H__
-#define __EXCEPTION_H__
+#if defined __EXCEPTION_TRACER__
 
-#include "definitions.h"
-
-#ifdef __WINDOWS__
-	#include <Windows.h>
-	#include <dbghelp.h>
-#endif
+#ifndef __OTSERV_EXCEPTION_H__
+#define __OTSERV_EXCEPTION_H__
 
 class ExceptionHandler
 {
@@ -35,13 +30,31 @@ public:
 	~ExceptionHandler();
 	bool InstallHandler();
 	bool RemoveHandler();
-
+	static void dumpStack();
 private:
-#ifdef __WINDOWS__
-	static long WINAPI MiniDumpExceptionHandler(EXCEPTION_POINTERS* exceptionPointers = NULL);
-	static int ref_counter;
-#endif
+#if defined WIN32 || defined __WINDOWS__
+
+	#if defined _MSC_VER || defined __USE_MINIDUMP__
+
+		static long __stdcall MiniDumpExceptionHandler(struct _EXCEPTION_POINTERS *pExceptionInfo);
+		static int ref_counter;
+
+	#elif __GNUC__
+
+		struct SEHChain{
+				SEHChain *prev;
+				void *SEHfunction;
+			};
+			SEHChain chain;
+			bool LoadMap();
+			static bool isMapLoaded;
+		#endif
+
+	#endif
+
 	bool isInstalled;
 };
+
+#endif
 
 #endif

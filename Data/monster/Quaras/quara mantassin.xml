@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Quara Mantassin" nameDescription="a quara mantassin" race="blood" experience="400" speed="520" manacost="480">
 	<health now="800" max="800"/>
 	<look type="72" corpse="6064"/>
@@ -18,65 +18,38 @@
 		<flag runonhealth="40"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="60" attack="40"/>
+		<attack name="melee" interval="1000" skill="60" attack="65"/>
 	</attacks>
 	<defenses armor="15" defense="15">
-		<defense name="invisible" interval="2000" chance="20" duration="2000">
+		<defense name="invisible" interval="1000" chance="30" duration="2000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
-		<defense name="speed" interval="2000" chance="20" speedchange="800" duration="5000">
-			<attribute key="areaEffect" value="redshimmer"/>
-		</defense>	
 	</defenses>
 	<elements>
-		<element earthPercent="-10"/>
+		<element firePercent="100"/>
+		<element icePercent="100"/>
+		<element earthPercent="-12"/>
 		<element energyPercent="-25"/>
 	</elements>
 	<immunities>
 		<immunity lifedrain="1"/>
-		<immunity drown="1"/>
-		<immunity fire="1"/>
-		<immunity ice="1"/>
 	</immunities>
-	<voices interval="5000" chance="9">
+	<voices interval="5000" chance="10">
 		<voice sentence="Zuerk Pachak!"/>
 		<voice sentence="Shrrrr"/>
 	</voices>
 	<loot>
-    <item id="2381" chance="4375" /><!-- halberd -->
-    <item id="2148" countmax="100" chance="28675" /><!-- gold coin -->
-    <item id="2148" countmax="29" chance="28675" /><!-- gold coin -->
-    <item id="2656" chance="700" /><!-- blue robe -->
-    <item id="2165" chance="1500" /><!-- stealth ring -->
-    <item id="5895" countmax="3" chance="1000" /><!-- fish fin -->
-    <item id="2377" chance="1650" /><!-- two handed sword -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="2654" chance="1600" /><!-- cape -->
-            <item id="2146" chance="1650" /><!-- small sapphire -->
-            <item id="2670" chance="5400" /><!-- shrimp -->
-            <item id="12445" chance="10125" /><!-- mantassin tail -->
-            <item id="2479" chance="600" /><!-- strange helmet -->
-        </inside>
-    </item>
-</loot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		<item id="2670" countmax="5" chance="20000"/><!-- shrimp -->
+		<item id="5895" countmax="1" chance="2000"/><!-- fish fin -->
+		<item id="2148" countmax="100" chance="100000"/><!-- gold coin -->
+		<item id="2377" chance="1818"/><!-- two handed sword -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="5895" countmax="1" chance="3333"/><!-- fish fin -->
+				<item id="2229" countmax="1" chance="4000"/><!-- skull -->
+				<item id="2165" chance="1250"/><!-- stealth ring -->
+				<item id="2656" chance="500"/><!-- blue robe -->
+			</inside>
+		</item>
+	</loot>
 </monster>

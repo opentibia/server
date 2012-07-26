@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Minotaur Mage" nameDescription="a minotaur mage" race="blood" experience="150" speed="170" manacost="0">
 	<health now="155" max="155"/>
 	<look type="23" corpse="5981"/>
@@ -18,68 +18,52 @@
 		<flag runonhealth="0"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="10" attack="20"/>
-		<attack name="energy" interval="2000" chance="18" range="7" target="1" min="-0" max="-60">
-			<attribute key="shootEffect" value="energyball"/>
+		<attack name="melee" interval="2000" skill="18" attack="15"/>
+		<attack name="energy" interval="1000" chance="17" range="7" min="-15" max="-45">
+			<attribute key="shootEffect" value="energy"/>
 			<attribute key="areaEffect" value="energy"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="18" range="7" radius="1" target="1" min="-0" max="-105">
+		<attack name="fire" interval="2000" chance="10" range="7" radius="1" target="1" min="-35" max="-95">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
-		<attack name="energyfield" interval="2000" chance="18" range="7" radius="1" target="1">
+		<attack name="energyfield" interval="1000" chance="12" range="7" radius="1" target="1">
 			<attribute key="shootEffect" value="energy"/>
 		</attack>
 	</attacks>
 	<defenses armor="18" defense="20"/>
 	<elements>
 		<element energyPercent="20"/>
-		<element earthPercent="20"/>
+		<element earthPercent="15"/>
 		<element holyPercent="10"/>
-		<element icePercent="-10"/>
+		<element icePercent="-5"/>
 		<element deathPercent="-5"/>
 	</elements>
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="9">
+	<voices interval="5000" chance="10">
 		<voice sentence="Learrn tha secrret uf deathhh!"/>
 		<voice sentence="Kaplar!"/>
 	</voices>
 	<loot>
-    <item id="12428" countmax="2" chance="2500" /><!-- minotaur horn -->
-    <item id="2148" countmax="35" chance="45550" /><!-- gold coin -->
-    <item id="2684" countmax="8" chance="8100" /><!-- carrot -->
-    <item id="12429" chance="6600" /><!-- purple robe -->
-    <item id="5878" countmax="3" chance="1750" /><!-- minotaur leather -->
-    <item id="2649" chance="6175" /><!-- leather legs -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="2050" chance="4500" /><!-- torch -->
-            <item id="2461" chance="4700" /><!-- leather helmet -->
-            <item id="7425" chance="1350" /><!-- taurus mace -->
-            <item id="2189" chance="1125" /><!-- wand of cosmic energy -->
-            <item id="7620" chance="700" /><!-- mana potion -->
-        </inside>
-    </item>
-</loot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="20" chance="100000"/><!-- gold coin -->
+		<item id="2050" chance="10000"/><!-- torch -->
+		<item id="2461" chance="8000"/><!-- leather helmet -->
+		<item id="2649" chance="8000"/><!-- leather legs -->
+		<item id="5878" countmax="1" chance="5000"/><!-- minotaur leather -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2189" chance="1333"/><!-- wand of cosmic energy -->
+				<item id="2404" chance="10000"/><!-- combat knife -->
+				<item id="2362" countmax="5" chance="20000"/><!-- carrot of doom -->
+				<item id="2817" chance="10000"/><!-- dead snake -->
+				<item id="2311" chance="2857"/><!-- heavy magic missile rune -->
+				<item id="2465" chance="4000"/><!-- brass armor -->
+				<item id="2648" chance="4000"/><!-- chain legs -->
+				<item id="7425" chance="1000"/><!-- taurus mace -->
+			</inside>
+		</item>
+	</loot>
 </monster>

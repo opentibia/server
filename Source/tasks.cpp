@@ -19,12 +19,16 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "exception.h"
 #include "tasks.h"
+#include "otsystem.h"
 #include "outputmessage.h"
 #include "game.h"
 
 extern Game g_game;
+
+#if defined __EXCEPTION_TRACER__
+#include "exception.h"
+#endif
 
 Dispatcher::Dispatcher()
 {
@@ -35,16 +39,16 @@ Dispatcher::Dispatcher()
 void Dispatcher::start()
 {
 	m_threadState = STATE_RUNNING;
-	m_thread = boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)this));
+	boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)this));
 }
 
 void Dispatcher::dispatcherThread(void* p)
 {
 	Dispatcher* dispatcher = (Dispatcher*)p;
-
+	#if defined __EXCEPTION_TRACER__
 	ExceptionHandler dispatcherExceptionHandler;
 	dispatcherExceptionHandler.InstallHandler();
-
+	#endif
 	#ifdef __DEBUG_SCHEDULER__
 	std::cout << "Starting Dispatcher" << std::endl;
 	#endif
@@ -58,7 +62,7 @@ void Dispatcher::dispatcherThread(void* p)
 		Task* task = NULL;
 
 		// check if there are tasks waiting
-		taskLockUnique.lock();
+		taskLockUnique.lock(); //getDispatcher().m_taskLock.lock();
 
 		if(dispatcher->m_taskList.empty()){
 			//if the list is empty wait for signal
@@ -100,8 +104,9 @@ void Dispatcher::dispatcherThread(void* p)
 			#endif
 		}
 	}
-
+#if defined __EXCEPTION_TRACER__
 	dispatcherExceptionHandler.RemoveHandler();
+#endif
 }
 
 void Dispatcher::addTask(Task* task, bool push_front /*= false*/)
@@ -173,9 +178,4 @@ void Dispatcher::shutdown()
 	#ifdef __DEBUG_SCHEDULER__
 	std::cout << "Shutdown Dispatcher" << std::endl;
 	#endif
-}
-
-void Dispatcher::join()
-{
-	m_thread.join();
 }

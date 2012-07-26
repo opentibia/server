@@ -21,11 +21,6 @@
 
 #include "vocation.h"
 #include "tools.h"
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <iostream>
-#include <cmath>
-#include <boost/algorithm/string/predicate.hpp>
 
 Vocations::Vocations()
 {
@@ -57,15 +52,14 @@ bool Vocations::loadFromXml(const std::string& datadir)
 		p = root->children;
 
 		while(p){
-			std::string str;
-			int intVal;
-			float floatVal;
 			if(xmlStrcmp(p->name, (const xmlChar*)"vocation") == 0){
-				Vocation* voc = new Vocation();
-				uint32_t voc_id;
+				std::string str;
+				int intVal;
+				float floatVal;
+				Vocation* voc = NULL;
 				xmlNodePtr skillNode;
 				if(readXMLInteger(p, "id", intVal)){
-					voc_id = intVal;
+					voc = new Vocation(intVal);
 					if(readXMLString(p, "name", str)){
 						voc->name = str;
 					}
@@ -102,30 +96,24 @@ bool Vocations::loadFromXml(const std::string& datadir)
 					if(readXMLFloat(p, "manamultiplier", floatVal)){
 						voc->manaMultiplier = floatVal;
 					}
-					if(readXMLInteger(p, "attackspeed", intVal)){
-						voc->attackSpeed = intVal;
-					}
 					skillNode = p->children;
 					while(skillNode){
 						if(xmlStrcmp(skillNode->name, (const xmlChar*)"skill") == 0){
-							int32_t skill_id;
-							if(readXMLInteger(skillNode, "id", intVal)){
-								skill_id = intVal;
-								if(skill_id < SKILL_FIRST || skill_id > SKILL_LAST){
-									std::cout << "No valid skill id. " << skill_id << std::endl;
-
+							SkillType skill_id;
+							try {
+								if(readXMLInteger(skillNode, "id", intVal)){
+									skill_id = SkillType::fromInteger(intVal);
+								} else if(readXMLString(skillNode, "name", str)){
+									skill_id = SkillType::fromString(str);
 								}
-								else{
-									if(readXMLInteger(skillNode, "base", intVal)){
-										voc->skillBases[skill_id] = intVal;
-									}
-									if(readXMLFloat(skillNode, "multiplier", floatVal)){
-										voc->skillMultipliers[skill_id] = floatVal;
-									}
+								if(readXMLInteger(skillNode, "base", intVal)){
+									voc->skillBases[skill_id.value()] = intVal;
 								}
-							}
-							else{
-								std::cout << "Missing skill id." << std::endl;
+								if(readXMLFloat(skillNode, "multiplier", floatVal)){
+									voc->skillMultipliers[skill_id.value()] = floatVal;
+								}
+							} catch(enum_conversion_error&){
+								std::cout << "Missing skill id ." << std::endl;
 							}
 						}
 						else if(xmlStrcmp(skillNode->name, (const xmlChar*)"damage") == 0){
@@ -169,7 +157,7 @@ bool Vocations::loadFromXml(const std::string& datadir)
 
 					//std::cout << "Voc id: " << voc_id << std::endl;
 					//voc->debugVocation();
-					vocationsMap[voc_id] = voc;
+					vocationsMap[voc->getID()] = voc;
 
 				}
 				else{
@@ -183,30 +171,33 @@ bool Vocations::loadFromXml(const std::string& datadir)
 	return true;
 }
 
-bool Vocations::getVocation(const uint32_t& vocationId, Vocation*& vocation)
+Vocation* Vocations::getVocation(uint32_t vocId)
 {
-	VocationsMap::const_iterator it = vocationsMap.find(vocationId);
+	VocationsMap::iterator it = vocationsMap.find(vocId);
 	if(it != vocationsMap.end()){
-		vocation = it->second;
-		return true;
+		return it->second;
 	}
-	std::cout << "Warning: [Vocations::getVocation] Vocation " << vocationId << " not found." << std::endl;
-	return false;
+	else{
+		vocationsMap[vocId] = new Vocation(vocId);
+		std::cout << "Warning: [Vocations::getVocation] Vocation " << vocId << " not found." << std::endl;
+		return vocationsMap[vocId];
+	}
 }
 
-bool Vocations::getVocationId(const std::string& name, int32_t& vocationId) const
+int32_t Vocations::getVocationId(const std::string& name)
 {
-	for(VocationsMap::const_iterator it = vocationsMap.begin(); it != vocationsMap.end(); ++it){
+	for(VocationsMap::iterator it = vocationsMap.begin(); it != vocationsMap.end(); ++it){
 		if(boost::algorithm::iequals(it->second->name, name)){
-			vocationId = it->first;
-			return true;
+			return it->first;
 		}
 	}
-	return false;
+
+	return -1;
 }
 
-Vocation::Vocation()
+Vocation::Vocation(uint32_t _id)
 {
+	id = _id;
 	name = "none";
 	gainHealthTicks = 6;
 	gainHealthAmount = 1;
@@ -218,8 +209,6 @@ Vocation::Vocation()
 	maxSoul = 100;
 	gainSoulTicks = 120;
 	manaMultiplier = 4.0;
-	attackSpeed = 1500;
-
 	skillMultipliers[0] = 1.5f;
 	skillMultipliers[1] = 2.0f;
 	skillMultipliers[2] = 2.0f;
@@ -253,34 +242,32 @@ Vocation::Vocation()
 Vocation::~Vocation()
 {
 	cacheMana.clear();
-	for(uint32_t i = SKILL_FIRST; i < SKILL_LAST; ++i){
-		cacheSkill[i].clear();
-	}
+	for(SkillType::iterator i = SkillType::begin(); i != SkillType::end(); ++i)
+		cacheSkill[i->value()].clear();
 }
 
-uint64_t Vocation::getReqSkillTries(int32_t skill, int32_t level)
+uint32_t Vocation::getReqSkillTries(SkillType skill, int32_t level)
 {
-	if(skill < SKILL_FIRST || skill > SKILL_LAST){
-		return 0;
-	}
-	skillCacheMap& skillMap = cacheSkill[skill];
-	skillCacheMap::iterator it = skillMap.find(level);
-	if(it != cacheSkill[skill].end()){
+	assert(skill.exists());
+
+	cacheMap& skillMap = cacheSkill[skill.value()];
+	cacheMap::iterator it = skillMap.find(level);
+	if(it != cacheSkill[skill.value()].end())
 		return it->second;
-	}
-	uint64_t tries = (uint64_t)(skillBases[skill] * std::pow((float)skillMultipliers[skill], (float)(level - 11)));
+	
+	uint32_t tries = (uint32_t)(skillBases[skill.value()] * std::pow((float)skillMultipliers[skill.value()], (float)(level - 11)));
 	skillMap[level] = tries;
 	return tries;
 }
 
-uint64_t Vocation::getReqMana(int32_t magLevel)
+uint32_t Vocation::getReqMana(int32_t magLevel)
 {
-	manaCacheMap::iterator it = cacheMana.find(magLevel);
+	cacheMap::iterator it = cacheMana.find(magLevel);
 	if(it != cacheMana.end()){
 		return it->second;
 	}
 
-	uint64_t reqMana = (uint64_t)(1600*std::pow(manaMultiplier, magLevel-1));
+	uint32_t reqMana = (uint32_t)(1600*std::pow(manaMultiplier, magLevel-1));
 	cacheMana[magLevel] = reqMana;
 
 	return reqMana;
@@ -293,7 +280,7 @@ void Vocation::debugVocation()
 	std::cout << "gain time: Health(" << gainHealthTicks << " ticks, +" << gainHealthAmount << "). Mana(" <<
 		gainManaTicks << " ticks, +" << gainManaAmount << ")" << std::endl;
 	std::cout << "mana multiplier: " << manaMultiplier << std::endl;
-	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){
-		std::cout << "Skill id: " << i << " multiplier: " << skillMultipliers[i] << std::endl;
+	for(SkillType::iterator i = SkillType::begin(); i != SkillType::end(); ++i){
+		std::cout << "Skill id: " << i->toString() << " multiplier: " << skillMultipliers[i->value()] << std::endl;
 	}
 }

@@ -19,15 +19,18 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include "networkmessage.h"
-#include "container.h"
-#include "creature.h"
-#include "player.h"
-#include "position.h"
-#include "rsa.h"
 #include <string>
 #include <iostream>
 #include <sstream>
+
+#include "networkmessage.h"
+
+#include "container.h"
+#include "creature.h"
+#include "player.h"
+
+#include "position.h"
+#include "rsa.h"
 
 int32_t NetworkMessage::decodeHeader()
 {
@@ -117,7 +120,8 @@ void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 		AddByte(count);
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		AddByte(Item::items.getClientFluidType(FluidTypes_t(count)));
+		uint32_t fluidIndex = count % 8;
+		AddByte(fluidMap[fluidIndex].value());
 	}
 }
 
@@ -131,7 +135,8 @@ void NetworkMessage::AddItem(const Item* item)
 		AddByte(item->getSubType());
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		AddByte(Item::items.getClientFluidType(FluidTypes_t(item->getSubType())));
+		uint32_t fluidIndex = item->getSubType() % 8;
+		AddByte(fluidMap[fluidIndex].value());
 	}
 }
 

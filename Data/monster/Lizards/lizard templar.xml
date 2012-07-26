@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<monster name="Lizard Templar" nameDescription="a lizard templar" race="blood" experience="155" speed="220" manacost="0">
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<monster name="Lizard Templar" nameDescription="a lizard templar" race="blood" experience="115" speed="220" manacost="0">
 	<health now="410" max="410"/>
 	<look type="113" corpse="4251"/>
 	<targetchange interval="5000" chance="8"/>
@@ -18,54 +18,33 @@
 		<flag runonhealth="0"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="30" attack="35"/>
+		<attack name="melee" interval="2000" skill="44" attack="30"/>
 	</attacks>
 	<defenses armor="16" defense="19"/>
 	<elements>
-
+		<element earthPercent="100"/>
 		<element energyPercent="20"/>
 		<element icePercent="10"/>
 		<element firePercent="-10"/>
 	</elements>
-	<immunities>
-<immunity earth="1"/>
-</immunities>
-	<voices interval="5000" chance="9">
+	<voices interval="5000" chance="10">
 		<voice sentence="Hissss!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="59" chance="31725" /><!-- gold coin -->
-    <item id="5876" chance="1225" /><!-- lizard leather -->
-    <item id="2376" chance="5225" /><!-- sword -->
-    <item id="2457" chance="2425" /><!-- steel helmet -->
-    <item id="2406" chance="9800" /><!-- short sword -->
-    <item id="3963" chance="900" /><!-- templar scytheblade -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="7618" chance="1550" /><!-- health potion -->
-            <item id="2394" chance="2925" /><!-- morning star -->
-            <item id="5881" countmax="3" chance="1275" /><!-- lizard scale -->
-            <item id="2463" chance="1600" /><!-- plate armor -->
-            <item id="2149" chance="775" /><!-- small emerald -->
-        </inside>
-    </item>
-</loot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="70" chance="100000"/><!-- gold coin -->
+		<item id="2376" chance="20000"/><!-- sword -->
+		<item id="3973" chance="300"/><!-- tusk shield -->
+		<item id="2463" chance="2000"/><!-- plate armor -->
+		<item id="5876" countmax="1" chance="5000"/><!-- lizard leather -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="3974" chance="500"/><!-- sentinel shield -->
+				<item id="2457" chance="3333"/><!-- steel helmet -->
+				<item id="3963" chance="433"/><!-- templar scytheblade -->
+				<item id="5881" countmax="1" chance="5000"/><!-- lizard scale -->
+			</inside>
+		</item>
+	</loot>
 </monster>

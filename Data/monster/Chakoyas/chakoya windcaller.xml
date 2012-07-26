@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Chakoya Windcaller" nameDescription="a chakoya windcaller" race="blood" experience="48" speed="270" manacost="305">
 	<health now="84" max="84"/>
 	<look type="260" corpse="7320"/>
@@ -19,39 +19,34 @@
 		<flag runonhealth="0"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="12" attack="20"/>
-		<attack name="ice" interval="2000" chance="18" range="7" min="-16" max="-32">
-			<attribute key="shootEffect" value="ice"/>
-			<attribute key="areaEffect" value="icearea"/>
+		<attack name="melee" interval="1000" chance="15" range="7" radius="3" target="0" min="-5" max="-15">
+			<attribute key="areaEffect" value="poff"/>
 		</attack>
-		<attack name="ice" interval="2000" chance="18" length="4" spread="3" min="-9" max="-20">
-			<attribute key="areaEffect" value="icearea"/>
+		<attack name="energy" interval="1000" chance="20" range="7" min="-5" max="-35">
+			<attribute key="shootEffect" value="fire"/>
+			<attribute key="areaEffect" value="energy"/>
+		</attack>
+		<attack name="lifedrain" interval="1000" chance="18" length="3" spread="2" min="-5" max="-20">
+			<attribute key="areaEffect" value="poff"/>
 		</attack>
 	</attacks>
-	<defenses armor="30" defense="30">
-		<defense name="invisible" interval="2000" chance="18" duration="4000">
-			<attribute key="areaEffect" value="blueshimmer"/>
-		</defense>
-	</defenses>
+	<defenses armor="30" defense="30"/>
 	<elements>
+		<element icePercent="100"/>
 		<element firePercent="50"/>
 		<element holyPercent="20"/>
 		<element energyPercent="-15"/>
-		<element deathPercent="-8"/>
+		<element deathPercent="-10"/>
 	</elements>
-	<immunities>
-		<immunity ice="1"/>
-	</immunities>
-	<voices interval="2000" chance="9">
+	<voices interval="2000" chance="5">
 		<voice sentence="Mupi! Si siyoqua jinuma!"/>
 		<voice sentence="Siqsiq ji jusipa!"/>
 		<voice sentence="Jagura taluka taqua!"/>
 		<voice sentence="Quatu nguraka!"/>
 	</voices>
 	<loot>
-    <item id="2148" countmax="25" chance="23625" /><!-- gold coin -->
-    <item id="2667" countmax="3" chance="22825" /><!-- fish -->
-    <item id="2460" chance="4100" /><!-- brass helmet -->
-    <item id="2541" chance="2000" /><!-- bone shield -->
-</loot>
+		<item id="2148" countmax="25" chance="3333"/><!-- gold coin -->
+		<item id="7290" chance="2000"/><!-- shard -->
+		<item id="7158" countmax="1" chance="250"/><!-- rainbow trout -->
+	</loot>
 </monster>

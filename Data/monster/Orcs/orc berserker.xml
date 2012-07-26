@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Orc Berserker" nameDescription="a orc berserker" race="blood" experience="195" speed="250" manacost="590">
 	<health now="210" max="210"/>
 	<look type="8" corpse="5980"/>
@@ -18,55 +18,34 @@
 		<flag runonhealth="0"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="40" attack="80"/>
+		<attack name="melee" interval="2000" min="-30" max="-200"/>
 	</attacks>
 	<defenses armor="15" defense="12">
-		<defense name="speed" interval="2000" chance="25" speedchange="290" duration="6000">
+		<defense name="speed" interval="1000" chance="15" speedchange="290" duration="6000">
 			<attribute key="areaEffect" value="redshimmer"/>
 		</defense>
 	</defenses>
 	<elements>
-		<element energyPercent="15"/>
+		<element energyPercent="20"/>
 		<element holyPercent="10"/>
-		<element earthPercent="-10"/>
-		<element deathPercent="-10"/>
+		<element earthPercent="-20"/>
+		<element deathPercent="-5"/>
 	</elements>
-	<voices interval="5000" chance="9">
+	<voices interval="5000" chance="10">
 		<voice sentence="KRAK ORRRRRRK!" yell="1"/>
 	</voices>
 	<loot>
-    <item id="12435" chance="4525" /><!-- orc leather -->
-    <item id="3965" chance="4725" /><!-- hunting spear -->
-    <item id="2381" chance="7100" /><!-- halberd -->
-    <item id="12433" chance="9500" /><!-- orcish gear -->
-    <item id="2148" countmax="12" chance="31000" /><!-- gold coin -->
-    <item id="2378" chance="6475" /><!-- battle axe -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="2671" chance="11275" /><!-- ham -->
-            <item id="2044" chance="1200" /><!-- lamp -->
-            <item id="11113" chance="3350" /><!-- orc tooth -->
-            <item id="2464" chance="1675" /><!-- chain armor -->
-        </inside>
-    </item>
-</loot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		<item id="3976" countmax="10" chance="50000"/><!-- worm -->
+		<item id="2148" countmax="15" chance="100000"/><!-- gold coin -->
+		<item id="2666" countmax="3" chance="33333"/><!-- meat -->
+		<item id="2381" chance="6666"/><!-- halberd -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2464" chance="10000"/><!-- chain armor -->
+				<item id="2458" chance="10000"/><!-- chain helmet -->
+				<item id="2044" chance="5000"/><!-- lamp -->
+				<item id="2378" chance="5000"/><!-- battle axe -->
+			</inside>
+		</item>
+	</loot>
 </monster>

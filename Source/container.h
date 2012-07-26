@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,13 +21,9 @@
 #ifndef __OTSERV_CONTAINER_H__
 #define __OTSERV_CONTAINER_H__
 
-#include "definitions.h"
 #include "cylinder.h"
 #include "item.h"
 #include <queue>
-
-class Container;
-class Depot;
 
 class ContainerIterator
 {
@@ -35,7 +31,7 @@ public:
 	ContainerIterator();
 	ContainerIterator(const ContainerIterator& rhs);
 	~ContainerIterator();
-
+	
 	ContainerIterator& operator=(const ContainerIterator& rhs);
 	bool operator==(const ContainerIterator& rhs);
 	bool operator!=(const ContainerIterator& rhs);
@@ -43,10 +39,10 @@ public:
 	ContainerIterator operator++(int);
 	Item* operator*();
 	Item* operator->();
-
+	
 protected:
 	ContainerIterator(Container* super);
-
+	
 	Container* super;
 	std::queue<Container*> over;
 	ItemList::iterator cur;
@@ -61,24 +57,16 @@ public:
 	virtual ~Container();
 	virtual Item* clone() const;
 
-	virtual Container* getContainer() {return this;};
-	virtual const Container* getContainer() const {return this;};
-	virtual Depot* getDepot() {return NULL;};
-	virtual const Depot* getDepot() const {return NULL;};
+	virtual Container* getContainer() {return this;}
+	virtual const Container* getContainer() const {return this;}
+	virtual Depot* getDepot() {return NULL;}
+	virtual const Depot* getDepot() const {return NULL;}
 
 	Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 	std::string getContentDescription() const;
 
 	uint32_t size() const {return (uint32_t)itemlist.size();}
-	bool full() const
-	{
-		if(maxSize){
-			return itemlist.size() >= maxSize;
-		}
-
-		return true;
-	}
 	bool empty() const {return itemlist.empty();}
 
 	ContainerIterator begin();
@@ -95,11 +83,23 @@ public:
 	Item* getItem(uint32_t index);
 	bool isHoldingItem(const Item* item) const;
 
-	uint32_t capacity() const {return maxSize ? maxSize : std::min(255, (int32_t)itemlist.size() + 1);}
+	uint32_t capacity() const {return maxSize;}
 	uint32_t getItemHoldingCount() const;
 	virtual double getWeight() const;
 
 	//cylinder implementations
+	virtual Cylinder* getParent() {return Thing::getParent();}
+	virtual const Cylinder* getParent() const {return Thing::getParent();}
+	virtual bool isRemoved() const {return Thing::isRemoved();}
+	virtual Position getPosition() const {return Thing::getPosition();}
+	virtual Tile* getTile() {return NULL;}
+	virtual const Tile* getTile() const {return NULL;}
+	virtual Item* getItem() {return this;}
+	virtual const Item* getItem() const {return this;}
+	virtual Creature* getCreature() {return NULL;}
+	virtual const Creature* getCreature() const {return NULL;}
+	virtual Tile* getParentTile() {return Thing::getParentTile();}
+	virtual const Tile* getParentTile() const {return Thing::getParentTile();}
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
@@ -108,13 +108,13 @@ public:
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
 		uint32_t& flags);
 
-	virtual void __addThing(Thing* thing);
-	virtual void __addThing(int32_t index, Thing* thing);
+	virtual void __addThing(Creature* actor, Thing* thing);
+	virtual void __addThing(Creature* actor, int32_t index, Thing* thing);
 
-	virtual void __updateThing(Thing* thing, uint16_t itemId, uint32_t count);
-	virtual void __replaceThing(uint32_t index, Thing* thing);
+	virtual void __updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count);
+	virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing);
 
-	virtual void __removeThing(Thing* thing, uint32_t count);
+	virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual int32_t __getFirstIndex() const;
@@ -123,33 +123,26 @@ public:
 	virtual std::map<uint32_t, uint32_t>& __getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(Thing* thing,  const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER, bool isNewItem = true);
-	virtual void postRemoveNotification(Thing* thing,  const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+	virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
-	virtual void __startDecaying();
-	virtual uint32_t getTotalAmountOfItemsInside() const { return amountOfItems; } //includes the item itself
-	uint16_t getDeepness() const { return deepness; }
-	void setDeepness(uint16_t newDeepness) { deepness = newDeepness; }
-
 private:
 	void onAddContainerItem(Item* item);
 	void onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemType& oldType,
 		Item* newItem, const ItemType& newType);
 	void onRemoveContainerItem(uint32_t index, Item* item);
-	void updateAmountOfItems(int32_t diff);
-	const Container* getParentContainer() const;
+
 	Container* getParentContainer();
 	void updateItemWeight(double diff);
+
 
 protected:
 	std::ostringstream& getContentDescription(std::ostringstream& os) const;
 
 	uint32_t maxSize;
 	double total_weight;
-	uint16_t deepness; //how deep is this container inside of another container (chain of containers)
-	uint32_t amountOfItems; //amount of items inside of this container, including itself and items inside of containers inside of this
 	ItemList itemlist;
 	uint32_t serializationCount;
 
@@ -158,3 +151,4 @@ protected:
 };
 
 #endif
+

@@ -21,14 +21,11 @@
 #ifndef __OTSERV_LOGGER_H__
 #define __OTSERV_LOGGER_H__
 
-#include "definitions.h"
-#include <string>
-#include <fstream>
-
-#if defined __GNUC__
-	#define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
-#elif defined _MSC_VER
-	#define __OTSERV_PRETTY_FUNCTION__ __FUNCDNAME__
+#ifdef __GNUC__
+#define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
+#endif
+#ifdef _MSC_VER
+#define __OTSERV_PRETTY_FUNCTION__ __FUNCDNAME__
 #endif
 
 #define LOG_MESSAGE(channel, type, level, message) \
@@ -51,8 +48,7 @@ public:
 	void logMessage(const char* channel, eLogType type, int level,
 			std::string message, const char* func);
 private:
-	std::ofstream m_file;
-	bool m_registering;
+	FILE* m_file;
 	Logger();
 };
 

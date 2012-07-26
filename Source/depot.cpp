@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,7 +21,6 @@
 
 #include "depot.h"
 #include "tools.h"
-#include <sstream>
 
 Depot::Depot(uint16_t _type) :
 Container(_type)
@@ -40,10 +39,10 @@ Attr_ReadValue Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_DEPOT_ID == attr){
 		uint16_t _depotId;
-		if(!propStream.GET_UINT16(_depotId)){
+		if(!propStream.GET_USHORT(_depotId)){
 			return ATTR_READ_ERROR;
 		}
-
+		
 		setDepotId(_depotId);
 		return ATTR_READ_CONTINUE;
 	}
@@ -59,9 +58,7 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		return RET_NOTPOSSIBLE;
 	}
 
-	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
-
-	if(!skipLimit){
+	if(!hasBitSet(FLAG_IGNORECAPACITY, flags)){
 		int addCount = 0;
 
 		if((item->isStackable() && item->getItemCount() != count)){
@@ -91,16 +88,16 @@ ReturnValue Depot::__queryMaxCount(int32_t index, const Thing* thing, uint32_t c
 	return Container::__queryMaxCount(index, thing, count, maxQueryCount, flags);
 }
 
-void Depot::postAddNotification(Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/, bool isNewItem /*=true*/)
+void Depot::postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(getParent() != NULL){
-		getParent()->postAddNotification(thing, oldParent, index, LINK_PARENT, isNewItem);
+		getParent()->postAddNotification(actor, thing, oldParent, index, LINK_PARENT);
 	}
 }
 
-void Depot::postRemoveNotification(Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
+void Depot::postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	if(getParent() != NULL){
-		getParent()->postRemoveNotification(thing, newParent, index, isCompleteRemoval, LINK_PARENT);
+		getParent()->postRemoveNotification(actor, thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 	}
 }

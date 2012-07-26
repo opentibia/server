@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <monster name="Orc Shaman" nameDescription="a orc shaman" race="blood" experience="110" speed="180" manacost="0">
 	<health now="115" max="115"/>
 	<look type="6" corpse="5978"/>
@@ -18,70 +18,48 @@
 		<flag runonhealth="15"/>
 	</flags>
 	<attacks>
-		<attack name="melee" interval="2000" skill="10" attack="15"/>
-		<attack name="energy" interval="2000" chance="16" range="7" min="-20" max="-31">
+		<attack name="melee" interval="2000" skill="20" attack="13"/>
+		<attack name="energy" interval="1000" chance="13" range="7" min="-20" max="-30">
 			<attribute key="shootEffect" value="energy"/>
 			<attribute key="areaEffect" value="energy"/>
 		</attack>
-		<attack name="fire" interval="2000" chance="16" range="7" radius="1" target="1" min="-5" max="-43">
+		<attack name="fire" interval="1000" chance="8" range="7" radius="1" target="1" min="-5" max="-45">
 			<attribute key="shootEffect" value="fire"/>
 			<attribute key="areaEffect" value="firearea"/>
 		</attack>
 	</attacks>
 	<defenses armor="8" defense="10">
-		<defense name="healing" interval="2000" chance="16" min="10" max="30">
+		<defense name="healing" interval="1000" chance="25" min="27" max="43">
 			<attribute key="areaEffect" value="blueshimmer"/>
 		</defense>
 	</defenses>
 	<elements>
 		<element energyPercent="50"/>
-		<element holyPercent="10"/>
-		<element earthPercent="-10"/>
+		<element holyPercent="25"/>
+		<element earthPercent="-5"/>
 		<element deathPercent="-5"/>
 	</elements>
 	<immunities>
 		<immunity invisible="1"/>
 	</immunities>
-	<voices interval="5000" chance="9">
+	<voices interval="5000" chance="10">
 		<voice sentence="Huumans stinkk!"/>
 	</voices>
 	<summons maxSummons="4">
-		<summon name="Snake" interval="2000" chance="16" max="4"/>
+		<summon name="Snake" interval="1000" chance="25" max="4"/>
 	</summons>
 	<loot>
-    <item id="12434" chance="7650" /><!-- shamanic hood -->
-    <item id="2148" countmax="5" chance="53425" /><!-- gold coin -->
-    <item id="12408" chance="9725" /><!-- broken shamanic staff -->
-    <item id="11113" chance="2000" /><!-- orc tooth -->
-    <item id="2389" chance="6025" /><!-- spear -->
-    <item id="2464" chance="8650" /><!-- chain armor -->
-    <item id="1987" chance="100000"><!-- bag -->
-        <inside>
-            <item id="2686" countmax="2" chance="7900" /><!-- corncob -->
-            <item id="12435" chance="4950" /><!-- orc leather -->
-            <item id="2188" chance="1575" /><!-- wand of decay -->
-            <item id="1958" chance="950" /><!-- book -->
-        </inside>
-    </item>
-</loot>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		<item id="2148" countmax="20" chance="100000"/><!-- gold coin -->
+		<item id="2401" chance="2222"/><!-- staff -->
+		<item id="2458" chance="2222"/><!-- chain helmet -->
+		<item id="1987" chance="100000"><!-- bag -->
+			<inside>
+				<item id="2817" chance="5000"/><!-- dead snake -->
+				<item id="2389" countmax="1" chance="4000"/><!-- spear -->
+				<item id="2079" chance="3333"/><!-- horn -->
+				<item id="2190" chance="1538"/><!-- wand of vortex -->
+				<item id="2188" chance="1000"/><!-- wand of decay -->
+			</inside>
+		</item>
+	</loot>
 </monster>
