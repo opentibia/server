@@ -1,0 +1,12 @@
+
+# OSX metadata files
+.DS_STORE
+
+# Windows metadata files
+Thumbs.db
+
+# XCode user files
+xcuserdata
+
+# Object files
+*.o
