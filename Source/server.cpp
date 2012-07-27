@@ -261,6 +261,8 @@ void ServicePort::open(IPAddressList ips, uint16_t port)
 			// std::cout << "\n" << ip->to_string() << "\n"; 
 			Acceptor_ptr aptr(new boost::asio::ip::tcp::acceptor(m_io_service, boost::asio::ip::tcp::endpoint(*ip, m_serverPort)));
 			
+			aptr->set_option(boost::asio::ip::tcp::no_delay(true));
+			
 			accept(aptr);
 			m_tcp_acceptors.push_back(aptr);
 		}
