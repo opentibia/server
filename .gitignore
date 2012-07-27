@@ -7,6 +7,12 @@ Thumbs.db
 
 # XCode user files
 xcuserdata
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+project.xcworkspace/
 
 # Object files
 *.o
