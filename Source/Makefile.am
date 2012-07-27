@@ -24,8 +24,7 @@ endif
 
 EXTRA_DIST = autogen.sh \
 	\
-	schema.mysql schema.pgsql schema.sqlite config.lua.dist \
-	AUTHORS Doxyfile LICENSE Makefile.am README README.DATABASE \
+	schema.mysql schema.pgsql schema.sqlite Makefile.am \
 	\
 	\
 	actor.h admin.h allocator.h ban.h beds.h \
