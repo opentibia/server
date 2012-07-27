@@ -422,7 +422,7 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 		return;
 	}
 
-	bool kickPlayer = false;
+	bool disconnectPlayer = false;
 
 	switch(recvbyte){
 	case 0x14: // logout
@@ -695,17 +695,17 @@ void ProtocolGame::parsePacket(NetworkMessage &msg)
 
 	default:
 		std::cout << "Unknown packet header: " << std::hex << (int)recvbyte << std::dec << ", player " << player->getName() << std::endl;
-		kickPlayer = true;
+		disconnectPlayer = true;
 		break;
 	}
 
 	if(msg.isOverrun()){ //we've got a badass over here
 		std::cout << "msg.isOvverrun() == true, player " << player->getName() << std::endl;
-		kickPlayer = true;
+		disconnectPlayer = true;
 	}
 
-	if(kickPlayer){
-		player->kickPlayer();
+	if(disconnectPlayer){
+		disconnect();
 	}
 }
 
