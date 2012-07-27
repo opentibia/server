@@ -172,7 +172,7 @@ bool DatabaseODBC::internalQuery(const std::string &query)
 	return true;
 }
 
-DBResult_ptr DatabaseODBC::internalStoreQuery(const std::string &query)
+DBResult_ptr DatabaseODBC::internalSelectQuery(const std::string &query)
 {
 	if(!m_connected)
 		return DBResult_ptr();

@@ -10,16 +10,16 @@ AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA_CFLAGS) $(DEBUG_FLAGS)\
 otserv_LDADD = $(LUA_LIBS)
 
 if USE_MYSQL
-MAYBE_MYSQL = databasemysql.cpp databasemysql.h
+MAYBE_MYSQL = database_driver_mysql.cpp database_driver_mysql.h
 endif
 if USE_SQLITE
-MAYBE_SQLITE = databasesqlite.cpp databasesqlite.h
+MAYBE_SQLITE = database_driver_sqlite.cpp database_driver_sqlite.h
 endif
 if USE_ODBC
-MAYBE_ODBC = databaseodbc.cpp databaseodbc.h
+MAYBE_ODBC = database_driver_odbc.cpp database_driver_odbc.h
 endif
 if USE_PGSQL
-MAYBE_PGSQL = databasepgsql.cpp databasepgsql.h
+MAYBE_PGSQL = database_driver_pgsql.cpp database_driver_pgsql.h
 endif
 
 EXTRA_DIST = autogen.sh \
@@ -33,8 +33,8 @@ EXTRA_DIST = autogen.sh \
 	condition.h condition_attributes.h configmanager.h \
 	connection.h const.h container.h creature.h \
 	creature_manager.h creature_type.h cylinder.h \
-	database.h definitions.h depot.h enum.h enums.h \
-	exception.h fileloader.h game.h house.h housetile.h \
+	database_driver.h definitions.h depot.h enum.h enums.h \
+	exception.h fileloader.h game.h house.h housetile.h http_request.h \
 	ioaccount.h iomap.h iomapotbm.h iomapserialize.h \
 	ioplayer.h item.h item_attributes.h itemloader.h \
 	items.h logger.h lua_manager.h map.h md5.h \
@@ -56,8 +56,8 @@ otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	condition_attributes.cpp configmanager.cpp \
 	connection.cpp const.cpp container.cpp creature.cpp \
 	creature_manager.cpp creature_type.cpp cylinder.cpp \
-	database.cpp depot.cpp enums.cpp exception.cpp \
-	fileloader.cpp game.cpp house.cpp housetile.cpp \
+	database_driver.cpp depot.cpp enums.cpp exception.cpp \
+	fileloader.cpp game.cpp house.cpp housetile.cpp http_request.cpp \
 	ioaccount.cpp iomapotbm.cpp iomapserialize.cpp \
 	ioplayer.cpp item.cpp item_attributes.cpp items.cpp \
 	logger.cpp lua_manager.cpp map.cpp md5.cpp networkmessage.cpp \

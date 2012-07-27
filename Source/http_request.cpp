@@ -114,7 +114,7 @@ Request& Request::fetch()
 	}
 
 	// Split the port from the domain
-	int portStart = domain.find(':');
+	std::string::size_type portStart = domain.find(':');
 	if(portStart != std::string::npos){
 		std::istringstream portConverter(domain.substr(portStart + 1));
 

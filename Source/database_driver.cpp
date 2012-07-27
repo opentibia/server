@@ -75,7 +75,7 @@ bool DatabaseDriver::executeQuery(const std::string &query)
 
 DBResult_ptr DatabaseDriver::storeQuery(const std::string &query)
 {
-	return internalStoreQuery(query);
+	return internalSelectQuery(query);
 }
 
 DBResult_ptr DatabaseDriver::storeQuery(DBQuery &query)

@@ -142,7 +142,7 @@ protected:
 	 * Executes a query directly
 	 */
 	virtual bool internalQuery(const std::string &query) = 0;
-	virtual DBResult_ptr internalStoreQuery(const std::string &query) = 0;
+	virtual DBResult_ptr internalSelectQuery(const std::string &query) = 0;
 
 	DatabaseDriver() : m_connected(false) {};
 	virtual ~DatabaseDriver() {};

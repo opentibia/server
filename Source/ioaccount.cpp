@@ -112,9 +112,7 @@ bool IOAccount::getPassword(const std::string& accountName, const std::string& p
 uint16_t IOAccount::getPremiumDaysLeft(uint32_t time)
 {
 	uint32_t now = (uint32_t)std::time(NULL) / 86400;
-	if((time_t)time == time_t(-1))
-		return 0xFFFF;
-
+	
 	if(uint32_t(time / 86400) < now)
 		return 0;
 

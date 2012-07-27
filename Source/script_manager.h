@@ -107,7 +107,7 @@ namespace Script {
 		boost::any parseDefaultDefinition(std::string& s);
 
 		friend class LuaClassType;
-		friend class LuaThread;
+		friend class ::LuaThread;
 	};
 
 

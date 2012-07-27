@@ -39,8 +39,6 @@ public:
 	virtual bool rollback();
 	virtual bool commit();
 
-	virtual bool executeQuery(const std::string &query);
-
 	virtual uint64_t getLastInsertedRowID();
 
 	virtual std::string escapeString(const std::string &s);
@@ -49,7 +47,7 @@ public:
 
 protected:
 	virtual bool internalQuery(const std::string &query);
-	virtual DBResult_ptr internalStoreQuery(const std::string &query);
+	virtual DBResult_ptr internalSelectQuery(const std::string &query);
 	virtual void freeResult(DBResult *res);
 
 	std::string _parse(const std::string &s);

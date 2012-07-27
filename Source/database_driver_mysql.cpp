@@ -168,7 +168,7 @@ bool DatabaseMySQL::internalQuery(const std::string &query)
 	return state;
 }
 
-DBResult_ptr DatabaseMySQL::internalStoreQuery(const std::string &query)
+DBResult_ptr DatabaseMySQL::internalSelectQuery(const std::string &query)
 {
 	if(!m_connected)
 		return DBResult_ptr();

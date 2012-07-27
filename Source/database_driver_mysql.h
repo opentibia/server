@@ -52,7 +52,7 @@ public:
 
 protected:
 	virtual bool internalQuery(const std::string &query);
-	virtual DBResult_ptr internalStoreQuery(const std::string &query);
+	virtual DBResult_ptr internalSelectQuery(const std::string &query);
 	virtual void freeResult(DBResult *res);
 
 	MYSQL m_handle;

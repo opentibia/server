@@ -1,0 +1,22 @@
+
+# Intermediate
+*.o
+.deps
+Makefile.in
+Makefile
+configure
+missing
+aclocal.m4
+autom4te.cache
+config.h
+config.h.in
+config.log
+config.status
+depcomp
+install-sh
+stamp-h1
+
+# Products
+otserv
+
+

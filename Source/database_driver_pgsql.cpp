@@ -98,7 +98,7 @@ bool DatabasePgSQL::internalQuery(const std::string &query)
 	return true;
 }
 
-DBResult_ptr DatabasePgSQL::internalStoreQuery(const std::string &query)
+DBResult_ptr DatabasePgSQL::internalSelectQuery(const std::string &query)
 {
 	if(!m_connected)
 		return DBResult_ptr();

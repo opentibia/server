@@ -3160,7 +3160,7 @@ int LuaState::lua_Tile_getDownItem()
 		// index = -index;
 	}
 
-	if(index >= 0 && uint32_t(index) < tile->items_downCount()){
+	if(index >= 0 && index < lastindex){
 		pushThing(*(tile->items_downBegin() + index));
 		return 1;
 	}
@@ -4240,7 +4240,9 @@ int LuaState::lua_Actor_openShop()
 	pop();
 
 	Player* player = popPlayer();
-	Actor* actor = popActor();
+
+	// The actor is not actually used.
+	/* Actor* actor = */ popActor();
 
 	player->sendShopWindow(list);
 	pushBoolean(true);
@@ -4250,7 +4252,9 @@ int LuaState::lua_Actor_openShop()
 int LuaState::lua_Actor_closeShop()
 {
 	Player* player = popPlayer();
-	Actor* actor = popActor();
+
+	// The actor is not used for anything
+	/* Actor* actor = */ popActor();
 
 	player->sendShopClose();
 	pushBoolean(true);

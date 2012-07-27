@@ -289,7 +289,7 @@ DBResult_ptr SQLiteResult::advance()
 
 bool SQLiteResult::empty()
 {
-	return !om_rowAvailable;
+	return !m_rowAvailable;
 }
 
 SQLiteResult::SQLiteResult(sqlite3_stmt* stmt)
