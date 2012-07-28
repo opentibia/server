@@ -1,9 +1,9 @@
 -- WORLD
 CREATE TABLE `worlds` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`name` VARCHAR(32) NOT NULL DEFAULT "OTServ",
+	`name` VARCHAR(32) NOT NULL,
 	`ip` INT UNSIGNED NOT NULL DEFAULT 0,
-	`port` INT(5) UNSIGNED NOT NULL DEFAULT 7172,
+	`port` INT(5) UNSIGNED NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY (`name`)
 ) ENGINE = InnoDB;
@@ -45,8 +45,6 @@ CREATE TABLE `accounts` (
 	PRIMARY KEY (`id`),
 	UNIQUE (`name`)
 ) ENGINE = InnoDB;
-
--- Player-related
 
 CREATE TABLE `players` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -111,12 +109,12 @@ CREATE TABLE `player_viplist` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_storage` (
-    `player_id` INT UNSIGNED NOT NULL,
-    `id` TEXT NOT NULL,
-    `value` TEXT NOT NULL,
+	`player_id` INT UNSIGNED NOT NULL,
+	`id` TEXT NOT NULL,
+	`value` TEXT NOT NULL,
 	PRIMARY KEY(`player_id`),
 	KEY(`id`(20)),
-    FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
+	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE `player_skills` (
@@ -309,27 +307,31 @@ CREATE TABLE `player_depots` (
 	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
+CREATE TABLE `map_store` (
+	`house_id` INT UNSIGNED NOT NULL,
+	`world_id` INT UNSIGNED NOT NULL,
+	"data" BLOB NOT NULL,
+	FOREIGN KEY (`house_id`) REFERENCES `houses`(`id`) ON SET NULL,
+	FOREIGN KEY (`world_id`) REFERENCES `worlds`(`id`) ON DELETE CASCADE
+) ENGINE = InnoDB;
 
-# The default world
-INSERT INTO `worlds` VALUES (1, "OTServ", 0, 7172);
-
-INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)
 	VALUES ('1', 'Player', 0, 0, 1000, 50);
-INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)
 	VALUES ('2', 'Premium Player', 0, 0, 2000, 100);
-INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)
 	VALUES ('3', 'Tutor', 16777216, 0, 1000, 50);
-INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)
 	VALUES ('4', 'Premium Tutor', 16777216, 0, 2000, 100);
-INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)
 	VALUES ('5', 'Gamemaster', 217768239050, 1, 2000, 300);
-INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)
 	VALUES ('6', 'Senior Gamemaster', 269307846602, 2, 2000, 300);
-INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)
 	VALUES ('7', 'Community Manager', 272227082232, 3, 2000, 300);
-INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`) 
+INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)
 	VALUES ('8', 'Server Administrator', 821982896120, 3, 2000, 300);
-	
+
 DELIMITER |
 
 CREATE TRIGGER `oncreate_players`
@@ -347,9 +349,3 @@ BEGIN
 END|
 
 DELIMITER ;
-
-
-# uncomment to add a default account 1/tibia
-#INSERT INTO `accounts`(`name`, `password`) VALUES ('1', 'tibia');
-#INSERT INTO `players`(`name`, `account_id`, `group_id`, `world_id`, `town_id`, `conditions`) VALUES
-#	("Player", 1, 1, 1, 1, ""), ("Administrator", 1, 8, 1, 1, ""),

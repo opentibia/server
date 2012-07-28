@@ -801,7 +801,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 		int32_t houseid = result->getDataInt("map_id");
 		House* house = Houses::getInstance().getHouse(houseid);
 		if(house){
-			int32_t ownerid = result->getDataInt("owner");
+			int32_t ownerid = result->getDataInt("owner_id");
 			int32_t paid = result->getDataInt("paid");
 			int32_t payRentWarnings = result->getDataInt("warnings");
 			uint32_t lastWarning = result->getDataInt("lastwarning");
