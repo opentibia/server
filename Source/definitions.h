@@ -130,7 +130,7 @@ enum passwordType_t{
 	#else
 		#define DEBUGBREAK() exit(EXIT_FAILURE)
 	#endif
-	
+
 	// Simple assert macro which also supports passing a message
 	#define ASSERT_MSG(expr, msg) \
 		do { \
@@ -162,11 +162,13 @@ enum passwordType_t{
 */
 #if defined __GNUC__
 	#include "compiler/gcc.h"
+	/*
 	#ifdef __MINGW32__
 		#include "compiler/mingw32.h"
 	#elif defined __CYGWIN__
 		#include "compiler/cygwin.h"
 	#endif
+	*/
 #elif defined(_MSC_VER)
 	#include "compiler/msvc.h"
 #endif
