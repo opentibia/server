@@ -1,6 +1,7 @@
 .DS_STORE
 Thumbs.db
 xcuserdata
+*.o
 .deps
 Makefile.in
 Makefile
@@ -20,7 +21,6 @@ stamp-h1
 *.autosave
 *.swp
 *.bak
-*.o
 *.kdev*
 CMakeLists.txt.user*
 CMakeCache.txt
@@ -28,6 +28,6 @@ CMakeFiles
 cmake_install.cmake
 Makefile
 config.lua
-*.s3db*
+*.s3db
 /otserv
 build

@@ -34,6 +34,9 @@ OPTION(USE_ODBC "build the server with ODBC database support" OFF)
 OPTION(USE_POSTGRE "build the server with PostgreSQL database support" OFF)
 OPTION(USE_LUAJIT "build the server with lua jit" OFF)
 OPTION(USE_CPP11 "build with the new C++11 standard" OFF)
+OPTION(SKULLSYSTEM "enable skull system" OFF)
+OPTION(OTALLOCATOR "enable otserv custom allocator" OFF)
+OPTION(DEBUGGING "enable debugging of internal systems" OFF)
 
 # Gives priority to static libraries (links faster)
 SET(USE_STATIC_LIBS ON)
@@ -50,9 +53,9 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	ENDIF()
 	IF(USE_CPP11)
 		IF(WIN32)
-			SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=gnu++0x")
+			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
 		ELSE()
-			SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11")
+			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 		ENDIF()
 	ENDIF()
 	IF(WIN32)
@@ -107,8 +110,8 @@ ENDIF()
 # SQLite, enabled by default
 IF(USE_SQLITE)
 	FIND_PACKAGE(SQLite REQUIRED)
-	SET(SERVER_SOURCES ${SERVER_SOURCES} Source/database_driver_sqlite.cpp)
-	SET(SERVER_HEADERS ${SERVER_HEADERS} Source/database_driver_sqlite.h)
+	SET(SERVER_SOURCES ${SERVER_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver_sqlite.cpp)
+	SET(SERVER_HEADERS ${SERVER_HEADERS} ${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver_sqlite.h)
 	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__USE_SQLITE__)
 	SET(SERVER_LIBRARIES ${SERVER_LIBRARIES} ${SQLITE_LIBRARY})
 	SET(SERVER_INCLUDE_DIRS ${SERVER_INCLUDE_DIRS} ${SQLITE_INCLUDE_DIR})
@@ -118,8 +121,8 @@ ENDIF()
 # MySQL
 IF(USE_MYSQL)
 	FIND_PACKAGE(MySQL REQUIRED)
-	SET(SERVER_SOURCES ${SERVER_SOURCES} Source/database_driver_mysql.cpp)
-	SET(SERVER_HEADERS ${SERVER_HEADERS} Source/database_driver_mysql.h)
+	SET(SERVER_SOURCES ${SERVER_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver_mysql.cpp)
+	SET(SERVER_HEADERS ${SERVER_HEADERS} ${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver_mysql.h)
 	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__USE_MYSQL__)
 	SET(SERVER_LIBRARIES ${SERVER_LIBRARIES} ${MYSQL_LIBRARY})
 	SET(SERVER_INCLUDE_DIRS ${SERVER_INCLUDE_DIRS} ${MYSQL_INCLUDE_DIR})
@@ -129,8 +132,8 @@ ENDIF()
 # PostgreSQL
 IF(USE_POSTGRE)
 	FIND_PACKAGE(PostgreSQL REQUIRED)
-	SET(SERVER_SOURCES ${SERVER_SOURCES} Source/database_driver_pgsql.cpp)
-	SET(SERVER_HEADERS ${SERVER_HEADERS} Source/database_driver_pgsql.h)
+	SET(SERVER_SOURCES ${SERVER_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver_pgsql.cpp)
+	SET(SERVER_HEADERS ${SERVER_HEADERS} ${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver_pgsql.h)
 	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__USE_PGSQL__)
 	SET(SERVER_LIBRARIES ${SERVER_LIBRARIES} ${POSTGRESQL_LIBRARY})
 	SET(SERVER_INCLUDE_DIRS ${SERVER_INCLUDE_DIRS} ${POSTGRESQL_INCLUDE_DIR})
@@ -138,167 +141,186 @@ IF(USE_POSTGRE)
 ENDIF()
 # ODBC
 IF(USE_ODBC)
-	SET(SERVER_SOURCES ${SERVER_SOURCES} Source/database_driver_odbc.cpp)
-	SET(SERVER_HEADERS ${SERVER_HEADERS} Source/database_driver_odbc.h)
+	SET(SERVER_SOURCES ${SERVER_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver_odbc.cpp)
+	SET(SERVER_HEADERS ${SERVER_HEADERS} ${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver_odbc.h)
 	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__USE_ODBC__)
 	SET(SERVER_LIBRARIES ${SERVER_LIBRARIES} ${ODBC_LIBRARY})
 	SET(SERVER_INCLUDE_DIRS ${SERVER_INCLUDE_DIRS} ${ODBC_INCLUDE_DIR})
 	MESSAGE(STATUS "ODBC: ON")
 ENDIF()
 
+SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D_THREAD_SAFE)
+
 IF(WIN32)
 	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__WINDOWS__)
 ENDIF()
 
+IF(DEBUGGING)
+	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__DEBUG__MOVESYS__ -D__DEBUG_HOUSES__ -D__DEBUG_MAILBOX__ -D__DEBUG_LUASCRIPTS__ -D__DEBUG_NET__)
+	MESSAGE(STATUS "Debugging: ON")
+ENDIF()
+
+IF(SKULLSYSTEM)
+	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__SKULLSYSTEM__)
+	MESSAGE(STATUS "Skull System: ON")
+ELSE()
+	MESSAGE(STATUS "Skull System: OFF")
+ENDIF()
+
+IF(OTALLOCATOR)
+	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__OTSERV_ALLOCATOR__)
+	MESSAGE(STATUS "Custom Allocator: ON")
+ENDIF()
+
 # Sources
 SET(SERVER_SOURCES ${SERVER_SOURCES}
-	Source/actor.cpp
-	Source/admin.cpp
-	Source/allocator.cpp
-	Source/ban.cpp
-	Source/beds.cpp
-	Source/chat.cpp
-	Source/combat.cpp
-	Source/condition.cpp
-	Source/condition_attributes.cpp
-	Source/configmanager.cpp
-	Source/connection.cpp
-	Source/const.cpp
-	Source/container.cpp
-	Source/creature.cpp
-	Source/creature_manager.cpp
-	Source/creature_type.cpp
-	Source/cylinder.cpp
-	Source/database_driver.cpp
-	Source/depot.cpp
-	Source/enums.cpp
-	Source/exception.cpp
-	Source/fileloader.cpp
-	Source/game.cpp
-	Source/house.cpp
-	Source/housetile.cpp
-	Source/http_request.cpp
-	Source/ioaccount.cpp
-	Source/iomapotbm.cpp
-	Source/iomapserialize.cpp
-	Source/ioplayer.cpp
-	Source/item.cpp
-	Source/item_attributes.cpp
-	Source/items.cpp
-	Source/logger.cpp
-	Source/lua_manager.cpp
-	Source/map.cpp
-	Source/md5.cpp
-	Source/networkmessage.cpp
-	Source/otserv.cpp
-	Source/outputmessage.cpp
-	Source/party.cpp
-	Source/player.cpp
-	Source/position.cpp
-	Source/protocol.cpp
-	Source/protocolgame.cpp
-	Source/protocollogin.cpp
-	Source/protocolold.cpp
-	Source/rsa.cpp
-	Source/scheduler.cpp
-	Source/script_environment.cpp
-	Source/script_event.cpp
-	Source/script_functions.cpp
-	Source/script_listener.cpp
-	Source/script_manager.cpp
-	Source/server.cpp
-	Source/sha1.cpp
-	Source/spawn.cpp
-	Source/status.cpp
-	Source/tasks.cpp
-	Source/teleport.cpp
-	Source/thing.cpp
-	Source/tile.cpp
-	Source/tools.cpp
-	Source/trashholder.cpp
-	Source/vocation.cpp
-	Source/waitlist.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/actor.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/admin.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/allocator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ban.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/beds.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/chat.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/combat.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/condition.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/condition_attributes.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/configmanager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/connection.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/const.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/container.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/creature.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/creature_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/creature_type.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/cylinder.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/depot.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enums.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/exception.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/fileloader.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/house.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/housetile.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/http_request.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ioaccount.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/iomapotbm.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/iomapserialize.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ioplayer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/item.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/item_attributes.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/items.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/logger.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/lua_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/map.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/md5.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/networkmessage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/otserv.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/outputmessage.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/party.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/player.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/position.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/protocol.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/protocolgame.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/protocollogin.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/protocolold.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/rsa.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/scheduler.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_environment.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_event.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_functions.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_listener.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/server.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/sha1.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/spawn.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/status.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/tasks.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/teleport.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/thing.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/tile.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/tools.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/trashholder.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/vocation.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/waitlist.cpp
 )
 
 # Headers
 SET(SERVER_HEADERS ${SERVER_HEADERS}
-	Source/account.h
-	Source/actor.h
-	Source/admin.h
-	Source/allocator.h
-	Source/ban.h
-	Source/beds.h
-	Source/boost_common.h
-	Source/chat.h
-	Source/classes.h
-	Source/combat.h
-	Source/condition.h
-	Source/condition_attributes.h
-	Source/configmanager.h
-	Source/connection.h
-	Source/const.h
-	Source/container.h
-	Source/creature.h
-	Source/creature_manager.h
-	Source/creature_type.h
-	Source/cylinder.h
-	Source/database_driver.h
-	Source/definitions.h # We need to get rid of this
-	Source/depot.h
-	Source/enum.h
-	Source/enums.h
-	Source/exception.h
-	Source/fileloader.h
-	Source/game.h
-	Source/house.h
-	Source/housetile.h
-	Source/http_request.h
-	Source/ioaccount.h
-	Source/iomap.h
-	Source/iomapotbm.h
-	Source/iomapserialize.h
-	Source/ioplayer.h
-	Source/item.h
-	Source/item_attributes.h
-	Source/itemloader.h
-	Source/items.h
-	Source/logger.h
-	Source/lua_manager.h
-	Source/map.h
-	Source/md5.h
-	Source/networkmessage.h
-	Source/otsystem.h
-	Source/outfit.h
-	Source/outputmessage.h
-	Source/party.h
-	Source/player.h
-	Source/position.h
-	Source/protocol.h
-	Source/protocolgame.h
-	Source/protocollogin.h
-	Source/protocolold.h
-	Source/rsa.h
-	Source/scheduler.h
-	Source/script_environment.h
-	Source/script_event.h
-	Source/script_listener.h
-	Source/script_manager.h
-	Source/server.h
-	Source/sha1.h
-	Source/shared_ptr.h
-	Source/spawn.h
-	Source/status.h
-	Source/tasks.h
-	Source/teleport.h
-	Source/templates.h
-	Source/thing.h
-	Source/tile.h
-	Source/tools.h
-	Source/town.h
-	Source/trashholder.h
-	Source/vocation.h
-	Source/waitlist.h
-	Source/waypoints.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/account.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/actor.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/admin.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/allocator.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ban.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/beds.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/boost_common.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/chat.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/classes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/combat.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/condition.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/condition_attributes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/configmanager.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/connection.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/const.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/container.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/creature.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/creature_manager.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/creature_type.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/cylinder.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/database_driver.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/definitions.h # We need to get rid of this
+	${CMAKE_CURRENT_SOURCE_DIR}/src/depot.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enum.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/enums.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/exception.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/fileloader.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/game.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/house.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/housetile.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/http_request.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ioaccount.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/iomap.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/iomapotbm.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/iomapserialize.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ioplayer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/item.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/item_attributes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/itemloader.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/items.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/logger.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/lua_manager.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/map.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/md5.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/networkmessage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/otsystem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/outfit.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/outputmessage.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/party.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/player.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/position.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/protocol.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/protocolgame.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/protocollogin.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/protocolold.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/rsa.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/scheduler.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_environment.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_event.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_listener.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/script_manager.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/server.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/sha1.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/shared_ptr.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/spawn.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/status.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/tasks.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/teleport.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/templates.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/thing.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/tile.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/tools.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/town.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/trashholder.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/vocation.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/waitlist.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/waypoints.h
 )
 
 INCLUDE_DIRECTORIES(${SERVER_INCLUDE_DIRS})
