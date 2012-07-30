@@ -112,7 +112,7 @@ CREATE TABLE `player_storage` (
 	`player_id` INT UNSIGNED NOT NULL,
 	`id` TEXT NOT NULL,
 	`value` TEXT NOT NULL,
-	PRIMARY KEY(`player_id`),
+	KEY(`player_id`),
 	KEY(`id`(20)),
 	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
@@ -190,7 +190,7 @@ CREATE TABLE `guild_members` (
 
 -- HOUSES
 CREATE TABLE `houses` (
-	`id` INT UNSIGNED NOT NULL,
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`world_id` INT UNSIGNED NOT NULL,
 	`map_id` INT UNSIGNED NOT NULL COMMENT 'house id in map editor',
 	`town_id` INT UNSIGNED NOT NULL DEFAULT 0,
@@ -310,9 +310,9 @@ CREATE TABLE `player_depots` (
 CREATE TABLE `map_store` (
 	`house_id` INT UNSIGNED NOT NULL,
 	`world_id` INT UNSIGNED NOT NULL,
-	"data" BLOB NOT NULL,
-	FOREIGN KEY (`house_id`) REFERENCES `houses`(`id`) ON SET NULL,
-	FOREIGN KEY (`world_id`) REFERENCES `worlds`(`id`) ON DELETE CASCADE
+	`data` BLOB NOT NULL,
+	FOREIGN KEY (`house_id`) REFERENCES `houses` (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`world_id`) REFERENCES `worlds` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 INSERT INTO `groups` (`id`, `name`, `flags`, `access`, `maxdepotitems`, `maxviplist`)

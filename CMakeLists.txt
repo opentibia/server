@@ -29,7 +29,7 @@ SET(VERSION_MICRO 0)
 
 # Select the database drivers
 OPTION(USE_SQLITE "build the server with SQLite database support" ON)
-OPTION(USE_MYSQL "build the server with MySQL database support" OFF)
+OPTION(USE_MYSQL "build the server with MySQL database support" ON)
 OPTION(USE_ODBC "build the server with ODBC database support" OFF)
 OPTION(USE_POSTGRE "build the server with PostgreSQL database support" OFF)
 OPTION(USE_LUAJIT "build the server with lua jit" OFF)

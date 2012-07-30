@@ -51,7 +51,7 @@ bool IOMapSerialize::loadMap(Map* map)
 }
 
 bool IOMapSerialize::saveMap(Map* map)
-{	
+{
 	bool s = false;
 
 	if(g_config.getString(ConfigManager::MAP_STORAGE_TYPE) == "relational")
@@ -84,14 +84,14 @@ bool IOMapSerialize::loadMapRelational(Map* map)
 
 				query.str("");
 				query << "SELECT * FROM `tile_items` WHERE `tile_id` = " << tileId << " ORDER BY `sid` DESC";
-				
+
 				DBResult* result_items = db->storeQuery(query.str());
 				if(result_items){
 					if(house->getPendingDepotTransfer()){
 						Player* player = g_game.getPlayerByGuidEx(house->getHouseOwner());
 						if(player){
 							Depot* depot = player->getDepot(player->getTown(), true);
-							
+
 							loadItems(db, result_items, depot, true);
 
 							if(player->isOffline()){
@@ -139,14 +139,14 @@ bool IOMapSerialize::loadMapRelational(Map* map)
 
 					query.str("");
 					query << "SELECT * FROM `tile_items` WHERE `tile_id` = " << tileId << " ORDER BY `sid` DESC";
-					
+
 					DBResult* result_items = db->storeQuery(query.str());
 					if(result_items){
 						if(house->getPendingDepotTransfer()){
 							Player* player = g_game.getPlayerByGuidEx(house->getHouseOwner());
 							if(player){
 								Depot* depot = player->getDepot(player->getTown(), true);
-								
+
 								loadItems(db, result_items, depot);
 
 								if(player->isOffline()){
@@ -434,7 +434,7 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 				Player* player = g_game.getPlayerByGuidEx(house->getHouseOwner());
 				if(player){
 					Depot* depot = player->getDepot(player->getTown(), true);
-					
+
 					propStream.GET_ULONG(item_count);
 					while(item_count--){
 						loadItem(propStream, depot, true);
@@ -452,7 +452,7 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 					std::cout << "ERROR: Unserialization of invalid tile in IOMapSerialize::loadTile()" << std::endl;
 					break;
 				}
-	 
+
 				propStream.GET_ULONG(item_count);
 				while(item_count--){
 					loadItem(propStream, tile);
@@ -488,7 +488,7 @@ bool IOMapSerialize::loadContainer(PropStream& propStream, Container* container)
 bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent, bool depotTransfer /*= false*/)
 {
 	Item* item = NULL;
-	
+
 	uint16_t id = 0;
 	propStream.GET_USHORT(id);
 
@@ -576,7 +576,7 @@ bool IOMapSerialize::loadItem(PropStream& propStream, Cylinder* parent, bool dep
 						return true;
 					}
 				}
-				
+
 				delete dummy;
 			}
 		}
@@ -601,7 +601,7 @@ bool IOMapSerialize::saveMapBinary(Map* map)
 	query << "DELETE FROM `map_store` WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
 	if(!db->executeQuery(query))
 		return false;
-	
+
 	//clear old tile data
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin();
 		it != Houses::getInstance().getHouseEnd();
@@ -639,7 +639,7 @@ bool IOMapSerialize::saveMapBinary(Map* map)
 bool IOMapSerialize::saveItem(PropWriteStream& stream, const Item* item)
 {
 	const Container* container = item->getContainer();
-	
+
 	// Write ID & props
 	stream.ADD_USHORT(item->getID());
 	item->serializeAttr(stream);
@@ -674,7 +674,7 @@ bool IOMapSerialize::saveTile(PropWriteStream& stream, const Tile* tile)
 				item->canWriteText() ||
 				item->getBed()))
 			continue;
-		
+
 		items.push_back(item);
 	}
 
@@ -762,7 +762,7 @@ bool IOMapSerialize::processHouseAuctions()
 	DBResult_ptr result_set;
 
 	time_t currentTime = std::time(NULL);
-	query << 
+	query <<
 		"SELECT `house_auctions`.* "
 		"FROM `house_auctions` "
 		"LEFT JOIN `houses` ON `houses`.`id` = `house_auctions`.`house_id` "
@@ -781,7 +781,7 @@ bool IOMapSerialize::processHouseAuctions()
 
 		house->setHouseOwner(playerid);
 		Houses::getInstance().payHouse(house, currentTime);
-		
+
 		query.reset();
 		query << "DELETE * FROM `house_auctions` WHERE `house_id` =" << houseid;
 		db->executeQuery(query);
@@ -822,7 +822,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 		House* house = it->second;
 		if(house->getHouseOwner() != 0 && house->getHouseId() != 0){
 			query.reset();
-			query << 
+			query <<
 				"SELECT `listid`, `list` "
 				"FROM `house_lists` "
 				"LEFT JOIN `houses` ON `house_lists`.`house_id` = `houses`.`id` "
@@ -849,7 +849,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map)
 		return false;
 
 	query.reset();
-	query << 
+	query <<
 		"DELETE FROM `house_lists` "
 		"WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
 	if(!db->executeQuery(query)) {

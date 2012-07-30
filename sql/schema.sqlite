@@ -376,8 +376,8 @@ FOR EACH ROW
 BEGIN
 	DELETE FROM "house_actions" WHERE "house_id" = OLD."id";
 	DELETE FROM "house_lists" WHERE "house_id" = OLD."id";
+	DELETE FROM "map_store" WHERE "house_id" = OLD."id";
 	UPDATE "tiles" SET "house_id" = 0 WHERE "house_id" = OLD."id";
-	UPDATE "map_store" SET "house_id" = 0 WHERE "house_id" = OLD."id";
 END;
 
 CREATE TRIGGER "ondelete_bans"
