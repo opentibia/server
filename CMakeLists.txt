@@ -29,11 +29,11 @@ SET(VERSION_MICRO 0)
 
 # Select the database drivers
 OPTION(USE_SQLITE "build the server with SQLite database support" ON)
-OPTION(USE_MYSQL "build the server with MySQL database support" ON)
+OPTION(USE_MYSQL "build the server with MySQL database support" OFF)
 OPTION(USE_ODBC "build the server with ODBC database support" OFF)
 OPTION(USE_POSTGRE "build the server with PostgreSQL database support" OFF)
 OPTION(USE_LUAJIT "build the server with lua jit" OFF)
-OPTION(USE_CPP11 "build with the new C++11 standard" OFF)
+OPTION(USE_CPP11 "build with the new C++11 standard enabled" OFF)
 OPTION(SKULLSYSTEM "enable skull system" OFF)
 OPTION(OTALLOCATOR "enable otserv custom allocator" OFF)
 OPTION(DEBUGGING "enable debugging of internal systems" OFF)
@@ -67,7 +67,22 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	ENDIF()
 # Compiler flags for MSVC
 ELSEIF(MSVC)
-	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D_CRT_SECURE_NO_WARNINGS)
+	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS}
+		-D_CRT_SECURE_NO_WARNINGS
+		-D_CRT_SECURE_NO_DEPRECATE
+		-D_CRT_NON_CONFORMING_SWPRINTFS
+		-D_SCL_SECURE_NO_DEPRECATE
+		-DWIN32_LEAN_AND_MEAN
+		-DNOMINMAX)
+	
+	# Disable iterator checking on release builds
+	IF(NOT (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+		SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS}
+			-D_SECURE_SCL=0
+			-D_SECURE_SCL_THROWS=0
+			-D_HAS_ITERATOR_DEBUGGING=0)
+	ENDIF()
+	
 	SET(SERVER_LIBRARY_DIRS ${SERVER_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 ENDIF()
 
@@ -149,10 +164,10 @@ IF(USE_ODBC)
 	MESSAGE(STATUS "ODBC: ON")
 ENDIF()
 
-SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D_THREAD_SAFE)
-
 IF(WIN32)
 	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D__WINDOWS__)
+ELSE()
+	SET(SERVER_DEFINITIONS ${SERVER_DEFINITIONS} -D_THREAD_SAFE)
 ENDIF()
 
 IF(DEBUGGING)
