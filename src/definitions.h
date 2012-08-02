@@ -146,9 +146,6 @@ enum passwordType_t{
 
 #define ASSERT(expr) ASSERT_MSG(expr, #expr)
 
-// Boost won't complain about non-working function
-#define BOOST_ASIO_ENABLE_CANCELIO 1
-
 #ifndef __FUNCTION__
 	#define	__FUNCTION__ __func__
 #endif
