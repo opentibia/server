@@ -3,10 +3,10 @@
 ----------------------------
 
 -- data directory location
-data_directory = "Data/"
+data_directory = "data/"
 
 -- map location
-map_file = "Data/world/map.otbm"
+map_file = "data/world/map.otbm"
 
 -- Type of map storage,
 -- 'relational' - Slower, but possible to run database queries to change all items to another id for example.
@@ -283,10 +283,10 @@ detailed_script_errors = true
 
 -- Database configuration
 -- options: mysql, sqlite, odbc or pgsql
-database_type = "mysql"
+database_type = "sqlite"
 
 -- SQL connection part
-database_schema = "revscriptsys"
+database_schema = "db.s3db"
 -- database_schema = "otserv" -- use this for MySQL/PgSQL
 -- database_schema = "Your Source" -- ODBC
 

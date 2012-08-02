@@ -1,0 +1,10 @@
+# Normalize source code before commits
+*.lua eol=lf 
+*.txt eol=lf 
+*.xml eol=lf 
+*.cpp eol=lf 
+*.sh  eol=lf 
+*.h   eol=lf 
+
+*.sql* eol=lf 
+schema.* eol=lf 

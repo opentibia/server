@@ -1,0 +1,432 @@
+-- WORLD
+CREATE TABLE "worlds" (
+	"id" INTEGER PRIMARY KEY NOT NULL,
+	"name" VARCHAR(32) NOT NULL,
+	"ip" INTEGER NOT NULL DEFAULT 0,
+	"port" INTEGER NOT NULL,
+	UNIQUE("name")
+);
+
+CREATE TABLE "global_storage" (
+	"id" TEXT KEY NOT NULL,
+	"value" TEXT NOT NULL
+);
+
+CREATE TABLE "schema_info" (
+	"name" VARCHAR(255) NOT NULL,
+	"value" VARCHAR(255) NOT NULL,
+	UNIQUE ("name")
+);
+
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 25);
+
+-- Player-related
+CREATE TABLE "groups" (
+	"id" INTEGER PRIMARY KEY,
+	"name" VARCHAR(255) NOT NULL,
+	"flags" INTEGER NOT NULL DEFAULT 0,
+	"access" INTEGER NOT NULL DEFAULT 0,
+	"violation" INTEGER NOT NULL DEFAULT 0,
+	"maxdepotitems" INTEGER NOT NULL,
+	"maxviplist" INTEGER NOT NULL
+);
+
+CREATE TABLE "accounts" (
+	"id" INTEGER PRIMARY KEY NOT NULL,
+	"name" VARCHAR(32) NOT NULL,
+	"password" VARCHAR(255) NOT NULL,
+	"email" VARCHAR(255) NOT NULL DEFAULT '',
+	"premend" INTEGER NOT NULL DEFAULT 0,
+	"blocked" BOOLEAN NOT NULL DEFAULT 0,
+	"warnings" INTEGER NOT NULL DEFAULT 0,
+	UNIQUE("name")
+);
+
+CREATE TABLE "players" (
+	`id` INTEGER PRIMARY KEY NOT NULL,
+	`name` VARCHAR(255) NOT NULL,
+	`account_id` INTEGER NOT NULL,
+	`group_id` INTEGER NOT NULL,
+	`world_id` INTEGER NOT NULL,
+	`town_id` INTEGER NOT NULL,
+
+	`sex` INTEGER NOT NULL DEFAULT 0,
+	`vocation` INTEGER NOT NULL DEFAULT 0,
+
+	`experience` BIGINTEGER NOT NULL DEFAULT 0,
+	`level` INTEGER NOT NULL DEFAULT 1,
+	`maglevel` INTEGER NOT NULL DEFAULT 0,
+	`health` INTEGER NOT NULL DEFAULT 100,
+	`healthmax` INTEGER NOT NULL DEFAULT 100,
+	`mana` INTEGER NOT NULL DEFAULT 100,
+	`manamax` INTEGER NOT NULL DEFAULT 100,
+	`manaspent` INTEGER NOT NULL DEFAULT 0,
+	`soul` INTEGER NOT NULL DEFAULT 0,
+	`cap` INTEGER NOT NULL DEFAULT 0,
+	`stamina` INTEGER NOT NULL DEFAULT 151200000,
+	`lookbody` INTEGER NOT NULL DEFAULT 10,
+	`lookfeet` INTEGER NOT NULL DEFAULT 10,
+	`lookhead` INTEGER NOT NULL DEFAULT 10,
+	`looklegs` INTEGER NOT NULL DEFAULT 10,
+	`looktype` INTEGER NOT NULL DEFAULT 136,
+	`lookaddons` INTEGER NOT NULL DEFAULT 0,
+
+	`posx` INTEGER NOT NULL DEFAULT 0,
+	`posy` INTEGER NOT NULL DEFAULT 0,
+	`posz` INTEGER NOT NULL DEFAULT 0,
+	`direction` INTEGER NOT NULL DEFAULT 0,
+	`lastlogin` INTEGER NOT NULL DEFAULT 0,
+	`lastlogout` INTEGER NOT NULL DEFAULT 0,
+	`lastip` INTEGER NOT NULL DEFAULT 0,
+	`save` BOOLEAN NOT NULL DEFAULT 1,
+	`conditions` BLOB NOT NULL,
+	`skull_type` INTEGER NOT NULL DEFAULT 0,
+	`skull_time` INTEGER NOT NULL DEFAULT 0,
+	`loss_experience` INTEGER NOT NULL DEFAULT 100,
+	`loss_mana` INTEGER NOT NULL DEFAULT 100,
+	`loss_skills` INTEGER NOT NULL DEFAULT 100,
+	`loss_items` INTEGER NOT NULL DEFAULT 10,
+	`loss_containers` INTEGER NOT NULL DEFAULT 100,
+
+	`online` BOOLEAN NOT NULL DEFAULT 0,
+
+	UNIQUE ("name"),
+	FOREIGN KEY ("account_id") REFERENCES "accounts" ("id"),
+	FOREIGN KEY ("group_id") REFERENCES "groups" ("id"),
+	FOREIGN KEY ("world_id") REFERENCES "groups" ("id")
+);
+
+CREATE TABLE "player_viplist" (
+	"player_id" INTEGER NOT NULL,
+	"vip_id" INTEGER NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id"),
+	FOREIGN KEY ("vip_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "player_storage" (
+	"player_id" INTEGER NOT NULL,
+	"id" TEXT NOT NULL,
+	"value" TEXT NOT NULL,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "player_skills" (
+	"player_id" INTEGER NOT NULL,
+	"skill_id" INTEGER NOT NULL,
+	"value" INTEGER NOT NULL DEFAULT 0,
+	"count" INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "player_deaths" (
+	"id" INTEGER NOT NULL,
+	"player_id" INTEGER NOT NULL,
+	"date" INTEGER NOT NULL,
+	"level" INTEGER NOT NULL,
+	PRIMARY KEY ("id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "killers" (
+	"id" INTEGER NOT NULL,
+	"death_id" INTEGER NOT NULL,
+	"final_hit" SMALLINTEGER NOT NULL DEFAULT 1,
+	PRIMARY KEY("id"),
+	FOREIGN KEY ("death_id") REFERENCES "player_deaths" ("id")
+);
+
+CREATE TABLE "environment_killers" (
+	"kill_id" INTEGER NOT NULL,
+	"name" VARCHAR(255) NOT NULL,
+	FOREIGN KEY ("kill_id") REFERENCES "killers" ("id")
+);
+
+CREATE TABLE "player_killers" (
+	"kill_id" INTEGER NOT NULL,
+	"player_id" INTEGER NOT NULL,
+	"unjustified" SMALLINTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("kill_id") REFERENCES "killers" ("id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+-- GUILDS
+CREATE TABLE "guilds" (
+	"id" INTEGER PRIMARY KEY,
+	"name" VARCHAR(255) NOT NULL,
+	"owner_id" INTEGER NOT NULL,
+	"creation_time" INTEGER NOT NULL,
+	FOREIGN KEY ("owner_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "guild_ranks" (
+	"id" INTEGER PRIMARY KEY,
+	"guild_id" INTEGER NOT NULL,
+	"name" VARCHAR(255) NOT NULL,
+	"level" INTEGER NOT NULL,
+	FOREIGN KEY ("guild_id") REFERENCES "guilds" ("id")
+);
+
+CREATE TABLE "guild_members" (
+	"player_id" INTEER NULL,
+	"rank_id" INTEER NOT NULL,
+	"nick" VARCHAR(256) NOT NULL DEFAULT '',
+	FOREIGN KEY ("rank_id") REFERENCES "guild_ranks" ("id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+-- HOUSES
+CREATE TABLE "houses" (
+	"id" INTEGER PRIMARY KEY,
+	"world_id" INTEGER NOT NULL DEFAULT 0,
+	"map_id" INTEGER NOT NULL DEFAULT 0,
+	"town_id" INTEGER NOT NULL DEFAULT 0,
+	"owner_id" INTEGER NOT NULL DEFAULT 0,
+	"name" VARCHAR(100) NOT NULL,
+	"rent" INTEGER NOT NULL DEFAULT 0,
+	"guildhall" BOOLEAN NOT NULL DEFAULT 0,
+	"tiles" INTEGER NOT NULL DEFAULT 0,
+	"doors" INTEGER NOT NULL DEFAULT 0,
+	"beds" INTEGER NOT NULL DEFAULT 0,
+	"paid" INTEGER NOT NULL DEFAULT 0,
+	"clear" BOOLEAN NOT NULL DEFAULT 0,
+	"warnings" INTEGER NOT NULL DEFAULT 0,
+	"lastwarning" INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("world_id") REFERENCES "worlds" ("id"),
+	FOREIGN KEY ("owner_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "house_auctions" (
+	"house_id" INTEGER NOT NULL,
+	"player_id" INTEGER NOT NULL,
+	"bid" INTEGER NOT NULL DEFAULT 0,
+	"limit" INTEGER NOT NULL DEFAULT 0,
+	"endtime" INTEGER NOT NULL DEFAULT 0,
+	FOREIGN KEY ("house_id") REFERENCES "houses" ("id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "house_lists" (
+	"house_id" INTEGER NOT NULL,
+	"listid" INTEGER NOT NULL,
+	"list" TEXT NOT NULL,
+	FOREIGN KEY ("house_id") REFERENCES "houses" ("id")
+);
+
+-- BANS
+CREATE TABLE "bans" (
+	"id" INTEGER PRIMARY KEY,
+	"expires" INTEGER NOT NULL DEFAULT 0,
+	"added" INTEGER NOT NULL DEFAULT 0,
+	"active" BOOLEAN NOT NULL DEFAULT 0,
+	"admin_id" INTEGER NOT NULL DEFAULT 0,
+	"comment" VARCHAR(1024) NOT NULL DEFAULT '',
+	FOREIGN KEY ("admin_id") REFERENCES "accounts"("id")
+);
+
+CREATE TABLE "account_bans" (
+	"ban_id" INTEGER NOT NULL,
+	"account_id" INTEGER NOT NULL,
+	FOREIGN KEY ("ban_id") REFERENCES "bans"("id"),
+	FOREIGN KEY ("account_id") REFERENCES "accounts"("id")
+);
+
+CREATE TABLE "ip_bans" (
+	"ban_id" INTEGER NOT NULL,
+	"ip" INTEGER NOT NULL,
+	"mask" INTEGER NOT NULL,
+	FOREIGN KEY ("ban_id") REFERENCES "bans"("id")
+);
+
+CREATE TABLE "player_bans" (
+	"ban_id" INTEGER NOT NULL,
+	"player_id" INTEGER NOT NULL,
+	FOREIGN KEY ("ban_id") REFERENCES "bans"("id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+-- MAP
+CREATE TABLE "item_containers" (
+	"id" INTEGER PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE "items" (
+	"container_id" INTEGER NOT NULL,
+	"id" INTEGER NOT NULL,
+	"parent_id" INTEGER DEFAULT NULL,
+	"count" INTEGER NOT NULL,
+	"attributes" BLOB,
+	FOREIGN KEY ("container_id") REFERENCES "item_containers" ("id")
+);
+
+CREATE TABLE "tiles" (
+	"world_id" INTEGER NOT NULL,
+	"house_id" INTEGER DEFAULT NULL,
+	"container_id" INTEGER NOT NULL,
+	"x" INTEGER NOT NULL,
+	"y" INTEGER NOT NULL,
+	"z" INTEGER NOT NULL,
+	FOREIGN KEY ("world_id") REFERENCES "worlds" ("id"),
+	FOREIGN KEY ("container_id") REFERENCES "item_containers" ("id"),
+	FOREIGN KEY ("house_id") REFERENCES "houses" ("id")
+);
+
+CREATE TABLE "player_items" (
+	"player_id" INTEGER NOT NULL,
+	"container_id" INTEGER NOT NULL,
+	FOREIGN KEY ("container_id") REFERENCES "item_containers" ("id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "player_depots" (
+	"depot_id" INTEGER NOT NULL,
+	"player_id" INTEGER NOT NULL,
+	"container_id" INTEGER NOT NULL,
+	FOREIGN KEY ("container_id") REFERENCES "item_containers" ("id"),
+	FOREIGN KEY ("player_id") REFERENCES "players" ("id")
+);
+
+CREATE TABLE "map_store" (
+	"house_id" INTEGER NOT NULL,
+	"world_id" INTEGER NOT NULL,
+	"data" BLOB NOT NULL,
+	FOREIGN KEY ("house_id") REFERENCES "houses" ("id")
+	FOREIGN KEY ("world_id") REFERENCES "worlds" ("id")
+);
+
+CREATE TRIGGER "ondelete_worlds"
+BEFORE DELETE
+ON "worlds"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "players" WHERE "world_id" = OLD."id";
+	DELETE FROM "houses" WHERE "world_id" = OLD."id";
+	DELETE FROM "tiles" WHERE "world_id" = OLD."id";
+	DELETE FROM "map_store" WHERE "world_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_accounts"
+BEFORE DELETE
+ON "accounts"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "players" WHERE "account_id" = OLD."id";
+	DELETE FROM "account_bans" WHERE "account_id" = OLD."id";
+	UPDATE "bans" SET "admin_id" = 0 WHERE "admin_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_players"
+BEFORE DELETE
+ON "players"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "player_viplist" WHERE "player_id" = OLD."id" OR "vip_id" = OLD."id";
+	DELETE FROM "player_storage" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_skills" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_deaths" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_killers" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_bans" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_items" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_depots" WHERE "player_id" = OLD."id";
+	DELETE FROM "player_bans" WHERE "player_id" = OLD."id";
+	DELETE FROM "guilds" WHERE "owner_id" = OLD."id";
+	DELETE FROM "guilds" WHERE "owner_id" = OLD."id";
+	DELETE FROM "guild_members" WHERE "player_id" = OLD."id";
+	DELETE FROM "house_actions" WHERE "player_id" = OLD."id";
+	UPDATE "houses" SET "owner_id" = 0 WHERE "owner_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_player_deaths"
+BEFORE DELETE
+ON "player_deaths"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "killers" WHERE "death_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_player_killers"
+BEFORE DELETE
+ON "player_killers"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "environment_killers" WHERE "kill_id" = OLD."id";
+	DELETE FROM "player_killers" WHERE "kill_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_guilds"
+BEFORE DELETE
+ON "guilds"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "guild_ranks" WHERE "guild_id" = OLD."id";
+	DELETE FROM "guild_members" WHERE "guild_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_guild_ranks"
+BEFORE DELETE
+ON "guild_ranks"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "guild_members" WHERE "guild_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_houses"
+BEFORE DELETE
+ON "houses"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "house_actions" WHERE "house_id" = OLD."id";
+	DELETE FROM "house_lists" WHERE "house_id" = OLD."id";
+	DELETE FROM "map_store" WHERE "house_id" = OLD."id";
+	UPDATE "tiles" SET "house_id" = 0 WHERE "house_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_bans"
+BEFORE DELETE
+ON "bans"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "account_bans" WHERE "ban_id" = OLD."id";
+	DELETE FROM "ip_bans" WHERE "ban_id" = OLD."id";
+	DELETE FROM "player_bans" WHERE "ban_id" = OLD."id";
+END;
+
+CREATE TRIGGER "ondelete_item_containers"
+BEFORE DELETE
+ON "item_containers"
+FOR EACH ROW
+BEGIN
+	DELETE FROM "items" WHERE "container_id" = OLD."id";
+	DELETE FROM "tiles" WHERE "container_id" = OLD."id";
+	DELETE FROM "player_items" WHERE "container_id" = OLD."id";
+	DELETE FROM "player_depots" WHERE "container_id" = OLD."id";
+END;
+
+INSERT INTO "groups" ("id", "name", "flags", "access", "maxdepotitems", "maxviplist")
+	VALUES ('1', 'Player', 0, 0, 1000, 50);
+INSERT INTO "groups" ("id", "name", "flags", "access", "maxdepotitems", "maxviplist")
+	VALUES ('2', 'Premium Player', 0, 0, 2000, 100);
+INSERT INTO "groups" ("id", "name", "flags", "access", "maxdepotitems", "maxviplist")
+	VALUES ('3', 'Tutor', 16777216, 0, 1000, 50);
+INSERT INTO "groups" ("id", "name", "flags", "access", "maxdepotitems", "maxviplist")
+	VALUES ('4', 'Premium Tutor', 16777216, 0, 2000, 100);
+INSERT INTO "groups" ("id", "name", "flags", "access", "maxdepotitems", "maxviplist")
+	VALUES ('5', 'Gamemaster', 217768239050, 1, 2000, 300);
+INSERT INTO "groups" ("id", "name", "flags", "access", "maxdepotitems", "maxviplist")
+	VALUES ('6', 'Senior Gamemaster', 269307846602, 2, 2000, 300);
+INSERT INTO "groups" ("id", "name", "flags", "access", "maxdepotitems", "maxviplist")
+	VALUES ('7', 'Community Manager', 272227082232, 3, 2000, 300);
+INSERT INTO "groups" ("id", "name", "flags", "access", "maxdepotitems", "maxviplist")
+	VALUES ('8', 'Server Administrator', 821982896120, 3, 2000, 300);
+
+CREATE TRIGGER "oncreate_players"
+AFTER INSERT
+ON "players"
+BEGIN
+	INSERT INTO "player_skills" ("player_id", "skill_id", "value") VALUES (NEW."id", 0, 10);
+	INSERT INTO "player_skills" ("player_id", "skill_id", "value") VALUES (NEW."id", 1, 10);
+	INSERT INTO "player_skills" ("player_id", "skill_id", "value") VALUES (NEW."id", 2, 10);
+	INSERT INTO "player_skills" ("player_id", "skill_id", "value") VALUES (NEW."id", 3, 10);
+	INSERT INTO "player_skills" ("player_id", "skill_id", "value") VALUES (NEW."id", 4, 10);
+	INSERT INTO "player_skills" ("player_id", "skill_id", "value") VALUES (NEW."id", 5, 10);
+	INSERT INTO "player_skills" ("player_id", "skill_id", "value") VALUES (NEW."id", 6, 10);
+END;
