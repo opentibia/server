@@ -706,8 +706,8 @@ bool IOMapSerialize::updateHouseInfo()
 
 		query.reset();
 		query << "SELECT * FROM `houses` WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `map_id` = " << house->getHouseId();
-		DBResult_ptr result;
-		if(result = db->storeQuery(query)){
+		DBResult_ptr result(db->storeQuery(query));
+		if(result){
 
 			query.reset();
 			query << "UPDATE `houses` SET ";

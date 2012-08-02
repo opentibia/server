@@ -181,7 +181,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 		"LEFT JOIN `guilds` ON `guilds`.`id` = `guild_ranks`.`guild_id` "
 		"WHERE `guild_members`.`player_id` = " << player->getGUID();
 
-	if(result = db->storeQuery(query)){
+	if((result = db->storeQuery(query))){
 		player->guildName = result->getDataString("guildname");
 		player->guildLevel = result->getDataInt("level");
 		player->guildId = result->getDataInt("guildid");

@@ -723,7 +723,7 @@ std::map<uint32_t, uint32_t>& Container::__getAllItemTypeCount(std::map<uint32_t
 
 Thing* Container::__getThing(uint32_t index) const
 {
-	if(index < 0 || index > size())
+	if(index > size())
 		return NULL;
 
 	uint32_t count = 0;

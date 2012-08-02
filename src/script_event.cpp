@@ -2010,8 +2010,8 @@ OnConditionEffect::Event::Event(Creature* creature, ConditionEffect& effect, Con
 
 OnConditionEffect::Event::Event(Creature* creature, ConditionEffect& effect, uint32_t ticks) :
 	creature(creature),
-	effect(effect),
-	reason(reason),
+	effect(effect),g
+	reason(CONDITIONEND_UPDATE),
 	eventType(EVENT_TICK)
 {
 	propagate_by_default = true;

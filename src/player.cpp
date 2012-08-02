@@ -2032,7 +2032,7 @@ uint32_t Player::getPercentLevel(uint64_t count, uint32_t nextLevelCount)
 {
 	if(nextLevelCount > 0){
 		uint32_t result = ((uint32_t)((double)count / nextLevelCount * 100));
-		if(result < 0 || result > 100){
+		if(result > 100){
 			return 0;
 		}
 
@@ -2984,7 +2984,7 @@ void Player::__updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint3
 
 void Player::__replaceThing(Creature* actor, uint32_t index, Thing* thing)
 {
-	if(index < 0 || index > 11){
+	if(index > 11){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__replaceThing], " << "player: " << getName() << ", index: " << index << ",  index < 0 || index > 11" << std::endl;
 		DEBUG_REPORT
