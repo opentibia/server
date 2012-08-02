@@ -1,7 +1,11 @@
-#ifdef __OTSERV_OTCP_H__
+// Prefix header = compiler automatically includes this header
+// Then an error should not be emitted on subsequent includes
+#if defined __OTSERV_OTCP_H__ && !defined USE_PREFIX_HEADER
 #error "Precompiled header should only be included once"
 #endif
 
+
+#ifndef __OTSERV_OTCP_H__
 #define __OTSERV_OTCP_H__
 
 // Definitions should be global.
@@ -45,20 +49,18 @@ extern "C"
 	#include <lauxlib.h>
 	#include <lualib.h>
 }
-//otserv
+
+// otserv
+// These files very rarely changes
 #include "position.h"
-#include "thing.h"
-#include "ban.h"
-#include "party.h"
-#include "cylinder.h"
 #include "fileloader.h"
 #include "exception.h"
 #include "logger.h"
 #include "md5.h"
 #include "sha1.h"
 #include "rsa.h"
-#include "scheduler.h"
-#include "tasks.h"
-#include "server.h"
-#include "status.h"
 
+// Forward declarations
+#include "classes.h"
+
+#endif

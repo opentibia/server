@@ -322,7 +322,8 @@ public:
 	}
 
 	ConditionEffect() :
-		type(type),
+        // Shouldn't there be a 'null' effect?
+		type(PERIODIC_HEAL),
 		interval(0),
 		data(boost::any()),
 		tickCount(0),

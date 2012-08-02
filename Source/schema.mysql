@@ -133,7 +133,7 @@ CREATE TABLE `player_deaths` (
 	`date` INT UNSIGNED NOT NULL,
 	`level` INT NOT NULL,
 	FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE,
-	PRIMARY KEY(`id`),
+	PRIMARY KEY (`id`),
 	KEY (`date`)
 ) ENGINE = InnoDB;
 
@@ -141,7 +141,7 @@ CREATE TABLE `killers` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`death_id` INT UNSIGNED NOT NULL,
 	`final_hit` TINYINT(1) NOT NULL DEFAULT 1,
-	PRIMARY KEY(`id`),
+	PRIMARY KEY (`id`),
 	FOREIGN KEY (`death_id`) REFERENCES `player_deaths` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 

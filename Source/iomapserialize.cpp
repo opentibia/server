@@ -66,9 +66,10 @@ bool IOMapSerialize::saveMap(Map* map)
 
 bool IOMapSerialize::loadMapRelational(Map* map)
 {
+	/*
 	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
-	/*
+    
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		House* house = it->second;
 

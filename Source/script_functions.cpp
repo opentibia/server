@@ -1,6 +1,9 @@
 /////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
+// This file defines all functions and classes exposed to the lua
+// scripting environment
+//////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -30,6 +33,7 @@
 #include "ioplayer.h"
 #include "game.h"
 #include "actor.h"
+#include "tasks.h"
 #include "town.h"
 #include "chat.h"
 #include "house.h"
@@ -4863,7 +4867,7 @@ int LuaState::lua_Player_sendMessage()
 	}
 	else if(isTable(-1)){
 		ReturnValue ret = popEnum<ReturnValue>();
-		MessageClass messageClass = popEnum<MessageClass>();
+		/* MessageClass messageClass = */ popEnum<MessageClass>();
 		Player* player = popPlayer();
 		player->sendCancelMessage(ret);
 	}
@@ -5879,8 +5883,8 @@ int LuaState::lua_rayCast()
 
 int LuaState::lua_canThrowObjectTo()
 {
-	int32_t rangex = Map::maxClientViewportX;
-	int32_t rangey = Map::maxClientViewportY;
+	int32_t rangex = Map_maxClientViewportX;
+	int32_t rangey = Map_maxClientViewportY;
 
 	if(getStackSize() > 4)
 		rangey = popInteger();

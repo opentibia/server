@@ -25,6 +25,7 @@
 #include "tile.h"
 #include "waypoints.h"
 #include <bitset>
+#include "protocolconst.h"
 
 #define MAP_MAX_LAYERS 16
 
@@ -37,7 +38,11 @@ struct AStarNode{
 #define MAX_NODES 512
 #define GET_NODE_INDEX(a) (a - &nodes[0])
 
+// The cost of a straight step for the pathfinding algorithm
 #define MAP_NORMALWALKCOST 10
+
+// The cost of a vertical step for the pathfinding algorithm, this should be more expensive
+// then two straight step, else the player / monsters will walk diagonally all the time.
 #define MAP_DIAGONALWALKCOST 25
 
 class AStarNodes{
@@ -139,11 +144,6 @@ class Map
 public:
 	Map();
 	~Map();
-
-	static const int32_t maxViewportX = 11;		//min value: maxClientViewportX + 1
-	static const int32_t maxViewportY = 11;		//min value: maxClientViewportY + 1
-	static const int32_t maxClientViewportX = 8;
-	static const int32_t maxClientViewportY = 6;
 
 	/**
 	* Load a map.

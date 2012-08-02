@@ -135,8 +135,8 @@ bool CreatureManager::deserializeSpell(xmlNodePtr node, SpellBlock& sb)
 			intValue = 0;
 		}
 
-		if(intValue > Map::maxViewportX * 2){
-			intValue = Map::maxViewportX * 2;
+		if(intValue > Map_maxViewportX * 2){
+			intValue = Map_maxViewportX * 2;
 		}
 
 		sb.range = intValue;

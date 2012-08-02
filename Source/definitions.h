@@ -161,12 +161,16 @@ enum passwordType_t{
     Compiler setup
 */
 #if defined __GNUC__
-	#include "compiler/gcc.h"
-	#ifdef __MINGW32__
-		#include "compiler/mingw32.h"
-	#elif defined __CYGWIN__
-		#include "compiler/cygwin.h"
-	#endif
+    #ifdef __llvm__
+        #include "compiler/llvm.h"
+    #else
+        #include "compiler/gcc.h"
+        #ifdef __MINGW32__
+            #include "compiler/mingw32.h"
+        #elif defined __CYGWIN__
+            #include "compiler/cygwin.h"
+        #endif
+    #endif
 #elif defined(_MSC_VER)
 	#include "compiler/msvc.h"
 #endif

@@ -4268,8 +4268,8 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 	getSpectators(list, player->getPosition(), false, false,
-		Map::maxClientViewportX, Map::maxClientViewportX,
-		Map::maxClientViewportY, Map::maxClientViewportY);
+		Map_maxClientViewportX, Map_maxClientViewportX,
+		Map_maxClientViewportY, Map_maxClientViewportY);
 
 	//send to client
 	Player* tmpPlayer = NULL;
@@ -4413,8 +4413,8 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClass type, const std::s
 	}
 	else{
 		getSpectators(list, creature->getPosition(), false, false,
-			Map::maxClientViewportX, Map::maxClientViewportX,
-			Map::maxClientViewportY, Map::maxClientViewportY);
+			Map_maxClientViewportX, Map_maxClientViewportX,
+			Map_maxClientViewportY, Map_maxClientViewportY);
 	}
 
 	if(type != SPEAK_PRIVATE_NP){

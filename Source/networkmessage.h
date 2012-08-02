@@ -24,6 +24,7 @@
 #include "definitions.h"
 #include "otsystem.h"
 #include "const.h"
+#include "protocolconst.h"
 
 class NetworkMessage
 {

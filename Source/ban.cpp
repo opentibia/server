@@ -396,7 +396,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 		ban.id = result->getDataInt("id");
 		ban.value = result->getDataString("value");
 		ban.param = result->getDataString("param");
-		ban.expires = result->getDataLong("expires");
+		ban.expires = (time_t)result->getDataLong("expires");
 		ban.added = (uint32_t)result->getDataLong("id");
 		ban.adminId = result->getDataInt("admin_id");
 		ban.reason = result->getDataInt("reason");

@@ -22,16 +22,11 @@
 #define __OTSERV_PROTOCOL_H__
 
 #include "classes.h"
+#include "protocolconst.h"
 
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;
 
-#define NETWORKMESSAGE_MAXSIZE 15340
-
-const int32_t Map_maxViewportX = 11;		//min value: maxClientViewportX + 1
-const int32_t Map_maxViewportY = 11;		//min value: maxClientViewportY + 1
-const int32_t Map_maxClientViewportX = 8;
-const int32_t Map_maxClientViewportY = 6;
 
 class Protocol : boost::noncopyable
 {

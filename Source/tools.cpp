@@ -24,6 +24,7 @@
 #include "sha1.h"
 #include "configmanager.h"
 #include <iomanip>
+#include <libxml/encoding.h>
 
 extern ConfigManager g_config;
 
@@ -123,14 +124,16 @@ bool utf8ToLatin1(char* intext, std::string& outtext)
 		return false;
 	}
 
-	int inlen  = strlen(intext);
+	size_t inlen  = strlen(intext);
 	if(inlen == 0){
 		return false;
 	}
 
-	int outlen = inlen*2;
+	size_t outlen = inlen*2;
 	unsigned char* outbuf = new unsigned char[outlen];
-	int res = UTF8Toisolat1(outbuf, &outlen, (unsigned char*)intext, &inlen);
+    // The casts to int* are safe according to the documentation
+    // Unless inlen is negative, outlen will never be
+	int res = UTF8Toisolat1(outbuf, (int*)&outlen, (unsigned char*)intext, (int*)&inlen);
 	if(res < 0){
 		delete[] outbuf;
 		return false;

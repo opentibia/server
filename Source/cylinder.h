@@ -23,6 +23,8 @@
 
 #define INDEX_WHEREEVER -1
 
+#include "thing.h"
+
 enum cylinderflags_t {
 	FLAG_PATHFINDING         = 1,	//An additional check is done for floor changing/teleport items
 	FLAG_IGNOREBLOCKITEM     = 2,	//Bypass moveable blocking item checks

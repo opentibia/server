@@ -435,10 +435,10 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos,
 		}
 
 		if(!foundCache){
-			minRangeX = (minRangeX == 0 ? -maxViewportX : -minRangeX);
-			maxRangeX = (maxRangeX == 0 ? maxViewportX : maxRangeX);
-			minRangeY = (minRangeY == 0 ? -maxViewportY : -minRangeY);
-			maxRangeY = (maxRangeY == 0 ? maxViewportY : maxRangeY);
+			minRangeX = (minRangeX == 0 ? -Map_maxViewportX : -minRangeX);
+			maxRangeX = (maxRangeX == 0 ? Map_maxViewportX : maxRangeX);
+			minRangeY = (minRangeY == 0 ? -Map_maxViewportY : -minRangeY);
+			maxRangeY = (maxRangeY == 0 ? Map_maxViewportY : maxRangeY);
 
 			int32_t minRangeZ;
 			int32_t maxRangeZ;
@@ -494,10 +494,10 @@ const SpectatorVec& Map::getSpectators(const Position& centerPos)
 			spectatorCache[centerPos] = p;
 			SpectatorVec& list = *p;
 
-			int32_t minRangeX = -maxViewportX;
-			int32_t maxRangeX = maxViewportX;
-			int32_t minRangeY = -maxViewportY;
-			int32_t maxRangeY = maxViewportY;
+			int32_t minRangeX = -Map_maxViewportX;
+			int32_t maxRangeX = Map_maxViewportX;
+			int32_t minRangeY = -Map_maxViewportY;
+			int32_t maxRangeY = Map_maxViewportY;
 
 			int32_t minRangeZ;
 			int32_t maxRangeZ;

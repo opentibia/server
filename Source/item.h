@@ -19,7 +19,7 @@
 #ifndef __OTSERV_ITEM_H__
 #define __OTSERV_ITEM_H__
 
-#include "classes.h"
+#include "thing.h"
 #include "items.h"
 #include "item_attributes.h"
 
