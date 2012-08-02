@@ -205,12 +205,6 @@ enum passwordType_t{
 	#endif
 #endif
 
-#ifdef XML_GCC_FREE
-	#define xmlFreeOTSERV(s)	free(s)
-#else
-	#define xmlFreeOTSERV(s)	xmlFree(s)
-#endif
-
 //#define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__ //experimental
 
 // OpenTibia configuration
