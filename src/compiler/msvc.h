@@ -22,11 +22,6 @@
 #define __OTSERV_MSVC_H__
 
 /*
-	Defines the operational system.
-*/
-#define __WINDOWS__
-
-/*
 	Visual Studio simple version definition.
 	Releases before Visual Studio 2005 (8.0) are not supported
 	but may compile otserv.
