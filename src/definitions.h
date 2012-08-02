@@ -22,8 +22,8 @@
 #define __OTSERV_DEFINITIONS_H__
 
 
-#define OTSERV_VERSION "0.7.0_SVN"
-#define OTSERV_NAME "OTServ (branch revscriptsys)"
+#define OTSERV_VERSION "0.7.0"
+#define OTSERV_NAME "OTServ"
 #define CURRENT_SCHEMA_VERSION 25
 
 #define CLIENT_VERSION_MIN 870
@@ -60,7 +60,6 @@
 
 //Default sql driver
 #if !defined(SINGLE_SQL_DRIVER) && !defined(MULTI_SQL_DRIVERS)
-	#define __USE_SQLITE__
 	#define SINGLE_SQL_DRIVER
 #endif
 
@@ -158,7 +157,7 @@ enum passwordType_t{
 #define make_str(str) xmake_str(str)
 
 /*
-    Compiler setup
+	Compiler setup
 */
 #if defined __GNUC__
 	#include "compiler/gcc.h"
@@ -174,8 +173,8 @@ enum passwordType_t{
 #endif
 
 /*
-    If the compiler supports the upcoming standard,
-    call some of the useful headers.
+	If the compiler supports the upcoming standard,
+	call some of the useful headers.
 */
 #ifdef __OTSERV_CXX0X__
 	#include <cstdint>
