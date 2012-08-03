@@ -139,8 +139,7 @@ bool utf8ToLatin1(char* intext, std::string& outtext)
 		return false;
 	}
 
-	outbuf[outlen] = '\0';
-	outtext = (char*)outbuf;
+	outtext = std::string((char*)outbuf, outlen);
 	delete[] outbuf;
 	return true;
 }
