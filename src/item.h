@@ -196,7 +196,7 @@ public:
 	uint32_t getOwner() const;
 
 	void setCorpseOwner(uint32_t _corpseOwner);
-	uint32_t getCorpseOwner();
+	uint32_t getCorpseOwner() const;
 
 	void setDuration(int32_t time);
 	void decreaseDuration(int32_t time);
@@ -479,7 +479,7 @@ inline void Item::setCorpseOwner(uint32_t _corpseOwner) {
 	setAttribute("corpseOwner", (int32_t)_corpseOwner);
 }
 
-inline uint32_t Item::getCorpseOwner() {
+inline uint32_t Item::getCorpseOwner() const {
 	const int32_t* owner = getIntegerAttribute("corpseOwner");
 	if(owner)
 		return (uint32_t)*owner;

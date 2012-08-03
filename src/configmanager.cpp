@@ -274,7 +274,7 @@ bool ConfigManager::setString(uint32_t _what, const std::string& _value)
 	}
 }
 
-std::string ConfigManager::getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default)
+std::string ConfigManager::getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default) const
 {
 	lua_getglobal(_L, _identifier.c_str());
 
@@ -290,7 +290,7 @@ std::string ConfigManager::getGlobalString(lua_State* _L, const std::string& _id
 	return ret;
 }
 
-int64_t ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default)
+int64_t ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default) const
 {
 	lua_getglobal(_L, _identifier.c_str());
 
@@ -305,7 +305,7 @@ int64_t ConfigManager::getGlobalNumber(lua_State* _L, const std::string& _identi
 	return val;
 }
 
-double ConfigManager::getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default)
+double ConfigManager::getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default) const
 {
 	lua_getglobal(_L, _identifier.c_str());
 
@@ -320,7 +320,7 @@ double ConfigManager::getGlobalFloat(lua_State* _L, const std::string& _identifi
 	return val;
 }
 
-bool ConfigManager::getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default)
+bool ConfigManager::getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default) const
 {
 	lua_getglobal(_L, _identifier.c_str());
 

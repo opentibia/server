@@ -153,7 +153,7 @@ public:
 
 	int32_t lightLevel;
 	int32_t lightColor;
-	
+
 	Direction bedPartnerDirection;
 	uint16_t maleSleeperID;
 	uint16_t femaleSleeperID;
@@ -212,7 +212,7 @@ public:
 	const A getElement(uint32_t id) const;
 	void addElement(A a, uint32_t pos);
 
-	uint32_t size() {return m_size;}
+	uint32_t size() const {return m_size;}
 
 private:
 	A* m_data;
@@ -248,7 +248,7 @@ public:
 
 	const ItemType* getElement(uint32_t id) const {return items.getElement(id);}
 	ItemType* getElement(uint32_t id) {return items.getElement(id);}
-	uint32_t size() {return items.size();}
+	uint32_t size() const {return items.size();}
 
 	std::map<uint32_t, ItemType*> currencyMap;
 

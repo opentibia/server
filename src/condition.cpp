@@ -266,7 +266,7 @@ bool Condition::unserialize(PropStream& propStream)
 {
 	uint8_t attr_type;
 	while(propStream.GET_UCHAR(attr_type) && attr_type != CONDITIONATTR_END.value()){
-		
+
 		if(attr_type == enums::CONDITIONATTRIBUTE_MECHANIC){
 			int32_t value = 0;
 			if(!propStream.GET_VALUE(value)){
@@ -352,13 +352,13 @@ bool Condition::serialize(PropWriteStream& propWriteStream)
 	return true;
 }
 
-int32_t ConditionEffect::getStatValue(Creature* creature, PlayerStatType statType, int32_t percent, int32_t value)
+int32_t ConditionEffect::getStatValue(Creature* creature, PlayerStatType statType, int32_t percent, int32_t value) const
 {
 	if(percent != 0){
 		switch(statType.value()){
 			case enums::STAT_MAXHITPOINTS:
 				return (int32_t)((float)creature->getMaxHealth() * (percent / 100.f));
-			
+
 			case enums::STAT_MAXMANAPOINTS:
 				return (int32_t)((float)creature->getMaxMana() * (percent / 100.f));
 
@@ -384,7 +384,7 @@ int32_t ConditionEffect::getStatValue(Creature* creature, PlayerStatType statTyp
 	return 0;
 }
 
-int32_t ConditionEffect::getSkillValue(Creature* creature, SkillType skillType, int32_t percent, int32_t value)
+int32_t ConditionEffect::getSkillValue(Creature* creature, SkillType skillType, int32_t percent, int32_t value) const
 {
 	if(percent != 0){
 		if(Player* player = creature->getPlayer()){
@@ -487,7 +487,7 @@ bool ConditionEffect::onBegin(Creature* creature)
 				modStat.delta += delta;
 				break;
 			}
-			
+
 			case ConditionEffect::MOD_SKILL:
 			{
 				ConditionEffect::ModSkill& modSkill = getModEffect<ConditionEffect::ModSkill>();
@@ -549,7 +549,7 @@ bool ConditionEffect::onEnd(Creature* creature, ConditionEnd reason)
 				player->sendStats();
 				break;
 			}
-			
+
 			case ConditionEffect::MOD_SKILL:
 			{
 				//revert our changes
@@ -719,7 +719,7 @@ bool ConditionEffect::unserialize(PropStream& propStream)
 	if(!propStream.GET_VALUE(value)){
 		return false;
 	}
-	
+
 	type = ConditionEffect::Type(value);
 
 	if(!propStream.GET_VALUE(interval)){
@@ -739,7 +739,7 @@ bool ConditionEffect::unserialize(PropStream& propStream)
 			if(revision != 1){
 				return false;
 			}
-			
+
 			ConditionEffect::ModPeriodicDamage mod;
 			if(!propStream.GET_VALUE(value)){
 				return false;

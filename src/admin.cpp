@@ -473,7 +473,7 @@ void ProtocolAdmin::adminCommandPayHouses()
 	}
 }
 
-Item* ProtocolAdmin::createMail(const std::string xmlData, std::string& name, uint32_t& depotId)
+Item* ProtocolAdmin::createMail(const std::string& xmlData, std::string& name, uint32_t& depotId)
 {
 	xmlDocPtr doc = xmlParseMemory(xmlData.c_str(), strlen(xmlData.c_str()));
 	if(!doc){
@@ -619,7 +619,6 @@ AdminProtocolConfig::AdminProtocolConfig()
 	m_onlyLocalHost = true;
 	m_maxConnections = 1;
 	m_currrentConnections = 0;
-	m_password = "";
 	m_key_RSA1024XTEA = NULL;
 	m_requireLogin = true;
 	m_requireEncryption = false;
@@ -732,12 +731,12 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 	return true;
 }
 
-bool AdminProtocolConfig::isEnabled()
+bool AdminProtocolConfig::isEnabled() const
 {
 	return m_enabled;
 }
 
-bool AdminProtocolConfig::onlyLocalHost()
+bool AdminProtocolConfig::onlyLocalHost() const
 {
 	return m_onlyLocalHost;
 }
@@ -760,21 +759,16 @@ void AdminProtocolConfig::removeConnection()
 	}
 }
 
-bool AdminProtocolConfig::passwordMatch(std::string& password)
+bool AdminProtocolConfig::passwordMatch(const std::string& password) const
 {
-	//prevent empty password login
-	if(m_password == ""){
-		return false;
-	}
-	if(password == m_password){
+	//prevent empty password login and different matches
+	if(m_password.empty() || password != m_password)
 		return true;
-	}
-	else{
-		return false;
-	}
+
+	return false;
 }
 
-bool AdminProtocolConfig::allowIP(uint32_t ip)
+bool AdminProtocolConfig::allowIP(uint32_t ip) const
 {
 	if(m_onlyLocalHost){
 		if(ip == 0x0100007F){ //127.0.0.1
@@ -795,17 +789,17 @@ bool AdminProtocolConfig::allowIP(uint32_t ip)
 	}
 }
 
-bool AdminProtocolConfig::requireLogin()
+bool AdminProtocolConfig::requireLogin() const
 {
 	return m_requireLogin;
 }
 
-bool AdminProtocolConfig::requireEncryption()
+bool AdminProtocolConfig::requireEncryption() const
 {
 	return m_requireEncryption;
 }
 
-uint16_t AdminProtocolConfig::getProtocolPolicy()
+uint16_t AdminProtocolConfig::getProtocolPolicy() const
 {
 	uint16_t policy = 0;
 	if(requireLogin()){
@@ -817,7 +811,7 @@ uint16_t AdminProtocolConfig::getProtocolPolicy()
 	return policy;
 }
 
-uint32_t AdminProtocolConfig::getProtocolOptions()
+uint32_t AdminProtocolConfig::getProtocolOptions() const
 {
 	uint32_t ret = 0;
 	if(requireEncryption()){

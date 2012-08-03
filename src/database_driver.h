@@ -62,7 +62,7 @@ public:
 	*
 	* @return whether or not the database is connected.
 	*/
-	bool isConnected() { return m_connected; }
+	bool isConnected() const { return m_connected; }
 
 protected:
 	/**

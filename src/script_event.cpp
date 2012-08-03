@@ -99,7 +99,7 @@ bool Event::call(Manager& state, Environment& environment, Listener_ptr listener
 	// clean up
 	reference = state.unReference(reference);
 	// removing everything from the stack, we're done
-	thread->clearStack(); 
+	thread->clearStack();
 
 	return !propagate;
 }
@@ -447,7 +447,7 @@ bool OnUseWeapon::Event::check_match(const ScriptInformation& info)
 bool OnUseWeapon::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerMap::iterator list_iter;
-	
+
 
 	if (!weapon) {
 		if(dispatchEvent<OnUseWeapon::Event>
@@ -715,7 +715,7 @@ bool OnMoveCreature::Event::dispatch(Manager& state, Environment& environment)
 		// Fetch item ids
 		id_list.clear();
 		fromTile->items_fetchListWithItemId(id_list);
-		
+
 		// Check item id matches
 		if (!id_list.empty())
 		{
@@ -1079,7 +1079,7 @@ void OnLeaveChannel::Event::update_instance(Manager& state, Environment& environ
 
 OnAccountLogin::Event::Event(std::string& name, uint32_t& number, std::string& password,
 	time_t& premiumEnd, uint32_t& warnings, std::list<AccountCharacter>& charList) :
-	name(name), number(number), password(password), premiumEnd(premiumEnd), warnings(warnings), charList(charList) 
+	name(name), number(number), password(password), premiumEnd(premiumEnd), warnings(warnings), charList(charList)
 {
 	propagate_by_default = true;
 }
@@ -2008,11 +2008,11 @@ OnConditionEffect::Event::Event(Creature* creature, ConditionEffect& effect, Con
 	propagate_by_default = true;
 }
 
-OnConditionEffect::Event::Event(Creature* creature, ConditionEffect& effect, uint32_t ticks) :
-	creature(creature),
-	effect(effect),g
-	reason(CONDITIONEND_UPDATE),
-	eventType(EVENT_TICK)
+OnConditionEffect::Event::Event(Creature* creature, ConditionEffect& effect, uint32_t ticks)
+	: creature(creature)
+	, effect(effect)
+	, reason(CONDITIONEND_UPDATE)
+	, eventType(EVENT_TICK)
 {
 	propagate_by_default = true;
 }
@@ -2320,7 +2320,7 @@ bool OnKill::Event::check_match(const ScriptInformation& info)
 bool OnKill::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerList list;
-	
+
 	// Tied to killer
 	Creature* killer = combatSource.getSourceCreature();
 	if(killer){
@@ -2333,7 +2333,7 @@ bool OnKill::Event::dispatch(Manager& state, Environment& environment)
 	if(dispatchEvent<OnKill::Event, ScriptInformation>
 			(this, state, environment, environment.Generic.OnKill))
 		return true;
-	
+
 	// Tied to dying creature
 	list = creature->getListeners(ON_KILLED_LISTENER);
 	if(dispatchEvent<OnKill::Event, ScriptInformation>
@@ -2413,7 +2413,7 @@ bool OnDeath::Event::check_match(const ScriptInformation& info)
 bool OnDeath::Event::dispatch(Manager& state, Environment& environment)
 {
 	ListenerList list;
-	
+
 	// Tied to killer
 	if(killer){
 		list = killer->getListeners(ON_DEATH_BY_LISTENER);
@@ -2425,7 +2425,7 @@ bool OnDeath::Event::dispatch(Manager& state, Environment& environment)
 	if(dispatchEvent<OnDeath::Event, ScriptInformation>
 			(this, state, environment, environment.Generic.OnDeathBy))
 		return true;
-	
+
 	// Tied to dying creature
 	list = creature->getListeners(ON_DEATH_LISTENER);
 	if(dispatchEvent<OnDeath::Event, ScriptInformation>
@@ -2594,7 +2594,7 @@ void OnActorLoadSpell::Event::push_instance(LuaState& state, Environment& enviro
 			case ::enums::CONDITION_PARALYZED:
 			{
 				const ConditionEffect::ModSpeed& modSpeed = spell.condition.effect.getModEffect<const ConditionEffect::ModSpeed>();
-				
+
 				state.newTable();
 					state.pushString("speed");
 					state.setField(-2, "name");
@@ -2608,7 +2608,7 @@ void OnActorLoadSpell::Event::push_instance(LuaState& state, Environment& enviro
 			case ::enums::CONDITION_SHAPESHIFT:
 			{
 				const ConditionEffect::ModShapeShift& modShapeShift = spell.condition.effect.getModEffect<const ConditionEffect::ModShapeShift>();
-				
+
 				state.newTable();
 					state.pushString("shapeshift");
 					state.setField(-2, "name");

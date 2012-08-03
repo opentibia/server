@@ -39,7 +39,7 @@ public:
 
 	~Task() {}
 
-	void operator()(){
+	void operator()() const{
 		m_f();
 	}
 

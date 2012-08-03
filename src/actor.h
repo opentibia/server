@@ -124,10 +124,10 @@ public:
 	bool searchTarget(TargetSearchType_t searchType = TARGETSEARCH_DEFAULT);
 	bool selectTarget(Creature* creature);
 
-	const CreatureList& getTargetList() {return targetList;}
-	const CreatureList& getFriendList() {return friendList;}
+	const CreatureList& getTargetList() const {return targetList;}
+	const CreatureList& getFriendList() const {return friendList;}
 
-	bool isTarget(Creature* creature);
+	bool isTarget(Creature* creature) const;
 	bool isFleeing() const {return getHealth() <= cType.fleeHealth();}
 
 	bool isImmune(CombatType type) const;

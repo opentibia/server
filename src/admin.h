@@ -138,21 +138,21 @@ public:
 
 	bool loadXMLConfig(const std::string& directory);
 
-	bool isEnabled();
+	bool isEnabled() const;
 
-	bool onlyLocalHost();
+	bool onlyLocalHost() const;
 	bool addConnection();
 	void removeConnection();
 
-	bool requireLogin();
-	bool requireEncryption();
+	bool requireLogin() const;
+	bool requireEncryption() const;
 
-	uint16_t getProtocolPolicy();
-	uint32_t getProtocolOptions();
+	uint16_t getProtocolPolicy() const;
+	uint32_t getProtocolOptions() const;
 
-	bool allowIP(uint32_t ip);
+	bool allowIP(uint32_t ip) const;
 
-	bool passwordMatch(std::string& password);
+	bool passwordMatch(const std::string& password) const;
 
 	RSA* getRSAKey(uint8_t type);
 
@@ -204,7 +204,7 @@ protected:
 	void adminCommandSendMail(const std::string& xmlData);
 	void adminCommandKickPlayer(const std::string& name);
 
-	Item* createMail(const std::string xmlData, std::string& name, uint32_t& depotId);
+	Item* createMail(const std::string& xmlData, std::string& name, uint32_t& depotId);
 
 	enum ConnectionState_t{
 		NO_CONNECTED,

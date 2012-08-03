@@ -70,7 +70,7 @@ public:
 
 	struct ModPeriodicDamage{
 		ModPeriodicDamage() {}
-		ModPeriodicDamage(CombatType type, int32_t min, int32_t max, int32_t value, bool isAverage = false) : 
+		ModPeriodicDamage(CombatType type, int32_t min, int32_t max, int32_t value, bool isAverage = false) :
 			type(type),
 			min(min),
 			max(max),
@@ -174,6 +174,7 @@ public:
 		int32_t color;
 	};
 
+	// TODO: use initializer list
 	struct ModShapeShift{
 		ModShapeShift() {}
 		ModShapeShift(uint32_t lookType, uint32_t lookTypeEx, uint32_t lookHead,
@@ -322,7 +323,7 @@ public:
 	}
 
 	ConditionEffect() :
-        // Shouldn't there be a 'null' effect?
+		// Shouldn't there be a 'null' effect?
 		type(PERIODIC_HEAL),
 		interval(0),
 		data(boost::any()),
@@ -390,8 +391,8 @@ public:
 	bool serialize(PropWriteStream& propWriteStream);
 
 protected:
-	int32_t getStatValue(Creature* creature, PlayerStatType statType, int32_t percent, int32_t value);
-	int32_t getSkillValue(Creature* creature, SkillType skillType, int32_t percent, int32_t value);
+	int32_t getStatValue(Creature* creature, PlayerStatType statType, int32_t percent, int32_t value) const;
+	int32_t getSkillValue(Creature* creature, SkillType skillType, int32_t percent, int32_t value) const;
 
 	ConditionEffect::Type type;
 	uint32_t interval;
@@ -457,7 +458,7 @@ public:
 	void addEffect(ConditionEffect effect);
 
 	Condition* clone()  const { return new Condition(*this); }
-	
+
 	bool isAttached() const {return attached;}
 	//serialization
 	bool isPersistent() const;

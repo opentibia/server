@@ -352,7 +352,7 @@ bool BanManager::removeNotations(uint32_t accno) const
 	return db->executeQuery(query.str());
 }
 
-uint32_t BanManager::getNotationsCount(uint32_t account)
+uint32_t BanManager::getNotationsCount(uint32_t account) const
 {
 	DatabaseDriver* db = DatabaseDriver::instance();
 	DBResult_ptr result;

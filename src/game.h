@@ -124,7 +124,8 @@ public:
 	  * \param width width of the map
 	  * \param height height of the map
 	  */
-	void getMapDimensions(uint32_t& width, uint32_t& height){
+	void getMapDimensions(uint32_t& width, uint32_t& height) const
+	{
 		width = map->mapWidth;
 		height = map->mapHeight;
 		return;
@@ -132,13 +133,13 @@ public:
 
 	void setWorldType(WorldType type);
 	WorldType getWorldType() const {return worldType;}
-	// These functions confuse me.. Why not use the config values?
-	uint32_t getInFightTicks() {return inFightTicks;}
-	uint32_t getExhaustionTicks() {return exhaustionTicks;}
-	uint32_t getAddExhaustionTicks() {return addExhaustionTicks;}
-	uint32_t getFightExhaustionTicks() {return fightExhaustionTicks;}
-	uint32_t getHealExhaustionTicks() {return healExhaustionTicks;}
-	uint32_t getStairhopExhaustion() {return stairhopExhaustion;}
+	// TODO: use config values from the config manager
+	uint32_t getInFightTicks() const {return inFightTicks;}
+	uint32_t getExhaustionTicks() const {return exhaustionTicks;}
+	uint32_t getAddExhaustionTicks() const {return addExhaustionTicks;}
+	uint32_t getFightExhaustionTicks() const {return fightExhaustionTicks;}
+	uint32_t getHealExhaustionTicks() const {return healExhaustionTicks;}
+	uint32_t getStairhopExhaustion() const {return stairhopExhaustion;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index,
@@ -614,7 +615,7 @@ public:
 	Map* getMap() { return map;}
 	const Map* getMap() const { return map;}
 
-	int getLightHour() {return light_hour;}
+	int getLightHour() const {return light_hour;}
 
 	void addCommandTag(std::string tag);
 	void resetCommandTag();

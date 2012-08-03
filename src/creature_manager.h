@@ -30,7 +30,7 @@ public:
 	~CreatureManager();
 
 	bool loadFromXml(const std::string& _datadir, bool reloading = false);
-	bool isLoaded(){return loaded;}
+	bool isLoaded() const {return loaded;}
 	bool configureSpells();
 	bool reload();
 

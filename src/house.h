@@ -152,7 +152,7 @@ public:
 	void resetSyncFlag(syncflags_t flag) {syncFlags &= ~(uint32_t)flag;}
 
 	void setLastWarning(time_t _lastWarning) {lastWarning = _lastWarning;}
-	time_t getLastWarning() {return lastWarning;}
+	time_t getLastWarning() const {return lastWarning;}
 
 	void setPayRentWarnings(uint32_t warnings) {rentWarnings = warnings;}
 	uint32_t getPayRentWarnings() const {return rentWarnings;}
@@ -178,16 +178,16 @@ public:
 
 	HouseTileList::iterator getTileBegin() {return houseTiles.begin();}
 	HouseTileList::iterator getTileEnd() {return houseTiles.end();}
-	size_t getTileCount() {return houseTiles.size();}
+	size_t getTileCount() const {return houseTiles.size();}
 
 	HouseDoorList::iterator getDoorBegin() {return doorList.begin();}
 	HouseDoorList::iterator getDoorEnd() {return doorList.end();}
-	size_t getDoorCount() {return doorList.size();}
+	size_t getDoorCount() const {return doorList.size();}
 
 	HouseBedItemList::iterator getBedsBegin() {return bedsList.begin();}
 	HouseBedItemList::iterator getBedsEnd() {return bedsList.end();}
-	size_t getBedTiles() {return bedsList.size();}
-	uint32_t getBedCount() {return (uint32_t)std::ceil((double)getBedTiles() / 2);} //each bed takes 2 sqms of space, ceil is just for bad maps
+	size_t getBedTiles() const {return bedsList.size();}
+	uint32_t getBedCount() const {return (uint32_t)std::ceil((double)getBedTiles() / 2);} //each bed takes 2 sqms of space, ceil is just for bad maps
 
 	// Transfers all items to depot and clicks all players (useful for map updates, for example)
 	void cleanHouse();

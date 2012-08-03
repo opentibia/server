@@ -157,10 +157,10 @@ public:
 
 private:
 	static void moveValue(lua_State* fromL, lua_State* toL);
-	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
-	int64_t getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default=0);
-	double getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default=0.0);
-	bool getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default=false);
+	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="") const;
+	int64_t getGlobalNumber(lua_State* _L, const std::string& _identifier, int64_t _default=0) const;
+	double getGlobalFloat(lua_State* _L, const std::string& _identifier, double _default=0.0) const;
+	bool getGlobalBoolean(lua_State* _L, const std::string& _identifier, bool _default=false) const;
 
 	lua_State* L;
 	bool m_isLoaded;

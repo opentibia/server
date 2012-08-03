@@ -50,8 +50,8 @@ public:
 	void startup();
 	void clear();
 	
-	bool isLoaded() { return loaded; }
-	bool isStarted() { return started; }
+	bool isLoaded() const { return loaded; }
+	bool isStarted() const { return started; }
 	
 private:
 	SpawnList spawnList;
@@ -69,7 +69,7 @@ public:
 	bool addNPC(const std::string& name, const Position& pos, Direction dir);
 	void removeMonster(Actor* monster);
 	
-	uint32_t getInterval() {return interval;}
+	uint32_t getInterval() const {return interval;}
 	void startup();
 
 	void startSpawnCheck();

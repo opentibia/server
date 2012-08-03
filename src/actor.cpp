@@ -526,7 +526,7 @@ BlockType Actor::blockHit(CombatType combatType, const CombatSource& combatSourc
 	return blockType;
 }
 
-bool Actor::isTarget(Creature* creature)
+bool Actor::isTarget(Creature* creature) const
 {
 	if( creature->isRemoved() ||
 		!canTarget() ||
@@ -728,8 +728,9 @@ void Actor::doAttacking(uint32_t interval)
 		return;
 	}
 
-	bool updateLook = true;
+	// TODO: seems "outOfRange" is being unused. Why?
 	bool outOfRange = true;
+	bool updateLook = true;
 
 	resetTicks = interval != 0;
 	attackTicks += interval;

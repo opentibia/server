@@ -24,6 +24,7 @@
 #include "classes.h"
 #include "cylinder.h"
 #include "item.h"
+#include <set>
 #include <boost/shared_ptr.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/member.hpp>
@@ -82,7 +83,7 @@ class TileItemBaseIterator : public std::iterator<std::bidirectional_iterator_ta
 public:
 	typedef TileItemBaseIterator<T, T_iter, E, E_iter, C> this_type;
 
-	TileItemBaseIterator() : 
+	TileItemBaseIterator() :
 	  vector(NULL), multiIndex(NULL) {}
 	TileItemBaseIterator(T _vector, T_iter pos)
 	{
@@ -121,7 +122,7 @@ public:
 		multiIndex_pos = rhs.multiIndex_pos;
 	}
 
-	const this_type& operator=(const this_type& rhs)
+	this_type& operator=(const this_type& rhs)
 	{
 		vector = rhs.vector;
 		vector_pos = rhs.vector_pos;
@@ -129,7 +130,7 @@ public:
 		multiIndex = rhs.multiIndex;
 		multiIndex_pos = rhs.multiIndex_pos;
 
-		return(*this);
+		return *this;
 	}
 
 	bool operator==(const this_type& rhs)
@@ -620,7 +621,7 @@ protected:
 	CreatureIterator creatures_insert(CreatureIterator _where, Creature* creature) {return creatures.insert(_where, creature);}
 	CreatureIterator creatures_erase(CreatureIterator _pos) {return creatures.erase(_pos);}
 
-	void items_onItemModified(Item* item){}
+	void items_onItemModified(Item* item) const {}
 
 	friend class Map;
 	friend class Tile;
@@ -744,7 +745,7 @@ public:
 			}
 		}
 		return vector;
-	}	
+	}
 	Item* items_getItemWithProps(ItemProp props) const
 	{
 		if(ground && ground->hasProperty(props)){
@@ -818,7 +819,7 @@ protected:
 		return creatures->erase(_pos);
 	}
 
-	void items_onItemModified(Item* item){}
+	void items_onItemModified(Item* item) const {}
 
 	friend class Map;
 	friend class Tile;

@@ -49,7 +49,7 @@ public:
 	void updateAllPartyIcons();
 	void updatePartyIcons(Player* player);
 	void broadcastPartyMessage(MessageClass msgClass, const std::string& msg, bool sendToInvitations = false);
-	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
+	bool disbandParty() const {return (memberList.empty() && inviteList.empty());}
 	bool canOpenCorpse(uint32_t ownerId);
 
 	void shareExperience(uint64_t experience, bool fromMonster);
@@ -63,7 +63,7 @@ public:
 	void addPlayerDamageMonster(Player* player, uint32_t points);
 	void clearPlayerPoints(Player* player);
 
-	const PlayerVector& getMemberList() {return memberList;}
+	const PlayerVector& getMemberList() const {return memberList;}
 
 protected:
 	bool sharedExpActive;

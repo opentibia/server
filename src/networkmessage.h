@@ -63,11 +63,11 @@ public:
 		m_ReadPos += 4;
 		return v;
 	}
-	uint32_t PeekU32(){
+	uint32_t PeekU32() const {
 		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 		return v;
 	}
-	uint64_t GetU64(){
+	uint64_t GetU64() const {
 		uint64_t v = *(uint64_t*)(m_MsgBuf + m_ReadPos);
 		return v;
 	}
@@ -135,7 +135,7 @@ public:
 
 
 protected:
-	inline bool canAdd(uint32_t size)
+	inline bool canAdd(uint32_t size) const
 	{
 		return (size + m_ReadPos < max_body_length);
 	};

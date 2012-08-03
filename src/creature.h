@@ -74,7 +74,8 @@ protected:
 };
 
 struct DeathLessThan{
-	bool operator()(const DeathEntry& d1, const DeathEntry& d2){
+	bool operator()(const DeathEntry& d1, const DeathEntry& d2) const
+	{
 		// Sort descending
 		return d1.damage > d2.damage;
 	}
@@ -178,7 +179,7 @@ public:
 	}
 
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
-	int getBaseSpeed() {return baseSpeed;}
+	int getBaseSpeed() const {return baseSpeed;}
 
 	virtual int32_t getHealth() const {return health;}
 	virtual int32_t getMaxHealth() const {return healthMax;}
@@ -225,7 +226,7 @@ public:
 	virtual void addSummon(Creature* creature);
 	virtual void removeSummon(const Creature* creature);
 	void destroySummons();
-	const std::list<Creature*>& getSummons() {return summons;}
+	const std::list<Creature*>& getSummons() const {return summons;}
 
 	virtual int32_t getArmor() const {return 0;}
 	virtual int32_t getDefense() const {return 0;}

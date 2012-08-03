@@ -50,7 +50,6 @@ struct LootBlock{
 
 		subType = -1;
 		actionId = -1;
-		text = "";
 		dropEmpty = false;
 	}
 };
@@ -66,7 +65,6 @@ struct SpellBlock{
 	{
 		chance = 100;
 		speed = 2000;
-		name = "";
 		damageType = COMBAT_NONE;
 		range = 0;
 		min = 0;

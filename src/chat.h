@@ -50,9 +50,9 @@ public:
 	bool talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time = 0);
 	bool sendInfo(SpeakClass type, const std::string& text, uint32_t time = 0);
 
-	const std::string& getName(){ return m_name; }
-	const uint16_t getId(){ return m_id; }
-	const UsersMap& getUsers(){ return m_users; }
+	const std::string& getName() const { return m_name; }
+	uint16_t getId() const { return m_id; }
+	const UsersMap& getUsers() const { return m_users; }
 
 	virtual const uint32_t getOwner(){ return 0; }
 

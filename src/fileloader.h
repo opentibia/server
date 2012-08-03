@@ -107,7 +107,7 @@ public:
 	void endNode();
 	int setProps(void* data, unsigned short size);
 
-	int getError(){return m_lastError;}
+	int getError() const {return m_lastError;}
 	void clearError(){m_lastError = ERROR_NONE;}
 
 protected:
@@ -180,7 +180,7 @@ public:
 		end = a + size;
 	}
 
-	int64_t size(){return end-p;}
+	int64_t size() const {return end-p;}
 
 	template <typename T>
 	inline bool GET_STRUCT(T* &ret){

@@ -137,7 +137,7 @@ public:
 	bool canOpenCorpse(uint32_t ownerId);
 
 	void setBalance(uint32_t amount) {setCustomValue("__balance", amount);}
-	uint32_t getBalance() {uint32_t amount = 0; if(getCustomValue("__balance", amount)) {return amount;} return 0;}
+	uint32_t getBalance() const {uint32_t amount = 0; if(getCustomValue("__balance", amount)) {return amount;} return 0;}
 	bool withdrawMoney(uint32_t amount);
 	bool depositMoney(uint32_t amount);
 	bool transferMoneyTo(const std::string& name, uint32_t amount);
@@ -244,7 +244,7 @@ public:
 
 	//safe-trade functions
 	void setTradeState(TradeState state) {tradeState = state;}
-	TradeState getTradeState() {return tradeState;}
+	TradeState getTradeState() const {return tradeState;}
 	Item* getTradeItem() {return tradeItem;}
 
 	//V.I.P. functions
@@ -553,8 +553,8 @@ public:
 	void addStamina(int64_t value);
 	void removeStamina(int64_t value) {addStamina(-value);}
 	int32_t getStaminaMinutes();
-	int32_t getStamina() {return stamina;}
-	int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
+	int32_t getStamina() const {return stamina;}
+	int32_t getSpentStamina() const {return MAX_STAMINA - stamina;}
 
 	//depots
 	DepotMap depots;

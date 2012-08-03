@@ -49,7 +49,7 @@ public:
 	// Get the value of the iterator
 	ET operator* () {return ET(typename ET::enum_type(i->first.value()));}
 	// Evil reinterpret cast, /should/ never break
-	const ET* operator->() {return reinterpret_cast<const ET*>(&(i->first));}
+	const ET* operator->() const {return reinterpret_cast<const ET*>(&(i->first));}
 
 	// Move the iterator
 	const enum_iterator<ET>& operator++() {
