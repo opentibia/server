@@ -43,12 +43,7 @@
 #include <iostream>
 #include <fstream>
 //lua
-extern "C"
-{
-	#include <lua.h>
-	#include <lauxlib.h>
-	#include <lualib.h>
-}
+#include <lua.hpp>
 
 // otserv
 // These files very rarely changes
