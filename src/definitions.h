@@ -163,8 +163,6 @@ enum passwordType_t{
         #include "compiler/gcc.h"
         #ifdef __MINGW32__
             #include "compiler/mingw32.h"
-        #elif defined __CYGWIN__
-            #include "compiler/cygwin.h"
         #endif
     #endif
 #elif defined(_MSC_VER)
