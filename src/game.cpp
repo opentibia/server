@@ -4992,7 +4992,7 @@ void Game::internalDecayItem(Item* item)
 
 		if(ret != RET_NOERROR){
 #ifdef __DEBUG__
-			std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
+			std::cout << "DEBUG, internalDecayItem failed, error code: " << ret << "item id: " << item->getID() << std::endl;
 #endif
 		}
 	}
