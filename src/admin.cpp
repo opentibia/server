@@ -498,13 +498,13 @@ Item* ProtocolAdmin::createMail(const std::string& xmlData, std::string& name, u
 	if(readXMLString(root, "town", strValue)){
 		Town* town = Towns::getInstance().getTown(strValue);
 		if(!town)
-			return false;
+			return NULL;
 		depotId = town->getTownID();
 	}
 	else{
 		//use the players default town
 		if(!IOPlayer::instance()->getDefaultTown(name, depotId)){
-			return false;
+			return NULL;
 		}
 	}
 
