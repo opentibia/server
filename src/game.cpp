@@ -1823,6 +1823,7 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 					int32_t rawSlot = INDEX_WHEREEVER;
 					toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
 					if(rawSlot != INDEX_WHEREEVER){
+						slot = SlotType(rawSlot);
 					}
 				}
 				else{
@@ -2029,6 +2030,7 @@ ReturnValue Game::internalAddItem(Creature *actor, Cylinder* toCylinder, Item* i
 				int32_t rawSlot = index;
 				toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
 				if(rawSlot != INDEX_WHEREEVER){
+					slot = SlotType(rawSlot);
 				}
 			}
 			else{
@@ -2176,6 +2178,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
 	bool depthSearch /*= true*/, int32_t subType /*= -1*/)
 {
 	if(cylinder == NULL){
+		return false;
 	}
 
 	std::list<Container*> listContainer;
@@ -4989,7 +4992,7 @@ void Game::internalDecayItem(Item* item)
 
 		if(ret != RET_NOERROR){
 #ifdef __DEBUG__
-			std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
+			std::cout << "DEBUG, internalDecayItem failed, error code: " << ret << "item id: " << item->getID() << std::endl;
 #endif
 		}
 	}
