@@ -34,25 +34,21 @@ struct spawnBlock_t{
 };
 
 class Spawns{
-private:
-	Spawns();
-
 public:
-	static Spawns* getInstance(){
-		static Spawns instance;
-		return &instance;
-	}
+	Spawns();
 	~Spawns();
-	
+
+	static Spawns* getInstance();
+
 	bool isInZone(const Position& centerPos, int32_t radius, const Position& pos);
-	
+
 	bool loadFromXml(const std::string& datadir);
 	void startup();
 	void clear();
-	
+
 	bool isLoaded() const { return loaded; }
 	bool isStarted() const { return started; }
-	
+
 private:
 	SpawnList spawnList;
 
@@ -64,11 +60,11 @@ class Spawn{
 public:
 	Spawn(const Position& pos, int32_t radius);
 	~Spawn();
-	
+
 	bool addMonster(const std::string& name, const Position& pos, Direction dir, uint32_t interval);
 	bool addNPC(const std::string& name, const Position& pos, Direction dir);
 	void removeMonster(Actor* monster);
-	
+
 	uint32_t getInterval() const {return interval;}
 	void startup();
 

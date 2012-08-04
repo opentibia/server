@@ -229,14 +229,11 @@ enum RentPeriod_t{
 
 class Houses
 {
+public:
 	Houses();
 	~Houses();
 
-public:
-	static Houses& getInstance(){
-		static Houses instance;
-		return instance;
-	}
+	static Houses* getInstance();
 
 	House* getHouse(uint32_t houseid, bool add = false)
 	{
@@ -244,7 +241,7 @@ public:
 		if(it != houseMap.end()){
 			return it->second;
 		}
-		
+
 		if(add){
 			House* house = new House(houseid);
 			houseMap[houseid] = house;

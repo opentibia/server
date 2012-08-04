@@ -63,7 +63,7 @@ public:
 	bool loadHouses(Map* map)
 	{
 		if(!map->housefile.empty()){
-			return Houses::getInstance().loadHousesXML(map->housefile);
+			return Houses::getInstance()->loadHousesXML(map->housefile);
 		}
 		return true;
 	}

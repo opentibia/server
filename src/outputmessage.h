@@ -148,17 +148,12 @@ typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 
 class OutputMessagePool
 {
-private:
-	OutputMessagePool();
-
 public:
+	OutputMessagePool();
 	~OutputMessagePool();
 
-	static OutputMessagePool* getInstance()
-	{
-		static OutputMessagePool instance;
-		return &instance;
-	}
+	static OutputMessagePool* getInstance();
+
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t OutputMessagePoolCount;

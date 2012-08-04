@@ -260,7 +260,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 							return false;
 						}
 
-						house = Houses::getInstance().getHouse(_houseid, true);
+						house = Houses::getInstance()->getHouse(_houseid, true);
 						if(!house){
 							std::stringstream ss;
 							ss << p << "Could not create house id: " << _houseid;
@@ -439,10 +439,10 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						return false;
 					}
 
-					Town* town = Towns::getInstance().getTown(townid);
+					Town* town = Towns::getInstance()->getTown(townid);
 					if(!town){
 						town = new Town(townid);
-						Towns::getInstance().addTown(townid, town);
+						Towns::getInstance()->addTown(townid, town);
 					}
 
 					std::string townName = "";

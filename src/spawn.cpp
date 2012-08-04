@@ -26,6 +26,7 @@
 #include "player.h"
 #include "configmanager.h"
 #include "creature_manager.h"
+#include "singleton.h"
 
 extern ConfigManager g_config;
 extern CreatureManager g_creature_types;
@@ -44,6 +45,12 @@ Spawns::Spawns()
 Spawns::~Spawns()
 {
 	clear();
+}
+
+Spawns* Spawns::getInstance()
+{
+	static Singleton<Spawns> instance;
+	return instance.get();
 }
 
 bool Spawns::loadFromXml(const std::string& _filename)
@@ -157,7 +164,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-						
+
 						if(interval >= MINSPAWN_INTERVAL){
 							spawn->addMonster(name, pos, dir, interval);
 						}
@@ -169,7 +176,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 						std::string name;
 						Direction direction = NORTH;
 						Position pos = centerPos;
-						
+
 						if(!readXMLString(tmpNode, "name", name)){
 							tmpNode = tmpNode->next;
 							continue;
@@ -199,7 +206,7 @@ bool Spawns::loadFromXml(const std::string& _filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
-						
+
 						spawn->addNPC(name, pos, direction);
 					}
 
@@ -301,7 +308,7 @@ bool Spawn::findPlayer(const Position& pos)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -370,7 +377,7 @@ void Spawn::checkSpawn()
 
 	cleanup();
 
-	
+
 	for(SpawnMap::iterator it = spawnMap.begin(); it != spawnMap.end(); ++it) {
 		spawnId = it->first;
 		spawnBlock_t& sb = it->second;

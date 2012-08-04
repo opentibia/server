@@ -175,7 +175,7 @@ void Manager::registerClasses() {
 	registerClass("Teleport", "Item");
 	registerClass("Container", "Item");
 	registerClass("Depot", "Container");
-	
+
 	registerClass("Tile");
 
 	registerClass("Town");
@@ -263,7 +263,7 @@ void Manager::registerClasses() {
 	registerMemberFunction("Creature", "getID()", &Manager::lua_Creature_getID);
 	registerMemberFunction("Creature", "getOrientation()", &Manager::lua_Creature_getOrientation);
 	registerMemberFunction("Creature", "getOutfit()", &Manager::lua_Creature_getOutfit);
-	registerMemberFunction("Creature", "getZone()", &Manager::lua_Creature_getZone);	
+	registerMemberFunction("Creature", "getZone()", &Manager::lua_Creature_getZone);
 	registerMemberFunction("Creature", "say(string msg [, SpeakClass type])", &Manager::lua_Creature_say);
 	registerMemberFunction("Creature", "setOutfit(table outfit)", &Manager::lua_Creature_setOutfit);
 	registerMemberFunction("Creature", "walk(Direction direction [,bool force])", &Manager::lua_Creature_walk);
@@ -644,7 +644,7 @@ void Manager::registerFunctions() {
 	registerGlobalFunction("sendAnimatedText(position where, int color, string text)", &Manager::lua_sendAnimatedText);
 
 	registerGlobalFunction("sendMailTo(Item item, string player [, Town town])", &Manager::lua_sendMailTo);
-	
+
 	registerGlobalFunction("setGameState(GameState gamestate)", &Manager::lua_setGameState);
 	registerGlobalFunction("saveGameState([ServerSaveType type])", &Manager::lua_saveGameState);
 
@@ -679,7 +679,7 @@ int LuaState::lua_statistics()
 	if (LuaThread* t = dynamic_cast<LuaThread *>(this)) {
 		manager = t->manager;
 	}
-	else { 
+	else {
 		manager = dynamic_cast<Script::Manager *>(this);
 	}
 
@@ -1007,7 +1007,7 @@ int LuaState::lua_registerGenericEvent_OnUseWeapon()
 
 	boost::any p(si_onuseweapon);
 	Listener_ptr listener(new Listener(ON_USE_WEAPON_LISTENER, p, *manager));
-	
+
 	ListenerList* list = NULL;
 	switch(si_onuseweapon.method){
 		case OnUseWeapon::FILTER_ITEMID: list = &environment->Generic.OnUseWeapon.ItemId[si_onuseweapon.id]; break;
@@ -1325,7 +1325,7 @@ int LuaState::lua_registerGenericEvent_OnEquipItem() {
 	Listener_ptr listener(new Listener(ON_EQUIP_ITEM_LISTENER, p, *manager));
 
 	environment->Generic.OnEquipItem.push_back(listener);
-	
+
 	// Register event
 	setRegistryItem(listener->getLuaTag());
 
@@ -1554,7 +1554,7 @@ int LuaState::lua_registerGenericEvent_CreatureMoveOut() {
 
 	boost::any p(si_onmovecreature);
 	Listener_ptr listener(new Listener(ON_MOVE_CREATURE_LISTENER, p, *manager));
-	
+
 	if (si_onmovecreature.method == OnMoveCreature::FILTER_ACTIONID)
 		environment->Generic.OnMoveOutCreature.ActionId[si_onmovecreature.id].push_back(listener);
 	else if (si_onmovecreature.method == OnMoveCreature::FILTER_ITEMID)
@@ -3075,7 +3075,7 @@ int LuaState::lua_Tile_getCreatures()
 int LuaState::lua_Tile_getMoveableItems()
 {
 	Tile* tile = popTile();
-	
+
 	newTable();
 	int n = 1;
 	for(TileItemIterator iter = tile->items_begin(), end_iter = tile->items_end(); iter != end_iter; ++iter){
@@ -3904,7 +3904,7 @@ int LuaState::lua_internalCastSpell()
 	Creature* target = popCreature();
 	Creature* caster = popCreature(ERROR_PASS);
 	CombatType combatType = popEnum<CombatType>();
-	
+
 	CombatSource combatSource(caster);
 	if(g_game.combatBlockHit(combatType, combatSource, target, amount, blockedByShield, blockedByArmor)){
 		pushBoolean(false);
@@ -5486,7 +5486,7 @@ int LuaState::lua_Town_getName()
 
 int LuaState::lua_Town_getHouse()
 {
-	Houses& houses = Houses::getInstance();
+	Houses* houses = Houses::getInstance();
 
 	uint32_t houseid = 0;
 	std::string name;
@@ -5500,7 +5500,7 @@ int LuaState::lua_Town_getHouse()
 	else{
 		name = popString();
 
-		for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
+		for(HouseMap::iterator it = houses->getHouseBegin(); it != houses->getHouseEnd(); ++it){
 			if(it->second->getName() == name)
 				houseid = it->second->getHouseId();
 		}
@@ -5509,7 +5509,7 @@ int LuaState::lua_Town_getHouse()
 	}
 	Town* town = popTown();
 
-	House* house = houses.getHouse(houseid);
+	House* house = houses->getHouse(houseid);
 
 	if(!house)
 		throw Script::Error("Town.getHouse : No house by the name '" + name + "' exists.");
@@ -5524,11 +5524,11 @@ int LuaState::lua_Town_getHouses()
 {
 	Town* town = popTown();
 
-	Houses& houses = Houses::getInstance();
+	Houses* houses = Houses::getInstance();
 
 	newTable();
 	int n = 1;
-	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
+	for(HouseMap::iterator it = houses->getHouseBegin(); it != houses->getHouseEnd(); ++it){
 		if(it->second->getTownId() == town->getTownID()){
 			pushHouse(it->second);
 			setField(-2, n++);
@@ -5641,7 +5641,7 @@ int LuaState::lua_House_getTown()
 {
 	House* house = popHouse();
 
-	pushTown(Towns::getInstance().getTown(house->getTownId()));
+	pushTown(Towns::getInstance()->getTown(house->getTownId()));
 	return 1;
 }
 int LuaState::lua_House_kickPlayer()
@@ -5911,11 +5911,11 @@ int LuaState::lua_getTile()
 
 int LuaState::lua_getTowns()
 {
-	Towns& towns = Towns::getInstance();
+	Towns* towns = Towns::getInstance();
 
 	newTable();
 	int n = 1;
-	for(TownMap::const_iterator i = towns.getTownBegin(); i != towns.getTownEnd(); ++i){
+	for(TownMap::const_iterator i = towns->getTownBegin(); i != towns->getTownEnd(); ++i){
 		pushTown(const_cast<Town*>((*i).second));
 		setField(-2, n++);
 	}
@@ -5983,11 +5983,11 @@ int LuaState::lua_setGlobalValue()
 
 int LuaState::lua_getHouses()
 {
-	Houses& houses = Houses::getInstance();
+	Houses* houses = Houses::getInstance();
 
 	newTable();
 	int n = 1;
-	for(HouseMap::iterator it = houses.getHouseBegin(); it != houses.getHouseEnd(); ++it){
+	for(HouseMap::iterator it = houses->getHouseBegin(); it != houses->getHouseEnd(); ++it){
 		pushHouse(it->second);
 		setField(-2, n++);
 	}

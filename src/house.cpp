@@ -29,6 +29,7 @@
 #include "tools.h"
 #include "depot.h"
 #include "beds.h"
+#include "singleton.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -111,7 +112,7 @@ void House::updateDoorDescription()
 			uint32_t price = getTileCount() * g_config.getNumber(ConfigManager::HOUSE_TILE_PRICE);
 			houseDescription << std::endl << "It costs " << price << " gold coins.";
 			std::string strPeriod;
-			Houses::getInstance().getRentPeriodString(strPeriod);
+			Houses::getInstance()->getRentPeriodString(strPeriod);
 			if(strPeriod != "never"){
 				houseDescription << " Its rent costs " << getRent() << " gold coins and it's paid " << strPeriod << ".";
 			}
@@ -395,7 +396,7 @@ bool House::canEditAccessList(uint32_t listId, const Player* player)
 		break;
 	default:
 		return false;
- 	}
+	}
 }
 
 AccessList::AccessList()
@@ -706,6 +707,12 @@ Houses::~Houses()
 	//
 }
 
+Houses* Houses::getInstance()
+{
+	static Singleton<Houses> instance;
+	return instance.get();
+}
+
 House* Houses::getHouseByPlayerId(uint32_t playerId)
 {
 	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
@@ -743,7 +750,7 @@ bool Houses::loadHousesXML(std::string filename)
 					return false;
 				}
 
-				House* house = Houses::getInstance().getHouse(_houseid);
+				House* house = Houses::getInstance()->getHouse(_houseid);
 				if(!house){
 					std::cout << "Error: [Houses::loadHousesXML] Unknown house, id = " << _houseid << std::endl;
 					xmlFreeDoc(doc);
@@ -825,7 +832,7 @@ bool Houses::payRent(Player* player, House* house, time_t time /*= 0*/)
 		return true;
 	}
 
-	Town* town = Towns::getInstance().getTown(house->getTownId());
+	Town* town = Towns::getInstance()->getTown(house->getTownId());
 	if(!town){
 		#ifdef __DEBUG_HOUSES__
 		std::cout << "Warning: [Houses::payHouses] town = NULL, townid = " <<
@@ -885,7 +892,7 @@ bool Houses::payHouse(House* house, time_t time)
 	}
 
 	uint32_t ownerid = house->getHouseOwner();
-	Town* town = Towns::getInstance().getTown(house->getTownId());
+	Town* town = Towns::getInstance()->getTown(house->getTownId());
 	if(!town){
 		#ifdef __DEBUG_HOUSES__
 		std::cout << "Warning: [Houses::payHouses] town = NULL, townid = " <<

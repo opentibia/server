@@ -462,7 +462,7 @@ void ProtocolAdmin::adminCommandShutdownServer()
 
 void ProtocolAdmin::adminCommandPayHouses()
 {
-	Houses::getInstance().payHouses();
+	Houses::getInstance()->payHouses();
 	addLogLine(this, LOGTYPE_EVENT, 1, "pay houses ok");
 
 	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
@@ -496,7 +496,7 @@ Item* ProtocolAdmin::createMail(const std::string& xmlData, std::string& name, u
 	}
 
 	if(readXMLString(root, "town", strValue)){
-		Town* town = Towns::getInstance().getTown(strValue);
+		Town* town = Towns::getInstance()->getTown(strValue);
 		if(!town)
 			return false;
 		depotId = town->getTownID();

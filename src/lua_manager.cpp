@@ -628,7 +628,7 @@ Town* LuaState::popTown(Script::ErrorMode mode /* = Script::ERROR_THROW */)
 	Script::ObjectID* objid = (Script::ObjectID*)lua_touserdata(state, -1);
 	pop();
 
-	return Towns::getInstance().getTown((uint32_t)*objid);
+	return Towns::getInstance()->getTown((uint32_t)*objid);
 }
 
 ChatChannel* LuaState::popChannel(Script::ErrorMode mode /* = Script::ERROR_THROW */)

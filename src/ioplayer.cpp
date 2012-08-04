@@ -81,7 +81,7 @@ bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload 
 	player->level = std::max((uint32_t)1, (uint32_t)result->getDataInt("level"));
 
 	player->town = result->getDataInt("town_id");
-	Town* town = Towns::getInstance().getTown(player->town);
+	Town* town = Towns::getInstance()->getTown(player->town);
 	if(town){
 		player->masterPos = town->getTemplePosition();
 	}

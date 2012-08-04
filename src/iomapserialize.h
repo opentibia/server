@@ -26,14 +26,7 @@
 
 class IOMapSerialize{
 public:
-	static IOMapSerialize* getInstance()
-	{
-		static IOMapSerialize instance;
-		return &instance;
-	}
-
-	IOMapSerialize() {}
-	~IOMapSerialize() {}
+	static IOMapSerialize* getInstance();
 
 	/** Load the map from a data storage
 	  * \param map pointer to the Map class
@@ -73,7 +66,7 @@ protected:
 	// Relational storage uses a row for each item/tile
 	bool loadMapRelational(Map* map);
 	bool saveMapRelational(Map* map);
-	
+
 	bool saveItems(DatabaseDriver* db, uint32_t houseId, const Tile* tile);
 	bool loadItems(DatabaseDriver* db, DBResult* result, Cylinder* parent, bool depotTransfer = false);
 

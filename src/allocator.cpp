@@ -26,21 +26,21 @@
 //normal new/delete
 void* operator new(size_t bytes)
 {
-	return PoolManager::getInstance().allocate(bytes);
+	return PoolManager::getInstance()->allocate(bytes);
 }
 
 void* operator new[](size_t bytes)
 {
-	return PoolManager::getInstance().allocate(bytes);
+	return PoolManager::getInstance()->allocate(bytes);
 }
 
 void operator delete(void *p)
 {
-	PoolManager::getInstance().deallocate(p);
+	PoolManager::getInstance()->deallocate(p);
 }
 
 void operator delete[](void *p){
-	PoolManager::getInstance().deallocate(p);
+	PoolManager::getInstance()->deallocate(p);
 }
 
 //dummy new/delete operators
@@ -69,8 +69,8 @@ void operator delete[](void* p, int dummy)
 void allocatorStatsThread(void *a){
 	while(1){
 		boost::this_thread::sleep(boost::posix_time::milliseconds(30000));
-		PoolManager::getInstance().dumpStats();
-		//PoolManager::getInstance().releaseMemory();
+		PoolManager::getInstance()->dumpStats();
+		//PoolManager::getInstance()->releaseMemory();
 	}
 }
 #endif

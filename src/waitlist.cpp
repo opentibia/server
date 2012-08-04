@@ -22,6 +22,18 @@
 #include "waitlist.h"
 #include "status.h"
 #include "player.h"
+#include "singleton.h"
+
+WaitingList::~WaitingList()
+{
+	cleanUpList();
+}
+
+WaitingList* WaitingList::getInstance()
+{
+	static Singleton<WaitingList> waitingList;
+	return waitingList.get();
+}
 
 WaitListIterator WaitingList::findClient(const Player* player, uint32_t& slot)
 {

@@ -28,9 +28,16 @@
 #include "house.h"
 #include "depot.h"
 #include "housetile.h"
+#include "singleton.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
+
+IOMapSerialize* IOMapSerialize::getInstance()
+{
+	static Singleton<IOMapSerialize> instance;
+	return instance.get();
+}
 
 bool IOMapSerialize::loadMap(Map* map)
 {
@@ -69,8 +76,8 @@ bool IOMapSerialize::loadMapRelational(Map* map)
 	/*
 	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
-    
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
+
+	for(HouseMap::iterator it = Houses::getInstance()->getHouseBegin(); it != Houses::getInstance()->getHouseEnd(); ++it){
 		House* house = it->second;
 
 		query.str("");
@@ -293,8 +300,8 @@ bool IOMapSerialize::saveMapRelational(Map* map)
 	}
 	query.str("");
 
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin();
-		it != Houses::getInstance().getHouseEnd(); ++it){
+	for(HouseMap::iterator it = Houses::getInstance()->getHouseBegin();
+		it != Houses::getInstance()->getHouseEnd(); ++it){
 
 		//save house items
 		House* house = it->second;
@@ -415,7 +422,7 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 	query << "SELECT * FROM `map_store` WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
 	for (result = db->storeQuery(query); result; result = result->advance()){
 		int32_t houseid = result->getDataInt("house_id");
-		House* house = Houses::getInstance().getHouse(houseid);
+		House* house = Houses::getInstance()->getHouse(houseid);
 
 		unsigned long attrSize = 0;
 		const char* attr = result->getDataStream("data", attrSize);
@@ -459,10 +466,10 @@ bool IOMapSerialize::loadMapBinary(Map* map)
 					loadItem(propStream, tile);
 				}
 			}
- 		}
+		}
 	}
 
- 	return true;
+	return true;
 }
 
 bool IOMapSerialize::loadContainer(PropStream& propStream, Container* container)
@@ -604,8 +611,8 @@ bool IOMapSerialize::saveMapBinary(Map* map)
 		return false;
 
 	//clear old tile data
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin();
-		it != Houses::getInstance().getHouseEnd();
+	for(HouseMap::iterator it = Houses::getInstance()->getHouseBegin();
+		it != Houses::getInstance()->getHouseEnd();
 		++it)
 	{
 		//save house items
@@ -701,7 +708,7 @@ bool IOMapSerialize::updateHouseInfo()
 	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
+	for(HouseMap::iterator it = Houses::getInstance()->getHouseBegin(); it != Houses::getInstance()->getHouseEnd(); ++it){
 		House* house = it->second;
 
 		query.reset();
@@ -774,14 +781,14 @@ bool IOMapSerialize::processHouseAuctions()
 		int32_t houseid = result_set->getDataInt("house_id");
 		int32_t playerid = result_set->getDataInt("player_id");
 
-		House* house = Houses::getInstance().getHouse(houseid);
+		House* house = Houses::getInstance()->getHouse(houseid);
 		if(!house){
 			success = false;
 			continue;
 		}
 
 		house->setHouseOwner(playerid);
-		Houses::getInstance().payHouse(house, currentTime);
+		Houses::getInstance()->payHouse(house, currentTime);
 
 		query.reset();
 		query << "DELETE * FROM `house_auctions` WHERE `house_id` =" << houseid;
@@ -800,7 +807,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 	query << "SELECT * FROM `houses` WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
 	for(result = db->storeQuery(query); result; result = result->advance()){
 		int32_t houseid = result->getDataInt("map_id");
-		House* house = Houses::getInstance().getHouse(houseid);
+		House* house = Houses::getInstance()->getHouse(houseid);
 		if(house){
 			int32_t ownerid = result->getDataInt("owner_id");
 			int32_t paid = result->getDataInt("paid");
@@ -819,7 +826,7 @@ bool IOMapSerialize::loadHouseInfo(Map* map)
 		}
 	}
 
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
+	for(HouseMap::iterator it = Houses::getInstance()->getHouseBegin(); it != Houses::getInstance()->getHouseEnd(); ++it){
 		House* house = it->second;
 		if(house->getHouseOwner() != 0 && house->getHouseId() != 0){
 			query.reset();
@@ -860,7 +867,7 @@ bool IOMapSerialize::saveHouseInfo(Map* map)
 	DBInsert houselist_insert(db);
 	houselist_insert.setQuery("INSERT INTO `house_lists` (`house_id`, `listid`, `list`) VALUES ");
 
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
+	for(HouseMap::iterator it = Houses::getInstance()->getHouseBegin(); it != Houses::getInstance()->getHouseEnd(); ++it){
 		House* house = it->second;
 
 		// Fetch house GUID

@@ -37,23 +37,15 @@ typedef WaitList::iterator WaitListIterator;
 class WaitingList
 {
 public:
-	static WaitingList* getInstance()
-	{
-		static WaitingList waitingList;
-		return &waitingList;
-	}
+	~WaitingList();
+
+	static WaitingList* getInstance();
 
 	bool clientLogin(const Player* player);
 	int32_t getClientSlot(const Player* player);
 	static int32_t getTime(int32_t slot);
 
 protected:
-	WaitingList(){};
-	~WaitingList()
-	{
-		waitList.clear();
-	}
-
 	WaitList priorityWaitList;
 	WaitList waitList;
 

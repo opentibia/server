@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,6 +22,7 @@
 #define __OTSERV_TOWN_H__
 
 #include "position.h"
+#include "singleton.h"
 
 class Town
 {
@@ -30,9 +31,7 @@ public:
 	{
 		townid = _townid;
 	}
-	
-	~Town(){};
-	
+
 	const Position& getTemplePosition() const {return posTemple;}
 	const std::string& getName() const {return townName;}
 
@@ -51,16 +50,16 @@ typedef std::map<uint32_t, Town*> TownMap;
 class Towns
 {
 public:
-	static Towns& getInstance()
+	static Towns* getInstance()
 	{
-		static Towns instance;
-		return instance;
+		static Singleton<Towns> instance;
+		return instance.get();
 	}
 
 	bool addTown(uint32_t _townid, Town* town)
 	{
 		TownMap::iterator it = townMap.find(_townid);
-		
+
 		if(it != townMap.end()){
 			return false;
 		}
@@ -68,7 +67,7 @@ public:
 		townMap[_townid] = town;
 		return true;
 	}
-	
+
 	Town* getTown(const std::string& townname)
 	{
 		for(TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it){
@@ -83,7 +82,7 @@ public:
 	Town* getTown(uint32_t _townid)
 	{
 		TownMap::iterator it = townMap.find(_townid);
-		
+
 		if(it != townMap.end()){
 			return it->second;
 		}

@@ -22,6 +22,7 @@
 #include "outputmessage.h"
 #include "protocol.h"
 #include "scheduler.h"
+#include "singleton.h"
 
 extern Dispatcher g_dispatcher;
 
@@ -62,6 +63,12 @@ OutputMessagePool::~OutputMessagePool()
 		delete *it;
 	}
 	m_outputMessages.clear();
+}
+
+OutputMessagePool* OutputMessagePool::getInstance()
+{
+	static Singleton<OutputMessagePool> instance;
+	return instance.get();
 }
 
 void OutputMessagePool::send(OutputMessage_ptr msg)
@@ -183,7 +190,7 @@ void OutputMessagePool::internalReleaseMessage(OutputMessage* msg)
 #ifdef __TRACK_NETWORK__
 	msg->clearTrack();
 #endif
-	
+
 	m_outputPoolLock.lock();
 	m_outputMessages.push_back(msg);
 	m_outputPoolLock.unlock();

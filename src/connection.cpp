@@ -24,12 +24,19 @@
 #include "outputmessage.h"
 #include "scheduler.h"
 #include "server.h"
+#include "singleton.h"
 
 bool Connection::m_logError = true;
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 uint32_t Connection::connectionCount = 0;
 #endif
+
+ConnectionManager* ConnectionManager::getInstance()
+{
+	static Singleton<ConnectionManager> instance;
+	return instance.get();
+}
 
 Connection_ptr ConnectionManager::createConnection(boost::asio::ip::tcp::socket* socket,
 	boost::asio::io_service& io_service, ServicePort_ptr servicer)
@@ -406,7 +413,7 @@ bool Connection::send(OutputMessage_ptr msg)
 		OutputMessagePool* outputPool = OutputMessagePool::getInstance();
 		outputPool->addToAutoSend(msg);
 	}
-	
+
 	m_connectionLock.unlock();
 	return true;
 }

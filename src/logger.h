@@ -39,17 +39,14 @@ enum eLogType {
 
 class Logger {
 public:
+	Logger();
 	~Logger();
-	static Logger* getInstance(){
-		static Logger instance;
-		return &instance;
-	}
+	static Logger* getInstance();
 
 	void logMessage(const char* channel, eLogType type, int level,
 			std::string message, const char* func);
 private:
 	FILE* m_file;
-	Logger();
 };
 
 #endif

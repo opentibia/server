@@ -41,14 +41,7 @@ typedef boost::shared_ptr<ServicePort> ServicePort_ptr;
 class ConnectionManager
 {
 public:
-	~ConnectionManager()
-	{
-	}
-
-	static ConnectionManager* getInstance(){
-		static ConnectionManager instance;
-		return &instance;
-	}
+	static ConnectionManager* getInstance();
 
 	Connection_ptr createConnection(boost::asio::ip::tcp::socket* socket,
 		boost::asio::io_service& io_service, ServicePort_ptr servicers);
@@ -56,11 +49,6 @@ public:
 	void closeAll();
 
 protected:
-
-	ConnectionManager()
-	{
-	}
-
 	std::list<Connection_ptr> m_connections;
 	boost::recursive_mutex m_connectionManagerLock;
 };

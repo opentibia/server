@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,6 +21,7 @@
 
 #include "logger.h"
 #include "tools.h"
+#include "singleton.h"
 
 Logger::Logger()
 {
@@ -36,11 +37,17 @@ Logger::~Logger()
 	}
 }
 
+Logger* Logger::getInstance()
+{
+	static Singleton<Logger> instance;
+	return instance.get();
+}
+
 void Logger::logMessage(const char* channel, eLogType type, int level, std::string message, const char* func)
 {
 	//TODO: decide if should be saved or not depending on channel type and level
 	// if should be save decide where and how
-	
+
 	//write timestamp of the event
 	char buffer[32];
 	time_t tmp = time(NULL);

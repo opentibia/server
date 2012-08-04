@@ -202,16 +202,16 @@ bool Game::saveServer(ServerSaveType saveType)
 		return true;
 
 	if(saveType == SERVER_SAVE_FULL){
-		Houses::getInstance().payHouses();
+		Houses::getInstance()->payHouses();
 	}
 
 	bool ret = map->saveMap();
 
 	std::cout << "Notice: Server saved. Process took " <<
 		(OTSYS_TIME() - start)/(1000.) << "s." << std::endl;
-	
+
 	g_config.setString(ConfigManager::MAP_STORAGE_TYPE, old_type);
-	
+
 	return ret;
 }
 
@@ -232,12 +232,12 @@ void Game::loadGameState()
 bool Game::saveGameState()
 {
 	DatabaseDriver* db = DatabaseDriver::instance();
-	
+
 	DBQuery q;
 	DBTransaction transaction(db);
 	transaction.begin();
 	DBQuery query;
-	
+
 	db->executeQuery("DELETE FROM `global_storage`");
 
 	DBInsert global_stmt(db);
@@ -685,7 +685,7 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 							thing = item;
 					}
 				}
-					
+
 				if (thing == NULL) {
 					//then down items
 					thing = tile->items_firstDown();
@@ -1158,7 +1158,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 				}
 			}
 		}
-	
+
 		//event method
 		for(it = list.begin(); it != list.end(); ++it){
 			(*it)->onCreatureDisappear(creature, isLogout);
@@ -1767,7 +1767,7 @@ bool Game::playerMoveItem(uint32_t playerId, const Position& fromPos,
 			(std::abs(mapFromPos.z - mapToPos.z) * 4 > item->getThrowRange()) ){
 		retVal = RET_DESTINATIONOUTOFREACH;
 	}
-	
+
 	if(retVal == RET_NOERROR && !canThrowObjectTo(mapFromPos, mapToPos)){
 		retVal = RET_CANNOTTHROW;
 	}
@@ -1823,7 +1823,7 @@ ReturnValue Game::internalMoveItem(Creature* actor, Cylinder* fromCylinder, Cyli
 					int32_t rawSlot = INDEX_WHEREEVER;
 					toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
 					if(rawSlot != INDEX_WHEREEVER){
-						slot = SlotType(rawSlot);	
+						slot = SlotType(rawSlot);
 					}
 				}
 				else{
@@ -2030,7 +2030,7 @@ ReturnValue Game::internalAddItem(Creature *actor, Cylinder* toCylinder, Item* i
 				int32_t rawSlot = index;
 				toCylinder->__queryDestination(rawSlot, item, &toItem, flags);
 				if(rawSlot != INDEX_WHEREEVER){
-					slot = SlotType(rawSlot);	
+					slot = SlotType(rawSlot);
 				}
 			}
 			else{
@@ -3018,7 +3018,7 @@ bool Game::playerUseItemEx(uint32_t playerId, Position fromPos, uint8_t fromStac
 		showUseHotkeyMessage(player, item);
 	}
 
-	if(ret != RET_NOERROR){		
+	if(ret != RET_NOERROR){
 		if(ret == RET_NEEDTOPICKUPITEM){
 			Item* moveItem = NULL;
 			ret = internalMoveItem(player, item->getParent(), player, INDEX_WHEREEVER,
@@ -3045,7 +3045,7 @@ bool Game::playerUseItemEx(uint32_t playerId, Position fromPos, uint8_t fromStac
 			player->sendCancelMessage(RET_THEREISNOWAY);
 			return false;
 		}
-		
+
 		if(ret == RET_NEEDTOMOVETOTARGET){
 			std::list<Direction> listDir;
 			if(getPathToEx(player, toPos, listDir, 0, 1, true, true)){
@@ -3126,7 +3126,7 @@ bool Game::playerUseBattleWindow(uint32_t playerId, Position fromPos, uint8_t fr
 		showUseHotkeyMessage(player, item);
 	}
 
-	if(ret != RET_NOERROR){		
+	if(ret != RET_NOERROR){
 		if(ret == RET_NEEDTOPICKUPITEM){
 			Item* moveItem = NULL;
 			ret = internalMoveItem(player, item->getParent(), player, INDEX_WHEREEVER,
@@ -3531,7 +3531,7 @@ bool Game::playerAcceptTrade(uint32_t playerId)
 
 			errorDescription = getTradeErrorDescription(ret2, tradeItem2);
 			player->sendTextMessage(MSG_INFO_DESCR, errorDescription);
-	
+
 			onPlayerTradeEnd(player, tradeItem1, tradePlayer, tradeItem2, false);
 		}
 
@@ -3709,7 +3709,7 @@ bool Game::playerShopPurchase(uint32_t playerId, uint16_t spriteId, uint8_t coun
 	if(player == NULL || player->isRemoved())
 		return false;
 
-	
+
 	const ItemType& it = Item::items.getItemIdByClientId(spriteId);
 	if(it.id == 0){
 		return false;
@@ -4164,7 +4164,7 @@ bool Game::checkReload(Player* player, const std::string& text)
 			std::cout << "================================================================================\n";
 
 			runShutdownScripts(false);
-			
+
 			uint64_t start = OTSYS_TIME();
 
 			try{
@@ -4992,7 +4992,7 @@ void Game::internalDecayItem(Item* item)
 
 		if(ret != RET_NOERROR){
 #ifdef __DEBUG__
-			std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
+			//std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
 #endif
 		}
 	}
