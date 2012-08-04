@@ -24,13 +24,7 @@
 #include "outfit.h"
 #include <queue>
 #include <stdexcept>
-
-extern "C"
-{
-	#include <lua.h>
-	#include <lauxlib.h>
-	#include <lualib.h>
-}
+#include <lua.hpp>
 
 typedef shared_ptr<Waypoint> Waypoint_ptr;
 
@@ -103,7 +97,7 @@ public:
 	// Pushes value onto the stack
 	void getField(int32_t index, const std::string& field_name);
 	void getField(int32_t index, int field_index);
-	
+
 	// Iterator over table
 	// Make sure to push nil before calling
 	bool iterateTable(int32_t index);
@@ -522,7 +516,7 @@ public:
 	int lua_Player_getItemTypeCount();
 	int lua_Player_getDepot();
 	int lua_Player_addDepot();
-	
+
 	int lua_Player_setVocation();
 	int lua_Player_setTown();
 	int lua_Player_addExperience();
