@@ -46,6 +46,8 @@ CREATE TABLE "players" (
 	"looklegs" BIGINT NOT NULL DEFAULT 10,
 	"looktype" BIGINT NOT NULL DEFAULT 136,
 	"lookaddons" BIGINT NOT NULL DEFAULT 0,
+	"lookmount" BIGINT NOT NULL DEFAULT 0,
+	"ridingmount" SMALLINT NOT NULL DEFAULT 0,
 	"posx" INT NOT NULL DEFAULT 0,
 	"posy" INT NOT NULL DEFAULT 0,
 	"posz" INT NOT NULL DEFAULT 0,
@@ -302,7 +304,7 @@ CREATE TABLE "schema_info" (
 	PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 24);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 25);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER
@@ -376,7 +378,7 @@ ON "players"
 FOR EACH ROW
 EXECUTE PROCEDURE "oncreate_players"();
 
-INSERT INTO "players" VALUES (1, 'Administrator', 1, 6, 2, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
-INSERT INTO "players" VALUES (2, 'Player', 1, 1, 1, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
+INSERT INTO "players" VALUES (1, 'Administrator', 1, 6, 2, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 0, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
+INSERT INTO "players" VALUES (2, 'Player', 1, 1, 1, 1, 0, 1, 0, 185, 185, 35, 35, 0, 100, 2, 10, 10, 10, 10, 75, 0, 0, 0, 200, 200, 6, 435, 0, 0, 1, 1, '', 0, 0, 100, 100, 100, 10, 100, 1, 0, 151200000, 0, 0, '');
 
 # to add your own privileges for players/gms please use this flag generator http://hem.bredband.net/johannesrosen/playerflags.html

@@ -104,11 +104,12 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[SQL_TYPE] = getGlobalString(L, "sql_type");
 		m_confInteger[SQL_PORT] = getGlobalNumber(L, "sql_port");
 		m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
+		m_confInteger[MARKET_OFFER_DURATION] = getGlobalNumber(L, "market_offer_duration",  30 * 24 * 60 * 60);
 	}
 
 	m_confString[LOGIN_MSG] = getGlobalString(L, "loginmsg", "Welcome.");
 	m_confString[SERVER_NAME] = getGlobalString(L, "servername");
-	m_confString[WORLD_NAME] = getGlobalString(L, "worldname", "Gameworld");
+	m_confString[WORLD_NAME] = getGlobalString(L, "worldname", "OpenTibia");
 	m_confString[OWNER_NAME] = getGlobalString(L, "ownername");
 	m_confString[OWNER_EMAIL] = getGlobalString(L, "owneremail");
 	m_confString[URL] = getGlobalString(L, "url");
@@ -190,10 +191,9 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[GUILD_WAR_FEE] = getGlobalNumber(L, "guild_war_fee", 1000);
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "statustimeout", 30 * 1000);
 	m_confInteger[SHOW_NEW_SKILL_LEVEL] = getGlobalBoolean(L, "show_new_skill_level", false);
-	m_confInteger[SHOW_HEALING] = getGlobalBoolean(L, "show_healing", false);
+	m_confInteger[SHOW_HEALING] = getGlobalBoolean(L, "show_healing", true);
 	m_confInteger[ORANGE_SPELL_TEXT] = getGlobalBoolean(L, "orange_spell_text", false);
 	m_confInteger[SHOW_DEATH_WINDOW] = getGlobalBoolean(L, "show_death_window", true);
-	m_confInteger[CAN_ROPE_CREATURES] = getGlobalBoolean(L, "can_rope_creatures", true);
 	m_confString[DEATH_MSG] = getGlobalString(L, "death_msg", "You are dead.");
 	m_confInteger[CAN_ATTACK_INVISIBLE] = getGlobalBoolean(L, "can_attack_invisible", false);
 	m_confInteger[CAN_PASS_THROUGH] = getGlobalBoolean(L, "can_pass_through", true);
@@ -214,14 +214,21 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[TILE_LIMIT] = getGlobalNumber(L, "tile_limit", 0);
 	m_confInteger[PROTECTION_TILE_LIMIT] = getGlobalNumber(L, "protection_tile_limit", 0);
 	m_confInteger[HOUSE_TILE_LIMIT]	= getGlobalNumber(L, "house_tile_limit", 0);
-	m_confInteger[LUA_EXCEPTED_TYPE_ERRORS_ENABLED]	= getGlobalBoolean(L, "lua_excepted_type_errors_enabled", false);
-	m_confInteger[MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS] = getGlobalNumber(L, "max_amount_items_inside_containers", 2000);
+	m_confInteger[LUA_EXCEPTED_TYPE_ERRORS_ENABLED]	= getGlobalBoolean(L, "lua_excepted_type_errors_enabled", true);
+	m_confInteger[ENABLE_COOLDOWN] = getGlobalBoolean(L, "enable_cooldown", true);
+	m_confInteger[ENABLE_MOUNTS] = getGlobalBoolean(L, "enable_mounts", true);
+	m_confInteger[MONSTER_SPAWN_WALKBACK] = getGlobalBoolean(L, "monster_spawn_walkback", true);
+	m_confInteger[MOUNT_TIME] = getGlobalNumber(L, "mount_time", 2000);
+	m_confInteger[DISMOUNT_IN_PZ] = getGlobalBoolean(L, "dismount_player_in_pz", true);  
+	m_confInteger[TIBIA_SLOTS] = getGlobalBoolean(L, "tibia_slots", true);  
+	m_confInteger[MAX_AMOUNT_ITEMS_INSIDE_CONTAINERS] = getGlobalNumber(L, "max_amount_items_inside_containers", 5000);
 	m_confInteger[MAX_DEEPNESS_OF_CHAIN_OF_CONTAINERS] = getGlobalNumber(L, "max_deepness_of_chain_of_containers", 500);
 	m_confInteger[BIND_ONLY_GLOBAL_ADDRESS]	= getGlobalBoolean(L, "bind_only_global_address", false);
-	m_confInteger[MAX_CONTAINERS_INSIDE_PLAYER_INVENTORY] = getGlobalNumber(L, "max_containers_inside_player_inventory", 100);
-	m_confInteger[GUILD_WARS_END_ONLY_ON_STARTUP] = getGlobalBoolean(L, "guild_wars_end_only_on_startup", true);
-	m_confInteger[USE_RUNE_LEVEL_REQUIREMENTS] = getGlobalBoolean(L, "use_rune_level_requirements", true);
-	
+	m_confInteger[MARKET_ENABLED] = getGlobalBoolean(L, "market_enabled", true);
+	m_confInteger[MARKET_PREMIUM] = getGlobalBoolean(L, "premium_to_create_market_offer", true);
+	m_confInteger[CHECK_EXPIRED_MARKET_OFFERS_EACH_MINUTES] = getGlobalNumber(L, "check_expired_market_offers_minutes", 60);
+	m_confInteger[MAX_MARKET_OFFERS_AT_A_TIME_PER_PLAYER] = getGlobalNumber(L, "max_market_offers_per_player", 100);
+
 	m_isLoaded = true;
 	return true;
 }

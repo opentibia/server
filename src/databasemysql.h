@@ -60,9 +60,6 @@ public:
 
 	DATABASE_VIRTUAL void freeResult(DBResult *res);
 
-	DATABASE_VIRTUAL uint64_t getLastInsertId() {return (uint64_t)mysql_insert_id(&m_handle);}
-
-	
 protected:
 	MYSQL m_handle;
 };

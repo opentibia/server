@@ -64,7 +64,7 @@ public:
 
 private:
 	Outfits();
-	
+
 	std::string m_datadir;
 	OutfitList allOutfits;
 	std::map<PlayerSex_t, OutfitMap > outfitMaps;

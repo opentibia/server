@@ -84,6 +84,7 @@ protected:
 	LuaScriptInterface m_scriptInterface;
 };
 
+typedef bool (ActionFunction)(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
 class Action : public Event
 {
 public:
@@ -93,7 +94,8 @@ public:
 	Action* clone() const { return new Action(*this); }
 
 	virtual bool configureEvent(xmlNodePtr p);
-
+	virtual bool loadFunction(const std::string& functionName);
+	
 	//scripting
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom,
 	const PositionEx& posTo, bool extendedUse, uint32_t creatureId);
@@ -107,9 +109,13 @@ public:
 	virtual ReturnValue canExecuteAction(const Player* player, const Position& toPos);
 	virtual bool hasOwnErrorHandler() {return false;}
 
+	ActionFunction* function;
+	
 protected:
 	virtual std::string getScriptEventName();
 
+	static ActionFunction enterMarket;
+	
 	bool allowFarUse;
 	bool checkLineOfSight;
 };

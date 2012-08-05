@@ -35,7 +35,7 @@ Dispatcher::Dispatcher()
 void Dispatcher::start()
 {
 	m_threadState = STATE_RUNNING;
-	m_thread = boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)this));
+	boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)this));
 }
 
 void Dispatcher::dispatcherThread(void* p)
@@ -173,9 +173,4 @@ void Dispatcher::shutdown()
 	#ifdef __DEBUG_SCHEDULER__
 	std::cout << "Shutdown Dispatcher" << std::endl;
 	#endif
-}
-
-void Dispatcher::join()
-{
-	m_thread.join();
 }

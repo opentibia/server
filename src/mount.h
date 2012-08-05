@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Logger class - captures everything that happens on the server
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,42 +18,51 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_LOGGER_H__
-#define __OTSERV_LOGGER_H__
+#ifndef __OTSERV_MOUNT_H__
+#define __OTSERV_MOUNT_H__
 
 #include "definitions.h"
+#include "enums.h"
+#include <vector>
 #include <string>
-#include <fstream>
+#include <map>
+#include <list>
 
-#if defined __GNUC__
-	#define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
-#elif defined _MSC_VER
-	#define __OTSERV_PRETTY_FUNCTION__ __FUNCDNAME__
-#endif
-
-#define LOG_MESSAGE(channel, type, level, message) \
-	Logger::getInstance()->logMessage(channel, type, level, message, __OTSERV_PRETTY_FUNCTION__);
-
-enum eLogType {
-	LOGTYPE_EVENT,
-	LOGTYPE_WARNING,
-	LOGTYPE_ERROR
+struct Mount{
+	Mount() : mountId(0), lookType(0), speed(0), attackSpeed(0), isPremium(false), isDefault(false), name("") {}
+	uint32_t mountId;
+	uint32_t lookType;
+	int32_t speed;
+	int32_t attackSpeed;
+	bool isPremium;
+	bool isDefault;
+	std::string name;
 };
 
-class Logger {
+typedef std::map<uint32_t, Mount > MountMap;
+
+class Mounts
+{
 public:
-	~Logger();
-	static Logger* getInstance(){
-		static Logger instance;
+	~Mounts();
+
+	static Mounts* getInstance()
+	{
+		static Mounts instance;
 		return &instance;
 	}
 
-	void logMessage(const char* channel, eLogType type, int level,
-			std::string message, const char* func);
+	bool loadFromXml(const std::string& datadir);
+	bool reload();
+
+	bool getMount(uint32_t value, Mount& mount, bool isId = false);
+	MountMap getMounts() {return mounts;}
+
 private:
-	std::ofstream m_file;
-	bool m_registering;
-	Logger();
+	Mounts();
+
+	std::string m_datadir;
+	MountMap mounts;
 };
 
 #endif

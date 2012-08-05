@@ -30,6 +30,7 @@
 #include "configmanager.h"
 #include "party.h"
 #include "monsters.h"
+#include "mount.h"
 #include <string>
 #include <sstream>
 #include <vector>
@@ -57,6 +58,10 @@ Creature::Creature() :
 	master = NULL;
 	lootDrop = true;
 	skillLoss = true;
+
+	ridingMount = false;
+	mountSpeed = 0;
+	mountAttackSpeed = 0;
 
 	health     = 1000;
 	healthMax  = 1000;
@@ -358,6 +363,18 @@ bool Creature::getNextStep(Direction& dir, uint32_t& flags)
 	}
 
 	return false;
+}
+
+void Creature::setCurrentOutfit(Outfit_t outfit)
+{
+	currentOutfit = outfit;
+	if(outfit.lookMount){
+		Mount mount;
+		if(Mounts::getInstance()->getMount(outfit.lookMount, mount)){
+			mountSpeed = mount.speed;
+			mountAttackSpeed = mount.attackSpeed;
+		}
+	}
 }
 
 bool Creature::startAutoWalk(std::list<Direction>& listDir)
@@ -834,7 +851,7 @@ Item* Creature::dropCorpse()
 	Item* splash = NULL;
 	switch(getRace()){
 		case RACE_VENOM:
-			splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_SLIME);
+			splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_GREEN);
 			break;
 
 		case RACE_BLOOD:
@@ -859,6 +876,7 @@ Item* Creature::dropCorpse()
 
 	//scripting event - onDie
 	this->onDieEvent(corpse);
+	
 	if(corpse)
 		dropLoot(corpse->getContainer());
 		
@@ -1294,6 +1312,7 @@ void Creature::onTickCondition(ConditionType_t type, int32_t interval, bool& bRe
 			case CONDITION_ENERGY: bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE); break;
 			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_EARTHDAMAGE); break;
 			case CONDITION_DROWN: bRemove = (field->getCombatType() != COMBAT_DROWNDAMAGE); break;
+			case CONDITION_BLEEDING: bRemove = (field->getCombatType() != COMBAT_BLEEDDAMAGE); break;
 			default:
 				break;
 		}
@@ -1356,19 +1375,60 @@ void Creature::onGainExperience(uint64_t gainExp, bool fromMonster)
 				getMaster()->getPlayer()->getGainExperience(gainExp, fromMonster);
 			}
 		}
+		const Position& targetPos = getPosition();
+		Player* thisPlayer = getPlayer();
+		if(thisPlayer)
+		{
+			std::stringstream ss;
+			ss << "You gained " << gainExp << " experience points.";
+			thisPlayer->sendExperienceMessage(MSG_EXPERIENCE, ss.str(), targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+		}
 
-		std::stringstream strExp;
-		strExp << gainExp;
-		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
+		std::stringstream ssExp;
+		ssExp << getNameDescription() << " gained " << gainExp << " experience points.";
+		std::string strExp = ssExp.str();
+
+		
+		const SpectatorVec& list = g_game.getSpectators(targetPos);
+		Player* tmpPlayer = NULL;
+		for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it)
+		{
+			if((tmpPlayer = (*it)->getPlayer()))
+			{
+				if(tmpPlayer != thisPlayer)
+					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE_OTHERS, strExp, targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+			}
+		}
 	}
 }
 
 void Creature::onGainSharedExperience(uint64_t gainExp, bool fromMonster)
 {
-	if(gainExp > 0){
-		std::stringstream strExp;
-		strExp << gainExp;
-		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
+	if(gainExp > 0)
+	{
+		const Position& targetPos = getPosition();
+		Player* thisPlayer = getPlayer();
+		if(thisPlayer)
+		{
+			std::stringstream ss;
+			ss << "You gained " << gainExp << " experience points.";
+			thisPlayer->sendExperienceMessage(MSG_EXPERIENCE, ss.str(), targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+		}
+		
+		std::stringstream ssExp;
+		ssExp << getNameDescription() << " gained " << gainExp << " experience points.";
+		std::string strExp = ssExp.str();
+
+		const SpectatorVec& list = g_game.getSpectators(targetPos);
+		Player* tmpPlayer = NULL;
+		for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it)
+		{
+			if((tmpPlayer = (*it)->getPlayer()))
+			{
+				if(tmpPlayer != thisPlayer)
+					tmpPlayer->sendExperienceMessage(MSG_EXPERIENCE_OTHERS, strExp, targetPos, gainExp, TEXTCOLOR_WHITE_EXP);
+			}
+		}
 	}
 }
 

@@ -21,7 +21,62 @@
 #ifndef __OTSERV_ENUMS_H__
 #define __OTSERV_ENUMS_H__
 
+#include <list>
+#include <string>
+
 #include "definitions.h"
+
+enum MarketAction_t
+{
+	MARKETACTION_BUY = 0,
+	MARKETACTION_SELL = 1
+};
+
+enum MarketRequest_t
+{
+	MARKETREQUEST_OWN_OFFERS = 0xFFFE,
+	MARKETREQUEST_OWN_HISTORY = 0xFFFF
+};
+
+enum MarketOfferState_t
+{
+	OFFERSTATE_ACTIVE = 0,
+	OFFERSTATE_CANCELLED = 1,
+	OFFERSTATE_EXPIRED = 2,
+	OFFERSTATE_ACCEPTED = 3,
+
+	OFFERSTATE_ACCEPTEDEX = 255
+};
+
+enum ChannelEvent_t
+{
+	CHANNELEVENT_JOIN = 0,
+	CHANNELEVENT_LEAVE = 1,
+	CHANNELEVENT_INVITE = 2,
+	CHANNELEVENT_EXCLUDE = 3
+};
+
+enum ReportType_t
+{
+	REPORTTYPE_NAME = 0,
+	REPORTTYPE_STATEMENT = 1,
+	REPORTTYPE_BOT = 2
+};
+
+//TODO operating system check
+enum OperatingSystem_t
+{
+	CLIENTOS_LINUX = 0x01,
+	CLIENTOS_WINDOWS = 0x02,
+	CLIENTOS_FLASH = 0x03
+};
+
+enum CreatureType_t
+{
+	CREATURETYPE_PLAYER = 0,
+	CREATURETYPE_MONSTER = 1,
+	CREATURETYPE_NPC = 2
+};
 
 enum RaceType_t {
 	RACE_NONE	= 0,
@@ -47,10 +102,11 @@ enum CombatType_t {
 	COMBAT_ICEDAMAGE        = 512,
 	COMBAT_HOLYDAMAGE       = 1024,
 	COMBAT_DEATHDAMAGE      = 2048,
-	COMBAT_LAST             = COMBAT_DEATHDAMAGE
+	COMBAT_BLEEDDAMAGE      = 4096,
+	COMBAT_LAST             = COMBAT_BLEEDDAMAGE
 };
 
-const int COMBAT_COUNT = 13;
+const int COMBAT_COUNT = 14;
 
 enum CombatParam_t{
 	COMBATPARAM_COMBATTYPE				= 1,
@@ -245,6 +301,7 @@ struct Outfit_t{
 		lookType   = 0;
 		lookTypeEx = 0;
 		lookAddons = 0;
+		lookMount  = 0;
 	}
 
 	uint32_t lookType;
@@ -254,6 +311,7 @@ struct Outfit_t{
 	uint32_t lookLegs;
 	uint32_t lookFeet;
 	uint32_t lookAddons;
+	uint32_t lookMount;
 };
 
 struct LightInfo{
@@ -290,7 +348,6 @@ struct ShopInfo{
 		sellPrice = _sellPrice;
 	};
 };
-
 enum reloadTypes_t {
 	RELOAD_TYPE_ACTIONS = 0,
 	RELOAD_TYPE_MONSTERS = 1,
@@ -302,10 +359,70 @@ enum reloadTypes_t {
 	RELOAD_TYPE_RAIDS = 7,
 	RELOAD_TYPE_CREATURESCRIPTS = 8,
 	RELOAD_TYPE_OUTFITS = 9,
-	//mounts = 10
+	RELOAD_TYPE_MOUNTS = 10,
 	RELOAD_TYPE_ITEMS = 11,
 	RELOAD_TYPE_GLOBALEVENTS = 12,
 	RELOAD_TYPE_LAST = RELOAD_TYPE_GLOBALEVENTS
 };
+
+struct MarketOffer
+{
+	uint32_t price;
+	uint32_t timestamp;
+	uint16_t amount;
+	uint16_t counter;
+	uint16_t itemId;
+	std::string playerName;
+};
+
+struct MarketOfferEx
+{
+	uint32_t playerId;
+	uint32_t timestamp;
+	uint32_t price;
+	uint16_t amount;
+	uint16_t counter;
+	uint16_t itemId;
+	MarketAction_t type;
+	std::string playerName;
+};
+
+struct ExpiredMarketOffer
+{
+	uint32_t id;
+	uint32_t price;
+	uint16_t amount;
+	uint16_t itemId;
+	uint32_t playerId;
+};
+
+struct HistoryMarketOffer
+{
+	uint32_t timestamp;
+	uint32_t price;
+	uint16_t itemId;
+	uint16_t amount;
+	MarketOfferState_t state;
+};
+
+struct MarketStatistics
+{
+	MarketStatistics()
+	{
+		numTransactions = 0;
+		highestPrice = 0;
+		totalPrice = 0;
+		lowestPrice = 0;
+	}
+
+	uint32_t numTransactions;
+	uint32_t highestPrice;
+	uint64_t totalPrice;
+	uint32_t lowestPrice;
+};
+
+typedef std::list<MarketOffer> MarketOfferList;
+typedef std::list<ExpiredMarketOffer> ExpiredMarketOfferList;
+typedef std::list<HistoryMarketOffer> HistoryMarketOfferList;
 
 #endif

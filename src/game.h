@@ -97,8 +97,8 @@ typedef std::map< uint32_t, shared_ptr<RuleViolation> > RuleViolationsMap;
 typedef std::vector<Player*> PlayerVector;
 
 #define EVENT_LIGHTINTERVAL  10000
-#define EVENT_DECAYINTERVAL  1000
-#define EVENT_DECAY_BUCKETS  16
+#define EVENT_DECAYINTERVAL  250
+#define EVENT_DECAY_BUCKETS  4
 
 /**
   * Main Game class.
@@ -171,6 +171,13 @@ public:
 	  * \return A Pointer to the player
 	  */
 	Player* getPlayerByID(uint32_t id);
+
+	/**
+	  * Returns a player based on guid
+	  * \param guid
+	  * \returns A Pointer to the player
+	  */
+	Player* getPlayerByGUID(const uint32_t& guid);
 
 	/**
 	  * Returns a creature based on a string name identifier
@@ -460,14 +467,23 @@ public:
 	bool playerRevokePartyInvitation(uint32_t playerId, uint32_t invitedId);
 	bool playerPassPartyLeadership(uint32_t playerId, uint32_t newLeaderId);
 	bool playerLeaveParty(uint32_t playerId);
-	bool playerEnableSharedPartyExperience(uint32_t playerId, uint8_t sharedExpActive, uint8_t unknown);
+	bool playerEnableSharedPartyExperience(uint32_t playerId, bool sharedExpActive);
 	bool playerShowQuestLog(uint32_t playerId);
 	bool playerShowQuestLine(uint32_t playerId, uint16_t questId);
 	bool playerViolationWindow(uint32_t playerId, std::string targetName, uint8_t reasonId, violationAction_t actionType,
 		std::string comment, std::string statement, uint16_t channelId, bool ipBanishment);
 	bool playerReportBug(uint32_t playerId, std::string comment);
+	bool playerMountCreature(uint32_t playerId, bool mount);
 	bool playerRegisterWalkAction(uint32_t playerId, SchedulerTask* task);
-	
+	bool playerLeaveMarket(uint32_t playerId);
+	bool playerBrowseMarket(uint32_t playerId, uint16_t spriteId);
+	bool playerBrowseMarketOwnOffers(uint32_t playerId);
+	bool playerBrowseMarketOwnHistory(uint32_t playerId);
+	bool playerCreateMarketOffer(uint32_t playerId, uint8_t type, uint16_t spriteId, uint16_t amount, uint32_t price, bool anonymous);
+	bool playerCancelMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter);
+	bool playerAcceptMarketOffer(uint32_t playerId, uint32_t timestamp, uint16_t counter, uint16_t amount);
+	void checkExpiredMarketOffers();
+
 	void cleanup();
 	void shutdown();
 	void FreeThing(Thing* thing);
@@ -497,8 +513,9 @@ public:
 #ifdef __SKULLSYSTEM__
 	void updateCreatureSkull(Player* player);
 #endif
-
+#ifdef __GUILDWARSLUARELOAD__
 	void updateCreatureEmblem(Creature* creature);
+#endif
 	GameState_t getGameState();
 	void setGameState(GameState_t newState);
 	bool saveServer(bool payHouses, bool shallowSave = false);
@@ -525,10 +542,6 @@ public:
 	//animation help functions
 	void addCreatureHealth(const Creature* target);
 	void addCreatureHealth(const SpectatorVec& list, const Creature* target);
-	void addAnimatedText(const Position& pos, uint8_t textColor,
-		const std::string& text);
-	void addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor,
-		const std::string& text);
 	void addMagicEffect(const Position& pos, uint8_t effect);
 	void addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t effect);
 	void addDistanceEffect(const Position& fromPos, const Position& toPos,

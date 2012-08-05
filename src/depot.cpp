@@ -27,8 +27,10 @@ Depot::Depot(uint16_t _type) :
 Container(_type)
 {
 	depotId = 0;
-	maxSize = 30;
+	maxSize = 3;
 	maxDepotLimit = 1500;
+	inbox = NULL;
+	chest = NULL;
 }
 
 Depot::~Depot()

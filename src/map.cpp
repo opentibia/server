@@ -341,13 +341,6 @@ void Map::getSpectatorsInternal(SpectatorVec& list, const Position& centerPos, b
 						Creature* creature = *node_iter;
 						const Position& cpos = creature->getPosition();
 						int32_t offsetZ = centerPos.z - cpos.z;
-						
-						//3lite - temporal "fix" TODO !!
-						if(!creature || creature->isRemoved()){
-							std::cout << "Map::getSpectatorsInternal : Leaf - NULL or removed creature on stack!" << std::endl;
-							// would be nice to remove that corrupted creature on the stack...
-							continue;
-						}
 
 						if(cpos.z < minRangeZ || cpos.z > maxRangeZ){
 							continue;
@@ -493,7 +486,7 @@ const SpectatorVec& Map::getSpectators(const Position& centerPos)
 				minRangeZ = 0;
 				maxRangeZ = 7;
 			}
-
+			
 			getSpectatorsInternal(list, centerPos, false,
 				minRangeX, maxRangeX,
 				minRangeY, maxRangeY,
@@ -524,14 +517,14 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool 
 		return false;
 	}
 
-	int deltaz = std::abs(fromPos.z - toPos.z);
-	if(deltaz > 2){
+	if(fromPos.z - fromPos.z > 2){
 		return false;
 	}
 
-	int deltax, deltay;
+	int deltax, deltay, deltaz;
 	deltax = std::abs(fromPos.x - toPos.x);
 	deltay = std::abs(fromPos.y - toPos.y);
+	deltaz = std::abs(fromPos.z - toPos.z);
 
 	//distance checks
 	if(deltax - deltaz > rangex || deltay - deltaz > rangey){
@@ -814,7 +807,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 
 	const Tile* tile = NULL;
 	AStarNode* found = NULL;
-
+	
 	while(fpp.maxSearchDist != -1 || nodes.countClosedNodes() < 100){
 		AStarNode* n = nodes.getBestNode();
 		if(!n){
@@ -826,7 +819,7 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 			dirList.clear();
 			return false; //no path found
 		}
-
+		
 		if(pathCondition(startPos, Position(n->x, n->y, startPos.z), fpp, bestMatch)){
 			found = n;
 			endPos = Position(n->x, n->y, startPos.z);
@@ -895,20 +888,20 @@ bool Map::getPathMatching(const Creature* creature, std::list<Direction>& dirLis
 
 		nodes.closeNode(n);
 	}
-
+	
 	int32_t prevx = endPos.x;
 	int32_t prevy = endPos.y;
 	int32_t dx, dy;
-
+	
 	if(!found){
 		return false;
 	}
-
+	
 	found = found->parent;
 	while(found){
 		pos.x = found->x;
 		pos.y = found->y;
-
+		
 		dx = pos.x - prevx;
 		dy = pos.y - prevy;
 

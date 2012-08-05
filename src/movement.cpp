@@ -188,7 +188,7 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 			pos.x = atoi(posList[0].c_str());
 			pos.y = atoi(posList[1].c_str());
 			pos.z = atoi(posList[2].c_str());
-			addEvent(moveEvent->clone(), pos, m_positionMap);
+			addEvent(moveEvent, pos, m_positionMap);
 		}
 	}
 	else{
@@ -417,12 +417,12 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 
 	MoveEvent* moveEvent = getEvent(tile, eventType1);
 	if(moveEvent){
-		ret &= moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
+		ret = ret & moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
 	}
 
 	moveEvent = getEvent(item, eventType1);
 	if(moveEvent){
-		ret &= moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
+		ret = ret & moveEvent->fireAddRemItem(item, NULL, tile->getPosition());
 	}
 
 	Item* tileItem = NULL;
@@ -437,7 +437,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 			if(tileItem && tileItem != item){
 				moveEvent = getEvent(tileItem, eventType2);
 				if(moveEvent){
-					ret &= moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
+					ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
 				}
 			}
 		}
@@ -456,7 +456,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 			moveEvent = getEvent(tileItem, eventType2);
 			if(moveEvent){
 				m_lastCacheItemVector.push_back(tileItem);
-				ret &= moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
+				ret = ret & moveEvent->fireAddRemItem(item, tileItem, tile->getPosition());
 			}
 			else if(hasTileEvent(tileItem)){
 				m_lastCacheItemVector.push_back(tileItem);

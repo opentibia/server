@@ -78,7 +78,7 @@ std::string Mission::getDescription(Player* player)
 
 bool Mission::isStarted(Player* player) const
 {
-	uint32_t value;
+	int32_t value;
 	if(player){
 		player->getStorageValue(storageID, (int32_t&)value);
 		if(value >= startValue && value <= endValue){
@@ -150,7 +150,7 @@ bool Quest::isCompleted(Player* player)
 
 bool Quest::isStarted(Player* player) const
 {
-	uint32_t value;
+	int32_t value;
 	if(player){
 		player->getStorageValue(startStorageID, (int32_t&)value);
 		if(value >= startStorageValue)
@@ -284,3 +284,21 @@ uint16_t Quests::getQuestsCount(Player* player)
 	}
 	return count;
 }
+
+
+bool Quests::isQuestStorage(const uint32_t key, const int32_t value)
+{
+	for(QuestsList::const_iterator it = quests.begin(), end = quests.end(); it != end; ++it)
+	{
+		if((*it)->getStartStorageId() == key && (*it)->getStartStorageValue() == value)
+			return true;
+
+		for(MissionsList::const_iterator m_it = (*it)->missions.begin(), m_end = (*it)->missions.end(); m_it != m_end; ++m_it)
+		{
+			if((*m_it)->getStorageId() == key && value >= (*m_it)->getStartStorageValue() && value <= (*m_it)->getEndStorageValue())
+				return true;
+		}
+	}
+	return false;
+}
+

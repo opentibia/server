@@ -65,6 +65,7 @@ void MonsterType::reset()
 	outfit.lookType   = 0;
 	outfit.lookTypeEx = 0;
 	outfit.lookAddons = 0;
+	outfit.lookMount  = 0;
 	lookCorpse = 0;
 
 	conditionImmunities = 0;
@@ -526,7 +527,14 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* 
 				maxDamage = intValue;
 				tickInterval = 10000;
 			}
+			else if(readXMLInteger(node, "bleed", intValue)){
+				conditionType = CONDITION_BLEEDING;
 
+				minDamage = intValue;
+				maxDamage = intValue;
+				tickInterval = 10000;
+			}
+			
 			if(readXMLInteger(node, "tick", intValue) && intValue > 0){
 				tickInterval = intValue;
 			}
@@ -575,6 +583,9 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* 
 		else if(asLowerCaseString(name) == "healing"){
 			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_HEALING);
 			combat->setParam(COMBATPARAM_AGGRESSIVE, 0);
+		}
+		else if(asLowerCaseString(name) == "bleed"){
+			combat->setParam(COMBATPARAM_COMBATTYPE, COMBAT_BLEEDDAMAGE);
 		}
 		else if(asLowerCaseString(name) == "speed"){
 			int32_t speedChange = 0;
@@ -761,6 +772,7 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* 
 				asLowerCaseString(name) == "dazzlecondition" ||
 				asLowerCaseString(name) == "cursecondition" ||
 				asLowerCaseString(name) == "freezecondition" ||
+				asLowerCaseString(name) == "bleedcondition" ||
 				asLowerCaseString(name) == "drowncondition"){
 			ConditionType_t conditionType = CONDITION_NONE;
 			uint32_t tickInterval = 2000;
@@ -802,7 +814,10 @@ bool Monsters::deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* 
 				conditionType = CONDITION_DROWN;
 				tickInterval = 5000;
 			}
-
+			else if(name == "bleedcondition"){
+				conditionType = CONDITION_BLEEDING;
+				tickInterval = 10000;
+			}
 
 			if(readXMLInteger(node, "tick", intValue) && intValue > 0){
 				tickInterval = intValue;
@@ -1146,6 +1161,10 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 					if(readXMLInteger(p, "addons", intValue)){
 						mType->outfit.lookAddons = intValue;
 					}
+					
+					if(readXMLInteger(p, "mount", intValue)){
+						mType->outfit.lookMount = intValue;
+					}
 				}
 				else if(readXMLInteger(p, "typeex", intValue)){
 					mType->outfit.lookTypeEx = intValue;
@@ -1243,6 +1262,10 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
 							}
+							else if(asLowerCaseString(strValue) == "bleed"){
+								mType->damageImmunities |= COMBAT_BLEEDDAMAGE;
+								mType->conditionImmunities |= CONDITION_BLEEDING;
+							}
 							else if(asLowerCaseString(strValue) == "manadrain"){
 								mType->damageImmunities |= COMBAT_MANADRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
@@ -1318,6 +1341,12 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 							if(intValue != 0){
 								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
+							}
+						}
+						else if(readXMLInteger(tmpNode, "bleed", intValue)){
+							if(intValue != 0){
+								mType->damageImmunities |= COMBAT_BLEEDDAMAGE;
+								mType->conditionImmunities |= CONDITION_BLEEDING;
 							}
 						}
 						else if(readXMLInteger(tmpNode, "manadrain", intValue)){
@@ -1451,6 +1480,9 @@ bool Monsters::loadMonster(const std::string& file, const std::string& monster_n
 						}
                         if(readXMLInteger(tmpNode, "healingPercent", intValue)){
 							mType->elementMap[COMBAT_HEALING] = intValue;
+						}
+						if(readXMLInteger(tmpNode, "bleedingPercent", intValue)){
+							mType->elementMap[COMBAT_BLEEDDAMAGE] = intValue;
 						}
 					}
 					tmpNode = tmpNode->next;

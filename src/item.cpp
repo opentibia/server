@@ -21,7 +21,6 @@
 
 #include "item.h"
 #include "container.h"
-#include "configmanager.h"
 #include "depot.h"
 #include "teleport.h"
 #include "trashholder.h"
@@ -39,7 +38,6 @@
 
 extern Game g_game;
 extern Weapons* g_weapons;
-extern ConfigManager g_config;
 
 Items Item::items;
 
@@ -770,10 +768,9 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 
 	if(it.isRune()){
 		s << " (\"" << it.runeSpellName << "\").";
-		if((g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && it.runeLevel > 0) || 
-			it.runeMagLevel > 0){
+		if(it.runeLevel > 0 || it.runeMagLevel > 0){
 			s << std::endl << "It can only be used with";
-			if(g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && it.runeLevel > 0){
+			if(it.runeLevel > 0){
 				s << " level " << it.runeLevel;
 			}
 			if(it.runeMagLevel > 0){
@@ -854,24 +851,41 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 			}
 		}
 		else if(it.showDuration){
-			if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
-				int32_t duration = item->getDuration() / 1000;
-				s << " that has energy for ";
+			if(item && item->hasAttribute(ATTR_ITEM_DURATION))
+		{
+			int32_t duration = item->getDuration() / 1000;
+			s << " that will expire in ";
 
-				if(duration >= 120){
-					s << duration / 60 << " minutes left.";
-				}
-				else if(duration > 60){
-					s << "1 minute left.";
-				}
-				else{
-					s << "less than a minute left.";
-				}
+			if(duration >= 86400)
+			{
+				uint16_t days = duration / 86400;
+				uint16_t hours = (duration % 86400) / 3600;
+				s << days << " day" << (days != 1 ? "s" : "");
+				if(hours > 0)
+					s << " and " << hours << " hour" << (hours != 1 ? "s" : "");
 			}
-			else{
-				s << " that is brand-new.";
+			else if(duration >= 3600)
+			{
+				uint16_t hours = duration / 3600;
+				uint16_t minutes = (duration % 3600) / 60;
+				s << hours << " hour" << (hours != 1 ? "s" : "");
+				if(minutes > 0)
+					s << " and " << minutes << " minute" << (minutes != 1 ? "s" : "");
 			}
+			else if(duration >= 60)
+			{
+				uint16_t minutes = duration / 60;
+				s << minutes << " minute" << (minutes != 1 ? "s" : "");
+				uint16_t seconds = duration % 60;
+				if(seconds > 0)
+					s << " and " << seconds << " second" << (seconds != 1 ? "s" : "");
+			}
+			else
+				s << duration << " second" << (duration != 1 ? "s" : "");
 		}
+		else
+			s << " that is brand-new";
+	}
 
 		s << " (";
 		bool prevDesc = false;
@@ -999,23 +1013,40 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 		}
 	}
 	else if(it.showDuration){
-		if(item && item->hasAttribute(ATTR_ITEM_DURATION)){
+		if(item && item->hasAttribute(ATTR_ITEM_DURATION))
+		{
 			int32_t duration = item->getDuration() / 1000;
-			s << " that has energy for ";
+			s << " that will expire in ";
 
-			if(duration >= 120){
-				s << duration / 60 << " minutes left.";
+			if(duration >= 86400)
+			{
+				uint16_t days = duration / 86400;
+				uint16_t hours = (duration % 86400) / 3600;
+				s << days << " day" << (days != 1 ? "s" : "");
+				if(hours > 0)
+					s << " and " << hours << " hour" << (hours != 1 ? "s" : "");
 			}
-			else if(duration > 60){
-				s << "1 minute left.";
+			else if(duration >= 3600)
+			{
+				uint16_t hours = duration / 3600;
+				uint16_t minutes = (duration % 3600) / 60;
+				s << hours << " hour" << (hours != 1 ? "s" : "");
+				if(minutes > 0)
+					s << " and " << minutes << " minute" << (minutes != 1 ? "s" : "");
 			}
-			else{
-				s << "less than a minute left.";
+			else if(duration >= 60)
+			{
+				uint16_t minutes = duration / 60;
+				s << minutes << " minute" << (minutes != 1 ? "s" : "");
+				uint16_t seconds = duration % 60;
+				if(seconds > 0)
+					s << " and " << seconds << " second" << (seconds != 1 ? "s" : "");
 			}
+			else
+				s << duration << " second" << (duration != 1 ? "s" : "");
 		}
-		else{
-			s << " that is brand-new.";
-		}
+		else
+			s << " that is brand-new";
 	}
 	else{
 		s << ".";
@@ -1064,11 +1095,7 @@ std::string Item::getDescription(const ItemType& it, int32_t lookDistance,
 	else if(it.description.length() && lookDistance <= 1){
 		s << std::endl << it.description;
 	}
-    else if(it.isFluidContainer() && subType > 0 && items[subType].description.length() && lookDistance <= 1)
-    {
-		s << std::endl << items[subType].description;
-    }
-	
+
 	return s.str();
 }
 

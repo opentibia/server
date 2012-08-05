@@ -87,7 +87,6 @@ public:
 	void start();
 	void stop();
 	void shutdown();
-	void join();
 
 	enum SchedulerState{
 		STATE_RUNNING,
@@ -98,7 +97,6 @@ public:
 protected:
 	static void schedulerThread(void* p);
 
-	boost::thread m_thread;
 	boost::mutex m_eventLock;
 	boost::condition_variable m_eventSignal;
 

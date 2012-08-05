@@ -55,7 +55,7 @@ FileLoader::~FileLoader()
 	}
 }
 
-bool FileLoader::openFile(const char* filename, const char* accept_identifier, bool write, bool caching /*= false*/)
+bool FileLoader::openFile(const char* filename, bool write, bool caching /*= false*/)
 {
 	if(write) {
 		m_file = fopen(filename, "wb");
@@ -72,17 +72,8 @@ bool FileLoader::openFile(const char* filename, const char* accept_identifier, b
 	else {
 		m_file = fopen(filename, "rb");
 		if(m_file){
-			char identifier[4];
-			if(fread(identifier, 1, 4, m_file) < 4){
-				fclose(m_file);
-				m_file = NULL;
-				m_lastError = ERROR_INVALID_FILE_VERSION;
-				return false;
-			}
-			// Accept 0x00000000 as wildcard
-			else if (memcmp(identifier, accept_identifier, 4) != 0 &&
-					 memcmp(identifier, "\0\0\0\0", 4) != 0)
-			{
+			uint32_t version;
+			if(fread(&version, sizeof(version), 1, m_file) && version > 0){
 				fclose(m_file);
 				m_file = NULL;
 				m_lastError = ERROR_INVALID_FILE_VERSION;
@@ -215,12 +206,11 @@ bool FileLoader::parseNode(NODE node)
 const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
 {
 	if(node){
-		while(node->propsSize >= m_buffer_size){
-            delete[] m_buffer;
-            while (node->propsSize >= m_buffer_size)
-				m_buffer_size *= 2;
-            m_buffer = new unsigned char[m_buffer_size];
-        }
+		if(node->propsSize >= m_buffer_size){
+			delete[] m_buffer;
+			m_buffer = new unsigned char[m_buffer_size + 1024];
+			m_buffer_size = m_buffer_size + 1024;
+		}
 		//get buffer
 		if(readBytes(m_buffer, node->propsSize, node->start + 2)){
 			//unscape buffer

@@ -40,7 +40,7 @@ extern Vocations g_vocations;
 extern ConfigManager g_config;
 
 Spells::Spells():
-m_scriptInterface("Spell Interface")
+ids(0), m_scriptInterface("Spell Interface")
 {
 	m_scriptInterface.initState();
 }
@@ -115,6 +115,7 @@ void Spells::clear()
 		delete it2->second;
 	}
 	instants.clear();
+	ids = 0;
 }
 
 LuaScriptInterface& Spells::getScriptInterface()
@@ -155,6 +156,7 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 			return false;
 		}
 
+		instant->setId(ids++);
 		instants[instant->getWords()] = instant;
 		return true;
 	}
@@ -165,6 +167,7 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 			return false;
 		}
 
+		rune->setId(ids++);
 		runes[rune->getRuneItemId()] = rune;
 		return true;
 	}
@@ -479,13 +482,15 @@ bool CombatSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 
 Spell::Spell()
 {
+	id = 0;
 	level = 0;
 	magLevel = 0;
 	mana = 0;
 	manaPercent = 0;
 	soul = 0;
 	range = -1;
-	exhaustion = -1;
+	icon = SPELL_NONE;
+	exhaustion = 1000;
 	needTarget = false;
 	needWeapon = false;
 	selfTarget = false;
@@ -561,8 +566,27 @@ bool Spell::configureSpell(xmlNodePtr p)
 	 	soul = intValue;
 	}
 
+	if(readXMLInteger(p, "icon", intValue)){
+		icon = (Spells_t)intValue;
+	}
+
 	if(readXMLInteger(p, "exhaustion", intValue)){
 		exhaustion = intValue;
+	}
+
+	if(readXMLString(p, "groupicons", strValue)){
+		std::vector<std::string> split = explodeString(strValue, ",");
+		for(std::vector<std::string>::iterator it = split.begin(); it != split.end(); it++){
+			groupExhaustions[(SpellGroups_t)atoi((*it).c_str())] = 0;
+		}
+	}
+
+	if(readXMLString(p, "groupexhaustions", strValue)){
+		int32_t i = 0;
+		std::vector<std::string> split = explodeString(strValue, ",");
+		for(std::map<SpellGroups_t, uint32_t>::iterator it = groupExhaustions.begin(); it != groupExhaustions.end(); it++, i++){
+			groupExhaustions[it->first] = atoi(split[i].c_str());
+		}
 	}
 
 	if(readXMLInteger(p, "prem", intValue)){
@@ -615,6 +639,24 @@ bool Spell::configureSpell(xmlNodePtr p)
 		isAggressive = (intValue == 1);
 	}
 
+	if(exhaustion == -1){
+		if(isAggressive){
+			exhaustion = g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED);
+		}
+		else{
+			exhaustion = g_config.getNumber(ConfigManager::HEAL_EXHAUSTED);
+		}
+	}
+
+	if(groupExhaustions.empty()){
+		if(isAggressive){
+			groupExhaustions[SPELLGROUP_MELEE] = g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED);
+		}
+		else{
+			groupExhaustions[SPELLGROUP_HEALING] = g_config.getNumber(ConfigManager::HEAL_EXHAUSTED);
+		}
+	}
+
 	xmlNodePtr vocationNode = p->children;
 	while(vocationNode){
 		if(xmlStrcmp(vocationNode->name,(const xmlChar*)"vocation") == 0){
@@ -653,9 +695,7 @@ bool Spell::playerSpellCheck(Player* player) const
 			}
 		}
 
-		if( (isAggressive && player->hasCondition(CONDITION_EXHAUST_COMBAT)) ||
-			(!isAggressive && player->hasCondition(CONDITION_EXHAUST_HEAL)) )
-		{
+		if(player->hasExhaustion(getId())){
 			player->sendCancelMessage(RET_YOUAREEXHAUSTED);
 
 			if(isInstant()){
@@ -665,7 +705,19 @@ bool Spell::playerSpellCheck(Player* player) const
 			return false;
 		}
 
-		if(g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && player->getLevel() < level){
+		for(std::map<SpellGroups_t, uint32_t>::const_iterator it = groupExhaustions.begin(); it != groupExhaustions.end(); it++){
+			if(player->hasCondition((ConditionType_t)(1 << (20 + it->first)))){
+				player->sendCancelMessage(RET_YOUAREEXHAUSTED);
+
+				if(isInstant()){
+					g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+				}
+
+				return false;
+			}
+		}
+
+		if(player->getLevel() < level){
 			player->sendCancelMessage(RET_NOTENOUGHLEVEL);
 			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
@@ -950,19 +1002,17 @@ void Spell::postCastSpell(Player* player, bool finishedCast /*= true*/, bool pay
 {
 	if(finishedCast){
 		if(!player->hasFlag(PlayerFlag_HasNoExhaustion)){
-			if(exhaustion != 0){
-				if(isAggressive){
-					if(exhaustion == -1)
-						player->addCombatExhaust(g_config.getNumber(ConfigManager::COMBAT_EXHAUSTED));
-					else
-						player->addCombatExhaust(exhaustion);
+			bool enableCooldown = g_config.getBoolean(ConfigManager::ENABLE_COOLDOWN);
+			for(std::map<SpellGroups_t, uint32_t>::const_iterator it = groupExhaustions.begin(); it != groupExhaustions.end(); it++){
+				player->addSpellExhaust(it->first, it->second);
+				if(enableCooldown){
+					player->sendSpellCooldown(uint16_t(it->first), uint16_t(it->second) / 250, true);
 				}
-				else{
-					if(exhaustion == -1)
-						player->addHealExhaust(g_config.getNumber(ConfigManager::HEAL_EXHAUSTED));
-					else
-						player->addHealExhaust(exhaustion);
-				}
+			}
+
+			player->setExhaustion(getId(), exhaustion);
+			if(enableCooldown){
+				player->sendSpellCooldown(uint16_t(getIcon()), uint16_t(getExhaustion()) / 250, false);
 			}
 		}
 	}
@@ -1712,7 +1762,8 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 
 	if(ret == RET_NOERROR){
 		spell->postCastSpell(player, (uint32_t)manaCost, (uint32_t)spell->getSoulCost(player));
-		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_ENERGY);
+		g_game.addMagicEffect(monster->getPosition(), NM_ME_TELEPORT);
 	}
 	else{
 		player->sendCancelMessage(ret);
@@ -2115,8 +2166,7 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 
 	hasCharges = (charges > 0);
 
-	if(magLevel != 0 || 
-		(g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && level != 0)){
+	if(magLevel != 0 || level != 0){
 		//Change information in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);
 		iType.runeSpellName = getName();
@@ -2136,9 +2186,9 @@ bool RuneSpell::loadFunction(const std::string& functionName)
 	else if(functionName == "convince"){
 		function = Convince;
 	}
-    else if(functionName == "soulfire"){
-        function = Soulfire;
-    }
+	else if(functionName == "soulfire"){
+		function = Soulfire;
+	}
 	else{
 		return false;
 	}
@@ -2218,7 +2268,13 @@ bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item,
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
-
+	
+	if(!player->hasFlag(PlayerFlag_CanConvinceAll) && convinceCreature->getPlayerMaster()){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+	
 	int32_t manaCost = 0;
 
 	if(convinceCreature->getMonster()){

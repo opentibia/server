@@ -31,11 +31,13 @@
 #include "combat.h"
 #include "movement.h"
 #include "configmanager.h"
+#include "configmanager.h"
 #include <string>
 #include <iostream>
 
 extern Game g_game;
 extern MoveEvents* g_moveEvents;
+extern ConfigManager g_config;
 extern ConfigManager g_config;
 
 StaticTile real_null_tile(0xFFFF, 0xFFFF, 0xFFFF);
@@ -485,6 +487,15 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		}
 	}
 
+	//dismount
+    if(g_config.getBoolean(ConfigManager::DISMOUNT_IN_PZ)){
+        if(creature->isRidingMount() && newTile->hasFlag(TILESTATE_PROTECTIONZONE)){
+            creature->setRidingMount(false);
+            g_game.changeSpeed(creature, 0);
+            g_game.internalCreatureChangeOutfit(creature, creature->getCurrentOutfit());
+        }
+    }  
+
 	//remove the creature
 	__removeThing(creature, 0);
 
@@ -511,8 +522,10 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 	//send to client
 	uint32_t i = 0;
+	bool mayWalkthrough = newTile->hasFlag(TILESTATE_PROTECTIONZONE);
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){
+			tmpPlayer->sendCreatureWalkthrough(creature, mayWalkthrough);
 			tmpPlayer->sendCreatureMove(creature, newTile, newPos, this, oldPos, oldStackPosVector[i], teleport);
 			++i;
 		}
@@ -601,8 +614,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				//There are 3 options for a monster to enter a magic field
 				//1) Monster is immune
 				if(!monster->isImmune(combatType)){
-					//2) Monster is "strong" enough to handle the damage and was attacked
-					//3) Monster is already afflicated by this type of condition
+					//1) Monster is "strong" enough to handle the damage and was attacked
+					//2) Monster is already afflicated by this type of condition
 					if(hasBitSet(FLAG_IGNOREFIELDDAMAGE, flags)){
 						if(!monster->hasCondition(Combat::DamageToConditionType(combatType), false)){
 							if(!monster->canPushItems() || !monster->hadRecentBattle()){
@@ -727,11 +740,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				}
 			}
 		}
-
+		
 		const uint32_t itemLimit = g_config.getNumber(hasFlag(TILESTATE_PROTECTIONZONE) ? ConfigManager::PROTECTION_TILE_LIMIT : ConfigManager::TILE_LIMIT);
 		if(itemLimit && getThingCount() > itemLimit)
 			return RET_TILEISFULL;
-
+			
 		bool hasHangable = false;
 		bool supportHangable = false;
 
@@ -1489,7 +1502,7 @@ void Tile::postRemoveNotification(Thing* thing,  const Cylinder* newParent, int3
 	if(/*isCompleteRemoval &&*/ getThingCount() > 8){
 		onUpdateTile();
 	}
-
+	
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if((tmpPlayer = (*it)->getPlayer())){

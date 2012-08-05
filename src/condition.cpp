@@ -210,6 +210,7 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_FREEZING:
 		case CONDITION_DAZZLED:
 		case CONDITION_CURSED:
+		case CONDITION_BLEEDING:
 		{
 			return new ConditionDamage(_id, _type);
 			break;
@@ -270,6 +271,8 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 		case CONDITION_EXHAUST_YELL:
 		case CONDITION_EXHAUST_COMBAT:
 		case CONDITION_EXHAUST_HEAL:
+		case CONDITION_EXHAUST_SUPPORT:
+		case CONDITION_EXHAUST_SPECIAL:
 		case CONDITION_EXHAUST_OTHERS:
 		case CONDITION_MUTED:
 		case CONDITION_TRADE_MUTED:
@@ -1542,6 +1545,10 @@ uint16_t ConditionDamage::getIcons() const
 			icons |= ICON_CURSED;
 			break;
 
+		case CONDITION_BLEEDING:
+			icons |= ICON_BLEEDING;
+			break;	
+		
 		default:
 			break;
 	}
@@ -1826,7 +1833,8 @@ bool ConditionOutfit::unserializeProp(ConditionAttr_t attr, PropStream& propStre
 				!propStream.GET_UINT32(outfit.lookBody) ||
 				!propStream.GET_UINT32(outfit.lookLegs) ||
 				!propStream.GET_UINT32(outfit.lookFeet) ||
-				!propStream.GET_UINT32(outfit.lookAddons))
+				!propStream.GET_UINT32(outfit.lookAddons) ||
+				!propStream.GET_UINT32(outfit.lookMount))
 		{
 			return false;
 		}
@@ -1853,6 +1861,7 @@ bool ConditionOutfit::serialize(PropWriteStream& propWriteStream)
 		propWriteStream.ADD_UINT32((*it).lookLegs);
 		propWriteStream.ADD_UINT32((*it).lookFeet);
 		propWriteStream.ADD_UINT32((*it).lookAddons);
+		propWriteStream.ADD_UINT32((*it).lookMount);
 	}
 
 	return true;

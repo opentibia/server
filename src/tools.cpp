@@ -29,7 +29,6 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
-#include <limits>
 #include <boost/algorithm/string/predicate.hpp>
 
 extern ConfigManager g_config;
@@ -203,20 +202,6 @@ std::vector<std::string> explodeString(const std::string& inString, const std::s
 bool hasBitSet(uint32_t flag, uint32_t flags)
 {
 	return ((flags & flag) == flag);
-}
-
- //safely adds incr to x, checking for overflow
-bool safeIncrUInt32_t(uint32_t& x, uint32_t incr)
-{
-    const static uint32_t MAXUINT32 = std::numeric_limits<uint32_t>::max();
- 
-    if(MAXUINT32 - incr >= x)
-    {
-        x += incr;
-        return true;
-    }
- 
-    return false;
 }
 
 #define RAND_MAX24 16777216
@@ -526,7 +511,13 @@ MagicEffectNames magicEffectNames[] = {
 	{"bats",              NM_ME_BATS},
 	{"smoke",             NM_ME_SMOKE},
 	{"insects",           NM_ME_INSECTS},
-	{"dragonhead",        NM_ME_DRAGONHEAD}
+	{"dragonhead",        NM_ME_DRAGONHEAD},
+	{"orcshaman",		NM_ME_ORCSHAMAN},
+	{"orcshamanfire",	NM_ME_ORCSHAMAN_FIRE},
+	{"thunder",		NM_ME_THUNDER},
+	{"ferumbras",		NM_ME_FERUMBRAS},
+	{"confettihorizontal",	NM_ME_CONFETTI_HORIZONTAL},
+	{"confettivertical",	NM_ME_CONFETTI_VERTICAL}
 };
 
 ShootTypeNames shootTypeNames[] = {
@@ -571,8 +562,10 @@ ShootTypeNames shootTypeNames[] = {
 	{"smallearth",        NM_SHOOT_SMALLEARTH},
 	{"eartharrow",        NM_SHOOT_EARTHARROW},
 	{"explosion",         NM_SHOOT_EXPLOSION},
-	{"cake",              NM_SHOOT_CAKE}
-};
+	{"cake",		NM_SHOOT_CAKE},
+	{"tarsalarrow",		NM_SHOOT_TARSALARROW},
+	{"vortexbolt",		NM_SHOOT_VORTEXBOLT},
+	{"football",		NM_SHOOT_FOOTBALL}};
 
 AmmoTypeNames ammoTypeNames[] = {
 	{"spear",          AMMO_SPEAR},
@@ -861,3 +854,39 @@ std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end)
 	}
 }
 
+std::string ucfirst(std::string str)
+{
+	for(uint32_t i = 0; i < str.length(); ++i)
+	{
+		if(str[i] != ' ')
+		{
+			str[i] = upchar(str[i]);
+			break;
+		}
+	}
+	return str;
+}
+
+std::string getWeaponName(WeaponType_t weaponType)
+{
+	switch(weaponType)
+	{
+		case WEAPON_SWORD:
+			return "sword";
+		case WEAPON_CLUB:
+			return "club";
+		case WEAPON_AXE:
+			return "axe";
+		case WEAPON_DIST:
+			return "distance";
+		case WEAPON_SHIELD:
+			return "shield";
+		case WEAPON_WAND:
+			return "wand";
+		case WEAPON_AMMO:
+			return "ammunition";
+		default:
+			break;
+	}
+	return "";
+}

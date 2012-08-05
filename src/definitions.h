@@ -23,9 +23,17 @@
 
 #define OTSERV_VERSION "0.6.3_SVN"
 #define OTSERV_NAME "OTServ"
-#define OTSERV_CLIENT_VERSION "8.61"
+#define OTSERV_CLIENT_VERSION "9.52"
 
-#define CURRENT_SCHEMA_VERSION 24
+#ifndef __OLD_GUILD_SYSTEM__
+#define __OLD_GUILD_SYSTEM__
+#endif
+
+#ifdef __OLD_GUILD_SYSTEM__
+#define CURRENT_SCHEMA_VERSION 26
+#else
+#define CURRENT_SCHEMA_VERSION 22
+#endif
 
 #ifdef __USE_SQLITE__
 	#define SINGLE_SQL_DRIVER
@@ -113,7 +121,6 @@ enum passwordType_t{
 //Windows Seven 0x0601
 #define _WIN32_WINNT 0x0501
 
- #define __MIN_PVP_LEVEL_APPLIES_TO_SUMMONS__
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)
@@ -123,19 +130,6 @@ enum passwordType_t{
 // Boost exception handling must be enabled
 #ifdef BOOST_NO_EXCEPTIONS
 	#error "Boost exception handling must be enabled."
-#endif
-
-//Enable multi-byte character set under MSVC
-#ifdef _MSC_VER
-	#ifndef _MBCS
-		#define _MBCS
-	#endif
-	#ifdef _UNICODE
-		#undef _UNICODE 
-	#endif
-	#ifdef UNICODE
-		#undef UNICODE
-	#endif
 #endif
 
 #endif

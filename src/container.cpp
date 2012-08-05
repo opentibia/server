@@ -349,8 +349,8 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
 
-	if(index == INDEX_WHEREEVER && !skipLimit){
-		if(size() >= capacity())
+	if(!skipLimit){
+		if(id == ITEM_INBOX || (index == INDEX_WHEREEVER && size() >= capacity()))
 			return RET_CONTAINERNOTENOUGHROOM;
 	}
 
@@ -749,7 +749,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	if(item->isStackable() && count != item->getItemCount()){
 		uint8_t newCount = (uint8_t)std::max((int32_t)0, (int32_t)(item->getItemCount() - count));
 		if(newCount == 0){
-			updateAmountOfItems(-(int32_t)item->getTotalAmountOfItemsInside());
+			updateAmountOfItems(-item->getTotalAmountOfItemsInside());
 		}
 		const double old_weight = -item->getWeight();
 		item->setItemCount(newCount);
@@ -773,7 +773,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 			}
 			onRemoveContainerItem(index, item);
 		}
-		updateAmountOfItems(-(int32_t)item->getTotalAmountOfItemsInside());
+		updateAmountOfItems(-item->getTotalAmountOfItemsInside());
 		total_weight -= item->getWeight();
 		item->setParent(NULL);
 		itemlist.erase(cit);

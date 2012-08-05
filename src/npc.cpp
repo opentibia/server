@@ -273,6 +273,10 @@ bool Npc::loadFromXml(const std::string& filename)
 					if(readXMLInteger(p, "addons", intValue)){
 						defaultOutfit.lookAddons = intValue;
 					}
+					
+					if(readXMLInteger(p, "mount", intValue)){
+						defaultOutfit.lookMount = intValue;
+					}
 				}
 				else if(readXMLInteger(p, "typeex", intValue)){
 					defaultOutfit.lookTypeEx = intValue;
@@ -807,6 +811,12 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						else if(strValue == "exhaust_heal"){
 							prop.condition = CONDITION_EXHAUST_HEAL;
 						}
+						else if(strValue == "exhaust_support"){
+							prop.condition = CONDITION_EXHAUST_SUPPORT;
+						}
+						else if(strValue == "exhaust_special"){
+							prop.condition = CONDITION_EXHAUST_SPECIAL;
+						}
 						else if(strValue == "exhaust_potion" || strValue == "exhaust_others"){
 							prop.condition = CONDITION_EXHAUST_OTHERS;
 						}
@@ -821,6 +831,9 @@ ResponseList Npc::loadInteraction(xmlNodePtr node)
 						}
 						else if(strValue == "muted"){
 							prop.condition = CONDITION_MUTED;
+						}
+						else if(strValue == "bleed"){
+							prop.condition = CONDITION_BLEEDING;
 						}
 					}
 
@@ -1505,7 +1518,7 @@ void Npc::onThink(uint32_t interval)
 	if(m_npcEventHandler){
 		m_npcEventHandler->onThink();
 	}
-
+	
 	std::vector<Player*> list;
 	Player* tmpPlayer = NULL;
 
@@ -1544,12 +1557,10 @@ void Npc::onThink(uint32_t interval)
 		}
 	}
 
-
-	/* TODO: This code does nothing. Check if nothing was left undone.
 	bool idleResponse = false;
 	if((uint32_t)(MAX_RAND_RANGE / idleInterval) >= (uint32_t)random_range(0, MAX_RAND_RANGE))
-		idleResponse = true; */
-
+		idleResponse = true;
+		
 	if (getTimeSinceLastMove() >= walkTicks)
 		addEventWalk();
 
@@ -3479,7 +3490,6 @@ void NpcScriptInterface::popState(lua_State *L, NpcState* &state)
 	state->scriptVars.s3 = getFieldString(L, "s3");
 }
 
-
 int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 {
 	//openShopWindow(cid, items, onBuy callback, onSell callback)
@@ -3543,7 +3553,7 @@ int NpcScriptInterface::luaOpenShopWindow(lua_State *L)
 
 	npc->addShopPlayer(player);
 	player->setShopOwner(npc, buyCallback, sellCallback);
-	player->openShopWindow(items);
+	player->openShopWindow(npc, items);
 
 	lua_pushboolean(L, true);
 	return 1;

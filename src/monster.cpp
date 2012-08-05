@@ -122,6 +122,9 @@ void Monster::onAttackedCreatureDissapear(bool isLogout)
 
 	attackTicks = 0;
 	extraMeleeAttack = true;
+		if(g_config.getBoolean(ConfigManager::MONSTER_SPAWN_WALKBACK)){
+		g_game.internalTeleport(this, getMasterPos());
+	}
 }
 
 void Monster::onFollowCreatureDissapear(bool isLogout)
@@ -653,11 +656,9 @@ void Monster::onEndCondition(ConditionType_t type, bool lastCondition)
 	updateIdleStatus();
 }
 
-
 void Monster::onThink(uint32_t interval)
 {
 	updateHadRecentBattleVar();
-
 	Creature::onThink(interval);
 
 	if(despawn()){
@@ -1432,11 +1433,11 @@ void Monster::changeHealth(int32_t healthChange)
 	//In case a player with ignore flag set attacks the monster
 	setIdle(false);
 	semiIdle = false;
-
+	
 	if(healthChange < 0){
 		timeOfLastHit = OTSYS_TIME();
 		updateHadRecentBattleVar();
-		}
+	}
 	Creature::changeHealth(healthChange);
 }
 

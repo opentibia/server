@@ -117,8 +117,11 @@ void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 		AddByte(count);
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		AddByte(Item::items.getClientFluidType(FluidTypes_t(count)));
+		uint32_t fluidIndex = count % 8;
+		AddByte(fluidMap[fluidIndex]);
 	}
+	if(it.isAnimation)
+		AddByte(0xFE); // random phase (0xFF for async)
 }
 
 void NetworkMessage::AddItem(const Item* item)
@@ -128,11 +131,14 @@ void NetworkMessage::AddItem(const Item* item)
 	AddU16(it.clientId);
 
 	if(it.stackable){
-		AddByte(item->getSubType());
+		AddByte(std::min((uint16_t)255, item->getSubType()));
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		AddByte(Item::items.getClientFluidType(FluidTypes_t(item->getSubType())));
+		uint32_t fluidIndex = item->getSubType() % 8;
+		AddByte(fluidMap[fluidIndex]);
 	}
+	if(it.isAnimation)
+		AddByte(0xFE); // random phase (0xFF for async)
 }
 
 void NetworkMessage::AddItemId(const Item *item){

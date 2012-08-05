@@ -82,7 +82,6 @@ public:
 
 	static bool useFist(Player* player, Creature* target);
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const = 0;
-	virtual int32_t getElementDamage(const Player* player, const Creature* target) const {return 0;}
 
 	const uint32_t getReqLevel() const {return level;}
 	const uint32_t getReqMagLv() const {return magLevel;}
@@ -133,7 +132,6 @@ public:
 
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Creature* target, const Item* item, bool maxDamage = false) const;
-	virtual int32_t getElementDamage(const Player* player, const Item* item) const;
 
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;

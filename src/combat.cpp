@@ -195,7 +195,10 @@ CombatType_t Combat::ConditionToDamageType(ConditionType_t type)
 		case CONDITION_CURSED:
 			return COMBAT_DEATHDAMAGE;
 			break;
-
+			
+		case CONDITION_BLEEDING:
+			return COMBAT_BLEEDDAMAGE;
+			break;
 		default:
 			break;
 	}
@@ -234,6 +237,10 @@ ConditionType_t Combat::DamageToConditionType(CombatType_t type)
 			return CONDITION_CURSED;
 			break;
 
+		case COMBAT_BLEEDDAMAGE:
+			return CONDITION_BLEEDING;
+			break;
+			
 		default:
 			break;
 	}

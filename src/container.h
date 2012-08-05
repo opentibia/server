@@ -132,7 +132,6 @@ public:
 	virtual uint32_t getTotalAmountOfItemsInside() const { return amountOfItems; } //includes the item itself
 	uint16_t getDeepness() const { return deepness; }
 	void setDeepness(uint16_t newDeepness) { deepness = newDeepness; }
-
 private:
 	void onAddContainerItem(Item* item);
 	void onUpdateContainerItem(uint32_t index, Item* oldItem, const ItemType& oldType,
@@ -142,7 +141,6 @@ private:
 	const Container* getParentContainer() const;
 	Container* getParentContainer();
 	void updateItemWeight(double diff);
-
 protected:
 	std::ostringstream& getContentDescription(std::ostringstream& os) const;
 
@@ -158,3 +156,4 @@ protected:
 };
 
 #endif
+

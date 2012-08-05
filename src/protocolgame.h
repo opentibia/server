@@ -101,6 +101,7 @@ private:
 
 	void parseRequestOutfit(NetworkMessage& msg);
 	void parseSetOutfit(NetworkMessage& msg);
+	void parseMountCreature(NetworkMessage& msg);
 	void parseSay(NetworkMessage& msg);
 	void parseLookAt(NetworkMessage& msg);
 	void parseFightModes(NetworkMessage& msg);
@@ -118,6 +119,7 @@ private:
 	void parseTextWindow(NetworkMessage& msg);
 	void parseHouseWindow(NetworkMessage& msg);
 
+	void parseRuleViolationReport(NetworkMessage& msg);
 	//shop methods
 	void parseLookInShop(NetworkMessage& msg);
 	void parsePlayerPurchase(NetworkMessage& msg);
@@ -139,7 +141,14 @@ private:
 	void parseLookInTrade(NetworkMessage& msg);
 	void parseAcceptTrade(NetworkMessage& msg);
 	void parseCloseTrade();
-
+	
+	//market methods
+	void parseMarketLeave();
+	void parseMarketBrowse(NetworkMessage& msg);
+	void parseMarketCreateOffer(NetworkMessage& msg);
+	void parseMarketCancelOffer(NetworkMessage& msg);
+	void parseMarketAcceptOffer(NetworkMessage& msg);
+	
 	//VIP methods
 	void parseAddVip(NetworkMessage& msg);
 	void parseRemoveVip(NetworkMessage& msg);
@@ -166,6 +175,7 @@ private:
 	void parseDebug(NetworkMessage& msg);
 
 	//Send functions
+	void sendChannelEvent(uint16_t channelId, const std::string& playerName, ChannelEvent_t channelEvent);
 	void sendClosePrivate(uint16_t channelId);
 	void sendCreatePrivateChannel(uint16_t channelId, const std::string& channelName);
 
@@ -181,8 +191,8 @@ private:
 
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
 	void sendMagicEffect(const Position& pos, unsigned char type);
-	void sendAnimatedText(const Position& pos, unsigned char color, std::string text);
 	void sendCreatureHealth(const Creature* creature);
+	void sendCreatureWalkthrough(const Creature* creature, bool walkthrough);
 	void sendSkills();
 	void sendPing();
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
@@ -194,12 +204,20 @@ private:
 	void sendCancelTarget();
 	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
 	void sendStats();
-	void sendTextMessage(MessageClasses mclass, const std::string& message);
+	void sendTextMessage(MessageClasses mclass, const std::string& message, Position* pos = NULL, uint32_t exp = 0, TextColor_t color = TEXTCOLOR_NONE);
 
-	void sendShop(const std::list<ShopInfo>& shop);
+	void sendShop(Npc* npc, const std::list<ShopInfo>& shop);
 	void sendCloseShop();
 	void sendPlayerCash(uint32_t amount);
 	void sendSaleItemList(const std::list<ShopInfo>& shop);
+	void sendMarketEnter(uint32_t depotId);
+	void sendMarketLeave();
+	void sendMarketBrowseItem(uint16_t itemId, const MarketOfferList& buyOffers, const MarketOfferList& sellOffers);
+	void sendMarketAcceptOffer(MarketOfferEx offer);
+	void sendMarketBrowseOwnOffers(const MarketOfferList& buyOffers, const MarketOfferList& sellOffers);
+	void sendMarketCancelOffer(MarketOfferEx offer);
+	void sendMarketBrowseOwnHistory(const HistoryMarketOfferList& buyOffers, const HistoryMarketOfferList& sellOffers);
+	void sendMarketDetail(uint16_t itemId);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	void sendQuestLog();
@@ -209,6 +227,8 @@ private:
 	void sendTextWindow(uint32_t windowTextId, uint32_t itemId, const std::string& text);
 	void sendHouseWindow(uint32_t windowTextId, House* house, uint32_t listId, const std::string& text);
 	void sendOutfitWindow();
+
+	void sendSpellCooldown(uint16_t spellId, uint32_t cooldown, bool isGroup);
 
 	void sendVIPLogIn(uint32_t guid);
 	void sendVIPLogOut(uint32_t guid);
@@ -223,8 +243,10 @@ private:
 
 	void sendCreatureSkull(const Creature* creature);
 	void sendCreatureShield(const Creature* creature);
+	#ifdef __GUILDWARSLUARELOAD__
 	void sendCreatureEmblem(const Creature* creature);
-	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
+	#endif
+	void sendCreatureSquare(const Creature* creature, uint8_t color);
 
 	//tiles
 	void sendAddTileItem(const Tile* tile, const Position& pos, uint32_t stackpos, const Item* item);
@@ -249,7 +271,14 @@ private:
 	void sendAddInventoryItem(slots_t slot, const Item* item);
 	void sendUpdateInventoryItem(slots_t slot, const Item* item);
 	void sendRemoveInventoryItem(slots_t slot);
-
+	
+	//messages
+	void sendDamageMessage(MessageClasses mclass, const std::string& message, const Position& pos,
+		uint32_t primaryDamage = 0, TextColor_t primaryColor = TEXTCOLOR_NONE,
+		uint32_t secondaryDamage = 0, TextColor_t secondaryColor = TEXTCOLOR_NONE);
+	void sendHealMessage(MessageClasses mclass, const std::string& message, const Position& pos, uint32_t heal, TextColor_t color);
+	void sendExperienceMessage(MessageClasses mclass, const std::string& message, const Position& pos, uint32_t exp, TextColor_t color);
+	
 	//Help functions
 
 	// translate a tile to clientreadable format
@@ -265,7 +294,7 @@ private:
 
 	void AddMapDescription(NetworkMessage_ptr msg, const Position& pos);
 	void AddTextMessage(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message);
-	void AddAnimatedText(NetworkMessage_ptr msg,const Position& pos, unsigned char color, const std::string& text);
+	void AddTextMessageEx(NetworkMessage_ptr msg,MessageClasses mclass, const std::string& message, const Position& pos, uint32_t value, TextColor_t color);
 	void AddMagicEffect(NetworkMessage_ptr msg,const Position& pos, unsigned char type);
 	void AddDistanceShoot(NetworkMessage_ptr msg,const Position& from, const Position& to, uint8_t type);
 	void AddCreature(NetworkMessage_ptr msg,const Creature* creature, bool known, uint32_t remove);

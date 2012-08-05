@@ -52,6 +52,18 @@ inline uint32_t swap_uint32(uint32_t x)
 		 | (x & 0x000000FF) << 24;
 }
 
+inline uint64_t swap_uint64(uint64_t x)
+{
+	return (x & 0xFF00000000000000ULL) >> 56
+		 | (x & 0x00FF000000000000ULL) >> 40
+		 | (x & 0x0000FF0000000000ULL) >> 24
+		 | (x & 0x000000FF00000000ULL) >> 8
+		 | (x & 0x00000000FF000000) << 8
+		 | (x & 0x0000000000FF0000) << 24
+		 | (x & 0x000000000000FF00) << 40
+		 | (x & 0x00000000000000FF) << 56;
+}
+
 inline int16_t swap_int16(int16_t x)
 {
 	return (int16_t)swap_uint16((uint16_t)x);
@@ -87,7 +99,6 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 bool readXMLContentString(xmlNodePtr node, std::string& value);
 std::vector<std::string> explodeString(const std::string& inString, const std::string& separator);
 bool hasBitSet(uint32_t flag, uint32_t flags);
-bool safeIncrUInt32_t(uint32_t &x, uint32_t incr);
 
 uint32_t rand24b();
 float box_muller(float m, float s);
@@ -123,5 +134,8 @@ uint32_t adlerChecksum(uint8_t *data, int32_t len);
 void showTime(std::stringstream& str, uint32_t time);
 uint32_t parseTime(const std::string& time);
 std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end);
+std::string ucfirst(std::string);
+
+std::string getWeaponName(WeaponType_t weaponType);
 
 #endif

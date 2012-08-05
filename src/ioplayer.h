@@ -76,6 +76,7 @@ public:
 	void updateLoginInfo(Player* player);
 	void updateLogoutInfo(Player* player);
 	bool cleanOnlineInfo();
+	void increaseBankBalance(uint32_t guid, uint64_t bankBalance);
 
 protected:
 	bool storeNameByGuid(Database &mysql, uint32_t guid);

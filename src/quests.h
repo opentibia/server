@@ -57,12 +57,17 @@ class Mission
 		std::string getName(Player* player);
 		std::string getDescription(Player* player);
 
+		uint32_t getStorageId() const { return storageID; }
+		int32_t getStartStorageValue() const { return startValue; }
+		int32_t getEndStorageValue() const { return endValue; }	
+		
 		MissionState* mainState;
 		StateList state;
 
 	private:
 		std::string missionName;
-		uint32_t storageID, startValue, endValue;
+		uint32_t storageID;
+		int32_t startValue, endValue;
 };
 
 class Quest
@@ -82,11 +87,16 @@ class Quest
 		MissionsList::const_iterator getFirstMission() const {return missions.begin();}
 		MissionsList::const_iterator getEndMission() const {return missions.end();}
 
+		uint32_t getStartStorageId() const { return startStorageID; }
+		int32_t getStartStorageValue() const { return startStorageValue; }
+		MissionsList missions;
+
 	private:
 		std::string name;
 		uint16_t id;
-		uint32_t startStorageID, startStorageValue;
-		MissionsList missions;
+		uint32_t startStorageID;
+		int32_t startStorageValue;
+		
 };
 
 class Quests
@@ -106,6 +116,7 @@ class Quests
 
 		bool loadFromXml(const std::string& _filename);
 		Quest* getQuestByID(uint16_t id);
+		bool isQuestStorage(const uint32_t key, const int32_t value);
 		uint16_t getQuestsCount(Player* player);
 		bool reload();
 
