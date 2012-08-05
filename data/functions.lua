@@ -555,6 +555,9 @@ function doPlayerRemoveSkillLossPercent(cid, amount)
 	if newvalue < 0 then
 		newvalue = 0
 	end
+	if newvalue > 100 then
+		newvalue = 100
+	end
 	-- Setting experience is enough (all other types follow it)
 	doPlayerSetLossPercent(cid, PLAYERLOSS_EXPERIENCE, newvalue)
 end

@@ -657,8 +657,6 @@
 	<action itemid="10791" script="doors/questdoor_closed.lua"/>
 	<action itemid="10792" script="doors/door_open_vertical.lua"/>
 	
-	<action itemid="14405" function="market"/>
-	
 	<!-- Windows -->
 	<action itemid="6436" script="doors/window_open.lua"/>
 	<action itemid="6437" script="doors/window_open.lua"/>

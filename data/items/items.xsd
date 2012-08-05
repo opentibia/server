@@ -22,6 +22,8 @@
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:attribute>
+      <xsd:attribute name="fluidClient" type="xsd:positiveInteger"/>
+      <xsd:attribute name="customFluid" type="xsd:positiveInteger"/>
       <xsd:attribute name="article" type="xsd:string"/>
       <xsd:attribute name="plural" type="xsd:string"/>
       <xsd:attribute name="editorsuffix" type="xsd:string"/>
