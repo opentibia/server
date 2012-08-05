@@ -61,7 +61,6 @@ inline float swap_float32(float x)
 	return *((float *)(void *)&ui);
 }
 
-bool fileExists(const char* filename);
 void replaceString(std::string& str, const std::string& sought, const std::string& replacement);
 void trim_right(std::string& source, const std::string& t = "\n\t ");
 void trim_left(std::string& source, const std::string& t = "\n\t ");
