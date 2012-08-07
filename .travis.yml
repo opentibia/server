@@ -1,4 +1,5 @@
 language: cpp
-before_script: cmake .
+before_script: 
+ - sudo apt-get libgmp-dev
+ - cmake .
 script: make
-
