@@ -1,5 +1,5 @@
 language: cpp
 before_script: 
- - sudo apt-get libgmp-dev
+ - sudo apt-get install libgmp-dev
  - cmake .
 script: make
