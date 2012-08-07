@@ -1,5 +1,5 @@
 language: cpp
 before_script: 
- - sudo apt-get install libgmp-dev libboost-dev libxml2-dev liblua5.1-0-dev libsqlite3-dev
+ - sudo apt-get install libgmp-dev libboost-thread-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev liblua5.1-0-dev
  - cmake .
 script: make
