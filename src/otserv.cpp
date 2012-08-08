@@ -91,9 +91,10 @@ time_t start_time;
 
 void ErrorMessage(const char* message) {
 	std::cout << std::endl << std::endl << "Error: " << message << std::endl;
-
+#ifdef __WINDOWS__
 	std::string s;
 	std::cin >> s;
+#endif
 }
 
 void ErrorMessage(std::string m){
