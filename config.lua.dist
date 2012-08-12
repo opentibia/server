@@ -20,7 +20,7 @@ use_local_ip = false
 
 -- server ip (the ip that this server on)
 -- Can be "auto" to fetch the global ip automatically
-ip = "auto"
+server_ip = "auto"
 
 -- ID of the world in the database, world name / port is fetched from the database
 world_id = 1
@@ -273,7 +273,6 @@ ip_server_list = {
 	"http://classictibia.com/echo_ip.php",
 }
 
--- SQL type
 -- The amount of events that can be called inside eachother
 script_recursion_depth = 16
 
