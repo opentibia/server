@@ -1,0 +1,15 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+before_script:
+ - sudo apt-get install libgmp3-dev libboost-thread-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev liblua5.1-dev libxml2-dev libsqlite3-dev
+script: |
+  cd src
+  ./autogen.sh
+  ./configure --enable-sqlite
+  make
+  
+notifications:
+  irc:
+#    - "irc.quakenet.org#otserv"
