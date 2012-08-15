@@ -438,7 +438,7 @@ bool ExceptionHandler::RemoveHandler()
 			if(g_config.getNumber(ConfigManager::SHOW_CRASH_WINDOW))
 				MessageBoxA(NULL,"Please send the file report.txt to support service. Thanks","Error",MB_OK |MB_ICONERROR);
 			std::cout << "Error report generated. Killing server." <<std::endl;
-			exit(1); //force exit
+			exit(EXIT_FAILURE); //force exit
 			return ExceptionContinueSearch;
 		}
 
@@ -468,7 +468,7 @@ bool ExceptionHandler::RemoveHandler()
 				std::cout << "Failed loading symbols. otserv.map not found. " << std::endl;
 				std::cout << "Go to http://otfans.net/showthread.php?t=4718 for more info." << std::endl;
 				system("pause");
-				exit(1);
+				exit(EXIT_FAILURE);
 				return false;
 			}
 
@@ -721,7 +721,7 @@ void _SigHandler(int signum, siginfo_t *info, void* secret)
 		((std::ofstream*)outdriver)->close();
 	}
 
-	_exit(1);
+	_exit(EXIT_FAILURE);
 }
 
 void ExceptionHandler::dumpStack()

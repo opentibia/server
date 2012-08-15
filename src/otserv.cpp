@@ -91,9 +91,10 @@ time_t start_time;
 
 void ErrorMessage(const char* message) {
 	std::cout << std::endl << std::endl << "Error: " << message << std::endl;
-
+#ifdef __WINDOWS__
 	std::string s;
 	std::cin >> s;
+#endif
 }
 
 void ErrorMessage(std::string m){
@@ -112,7 +113,7 @@ struct CommandLineOptions{
 
 CommandLineOptions g_command_opts;
 
-bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args);
+CommandLineOptions parseCommandLine(std::vector<std::string> args);
 void mainLoader(const CommandLineOptions& command_opts, ServiceManager* servicer);
 void badAllocationHandler();
 
@@ -130,10 +131,7 @@ void closeRunfile(void)
 int main(int argc, char *argv[])
 {
 	// Parse any command line (and display help text)
-	if(parseCommandLine(g_command_opts, std::vector<std::string>(argv, argv + argc)) == false){
-		return 0;
-	}
-
+    g_command_opts = parseCommandLine(std::vector<std::string>(argv, argv + argc));
 #if !defined(__WINDOWS__)
 	if(g_command_opts.runfile != ""){
 		std::ofstream f(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out);
@@ -266,13 +264,14 @@ int main(int argc, char *argv[])
 	mainExceptionHandler.RemoveHandler();
 #endif
 	// Don't run destructors, may hang!
-	exit(0);
+	exit(EXIT_SUCCESS);
 
 	return EXIT_SUCCESS;
 }
 
-bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
+CommandLineOptions parseCommandLine(std::vector<std::string> args)
 {
+    CommandLineOptions opts;
 	std::vector<std::string>::iterator argi = args.begin();
 	opts.truncate_log = false;
 
@@ -286,13 +285,13 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		if(arg == "-p" || arg == "--port"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter 1 for '" << arg << "'" << std::endl;
-				return false;
+				exit(EXIT_FAILURE);
 			}
 			std::string type = *argi;
 
 			if(++argi == args.end()){
 				std::cout << "Missing parameter 2 for '" << arg << "'" << std::endl;
-				return false;
+				exit(EXIT_FAILURE);
 			}
 
 			if(type == "l" || type == "login")
@@ -306,7 +305,7 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		else if(arg == "-r" || arg == "--runfile"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
-				return false;
+				exit(EXIT_FAILURE);
 			}
 			opts.runfile = *argi;
 		}
@@ -314,14 +313,14 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		else if(arg == "-i" || arg == "--ip"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
-				return false;
+				exit(EXIT_FAILURE);
 			}
 			g_config.setString(ConfigManager::IP, *argi);
 		}
 		else if(arg == "-c" || arg == "--config"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter for '" << arg << "'" << std::endl;
-				return false;
+				exit(EXIT_FAILURE);
 			}
 			opts.configfile = *argi;
 		}
@@ -331,12 +330,12 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 		else if(arg == "-l" || arg == "--log-file"){
 			if(++argi == args.end()){
 				std::cout << "Missing parameter 1 for '" << arg << "'" << std::endl;
-				return false;
+				exit(EXIT_FAILURE);
 			}
 			opts.logfile = *argi;
 			if(++argi == args.end()){
 				std::cout << "Missing parameter 2 for '" << arg << "'" << std::endl;
-				return false;
+				exit(EXIT_FAILURE);
 			}
 			opts.errfile = *argi;
 		}
@@ -357,16 +356,20 @@ bool parseCommandLine(CommandLineOptions& opts, std::vector<std::string> args)
 			#endif
 			"\t--truncate-log\t\tReset log file each time the server is \n"
 			"\t\t\t\tstarted.\n";
-			return false;
+			exit(EXIT_SUCCESS);
+		}
+		else if(arg == "--version"){
+		    std::cout << OTSERV_NAME << " " << OTSERV_VERSION << std::endl;
+		    exit(EXIT_SUCCESS);
 		}
 		else{
 			std::cout << "Unrecognized command line argument '" << arg << "'\n"
-			"Usage: otserv {-i|-p|-c|-r|-l}" << "\n";
-			return false;
+			"Try 'otserv --help' for more information." << "\n";
+			exit(EXIT_FAILURE);
 		}
 		++argi;
 	}
-	return true;
+	return opts;
 }
 
 void badAllocationHandler()
@@ -375,7 +378,7 @@ void badAllocationHandler()
 	puts("Allocation failed, server out of memory.\nDecrese the size of your map or compile in 64-bit mode.");
 	char buf[1024];
 	fgets(buf, 1024, stdin);
-	exit(-1);
+	exit(EXIT_FAILURE);
 }
 
 void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_manager)
@@ -436,7 +439,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		os << "Unable to load " << configname;
 #endif
 		ErrorMessage(os.str());
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -465,7 +468,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	/* Won't compile! access is not standard
 	if (access(g_config.getString(ConfigManager::DATA_DIRECTORY).c_str(), F_OK)) { // check if datadir exists
 		ErrorMessage("Data directory does not exist!");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	*/
 	std::cout << "[done]" << std::endl;
@@ -475,7 +478,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	if(db == NULL || !db->isConnected())
 	{
 		ErrorMessage("Database Connection Failed!");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -486,13 +489,13 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	DBResult* result;
 	if(!(result = db->storeQuery("SELECT `value` FROM `schema_info` WHERE `name` = 'version';"))){
 		ErrorMessage("Can't get schema version! Does `schema_info` exist?");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	int schema_version = result->getDataInt("value");
 	db->freeResult(result);
 	if(schema_version != CURRENT_SCHEMA_VERSION){
 		ErrorMessage("Your database is outdated. Run the dbupdate utility to update it to the latest schema version.");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "Version = " << schema_version << " ";
 	std::cout << "[done]" << std::endl;
@@ -503,7 +506,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		std::stringstream errormsg;
 		errormsg << "Unable to execute query for cleaning online status!";
 		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -525,7 +528,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	std::cout << ":: Loading " << filename.str() << "... " << std::flush;
 	if(!g_vocations.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		ErrorMessage("Unable to load vocations!");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -537,7 +540,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -548,7 +551,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -560,7 +563,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -573,7 +576,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << "[done]" << std::endl;
 
@@ -587,7 +590,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		g_game.setWorldType(WORLD_TYPE_PVPE);
 	else{
 		ErrorMessage("Unknown world type!");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::cout << ":: Worldtype: " << asUpperCaseString(worldType) << std::endl;
 
@@ -610,7 +613,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	else{
 		ErrorMessage("Unknown password type!");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 
 	if(g_config.getString(ConfigManager::PASSWORD_SALT) != "")
@@ -625,7 +628,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 
 		if(!g_game.loadMap(filename.str())){
 			ErrorMessage("Couldn't load map");
-			exit(-1);
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -639,14 +642,14 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 	}
 	if(!(world_result = db->storeQuery("SELECT `name`, `port` FROM `worlds` WHERE `id` = '" + world_id + "'"))){
 		ErrorMessage("Cannot load world with world id " + world_id + ".");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	std::string world_name = world_result->getDataString("name");
 	int game_port = world_result->getDataInt("port");
 
 	if(world_name == "" || game_port == 0){
 		ErrorMessage("The specified world was not found in the database.");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 
 	// Set game state to starting up
@@ -661,7 +664,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		std::cout << "::" << std::endl;
 	} catch(Script::Error& err){
 		std::cout << std::endl << err.what() << std::endl;
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	g_game.runStartupScripts(true);
 	
@@ -715,7 +718,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 			else{
 				std::string error_msg = "Can't resolve: " + globalIPstr;
 				ErrorMessage(error_msg.c_str());
-				exit(-1);
+				exit(EXIT_FAILURE);
 			}
 		}
 
