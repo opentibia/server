@@ -21,9 +21,14 @@
 #ifndef __OTSERV_THING_H__
 #define __OTSERV_THING_H__
 
-#include "classes.h"
-#include "position.h"
-#include "const.h"
+#include <string>
+#include <cstdint>
+
+// Forward declaration
+class Cylinder;
+class Tile;
+class Position;
+class Creature;
 
 class Thing {
 protected:
@@ -32,19 +37,15 @@ protected:
 public:
 	virtual ~Thing();
 
-	void addRef() {++m_refCount;}
-	void unRef() {
-		--m_refCount;
-		if(m_refCount <= 0)
-			delete this;
-	}
+	void addRef();
+	void unRef();
 
 	virtual std::string getDescription(int32_t lookDistance) const = 0;
 
-	Cylinder* getParent() {return parent;}
-	const Cylinder* getParent() const {return parent;}
+	Cylinder* getParent();
+	const Cylinder* getParent() const;
 
-	virtual void setParent(Cylinder* cylinder) {parent = cylinder;}
+	virtual void setParent(Cylinder* cylinder);
 
 	Cylinder* getTopParent(); //returns Tile/Container or a Player
 	const Cylinder* getTopParent() const;
@@ -56,12 +57,12 @@ public:
 	virtual int getThrowRange() const = 0;
 	virtual bool isPushable() const = 0;
 
-	virtual Item* getItem() {return NULL;}
-	virtual const Item* getItem() const {return NULL;}
-	virtual Tile* getTile() {return NULL;}
-	virtual const Tile* getTile() const {return NULL;}
-	virtual Creature* getCreature() {return NULL;}
-	virtual const Creature* getCreature() const {return NULL;}
+	virtual Item* getItem();
+	virtual const Item* getItem() const;
+	virtual Tile* getTile();
+	virtual const Tile* getTile() const;
+	virtual Creature* getCreature();
+	virtual const Creature* getCreature() const;
 
 	virtual bool isRemoved() const;
 
@@ -70,7 +71,4 @@ private:
 	int32_t m_refCount;
 };
 
-
 #endif //__THING_H__
-
-
