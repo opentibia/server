@@ -250,6 +250,16 @@ void Spawns::clear()
 	filename = "";
 }
 
+bool Spawns::isLoaded() const
+{
+	return loaded;
+}
+
+bool Spawns::isStarted() const
+{
+	return started;
+}
+
 bool Spawns::isInZone(const Position& centerPos, int32_t radius, const Position& pos)
 {
 	if(radius == -1){
@@ -495,6 +505,11 @@ void Spawn::removeMonster(Actor* monster)
 			break;
 		}
 	}
+}
+
+uint32_t Spawn::getInterval() const
+{
+	return interval;
 }
 
 void Spawn::stopEvent()

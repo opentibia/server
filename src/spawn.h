@@ -21,7 +21,15 @@
 #ifndef __OTSERV_SPAWN_H__
 #define __OTSERV_SPAWN_H__
 
-#include "classes.h"
+#include <cstdint>
+#include <string>
+#include <list>
+#include <map>
+
+// Forward declaration
+class CreatureType;
+class Spawn;
+class Position;
 
 typedef std::list<Spawn*> SpawnList;
 
@@ -46,13 +54,14 @@ public:
 	void startup();
 	void clear();
 
-	bool isLoaded() const { return loaded; }
-	bool isStarted() const { return started; }
+	bool isLoaded() const;
+	bool isStarted() const;
 
 private:
 	SpawnList spawnList;
 
-	bool loaded, started;
+	bool loaded;
+	bool started;
 	std::string filename;
 };
 
@@ -65,7 +74,7 @@ public:
 	bool addNPC(const std::string& name, const Position& pos, Direction dir);
 	void removeMonster(Actor* monster);
 
-	uint32_t getInterval() const {return interval;}
+	uint32_t getInterval() const;
 	void startup();
 
 	void startSpawnCheck();
