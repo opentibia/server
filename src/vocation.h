@@ -21,6 +21,9 @@
 #ifndef __OTSERV_VOCATION_H__
 #define __OTSERV_VOCATION_H__
 
+#include <cstdint>
+#include <string>
+#include <map>
 #include "enums.h"
 #include "const.h"
 
@@ -28,45 +31,34 @@ class Vocation
 {
 	Vocation(uint32_t id);
 	~Vocation();
+
 public:
-	uint32_t getID() const {return id;}
-	const std::string& getVocName() const {return name;}
-	const std::string& getVocDescription() const {return description;}
+	uint32_t getID() const;
+	const std::string& getVocName() const;
+	const std::string& getVocDescription() const;
 	uint32_t getReqSkillTries(SkillType skill, int32_t level);
 	uint32_t getReqMana(int32_t magLevel);
 
-	uint32_t getHPGain() const {return gainHP;}
-	uint32_t getManaGain() const {return gainMana;}
-	uint32_t getCapGain() const {return gainCap;}
+	uint32_t getHPGain() const;
+	uint32_t getManaGain() const;
+	uint32_t getCapGain() const;
 
-	uint32_t getManaGainTicks() const {return gainManaTicks;}
-	uint32_t getManaGainAmount() const {return gainManaAmount;}
-	uint32_t getHealthGainTicks() const {return gainHealthTicks;}
-	uint32_t getHealthGainAmount() const {return gainHealthAmount;}
+	uint32_t getManaGainTicks() const;
+	uint32_t getManaGainAmount() const;
+	uint32_t getHealthGainTicks() const;
+	uint32_t getHealthGainAmount() const;
 
-	uint16_t getSoulMax() const {return maxSoul;}
-	uint16_t getSoulGainTicks() const {return gainSoulTicks;}
+	uint16_t getSoulMax() const;
+	uint16_t getSoulGainTicks() const;
 
-	float getMeleeBaseDamage(WeaponType weaponType) const
-	{
-		if(weaponType == WEAPON_SWORD)
-			return swordBaseDamage;
-		else if(weaponType == WEAPON_AXE)
-			return axeBaseDamage;
-		else if(weaponType == WEAPON_CLUB)
-			return clubBaseDamage;
-		else if(weaponType == WEAPON_DIST)
-			return distBaseDamage;
-		else
-			return fistBaseDamage;
-	};
+	float getMeleeBaseDamage(WeaponType weaponType) const;
 
-	float getMagicBaseDamage() const {return magicBaseDamage;}
-	float getWandBaseDamage() const {return wandBaseDamage;}
-	float getHealingBaseDamage() const {return healingBaseDamage;}
+	float getMagicBaseDamage() const;
+	float getWandBaseDamage() const;
+	float getHealingBaseDamage() const;
 
-	float getBaseDefense() const {return baseDefense;}
-	float getArmorDefense() const {return armorDefense;}
+	float getBaseDefense() const;
+	float getArmorDefense() const;
 
 	void debugVocation();
 
@@ -107,10 +99,9 @@ protected:
 	typedef std::map<uint32_t, uint32_t> cacheMap;
 	cacheMap cacheMana;
 	cacheMap cacheSkill[SkillType::size];
-	
+
 	friend class Vocations;
 };
-
 
 class Vocations
 {

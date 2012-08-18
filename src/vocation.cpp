@@ -19,8 +19,199 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <iostream>
+#include <cassert>
 #include "vocation.h"
 #include "tools.h"
+
+Vocation::Vocation(uint32_t _id)
+{
+	id = _id;
+	name = "none";
+	gainHealthTicks = 6;
+	gainHealthAmount = 1;
+	gainManaTicks = 6;
+	gainManaAmount = 1;
+	gainCap = 5;
+	gainMana = 5;
+	gainHP = 5;
+	maxSoul = 100;
+	gainSoulTicks = 120;
+	manaMultiplier = 4.0;
+	skillMultipliers[0] = 1.5f;
+	skillMultipliers[1] = 2.0f;
+	skillMultipliers[2] = 2.0f;
+	skillMultipliers[3] = 2.0f;
+	skillMultipliers[4] = 2.0f;
+	skillMultipliers[5] = 1.5f;
+	skillMultipliers[6] = 1.1f;
+
+	skillBases[0] = 50;
+	skillBases[1] = 50;
+	skillBases[2] = 50;
+	skillBases[3] = 50;
+	skillBases[4] = 30;
+	skillBases[5] = 100;
+	skillBases[6] = 20;
+
+	swordBaseDamage = 1.;
+	axeBaseDamage = 1.;
+	clubBaseDamage = 1.;
+	distBaseDamage = 1.;
+	fistBaseDamage = 1.;
+
+	magicBaseDamage = 1.;
+	wandBaseDamage = 1.;
+	healingBaseDamage = 1.;
+
+	baseDefense = 1.;
+	armorDefense = 1.;
+}
+
+Vocation::~Vocation()
+{
+	cacheMana.clear();
+	for(SkillType::iterator i = SkillType::begin(); i != SkillType::end(); ++i)
+		cacheSkill[i->value()].clear();
+}
+
+uint32_t Vocation::getID() const
+{
+	return id;
+}
+
+const std::string& Vocation::getVocName() const
+{
+	return name;
+}
+
+const std::string& Vocation::getVocDescription() const
+{
+	return description;
+}
+
+uint32_t Vocation::getReqSkillTries(SkillType skill, int32_t level)
+{
+	assert(skill.exists());
+
+	cacheMap& skillMap = cacheSkill[skill.value()];
+	cacheMap::iterator it = skillMap.find(level);
+	if(it != cacheSkill[skill.value()].end())
+		return it->second;
+
+	uint32_t tries = (uint32_t)(skillBases[skill.value()] * std::pow((float)skillMultipliers[skill.value()], (float)(level - 11)));
+	skillMap[level] = tries;
+	return tries;
+}
+
+uint32_t Vocation::getReqMana(int32_t magLevel)
+{
+	cacheMap::iterator it = cacheMana.find(magLevel);
+	if(it != cacheMana.end()){
+		return it->second;
+	}
+
+	uint32_t reqMana = (uint32_t)(1600*std::pow(manaMultiplier, magLevel-1));
+	cacheMana[magLevel] = reqMana;
+
+	return reqMana;
+}
+
+uint32_t Vocation::getHPGain() const
+{
+	return gainHP;
+}
+
+uint32_t Vocation::getManaGain() const
+{
+	return gainMana;
+}
+
+uint32_t Vocation::getCapGain() const
+{
+	return gainCap;
+}
+
+uint32_t Vocation::getManaGainTicks() const
+{
+	return gainManaTicks;
+}
+
+uint32_t Vocation::getManaGainAmount() const
+{
+	return gainManaAmount;
+}
+
+uint32_t Vocation::getHealthGainTicks() const
+{
+	return gainHealthTicks;
+}
+
+uint32_t Vocation::getHealthGainAmount() const
+{
+	return gainHealthAmount;
+}
+
+uint16_t Vocation::getSoulMax() const
+{
+	return maxSoul;
+}
+
+uint16_t Vocation::getSoulGainTicks() const
+{
+	return gainSoulTicks;
+}
+
+float Vocation::getMeleeBaseDamage(WeaponType weaponType) const
+{
+	if(weaponType == WEAPON_SWORD)
+		return swordBaseDamage;
+	else if(weaponType == WEAPON_AXE)
+		return axeBaseDamage;
+	else if(weaponType == WEAPON_CLUB)
+		return clubBaseDamage;
+	else if(weaponType == WEAPON_DIST)
+		return distBaseDamage;
+	else
+		return fistBaseDamage;
+}
+
+float Vocation::getMagicBaseDamage() const
+{
+	return magicBaseDamage;
+}
+
+float Vocation::getWandBaseDamage() const
+{
+	return wandBaseDamage;
+}
+
+float Vocation::getHealingBaseDamage() const
+{
+	return healingBaseDamage;
+}
+
+float Vocation::getBaseDefense() const
+{
+	return baseDefense;
+}
+
+float Vocation::getArmorDefense() const
+{
+	return armorDefense;
+}
+
+void Vocation::debugVocation()
+{
+	std::cout << "name: " << name << std::endl;
+	std::cout << "gain cap: " << gainCap << " hp: " << gainHP << " mana: " << gainMana << std::endl;
+	std::cout << "gain time: Health(" << gainHealthTicks << " ticks, +" << gainHealthAmount << "). Mana(" <<
+		gainManaTicks << " ticks, +" << gainManaAmount << ")" << std::endl;
+	std::cout << "mana multiplier: " << manaMultiplier << std::endl;
+	for(SkillType::iterator i = SkillType::begin(); i != SkillType::end(); ++i){
+		std::cout << "Skill id: " << i->toString() << " multiplier: " << skillMultipliers[i->value()] << std::endl;
+	}
+}
 
 Vocations::Vocations()
 {
@@ -193,94 +384,4 @@ int32_t Vocations::getVocationId(const std::string& name)
 	}
 
 	return -1;
-}
-
-Vocation::Vocation(uint32_t _id)
-{
-	id = _id;
-	name = "none";
-	gainHealthTicks = 6;
-	gainHealthAmount = 1;
-	gainManaTicks = 6;
-	gainManaAmount = 1;
-	gainCap = 5;
-	gainMana = 5;
-	gainHP = 5;
-	maxSoul = 100;
-	gainSoulTicks = 120;
-	manaMultiplier = 4.0;
-	skillMultipliers[0] = 1.5f;
-	skillMultipliers[1] = 2.0f;
-	skillMultipliers[2] = 2.0f;
-	skillMultipliers[3] = 2.0f;
-	skillMultipliers[4] = 2.0f;
-	skillMultipliers[5] = 1.5f;
-	skillMultipliers[6] = 1.1f;
-
-	skillBases[0] = 50;
-	skillBases[1] = 50;
-	skillBases[2] = 50;
-	skillBases[3] = 50;
-	skillBases[4] = 30;
-	skillBases[5] = 100;
-	skillBases[6] = 20;
-
-	swordBaseDamage = 1.;
-	axeBaseDamage = 1.;
-	clubBaseDamage = 1.;
-	distBaseDamage = 1.;
-	fistBaseDamage = 1.;
-
-	magicBaseDamage = 1.;
-	wandBaseDamage = 1.;
-	healingBaseDamage = 1.;
-
-	baseDefense = 1.;
-	armorDefense = 1.;
-}
-
-Vocation::~Vocation()
-{
-	cacheMana.clear();
-	for(SkillType::iterator i = SkillType::begin(); i != SkillType::end(); ++i)
-		cacheSkill[i->value()].clear();
-}
-
-uint32_t Vocation::getReqSkillTries(SkillType skill, int32_t level)
-{
-	assert(skill.exists());
-
-	cacheMap& skillMap = cacheSkill[skill.value()];
-	cacheMap::iterator it = skillMap.find(level);
-	if(it != cacheSkill[skill.value()].end())
-		return it->second;
-	
-	uint32_t tries = (uint32_t)(skillBases[skill.value()] * std::pow((float)skillMultipliers[skill.value()], (float)(level - 11)));
-	skillMap[level] = tries;
-	return tries;
-}
-
-uint32_t Vocation::getReqMana(int32_t magLevel)
-{
-	cacheMap::iterator it = cacheMana.find(magLevel);
-	if(it != cacheMana.end()){
-		return it->second;
-	}
-
-	uint32_t reqMana = (uint32_t)(1600*std::pow(manaMultiplier, magLevel-1));
-	cacheMana[magLevel] = reqMana;
-
-	return reqMana;
-}
-
-void Vocation::debugVocation()
-{
-	std::cout << "name: " << name << std::endl;
-	std::cout << "gain cap: " << gainCap << " hp: " << gainHP << " mana: " << gainMana << std::endl;
-	std::cout << "gain time: Health(" << gainHealthTicks << " ticks, +" << gainHealthAmount << "). Mana(" <<
-		gainManaTicks << " ticks, +" << gainManaAmount << ")" << std::endl;
-	std::cout << "mana multiplier: " << manaMultiplier << std::endl;
-	for(SkillType::iterator i = SkillType::begin(); i != SkillType::end(); ++i){
-		std::cout << "Skill id: " << i->toString() << " multiplier: " << skillMultipliers[i->value()] << std::endl;
-	}
 }
