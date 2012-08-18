@@ -21,23 +21,22 @@
 #ifndef __OTSERV_TOWN_H__
 #define __OTSERV_TOWN_H__
 
+#include <cstdint>
+#include <string>
+#include <map>
 #include "position.h"
-#include "singleton.h"
 
 class Town
 {
 public:
-	Town(uint32_t _townid)
-	{
-		townid = _townid;
-	}
+	Town(uint32_t _townid);
 
-	const Position& getTemplePosition() const {return posTemple;}
-	const std::string& getName() const {return townName;}
+	const Position& getTemplePosition() const;
+	const std::string& getName() const;
 
-	void setTemplePos(const Position& pos) {posTemple = pos;}
-	void setName(std::string _townName) {townName = _townName;}
-	uint32_t getTownID() const {return townid;}
+	void setTemplePos(const Position& pos);
+	void setName(const std::string& _townName);
+	uint32_t getTownID() const;
 
 private:
 	uint32_t townid;
@@ -50,48 +49,15 @@ typedef std::map<uint32_t, Town*> TownMap;
 class Towns
 {
 public:
-	static Towns* getInstance()
-	{
-		static Singleton<Towns> instance;
-		return instance.get();
-	}
+	static Towns* getInstance();
 
-	bool addTown(uint32_t _townid, Town* town)
-	{
-		TownMap::iterator it = townMap.find(_townid);
+	bool addTown(uint32_t _townid, Town* town);
 
-		if(it != townMap.end()){
-			return false;
-		}
+	Town* getTown(const std::string& townname);
+	Town* getTown(uint32_t _townid);
 
-		townMap[_townid] = town;
-		return true;
-	}
-
-	Town* getTown(const std::string& townname)
-	{
-		for(TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it){
-			if(boost::algorithm::iequals(it->second->getName(), townname)){
-				return it->second;
-			}
-		}
-
-		return NULL;
-	}
-
-	Town* getTown(uint32_t _townid)
-	{
-		TownMap::iterator it = townMap.find(_townid);
-
-		if(it != townMap.end()){
-			return it->second;
-		}
-
-		return NULL;
-	}
-
-	TownMap::const_iterator getTownBegin() const{return townMap.begin();}
-	TownMap::const_iterator getTownEnd() const{return townMap.end();}
+	TownMap::const_iterator getTownBegin() const;
+	TownMap::const_iterator getTownEnd() const;
 
 private:
 	TownMap townMap;
