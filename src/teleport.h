@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,6 +21,8 @@
 #ifndef __OTSERV_TELEPORT_H__
 #define __OTSERV_TELEPORT_H__
 
+#include <cstdint>
+#include "position.h"
 #include "cylinder.h"
 #include "item.h"
 
@@ -29,30 +31,30 @@ class Teleport : public Item, public Cylinder
 public:
 	Teleport(uint16_t _type);
 	~Teleport();
-	
-	virtual Teleport* getTeleport() {return this;}
-	virtual const Teleport* getTeleport() const {return this;}
-	
+
+	virtual Teleport* getTeleport();
+	virtual const Teleport* getTeleport() const;
+
 	//serialization
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	void setDestPos(const Position& pos) {destPos = pos;}
-	const Position& getDestPos() const {return destPos;}
+	void setDestPos(const Position& pos);
+	const Position& getDestPos() const;
 
 	//cylinder implementations
-	virtual Cylinder* getParent() {return Item::getParent();}
-	virtual const Cylinder* getParent() const {return Item::getParent();}
-	virtual bool isRemoved() const {return Item::isRemoved();}
-	virtual Position getPosition() const {return Item::getPosition();}
-	virtual Tile* getTile() {return NULL;}
-	virtual const Tile* getTile() const {return NULL;}
-	virtual Item* getItem() {return this;}
-	virtual const Item* getItem() const {return this;}
-	virtual Creature* getCreature() {return NULL;}
-	virtual const Creature* getCreature() const {return NULL;}
-	virtual Tile* getParentTile() {return Item::getParentTile();}
-	virtual const Tile* getParentTile() const {return Item::getParentTile();}
+	virtual Cylinder* getParent();
+	virtual const Cylinder* getParent() const;
+	virtual bool isRemoved() const;
+	virtual Position getPosition() const;
+	virtual Tile* getTile();
+	virtual const Tile* getTile() const;
+	virtual Item* getItem();
+	virtual const Item* getItem() const;
+	virtual Creature* getCreature();
+	virtual const Creature* getCreature() const;
+	virtual Tile* getParentTile();
+	virtual const Tile* getParentTile() const;
 
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;

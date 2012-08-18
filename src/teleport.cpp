@@ -36,6 +36,16 @@ Teleport::~Teleport()
 	//
 }
 
+Teleport* Teleport::getTeleport()
+{
+	return this;
+}
+
+const Teleport* Teleport::getTeleport() const
+{
+	return this;
+}
+
 Attr_ReadValue Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_TELE_DEST == attr){
@@ -66,6 +76,76 @@ bool Teleport::serializeAttr(PropWriteStream& propWriteStream) const
 	propWriteStream.ADD_VALUE(tele_dest);
 
 	return ret;
+}
+
+void Teleport::setDestPos(const Position& pos)
+{
+	destPos = pos;
+}
+
+const Position& Teleport::getDestPos() const
+{
+	return destPos;
+}
+
+Cylinder* Teleport::getParent()
+{
+	return Item::getParent();
+}
+
+const Cylinder* Teleport::getParent() const
+{
+	return Item::getParent();
+}
+
+bool Teleport::isRemoved() const
+{
+	return Item::isRemoved();
+}
+
+Position Teleport::getPosition() const
+{
+	return Item::getPosition();
+}
+
+Tile* Teleport::getTile()
+{
+	return NULL;
+}
+
+const Tile* Teleport::getTile() const
+{
+	return NULL;
+}
+
+Item* Teleport::getItem()
+{
+	return this;
+}
+
+const Item* Teleport::getItem() const
+{
+	return this;
+}
+
+Creature* Teleport::getCreature()
+{
+	return NULL;
+}
+
+const Creature* Teleport::getCreature() const
+{
+	return NULL;
+}
+
+Tile* Teleport::getParentTile()
+{
+	return Item::getParentTile();
+}
+
+const Tile* Teleport::getParentTile() const
+{
+	return Item::getParentTile();
 }
 
 ReturnValue Teleport::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
