@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,6 +32,76 @@ TrashHolder::TrashHolder(uint16_t _type, MagicEffect _effect /*= MAGIC_EFFECT_NO
 TrashHolder::~TrashHolder()
 {
 	//
+}
+
+TrashHolder* TrashHolder::getTrashHolder()
+{
+	return this;
+}
+
+const TrashHolder* TrashHolder::getTrashHolder() const
+{
+	return this;
+}
+
+Cylinder* TrashHolder::getParent()
+{
+	return Item::getParent();
+}
+
+const Cylinder* TrashHolder::getParent() const
+{
+	return Item::getParent();
+}
+
+bool TrashHolder::isRemoved() const
+{
+	return Item::isRemoved();
+}
+
+Position TrashHolder::getPosition() const
+{
+	return Item::getPosition();
+}
+
+Tile* TrashHolder::getTile()
+{
+	return NULL;
+}
+
+const Tile* TrashHolder::getTile() const
+{
+	return NULL;
+}
+
+Item* TrashHolder::getItem()
+{
+	return this;
+}
+
+const Item* TrashHolder::getItem() const
+{
+	return this;
+}
+
+Creature* TrashHolder::getCreature()
+{
+	return NULL;
+}
+
+const Creature* TrashHolder::getCreature() const
+{
+	return NULL;
+}
+
+Tile* TrashHolder::getParentTile()
+{
+	return Item::getParentTile();
+}
+
+const Tile* TrashHolder::getParentTile() const
+{
+	return Item::getParentTile();
 }
 
 ReturnValue TrashHolder::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
