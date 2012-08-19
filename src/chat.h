@@ -21,8 +21,14 @@
 #ifndef __OTSERV_CHAT_H__
 #define __OTSERV_CHAT_H__
 
-#include "classes.h"
+#include <map>
+#include <cstdint>
+#include <string>
+#include <list>
 #include "const.h"
+
+class Player;
+class Party;
 
 typedef std::map<uint32_t, Player*> UsersMap;
 
@@ -50,18 +56,17 @@ public:
 	bool talk(Player* fromPlayer, SpeakClass type, const std::string& text, uint32_t time = 0);
 	bool sendInfo(SpeakClass type, const std::string& text, uint32_t time = 0);
 
-	const std::string& getName() const { return m_name; }
-	uint16_t getId() const { return m_id; }
-	const UsersMap& getUsers() const { return m_users; }
+	const std::string& getName() const;
+	uint16_t getId() const;
+	const UsersMap& getUsers() const;
 
-	virtual const uint32_t getOwner(){ return 0; }
+	virtual uint32_t getOwner();
 
 	// Block a player from hearing messages, required for the lua events to work properly
 	// this is to prevent the player from hearing a message before he has been sent the
 	// channel contents. ONLY ONE PLAYER CAN BE DEAF AT A TIME
 	// Call with NULL to make everyone hear again.
-	void makePlayerDeaf(Player* p)
-		{m_deaf_user = p;}
+	void makePlayerDeaf(Player* p);
 
 protected:
 	UsersMap m_users;
@@ -74,10 +79,10 @@ class PrivateChatChannel : public ChatChannel
 {
 public:
 	PrivateChatChannel(uint16_t channelId, std::string channelName);
-	virtual ~PrivateChatChannel(){}
+	virtual ~PrivateChatChannel();
 
-	virtual const uint32_t getOwner(){return m_owner;}
-	void setOwner(uint32_t id){m_owner = id;}
+	virtual uint32_t getOwner();
+	void setOwner(uint32_t id);
 
 	bool isInvited(const Player* player);
 

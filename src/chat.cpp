@@ -27,10 +27,25 @@
 extern void g_gameUnscript(void* v);
 extern void g_gameOnLeaveChannel(Player* player, ChatChannel* channel);
 
-PrivateChatChannel::PrivateChatChannel(uint16_t channelId, std::string channelName) :
-ChatChannel(channelId, channelName)
+PrivateChatChannel::PrivateChatChannel(uint16_t channelId, std::string channelName)
+	: ChatChannel(channelId, channelName)
 {
 	m_owner = 0;
+}
+
+PrivateChatChannel::~PrivateChatChannel()
+{
+
+}
+
+uint32_t PrivateChatChannel::getOwner()
+{
+	return m_owner;
+}
+
+void PrivateChatChannel::setOwner(uint32_t id)
+{
+	m_owner = id;
 }
 
 bool PrivateChatChannel::isInvited(const Player* player)
@@ -75,7 +90,7 @@ void PrivateChatChannel::invitePlayer(Player* player, Player* invitePlayer)
 		std::stringstream msg;
 		msg << player->getName() << " invites you to " << playerSexAdjectiveString(player->getSex())
 			<<  " private chat channel.";
-		
+
 		invitePlayer->sendTextMessage(MSG_INFO_DESCR, msg.str().c_str());
 
 		msg.str("");
@@ -177,6 +192,31 @@ bool ChatChannel::sendInfo(SpeakClass type, const std::string& text, uint32_t ti
 	}
 
 	return true;
+}
+
+const std::string& ChatChannel::getName() const
+{
+	return m_name;
+}
+
+uint16_t ChatChannel::getId() const
+{
+	return m_id;
+}
+
+const UsersMap& ChatChannel::getUsers() const
+{
+	return m_users;
+}
+
+uint32_t ChatChannel::getOwner()
+{
+	return 0;
+}
+
+void ChatChannel::makePlayerDeaf(Player* p)
+{
+	m_deaf_user = p;
 }
 
 Chat::Chat()
@@ -392,7 +432,7 @@ void Chat::removeUserFromAllChannels(Player* player)
 
 	for(GuildChannelMap::iterator it = m_guildChannels.begin(); it != m_guildChannels.end(); ++it){
 		it->second->removeUser(player);
-	}	
+	}
 }
 
 bool Chat::talkToChannel(Player* player, SpeakClass type, const std::string& text, uint16_t channelId)
