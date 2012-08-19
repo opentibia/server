@@ -21,8 +21,11 @@
 #ifndef __OTSERV_PARTY_H__
 #define __OTSERV_PARTY_H__
 
-#include "classes.h"
+#include <vector>
+#include <map>
 #include "const.h"
+
+class Player;
 
 typedef std::vector<Player*> PlayerVector;
 
@@ -32,8 +35,8 @@ public:
 	Party(Player* _leader);
 	~Party();
 
-	Player* getLeader() const {return leader;}
-	void setLeader(Player* _leader) {leader = _leader;}
+	Player* getLeader() const;
+	void setLeader(Player* _leader);
 
 	void disband();
 	bool invitePlayer(Player* player);
@@ -49,13 +52,13 @@ public:
 	void updateAllPartyIcons();
 	void updatePartyIcons(Player* player);
 	void broadcastPartyMessage(MessageClass msgClass, const std::string& msg, bool sendToInvitations = false);
-	bool disbandParty() const {return (memberList.empty() && inviteList.empty());}
+	bool disbandParty() const;
 	bool canOpenCorpse(uint32_t ownerId);
 
 	void shareExperience(uint64_t experience, bool fromMonster);
 	bool setSharedExperience(Player* player, bool _sharedExpActive);
-	bool isSharedExperienceActive() const {return sharedExpActive;}
-	bool isSharedExperienceEnabled() const {return sharedExpEnabled;}
+	bool isSharedExperienceActive() const;
+	bool isSharedExperienceEnabled() const;
 	bool canUseSharedExperience(const Player* player) const;
 	void updateSharedExperience();
 
@@ -63,9 +66,9 @@ public:
 	void addPlayerDamageMonster(Player* player, uint32_t points);
 	void clearPlayerPoints(Player* player);
 
-	const PlayerVector& getMemberList() const {return memberList;}
+	const PlayerVector& getMemberList() const;
 
-protected:
+private:
 	bool sharedExpActive;
 	bool sharedExpEnabled;
 

@@ -45,6 +45,16 @@ Party::~Party()
 {
 }
 
+Player* Party::getLeader() const
+{
+	return leader;
+}
+
+void Party::setLeader(Player* _leader)
+{
+	leader = _leader;
+}
+
 void Party::disband()
 {
 	g_chat.deleteChannel(this);
@@ -86,7 +96,7 @@ bool Party::invitePlayer(Player* player)
 	}
 
 	std::stringstream ss;
-	
+
 	if(!(inviteList.empty() && memberList.empty())) {
 		ss << player->getName() << " has been invited.";
 	} else {
@@ -334,6 +344,11 @@ void Party::broadcastPartyMessage(MessageClass msgClass, const std::string& msg,
 	}
 }
 
+bool Party::disbandParty() const
+{
+	return memberList.empty() && inviteList.empty();
+}
+
 void Party::updateSharedExperience()
 {
 	if(sharedExpActive){
@@ -375,6 +390,16 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 	return true;
 }
 
+bool Party::isSharedExperienceActive() const
+{
+	return sharedExpActive;
+}
+
+bool Party::isSharedExperienceEnabled() const
+{
+	return sharedExpEnabled;
+}
+
 void Party::shareExperience(uint64_t experience, bool fromMonster)
 {
 	double member_factor = g_config.getNumber(ConfigManager::PARTY_MEMBER_EXP_BONUS);
@@ -383,7 +408,7 @@ void Party::shareExperience(uint64_t experience, bool fromMonster)
 	if(xpgained < 0)
 		return;
 	uint64_t shareExp = (uint64_t)std::ceil(xpgained);
-	
+
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
 		(*it)->onGainSharedExperience(shareExp, fromMonster);
 	}
@@ -495,6 +520,11 @@ void Party::clearPlayerPoints(Player* player)
 		pointMap.erase(it);
 		updateSharedExperience();
 	}
+}
+
+const PlayerVector& Party::getMemberList() const
+{
+	return memberList;
 }
 
 bool Party::canOpenCorpse(uint32_t ownerId)
