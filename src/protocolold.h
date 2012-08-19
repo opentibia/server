@@ -21,8 +21,10 @@
 #ifndef __OTSERV_PROTOCOLOLD_H__
 #define __OTSERV_PROTOCOLOLD_H__
 
-#include "classes.h"
+#include <cstdint>
 #include "protocol.h"
+
+class NetworkMessage;
 
 class ProtocolOld : public Protocol
 {
@@ -32,26 +34,12 @@ public:
 	// Ident is added in subclass
 	enum {use_checksum = false};
 
-
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolOldCount;
 #endif
 
-	ProtocolOld(Connection_ptr connection) : Protocol(connection)
-	{
-		enableChecksum();
-
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-		protocolOldCount++;
-#endif
-	}
-
-	virtual ~ProtocolOld()
-	{
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-		protocolOldCount--;
-#endif
-	}
+	ProtocolOld(Connection_ptr connection);
+	virtual ~ProtocolOld();
 
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
 
@@ -69,19 +57,19 @@ class ProtocolOldLogin : public ProtocolOld
 {
 public:
 	enum {protocol_identifier = 0x01};
-	static const char* protocol_name() {return "old login protocol";}
-	
-	ProtocolOldLogin(Connection_ptr connection) : ProtocolOld(connection) {}
+
+	ProtocolOldLogin(Connection_ptr connection);
+
+	static const char* protocol_name();
 };
 
 class ProtocolOldGame : public ProtocolOld
 {
 public:
 	enum {protocol_identifier = 0x0A};
-	static const char* protocol_name() {return "old gameworld protocol";}
-	
-	ProtocolOldGame(Connection_ptr connection) : ProtocolOld(connection) {}
+	static const char* protocol_name();
+
+	ProtocolOldGame(Connection_ptr connection);
 };
 
 #endif
-

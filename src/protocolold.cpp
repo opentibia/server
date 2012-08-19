@@ -22,6 +22,7 @@
 #include "protocolold.h"
 #include "outputmessage.h"
 #include "game.h"
+#include "connection.h"
 
 extern Game g_game;
 
@@ -85,8 +86,46 @@ bool ProtocolOld::parseFirstPacket(NetworkMessage& msg)
 	return false;
 }
 
+ProtocolOld::ProtocolOld(Connection_ptr connection)
+	: Protocol(connection)
+{
+	enableChecksum();
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	protocolOldCount++;
+#endif
+}
+
+ProtocolOld::~ProtocolOld()
+{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	protocolOldCount--;
+#endif
+}
+
 void ProtocolOld::onRecvFirstMessage(NetworkMessage& msg)
 {
 	parseFirstPacket(msg);
 }
 
+ProtocolOldLogin::ProtocolOldLogin(Connection_ptr connection)
+	: ProtocolOld(connection)
+{
+
+}
+
+const char* ProtocolOldLogin::protocol_name()
+{
+	return "old login protocol";
+}
+
+const char* ProtocolOldGame::protocol_name()
+{
+	return "old gameworld protocol";
+}
+
+ProtocolOldGame::ProtocolOldGame(Connection_ptr connection)
+	: ProtocolOld(connection)
+{
+
+}
