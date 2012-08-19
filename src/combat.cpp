@@ -28,6 +28,14 @@
 extern Game g_game;
 extern ConfigManager g_config;
 
+CombatSource::CombatSource()
+	: creature(NULL)
+	, item(NULL)
+	, condition(false)
+{
+
+}
+
 CombatSource::CombatSource(Creature* creature, Item* item, bool condition) :
 	creature(creature), item(item), condition(condition)
 {
@@ -62,6 +70,36 @@ CombatSource::~CombatSource()
 	setSourceItem(NULL);
 }
 
+bool CombatSource::isSourceCreature() const
+{
+	return creature != NULL;
+}
+
+bool CombatSource::isSourceItem() const
+{
+	return item != NULL;
+}
+
+bool CombatSource::isSourceCondition() const
+{
+	return condition;
+}
+
+Creature* CombatSource::getSourceCreature() const
+{
+	return creature;
+}
+
+Item* CombatSource::getSourceItem() const
+{
+	return item;
+}
+
+void CombatSource::setSourceIsCondition(bool b)
+{
+	condition = b;
+}
+
 void CombatSource::setSourceCreature(Creature* _creature)
 {
 	if(_creature != creature){
@@ -91,15 +129,8 @@ void CombatSource::setSourceItem(Item* _item)
 	}
 }
 
-Combat::Combat()
-{
-	//
-}
 
-Combat::~Combat()
-{
-	//
-}
+namespace Combat {
 
 /*
 bool Combat::internalCombat(CombatSource& combatSource, CombatParams& params, Creature* target,
@@ -137,7 +168,7 @@ bool Combat::internalCombat(CombatSource& combatSource, CombatParams& params, Cr
 }
 */
 
-bool Combat::isPlayerCombat(const Creature* target)
+bool isPlayerCombat(const Creature* target)
 {
 	if(target->getPlayer()){
 		return true;
@@ -150,7 +181,7 @@ bool Combat::isPlayerCombat(const Creature* target)
 	return false;
 }
 
-ReturnValue Combat::canTargetCreature(const Player* player, const Creature* target)
+ReturnValue canTargetCreature(const Player* player, const Creature* target)
 {
 	if(player == target){
 		return RET_YOUMAYNOTATTACKTHISPERSON;
@@ -208,7 +239,7 @@ ReturnValue Combat::canTargetCreature(const Player* player, const Creature* targ
 	return Combat::canDoCombat(player, target);
 }
 
-ReturnValue Combat::canDoCombat(const Creature* attacker, const Tile* tile, bool isAggressive)
+ReturnValue canDoCombat(const Creature* attacker, const Tile* tile, bool isAggressive)
 {
 	if(tile->blockProjectile()){
 		return RET_NOTENOUGHROOM;
@@ -246,7 +277,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Tile* tile, bool
 	return RET_NOERROR;
 }
 
-bool Combat::isInPvpZone(const Creature* attacker, const Creature* target)
+bool isInPvpZone(const Creature* attacker, const Creature* target)
 {
 	if(attacker->getZone() != ZONE_PVP){
 		return false;
@@ -259,7 +290,7 @@ bool Combat::isInPvpZone(const Creature* attacker, const Creature* target)
 	return true;
 }
 
-bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
+bool isUnjustKill(const Creature* attacker, const Creature* target)
 {
 #ifdef __SKULLSYSTEM__
 	const Player* attackerPlayer = attacker->getPlayer();
@@ -286,7 +317,7 @@ bool Combat::isUnjustKill(const Creature* attacker, const Creature* target)
 #endif
 }
 
-ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target)
+ReturnValue canDoCombat(const Creature* attacker, const Creature* target)
 {
 	if(attacker){
 		if(const Player* targetPlayer = target->getPlayer()){
@@ -347,7 +378,7 @@ ReturnValue Combat::canDoCombat(const Creature* attacker, const Creature* target
 	return RET_NOERROR;
 }
 
-Position Combat::getCasterPosition(const Creature* creature, Direction dir)
+Position getCasterPosition(const Creature* creature, Direction dir)
 {
 	Position pos = creature->getPosition();
 
@@ -394,3 +425,6 @@ Position Combat::getCasterPosition(const Creature* creature, Direction dir)
 
 	return pos;
 }
+
+} // namespace Combat
+

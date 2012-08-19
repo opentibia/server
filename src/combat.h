@@ -25,24 +25,25 @@
 #include "map.h"
 #include "otsystem.h"
 
-struct CombatSource{
-	CombatSource() : creature(NULL), item(NULL), condition(false) {}
+class CombatSource{
+public:
+	CombatSource();
 	CombatSource(Creature* creature, Item* item, bool condition);
 	CombatSource(Creature* creature);
 	CombatSource(Item* item);
-	~CombatSource();
 	CombatSource(const CombatSource& rhs);
+	~CombatSource();
 
-	bool isSourceCreature() const {return creature != NULL;}
-	bool isSourceItem() const {return item != NULL;}
-	bool isSourceCondition() const {return condition;}
+	bool isSourceCreature() const;
+	bool isSourceItem() const;
+	bool isSourceCondition() const;
 
-	Creature* getSourceCreature() const {return creature;}
-	Item* getSourceItem() const {return item;}
+	Creature* getSourceCreature() const;
+	Item* getSourceItem() const;
 
 	void setSourceCreature(Creature* _creature);
 	void setSourceItem(Item* _item);
-	void setSourceIsCondition(bool b) {condition = b;}
+	void setSourceIsCondition(bool b);
 
 private:
 	Creature* creature;
@@ -85,19 +86,17 @@ struct CombatParams{
 	CombatEffect effects;
 };
 
-class Combat {
-public:
-	Combat();
-	~Combat();
+namespace Combat {
 
-	static bool isInPvpZone(const Creature* attacker, const Creature* target);
-	static bool isUnjustKill(const Creature* attacker, const Creature* target);
-	static bool isPlayerCombat(const Creature* target);
-	static ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
-	static ReturnValue canDoCombat(const Creature* attacker, const Tile* tile, bool isAggressive);
-	static ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
-	static Position getCasterPosition(const Creature* creature, Direction dir);
-};
+bool isInPvpZone(const Creature* attacker, const Creature* target);
+bool isUnjustKill(const Creature* attacker, const Creature* target);
+bool isPlayerCombat(const Creature* target);
+ReturnValue canTargetCreature(const Player* attacker, const Creature* target);
+ReturnValue canDoCombat(const Creature* attacker, const Tile* tile, bool isAggressive);
+ReturnValue canDoCombat(const Creature* attacker, const Creature* target);
+Position getCasterPosition(const Creature* creature, Direction dir);
+
+} // namespace Combat
 
 class MagicField : public Item{
 public:

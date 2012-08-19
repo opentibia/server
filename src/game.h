@@ -693,7 +693,6 @@ protected:
 
 	ServiceManager* service_manager;
 	Map* map;
-	Combat combat;
 
 	std::vector<std::string> commandTags;
 
