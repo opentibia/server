@@ -21,8 +21,13 @@
 #ifndef __OTSERV_BEDS_H__
 #define __OTSERV_BEDS_H__
 
-#include "classes.h"
+#include <cstdint>
+#include <map>
 #include "item.h"
+
+// Forward declaration
+class House;
+class Player;
 
 class BedItem : public Item
 {
@@ -30,24 +35,24 @@ public:
 	BedItem(uint16_t id);
 	virtual ~BedItem();
 
-	virtual BedItem* getBed(){ return this; }
-	virtual const BedItem* getBed() const { return this; }
+	virtual BedItem* getBed();
+	virtual const BedItem* getBed() const;
 
 	//serialization
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	//override
-	virtual bool canRemove() const {return (house == NULL); }
+	virtual bool canRemove() const;
 
-	uint32_t getSleeper() const { return sleeperGUID; }
-	void setSleeper(uint32_t guid){ sleeperGUID = guid; }
+	uint32_t getSleeper() const;
+	void setSleeper(uint32_t guid);
 
-	time_t getSleepStart() const { return sleepStart; }
-	void setSleepStart(time_t now){ sleepStart = now; }
+	time_t getSleepStart() const;
+	void setSleepStart(time_t now);
 
-	House* getHouse() const { return house; }
-	void setHouse(House* h){ house = h; }
+	House* getHouse() const;
+	void setHouse(House* h);
 
 	bool canUse(Player* player);
 	void sleep(Player* player);
@@ -65,20 +70,19 @@ protected:
 	House* house;
 };
 
-
 class Beds
 {
+	Beds();
+
 public:
-	~Beds(){}
+	~Beds();
 
 	static Beds& instance();
 
 	BedItem* getBedBySleeper(uint32_t guid);
 	void setBedSleeper(BedItem* bed, uint32_t guid);
 
-protected:
-	Beds(){ BedSleepersMap.clear(); }
-
+private:
 	std::map<uint32_t, BedItem*> BedSleepersMap;
 };
 

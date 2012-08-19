@@ -44,6 +44,16 @@ BedItem::~BedItem()
 	//
 }
 
+BedItem* BedItem::getBed()
+{
+	return this;
+}
+
+const BedItem* BedItem::getBed() const
+{
+	return this;
+}
+
 Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	switch(attr){
@@ -91,6 +101,41 @@ bool BedItem::serializeAttr(PropWriteStream& propWriteStream) const
 	propWriteStream.ADD_ULONG((int32_t)sleepStart);
 
 	return true;
+}
+
+bool BedItem::canRemove() const
+{
+	return (house == NULL);
+}
+
+uint32_t BedItem::getSleeper() const
+{
+	return sleeperGUID;
+}
+
+void BedItem::setSleeper(uint32_t guid)
+{
+	sleeperGUID = guid;
+}
+
+time_t BedItem::getSleepStart() const
+{
+	return sleepStart;
+}
+
+void BedItem::setSleepStart(time_t now)
+{
+	sleepStart = now;
+}
+
+House* BedItem::getHouse() const
+{
+	return house;
+}
+
+void BedItem::setHouse(House* h)
+{
+	house = h;
 }
 
 BedItem* BedItem::getNextBedItem()
@@ -292,6 +337,16 @@ void BedItem::internalRemoveSleeper()
 	setSleeper(0);
 	setSleepStart(0);
 	setSpecialDescription("Nobody is sleeping there.");
+}
+
+Beds::Beds()
+{
+
+}
+
+Beds::~Beds()
+{
+
 }
 
 Beds& Beds::instance()
