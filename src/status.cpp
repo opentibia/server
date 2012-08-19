@@ -24,6 +24,8 @@
 #include "game.h"
 #include "player.h"
 #include "configmanager.h"
+#include "singleton.h"
+#include "connection.h"
 
 #ifndef WIN32
 	#define SOCKET_ERROR -1
@@ -48,6 +50,21 @@ enum RequestedInfo_t{
 uint32_t ProtocolStatus::protocolStatusCount = 0;
 #endif
 std::map<uint32_t, int64_t> ProtocolStatus::ipConnectMap;
+
+ProtocolStatus::ProtocolStatus(Connection_ptr connection)
+	: Protocol(connection)
+{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	protocolStatusCount++;
+#endif
+}
+
+ProtocolStatus::~ProtocolStatus()
+{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	protocolStatusCount--;
+#endif
+}
 
 void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 {
@@ -98,6 +115,11 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 	getConnection()->closeConnection();
 }
 
+const char* ProtocolStatus::protocol_name()
+{
+	return "status protocol";
+}
+
 #ifdef __DEBUG_NET_DETAIL__
 void ProtocolStatus::deleteProtocolTask()
 {
@@ -112,6 +134,12 @@ Status::Status()
 	m_playersmax = 0;
 	m_playerspeak = 0;
 	m_start = OTSYS_TIME();
+}
+
+Status* Status::instance()
+{
+	static Singleton<Status> status;
+	return status.get();
 }
 
 void Status::addPlayer()
@@ -300,6 +328,21 @@ void Status::getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMe
 	}
 
 	return;
+}
+
+uint32_t Status::getPlayersOnline() const
+{
+	return m_playersonline;
+}
+
+uint32_t Status::getMaxPlayersOnline() const
+{
+	return m_playersmax;
+}
+
+void Status::setMaxPlayersOnline(int max)
+{
+	m_playersmax = max;
 }
 
 bool Status::hasSlot() const

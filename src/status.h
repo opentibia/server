@@ -21,6 +21,10 @@
 #ifndef __OTSERV_STATUS_H__
 #define __OTSERV_STATUS_H__
 
+#include <string>
+#include <cstdint>
+#include <map>
+#include <boost/noncopyable.hpp>
 #include "protocol.h"
 
 class ProtocolStatus : public Protocol
@@ -30,27 +34,17 @@ public:
 	enum {server_sends_first = false};
 	enum {protocol_identifier = 0xFF};
 	enum {use_checksum = false};
-	static const char* protocol_name() {return "status protocol";}
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t protocolStatusCount;
 #endif
 
-	ProtocolStatus(Connection_ptr connection) : Protocol(connection)
-	{
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-		protocolStatusCount++;
-#endif
-	}
-
-	virtual ~ProtocolStatus()
-	{
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-		protocolStatusCount--;
-#endif
-	}
+	ProtocolStatus(Connection_ptr connection);
+	virtual ~ProtocolStatus();
 
 	virtual void onRecvFirstMessage(NetworkMessage& msg);
+
+	static const char* protocol_name();
 
 protected:
 	static std::map<uint32_t, int64_t> ipConnectMap;
@@ -60,14 +54,11 @@ protected:
 	#endif
 };
 
-class Status{
+class Status : boost::noncopyable {
 public:
-	// procs
-	static Status* instance()
-	{
-		static Status status;
-		return &status;
-	}
+	Status();
+
+	static Status* instance();
 
 	void addPlayer();
 	void removePlayer();
@@ -76,15 +67,12 @@ public:
 	std::string getStatusString() const;
 	void getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const;
 
-	uint32_t getPlayersOnline() const {return m_playersonline;}
-	uint32_t getMaxPlayersOnline() const {return m_playersmax;}
+	uint32_t getPlayersOnline() const;
+	uint32_t getMaxPlayersOnline() const;
 
-	void setMaxPlayersOnline(int max){m_playersmax = max;}
+	void setMaxPlayersOnline(int max);
 
 	uint64_t getUpTime() const;
-
-protected:
-	Status();
 
 private:
 	uint64_t m_start;
