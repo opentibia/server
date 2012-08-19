@@ -20,9 +20,11 @@
 #include "otpch.h"
 
 #include "outputmessage.h"
+#include "connection.h"
 #include "protocol.h"
 #include "scheduler.h"
 #include "singleton.h"
+#include "tools.h"
 
 extern Dispatcher g_dispatcher;
 
@@ -33,6 +35,84 @@ uint32_t OutputMessagePool::OutputMessagePoolCount = OUTPUT_POOL_SIZE;
 OutputMessage::OutputMessage()
 {
 	freeMessage();
+}
+
+OutputMessage::~OutputMessage()
+{
+
+}
+
+char* OutputMessage::getOutputBuffer()
+{
+	return (char*)&m_MsgBuf[m_outputBufferStart];
+}
+
+void OutputMessage::writeMessageLength()
+{
+	add_header((uint16_t)(m_MsgSize));
+}
+
+void OutputMessage::addCryptoHeader(bool addChecksum)
+{
+	if(addChecksum){
+		add_header((uint32_t)(adlerChecksum((uint8_t*)(m_MsgBuf + m_outputBufferStart), m_MsgSize)));
+	}
+	add_header((uint16_t)(m_MsgSize));
+}
+
+Protocol* OutputMessage::getProtocol()
+{
+	return m_protocol;
+}
+
+Connection_ptr OutputMessage::getConnection()
+{
+	return m_connection;
+}
+
+uint64_t OutputMessage::getFrame() const
+{
+	return m_frame;
+}
+
+void OutputMessage::freeMessage()
+{
+	setConnection(Connection_ptr());
+	setProtocol(NULL);
+	m_frame = 0;
+	//allocate enough size for headers
+	//2 bytes for unencrypted message size
+	//4 bytes for checksum
+	//2 bytes for encrypted message size
+	m_outputBufferStart = 8;
+
+	//setState have to be the last one
+	setState(OutputMessage::STATE_FREE);
+}
+
+void OutputMessage::setProtocol(Protocol* protocol)
+{
+	m_protocol = protocol;
+}
+
+void OutputMessage::setConnection(Connection_ptr connection)
+{
+	m_connection = connection;
+}
+
+void OutputMessage::setState(OutputMessageState state)
+{
+	m_state = state;
+}
+
+OutputMessage::OutputMessageState OutputMessage::getState() const
+{
+	return m_state;
+}
+
+void OutputMessage::setFrame(uint64_t frame)
+{
+	m_frame = frame;
 }
 
 //*********** OutputMessagePool ****************
@@ -49,13 +129,6 @@ OutputMessagePool::OutputMessagePool()
 	m_frameTime = OTSYS_TIME();
 }
 
-void OutputMessagePool::startExecutionFrame()
-{
-	//boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
-	m_frameTime = OTSYS_TIME();
-	m_isOpen = true;
-}
-
 OutputMessagePool::~OutputMessagePool()
 {
 	InternalOutputMessageList::iterator it;
@@ -63,6 +136,32 @@ OutputMessagePool::~OutputMessagePool()
 		delete *it;
 	}
 	m_outputMessages.clear();
+}
+
+void OutputMessagePool::startExecutionFrame()
+{
+	//boost::recursive_mutex::scoped_lock lockClass(m_outputPoolLock);
+	m_frameTime = OTSYS_TIME();
+	m_isOpen = true;
+}
+
+size_t OutputMessagePool::getTotalMessageCount() const
+{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	return OutputMessagePoolCount;
+#else
+	return m_allOutputMessages.size();
+#endif
+}
+
+size_t OutputMessagePool::getAvailableMessageCount() const
+{
+	return m_outputMessages.size();
+}
+
+size_t OutputMessagePool::getAutoMessageCount() const
+{
+	return m_autoSendOutputMessages.size();
 }
 
 OutputMessagePool* OutputMessagePool::getInstance()
@@ -155,6 +254,11 @@ void OutputMessagePool::sendAll()
 			++it;
 		}
 	}
+}
+
+void OutputMessagePool::stop()
+{
+	m_isOpen = false;
 }
 
 void OutputMessagePool::releaseMessage(OutputMessage* msg)
