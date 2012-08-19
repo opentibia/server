@@ -547,7 +547,7 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos, bool 
 
 bool Map::checkSightLine(const Position& fromPos, const Position& toPos) const
 {
-	if(Position::areInRange<0,0,15>(fromPos, toPos)){
+	if(fromPos == toPos){
 		return true;
 	}
 
