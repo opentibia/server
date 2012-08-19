@@ -19,27 +19,57 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
-#include <string>
-#include <iostream>
-#include <sstream>
-
 #include "networkmessage.h"
-
-#include "container.h"
 #include "creature.h"
-#include "player.h"
-
 #include "position.h"
-#include "rsa.h"
+#include "item.h"
 
-int32_t NetworkMessage::decodeHeader()
+NetworkMessage::NetworkMessage()
 {
-	int32_t size = (int32_t)(m_MsgBuf[0] | m_MsgBuf[1] << 8);
-	m_MsgSize = size;
-	return size;
+	Reset();
 }
 
-/******************************************************************************/
+NetworkMessage::~NetworkMessage()
+{
+
+}
+
+uint8_t NetworkMessage::GetByte()
+{
+	return m_MsgBuf[m_ReadPos++];
+}
+
+uint16_t NetworkMessage::GetU16()
+{
+	uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
+	m_ReadPos += 2;
+	return v;
+}
+
+uint16_t NetworkMessage::GetSpriteId()
+{
+	return GetU16();
+}
+
+uint32_t NetworkMessage::GetU32()
+{
+	uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+	m_ReadPos += 4;
+	return v;
+}
+
+uint32_t NetworkMessage::PeekU32() const
+{
+	uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
+	return v;
+}
+
+uint64_t NetworkMessage::GetU64() const
+{
+	uint64_t v = *(uint64_t*)(m_MsgBuf + m_ReadPos);
+	return v;
+}
+
 std::string NetworkMessage::GetString()
 {
 	uint16_t stringlen = GetU16();
@@ -70,7 +100,43 @@ Position NetworkMessage::GetPosition()
 	pos.z = GetByte();
 	return pos;
 }
-/******************************************************************************/
+
+void NetworkMessage::SkipBytes(int count)
+{
+	m_ReadPos += count;
+}
+
+void NetworkMessage::AddByte(uint8_t value)
+{
+	if(!canAdd(1))
+		return;
+	m_MsgBuf[m_ReadPos++] = value;
+	m_MsgSize++;
+}
+
+void NetworkMessage::AddU16(uint16_t value)
+{
+	if(!canAdd(2))
+		return;
+	*(uint16_t*)(m_MsgBuf + m_ReadPos) = value;
+	m_ReadPos += 2; m_MsgSize += 2;
+}
+
+void NetworkMessage::AddU32(uint32_t value)
+{
+	if(!canAdd(4))
+		return;
+	*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
+	m_ReadPos += 4; m_MsgSize += 4;
+}
+
+void NetworkMessage::AddU64(uint64_t value)
+{
+	if(!canAdd(8))
+		return;
+	*(uint64_t*)(m_MsgBuf + m_ReadPos) = value;
+	m_ReadPos += 8; m_MsgSize += 8;
+}
 
 void NetworkMessage::AddString(const char* value)
 {
@@ -101,6 +167,11 @@ void NetworkMessage::AddPaddingBytes(uint32_t n)
 
 	memset((void*)&m_MsgBuf[m_ReadPos], 0x33, n);
 	m_MsgSize = m_MsgSize + n;
+}
+
+void NetworkMessage::AddString(const std::string &value)
+{
+	AddString(value.c_str());
 }
 
 void NetworkMessage::AddPosition(const Position& pos)
@@ -140,12 +211,62 @@ void NetworkMessage::AddItem(const Item* item)
 	}
 }
 
-void NetworkMessage::AddItemId(const Item *item){
+void NetworkMessage::AddItemId(const Item *item)
+{
 	const ItemType &it = Item::items[item->getID()];
 	AddU16(it.clientId);
 }
 
-void NetworkMessage::AddItemId(uint16_t itemId){
+void NetworkMessage::AddItemId(uint16_t itemId)
+{
 	const ItemType &it = Item::items[itemId];
 	AddU16(it.clientId);
+}
+
+int32_t NetworkMessage::getMessageLength() const
+{
+	return m_MsgSize;
+}
+
+void NetworkMessage::setMessageLength(int32_t newSize)
+{
+	m_MsgSize = newSize;
+}
+
+int32_t NetworkMessage::getReadPos() const
+{
+	return m_ReadPos;
+}
+
+void NetworkMessage::setReadPos(int32_t pos)
+{
+	m_ReadPos = pos;
+}
+
+int32_t NetworkMessage::decodeHeader()
+{
+	int32_t size = (int32_t)(m_MsgBuf[0] | m_MsgBuf[1] << 8);
+	m_MsgSize = size;
+	return size;
+}
+
+char* NetworkMessage::getBuffer()
+{
+	return (char*)&m_MsgBuf[0];
+}
+
+char* NetworkMessage::getBodyBuffer()
+{
+	m_ReadPos = 2; return (char*)&m_MsgBuf[header_length];
+}
+
+void NetworkMessage::Reset()
+{
+	m_MsgSize = 0;
+	m_ReadPos = 8;
+}
+
+bool NetworkMessage::canAdd(uint32_t size) const
+{
+	return size + m_ReadPos < max_body_length;
 }
