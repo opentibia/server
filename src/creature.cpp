@@ -97,8 +97,36 @@ Creature::~Creature()
 	conditions.clear();
 
 	attackedCreature = NULL;
+}
 
-	//std::cout << "Creature destructor " << this->getID() << std::endl;
+Creature* Creature::getCreature()
+{
+	return this;
+}
+
+const Creature* Creature::getCreature() const
+{
+	return this;
+}
+
+Player* Creature::getPlayer()
+{
+	return NULL;
+}
+
+const Player* Creature::getPlayer() const
+{
+	return NULL;
+}
+
+Actor* Creature::getActor()
+{
+	return NULL;
+}
+
+const Actor* Creature::getActor() const
+{
+	return NULL;
 }
 
 bool Creature::canSee(const Position& myPos, const Position& pos, int32_t viewRangeX, int32_t viewRangeY)
@@ -153,6 +181,52 @@ bool Creature::canWalkthrough(const Creature* creature) const
 {
 	// Since 8.54 update, creatures may walk through others with some restrictions
 	return creature->getPlayer() && creature->getPlayer()->hasFlag(PlayerFlag_CannotBeSeen);
+}
+
+RaceType Creature::getRace() const
+{
+	return RACE_NONE;
+}
+
+Direction Creature::getDirection() const
+{
+	return direction;
+}
+
+void Creature::setDirection(Direction dir)
+{
+	direction = dir;
+}
+
+const Position& Creature::getMasterPos() const
+{
+	return masterPos;
+}
+
+void Creature::setMasterPos(const Position& pos, uint32_t radius /* = 1 */)
+{
+	masterPos = pos;
+	masterRadius = radius;
+}
+
+int Creature::getThrowRange() const
+{
+	return 1;
+}
+
+bool Creature::isPushable() const
+{
+	return (getWalkDelay() <= 0);
+}
+
+bool Creature::isRemoved() const
+{
+	return isInternalRemoved;
+}
+
+bool Creature::canSeeInvisibility() const
+{
+	return false;
 }
 
 int64_t Creature::getTimeSinceLastMove() const
@@ -289,6 +363,21 @@ void Creature::onWalk(Direction& dir)
 	}
 }
 
+void Creature::onWalkAborted()
+{
+
+}
+
+void Creature::onWalkComplete()
+{
+
+}
+
+Creature* Creature::getFollowCreature() const
+{
+	return followCreature;
+}
+
 bool Creature::getNextStep(Direction& dir, uint32_t& flags)
 {
 	if(!listWalkDir.empty()){
@@ -346,6 +435,21 @@ void Creature::internalCreatureDisappear(const Creature* creature, bool isLogout
 		setFollowCreature(NULL);
 		onFollowCreatureDissapear(isLogout);
 	}
+}
+
+void Creature::doAttacking(uint32_t interval)
+{
+
+}
+
+bool Creature::hasExtraSwing()
+{
+	return false;
+}
+
+uint64_t Creature::getLostExperience() const
+{
+	return 0;
 }
 
 void Creature::updateMapCache()
@@ -732,6 +836,21 @@ void Creature::onCreatureMove(const Creature* creature, const Tile* newTile, con
 	}
 }
 
+void Creature::onAttackedCreatureDissapear(bool isLogout)
+{
+
+}
+
+void Creature::onFollowCreatureDissapear(bool isLogout)
+{
+
+}
+
+void Creature::onCreatureTurn(const Creature* creature)
+{
+
+}
+
 void Creature::onCreatureSay(const Creature* creature, SpeakClass type, const std::string& text)
 {
 	g_game.onCreatureHear(this, const_cast<Creature*>(creature), type, text);
@@ -742,6 +861,16 @@ void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
 	//
 }
 
+void Creature::onCreatureChangeOutfit(const Creature* creature, const OutfitType& outfit)
+{
+
+}
+
+void Creature::onCreatureConvinced(const Creature* convincer, const Creature* creature)
+{
+
+}
+
 void Creature::onPlacedCreature()
 {
 	g_game.onMoveCreature(this, this, NULL, getParentTile());
@@ -750,6 +879,26 @@ void Creature::onPlacedCreature()
 void Creature::onRemovedCreature()
 {
 	g_game.onMoveCreature(this, this, getParentTile(), NULL);
+}
+
+WeaponType Creature::getWeaponType()
+{
+	return WEAPON_NONE;
+}
+
+size_t Creature::getSummonCount() const
+{
+	return summons.size();
+}
+
+void Creature::setDropLoot(bool _lootDrop)
+{
+	lootDrop = _lootDrop;
+}
+
+void Creature::setLossSkill(bool _skillLoss)
+{
+	skillLoss = _skillLoss;
 }
 
 void Creature::onDie()
@@ -933,6 +1082,16 @@ DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 	return list;
 }
 
+void Creature::dropLoot(Container* corpse)
+{
+
+}
+
+uint16_t Creature::getCorpseId() const
+{
+	return 0;
+}
+
 bool Creature::hasBeenAttacked(uint32_t attackerId) const
 {
 	CountMap::const_iterator it = damageMap.find(attackerId);
@@ -991,7 +1150,7 @@ void Creature::drainHealth(CombatType combatType, const CombatSource& combatSour
 {
 	lastDamageSource = combatType;
 	changeHealth(-damage);
-	
+
 	if(combatSource.isSourceCreature()){
 		combatSource.getSourceCreature()->onAttackedCreatureDrainHealth(this, damage);
 	}
@@ -1007,6 +1166,16 @@ void Creature::drainMana(const CombatSource& combatSource, int32_t points, bool 
 	}
 }
 
+bool Creature::challengeCreature(Creature* creature)
+{
+	return false;
+}
+
+bool Creature::convinceCreature(Creature* creature)
+{
+	return false;
+}
+
 void Creature::setParent(Cylinder* cylinder)
 {
 	_tile = dynamic_cast<Tile*>(cylinder);
@@ -1016,6 +1185,16 @@ void Creature::setParent(Cylinder* cylinder)
 Position Creature::getPosition() const
 {
 	return _tile->getPosition();
+}
+
+Tile* Creature::getParentTile()
+{
+	return _tile;
+}
+
+const Tile* Creature::getParentTile() const
+{
+	return _tile;
 }
 
 BlockType Creature::blockHit(CombatType combatType, const CombatSource& combatSource, int32_t& damage,
@@ -1079,6 +1258,36 @@ BlockType Creature::blockHit(CombatType combatType, const CombatSource& combatSo
 	onAttacked();
 
 	return blockType;
+}
+
+void Creature::setMaster(Creature* creature)
+{
+	master = creature;
+}
+
+Creature* Creature::getMaster()
+{
+	return master;
+}
+
+bool Creature::isSummon() const
+{
+	return master != NULL;
+}
+
+bool Creature::isPlayerSummon() const
+{
+	return master != NULL && master->getPlayer() != NULL;
+}
+
+Player* Creature::getPlayerMaster() const
+{
+	return (isPlayerSummon() ? master->getPlayer() : NULL);
+}
+
+const Creature* Creature::getMaster() const
+{
+	return master;
 }
 
 bool Creature::setAttackedCreature(Creature* creature)
@@ -1181,6 +1390,21 @@ bool Creature::setFollowCreature(Creature* creature, bool fullPathSearch /*= fal
 	return true;
 }
 
+void Creature::onFollowCreature(const Creature* creature)
+{
+
+}
+
+void Creature::onFollowCreatureComplete(const Creature* creature)
+{
+
+}
+
+Creature* Creature::getAttackedCreature()
+{
+	return attackedCreature;
+}
+
 double Creature::getDamageRatio(Creature* attacker) const
 {
 	int32_t totalDamage = 0;
@@ -1274,6 +1498,36 @@ void Creature::onEndCondition(const Condition* condition, bool preEnd /*= true*/
 void Creature::onCombatRemoveCondition(const CombatSource& combatSource, Condition* condition)
 {
 	removeCondition(condition);
+}
+
+void Creature::onAttackedCreature(Creature* target)
+{
+
+}
+
+void Creature::onSummonAttackedCreature(Creature* summon, Creature* target)
+{
+
+}
+
+void Creature::onAttacked()
+{
+
+}
+
+void Creature::onSummonAttackedCreatureDrainHealth(Creature* summon, Creature* target, int32_t points)
+{
+
+}
+
+void Creature::onAttackedCreatureDrainMana(Creature* target, int32_t points)
+{
+
+}
+
+void Creature::onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points)
+{
+
 }
 
 void Creature::onIdleStatus()
@@ -1382,6 +1636,31 @@ void Creature::destroySummons()
 		(*cit)->unRef();
 	}
 	summons.clear();
+}
+
+const std::list<Creature*>& Creature::getSummons() const
+{
+	return summons;
+}
+
+int32_t Creature::getArmor() const
+{
+	return 0;
+}
+
+int32_t Creature::getDefense() const
+{
+	return 0;
+}
+
+double Creature::getAttackFactor() const
+{
+	return 1.0;
+}
+
+double Creature::getDefenseFactor() const
+{
+	return 1.0;
 }
 
 bool Creature::addCondition(Condition* condition)
@@ -1599,10 +1878,44 @@ bool Creature::isImmune(MechanicType type) const
 	return (getMechanicImmunities() & type);
 }
 
+bool Creature::isCured(Condition* condition) const
+{
+	return false;
+}
+
+MechanicType Creature::getMechanicImmunities() const
+{
+	return MECHANIC_NONE;
+}
+
+CombatType Creature::getDamageImmunities() const
+{
+	return COMBAT_NONE;
+}
+
+bool Creature::isAttackable() const
+{
+	return true;
+}
+
 std::string Creature::getDescription(int32_t lookDistance) const
 {
-	std::string str = "a creature";
-	return str;
+	return "a creature";
+}
+
+void Creature::setID()
+{
+	this->id = auto_id | this->idRange();
+}
+
+void Creature::setRemoved()
+{
+	isInternalRemoved = true;
+}
+
+uint32_t Creature::getID() const
+{
+	return id;
 }
 
 int32_t Creature::getStepDuration(Direction dir) const
@@ -1636,6 +1949,78 @@ int32_t Creature::getStepDuration() const
 	return duration * lastStepCost;
 }
 
+int32_t Creature::getStepSpeed() const
+{
+	return getSpeed();
+}
+
+int32_t Creature::getSpeed() const
+{
+	return baseSpeed + varSpeed;
+}
+
+void Creature::setSpeed(int32_t varSpeedDelta)
+{
+	int32_t oldSpeed = getSpeed();
+	varSpeed = varSpeedDelta;
+	if(getSpeed() <= 0){
+		stopEventWalk();
+	}
+	else if(oldSpeed <= 0 && !listWalkDir.empty()){
+		addEventWalk();
+	}
+}
+
+void Creature::setBaseSpeed(uint32_t newBaseSpeed)
+{
+	baseSpeed = newBaseSpeed;
+}
+
+int Creature::getBaseSpeed() const
+{
+	return baseSpeed;
+}
+
+int32_t Creature::getHealth() const
+{
+	return health;
+}
+
+int32_t Creature::getMaxHealth() const
+{
+	return healthMax;
+}
+
+int32_t Creature::getMana() const
+{
+	return mana;
+}
+
+int32_t Creature::getMaxMana() const
+{
+	return manaMax;
+}
+
+const OutfitType Creature::getCurrentOutfit() const
+{
+	return currentOutfit;
+}
+
+const void Creature::setCurrentOutfit(OutfitType outfit)
+{
+	currentOutfit = outfit;
+}
+
+const OutfitType Creature::getDefaultOutfit() const
+{
+	return defaultOutfit;
+}
+
+bool Creature::isInvisible() const
+{
+	return hasCondition(CONDITION_INVISIBLE);
+}
+
 int64_t Creature::getEventStepTicks() const
 {
 	int64_t ret = getWalkDelay();
@@ -1656,6 +2041,11 @@ void Creature::setNormalCreatureLight()
 {
 	internalLight.level = 0;
 	internalLight.color = 0;
+}
+
+void Creature::setCreatureLight(const LightInfo& light)
+{
+	internalLight = light;
 }
 
 FrozenPathingConditionCall::FrozenPathingConditionCall(const Position& _targetPos)
@@ -1800,4 +2190,19 @@ bool Creature::getCustomValue(const std::string& key, int32_t value) const
 
 	value = atoi(strValue.c_str());
 	return true;
+}
+
+StorageMap::const_iterator Creature::getCustomValueIteratorBegin() const
+{
+	return storageMap.begin();
+}
+
+StorageMap::const_iterator Creature::getCustomValueIteratorEnd() const
+{
+	return storageMap.end();
+}
+
+bool Creature::useCacheMap() const
+{
+	return false;
 }
