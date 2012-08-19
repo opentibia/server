@@ -21,9 +21,13 @@
 #ifndef __OTSERV_CONNECTION_H__
 #define __OTSERV_CONNECTION_H__
 
-#include "classes.h"
-#include "networkmessage.h"
 #include <boost/enable_shared_from_this.hpp>
+#include "networkmessage.h"
+
+class OutputMessage;
+class Connection;
+class ServiceBase;
+class ServicePort;
 
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;
@@ -55,7 +59,14 @@ protected:
 
 class Connection : public boost::enable_shared_from_this<Connection>, boost::noncopyable
 {
+	friend class ConnectionManager;
+
 public:
+	Connection(boost::asio::ip::tcp::socket* socket,
+		boost::asio::io_service& io_service,
+		ServicePort_ptr service_port);
+	~Connection();
+
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 	static uint32_t connectionCount;
 #endif
@@ -70,40 +81,7 @@ public:
 		CONNECTION_STATE_CLOSED = 3
 	};
 
-private:
-	Connection(boost::asio::ip::tcp::socket* socket,
-		boost::asio::io_service& io_service,
-		ServicePort_ptr service_port) :
-			m_socket(socket),
-			m_readTimer(io_service),
-			m_writeTimer(io_service),
-			m_io_service(io_service),
-			m_service_port(service_port)
-	{
-		m_refCount = 0;
-		m_protocol = NULL;
-		m_pendingWrite = 0;
-		m_pendingRead = 0;
-		m_connectionState = CONNECTION_STATE_OPEN;
-		m_receivedFirst = false;
-		m_writeError = false;
-		m_readError = false;
-
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-		connectionCount++;
-#endif
-	}
-	friend class ConnectionManager;
-
-public:
-	~Connection()
-	{
-#ifdef __ENABLE_SERVER_DIAGNOSTIC__
-		connectionCount--;
-#endif
-	}
-
-	boost::asio::ip::tcp::socket& getHandle() { return *m_socket; }
+	boost::asio::ip::tcp::socket& getHandle();
 
 	void closeConnection();
 	// Used by protocols that require server to send first
@@ -114,8 +92,8 @@ public:
 
 	uint32_t getIP() const;
 
-	int32_t addRef() {return ++m_refCount;}
-	int32_t unRef() {return --m_refCount;}
+	int32_t addRef();
+	int32_t unRef();
 
 private:
 	void parseHeader(const boost::system::error_code& error);

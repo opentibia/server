@@ -25,6 +25,7 @@
 #include "scheduler.h"
 #include "server.h"
 #include "singleton.h"
+#include "tools.h"
 
 bool Connection::m_logError = true;
 
@@ -90,6 +91,41 @@ void ConnectionManager::closeAll()
 }
 
 //*****************
+
+Connection::Connection(boost::asio::ip::tcp::socket* socket,
+	boost::asio::io_service& io_service,
+	ServicePort_ptr service_port)
+	: m_socket(socket)
+	, m_readTimer(io_service)
+	, m_writeTimer(io_service)
+	, m_io_service(io_service)
+	, m_service_port(service_port)
+{
+	m_refCount = 0;
+	m_protocol = NULL;
+	m_pendingWrite = 0;
+	m_pendingRead = 0;
+	m_connectionState = CONNECTION_STATE_OPEN;
+	m_receivedFirst = false;
+	m_writeError = false;
+	m_readError = false;
+
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	connectionCount++;
+#endif
+}
+
+Connection::~Connection()
+{
+#ifdef __ENABLE_SERVER_DIAGNOSTIC__
+	connectionCount--;
+#endif
+}
+
+boost::asio::ip::tcp::socket& Connection::getHandle()
+{
+	return *m_socket;
+}
 
 void Connection::closeConnection()
 {
@@ -452,6 +488,16 @@ uint32_t Connection::getIP() const
 		PRINT_ASIO_ERROR("Getting remote ip");
 		return 0;
 	}
+}
+
+int32_t Connection::addRef()
+{
+	return ++m_refCount;
+}
+
+int32_t Connection::unRef()
+{
+	return --m_refCount;
 }
 
 void Connection::onWriteOperation(OutputMessage_ptr msg, const boost::system::error_code& error)
