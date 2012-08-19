@@ -27,6 +27,7 @@
 #include "depot.h"
 #include "town.h"
 #include "configmanager.h"
+#include "singleton.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
@@ -35,6 +36,12 @@ extern Game g_game;
 #pragma warning( disable : 4005)
 #pragma warning( disable : 4996)
 #endif
+
+IOPlayer* IOPlayer::instance()
+{
+	static Singleton<IOPlayer> instance;
+	return instance.get();
+}
 
 bool IOPlayer::loadPlayer(Player* player, const std::string& name, bool preload /*= false*/)
 {

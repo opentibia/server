@@ -21,9 +21,21 @@
 #ifndef __OTSERV_IOPLAYER_H__
 #define __OTSERV_IOPLAYER_H__
 
-#include "classes.h"
-#include "creature.h"
+#include <vector>
+#include <list>
+#include <map>
+#include <string>
+#include <cstdint>
+#include <boost/algorithm/string/predicate.hpp>
 #include "database_driver.h"
+#include "const.h"
+
+class Item;
+class Player;
+class Creature;
+struct DeathEntry;
+
+typedef std::vector<DeathEntry> DeathList;
 
 enum UnjustKillPeriod_t{
 	UNJUST_KILL_PERIOD_DAY,
@@ -37,14 +49,7 @@ typedef std::list<itemBlock> ItemBlockList;
 /** Class responsible for loading players from database. */
 class IOPlayer {
 public:
-	IOPlayer() {}
-	~IOPlayer() {}
-
-	static IOPlayer* instance()
-	{
-		static IOPlayer instance;
-		return &instance;
-	}
+	static IOPlayer* instance();
 
 	/** Load a player
 	  * \param player Player structure to load to
@@ -87,7 +92,7 @@ protected:
 	{
 		bool operator()(const std::string& l, const std::string& r) const
 		{
-			return asLowerCaseString(l).compare(asLowerCaseString(r)) < 0;
+			return boost::algorithm::ilexicographical_compare(l, r);
 		}
 	};
 
@@ -133,7 +138,6 @@ protected:
 	NameCacheMap nameCacheMap;
 	GuidCacheMap guidCacheMap;
 	UnjustCacheMap unjustKillCacheMap;
-
 };
 
 #endif
