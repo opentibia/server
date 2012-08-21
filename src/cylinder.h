@@ -21,7 +21,7 @@
 #ifndef __OTSERV_CYLINDER_H__
 #define __OTSERV_CYLINDER_H__
 
-#include <cstdint>
+#include <stdint.h>
 #include <map>
 #include "const.h"
 

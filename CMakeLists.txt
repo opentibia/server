@@ -257,6 +257,7 @@ SET(SERVER_SOURCES ${SERVER_SOURCES}
 	${CMAKE_CURRENT_SOURCE_DIR}/src/thing.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/tile.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/tools.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/town.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/trashholder.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/vocation.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/waitlist.cpp

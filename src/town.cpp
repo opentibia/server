@@ -21,6 +21,8 @@
 #include "town.h"
 #include "singleton.h"
 
+#include <boost/algorithm/string/predicate.hpp>
+
 Town::Town(uint32_t _townid)
 {
 	townid = _townid;

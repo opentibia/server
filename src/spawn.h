@@ -21,7 +21,7 @@
 #ifndef __OTSERV_SPAWN_H__
 #define __OTSERV_SPAWN_H__
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 #include <list>
 #include <map>

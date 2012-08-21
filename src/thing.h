@@ -22,7 +22,7 @@
 #define __OTSERV_THING_H__
 
 #include <string>
-#include <cstdint>
+#include <stdint.h>
 
 // Forward declaration
 class Cylinder;
