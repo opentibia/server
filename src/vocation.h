@@ -21,7 +21,7 @@
 #ifndef __OTSERV_VOCATION_H__
 #define __OTSERV_VOCATION_H__
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 #include <map>
 #include "enums.h"

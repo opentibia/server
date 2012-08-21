@@ -21,7 +21,7 @@
 #ifndef __OTSERV_TELEPORT_H__
 #define __OTSERV_TELEPORT_H__
 
-#include <cstdint>
+#include <stdint.h>
 #include "position.h"
 #include "cylinder.h"
 #include "item.h"

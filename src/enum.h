@@ -20,7 +20,11 @@
 #define OTSERV_ENUM_H__
 
 #include <assert.h>
+#include <algorithm>
 #include <stdexcept>
+#include <sstream>
+#include <map>
+#include <vector>
 
 class enum_conversion_error : public std::logic_error {
 public:

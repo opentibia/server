@@ -21,7 +21,7 @@
 #ifndef __OTSERV_BEDS_H__
 #define __OTSERV_BEDS_H__
 
-#include <cstdint>
+#include <stdint.h>
 #include <map>
 #include "item.h"
 

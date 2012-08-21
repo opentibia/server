@@ -174,7 +174,6 @@ enum passwordType_t{
 	call some of the useful headers.
 */
 #ifdef __OTSERV_CXX0X__
-	#include <cstdint>
 	#include <unordered_map>
 	#include <unordered_set>
 #else
