@@ -19,8 +19,13 @@
 #ifndef OTSERV_ENUM_H__
 #define OTSERV_ENUM_H__
 
-#include <assert.h>
+#include <string>
+#include <vector>
+#include <map>
+#include <cassert>
 #include <stdexcept>
+#include <algorithm>
+#include <sstream>
 
 class enum_conversion_error : public std::logic_error {
 public:
@@ -61,7 +66,7 @@ public:
 		++i;
 		return r;
 	}
-	
+
 	// Compare the iterator
 	bool operator==(const enum_iterator<ET>& o) const {return i == o.i;}
 	bool operator==(const ET& e) const                {return i->first.e == e.e;}
@@ -109,7 +114,7 @@ public:
 	enum {size = size_};
 
 	// Static utility functions
-	
+
 	// Conversion to some types..
 	E evalue() const{return e;}
 	int value() const {return int(e);}
@@ -336,7 +341,7 @@ public:
 
 	BitEnum<E, size_>& operator|=(const BitEnum<E, size_>& o) {Enum<E, size_>::e = E(int(Enum<E, size_>::e) | int(o.e)); return *this;}
 	BitEnum<E, size_>& operator&=(const BitEnum<E, size_>& o) {Enum<E, size_>::e = E(int(Enum<E, size_>::e) & int(o.e)); return *this;}
-	
+
 	// Classes
 	typedef enum_iterator< BitEnum<E, size_> > iterator;
 	typedef iterator const_iterator; // const_iterator is the same

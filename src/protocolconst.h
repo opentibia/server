@@ -30,13 +30,13 @@
 
 // This defines the range of how many tiles to send to the client
 // This cannot change without recoding the client (ie: never without OTClient)
-const int32_t Map_maxClientViewportX = 8;
-const int32_t Map_maxClientViewportY = 6;
+const int Map_maxClientViewportX = 8;
+const int Map_maxClientViewportY = 6;
 
 // The size of the viewport, this is how far creatures will react / see other creatures
 // (IE limit of NPC AI)
 // These values *must* be larger than the client viewport
-const int32_t Map_maxViewportX = 11;
-const int32_t Map_maxViewportY = 11;
+const int Map_maxViewportX = 11;
+const int Map_maxViewportY = 11;
 
 #endif

@@ -21,6 +21,7 @@
 #ifndef __OTSERV_TOOLS_H__
 #define __OTSERV_TOOLS_H__
 
+#include <libxml/tree.h>
 #include "enums.h"
 #include "const.h"
 

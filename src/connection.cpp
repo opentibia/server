@@ -19,6 +19,9 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <boost/asio/placeholders.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/read.hpp>
 #include "connection.h"
 #include "protocol.h"
 #include "outputmessage.h"
@@ -582,7 +585,7 @@ void Connection::handleReadTimeout(boost::weak_ptr<Connection> weak_conn, const 
 			return;
 		}
 
-		if(shared_ptr<Connection> connection = weak_conn.lock()){
+		if(boost::shared_ptr<Connection> connection = weak_conn.lock()){
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Connection::handleReadTimeout" << std::endl;
 			#endif
@@ -627,7 +630,7 @@ void Connection::handleWriteTimeout(boost::weak_ptr<Connection> weak_conn, const
 			return;
 		}
 
-		if(shared_ptr<Connection> connection = weak_conn.lock()){
+		if(boost::shared_ptr<Connection> connection = weak_conn.lock()){
 			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Connection::handleWriteTimeout" << std::endl;
 			#endif

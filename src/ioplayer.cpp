@@ -32,11 +32,6 @@
 extern ConfigManager g_config;
 extern Game g_game;
 
-#ifndef __GNUC__
-#pragma warning( disable : 4005)
-#pragma warning( disable : 4996)
-#endif
-
 IOPlayer* IOPlayer::instance()
 {
 	static Singleton<IOPlayer> instance;

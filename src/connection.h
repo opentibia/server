@@ -22,12 +22,17 @@
 #define __OTSERV_CONNECTION_H__
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include "networkmessage.h"
 
 class OutputMessage;
 class Connection;
 class ServiceBase;
 class ServicePort;
+class Protocol;
 
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;

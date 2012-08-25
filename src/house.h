@@ -21,7 +21,8 @@
 #ifndef __OTSERV_HOUSE_H__
 #define __OTSERV_HOUSE_H__
 
-#include "classes.h"
+#include <boost/regex.hpp>
+#include "position.h"
 #include "item.h"
 #include "container.h"
 

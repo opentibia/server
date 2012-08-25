@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <boost/algorithm/string/predicate.hpp>
 #include "vocation.h"
 #include "tools.h"
 

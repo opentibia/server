@@ -23,10 +23,12 @@
 #include <winerror.h>
 #endif
 
+#include <boost/asio/placeholders.hpp>
 #include "server.h"
 #include "scheduler.h"
 #include "outputmessage.h"
 #include "ban.h"
+#include "connection.h"
 
 extern BanManager g_bans;
 
@@ -95,7 +97,7 @@ void ServiceManager::stop()
 	m_acceptors.clear();
 
 	OutputMessagePool::getInstance()->stop();
-	
+
 	// Give the server 3 seconds to process all messages before death
 	death_timer.expires_from_now(boost::posix_time::seconds(3));
 	death_timer.async_wait(boost::bind(&ServiceManager::die, this));
@@ -241,7 +243,7 @@ void ServicePort::openAcceptor(boost::weak_ptr<ServicePort> weak_service, IPAddr
 		return;
 	}
 
-	if(ServicePort_ptr service = weak_service.lock()){		
+	if(ServicePort_ptr service = weak_service.lock()){
 		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "ServicePort::openAcceptor" << std::endl;
 		#endif
@@ -256,13 +258,13 @@ void ServicePort::open(IPAddressList ips, uint16_t port)
 	m_serverPort = port;
 	m_pendingStart = false;
 
-	for(IPAddressList::iterator ip = ips.begin(); ip != ips.end(); ++ip){ 
+	for(IPAddressList::iterator ip = ips.begin(); ip != ips.end(); ++ip){
 		try{
-			// std::cout << "\n" << ip->to_string() << "\n"; 
+			// std::cout << "\n" << ip->to_string() << "\n";
 			Acceptor_ptr aptr(new boost::asio::ip::tcp::acceptor(m_io_service, boost::asio::ip::tcp::endpoint(*ip, m_serverPort)));
-			
+
 			aptr->set_option(boost::asio::ip::tcp::no_delay(true));
-			
+
 			accept(aptr);
 			m_tcp_acceptors.push_back(aptr);
 		}

@@ -23,6 +23,7 @@
 #include "definitions.h"
 #include <string>
 #include <map>
+#include <boost/any.hpp>
 
 class PropWriteStream;
 class PropStream;

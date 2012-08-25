@@ -21,6 +21,8 @@
 #ifndef __OTSERV_OUTFIT_H__
 #define __OTSERV_OUTFIT_H__
 
+#include <list>
+#include <stdint.h>
 #include "enums.h"
 
 struct OutfitType

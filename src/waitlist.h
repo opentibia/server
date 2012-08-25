@@ -21,7 +21,11 @@
 #ifndef __OTSERV_WAITLIST_H__
 #define __OTSERV_WAITLIST_H__
 
-#include "classes.h"
+#include <string>
+#include <list>
+#include <stdint.h>
+
+class Player;
 
 struct Wait{
 	uint32_t acc;

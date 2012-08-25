@@ -21,7 +21,7 @@
 #ifndef __OTSERV_TRASHHOLDER_H__
 #define __OTSERV_TRASHHOLDER_H__
 
-#include <cstdint>
+#include <stdint.h>
 #include "cylinder.h"
 #include "const.h"
 #include "item.h"

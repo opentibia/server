@@ -199,9 +199,10 @@ function BeginEnumFile(filename)
 	
 	-- Include guards
 	header:write("#ifndef " .. filename:upper() .. "_H\n")
-	header:write("#define " .. filename:upper() .. "_H\n")
+	header:write("#define " .. filename:upper() .. "_H\n\n")
 	
 	-- Includes
+	header:write("#include <stdint.h>")
 	header:write("#include \"enum.h\"\n\n")
 	implementation:write("#include \"otpch.h\"\n")
 	implementation:write("#include \"" .. header.name .. "\"\n\n")

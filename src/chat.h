@@ -22,9 +22,9 @@
 #define __OTSERV_CHAT_H__
 
 #include <map>
-#include <cstdint>
 #include <string>
 #include <list>
+#include <stdint.h>
 #include "const.h"
 
 class Player;

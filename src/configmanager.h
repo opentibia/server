@@ -21,6 +21,11 @@
 #ifndef __OTSERV_CONFIGMANAGER_H__
 #define __OTSERV_CONFIGMANAGER_H__
 
+#include <string>
+#include <vector>
+#include <stdint.h>
+#include <lua.hpp>
+
 class ConfigManager {
 public:
 	ConfigManager();
@@ -168,6 +173,5 @@ private:
 	int64_t m_confInteger[LAST_INTEGER_CONFIG];
 	double m_confFloat[LAST_FLOAT_CONFIG];
 };
-
 
 #endif /* _CONFIG_MANAGER_H */

@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <fstream>
 #include "protocolgame.h"
 #include "scheduler.h"
 #include "tasks.h"
@@ -33,6 +34,7 @@
 #include "waitlist.h"
 #include "ban.h"
 #include "configmanager.h"
+#include "connection.h"
 
 extern Game g_game;
 extern ConfigManager g_config;
@@ -2327,35 +2329,35 @@ void ProtocolGame::sendHouseWindow(uint32_t windowTextId, House* _house,
 
 void ProtocolGame::sendOutfitWindow(const std::list<Outfit>& outfitList)
  {
- 	#define MAX_NUMBER_OF_OUTFITS 25
- 	//client 8.0 outfits limit is 25
+	#define MAX_NUMBER_OF_OUTFITS 25
+	//client 8.0 outfits limit is 25
 
- 	NetworkMessage_ptr msg = getOutputBuffer();
- 	if(msg){
- 		TRACK_MESSAGE(msg);
- 		msg->AddByte(0xC8);
- 		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
+	NetworkMessage_ptr msg = getOutputBuffer();
+	if(msg){
+		TRACK_MESSAGE(msg);
+		msg->AddByte(0xC8);
+		AddCreatureOutfit(msg, player, player->getDefaultOutfit());
 
- 		if(outfitList.size() > 0){
+		if(outfitList.size() > 0){
 			if(outfitList.size() > MAX_NUMBER_OF_OUTFITS){
- 				msg->AddByte(MAX_NUMBER_OF_OUTFITS);
- 			}
+				msg->AddByte(MAX_NUMBER_OF_OUTFITS);
+			}
 			else{
-	 			msg->AddByte(outfitList.size());
+				msg->AddByte(outfitList.size());
 			}
 
- 			uint32_t counter = 0;
+			uint32_t counter = 0;
 			std::list<Outfit>::const_iterator it;
- 			for(it = outfitList.begin(); it != outfitList.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
- 				msg->AddU16(it->lookType);
+			for(it = outfitList.begin(); it != outfitList.end() && (counter < MAX_NUMBER_OF_OUTFITS); ++it, ++counter){
+				msg->AddU16(it->lookType);
 				msg->AddString(it->name);
 				if(g_config.getNumber(ConfigManager::ADDONS_ONLY_FOR_PREMIUM) && !player->isPremium()){
- 					msg->AddByte(0);
+					msg->AddByte(0);
 				}
 				else{
 					msg->AddByte(it->addons);
 				}
- 			}
+			}
 		}
 		else{
 			msg->AddByte(1);
@@ -2368,7 +2370,7 @@ void ProtocolGame::sendOutfitWindow(const std::list<Outfit>& outfitList)
 		msg->AddByte(0x01); // Num of mounts
 		msg->AddU16(0x00); // Look type of the mount
 		msg->AddString("No Mount"); // Name of the mount
- 	}
+	}
 }
 
 /*

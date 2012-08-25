@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <boost/algorithm/string/predicate.hpp>
 #include "waitlist.h"
 #include "status.h"
 #include "player.h"

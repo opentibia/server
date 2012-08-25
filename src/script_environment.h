@@ -21,6 +21,8 @@
 
 #include "classes.h"
 #include <boost/bimap.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include "enums.h"
 
 namespace Script {

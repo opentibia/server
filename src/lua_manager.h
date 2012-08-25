@@ -19,22 +19,23 @@
 #ifndef __OTSERV_LUA_MANAGER_H__
 #define __OTSERV_LUA_MANAGER_H__
 
+#include <queue>
+#include <stdexcept>
+#include <boost/shared_ptr.hpp>
+#include <lua.hpp>
 #include "classes.h"
 #include "enums.h"
 #include "outfit.h"
-#include <queue>
-#include <stdexcept>
-#include <lua.hpp>
 
-typedef shared_ptr<Waypoint> Waypoint_ptr;
+typedef boost::shared_ptr<Waypoint> Waypoint_ptr;
 
 namespace Script {
 	typedef uint64_t ObjectID;
 	class Environment;
 	class Manager;
 	class Listener;
-	typedef shared_ptr<Listener> Listener_ptr;
-	typedef weak_ptr<Listener> Listener_wptr;
+	typedef boost::shared_ptr<Listener> Listener_ptr;
+	typedef boost::weak_ptr<Listener> Listener_wptr;
 	class Event;
 
 	enum ErrorMode {
@@ -219,7 +220,7 @@ public:
 	#if VISUALC_VERSION < 10
 	// for some reason, having trouble compiling this under vc10
 	// TODO: Find a proper fix for this!
-	void push(int i) {pushInteger(i);}
+	// void push(int i) {pushInteger(i);}
 	#endif
 	#endif
 
@@ -718,8 +719,8 @@ protected:
 	int32_t thread_state;
 };
 
-typedef shared_ptr<LuaThread> LuaThread_ptr;
-typedef weak_ptr<LuaThread> LuaThread_wptr;
+typedef boost::shared_ptr<LuaThread> LuaThread_ptr;
+typedef boost::weak_ptr<LuaThread> LuaThread_wptr;
 
 class LuaStateManager : public LuaState {
 public:

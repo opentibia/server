@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <fstream>
 #include "game.h"
 #include "scheduler.h"
 #include "tasks.h"

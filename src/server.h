@@ -21,9 +21,12 @@
 #ifndef __OTSERV_SERVER_H__
 #define __OTSERV_SERVER_H__
 
-#include "classes.h"
 #include <boost/utility.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/address.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include "classes.h"
 
 class ServiceBase;
 class ServicePort;
@@ -137,7 +140,7 @@ bool ServiceManager::add(uint16_t port, IPAddressList ips)
 	}
 	ServicePort_ptr service_port;
 
-	std::map<uint16_t, ServicePort_ptr>::iterator finder = 
+	std::map<uint16_t, ServicePort_ptr>::iterator finder =
 		m_acceptors.find(port);
 
 	if(finder == m_acceptors.end()){
@@ -148,8 +151,8 @@ bool ServiceManager::add(uint16_t port, IPAddressList ips)
 	else{
 		service_port = finder->second;
 		if(service_port->is_single_socket() || ProtocolType::server_sends_first){
-			std::cout << "ERROR: " << ProtocolType::protocol_name() << 
-				" and " << service_port->get_protocol_names() << 
+			std::cout << "ERROR: " << ProtocolType::protocol_name() <<
+				" and " << service_port->get_protocol_names() <<
 				" cannot use the same port " << port << "." << std::endl;
 			return false;
 		}

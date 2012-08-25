@@ -21,7 +21,7 @@
 #ifndef __OTSERV_POSITION_H__
 #define __OTSERV_POSITION_H__
 
-#include <cstdint>
+#include <stdint.h>
 #include "enums.h"
 
 class Position{

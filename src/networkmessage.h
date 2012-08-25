@@ -21,8 +21,8 @@
 #ifndef __OTSERV_NETWORKMESSAGE_H__
 #define __OTSERV_NETWORKMESSAGE_H__
 
-#include <cstdint>
 #include <string>
+#include <stdint.h>
 #include <boost/shared_ptr.hpp>
 #include "protocolconst.h"
 

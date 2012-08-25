@@ -21,9 +21,6 @@
 #ifndef __OTSERV_TILE_H__
 #define __OTSERV_TILE_H__
 
-#include "classes.h"
-#include "cylinder.h"
-#include "item.h"
 #include <set>
 #include <boost/shared_ptr.hpp>
 #include <boost/multi_index_container.hpp>
@@ -31,6 +28,9 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/random_access_index.hpp>
+#include "cylinder.h"
+#include "item.h"
+#include "position.h"
 
 #define INDEXED_TILE_ITEM_COUNT 20
 

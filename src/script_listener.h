@@ -19,6 +19,9 @@
 #ifndef __OTSERV_SCRIPT_EVENT_LISTENER_H__
 #define __OTSERV_SCRIPT_EVENT_LISTENER_H__
 
+#include <boost/any.hpp>
+#include <boost/weak_ptr.hpp>
+#include <stdint.h>
 #include "enums.h"
 
 namespace Script {

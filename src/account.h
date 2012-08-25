@@ -21,6 +21,9 @@
 #ifndef __OTSERV_ACCOUNT_H__
 #define __OTSERV_ACCOUNT_H__
 
+#include <string>
+#include <list>
+#include <stdint.h>
 
 struct AccountCharacter
 {

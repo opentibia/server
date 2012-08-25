@@ -21,9 +21,9 @@
 #ifndef __OTSERV_TOWN_H__
 #define __OTSERV_TOWN_H__
 
-#include <cstdint>
 #include <string>
 #include <map>
+#include <stdint.h>
 #include "position.h"
 
 class Town

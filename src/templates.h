@@ -22,6 +22,8 @@
 #define __OTSERV_TEMPLATES_H__
 
 #include <set>
+#include <stdint.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 template<class T> class AutoList
 {

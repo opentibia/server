@@ -18,6 +18,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include <boost/algorithm/string/predicate.hpp>
 #include "town.h"
 #include "singleton.h"
 

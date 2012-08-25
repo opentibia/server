@@ -19,10 +19,11 @@
 #ifndef __OTSERV_SCRIPT_MANAGER__
 #define __OTSERV_SCRIPT_MANAGER__
 
+#include <string>
+#include <set>
+#include <boost/any.hpp>
 #include "lua_manager.h"
 #include "boost_common.h"
-#include <boost/any.hpp>
-#include <set>
 
 namespace Script {
 	class Event;
@@ -147,13 +148,13 @@ inline void Script::Manager::registerEnum()
 		int in = 1;
 		for(std::vector<std::string>::const_iterator str = stringValues.begin(); str != stringValues.end(); ++str, ++in)
 			setField(3, in, *str);
-		
+
 		// Save the table
 		setField(2, "__strValues");
-		
+
 		// set integer converted value
 		setField(2, "__intValue", ei->value());
-		
+
 		// Save first pointer to class instance as a global
 		duplicate(2);
 		setGlobal(stringValues.front());

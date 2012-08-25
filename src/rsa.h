@@ -21,6 +21,9 @@
 #ifndef __OTSERV_RSA_H__
 #define __OTSERV_RSA_H__
 
+#include <string>
+#include <stdint.h>
+#include <boost/thread/recursive_mutex.hpp>
 #include "gmp.h"
 
 class RSA{

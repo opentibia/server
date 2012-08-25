@@ -25,7 +25,7 @@
 #include <list>
 #include <map>
 #include <string>
-#include <cstdint>
+#include <stdint.h>
 #include <boost/algorithm/string/predicate.hpp>
 #include "database_driver.h"
 #include "const.h"

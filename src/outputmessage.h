@@ -21,9 +21,9 @@
 #ifndef __OTSERV_OUTPUTMESSAGE_H__
 #define __OTSERV_OUTPUTMESSAGE_H__
 
-#include <cstdint>
 #include <cstddef>
 #include <list>
+#include <stdint.h>
 #include <boost/thread/recursive_mutex.hpp>
 #include "networkmessage.h"
 

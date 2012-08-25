@@ -22,8 +22,8 @@
 #define __OTSERV_STATUS_H__
 
 #include <string>
-#include <cstdint>
 #include <map>
+#include <stdint.h>
 #include <boost/noncopyable.hpp>
 #include "protocol.h"
 

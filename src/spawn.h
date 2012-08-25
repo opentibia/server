@@ -21,15 +21,17 @@
 #ifndef __OTSERV_SPAWN_H__
 #define __OTSERV_SPAWN_H__
 
-#include <cstdint>
 #include <string>
 #include <list>
 #include <map>
+#include <stdint.h>
+#include "enums.h"
+#include "position.h"
 
 // Forward declaration
 class CreatureType;
 class Spawn;
-class Position;
+class Actor;
 
 typedef std::list<Spawn*> SpawnList;
 

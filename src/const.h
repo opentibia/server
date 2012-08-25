@@ -5,6 +5,8 @@
 
 #ifndef CONST_H
 #define CONST_H
+
+#include <stdint.h>
 #include "enum.h"
 
 namespace enums {

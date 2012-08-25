@@ -27,6 +27,7 @@
 #include "scheduler.h"
 #include "outputmessage.h"
 #include "rsa.h"
+#include "connection.h"
 
 extern RSA g_RSA;
 

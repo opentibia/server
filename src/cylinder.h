@@ -21,8 +21,8 @@
 #ifndef __OTSERV_CYLINDER_H__
 #define __OTSERV_CYLINDER_H__
 
-#include <cstdint>
 #include <map>
+#include <stdint.h>
 #include "const.h"
 
 #define INDEX_WHEREEVER -1

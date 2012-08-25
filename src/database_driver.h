@@ -21,13 +21,17 @@
 #ifndef __OTSERV_DATABASE_DRIVER_H__
 #define __OTSERV_DATABASE_DRIVER_H__
 
+#include <iosfwd>
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include "definitions.h"
 
 class DatabaseDriver;
 class DBResult;
 class DBQuery;
 
-typedef shared_ptr<DBResult> DBResult_ptr;
+typedef boost::shared_ptr<DBResult> DBResult_ptr;
 
 enum DBParam_t{
 	DBPARAM_MULTIINSERT = 1

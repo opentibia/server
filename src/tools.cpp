@@ -19,12 +19,14 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <iostream>
+#include <iomanip>
+#include <libxml/encoding.h>
+#include <libxml/tree.h>
 #include "tools.h"
 #include "md5.h"
 #include "sha1.h"
 #include "configmanager.h"
-#include <iomanip>
-#include <libxml/encoding.h>
 
 extern ConfigManager g_config;
 
@@ -131,8 +133,8 @@ bool utf8ToLatin1(char* intext, std::string& outtext)
 
 	size_t outlen = inlen*2;
 	unsigned char* outbuf = new unsigned char[outlen];
-    // The casts to int* are safe according to the documentation
-    // Unless inlen is negative, outlen will never be
+	// The casts to int* are safe according to the documentation
+	// Unless inlen is negative, outlen will never be
 	int res = UTF8Toisolat1(outbuf, (int*)&outlen, (unsigned char*)intext, (int*)&inlen);
 	if(res < 0){
 		delete[] outbuf;

@@ -32,11 +32,11 @@ struct LightInfo{
 	LightInfo(){
 		level = 0;
 		color = 0;
-	};
+	}
 	LightInfo(uint32_t _level, uint32_t _color){
 		level = _level;
 		color = _color;
-	};
+	}
 };
 
 //class ConditionEffect
@@ -347,7 +347,7 @@ public:
 		owner_condition(NULL)
 		{}
 
-	~ConditionEffect(){};
+	~ConditionEffect(){}
 	bool onBegin(Creature* creature);
 	bool onEnd(Creature* creature, ConditionEnd reason);
 	bool onUpdate(Creature* creature, const ConditionEffect& addEffect);

@@ -21,6 +21,8 @@
 #ifndef __OTSERV_LOGGER_H__
 #define __OTSERV_LOGGER_H__
 
+#include <string>
+
 #ifdef __GNUC__
 #define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
 #endif

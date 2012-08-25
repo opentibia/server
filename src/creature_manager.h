@@ -21,8 +21,14 @@
 #ifndef __OTSERV_CREATUREMANAGER_H__
 #define __OTSERV_CREATUREMANAGER_H__
 
-#include "classes.h"
+#include <string>
+#include <stdint.h>
+#include <libxml/tree.h>
 #include "condition_attributes.h"
+
+class CreatureType;
+struct SpellBlock;
+struct LootBlock;
 
 class CreatureManager{
 public:

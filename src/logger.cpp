@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <ctime>
 #include "logger.h"
 #include "tools.h"
 #include "singleton.h"

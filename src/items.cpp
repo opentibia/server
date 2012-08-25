@@ -19,6 +19,9 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <iostream>
+#include <boost/algorithm/string/predicate.hpp>
+#include <libxml/xmlschemas.h>
 #include "items.h"
 #include "condition.h"
 
@@ -1340,7 +1343,7 @@ bool Abilities::Absorb::reduce(CombatType ctype, int32_t& dmg) const
 	if(resistances[ctype.index()] > 0)
 		r = true;
 	dmg = (int32_t)std::floor((double)dmg * (100 - resistances[ctype.index()]) / 100.);
-	
+
 	return r;
 }
 

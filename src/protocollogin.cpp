@@ -19,13 +19,14 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <iomanip>
 #include "protocollogin.h"
 #include "outputmessage.h"
 #include "ioaccount.h"
 #include "ban.h"
 #include "game.h"
 #include "configmanager.h"
-#include <iomanip>
+#include "connection.h"
 
 extern ConfigManager g_config;
 extern BanManager g_bans;

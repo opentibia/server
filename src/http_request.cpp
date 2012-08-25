@@ -20,11 +20,11 @@
 
 #include "otpch.h"
 
-#include "http_request.h"
-
+#include <iostream>
+#include <sstream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
-#include <sstream>
+#include "http_request.h"
 
 using namespace HTTP;
 
@@ -192,7 +192,7 @@ Request& Request::fetch()
 		if(output){
 			response += ln;
 		}
-		
+
 		// Maybe it's the first response line?
 		else if(lineNumber == 1){
 			// Find space after "HTTP/1.1"

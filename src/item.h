@@ -19,6 +19,7 @@
 #ifndef __OTSERV_ITEM_H__
 #define __OTSERV_ITEM_H__
 
+#include <libxml/tree.h>
 #include "thing.h"
 #include "items.h"
 #include "item_attributes.h"
@@ -274,7 +275,7 @@ public:
 	bool floorChangeSouth() const {return items[id].floorChangeSouth;}
 	bool floorChangeEast() const {return items[id].floorChangeEast;}
 	bool floorChangeWest() const {return items[id].floorChangeWest;}
-	
+
 	int32_t getTopOrder() const {return items[id].alwaysOnTopOrder;}
 	SlotPosition getSlotPosition() const {return items[id].slotPosition;}
 	SlotType getWieldPosition() const {return items[id].wieldPosition;}

@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <fstream>
 #include "otsystem.h"
 #include "tasks.h"
 #include "scheduler.h"
@@ -131,7 +132,7 @@ void closeRunfile(void)
 int main(int argc, char *argv[])
 {
 	// Parse any command line (and display help text)
-    g_command_opts = parseCommandLine(std::vector<std::string>(argv, argv + argc));
+	g_command_opts = parseCommandLine(std::vector<std::string>(argv, argv + argc));
 #if !defined(__WINDOWS__)
 	if(g_command_opts.runfile != ""){
 		std::ofstream f(g_command_opts.runfile.c_str(), std::ios::trunc | std::ios::out);
@@ -271,7 +272,7 @@ int main(int argc, char *argv[])
 
 CommandLineOptions parseCommandLine(std::vector<std::string> args)
 {
-    CommandLineOptions opts;
+	CommandLineOptions opts;
 	std::vector<std::string>::iterator argi = args.begin();
 	opts.truncate_log = false;
 
@@ -359,8 +360,8 @@ CommandLineOptions parseCommandLine(std::vector<std::string> args)
 			exit(EXIT_SUCCESS);
 		}
 		else if(arg == "--version"){
-		    std::cout << OTSERV_NAME << " " << OTSERV_VERSION << std::endl;
-		    exit(EXIT_SUCCESS);
+			std::cout << OTSERV_NAME << " " << OTSERV_VERSION << std::endl;
+			exit(EXIT_SUCCESS);
 		}
 		else{
 			std::cout << "Unrecognized command line argument '" << arg << "'\n"
@@ -667,7 +668,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 		exit(EXIT_FAILURE);
 	}
 	g_game.runStartupScripts(true);
-	
+
 
 	// Load IP Address(es)
 	// Primary IP is the "best" IP we can find (first global, then net adapter, then localhost)
@@ -697,7 +698,7 @@ void mainLoader(const CommandLineOptions& command_opts, ServiceManager* service_
 			}
 			std::cout << " [failed, " << request.responseCode() << "]" << std::endl;
 		}
-	
+
 		if (server == servers.end())
 			std::cout << ":: No server replied, using local IP" << std::endl;
 	}

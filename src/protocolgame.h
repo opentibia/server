@@ -21,6 +21,7 @@
 #ifndef __OTSERV_PROTOCOLGAME_H__
 #define __OTSERV_PROTOCOLGAME_H__
 
+#include <list>
 #include "classes.h"
 #include "protocol.h"
 #include "enums.h"

@@ -21,6 +21,7 @@
 #ifndef __OTSERV_OTTHREAD_H__
 #define __OTSERV_OTTHREAD_H__
 
+#include <stdint.h>
 #include "logger.h"
 
 #ifdef __WINDOWS__
@@ -43,6 +44,7 @@ typedef int socklen_t;
 
 #else  // #if defined __WINDOWS__
 
+#include <stdint.h>
 #include <time.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
@@ -50,7 +52,6 @@ typedef int socklen_t;
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <stdint.h>
 #include <errno.h>
 
 inline int64_t OTSYS_TIME()

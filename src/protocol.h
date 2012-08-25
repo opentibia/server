@@ -21,12 +21,18 @@
 #ifndef __OTSERV_PROTOCOL_H__
 #define __OTSERV_PROTOCOL_H__
 
-#include "classes.h"
+#include <boost/shared_ptr.hpp>
+#include <boost/noncopyable.hpp>
+#include <stdint.h>
 #include "protocolconst.h"
+
+class RSA;
+class OutputMessage;
+class Connection;
+class NetworkMessage;
 
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 typedef boost::shared_ptr<Connection> Connection_ptr;
-
 
 class Protocol : boost::noncopyable
 {

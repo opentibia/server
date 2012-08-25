@@ -21,7 +21,7 @@
 #ifndef __OTSERV_PROTOCOLOLD_H__
 #define __OTSERV_PROTOCOLOLD_H__
 
-#include <cstdint>
+#include <stdint.h>
 #include "protocol.h"
 
 class NetworkMessage;

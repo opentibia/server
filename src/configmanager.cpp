@@ -19,7 +19,9 @@
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
 
+#include <iostream>
 #include "configmanager.h"
+#include "definitions.h"
 
 ConfigManager::ConfigManager()
 {
@@ -184,7 +186,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 
 	m_confInteger[PASSWORD_TYPE] = PASSWORD_TYPE_PLAIN;
 	m_confInteger[STATUSQUERY_TIMEOUT] = getGlobalNumber(L, "status_information_timeout", 30 * 1000);
-	
+
 	m_isLoaded = true;
 	return true;
 }
