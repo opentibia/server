@@ -98,16 +98,13 @@ Position getCasterPosition(const Creature* creature, Direction dir);
 
 } // namespace Combat
 
-class MagicField : public Item{
+class MagicField : public Item {
 public:
-	MagicField(uint16_t _type) : Item(_type)
-	{
-		setAttribute("created", (int32_t)std::time(NULL));
-	}
-	~MagicField() {}
+	MagicField(uint16_t _type);
+	~MagicField();
 
-	virtual MagicField* getMagicField() {return this;}
-	virtual const MagicField* getMagicField() const {return this;}
+	virtual MagicField* getMagicField();
+	virtual const MagicField* getMagicField() const;
 };
 
 #endif

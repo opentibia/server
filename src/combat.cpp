@@ -428,3 +428,24 @@ Position getCasterPosition(const Creature* creature, Direction dir)
 
 } // namespace Combat
 
+MagicField::MagicField(uint16_t _type)
+	: Item(_type)
+{
+	setAttribute("created", (int32_t)std::time(NULL));
+}
+
+MagicField::~MagicField()
+{
+
+}
+
+MagicField* MagicField::getMagicField()
+{
+	return this;
+}
+
+const MagicField* MagicField::getMagicField() const
+{
+	return this;
+}
+
