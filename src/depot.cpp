@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,6 +21,7 @@
 
 #include "depot.h"
 #include "tools.h"
+#include "position.h"
 
 Depot::Depot(uint16_t _type) :
 Container(_type)
@@ -35,6 +36,16 @@ Depot::~Depot()
 	//
 }
 
+Depot* Depot::getDepot()
+{
+	return this;
+}
+
+const Depot* Depot::getDepot() const
+{
+	return this;
+}
+
 Attr_ReadValue Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_DEPOT_ID == attr){
@@ -42,12 +53,77 @@ Attr_ReadValue Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 		if(!propStream.GET_USHORT(_depotId)){
 			return ATTR_READ_ERROR;
 		}
-		
+
 		setDepotId(_depotId);
 		return ATTR_READ_CONTINUE;
 	}
 	else
 		return Item::readAttr(attr, propStream);
+}
+
+uint32_t Depot::getDepotId() const
+{
+	return depotId;
+}
+
+void Depot::setMaxDepotLimit(uint32_t maxitems)
+{
+	maxDepotLimit = maxitems;
+}
+
+void Depot::setDepotId(uint32_t id)
+{
+	depotId = id;
+}
+
+Cylinder* Depot::getParent()
+{
+	return Item::getParent();
+}
+
+const Cylinder* Depot::getParent() const
+{
+	return Item::getParent();
+}
+
+bool Depot::isRemoved() const
+{
+	return Item::isRemoved();
+}
+
+Position Depot::getPosition() const
+{
+	return Item::getPosition();
+}
+
+Tile* Depot::getParentTile()
+{
+	return Item::getParentTile();
+}
+
+const Tile* Depot::getParentTile() const
+{
+	return Item::getParentTile();
+}
+
+Item* Depot::getItem()
+{
+	return this;
+}
+
+const Item* Depot::getItem() const
+{
+	return this;
+}
+
+Creature* Depot::getCreature()
+{
+	return NULL;
+}
+
+const Creature* Depot::getCreature() const
+{
+	return NULL;
 }
 
 ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -100,4 +176,9 @@ void Depot::postRemoveNotification(Creature* actor, Thing* thing, const Cylinder
 	if(getParent() != NULL){
 		getParent()->postRemoveNotification(actor, thing, newParent, index, isCompleteRemoval, LINK_PARENT);
 	}
+}
+
+bool Depot::canRemove() const
+{
+	return false;
 }
