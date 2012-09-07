@@ -5135,8 +5135,8 @@ void Game::shutdown()
 {
 	std::cout << "Shutting down server...";
 
-	g_scheduler.shutdownAndWait();
-	g_dispatcher.shutdownAndWait();
+	g_scheduler.shutdown();
+	g_dispatcher.shutdown();
 	Spawns::getInstance()->clear();
 
 	cleanup();

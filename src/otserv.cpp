@@ -264,6 +264,8 @@ int main(int argc, char *argv[])
 #if defined __EXCEPTION_TRACER__
 	mainExceptionHandler.RemoveHandler();
 #endif
+	g_scheduler.shutdownAndWait();
+	g_dispatcher.shutdownAndWait();
 	// Don't run destructors, may hang!
 	exit(EXIT_SUCCESS);
 
