@@ -36,10 +36,17 @@ Dispatcher::Dispatcher()
 	m_threadState = STATE_TERMINATED;
 }
 
+void Dispatcher::shutdownAndWait()
+{
+	shutdown();
+	m_thread.join();
+}
+
 void Dispatcher::start()
 {
+	assert(m_threadState == STATE_TERMINATED);
 	m_threadState = STATE_RUNNING;
-	boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)this));
+	m_thread =  boost::thread(boost::bind(&Dispatcher::dispatcherThread, (void*)this)).move();
 }
 
 void Dispatcher::dispatcherThread(void* p)
