@@ -31,10 +31,17 @@ Scheduler::Scheduler()
 	m_threadState = STATE_TERMINATED;
 }
 
+void Scheduler::shutdownAndWait()
+{
+	shutdown();
+	m_thread.join();
+}
+
 void Scheduler::start()
 {
+	assert(m_threadState == STATE_TERMINATED);
 	m_threadState = STATE_RUNNING;
-	boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)this));
+	m_thread = boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)this)).move();
 }
 
 void Scheduler::schedulerThread(void* p)

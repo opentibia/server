@@ -738,7 +738,7 @@ public:
 	void freeThread(LuaThread_ptr thread);
 
 	struct ThreadSchedule {
-		time_t scheduled_time;
+		int64_t scheduled_time;
 		LuaThread_ptr thread;
 
 		bool operator<(const LuaStateManager::ThreadSchedule& rhs) const {
