@@ -6955,8 +6955,8 @@ int LuaScriptInterface::luaVariantToPosition(lua_State *L)
 			}
 			break;
 		case VARIANT_NUMBER:
-			if (Player* player = env->getPlayerByUID(var.number)){
-				pos = player->getPosition();
+			if (Creature* creature = env->getCreatureByUID(var.number)){
+				pos = creature->getPosition();
 			}
 			break;
 		default:
