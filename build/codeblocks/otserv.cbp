@@ -122,13 +122,12 @@
 			<Add option="-D__USE_SQLITE__" />
 			<Add option="-Wno-unused-parameter" />
 		</Compiler>
-		<Unit filename="../../src/AUTHORS" />
-		<Unit filename="../../src/Doxyfile" />
-		<Unit filename="../../src/LICENSE" />
+		<Unit filename="../../AUTHORS" />
+		<!--Unit filename="../../Doxyfile" /-->
+		<Unit filename="../../LICENSE" />
 		<Unit filename="../../src/Makefile.am" />
-		<Unit filename="../../src/README" />
-		<Unit filename="../../src/README.DATABASE" />
-		<Unit filename="../../src/abstract_lua_t.h" />
+		<Unit filename="../../README" />
+		<Unit filename="../../README.DATABASE" />
 		<Unit filename="../../src/account.h" />
 		<Unit filename="../../src/actions.cpp" />
 		<Unit filename="../../src/actions.h" />
@@ -145,11 +144,11 @@
 		<Unit filename="../../src/beds.h" />
 		<Unit filename="../../src/chat.cpp" />
 		<Unit filename="../../src/chat.h" />
-		<Unit filename="otserv.rc">
+		<!--Unit filename="otserv.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Debug Windows" />
 			<Option target="Release Windows" />
-		</Unit>
+		</Unit-->
 		<Unit filename="../../src/combat.cpp" />
 		<Unit filename="../../src/combat.h" />
 		<Unit filename="../../src/compiler/gcc.h" />
@@ -158,7 +157,7 @@
 		<Unit filename="../../src/compiler/workarounds.h" />
 		<Unit filename="../../src/condition.cpp" />
 		<Unit filename="../../src/condition.h" />
-		<Unit filename="../../src/config.lua.dist" />
+		<Unit filename="../../config.lua.dist" />
 		<Unit filename="../../src/configmanager.cpp" />
 		<Unit filename="../../src/configmanager.h" />
 		<Unit filename="../../src/configure.ac" />
@@ -183,8 +182,8 @@
 		<Unit filename="../../src/databasepgsql.h" />
 		<Unit filename="../../src/databasesqlite.cpp" />
 		<Unit filename="../../src/databasesqlite.h" />
-		<Unit filename="../../src/db.s3db" />
-		<Unit filename="../../src/debianfix.sh" />
+		<!--Unit filename="../../src/db.s3db" /-->
+		<!--Unit filename="../../debianfix.sh" /-->
 		<Unit filename="../../src/definitions.h" />
 		<Unit filename="../../src/depot.cpp" />
 		<Unit filename="../../src/depot.h" />
@@ -195,8 +194,6 @@
 		<Unit filename="../../src/fileloader.h" />
 		<Unit filename="../../src/game.cpp" />
 		<Unit filename="../../src/game.h" />
-		<Unit filename="../../src/global_list_lua_manager.h" />
-		<Unit filename="../../src/global_lists_lua_manager.h" />
 		<Unit filename="../../src/globalevent.cpp" />
 		<Unit filename="../../src/globalevent.h" />
 		<Unit filename="../../src/guild.cpp" />
@@ -241,8 +238,8 @@
 		<Unit filename="../../src/npc.h" />
 		<Unit filename="../../src/otpch.h" />
 		<Unit filename="../../src/otserv.cpp" />
-		<Unit filename="../../src/otserv.ico" />
-		<Unit filename="../../src/otserv.kdevelop" />
+		<Unit filename="../../otserv.ico" />
+		<!--Unit filename="../../otserv.kdevelop" /-->
 		<Unit filename="../../src/otsystem.h" />
 		<Unit filename="../../src/outfit.cpp" />
 		<Unit filename="../../src/outfit.h" />
@@ -250,7 +247,7 @@
 		<Unit filename="../../src/outputmessage.h" />
 		<Unit filename="../../src/party.cpp" />
 		<Unit filename="../../src/party.h" />
-		<Unit filename="../../src/pch.mak" />
+		<!--Unit filename="../../pch.mak" /-->
 		<Unit filename="../../src/player.cpp" />
 		<Unit filename="../../src/player.h" />
 		<Unit filename="../../src/position.cpp" />
