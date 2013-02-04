@@ -3,10 +3,10 @@
 ----------------------------
 
 -- data directory location
-datadir = "Data/"
+datadir = "data/"
 
 -- map location
-map = "Data/world/map.otbm"
+map = "data/world/map.otbm"
 
 -- Type of map storage,
 -- 'relational' - Slower, but possible to run database queries to change all items to another id for example.
