@@ -82,7 +82,7 @@ pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
 pkgsysconf_DATA = config.lua
 
 config.lua:
-	cp $(srcdir)/config.lua.dist config.lua
+	cp $(srcdir)/../config.lua.dist config.lua
 
 
 distclean-local:
