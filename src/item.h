@@ -45,6 +45,7 @@ class BedItem;
 //]
 
 enum ITEMPROPERTY{
+	FIRSTPROPERTY = 0,
 	BLOCKSOLID = 0,
 	HASHEIGHT,
 	BLOCKPROJECTILE,
@@ -56,7 +57,8 @@ enum ITEMPROPERTY{
 	IMMOVABLEBLOCKPATH,
 	IMMOVABLENOFIELDBLOCKPATH,
 	NOFIELDBLOCKPATH,
-	SUPPORTHANGABLE
+	SUPPORTHANGABLE,
+	LASTPROPERTY = SUPPORTHANGABLE
 };
 
 enum TradeEvents_t{
@@ -161,7 +163,7 @@ public:
 	uint16_t getFluidType() const {return (uint16_t)getIntAttr(ATTR_ITEM_FLUIDTYPE);}
 
 	void setOwner(uint32_t _owner) {setIntAttr(ATTR_ITEM_OWNER, _owner);}
-	uint32_t getOwner() const {return (uint32_t)getIntAttr(ATTR_ITEM_OWNER);}
+	virtual uint32_t getOwner() const {return (uint32_t)getIntAttr(ATTR_ITEM_OWNER);}
 
 	void setCorpseOwner(uint32_t _corpseOwner) {setIntAttr(ATTR_ITEM_CORPSEOWNER, _corpseOwner);}
 	uint32_t getCorpseOwner() {return (uint32_t)getIntAttr(ATTR_ITEM_CORPSEOWNER);}

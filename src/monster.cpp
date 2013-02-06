@@ -829,7 +829,7 @@ void Monster::onThinkTarget(uint32_t interval)
 					targetChangeCooldown = (uint32_t)mType->changeTargetSpeed;
 
 					if(mType->changeTargetChance >= random_range(1, 100)){
-						if(mType->targetDistance <= 1){
+						if(getGoalTargetDistance() <= 1){
 							searchTarget(TARGETSEARCH_RANDOM);
 						}
 						else{
@@ -1558,7 +1558,7 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 	Creature::getPathSearchParams(creature, fpp);
 
 	fpp.minTargetDist = 1;
-	fpp.maxTargetDist = mType->targetDistance;
+	fpp.maxTargetDist = getGoalTargetDistance();
 
 	if(isSummon()){
 		if(getMaster() == creature){
@@ -1566,7 +1566,7 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 			fpp.fullPathSearch = true;
 		}
 		else{
-			if(mType->targetDistance <= 1){
+			if(getGoalTargetDistance() <= 1){
 				fpp.fullPathSearch = true;
 			}
 			else{
@@ -1583,7 +1583,7 @@ void Monster::getPathSearchParams(const Creature* creature, FindPathParams& fpp)
 			fpp.fullPathSearch = false;
 		}
 		else{
-			if(mType->targetDistance <= 1){
+			if(getGoalTargetDistance() <= 1){
 				fpp.fullPathSearch = true;
 			}
 			else{

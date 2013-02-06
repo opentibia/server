@@ -86,6 +86,8 @@ Creature::Creature() :
 	lastDamageSource = COMBAT_NONE;
 	lastHitCreature = 0;
 
+	modifierShootRange = 0;
+
 	blockCount = 0;
 	blockTicks = 0;
 	walkUpdateTicks = 0;
@@ -1518,6 +1520,28 @@ void Creature::removeCondition(Condition* condition)
 
 		delete condition;
 	}
+}
+
+std::list<const Condition*> Creature::getAllConditions(ConditionType_t type) const
+{
+	std::list <const Condition*> ret;
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type){
+			ret.push_back(*it);
+		}
+	}
+	return ret;
+}
+
+std::list<Condition*> Creature::getAllConditions(ConditionType_t type)
+{
+	std::list <Condition*> ret;
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type){
+			ret.push_back(*it);
+		}
+	}
+	return ret;
 }
 
 Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id, uint32_t subId) const

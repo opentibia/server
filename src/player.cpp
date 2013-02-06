@@ -104,7 +104,7 @@ Creature()
 	lastAttackBlockType = BLOCK_NONE;
 	addAttackSkillPoint = false;
 	lastAttack = 0;
-	shootRange = 1;
+	pureShootRange = 1;
 
 	chaseMode = CHASEMODE_STANDSTILL;
 	fightMode = FIGHTMODE_ATTACK;
@@ -422,7 +422,7 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
 						const Weapon* weapon = g_weapons->getWeapon(ammuItem);
 						if(weapon){
-							shootRange = item->getShootRange();
+							pureShootRange = item->getShootRange();
 							return ammuItem;
 						}
 					}
@@ -430,7 +430,7 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 				else{
 					const Weapon* weapon = g_weapons->getWeapon(item);
 					if(weapon){
-						shootRange = item->getShootRange();
+						pureShootRange = item->getShootRange();
 						return item;
 					}
 				}

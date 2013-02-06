@@ -373,7 +373,8 @@ public:
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
 	virtual bool hasExtraSwing() {return lastAttack > 0 && ((OTSYS_TIME() - lastAttack) >= getAttackSpeed());}
-	int32_t getShootRange() const {return shootRange;}
+	int32_t getPureShootRange() const { return pureShootRange; }
+	int32_t getShootRange() const { return std::max(pureShootRange + modifierShootRange, 1); }
 
 	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	static std::string getSkillName(int skillid);
@@ -814,7 +815,7 @@ protected:
 	BlockType_t lastAttackBlockType;
 	bool addAttackSkillPoint;
 	uint64_t lastAttack;
-	int32_t shootRange;
+	int32_t pureShootRange;
 
 	chaseMode_t chaseMode;
 	fightMode_t fightMode;

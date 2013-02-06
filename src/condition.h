@@ -109,6 +109,8 @@ struct IntervalInfo{
 	int32_t interval;
 };
 
+class ConditionDamage;
+
 class Condition{
 public:
 	Condition(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
@@ -141,6 +143,8 @@ public:
 	virtual bool unserializeProp(ConditionAttr_t attr, PropStream& propStream);
 
 	bool isPersistent() const;
+	virtual const ConditionDamage* getDamageCondition() const { return NULL; }
+	virtual ConditionDamage* getDamageCondition() { return NULL; }
 
 protected:
 	ConditionId_t id;
@@ -291,6 +295,11 @@ public:
 	bool addDamage(int32_t rounds, int32_t time, int32_t value);
 	bool doForceUpdate() const { return forceUpdate;}
 	int32_t getTotalDamage() const;
+	virtual const ConditionDamage* getDamageCondition() const { return this; }
+	virtual ConditionDamage* getDamageCondition() { return this; }
+	int32_t getNextDamage() const;
+	int32_t getRemainingDamage() const;
+	int32_t getLastDamage() const {	return lastDamage; }
 
 	int32_t getLength() const
 	{
@@ -320,6 +329,8 @@ protected:
 	int32_t periodDamage;
 	int32_t periodDamageTick;
 	int32_t tickInterval;
+
+	int32_t lastDamage;
 
 	bool forceUpdate;
 	bool delayed;

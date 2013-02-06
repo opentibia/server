@@ -124,6 +124,8 @@ public:
 	bool isFleeing() const {return getHealth() <= mType->runAwayHealth;}
 
 	virtual bool hasHiddenHealth() const { return mType->hideHealth; }
+	uint8_t getPureTargetDistance() const { return mType->targetDistance; }
+	uint8_t getGoalTargetDistance() const { return std::max(mType->targetDistance + modifierShootRange, 1); }
 
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);

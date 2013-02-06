@@ -27,12 +27,16 @@
 #include "map.h"
 #include "baseevents.h"
 #include "otsystem.h"
+#include "configmanager.h"
 #include <vector>
 
 class Condition;
 class Creature;
 class Position;
 class Item;
+class ConfigManager;
+
+extern ConfigManager g_config;
 
 //for luascript callback
 class ValueCallback : public CallBack{
@@ -366,6 +370,13 @@ public:
 
 	virtual MagicField* getMagicField() {return this;}
 	virtual const MagicField* getMagicField() const {return this;}
+
+	virtual uint32_t getOwner() const{
+		if (OTSYS_TIME() - createTime > g_config.getNumber(ConfigManager::FIELD_OWNERSHIP_DURATION)){
+			return 0;
+		}
+		return this->Item::getOwner();
+	}
 
 	virtual bool isBlocking(const Creature* creature) const;
 

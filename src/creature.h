@@ -306,6 +306,8 @@ public:
 	void removeCondition(ConditionType_t type);
 	void removeCondition(Condition* condition);
 	void removeCondition(const Creature* attacker, ConditionType_t type);
+	std::list<const Condition*> getAllConditions(ConditionType_t type) const;
+	std::list<Condition*> getAllConditions(ConditionType_t type);
 	Condition* getCondition(ConditionType_t type, ConditionId_t id, uint32_t subId) const;
 	void executeConditions(uint32_t interval);
 	bool hasCondition(ConditionType_t type, bool checkTime = true) const;
@@ -316,6 +318,10 @@ public:
 	virtual uint32_t getConditionImmunities() const { return 0; }
 	virtual uint32_t getConditionSuppressions() const { return 0; }
 	virtual bool isAttackable() const { return true;}
+
+	void setModifierShootRange(int8_t val) { modifierShootRange = val; }
+	int8_t getModifierShootRange() { return modifierShootRange; }
+
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 
@@ -488,6 +494,8 @@ protected:
 	uint32_t lastHitCreature;
 	uint32_t blockCount;
 	uint32_t blockTicks;
+
+	int8_t modifierShootRange;
 
 	//creature script events
 	bool hasEventRegistered(CreatureEventType_t event){

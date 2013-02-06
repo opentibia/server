@@ -1103,6 +1103,7 @@ Condition(_id, _type, 0)
 	periodDamage = 0;
 	periodDamageTick = 0;
 	tickInterval = 2000;
+	lastDamage = 0;
 }
 
 bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
@@ -1366,6 +1367,17 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 	return Condition::executeCondition(creature, interval);
 }
 
+int32_t ConditionDamage::getNextDamage() const
+{
+	if(periodDamage != 0)
+		return periodDamage;
+	else if(!damageList.empty()){
+		const IntervalInfo& damageInfo = damageList.front();
+		return damageInfo.value;
+	}
+	return 0;
+}
+
 bool ConditionDamage::getNextDamage(int32_t& damage)
 {
 	if(periodDamage != 0){
@@ -1392,6 +1404,8 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 	if(creature->isSuppress(getType())){
 		return true;
 	}
+
+	lastDamage = damage;
 
 	Creature* attacker = g_game.getCreatureByID(owner);
 
@@ -1491,6 +1505,18 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 			}
 		}
 	}
+}
+
+int32_t ConditionDamage::getRemainingDamage() const
+{
+	if (periodDamage > 0){
+		return -periodDamage; //negative number indicates an eternal periodical damage
+	}
+	int32_t result = 0;
+	for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); ++it){
+		result += it->value;
+	}
+	return result;
 }
 
 int32_t ConditionDamage::getTotalDamage() const

@@ -48,6 +48,7 @@ class Combat;
 class Condition;
 class Npc;
 class Spell;
+class CombatParams;
 
 enum LuaVariantType_t{
 	VARIANT_NONE = 0,
@@ -322,14 +323,19 @@ public:
 	static double popFloatNumber(lua_State *L);
 	static std::string popString(lua_State *L);
 	static int32_t popCallback(lua_State *L);
+	static void popCombatParams(lua_State *L, CombatParams &params);
 
-	static int32_t getField(lua_State *L, const char *key);
-	static uint32_t getFieldU32(lua_State *L, const char *key);
+	static int32_t getField(lua_State *L, const char *key, bool *error = NULL);
+	static int32_t getField(lua_State *L, const char *key, int32_t defaultValue);
+	static uint32_t getFieldU32(lua_State *L, const char *key, bool *error = NULL);
+	static uint32_t getFieldU32(lua_State *L, const char *key, uint32_t defaultValue);
 	static void setField(lua_State *L, const char* index, double val);
 	static void setField(lua_State *L, const char* index, const std::string& val);
-	static std::string getFieldString(lua_State *L, const char *key);
+	static std::string getFieldString(lua_State *L, const char *key, bool *error = NULL);
+	static std::string getFieldString(lua_State *L, const char *key, std::string defaultValue);
 	static void setFieldBool(lua_State *L, const char* index, bool val);
-	static bool getFieldBool(lua_State *L, const char *key);
+	static bool getFieldBool(lua_State *L, const char *key, bool *error = NULL);
+	static bool getFieldBool(lua_State *L, const char *key, bool defaultValue);
 	static std::string escapeString(const std::string& string);
 
 protected:
@@ -429,6 +435,21 @@ protected:
 	static int luaGetTileThingByTopOrder(lua_State *L);
 	static int luaGetTopCreature(lua_State *L);
 	static int luaGetAllCreatures(lua_State *L);
+	static int luaGetItemShootType(lua_State *L);
+	static int luaGetItemAmuType(lua_State *L);
+	static int luaGetAllItems(lua_State *L);
+	static int luaGetItemOwner(lua_State *L);
+	static int luaGetLastDamageConditionValue(lua_State *L);
+	static int luaGetNextDamageConditionValue(lua_State *L);
+	static int luaGetTotalRemainingDamageFromCondition(lua_State *L);
+	static int luaGetItemShootRange(lua_State *L);
+	static int luaGetItemShootRangeByUID(lua_State *L);
+	static int luaGetMonsterPureGoalTargetDistance(lua_State *L);
+	static int luaDoSetCreatureModifierShootRange(lua_State *L);
+	static int luaGetCreatureModifierShootRange(lua_State *L);
+	static int luaGetItemWieldProperlyInfo(lua_State *L);
+	static int luaGetItemBreakChance(lua_State *L);
+
 	static int luaGetThingDefaultDescription(lua_State *L);
 	static int luaGetItemTypeDefaultDescription(lua_State *L);
 	static int luaGetItemSpecialDescription(lua_State *L);
