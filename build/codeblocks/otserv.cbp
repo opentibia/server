@@ -128,6 +128,8 @@
 		<Unit filename="../../src/Makefile.am" />
 		<Unit filename="../../README" />
 		<Unit filename="../../README.DATABASE" />
+		<Unit filename="../../src/abstract_lua_t.cpp" />
+		<Unit filename="../../src/abstract_lua_t.h" />
 		<Unit filename="../../src/account.h" />
 		<Unit filename="../../src/actions.cpp" />
 		<Unit filename="../../src/actions.h" />
@@ -196,6 +198,10 @@
 		<Unit filename="../../src/game.h" />
 		<Unit filename="../../src/globalevent.cpp" />
 		<Unit filename="../../src/globalevent.h" />
+		<Unit filename="../../src/global_list_lua_manager.cpp" />
+		<Unit filename="../../src/global_list_lua_manager.h" />
+		<Unit filename="../../src/global_lists_lua_manager.cpp" />
+		<Unit filename="../../src/global_lists_lua_manager.h" />
 		<Unit filename="../../src/guild.cpp" />
 		<Unit filename="../../src/guild.h" />
 		<Unit filename="../../src/house.cpp" />

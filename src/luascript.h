@@ -38,6 +38,10 @@ extern "C"
 #include <lualib.h>
 }
 
+#ifdef __GLOBAL_LIST_LUA_INTERFACE__
+#include "abstract_lua_t.h"
+#endif
+
 class Thing;
 class Creature;
 class Player;
@@ -712,6 +716,27 @@ protected:
 	static int luaBitUXor(lua_State *L);
 	static int luaBitULeftShift(lua_State *L);
 	static int luaBitURightShift(lua_State *L);
+
+	#ifdef __GLOBAL_LIST_LUA_INTERFACE__
+	static int luaCreateNewGlobalList(lua_State *L);
+	static int luaGetGlobalListValue(lua_State *L);
+	static int luaSetGlobalListValue(lua_State *L);
+	static int luaDeleteGlobalList(lua_State *L);
+	static int luaFindGlobalListValue(lua_State *L);
+	static int luaCountGlobalListValues(lua_State *L);
+	static int luaGetSizeGlobalList(lua_State *L);
+	static int luaIsEmptyGlobalList(lua_State *L);
+	static int luaExistsGlobalList(lua_State *L);
+	static int lua_pushAbstract_lua_t(lua_State *L, abstract_lua_t a);
+	static abstract_lua_t popAbstract_lua_t(lua_State *L);
+	static int luaWithGlobalList(lua_State *L);
+	static int luaReadActualGlobalList(lua_State *L);
+	static int luaResetReaderFromActualGlobalList(lua_State *L);
+	static int luaSetReaderFromActualGlobalListToEnd(lua_State *L);
+	static int luaIncReaderFromActualGlobalList(lua_State *L);
+	static int luaSetReaderOfActualGlobalListToKey(lua_State *L);
+	static int luaChangeValueOfReaderOfActualGlobalListToKey(lua_State *L);
+	#endif
 
 	static const luaL_Reg luaDatabaseTable[10];
 	static int32_t luaDatabaseExecute(lua_State* L);

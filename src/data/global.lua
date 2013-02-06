@@ -10,6 +10,9 @@ dofile(getDataDir() .. 'game_classes/calculator.lua')
 -- Load Exp Stages
 dofile(getDataDir() .. 'exp_stages.lua')
 
+-- Load the utility library for global tables
+dofile(getDataDir() .. 'globalTablesLib.lua')
+
 -- Load db file
 dofile(getDataDir() .. 'db.lua')
 

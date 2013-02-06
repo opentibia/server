@@ -50,32 +50,34 @@ EXTRA_DIST=autogen.sh \
 	database.h	 logger.h	   raids.h \
 	luascript.h	   rsa.h \
 	mailbox.h	   scheduler.h \
-	guild.h		globalevent.h
+	guild.h		globalevent.h \
+	abstract_lua_t.h global_list_lua_manager.h global_lists_lua_manager.h
 
 
 
 
 otserv_SOURCES = $(MAYBE_MYSQL) $(MAYBE_SQLITE) $(MAYBE_ODBC) $(MAYBE_PGSQL) \
 	map.cpp		   rsa.cpp \
-	actions.cpp	   md5.cpp		   scheduler.cpp \
-	admin.cpp	   monster.cpp	           scriptmanager.cpp \
+	actions.cpp	   md5.cpp	scheduler.cpp \
+	admin.cpp	   monster.cpp	       scriptmanager.cpp \
 	allocator.cpp	   depot.cpp	       monsters.cpp	   server.cpp \
 	ban.cpp		   exception.cpp       movement.cpp	   sha1.cpp \
 	baseevents.cpp	   fileloader.cpp      networkmessage.cpp  spawn.cpp \
 	beds.cpp	   game.cpp	       npc.cpp		   spells.cpp \
 	chat.cpp	   house.cpp	       otserv.cpp	   status.cpp \
 	combat.cpp	   housetile.cpp       outfit.cpp	   talkaction.cpp \
-	ioaccount.cpp       outputmessage.cpp   tasks.cpp \
+	ioaccount.cpp      outputmessage.cpp  tasks.cpp \
 	condition.cpp	   iomapotbm.cpp       party.cpp	   teleport.cpp \
 	configmanager.cpp  iomapserialize.cpp  player.cpp	   thing.cpp \
-	connection.cpp	   position.cpp	   tile.cpp	\
+	connection.cpp	   position.cpp	       tile.cpp	\
 	container.cpp	   ioplayer.cpp        protocol.cpp	   tools.cpp \
 	creature.cpp	   item.cpp	       protocolgame.cpp    trashholder.cpp \
 	creatureevent.cpp  items.cpp	       protocollogin.cpp   vocation.cpp \
 	cylinder.cpp	   logger.cpp	       protocolold.cpp	   waitlist.cpp \
 	database.cpp	   luascript.cpp       quests.cpp	   weapons.cpp \
 	mailbox.cpp	   raids.cpp \
-	guild.cpp	globalevent.cpp
+	guild.cpp	   globalevent.cpp\
+	abstract_lua_t.cpp global_list_lua_manager.cpp global_lists_lua_manager.cpp
 
 pkgsysconfdir=$(sysconfdir)/$(PACKAGE)
 

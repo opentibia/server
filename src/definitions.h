@@ -36,6 +36,8 @@
 	#define __GLOBALEVENTS__
 #endif
 
+#define __GLOBAL_LIST_LUA_INTERFACE__ //activates global_list lua interface
+
 #ifdef __USE_MYSQL__
 	#ifdef SINGLE_SQL_DRIVER
 		#define MULTI_SQL_DRIVERS

@@ -2172,7 +2172,57 @@ void LuaScriptInterface::registerFunctions()
 	//bit operations for Lua, based on bitlib project release 24
 	//bit.bnot, bit.band, bit.bor, bit.bxor, bit.lshift, bit.rshift
 	luaL_register(m_luaState, "bit", LuaScriptInterface::luaBitReg);
-	
+
+	#ifdef __GLOBAL_LIST_LUA_INTERFACE__
+	//createNewGlobalList(name)
+	lua_register(m_luaState, "createNewGlobalList",LuaScriptInterface::luaCreateNewGlobalList);
+
+	//deleteGlobalList(name)
+	lua_register(m_luaState, "deleteGlobalList",LuaScriptInterface::luaDeleteGlobalList);
+
+	//setGlobalListValue(name, key, value)
+	lua_register(m_luaState, "setGlobalListValue",LuaScriptInterface::luaSetGlobalListValue);
+
+	//getGlobalListValue(name, key)
+	lua_register(m_luaState, "getGlobalListValue",LuaScriptInterface::luaGetGlobalListValue);
+
+	//findGlobalListValue(name, value, n=1)
+	lua_register(m_luaState, "findGlobalListValue",LuaScriptInterface::luaFindGlobalListValue);
+
+	//countGlobalListValues(name, value)
+	lua_register(m_luaState, "countGlobalListValues",LuaScriptInterface::luaCountGlobalListValues);
+
+	//getSizeGlobalList(name)
+	lua_register(m_luaState, "getSizeGlobalList",LuaScriptInterface::luaGetSizeGlobalList);
+
+	//isEmptyGlobalList(name)
+	lua_register(m_luaState, "isEmptyGlobalList",LuaScriptInterface::luaIsEmptyGlobalList);
+
+	//existsGlobalList(name)
+	lua_register(m_luaState, "existsGlobalList",LuaScriptInterface::luaExistsGlobalList);
+
+	//withGlobalList(name)
+	lua_register(m_luaState, "withGlobalList",LuaScriptInterface::luaWithGlobalList);
+
+	//readActualGlobalList()
+	lua_register(m_luaState, "readActualGlobalList",LuaScriptInterface::luaReadActualGlobalList);
+
+	//resetReaderFromActualGlobalList()
+	lua_register(m_luaState, "resetReaderFromActualGlobalList",LuaScriptInterface::luaResetReaderFromActualGlobalList);
+
+	//setReaderFromActualGlobalListToEnd()
+	lua_register(m_luaState, "setReaderFromActualGlobalListToEnd",LuaScriptInterface::luaSetReaderFromActualGlobalListToEnd);
+
+	//luaIncReaderFromActualGlobalList(incr)
+	lua_register(m_luaState, "incReaderFromActualGlobalList",LuaScriptInterface::luaIncReaderFromActualGlobalList);
+
+	//setReaderOfActualGlobalListToKey(key)
+	lua_register(m_luaState, "setReaderOfActualGlobalListToKey",LuaScriptInterface::luaSetReaderOfActualGlobalListToKey);
+
+	//changeValueOfReaderOfActualGlobalListToKey(key)
+	lua_register(m_luaState, "changeValueOfReaderOfActualGlobalListToKey",LuaScriptInterface::luaChangeValueOfReaderOfActualGlobalListToKey);
+	#endif
+
 	//db table
 	luaL_register(m_luaState, "db", LuaScriptInterface::luaDatabaseTable);
 
@@ -9606,6 +9656,328 @@ SHIFTOP(int32_t, RightShift, >>)
 SHIFTOP(uint32_t, ULeftShift, <<)
 SHIFTOP(uint32_t, URightShift, >>)
 
+#ifdef __GLOBAL_LIST_LUA_INTERFACE__
+#include "global_lists_lua_manager.h"
+global_lists_lua_manager global_lists_manager;
+
+abstract_lua_t LuaScriptInterface::popAbstract_lua_t(lua_State *L)
+{
+	abstract_lua_t ret;
+	int tipo=lua_type(L,-1);
+	if (tipo==LUA_TNUMBER) {
+		ret.set(popFloatNumber(L));
+	}
+	else if (tipo==LUA_TSTRING) {
+		ret.set(popString(L));
+	}
+	else if (tipo==LUA_TNIL) {
+		lua_pop(L,1);
+	}
+	else if (tipo==LUA_TBOOLEAN){
+		ret.setBool(popBoolean(L));
+	}
+	else
+		reportErrorFunc("Wrong parameter type. You should use only strings, booleans or numbers as keys or values for a global list.");
+	return(ret);
+}
+
+int LuaScriptInterface::lua_pushAbstract_lua_t(lua_State *L, abstract_lua_t a)
+{
+	double d;
+	std::string s;
+	bool b;
+	if(a.getReal(d))
+		lua_pushnumber(L,d);
+	else if(a.getString(s))
+		lua_pushstring(L,s.c_str());
+	else if(a.getBool(b))
+		lua_pushboolean(L,b);
+	else
+		lua_pushnil(L);
+	return(1);
+}
+
+
+int LuaScriptInterface::luaCreateNewGlobalList(lua_State *L)
+{
+	//createNewGlobalList(name)
+	std::string name = popString(L);
+	if (global_lists_manager.createNewList(name))
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaDeleteGlobalList(lua_State *L)
+{
+	//deleteGlobalList(name)
+	std::string name = popString(L);
+	if (global_lists_manager.deleteList(name))
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaIsEmptyGlobalList(lua_State *L)
+{
+	//isEmptyGlobalList(name)
+	std::string name = popString(L);
+	if (global_lists_manager.isEmpty(name))
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaExistsGlobalList(lua_State *L)
+{
+	//existsGlobalList(name)
+	std::string name = popString(L);
+	if (global_lists_manager.exists(name))
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetSizeGlobalList(lua_State *L)
+{
+	//getSizeGlobalList(name)
+	std::string name = popString(L);
+	int32_t ret = global_lists_manager.getSize(name);
+	lua_pushnumber(L,ret);
+	return 1;
+}
+
+
+int LuaScriptInterface::luaSetGlobalListValue(lua_State *L)
+{
+	//setGlobalListValue(name,key,value)
+	abstract_lua_t value;
+	bool nao_deu_erro = false;
+	uint32_t parameters = lua_gettop(L);
+	if (parameters > 3)
+		reportErrorFunc("Too many parameters at setGlobalListValue.");
+	else if (parameters<2)
+		reportErrorFunc("Missing parameters at setGlobalListValue.");
+	else if (parameters == 3) {
+		value = popAbstract_lua_t(L);
+	}
+
+	if ((parameters!=3) && (parameters!=2)) {
+		lua_pushboolean(L, false);
+		return(1);
+	}
+
+	abstract_lua_t key = popAbstract_lua_t(L);
+	std::string name = popString(L);
+	if ((!key.isNil()) && (!value.isNil())) {
+		nao_deu_erro = global_lists_manager.setValue(name,key,value);
+	}
+	if ((!key.isNil()) && (value.isNil())) {
+		nao_deu_erro = global_lists_manager.deleteValue(name, key);
+	}
+	if (nao_deu_erro)
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetGlobalListValue(lua_State *L)
+{
+	//getGlobalListValue(name,key)
+	uint32_t parameters = lua_gettop(L);
+	if (parameters>2)
+		reportErrorFunc("Too many parameters at getGlobalListValue.");
+	else if (parameters<2)
+		reportErrorFunc("Missing parameters at getGlobalListValue.");
+	if (parameters != 2) {
+		lua_pushnil(L);
+		return(1);
+	}
+	abstract_lua_t result,key;
+	bool nao_deu_erro = false;
+	key = popAbstract_lua_t(L);
+	if (!key.isNil()) {
+		std::string name = popString(L);
+		nao_deu_erro = global_lists_manager.getValue(name,key,result);
+	}
+	else
+		reportErrorFunc("Missing parameters at getGlobalListValue.");
+	if (!nao_deu_erro) {
+		lua_pushnil(L);
+		return(1);
+	}
+	lua_pushAbstract_lua_t(L, result);
+	return(1);
+}
+
+int LuaScriptInterface::luaFindGlobalListValue(lua_State *L)
+{
+	//findGlobalListValue(name, value, n=1)
+	uint32_t parameters = lua_gettop(L);
+	if (parameters>=4)
+		reportErrorFunc("Too many parameters at findGlobalListValue.");
+	else if (parameters<2)
+		reportErrorFunc("Missing parameters at findGlobalListValue.");
+
+	if ((parameters < 2) || (parameters>=4)) {
+		lua_pushnil(L);
+		return(1);
+	}
+	int n=1;
+	if (parameters==3)
+		n = popNumber(L);
+	abstract_lua_t key, value;
+	bool deu_erro = true;
+	value = popAbstract_lua_t(L);
+	if (!value.isNil()) {
+		std::string name = popString(L);
+		deu_erro = not(global_lists_manager.findValue(name,value,key,n));
+	}
+	else
+		reportErrorFunc("Missing parameters at findGlobalListValue.");
+	if (deu_erro)
+		lua_pushnil(L);
+	else
+		lua_pushAbstract_lua_t(L,key);
+	return(1);
+}
+
+
+int LuaScriptInterface::luaCountGlobalListValues(lua_State *L)
+{
+	//countGlobalListValues(name,value)
+	uint32_t parameters = lua_gettop(L);
+	if (parameters!=2) {
+		reportErrorFunc("Wrong number of parameters at countGlobalListValues.");
+		lua_pushnil(L);
+		return(1);
+	}
+	abstract_lua_t value = popAbstract_lua_t(L);
+	if (!value.isNil()) {
+		std::string name = popString(L);
+		int32_t ret = global_lists_manager.countValues(name,value);
+		lua_pushnumber(L,ret);
+	}
+	else {
+	reportErrorFunc("Missing parameters at countGlobalListValues.");
+	lua_pushnil(L);
+	}
+	return(1);
+}
+
+int LuaScriptInterface::luaWithGlobalList(lua_State *L)
+{
+	//withGlobalList(name)
+	std::string name = popString(L);
+	if (global_lists_manager.withList(name))
+		lua_pushboolean(L, true);
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaReadActualGlobalList(lua_State *L)
+{
+	//readActualGlobalList()
+	std::string name = popString(L);
+	global_list_lua_manager *r = global_lists_manager.getReader();
+	if (r) {
+		abstract_lua_t key, value;
+		if (r->read(key, value)) {
+			lua_pushAbstract_lua_t(L, key);
+			lua_pushAbstract_lua_t(L, value);
+		}
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaResetReaderFromActualGlobalList(lua_State *L)
+{
+	//resetReaderFromActualGlobalList()
+	global_list_lua_manager *r = global_lists_manager.getReader();
+	if (r) {
+		r->resetReader();
+		lua_pushboolean(L, true);
+	}
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaSetReaderFromActualGlobalListToEnd(lua_State *L)
+{
+	//setReaderFromActualGlobalListToEnd()
+	global_list_lua_manager *r = global_lists_manager.getReader();
+	if (r) {
+		r->setReaderToEnd();
+		lua_pushboolean(L, true);
+	}
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaIncReaderFromActualGlobalList(lua_State *L)
+{
+	//setReaderFromActualGlobalListToEnd(incr)
+	int incr=+1;
+	uint32_t parameters = lua_gettop(L);
+	if (parameters>1) {
+		reportErrorFunc("Warning: wrong number of parameters at setReaderFromActualGlobalListToEnd.");
+		lua_pushboolean(L, false);
+		return(1);
+	}
+	if (parameters==1)
+		incr = popNumber(L);
+	global_list_lua_manager *r = global_lists_manager.getReader();
+	if (r) {
+		if (r->incReader(incr))
+			lua_pushboolean(L, true);
+		else
+			lua_pushboolean(L, false);
+	}
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaSetReaderOfActualGlobalListToKey(lua_State *L)
+{
+	//luaSetReaderOfActualGlobalListToKey(key)
+	abstract_lua_t key = popAbstract_lua_t(L);
+	global_list_lua_manager *r = global_lists_manager.getReader();
+	if (r) {
+		if (r->setReaderToKey(key))
+			lua_pushboolean(L, true);
+		else
+			lua_pushboolean(L, false);
+	}
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+
+int LuaScriptInterface::luaChangeValueOfReaderOfActualGlobalListToKey(lua_State *L)
+{
+	//changeValueOfReaderOfActualGlobalListToKey(newValue)
+	abstract_lua_t newValue = popAbstract_lua_t(L);
+	global_list_lua_manager *r = global_lists_manager.getReader();
+	if (r) {
+		if (r->changeValue(newValue))
+			lua_pushboolean(L, true);
+		else
+			lua_pushboolean(L, false);
+	}
+	else
+		lua_pushboolean(L, false);
+	return 1;
+}
+#endif
 
 const luaL_Reg LuaScriptInterface::luaDatabaseTable[] =
 {
