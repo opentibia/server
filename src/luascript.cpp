@@ -6836,7 +6836,7 @@ int LuaScriptInterface::luaDoTargetCombatHealth(lua_State *L)
 	bool firstForm = (parameters != 5); //are we using the first form of targetCombatHealth?
 	uint8_t effect;
 	if(firstForm){
-	    effect = (uint8_t)popNumber(L);
+		effect = (uint8_t)popNumber(L);
 	}
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
@@ -6855,7 +6855,6 @@ int LuaScriptInterface::luaDoTargetCombatHealth(lua_State *L)
 		popCombatParams(L, params);
 	}
 
-	CombatType_t combatType = (CombatType_t)popNumber(L);
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
