@@ -25,6 +25,7 @@
 #include "otsystem.h"
 #include "const.h"
 #include <string>
+#include "tools.h"
 #include <boost/shared_ptr.hpp>
 
 class Item;
@@ -66,59 +67,13 @@ public:
 	}
 
 #ifndef __SWAP_ENDIAN__
-	uint16_t GetU16(){
-		if(!expectRead(2)){
-			return 0;
-		}
-		
-		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
-		m_ReadPos += 2;
-		return v;
-	}
-	uint32_t GetU32(){
-		if(!expectRead(4)){
-			return 0;
-		}
-		
-		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
-		m_ReadPos += 4;
-		return v;
-	}
-	uint32_t PeekU32(){
-		if(!expectRead(4)){
-			return 0;
-		}
-		
-		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
-		return v;
-	}
+	uint16_t GetU16() { return internalGetU16(); }
+	uint32_t GetU32() { return internalGetU32(); }
+	uint16_t PeekU32() { return internalPeekU32(); }
 #else
-	uint16_t GetU16(){
-		if(!expectRead(2)){
-			return 0;
-		}
-		
-		uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
-		m_ReadPos += 2;
-		return swap_uint16(v);
-	}
-	uint32_t GetU32(){
-		if(!expectRead(4)){
-			return 0;
-		}
-		
-		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
-		m_ReadPos += 4;
-		return swap_uint32(v);
-	}
-	uint32_t PeekU32(){
-		if(!expectRead(4)){
-			return 0;
-		}
-		
-		uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
-		return swap_uint32(v);
-	}
+	uint16_t GetU16(){ return swap_uint16(internalGetU16()); }
+	uint32_t GetU32(){ return swap_uint32(internalGetU32()); }
+	uint32_t PeekU32(){ return swap_uint32(internalPeekU32()); }
 #endif
 
 	uint16_t GetSpriteId(){
@@ -141,31 +96,11 @@ public:
 	}
 
 #ifndef __SWAP_ENDIAN__
-	void AddU16(uint16_t value){
-		if(canAdd(2)){
-			*(uint16_t*)(m_MsgBuf + m_ReadPos) = value;
-			m_ReadPos += 2; m_MsgSize += 2;
-		}
-	}
-	void AddU32(uint32_t value){
-		if(canAdd(4)){
-			*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
-			m_ReadPos += 4; m_MsgSize += 4;
-		}
-	}
+	void AddU16(uint16_t value){ return internalAddU16(value); }
+	void AddU32(uint32_t value){ return internalAddU32(value); }
 #else
-	void AddU16(uint16_t value){
-		if(canAdd(2)){
-			*(uint16_t*)(m_MsgBuf + m_ReadPos) = swap_uint16(value);
-			m_ReadPos += 2; m_MsgSize += 2;
-		}
-	}
-	void AddU32(uint32_t value){
-		if(canAdd(4)){
-			*(uint32_t*)(m_MsgBuf + m_ReadPos) = swap_uint32(value);
-			m_ReadPos += 4; m_MsgSize += 4;
-		}
-	}
+	void AddU16(uint16_t value){ return internalAddU16(swap_uint16(value)); }
+	void AddU32(uint32_t value){ return internalAddU32(swap_uint32(value)); }
 #endif
 
 	void AddBytes(const char* bytes, uint32_t size);
@@ -214,6 +149,51 @@ protected:
 		
 		return true;
 	};
+
+	inline uint16_t internalGetU16(){
+		if(!expectRead(2)){
+			return 0;
+		}
+		uint16_t v;
+		readPtrAs(m_MsgBuf + m_ReadPos, &v);
+		m_ReadPos += 2;
+		return v;
+	}
+
+	inline uint32_t internalGetU32(){
+		if(!expectRead(4)){
+			return 0;
+		}
+		
+		uint32_t v;
+		readPtrAs(m_MsgBuf + m_ReadPos, &v);
+		m_ReadPos += 4;
+		return v;
+	}
+
+	inline uint32_t internalPeekU32(){
+		if(!expectRead(4)){
+			return 0;
+		}
+		
+		uint32_t v;
+		readPtrAs(m_MsgBuf + m_ReadPos, &v);
+		return v;
+	}
+
+	void internalAddU16(uint16_t value){
+		if(canAdd(2)){
+			writePtrAs(m_MsgBuf + m_ReadPos, &value);
+			m_ReadPos += 2; m_MsgSize += 2;
+		}
+	}
+
+	void internalAddU32(uint32_t value){
+		if(canAdd(4)){
+			writePtrAs(m_MsgBuf + m_ReadPos, &value);
+			m_ReadPos += 4; m_MsgSize += 4;
+		}
+	}
 
 	int32_t m_MsgSize;
 	int32_t m_ReadPos;

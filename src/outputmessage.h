@@ -113,7 +113,7 @@ protected:
 			return;
 		}
 		m_outputBufferStart = m_outputBufferStart - sizeof(T);
-		*(T*)(m_MsgBuf + m_outputBufferStart) = add;
+		writePtrAs(m_MsgBuf + m_outputBufferStart, &add);
 		//added header size to the message size
 		m_MsgSize = m_MsgSize + sizeof(T);
 	}

@@ -30,6 +30,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstring>
+#include "string.h"
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
@@ -61,6 +62,22 @@ inline int32_t swap_int32(int32_t x)
 {
 	return (int32_t)swap_uint32((uint32_t)x);
 }
+
+/*template <typename T> void readPtrAs(uint8_t *ptr, T* val);
+template <typename T> void writePtrAs(uint8_t *ptr, T* val);*/
+
+template <typename T>
+inline void readPtrAs(uint8_t *ptr, T* val)
+{
+	memcpy(val, ptr, sizeof(T));
+}
+
+template <typename T>
+inline void writePtrAs(uint8_t *ptr, T* val)
+{
+	memcpy(ptr, val, sizeof(T));
+}
+
 
 /*inline float swap_float32(float x)
 {
