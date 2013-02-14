@@ -36,7 +36,7 @@
 	#define __GLOBALEVENTS__
 #endif
 
-#define __GLOBAL_LIST_LUA_INTERFACE__ //activates global_list lua interface
+#define __GLOBAL_LIST_LUA_INTERFACE__ //enables compilation with global_list lua interface
 
 #ifdef __USE_MYSQL__
 	#ifdef SINGLE_SQL_DRIVER
@@ -133,7 +133,7 @@ enum passwordType_t{
 		#define _MBCS
 	#endif
 	#ifdef _UNICODE
-		#undef _UNICODE 
+		#undef _UNICODE
 	#endif
 	#ifdef UNICODE
 		#undef UNICODE

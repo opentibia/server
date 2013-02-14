@@ -62,14 +62,15 @@ public:
 		if(!expectRead(1)){
 			return 0;
 		}
-		
+
 		return m_MsgBuf[m_ReadPos++];
 	}
+
 
 #ifndef __SWAP_ENDIAN__
 	uint16_t GetU16() { return internalGetU16(); }
 	uint32_t GetU32() { return internalGetU32(); }
-	uint16_t PeekU32() { return internalPeekU32(); }
+	uint32_t PeekU32() { return internalPeekU32(); }
 #else
 	uint16_t GetU16(){ return swap_uint16(internalGetU16()); }
 	uint32_t GetU32(){ return swap_uint32(internalGetU32()); }
@@ -124,7 +125,7 @@ public:
 	void setReadPos(int32_t pos) {m_ReadPos = pos; }
 
 	int32_t decodeHeader();
-	
+
 	bool isOverrun(){ return m_overrun; };
 
 	char* getBuffer() { return (char*)&m_MsgBuf[0]; }
@@ -140,13 +141,13 @@ protected:
 	inline bool canAdd(uint32_t size){
 		return (size + m_ReadPos < max_body_length);
 	};
-	
+
 	inline bool expectRead(int32_t size){
 		if(size >= (NETWORKMESSAGE_MAXSIZE - m_ReadPos)){
 			m_overrun = true;
 			return false;
 		}
-		
+
 		return true;
 	};
 
@@ -164,7 +165,7 @@ protected:
 		if(!expectRead(4)){
 			return 0;
 		}
-		
+
 		uint32_t v;
 		readPtrAs(m_MsgBuf + m_ReadPos, &v);
 		m_ReadPos += 4;
@@ -175,7 +176,7 @@ protected:
 		if(!expectRead(4)){
 			return 0;
 		}
-		
+
 		uint32_t v;
 		readPtrAs(m_MsgBuf + m_ReadPos, &v);
 		return v;
@@ -197,7 +198,7 @@ protected:
 
 	int32_t m_MsgSize;
 	int32_t m_ReadPos;
-	
+
 	bool m_overrun;
 
 	uint8_t m_MsgBuf[NETWORKMESSAGE_MAXSIZE];

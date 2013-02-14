@@ -67,13 +67,13 @@ inline int32_t swap_int32(int32_t x)
 template <typename T> void writePtrAs(uint8_t *ptr, T* val);*/
 
 template <typename T>
-inline void readPtrAs(uint8_t *ptr, T* val)
+inline void readPtrAs(void *ptr, T* val)
 {
 	memcpy(val, ptr, sizeof(T));
 }
 
 template <typename T>
-inline void writePtrAs(uint8_t *ptr, T* val)
+inline void writePtrAs(void *ptr, T* val)
 {
 	memcpy(ptr, val, sizeof(T));
 }
