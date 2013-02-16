@@ -106,7 +106,7 @@ protected:
 	typedef std::map<uint32_t, uint64_t> manaCacheMap;
 	manaCacheMap cacheMana;
 
-	typedef std::map<uint32_t, uint32_t> skillCacheMap;
+	typedef std::map<uint32_t, uint64_t> skillCacheMap;
 	skillCacheMap cacheSkill[SKILL_LAST + 1];
 };
 
