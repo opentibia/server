@@ -1462,7 +1462,6 @@ bool ConditionDamage::updateCondition(const ConditionDamage* addCondition)
 		return false;
 	}
 
-	lastDamage = addCondition->lastDamage;
 	return true;
 }
 
@@ -1480,6 +1479,7 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 			tickInterval = conditionDamage.tickInterval;
 			periodDamage = conditionDamage.periodDamage;
 			int32_t nextTimeLeft = tickInterval;
+			lastDamage = conditionDamage.lastDamage;
 
 			if(!damageList.empty()){
 				//save previous timeLeft
