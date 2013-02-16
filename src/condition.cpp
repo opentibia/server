@@ -1462,6 +1462,7 @@ bool ConditionDamage::updateCondition(const ConditionDamage* addCondition)
 		return false;
 	}
 
+	lastDamage = addCondition->lastDamage;
 	return true;
 }
 
