@@ -468,42 +468,48 @@ bool Weapon::useFist(Player* player, Creature* target)
 
 bool Weapon::internalUseWeapon(Player* player, Item* item, Creature* target, int32_t damageModifier) const
 {
+	bool result = true;
 	if(m_scripted){
 		LuaVariant var;
 		var.type = VARIANT_NUMBER;
 		var.number = target->getID();
-		executeUseWeapon(player, var);
+		result = executeUseWeapon(player, var);
 	}
 	else{
 		int32_t damage = (getWeaponDamage(player, target, item) * damageModifier) / 100;
 		Combat::doCombatHealth(player, target, damage, damage, params);
 	}
 
-	if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION)){
-		onUsedAmmo(player, item, target->getTile());
+	if(result){
+		if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION)){
+			onUsedAmmo(player, item, target->getTile());
+		}
+		onUsedWeapon(player, item, target->getTile());
 	}
-	onUsedWeapon(player, item, target->getTile());
 	return true;
 }
 
 bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 {
+	bool result = true;
 	if(m_scripted){
 		LuaVariant var;
 		var.type = VARIANT_TARGETPOSITION;
 		var.pos = tile->getPosition();
-		executeUseWeapon(player, var);
+		result = executeUseWeapon(player, var);
 	}
 	else{
 		Combat::postCombatEffects(player, tile->getPosition(), params);
 		g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 	}
 
-	if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION)){
-		onUsedAmmo(player, item, tile);
+	if(result){
+		if(g_config.getNumber(ConfigManager::REMOVE_AMMUNITION)){
+			onUsedAmmo(player, item, tile);
+		}
+		onUsedWeapon(player, item, tile);
 	}
-	onUsedWeapon(player, item, tile);
-	return true;
+	return result;
 }
 
 void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
@@ -577,7 +583,7 @@ int32_t Weapon::getManaCost(const Player* player) const
 	return 0;
 }
 
-void Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
+bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 {
 	//onUseWeapon(cid, var)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -600,11 +606,13 @@ void Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 		lua_pushnumber(L, cid);
 		m_scriptInterface->pushVariant(L, var);
 
-		m_scriptInterface->callFunction(2, false);
+		bool result = m_scriptInterface->callFunction(2, true);
 		m_scriptInterface->releaseScriptEnv();
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. Weapon::executeUseWeapon" << std::endl;
+		return false;
 	}
 }
 

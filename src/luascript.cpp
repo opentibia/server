@@ -112,7 +112,7 @@ void ScriptEnviroment::resetEnv()
 		}
 	}
 	m_tempItems.clear();
-	
+
 	if(!m_tempResults.empty())
 	{
 		Database* db = Database::instance();
@@ -122,7 +122,7 @@ void ScriptEnviroment::resetEnv()
 				db->freeResult(it->second);
 		}
 	}
-	
+
 	m_tempResults.clear();
 
 	m_realPos.x = 0;
@@ -301,12 +301,12 @@ Thing* ScriptEnviroment::getThingByUID(uint32_t uid)
 	if(it != m_localMap.end() && !it->second->isRemoved()){
 		return it->second;
 	}
-	
+
 	it = m_globalMap.find(uid);
 	if(it != m_globalMap.end() && !it->second->isRemoved()){
 		return it->second;
 	}
-	
+
 	if(uid >= PLAYER_ID_RANGE){ //is a creature id
 		Thing* thing = g_game.getCreatureByID(uid);
 		if(thing && !thing->isRemoved()){
@@ -314,7 +314,7 @@ Thing* ScriptEnviroment::getThingByUID(uint32_t uid)
 			return thing;
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -326,7 +326,7 @@ Item* ScriptEnviroment::getItemByUID(uint32_t uid)
 			return item;
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -1077,11 +1077,11 @@ bool LuaScriptInterface::popBoolean(lua_State *L, bool acceptIntegers /*=true*/)
 		if(tipo == LUA_TNUMBER && acceptIntegers){
 			return (uint32_t(lua_tonumber(L, 0)) != 0);
 		}
-	else{
-	if(g_config.getNumber(ConfigManager::LUA_EXCEPTED_TYPE_ERRORS_ENABLED)){
-		reportErrorFunc("Error: Expected boolean type parameter.");
-		}
-		return false;
+		else{
+			if(g_config.getNumber(ConfigManager::LUA_EXCEPTED_TYPE_ERRORS_ENABLED)){
+				reportErrorFunc("Error: Expected boolean type parameter.");
+			}
+			return true;
 		}
 	}
 }
@@ -2228,7 +2228,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//result table
 	luaL_register(m_luaState, "result", LuaScriptInterface::luaResultTable);
-	
+
 	//isGmInvisible(cid)
 	lua_register(m_luaState, "isGmInvisible", LuaScriptInterface::luaIsGmInvisible);
 
@@ -2261,7 +2261,7 @@ void LuaScriptInterface::registerFunctions()
 
 	//doUpdateGuildWar(warId)
 	lua_register(m_luaState, "doUpdateGuildWar", LuaScriptInterface::luaDoUpdateGuildWar);
-	
+
 	//doSavePlayer(cid)
 	lua_register(m_luaState, "doSavePlayer", LuaScriptInterface::luaDoSavePlayer);
 }
@@ -3416,19 +3416,19 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 		//subtype already supplied, count then is the amount
 		itemCount = count;
 	}
-	
+
 	else if(it.hasSubType())
 		{
 			if(it.stackable)
 				itemCount = (int32_t)std::ceil((float)count / 100);
-			
+
 
 			subType = count;
 		}
 		else{
 			itemCount = std::max((int32_t)1, (int32_t)count);
 		}
-	
+
 
 	while(itemCount > 0){
 		int32_t stackCount = std::min((int32_t)100, (int32_t)subType);
@@ -10729,9 +10729,9 @@ int LuaScriptInterface::luaDoSavePlayer(lua_State *L)
 {
 	uint32_t cid = popNumber(L);
 	ScriptEnviroment* env = getScriptEnv();
- 
+
 	Player* player = env->getPlayerByUID(cid);
- 
+
 	if (player){
 		if (IOPlayer::instance()->savePlayer(player)){
 			lua_pushboolean(L, true);
@@ -10742,6 +10742,6 @@ int LuaScriptInterface::luaDoSavePlayer(lua_State *L)
 	} else {
 		lua_pushboolean(L, false);
 	}
- 
+
 	return 0;
 }
