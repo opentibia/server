@@ -1,19 +1,13 @@
 function onSay(cid, words, param)
-	if(param == "") then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter.")
+	local playerPos = getPlayerPosition(cid)
+	local parameters = serializeParam(param)
+	local itemid = interpretStringAsWordParam(parameters[1], true)
+	if(itemid == nil) then
+		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the item id!")
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
 		return false
-	else
-		param = string.explode(param, " ")
 	end
-
-	local playerPos = getPlayerPosition(cid)
-
-	local itemid = tonumber(param[1])
-	local itemcount = param[2] ~= nil and tonumber(param[2]) or 1
-	local count = math.min(itemcount, 100)
-	
-	if isValidItemId(itemid) == false then
+	if not isValidItemId(itemid) then
 		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Invalid item id.")	
 		doSendMagicEffect(playerPos, CONST_ME_POFF)
 		return false
@@ -26,14 +20,26 @@ function onSay(cid, words, param)
 		return false
 	end
 
+	local itemcount = interpretStringAsWordParam(parameters[2], true)
+	if itemcount == nil or itemcount < 1 then
+		itemcount = 1
+	else
+		itemcount = math.min(math.floor(itemcount), 100 )
+	end
+
 	local item = doCreateItemEx(itemid, itemcount)
-	if item ~= false then
-		if doPlayerAddItemEx(cid, item, true) ~= RETURNVALUE_NOERROR then
-			doRemoveItem(item)
+
+	if( item ~= false )then
+		local actionId = interpretStringAsWordParam(parameters[3], true)
+		if actionId ~= nil and itemcount == 1 then
+			doSetItemActionId(item, actionId)
+		end
+		if( doPlayerAddItemEx( cid, item, true ) ~= RETURNVALUE_NOERROR )then
+			doRemoveItem( item )
 		else
-			doDecayItem(item)
-			doSendMagicEffect(playerPos, CONST_ME_MAGIC_GREEN)
-			return false
+			doDecayItem( item )
+			doSendMagicEffect( playerPos, CONST_ME_MAGIC_GREEN )
+			return true
 		end
 	end
 

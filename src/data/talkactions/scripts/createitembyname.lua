@@ -1,26 +1,23 @@
 function onSay( cid, words, param )
-	if( param == "" )then
-		doPlayerSendTextMessage( cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the parameter." )
+	local playerPos = getPlayerPosition( cid )
+        local parameters = serializeParam( param )
+	local itemname = interpretStringAsWordParam(parameters[1])
+	if ( itemname == nil )then
+		doPlayerSendTextMessage( cid, MESSAGE_STATUS_CONSOLE_BLUE, "You need to type the name of the item!" )
 		doSendMagicEffect( playerPos, CONST_ME_POFF )
 		return false
 	end
 
-	local playerPos = getPlayerPosition( cid )
-	local parameters = serializeParam( param )
-	local itemname = parameters[1]
-	local itemcount = parameters[2]
-	
-	if not( itemname ) then
-		doPlayerSendTextMessage(cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned.")
-		doSendMagicEffect(playerPos, CONST_ME_POFF)
-		return false
+	local itemcount = interpretStringAsWordParam(parameters[2], true)
+	if itemcount == nil or itemcount < 1 then
+		itemcount = 1
+	else
+		itemcount = math.min(math.floor(itemcount), 100 )
 	end
-
-	itemcount = itemcount and math.min( tonumber( itemcount ), 100 ) or 1
 
 	local itemid = getItemIdByName(itemname)
 	if( itemid == false )then
-		doPlayerSendTextMessage( cid, MESSAGE_STATUS_CONSOLE_BLUE, "There isn't any item named " .. itemname .. "." )
+		doPlayerSendTextMessage( cid, MESSAGE_STATUS_CONSOLE_BLUE, "There isn't any item named " .. '"' .. itemname .. '".' )
 		doSendMagicEffect( playerPos, CONST_ME_POFF )
 		return false
 	end
@@ -33,16 +30,22 @@ function onSay( cid, words, param )
 	end
 
 	local item = doCreateItemEx( itemid, itemcount )
+
 	if( item ~= false )then
+		local actionId = interpretStringAsWordParam(parameters[3], true)
+		if actionId ~= nil and itemcount == 1 then
+			doSetItemActionId(item, actionId)
+		end
 		if( doPlayerAddItemEx( cid, item, true ) ~= RETURNVALUE_NOERROR )then
 			doRemoveItem( item )
-			doPlayerSendTextMessage( cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned." )
-			doSendMagicEffect( playerPos, CONST_ME_POFF )
 		else
 			doDecayItem( item )
 			doSendMagicEffect( playerPos, CONST_ME_MAGIC_GREEN )
+			return true
 		end
 	end
 
+	doPlayerSendTextMessage( cid, MESSAGE_STATUS_CONSOLE_BLUE, "Item could not be summoned." )
+	doSendMagicEffect( playerPos, CONST_ME_POFF )
 	return false
 end

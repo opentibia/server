@@ -193,6 +193,14 @@ function isKnight(cid)
 	return (isInArray({4,8}, getPlayerVocation(cid)) == true)
 end
 
+function copyRawTable(t)
+	local ret = {}
+	for i,v in pairs(t) do
+		ret[i] = v
+	end
+	return ret
+end
+
 function getDirectionTo(pos1, pos2)
 	local dir = NORTH
 	if(pos1.x > pos2.x) then
@@ -235,7 +243,7 @@ function getPlayerLookPos(cid)
 end
 
 function getPosByDir(basePos, dir)
-	local pos = basePos
+	local pos = copyRawTable(basePos)
 	if(dir == NORTH) then
 		pos.y = pos.y-1
 	elseif(dir == SOUTH) then
@@ -429,18 +437,96 @@ end
 
 function string.strip_whitespace(str)
 	if #str < 1 then return str end
-	local start = string.find(str, "[^%s]") -- First non-whitespace character
-	local _end = #str + 1 - string.find(str:reverse(), "[^%s]") -- Last non-whitespace character
-
-	if start ~= nil and _end ~= nil then
+	local start = string.find(str, "[%S]") -- First non-whitespace character
+	if start ~= nil then
+		local _end = #str + 1 - string.find(str:reverse(), "[^%s]") -- Last non-whitespace character
 		return string.sub(str, start, _end)
-	elseif start ~= nil then
-		return string.sub(str, start)
-	elseif _end ~= nil then
-		return string.sub(str, 1, _end)
+	else
+		return ""
 	end
-	return str
 end
+
+function string.clearDuplicatedBlankSpaces(str)
+	return string.gsub(str, '%s%s+', ' ')
+end
+
+--onlyAsNumber is false by default
+function interpretStringAsWordParam(str, onlyAsNumber)
+	local ret = nil
+	if str ~= nil then
+		local n = tonumber(str)
+		if n ~= nil then
+			ret = n
+		elseif onlyAsNumber ~= true then
+			ret = string.strip_whitespace(string.clearDuplicatedBlankSpaces(str))
+		end
+	end
+	if ret == '' then ret = nil end
+	return ret
+end
+	
+--internal funcion used by serializeParam
+local function getNextWord(param, startPos)
+	local i1,i2, j1, j2, retStr, retNextStartSearch
+	local notInterpret = false
+	i1, i2 = param:find('".-"', startPos)
+	j1, j2 = param:find('%s+%d', startPos)
+	if i1 ~= nil and (j1 == nil or i1 <= j1) then
+		if i1 > startPos then
+			retStr = param:sub(startPos, i1 - 1)
+			retNextStartSearch = i1
+		else
+			retStr = param:sub(i1 + 1, i2 - 1)
+			retNextStartSearch = i2 + 1
+			notInterpret = true
+		end
+	elseif j1 ~= nil and (i1 == nil or i1 > j1) then
+		if j1 > startPos then
+			retStr = param:sub(startPos, j1 - 1)
+			retNextStartSearch = j1
+		else
+			local firstDigitPos = param:find('%d', startPos)
+			local endPosStr = param:find('[%s"]', firstDigitPos + 1)
+			if endPosStr == nil then
+				retStr = param:sub(firstDigitPos)
+				retNextStartSearch = param:len() + 1
+			else
+				retStr = param:sub(firstDigitPos, endPosStr - 1)
+				retNextStartSearch = endPosStr
+			end
+		end
+	else
+		retStr = param:sub(startPos)
+		retNextStartSearch = param:len() + 1
+	end
+	if not notInterpret then
+		retStr = interpretStringAsWordParam(retStr)
+	end
+	return retStr, retNextStartSearch
+end
+
+--[[ this function serialize the string param into several parameters, following those rules:
+     1) anything between quotes is taking literally, ignoring any other rule;
+     2) blank spaces at the beginning/end of a parameter are eliminated (except for the case of rule 1);
+     3) all duplicated blank spaces are replaced by a single blank space (except for the case of rule 1);
+     4) if a word starts with a number, then it means the beginning of a new parameter(except for the case of rule 1);
+     5) string which represent numbers are automatically replaced by those numbers (except for the case of rule 1)
+--]]
+
+function serializeParam(param)
+	local ret = {}
+	local startPos = 1
+	local len = param:len()
+	local str, asNumber
+	while startPos <= len do
+		str, startPos = getNextWord(param, startPos)
+		if str ~= nil then
+			table.insert(ret, str)
+		end
+	end
+	return ret
+end
+
 
 function convertIntToIP(int, mask)
 	local b4 = bit.urshift(bit.uband(int,  4278190080), 24)
