@@ -12898,7 +12898,7 @@
 	</item>
 	<item id="6004" name="remains of a mummy" editorsuffix=" (Unmoveable)">
 		<attribute key="containerSize" value="10"/>
-		<attribute key="decayTo" value="2949"/>
+		<attribute key="decayTo" value="9083"/>
 		<attribute key="duration" value="10"/>
 		<attribute key="corpseType" value="undead"/>
 	</item>
@@ -21211,8 +21211,11 @@
 		<attribute key="containerSize" value="10"/>
 	</item>
 	<item id="9083" name="remains of a mummy">
+		<attribute key="weight" value="1000"/>
 		<attribute key="weight" value="48000"/>
 		<attribute key="containerSize" value="10"/>
+		<attribute key="decayTo" value="2950"/>
+		<attribute key="duration" value="900"/>
 	</item>
 	<item id="9084" article="an" name="iron pillar"/>
 	<item id="9085" article="an" name="iron construction"/>

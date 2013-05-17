@@ -200,7 +200,6 @@ private:
 	bool isOpponent(const Creature* creature);
 
 	virtual uint64_t getLostExperience() const { return ((skillLoss ? mType->experience : 0)); }
-	virtual uint16_t getLookCorpse() { return mType->lookCorpse; }
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return mType->damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return mType->conditionImmunities; }
