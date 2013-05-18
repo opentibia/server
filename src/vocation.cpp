@@ -105,6 +105,9 @@ bool Vocations::loadFromXml(const std::string& datadir)
 					if(readXMLInteger(p, "attackspeed", intVal)){
 						voc->attackSpeed = intVal;
 					}
+					if(readXMLFloat(p, "expMultiplier", floatVal)){
+						voc->expMultiplier = floatVal;
+					}
 					skillNode = p->children;
 					while(skillNode){
 						if(xmlStrcmp(skillNode->name, (const xmlChar*)"skill") == 0){
@@ -218,6 +221,7 @@ Vocation::Vocation()
 	maxSoul = 100;
 	gainSoulTicks = 120;
 	manaMultiplier = 4.0;
+	expMultiplier = 1.0;
 	attackSpeed = 1500;
 
 	skillMultipliers[0] = 1.5f;

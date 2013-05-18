@@ -222,6 +222,8 @@ public:
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
 	uint32_t getBaseSpeed() const {return baseSpeed;}
 
+	virtual float getGainExpMultiplierDueType() const { return 1.0; };
+
 	virtual int32_t getHealth() const {
 		if(health < 0){
 			return 0;

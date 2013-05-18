@@ -863,7 +863,7 @@ Item* Creature::dropCorpse()
 	this->onDieEvent(corpse);
 	if(corpse)
 		dropLoot(corpse->getContainer());
-		
+
 	return corpse;
 }
 
@@ -1216,7 +1216,7 @@ double Creature::getDamageRatio(Creature* attacker) const
 
 uint64_t Creature::getGainedExperience(Creature* attacker) const
 {
-	return (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
+	return (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE) * attacker->getGainExpMultiplierDueType());
 }
 
 void Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)

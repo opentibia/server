@@ -47,6 +47,7 @@ public:
 	uint16_t getSoulMax() const {return maxSoul;};
 	uint16_t getSoulGainTicks() const {return gainSoulTicks;};
 	uint32_t getAttackSpeed() const {return attackSpeed;};
+	float getExpMultiplier() const { return expMultiplier; };
 
 	float getMeleeBaseDamage(WeaponType_t weaponType) const
 	{
@@ -90,6 +91,7 @@ protected:
 	uint32_t skillBases[SKILL_LAST + 1];
 	float skillMultipliers[SKILL_LAST + 1];
 	float manaMultiplier;
+	float expMultiplier;
 	uint32_t attackSpeed;
 
 	float swordBaseDamage;

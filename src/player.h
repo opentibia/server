@@ -161,7 +161,7 @@ public:
 	bool canSeeGmInvisible(const Player* player) const { return (player->getAccessLevel() <= getAccessLevel()); }
 	bool hasSomeInvisibilityFlag() const { return hasFlag(PlayerFlag_CannotBeSeen) || isGmInvisible(); }
 	//]
-	
+
 	void setFlags(uint64_t flags){ groupFlags = flags;}
 	bool hasFlag(PlayerFlags value) const { return (0 != (groupFlags & ((uint64_t)1 << value)));}
 
@@ -172,6 +172,8 @@ public:
 	bool isOnline() const {return !isOffline();}
 	void disconnect() {if(client) client->disconnect();}
 	uint32_t getIP() const;
+
+	virtual float getGainExpMultiplierDueType() const { return vocation->getExpMultiplier(); };
 
 	void addContainer(uint32_t cid, Container* container);
 	void closeContainer(uint32_t cid);
@@ -465,7 +467,7 @@ public:
 	void broadcastLoot(Creature* creature, Container* corpse);
 	bool checkPzBlock(Player* targetPlayer);
 	bool canAddContainer(const Container* container) const;
-	
+
 	//creature events
 	void onAdvanceEvent(levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
 	bool onLookEvent(Thing* target, uint32_t itemId);
@@ -716,7 +718,7 @@ public:
 	int32_t getStamina() {return stamina;}
 	int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
 	void setStaminaMinutes(uint32_t value) {addStamina((int64_t)(value * STAMINA_MULTIPLIER));}
-	
+
 	//depots
 	DepotMap depots;
 	uint32_t maxDepotLimit;
