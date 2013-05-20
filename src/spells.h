@@ -83,6 +83,8 @@ public:
 
 	virtual bool castSpell(Creature* creature) = 0;
 	virtual bool castSpell(Creature* creature, Creature* target) = 0;
+	virtual Spell* getSpell() { return NULL; }
+	virtual const Spell* getSpell() const { return NULL; }
 
 	//used by some child classes, like CombatSpell and InstantSpell
 	bool internalExecuteCastSpell(Event *event, Creature* creature, const LuaVariant& var, bool &result);
@@ -117,6 +119,9 @@ public:
 
 	bool configureSpell(xmlNodePtr xmlspell);
 	const std::string& getName() const {return name;}
+
+	virtual Spell* getSpell() { return this; }
+	virtual const Spell* getSpell() const { return this; }
 
 	void postCastSpell(Player* player, bool finishedSpell = true, bool payCost = true) const;
 	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;

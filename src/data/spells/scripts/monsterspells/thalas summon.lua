@@ -4,7 +4,7 @@ setCombatArea(combat, area)
 
 local maxsummons = 8
 
-function onCastSpell(cid, var)
+function onCastSpell(cid, var, extraParameters)
 	local summoncount = getCreatureSummons(cid)
 	if #summoncount < 8 then
 		for i = 1, maxsumons - #summoncount do

@@ -196,8 +196,9 @@ bool BaseSpell::internalExecuteCastSpell(Event *event, Creature* creature, const
 		lua_pushnumber(L, cid);
 		m_scriptInterface->pushVariant(L, var);
 
-		if(creature->getMonster())
-			g_monsters.pushSpellParameters(creature->getName(), m_scriptInterface);
+		if(creature->getMonster() && getSpell()){
+			g_monsters.pushSpellParameters(creature->getName(), m_scriptInterface, getSpell()->getName());
+		}
 		else
 			lua_pushnil(L);
 
@@ -504,6 +505,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 	std::string strValue;
 	if(readXMLString(p, "name", strValue)){
 		name = strValue;
+		toLowerCaseString(name);
 
 		const char* reservedList[] =
 		{
@@ -2115,7 +2117,7 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 
 	hasCharges = (charges > 0);
 
-	if(magLevel != 0 || 
+	if(magLevel != 0 ||
 		(g_config.getNumber(ConfigManager::USE_RUNE_LEVEL_REQUIREMENTS) && level != 0)){
 		//Change information in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);

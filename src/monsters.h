@@ -125,7 +125,7 @@ public:
 	bool isLureable;
 
 	ParametersMap m_parameters;
-	ParametersMap m_spellParameters;
+	std::map<std::string, ParametersMap> m_spellParameters;
 
 	int lightLevel;
 	int lightColor;
@@ -168,13 +168,13 @@ public:
 
 	static uint32_t getLootRandom();
 
-	void pushSpellParameters(const std::string name, LuaScriptInterface* env);
+	void pushSpellParameters(const std::string monsterName, LuaScriptInterface* env, const std::string spellName);
 
 private:
 	ConditionDamage* getDamageCondition(ConditionType_t conditionType,
 		int32_t maxDamage, int32_t minDamage, int32_t startDamage, uint32_t tickInterval);
 	bool deserializeSpell(xmlNodePtr node, spellBlock_t& sb, MonsterType* mType, const std::string& description = "");
-	void deserializeParameters(xmlNodePtr node, MonsterType* mType, bool fromSpell = false);
+	void deserializeParameters(xmlNodePtr node, MonsterType* mType, const std::string& name = "");
 
 	bool loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
 

@@ -209,13 +209,13 @@ bool hasBitSet(uint32_t flag, uint32_t flags)
 bool safeIncrUInt32_t(uint32_t& x, uint32_t incr)
 {
     const static uint32_t MAXUINT32 = std::numeric_limits<uint32_t>::max();
- 
+
     if(MAXUINT32 - incr >= x)
     {
         x += incr;
         return true;
     }
- 
+
     return false;
 }
 
@@ -759,7 +759,7 @@ uint32_t adlerChecksum(uint8_t *data, int32_t len)
 {
 	if(len > NETWORKMESSAGE_MAXSIZE)
 		return 0;
-		
+
 	if(len < 0){
 		std::cout << "[Error] adlerChecksum. len < 0" << std::endl;
 		return 0;

@@ -31,8 +31,11 @@
 #include <ctime>
 #include <cstring>
 #include "string.h"
+#include <map>
+
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+
 
 enum DistributionType_t {
 	DISTRO_UNIFORM,
@@ -62,6 +65,37 @@ inline int32_t swap_int32(int32_t x)
 {
 	return (int32_t)swap_uint32((uint32_t)x);
 }
+
+
+template <class keyType, class valueType>
+void printMap(const std::map<keyType, valueType> &map, std::string text = "", std::string margin = "  ")
+{
+	typename std::map<keyType, valueType>::const_iterator it;
+	if(text.size() > 0)
+		std::cout << text << std::endl;
+	if(map.empty())
+		std::cout << margin << "(empty)" << std::endl;
+	for(it = map.begin(); it != map.end(); it++){
+		std::cout << margin << "key: " << it->first << " value: " << it->second << std::endl;
+	}
+}
+
+template <class keyType, class mapType>
+void printMapOfMaps(const std::map<keyType, mapType> mapOfMaps, std::string text ="", std::string margin = "  ")
+{
+	typename std::map<keyType, mapType>::const_iterator it;
+	if(text.size() > 0)
+		std::cout << text << std::endl;
+	if(mapOfMaps.empty())
+		std::cout << margin << "(empty)" << std::endl;
+	for(it = mapOfMaps.begin(); it != mapOfMaps.end(); it++){
+		std::cout << margin << "map for key: " << it->first << std::endl;
+		std::string margin2 = margin + margin;
+		std::string name2 = "";
+		printMap(it->second, name2, margin2);
+	}
+}
+
 
 /*template <typename T> void readPtrAs(uint8_t *ptr, T* val);
 template <typename T> void writePtrAs(uint8_t *ptr, T* val);*/

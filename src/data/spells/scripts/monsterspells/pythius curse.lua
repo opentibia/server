@@ -37,6 +37,6 @@ addDamageCondition(curse, 1, 4000, -342)
 addDamageCondition(curse, 1, 4000, -342)
 setCombatCondition(combat, curse)
 
-function onCastSpell(cid, var)
+function onCastSpell(cid, var, extraParameters)
 	return doCombat(cid, combat, var)
 end
