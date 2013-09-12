@@ -87,5 +87,5 @@ config.lua:
 
 
 distclean-local:
-	-rm -f config.lua.dist config.lua
+	-rm -f config.lua
 
