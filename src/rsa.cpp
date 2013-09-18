@@ -95,12 +95,12 @@ bool RSA::setKey(const std::string& file)
 		return false;
 	}
 
-	char p[512];
-	char q[512];
-	char d[512];
-	delete fgets(p, 512, f);
-	delete fgets(q, 512, f);
-	delete fgets(d, 512, f);
+	char p[512], q[512], d[512];
+	if (!fgets(p, 512, f) || !fgets(q, 512, f) || !fgets(d, 512, f)) {
+		fclose(f);
+		return false;
+	}
+	fclose(f);
 
 	setKey(p, q, d);
 	return true;
