@@ -32,8 +32,8 @@ public:
 	~RSA();
 	void setKey(const char* p, const char* q);
 	bool setKey(const std::string& file);
-	bool decrypt(char* msg, int32_t size);
-	bool encrypt(char* msg, int32_t size, const char* key);
+	bool decrypt(char* msg);
+	bool encrypt(char* msg);
 
 	int32_t getKeySize();
 	void getPublicKey(char* buffer);
