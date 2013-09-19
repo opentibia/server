@@ -27,7 +27,7 @@ RSA::RSA()
 	m_keySet = false;
 	mpz_init2(m_p, 1024);
 	mpz_init2(m_q, 1024);
-	mpz_init2(m_n, 8024);
+	mpz_init(m_n);
 	mpz_init2(m_d, 1024);
 	mpz_init(m_e);
 }
@@ -74,6 +74,11 @@ void RSA::setKey(const char* p, const char* q)
 	// n = p * q
 	mpz_mul(m_n, m_p, m_q);
 	
+	// TODO, since n is too small we won't be able to decode big numbers.
+	if(mpz_sizeinbase(m_n, 2) <= 1024){
+		std::cout << " WARNING: 2^1023 < n < 2^1024 ";
+	}
+	
 	// d = e^-1 mod (p - 1)(q - 1)
 	mpz_t p_1, q_1, pq_1;
 	mpz_init2(p_1, 1024);
@@ -94,7 +99,7 @@ void RSA::setKey(const char* p, const char* q)
 	mpz_clear(pq_1);
 }
 
-bool RSA::encrypt(char* msg, int32_t size, const char* key)
+bool RSA::encrypt(char* msg)
 {
 	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
 	
@@ -118,7 +123,7 @@ bool RSA::encrypt(char* msg, int32_t size, const char* key)
 	return true;
 }
 
-bool RSA::decrypt(char* msg, int32_t size)
+bool RSA::decrypt(char* msg)
 {
 	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
 
