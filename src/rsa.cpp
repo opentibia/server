@@ -95,8 +95,8 @@ bool RSA::setKey(const std::string& file)
 		return false;
 	}
 
-	char p[512], q[512], d[512];
-	if (!fgets(p, 512, f) || !fgets(q, 512, f) || !fgets(d, 512, f)) {
+	char p[513], q[513], d[513];
+	if (!fgets(p, 513, f) || !fgets(q, 513, f) || !fgets(d, 513, f)) {
 		fclose(f);
 		return false;
 	}
