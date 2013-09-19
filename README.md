@@ -39,12 +39,10 @@ Then you are logged in.
 
 
 - Active Developers
-
-    - Assassina			OpenTibia
+    - iryont			OpenTibia
+    - marksamman		OpenTibia
+    - assassina			OpenTibia
     - hackerpotato		OpenTibia
-    - Nostradamus			POT/OpenTibia
-    - rafaelhamdan		OpenTibia
-    - Sim0ne				OpenTibia
 
 - Forum Administrators
 
@@ -61,6 +59,9 @@ Then you are logged in.
 
 - Inactive Developers
 
+    - Sim0ne
+    - Nostradamus
+    - rafaelhamdan
     - Acrimon
     - Haktivex
     - Fandoras
