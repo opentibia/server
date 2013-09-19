@@ -18,19 +18,19 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+
 #ifndef __OTSERV_RSA_H__
 #define __OTSERV_RSA_H__
 
-#include <string>
-#include <stdint.h>
-#include <boost/thread/recursive_mutex.hpp>
+#include "definitions.h"
 #include "gmp.h"
+#include <boost/thread.hpp>
 
 class RSA{
 public:
 	RSA();
 	~RSA();
-	void setKey(const char* p, const char* q, const char* d);
+	void setKey(const char* p, const char* q);
 	bool setKey(const std::string& file);
 	bool decrypt(char* msg, int32_t size);
 	bool encrypt(char* msg, int32_t size, const char* key);
@@ -45,7 +45,7 @@ protected:
 	boost::recursive_mutex rsaLock;
 
 	//use only GMP
-	mpz_t m_p, m_q, m_u, m_d, m_dp, m_dq, m_mod;
+	mpz_t m_p, m_q, m_n, m_d, m_e;
 };
 
 #endif
