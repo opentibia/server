@@ -3157,7 +3157,8 @@ void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* 
 		g_game.onPlayerEquipItem(this, thing->getItem(), SlotType(index), true);
 	}
 
-
+	bool requireListUpdate = true;
+	
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		const Item* i = (oldParent? oldParent->getItem() : NULL);
 
