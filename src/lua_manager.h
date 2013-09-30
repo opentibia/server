@@ -22,7 +22,8 @@
 #include <queue>
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
-#include <lua.hpp>
+
+#include "lua.hpp"
 #include "classes.h"
 #include "enums.h"
 #include "outfit.h"
