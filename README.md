@@ -11,7 +11,7 @@ control.
 
 # How does it work?
 
-This version of OTServ is targeted towards Tibia 8.60 and 8.61.
+This version of OTServ is targeted towards Tibia 8.7.
 
 To connect Tibia client to OTServ you will have to use an IP changer, you can get one here
 http://www.otchanger.net/
@@ -31,16 +31,13 @@ Then you are logged in.
 
 - Project Admins
 
+    - Iryont / iryont
+    - Talaturen / marksamman
     - Remere / hjnilsson
-    - SimOne / xeroc81
-    - Tliff *Inactive*
-    - Spin *Inactive*
-    - Shi'Voc *Inactive*
 
 
 - Active Developers
-    - iryont			OpenTibia
-    - marksamman		OpenTibia
+- 
     - assassina			OpenTibia
     - hackerpotato		OpenTibia
 
@@ -59,7 +56,10 @@ Then you are logged in.
 
 - Inactive Developers
 
-    - Sim0ne
+    - SimOne / xeroc81
+    - Tliff
+    - Spin
+    - Shi'Voc
     - Nostradamus
     - rafaelhamdan
     - Acrimon
