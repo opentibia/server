@@ -37,7 +37,7 @@ Then you are logged in.
 
 
 - Active Developers
-- 
+
     - assassina			OpenTibia
     - hackerpotato		OpenTibia
 
