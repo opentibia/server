@@ -98,7 +98,7 @@ bool readXMLInteger64(xmlNodePtr node, const char* tag, uint64_t& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
-		value = ATOI64(nodeValue);
+		value = atoll(nodeValue);
 		xmlFree(nodeValue);
 		return true;
 	}
