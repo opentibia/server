@@ -22,6 +22,8 @@
 #define __OTSERV_HOUSE_H__
 
 #include <boost/regex.hpp>
+#include <unordered_set>
+
 #include "position.h"
 #include "item.h"
 #include "container.h"
