@@ -1,5 +1,5 @@
 #ifndef __LUAHPP__
-#define __LUAHPP_
+#define __LUAHPP__
 
 extern "C"
 {
