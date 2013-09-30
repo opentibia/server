@@ -13,7 +13,7 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}")
 set(CMAKE_CXX_FLAGS             "-D__USE_MYSQL__")
 
 # Show all warnings and make them as errors
-set(CMAKE_CXX_FLAGS             "-Wall -Werror ${CMAKE_CXX_FLAGS}")
+#set(CMAKE_CXX_FLAGS             "-Wall -Werror ${CMAKE_CXX_FLAGS}")
 
 # Set compiler standard to C++11
 set(CMAKE_CXX_FLAGS             "-std=c++0x ${CMAKE_CXX_FLAGS}")
