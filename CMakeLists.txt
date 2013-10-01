@@ -9,6 +9,9 @@ set(VERSION_MINOR 7)
 set(VERSION_MICRO 0)
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}")
 
+# Make sure the compiler can compile C++11 code
+include(FindCXX11)
+
 # Use MySQL
 set(CMAKE_CXX_FLAGS             "-D__USE_MYSQL__")
 
