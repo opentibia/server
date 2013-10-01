@@ -18,10 +18,4 @@ set(CMAKE_CXX_FLAGS             "-D__USE_MYSQL__")
 # Set compiler standard to C++11
 set(CMAKE_CXX_FLAGS             "-std=c++0x ${CMAKE_CXX_FLAGS}")
 
-# Include libxml2 headers
-set(CMAKE_CXX_FLAGS             "-I/usr/include/libxml2 ${CMAKE_CXX_FLAGS}")
-
-# Link with libxml2 library
-set(CMAKE_EXE_LINKER_FLAGS      "-lxml2")
-
 add_subdirectory(src)
