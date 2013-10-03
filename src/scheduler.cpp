@@ -41,7 +41,7 @@ void Scheduler::start()
 {
 	assert(m_threadState == STATE_TERMINATED);
 	m_threadState = STATE_RUNNING;
-	m_thread = boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)this)).move();
+	m_thread = boost::thread(boost::bind(&Scheduler::schedulerThread, (void*)this));
 }
 
 void Scheduler::schedulerThread(void* p)
