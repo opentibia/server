@@ -4,7 +4,7 @@ file(GLOB_RECURSE HDR_LIST *.h)
 find_package(Boost COMPONENTS thread regex system filesystem REQUIRED)
 find_package(GMP)
 find_package(MySQL)
-#find_package(SQLite)
+find_package(SQLite)
 find_package(Lua 5.1)
 find_package(LibXML2)
 
