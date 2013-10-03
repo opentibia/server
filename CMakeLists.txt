@@ -9,8 +9,8 @@ set(VERSION_MINOR 7)
 set(VERSION_MICRO 0)
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}")
 
-# Use MySQL
-set(CMAKE_CXX_FLAGS             "-D__USE_MYSQL__")
+# Compile with both MySQL and SQLite
+set(CMAKE_CXX_FLAGS             "-D__USE_MYSQL__ -D__USE_SQLITE__")
 
 # Make sure the compiler can compile C++11 code
 include(FindCXX11)
