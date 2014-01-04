@@ -429,7 +429,7 @@ bool BanManager::removeAccountBans(uint32_t accno) const
 	query << "SELECT `ban_id` AS `id` "
 			 "FROM `account_bans` "
 			 "INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
-			 "WHERE `account_id` = " << guid << " AND `active` = 1"
+			 "WHERE `account_id` = " << accno << " AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
