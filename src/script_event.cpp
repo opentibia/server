@@ -2404,12 +2404,7 @@ bool OnDeath::Event::check_match(const ScriptInformation& info)
 		case FILTER_ACTOR_DEATH_BY_ACTOR:
 			return killer != NULL && creature->getActor() == NULL && killer->getActor() != NULL;
 		case FILTER_ACTOR_DEATH_BY_PLAYER:
-			return killer != NULL && creature->getActor() != NULL && killer->get
-				(this, state, environment, list))
-			return true;
-	}
-
-	if(dispatchEventPlayer() != NULL;
+			return killer != NULL && creature->getActor() != NULL && killer->getPlayer() != NULL;
 		default: break;
 	}
 	return false;
