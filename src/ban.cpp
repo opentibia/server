@@ -397,7 +397,7 @@ bool BanManager::removePlayerBans(uint32_t guid) const
 	query << "SELECT `ban_id` AS `id` "
 			 "FROM `player_bans` "
 			 "INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
-			 "WHERE `player_id` = " << guid << " AND `active` = 1"
+			 "WHERE `player_id` = " << guid << " AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
@@ -462,7 +462,7 @@ uint32_t BanManager::getNotationsCount(uint32_t account) const
 
 std::vector<Ban> BanManager::getBans(BanType_t type)
 {
-	std::vector<Ban> result;
+	std::vector<Ban> ret;
 	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	
@@ -513,9 +513,9 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 			ban.adminId = result->getDataInt("admin_id");
 			ban.comment = result->getDataString("comment");
 			
-			result.push_back(ban);
+			ret.push_back(ban);
 		}
 	}
 	
-	return result;
+	return ret;
 }
