@@ -109,7 +109,7 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 	query << "SELECT COUNT(*) AS `count` "
 			 "FROM `ip_bans` "
 			 "INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-			 "WHERE " << "((" << clientip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) AND `active` = 1 AND (`expires` >= unix_timestamp(now()) OR `expires` <= 0)"
+			 "WHERE " << "((" << clientip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) AND `active` = 1 AND (`expires` >= unix_timestamp(now()) OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str()))){
@@ -158,7 +158,8 @@ bool BanManager::isAccountBanished(uint32_t accountId) const
 			 "FROM `account_bans` "
 			 "INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
 			 "WHERE "
-			 "`account_id` = " << accountId << " AND "
+			 "`account_id` = ";
+			 query << accountId << " AND "
 			 "`active` = 1 AND "
 			 "(`expires` >= unix_timestamp(now()) OR `expires` <= 0)";
 
@@ -215,7 +216,7 @@ uint32_t adminid, std::string comment) const
 	DBInsert stmt(db);
 	DBQuery query;
 	
-	stmtBan.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
+	stmt.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
 	query << time << ", " << std::time(NULL) << ", 1, " << adminid << ", " << db->escapeString(comment);
 	
 	if(!stmt.addRow(query.str())){
@@ -255,7 +256,7 @@ std::string comment, std::string statement, uint32_t reason, ViolationAction act
 	DBInsert stmt(db);
 	DBQuery query;
 	
-	stmtBan.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
+	stmt.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
 	query << time << ", " << std::time(NULL) << ", 1, " << adminid << ", " << db->escapeString(comment);
 	
 	if(!stmt.addRow(query.str())){
@@ -317,7 +318,7 @@ std::string comment, std::string statement, uint32_t reason, ViolationAction act
 	DBInsert stmt(db);
 	DBQuery query;
 	
-	stmtBan.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
+	stmt.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
 	query << time << ", " << std::time(NULL) << ", 1, " << adminid << ", " << db->escapeString(comment);
 	
 	if(!stmt.addRow(query.str())){
@@ -371,7 +372,7 @@ bool BanManager::removeIpBans(uint32_t ip, uint32_t mask) const
 	query << "SELECT `ban_id` AS `id` "
 			 "FROM `ip_bans` "
 			 "INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-			 "WHERE " << "((" << ip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) AND `active` = 1"
+			 "WHERE " << "((" << ip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
