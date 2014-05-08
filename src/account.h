@@ -30,7 +30,8 @@ struct AccountCharacter
 	AccountCharacter() : ip(0), port(7172) {}
 
 	std::string name;
-	std::string world;
+    std::string world_name;
+    uint16_t world_id;
 	uint32_t ip;
 	uint16_t port;
 };

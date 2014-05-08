@@ -1123,7 +1123,8 @@ void OnAccountLogin::Event::push_instance(LuaState& state, Environment& environm
 	for(std::list<AccountCharacter>::iterator iter = charList.begin(); iter != charList.end(); ++iter, ++n){
 		state.newTable();
 		state.setField(-1, "name", iter->name);
-		state.setField(-1, "name", iter->world);
+        state.setField(-1, "world_name", iter->world_name);
+        state.setField(-1, "world_id", iter->world_id);
 		state.setField(-1, "ip", iter->ip);
 		state.setField(-1, "port", iter->port);
 	}
@@ -1193,8 +1194,11 @@ void OnAccountLogin::Event::update_instance(Manager& state, Environment& environ
 			thread->getField(-1, "name");
 			character.name = thread->popString();
 
-			thread->getField(-1, "world");
-			character.world = thread->popString();
+            thread->getField(-1, "world_name");
+            character.world_name = thread->popString();
+
+            thread->getField(-1, "world_id");
+            character.world_id = thread->popUnsignedInteger();
 
 			thread->getField(-1, "ip");
 			character.ip = thread->popUnsignedInteger();
@@ -2230,9 +2234,8 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 	state.setField(-2, "creature");
 	state.pushThing(combatSource.getSourceCreature());
 	state.setField(-2, "attacker");
-	//TODO: Be able to export BitEnum
-	//state.pushEnum(combatType);
-	//state.setField(-2, "combatType");
+    state.pushEnum(combatType);
+    state.setField(-2, "combatType");
 	state.pushThing(combatSource.getSourceItem());
 	state.setField(-2, "item");
 	state.pushBoolean(combatSource.isSourceCondition());
@@ -2243,9 +2246,7 @@ void OnDamage::Event::push_instance(LuaState& state, Environment& environment)
 
 void OnDamage::Event::update_instance(Manager& state, Environment& environment, LuaThread_ptr thread)
 {
-	/*
-	//TODO: Be able to export BitEnum
-	thread->getField(-1, "combatType");
+    thread->getField(-1, "combatType");
 	if(thread->isTable()) {
 		try{
 			combatType = thread->popEnum<CombatType>();
@@ -2258,7 +2259,6 @@ void OnDamage::Event::update_instance(Manager& state, Environment& environment, 
 		thread->HandleError(ERROR_WARN, "Event 'OnDamage' invalid value of 'combatType'");
 		thread->pop();
 	}
-	*/
 
 	thread->getField(-1, "value");
 	if(thread->isNumber()) {

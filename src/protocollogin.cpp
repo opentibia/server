@@ -153,9 +153,16 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		for(it = account.charList.begin(); it != account.charList.end(); it++){
 			const AccountCharacter& character = *it;
 			output->AddString(character.name);
-			output->AddString(character.world);
-			output->AddU32(character.ip);
-			output->AddU16(character.port);
+            output->AddString(character.world_name);
+
+            if (clientip == getIP() && character.world_id ==
+                    (uint16_t)g_config.getNumber(ConfigManager::WORLD_ID))
+                // Client is at Localhost and also the Game World is located in the same IP as Login Server.
+                output->AddU32(clientip);
+            else
+                output->AddU32(character.ip);
+
+            output->AddU16(character.port);
 		}
 		output->AddU16(IOAccount::getPremiumDaysLeft(account.premiumEnd));
 

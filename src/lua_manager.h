@@ -694,8 +694,7 @@ inline void LuaState::pushEnum(const Enum<E, size_>& e){
 
 template<class E, int size_>
 inline void LuaState::pushEnum(const BitEnum<E, size_>& e){
-	throw enum_conversion_error("Can not convert BitEnum to lua value (yet)");
-	//getGlobal(e.toString());
+    getGlobal(e.toString());
 }
 
 
