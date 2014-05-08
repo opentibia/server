@@ -28,6 +28,14 @@
 
 extern ConfigManager g_config;
 
+std::string BanManager::getNowString() const
+{
+    if(g_config.getString(ConfigManager::SQL_TYPE) == "sqlite")
+        return "strftime('%s', 'now')";
+    else
+        return "unix_timestamp(now())";
+}
+
 bool BanManager::clearTemporaryBans() const
 {
 	DatabaseDriver* db = DatabaseDriver::instance();
@@ -109,7 +117,8 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 	query << "SELECT COUNT(*) AS `count` "
 			 "FROM `ip_bans` "
 			 "INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-			 "WHERE " << "((" << clientip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) AND `active` = 1 AND (`expires` >= unix_timestamp(now()) OR `expires` <= 0)";
+             "WHERE " << "((" << clientip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask <<
+             ")) AND `active` = 1 AND (`expires` >= " << getNowString() << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str()))){
@@ -131,7 +140,7 @@ bool BanManager::isPlayerBanished(uint32_t playerId) const
 			 "WHERE "
 			 "`player_id` = " << playerId << " AND "
 			 "`active` = 1 AND "
-			 "(`expires` >= unix_timestamp(now()) OR `expires` <= 0)";
+             "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str()))){
@@ -154,14 +163,14 @@ bool BanManager::isAccountBanished(uint32_t accountId) const
 	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
-	query << "SELECT (COUNT*) as `count` ";
+    query << "SELECT COUNT(*) as `count` "
 			 "FROM `account_bans` "
 			 "INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
 			 "WHERE "
 			 "`account_id` = ";
 			 query << accountId << " AND "
 			 "`active` = 1 AND "
-			 "(`expires` >= unix_timestamp(now()) OR `expires` <= 0)";
+             "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str())))
@@ -473,7 +482,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 					 "INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
 					 "WHERE "
 					 "`active` = 1 AND "
-					 "(`expires` >= unix_timestamp(now()) OR `expires` <= 0)";
+                     "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
 			break;
 		}
 		
@@ -483,7 +492,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 					 "INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
 					 "WHERE "
 					 "`active` = 1 AND "
-					 "(`expires` >= unix_timestamp(now()) OR `expires` <= 0)";
+                     "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
 			break;
 		}
 		
@@ -493,7 +502,7 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 					 "INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
 					 "WHERE "
 					 "`active` = 1 AND "
-					 "(`expires` >= unix_timestamp(now()) OR `expires` <= 0)";
+                     "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
 			break;
 		}
 		
