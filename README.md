@@ -40,6 +40,7 @@ Then you are logged in.
 
     - assassina			OpenTibia
     - hackerpotato		OpenTibia
+    - kilouco / aseverino	OpenTibia
 
 - Forum Administrators
 
@@ -86,7 +87,6 @@ Then you are logged in.
     - Primer
     - j4K3xBl4sT3r
     - Wrzasq
-    - Kilouco
     - nfries88
     - the fike
     - Vitor
