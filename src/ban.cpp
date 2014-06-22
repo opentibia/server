@@ -81,7 +81,7 @@ bool BanManager::isIpDisabled(uint32_t clientip)
 	if(g_config.getNumber(ConfigManager::LOGIN_TRIES) == 0 || clientip == 0) return false;
 	banLock.lock();
 
-	time_t currentTime = std::time(NULL);
+	time_t currentTime = (OTSYS_TIME() / 1000);
 	IpLoginMap::iterator it = ipLoginMap.find(clientip);
 	if(it != ipLoginMap.end()){
 		uint32_t loginTimeout = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TIMEOUT) / 1000;
@@ -180,7 +180,7 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 	
 	banLock.lock();
 
-	time_t currentTime = std::time(NULL);
+	time_t currentTime = (OTSYS_TIME() / 1000);
 	IpLoginMap::iterator it = ipLoginMap.find(clientip);
 	if(it == ipLoginMap.end()){
 		LoginBlock lb;
@@ -218,7 +218,7 @@ uint32_t adminid, std::string comment) const
 	DBQuery query;
 	
 	stmt.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
-	query << time << ", " << std::time(NULL) << ", 1, " << adminid << ", " << db->escapeString(comment);
+	query << time << ", " << (OTSYS_TIME() / 1000) << ", 1, " << adminid << ", " << db->escapeString(comment);
 	
 	if(!stmt.addRow(query.str())){
 		return false;
@@ -258,7 +258,7 @@ std::string comment, std::string statement, uint32_t reason, ViolationAction act
 	DBQuery query;
 	
 	stmt.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
-	query << time << ", " << std::time(NULL) << ", 1, " << adminid << ", " << db->escapeString(comment);
+	query << time << ", " << (OTSYS_TIME() / 1000) << ", 1, " << adminid << ", " << db->escapeString(comment);
 	
 	if(!stmt.addRow(query.str())){
 		return false;
@@ -320,7 +320,7 @@ std::string comment, std::string statement, uint32_t reason, ViolationAction act
 	DBQuery query;
 	
 	stmt.setQuery("INSERT INTO `bans` (`expires`, `added`, `active`, `admin_id`, `comment`) VALUES ");
-	query << time << ", " << std::time(NULL) << ", 1, " << adminid << ", " << db->escapeString(comment);
+	query << time << ", " << (OTSYS_TIME() / 1000) << ", 1, " << adminid << ", " << db->escapeString(comment);
 	
 	if(!stmt.addRow(query.str())){
 		return false;
