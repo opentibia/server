@@ -63,7 +63,7 @@ typedef std::map<uint32_t, ConnectBlock > IpConnectMap;
 
 class BanManager {
 public:
-    BanManager() { m_nowString = ""; }
+    BanManager() {}
 	~BanManager() {}
 
     bool clearTemporaryBans() const;
@@ -101,9 +101,6 @@ protected:
 
 	IpLoginMap ipLoginMap;
 	IpConnectMap ipConnectMap;
-
-    std::string m_nowString;
-    std::string getNowString() const;
 };
 
 #endif
