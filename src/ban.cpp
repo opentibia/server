@@ -107,19 +107,18 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 
 	DBQuery query;
 	query <<
-			"SELECT COUNT(*) AS `count` "
-			"FROM `ip_bans` "
-			"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-			"WHERE " << "((" << clientip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask <<
-			")) AND `active` = 1 AND (`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
+		"SELECT COUNT(*) AS `count` "
+		"FROM `ip_bans` "
+		"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
+		"WHERE " << "((" << clientip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) "
+		"AND `active` = 1 AND (`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str()))){
 		return false;
 	}
 
-	int t = result->getDataInt("count");
-	return t > 0;
+	return result->getDataInt("count") > 0;
 }
 
 bool BanManager::isPlayerBanished(uint32_t playerId) const
@@ -128,13 +127,13 @@ bool BanManager::isPlayerBanished(uint32_t playerId) const
 
 	DBQuery query;	
 	query <<
-			"SELECT COUNT(*) AS `count` "
-			"FROM `player_bans` "
-			"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
-			"WHERE "
-			"`player_id` = " << playerId << " AND "
-			"`active` = 1 AND "
-			"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
+		"SELECT COUNT(*) AS `count` "
+		"FROM `player_bans` "
+		"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
+		"WHERE "
+		"`player_id` = " << playerId << " AND "
+		"`active` = 1 AND "
+		"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str()))){
@@ -158,11 +157,11 @@ bool BanManager::isAccountBanished(uint32_t accountId) const
 
 	DBQuery query;
 	query <<
-			"SELECT COUNT(*) as `count` "
-			"FROM `account_bans` "
-			"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
-			"WHERE "
-			"`account_id` = " << accountId << " AND `active` = 1 AND (`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
+		"SELECT COUNT(*) as `count` "
+		"FROM `account_bans` "
+		"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
+		"WHERE "
+		"`account_id` = " << accountId << " AND `active` = 1 AND (`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str())))
@@ -191,9 +190,10 @@ void BanManager::addLoginAttempt(uint32_t clientip, bool isSuccess)
 		it = ipLoginMap.find(clientip);
 	}
 
-	if(it->second.numberOfLogins >= (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TRIES))
-	it->second.numberOfLogins = 0;
-
+	if(it->second.numberOfLogins >= (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TRIES)){
+		it->second.numberOfLogins = 0;
+	}
+	
 	uint32_t retryTimeout = (uint32_t)g_config.getNumber(ConfigManager::RETRY_TIMEOUT) / 1000;
 	if(!isSuccess || ((uint32_t)currentTime < (uint32_t)it->second.lastLoginTime + retryTimeout)){
 		++it->second.numberOfLogins;
@@ -371,10 +371,11 @@ bool BanManager::removeIpBans(uint32_t ip, uint32_t mask) const
 
 	DBQuery query;
 	query <<
-			"SELECT `ban_id` AS `id` "
-			"FROM `ip_bans` "
-			"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-			"WHERE " << "((" << ip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) AND `active` = 1";
+		"SELECT `ban_id` AS `id` "
+		"FROM `ip_bans` "
+		"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
+		"WHERE " << "((" << ip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) "
+		"AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
@@ -397,10 +398,11 @@ bool BanManager::removePlayerBans(uint32_t guid) const
 
 	DBQuery query;
 	query <<
-			"SELECT `ban_id` AS `id` "
-			"FROM `player_bans` "
-			"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
-			"WHERE `player_id` = " << guid << " AND `active` = 1";
+		"SELECT `ban_id` AS `id` "
+		"FROM `player_bans` "
+		"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
+		"WHERE `player_id` = " << guid << " "
+		"AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
@@ -430,10 +432,11 @@ bool BanManager::removeAccountBans(uint32_t accno) const
 
 	DBQuery query;
 	query <<
-			"SELECT `ban_id` AS `id` "
-			"FROM `account_bans` "
-			"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
-			"WHERE `account_id` = " << accno << " AND `active` = 1";
+	"SELECT `ban_id` AS `id` "
+	"FROM `account_bans` "
+	"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
+	"WHERE `account_id` = " << accno << " "
+	"AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
@@ -473,34 +476,37 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 	switch(type){
 	case BAN_IPADDRESS: {
 			query <<
-					"SELECT `id`, `ip` as `value`, `mask` as `param`, `expires`, `added`, `admin_id`, `comment`"
-					"FROM `ip_bans` "
-					"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-					"WHERE "
-					"`active` = 1 AND "
-					"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
+				"SELECT `id`, `ip` as `value`, `mask` as `param`, `expires`, `added`, `admin_id`, `comment`"
+				"FROM `ip_bans` "
+				"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
+				"WHERE "
+				"`active` = 1 "
+				"AND "
+				"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 			break;
 		}
 		
 	case BAN_PLAYER: {
 			query <<
-					"SELECT `id`, `player_id` as `value`, `expires`, `added`, `admin_id`, `comment`"
-					"FROM `player_bans` "
-					"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
-					"WHERE "
-					"`active` = 1 AND "
-					"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
+				"SELECT `id`, `player_id` as `value`, `expires`, `added`, `admin_id`, `comment`"
+				"FROM `player_bans` "
+				"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
+				"WHERE "
+				"`active` = 1 "
+				"AND "
+				"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 			break;
 		}
 		
 	case BAN_ACCOUNT: {
 			query <<
-					"SELECT `id`, `account_id` as `value`, `expires`, `added`, `admin_id`, `comment`"
-					"FROM `account_bans` "
-					"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
-					"WHERE "
-					"`active` = 1 AND "
-					"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
+				"SELECT `id`, `account_id` as `value`, `expires`, `added`, `admin_id`, `comment`"
+				"FROM `account_bans` "
+				"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
+				"WHERE "
+				"`active` = 1 "
+				"AND "
+				"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 			break;
 		}
 		
