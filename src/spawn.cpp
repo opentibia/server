@@ -505,6 +505,9 @@ void Spawn::removeMonster(Actor* monster)
 			break;
 		}
 	}
+	
+	/* The check might have been removed from scheduler */
+        startSpawnCheck();
 }
 
 uint32_t Spawn::getInterval() const
