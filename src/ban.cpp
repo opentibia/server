@@ -28,14 +28,6 @@
 
 extern ConfigManager g_config;
 
-std::string BanManager::getNowString() const
-{
-    if(g_config.getString(ConfigManager::SQL_TYPE) == "sqlite")
-        return "strftime('%s', 'now')";
-    else
-        return "unix_timestamp(now())";
-}
-
 bool BanManager::clearTemporaryBans() const
 {
 	DatabaseDriver* db = DatabaseDriver::instance();
@@ -114,11 +106,12 @@ bool BanManager::isIpBanished(uint32_t clientip, uint32_t mask /*= 0xFFFFFFFF*/)
 	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
-	query << "SELECT COUNT(*) AS `count` "
-			 "FROM `ip_bans` "
-			 "INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-             "WHERE " << "((" << clientip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask <<
-             ")) AND `active` = 1 AND (`expires` >= " << getNowString() << " OR `expires` <= 0)";
+	query <<
+			"SELECT COUNT(*) AS `count` "
+			"FROM `ip_bans` "
+			"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
+			"WHERE " << "((" << clientip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask <<
+			")) AND `active` = 1 AND (`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str()))){
@@ -134,13 +127,14 @@ bool BanManager::isPlayerBanished(uint32_t playerId) const
 	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;	
-	query << "SELECT COUNT(*) AS `count` "
-			 "FROM `player_bans` "
-			 "INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
-			 "WHERE "
-			 "`player_id` = " << playerId << " AND "
-			 "`active` = 1 AND "
-             "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
+	query <<
+			"SELECT COUNT(*) AS `count` "
+			"FROM `player_bans` "
+			"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
+			"WHERE "
+			"`player_id` = " << playerId << " AND "
+			"`active` = 1 AND "
+			"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str()))){
@@ -163,14 +157,12 @@ bool BanManager::isAccountBanished(uint32_t accountId) const
 	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
-    query << "SELECT COUNT(*) as `count` "
-			 "FROM `account_bans` "
-			 "INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
-			 "WHERE "
-			 "`account_id` = ";
-			 query << accountId << " AND "
-			 "`active` = 1 AND "
-             "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
+	query <<
+			"SELECT COUNT(*) as `count` "
+			"FROM `account_bans` "
+			"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
+			"WHERE "
+			"`account_id` = " << accountId << " AND `active` = 1 AND (`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 
 	DBResult_ptr result;
 	if(!(result = db->storeQuery(query.str())))
@@ -378,10 +370,11 @@ bool BanManager::removeIpBans(uint32_t ip, uint32_t mask) const
 	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
-	query << "SELECT `ban_id` AS `id` "
-			 "FROM `ip_bans` "
-			 "INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-			 "WHERE " << "((" << ip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) AND `active` = 1";
+	query <<
+			"SELECT `ban_id` AS `id` "
+			"FROM `ip_bans` "
+			"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
+			"WHERE " << "((" << ip << " & " << mask << " & `mask`) = (`ip` & `mask` & " << mask << ")) AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
@@ -403,10 +396,11 @@ bool BanManager::removePlayerBans(uint32_t guid) const
 	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
-	query << "SELECT `ban_id` AS `id` "
-			 "FROM `player_bans` "
-			 "INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
-			 "WHERE `player_id` = " << guid << " AND `active` = 1";
+	query <<
+			"SELECT `ban_id` AS `id` "
+			"FROM `player_bans` "
+			"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
+			"WHERE `player_id` = " << guid << " AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
@@ -435,10 +429,11 @@ bool BanManager::removeAccountBans(uint32_t accno) const
 	DatabaseDriver* db = DatabaseDriver::instance();
 
 	DBQuery query;
-	query << "SELECT `ban_id` AS `id` "
-			 "FROM `account_bans` "
-			 "INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
-			 "WHERE `account_id` = " << accno << " AND `active` = 1";
+	query <<
+			"SELECT `ban_id` AS `id` "
+			"FROM `account_bans` "
+			"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
+			"WHERE `account_id` = " << accno << " AND `active` = 1";
 	
 	for(DBResult_ptr result = db->storeQuery(query.str()); result; result = result->advance()){
 		query.reset();
@@ -476,37 +471,40 @@ std::vector<Ban> BanManager::getBans(BanType_t type)
 	DBQuery query;
 	
 	switch(type){
-		case BAN_IPADDRESS: {
-			query << "SELECT `id`, `ip` as `value`, `mask` as `param`, `expires`, `added`, `admin_id`, `comment`"
-					 "FROM `ip_bans` "
-					 "INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
-					 "WHERE "
-					 "`active` = 1 AND "
-                     "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
+	case BAN_IPADDRESS: {
+			query <<
+					"SELECT `id`, `ip` as `value`, `mask` as `param`, `expires`, `added`, `admin_id`, `comment`"
+					"FROM `ip_bans` "
+					"INNER JOIN `bans` ON `bans`.`id` = `ip_bans`.`ban_id` "
+					"WHERE "
+					"`active` = 1 AND "
+					"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 			break;
 		}
 		
-		case BAN_PLAYER: {
-			query << "SELECT `id`, `player_id` as `value`, `expires`, `added`, `admin_id`, `comment`"
-					 "FROM `player_bans` "
-					 "INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
-					 "WHERE "
-					 "`active` = 1 AND "
-                     "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
+	case BAN_PLAYER: {
+			query <<
+					"SELECT `id`, `player_id` as `value`, `expires`, `added`, `admin_id`, `comment`"
+					"FROM `player_bans` "
+					"INNER JOIN `bans` ON `bans`.`id` = `player_bans`.`ban_id` "
+					"WHERE "
+					"`active` = 1 AND "
+					"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 			break;
 		}
 		
-		case BAN_ACCOUNT: {
-			query << "SELECT `id`, `account_id` as `value`, `expires`, `added`, `admin_id`, `comment`"
-					 "FROM `account_bans` "
-					 "INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
-					 "WHERE "
-					 "`active` = 1 AND "
-                     "(`expires` >= " << getNowString() << " OR `expires` <= 0)";
+	case BAN_ACCOUNT: {
+			query <<
+					"SELECT `id`, `account_id` as `value`, `expires`, `added`, `admin_id`, `comment`"
+					"FROM `account_bans` "
+					"INNER JOIN `bans` ON `bans`.`id` = `account_bans`.`ban_id` "
+					"WHERE "
+					"`active` = 1 AND "
+					"(`expires` >= " << (OTSYS_TIME() / 1000) << " OR `expires` <= 0)";
 			break;
 		}
 		
-		default: break;
+	default: break;
 	}
 	
 	if(query.good()){
