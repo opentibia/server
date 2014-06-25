@@ -486,6 +486,9 @@ void Spawn::removeMonster(Monster* monster)
 			break;
 		}
 	}
+	
+	/* The check might have been removed from scheduler */
+        startSpawnCheck();
 }
 
 void Spawn::stopEvent()
