@@ -386,6 +386,9 @@ house_level = 1
 -- PS: This info is going to be shown just if house has no owner
 show_house_prices = false
 
+max_packets_per_second = 25
+
+
 -- SQL type
 -- options: mysql, sqlite, odbc or pgsql
 sql_type = "sqlite"

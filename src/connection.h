@@ -109,6 +109,8 @@ private:
 		m_receivedFirst = false;
 		m_writeError = false;
 		m_readError = false;
+		m_packetsSent = 0;
+		m_timeConnected = time(nullptr);
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		connectionCount++;
@@ -169,6 +171,9 @@ private:
 	bool m_receivedFirst;
 	bool m_writeError;
 	bool m_readError;
+
+	time_t m_timeConnected;
+	uint32_t m_packetsSent;
 
 	int32_t m_pendingWrite;
 	int32_t m_pendingRead;
