@@ -165,33 +165,35 @@ enum SpeakClasses {
 	SPEAK_PRIVATE           = 0x06, //Players speaking privately to players
 	SPEAK_CHANNEL_Y         = 0x07,	//Yellow message in chat
 	SPEAK_CHANNEL_W         = 0x08, //White message in chat
-	SPEAK_BROADCAST         = 0x09,	//Broadcast a message - #b
-	SPEAK_CHANNEL_R1        = 0x0A, //Talk red on chat - #c
-	SPEAK_PRIVATE_RED       = 0x0B,	//Red private - @name@ text
-	SPEAK_CHANNEL_O         = 0x0C,	//Talk orange on text
-	SPEAK_MONSTER_SAY       = 0x0D,	//Talk orange
-	SPEAK_MONSTER_YELL      = 0x0E,	//Yell orange
-
-	//removed from game
-	SPEAK_RVR_CHANNEL       = 0xFF + 1, //Reporting rule violation - Ctrl+R
-	SPEAK_RVR_ANSWER        = 0xFF + 2, //Answering report
-	SPEAK_RVR_CONTINUE	    = 0xFF + 3, //Answering the answer of the report
-	SPEAK_CHANNEL_R2        = 0xFF + 4,	//Talk red anonymously on chat - #d
+	
+	SPEAK_RVR_CHANNEL		= 0x09, //Reporting rule violation - Ctrl+R
+	SPEAK_RVR_ANSWER		= 0x0A, //Answering report
+	SPEAK_RVR_CONTINUE		= 0x0B, //Answering the answer of the report
+	SPEAK_BROADCAST     	= 0x0C,	//Broadcast a message - #b
+	SPEAK_CHANNEL_R1    	= 0x0D,	//Talk red on chat - #c
+	SPEAK_PRIVATE_RED   	= 0x0E,	//Red private - @name@ text
+	SPEAK_CHANNEL_O     	= 0x0F,	//Talk orange on text
+	//SPEAK_                = 0x10, //?
+	SPEAK_CHANNEL_R2    	= 0x11,	//Talk red anonymously on chat - #d
+	//SPEAK_                = 0x12, //?
+	SPEAK_MONSTER_SAY   	= 0x13,	//Talk orange
+	SPEAK_MONSTER_YELL  	= 0x14	//Yell orange
 };
 
 enum MessageClasses {
-	MSG_CLASS_FIRST				= 0x0D,
-	MSG_STATUS_CONSOLE_ORANGE2	= MSG_CLASS_FIRST, //Orange message in the console
-	MSG_STATUS_CONSOLE_ORANGE	= 0x0E, //Orange message in the console
+	MSG_CLASS_FIRST				= 0x12,
+	
+	MSG_STATUS_CONSOLE_RED		= MSG_CLASS_FIRST, //Red message in the console
+	MSG_STATUS_CONSOLE_ORANGE2	= 0x13, //Orange message in the console
+	MSG_STATUS_CONSOLE_ORANGE	= 0x14, //Orange message in the console
+	MSG_STATUS_WARNING			= 0x15, //Red message in game window and in the console
+	MSG_EVENT_ADVANCE			= 0x16, //White message in game window and in the console
+	MSG_EVENT_DEFAULT			= 0x17, //White message at the bottom of the game window and in the console
+	MSG_STATUS_DEFAULT			= 0x18, //White message at the bottom of the game window and in the console
+	MSG_INFO_DESCR				= 0x19, //Green message in game window and in the console
+	MSG_STATUS_SMALL			= 0x1A, //White message at the bottom of the game window"
+	MSG_STATUS_CONSOLE_BLUE		= 0x1B, //Blue message in the console
 
-	MSG_STATUS_WARNING			= 0x0F, //Red message in game window and in the console
-	MSG_EVENT_ADVANCE			= 0x10, //White message in game window and in the console
-	MSG_EVENT_DEFAULT			= 0x11, //White message at the bottom of the game window and in the console
-	MSG_STATUS_DEFAULT			= 0x12, //White message at the bottom of the game window and in the console
-	MSG_INFO_DESCR				= 0x13, //Green message in game window and in the console
-	MSG_STATUS_SMALL			= 0x14, //White message at the bottom of the game window
-	MSG_STATUS_CONSOLE_BLUE		= 0x15, //Blue message in the console
-	MSG_STATUS_CONSOLE_RED		= 0x16, //Red message in the console
 	MSG_CLASS_LAST				= MSG_STATUS_CONSOLE_BLUE
 };
 
@@ -467,7 +469,7 @@ enum ViolationActions_t
 	Action_IpBan                    = 1 << 7
 };
 
-const int maxViolationLevel = 3;
+const int maxViolationLevel = 4;
 
 const int32_t violationReasons[maxViolationLevel + 1] =
 {
@@ -475,6 +477,7 @@ const int32_t violationReasons[maxViolationLevel + 1] =
 	3,	//all name reasons
 	9,	//all name & statement reasons
 	18,	//all name, statement & cheating reasons
+	19  //all name, statement & cheating reasons & ip-banishment
 };
 
 const int32_t violationNames[maxViolationLevel + 1] =
@@ -483,6 +486,7 @@ const int32_t violationNames[maxViolationLevel + 1] =
 	Action_Namelock,
 	Action_Namelock,
 	Action_Namelock | Action_NamelockBan,
+	Action_Namelock | Action_NamelockBan | Action_NamelockBanFinalWarning | Action_IpBan
 };
 
 const int32_t violationStatements[maxViolationLevel + 1] =
@@ -491,6 +495,7 @@ const int32_t violationStatements[maxViolationLevel + 1] =
 	Action_None,
 	Action_StatementReport,
 	Action_StatementReport | Action_Notation | Action_Banishment,
+	Action_StatementReport | Action_Notation | Action_Banishment | Action_BanFinalWarning | Action_IpBan
 };
 
 //Reserved player storage key ranges
