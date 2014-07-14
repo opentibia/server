@@ -110,7 +110,7 @@ private:
 		m_writeError = false;
 		m_readError = false;
 		m_packetsSent = 0;
-		m_timeConnected = time(nullptr);
+		m_timeConnected = time(NULL);
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
 		connectionCount++;
