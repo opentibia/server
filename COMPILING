@@ -3,8 +3,7 @@ How do I compile OTServ?
 	way which also provides huge possibilities of easy data management and manipulation. By default SQLite is
 	selected as database engine. It doesn't require any configuration from you, OTServ is configured for it by default and all what you need is to provide SQLite library for it.
 	
-		Instructions to compile OTServ: http://otfans.net/wiki/index.php/Compiling_OTServ
-		Updated easy instructions to compile OTServ using msvc 2010 http://otfans.net/showthread.php?170169-Compiling-Simple-OTServ-MSVC-2010-Compiling-the-Source
+	Instructions to compile OTServ in Windows/Linux	http://otland.net/threads/compiling-simple-otserv-msvc-2010-linux-compiling-the-source.218342/#post-2097360
 		
 MySQL Server
 	By default OTServ uses SQLite database which doesn't require any configuration from you. However it is
@@ -14,7 +13,7 @@ MySQL Server
 
 
 		Instructions to setup a server:
-			1. Download XAMPP (not XAMPP Lite) (http://sourceforge.net/projects/xampp/files/XAMPP%20Windows/1.7.4/xampp-win32-1.7.4-VC6-installer.exe/download)
+			1. Download XAMPP (not XAMPP Lite) (http://downloads.sourceforge.net/project/xampp/XAMPP%20Windows/1.8.3/xampp-win32-1.8.3-4-VC11-installer.exe)
 			2. Install
 			3. Open "xampp-control.exe"
 			4. Click on the buttons Start to open "MySQL" and "Apache"
@@ -52,4 +51,3 @@ Problems?
 	OpenTibia Project Tools forum at OTFans (http://otfans.net/project.php?projectid=1). When the
 	server crashes, you should get a report generated at your Otserv folder named report.txt, 
 	you should also report this at the Project Tools forum, this report will help us in resolving the bugs.
-##TEST coMMIT
