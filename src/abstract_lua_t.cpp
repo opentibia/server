@@ -1,5 +1,7 @@
+#include "otpch.h"
 #include "abstract_lua_t.h"
 #include <iostream>
+
 
 #ifdef __GLOBAL_LIST_LUA_INTERFACE__
 bool abstract_lua_t::getString(std::string &v) const

@@ -1,4 +1,6 @@
+#include "otpch.h"
 #include "global_list_lua_manager.h"
+
 
 #ifdef __GLOBAL_LIST_LUA_INTERFACE__
 
