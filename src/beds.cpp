@@ -39,7 +39,7 @@ BedItem::BedItem(uint16_t _id) : Item(_id)
 
 BedItem::~BedItem()
 {
-	//
+	Beds::instance().setBedSleeper(NULL, sleeperGUID);
 }
 
 Attr_ReadValue BedItem::readAttr(AttrTypes_t attr, PropStream& propStream)
