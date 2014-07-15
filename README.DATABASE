@@ -1,7 +1,9 @@
 This file contains list of all requirements that database must fit for OTServ. They are grouped in two parts:
 
-    I. Database storage system requirements.
-    II. Database definition requirements.
+     
+	I.INSTALLING DATABASE.
+	II.Database storage system requirements.
+    III. Database definition requirements.
 
 If you are trying to run OTServ on database system that is not currently supported by SVN:
     - Make sure that database system provides all required features.
@@ -13,8 +15,28 @@ If you are trying to run OTServ:
     - Make sure you are running it on system that provides all required features.
 
 
+
 ----------
-I. Database storage system requirements.
+I.INSTALLING DATABASE
+
+----------	
+sqlite::
+
+if you want to create db.s3db by yourself( it is already in src directory.)
+in linux
+sqlite3 db.s3db < schema.sqlite3
+
+mysql::
+import schema.mysql to your database.
+
+pgsql
+import schema.pgsql to your database.
+
+	
+	
+	
+----------
+2. Database storage system requirements.
 
 This part lists features that database system must provide in order to implement OTServ database in it.
 ----------
