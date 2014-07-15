@@ -1029,8 +1029,8 @@ LuaVariant LuaScriptInterface::popVariant(lua_State *L)
 void LuaScriptInterface::popCombatParams(lua_State *L, CombatParams &params)
 {
 	params.combatType = (CombatType_t) getField(L, "combatType", params.combatType);
-	params.blockedByArmor = getField(L, "blockedByArmor", params.blockedByArmor);
-	params.blockedByShield = getField(L, "blockedByShield", params.blockedByShield);
+	params.blockedByArmor = (bool) getField(L, "blockedByArmor", params.blockedByArmor);
+	params.blockedByShield = (bool) getField(L, "blockedByShield", params.blockedByShield);
 	params.targetCasterOrTopMost = (bool) getField(L, "targetCasterOrTopMost", params.targetCasterOrTopMost);
 	params.isAggressive = (bool) getField(L, "isAggressive", params.isAggressive);
 	params.pzBlock = (bool) getField(L, "pzBlock", params.pzBlock);
