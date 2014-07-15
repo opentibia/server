@@ -125,7 +125,7 @@ bool Mailbox::sendItemTo(const std::string& name, uint32_t depotId, Item* item)
 	ReturnValue moveResult;
         Depot* depot = player->getDepot(depotId, true);
 	        if(depot){
-		moveResult = g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,	item, item->getItemCount(), NULL, NULL);
+		moveResult = g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,	item, item->getItemCount(), NULL, 0);
                 if(moveResult == RET_NOERROR)
                 {
                         if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
@@ -140,7 +140,7 @@ bool Mailbox::sendItemTo(const std::string& name, uint32_t depotId, Item* item)
                 }
 		else if (moveResult == RET_DEPOTISFULL)
 		{
-			g_game.internalCreatureSay(player, SPEAK_MONSTER_SAY, "You can not sent this because the receiver depot is full!");
+			g_game.internalCreatureSay(player, SPEAK_MONSTER_SAY, "Sorry, depot of the player is full.");
 		}
         }
 	
