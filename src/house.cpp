@@ -249,7 +249,7 @@ bool House::transferToDepot()
 	for(std::list<Item*>::iterator it = moveItemList.begin(); it != moveItemList.end(); ++it){
 		if(depot) {
 			g_game.internalMoveItem((*it)->getParent(), depot, INDEX_WHEREEVER,
-				(*it), (*it)->getItemCount(), NULL, FLAG_NOLIMIT);
+				(*it), (*it)->getItemCount(), NULL, NULL);
 		} else {
 			g_game.internalRemoveItem(*it);
 		}
