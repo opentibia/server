@@ -52,7 +52,8 @@ class Combat;
 class Condition;
 class Npc;
 class Spell;
-class CombatParams;
+
+struct CombatParams;
 
 enum LuaVariantType_t{
 	VARIANT_NONE = 0,
