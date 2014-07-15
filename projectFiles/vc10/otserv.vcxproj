@@ -59,7 +59,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>otpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
