@@ -9835,7 +9835,7 @@ int LuaScriptInterface::luaFindGlobalListValue(lua_State *L)
 	value = popAbstract_lua_t(L);
 	if (!value.isNil()) {
 		std::string name = popString(L);
-		deu_erro = not(global_lists_manager.findValue(name,value,key,n));
+		deu_erro = !(global_lists_manager.findValue(name,value,key,n));
 	}
 	else
 		reportErrorFunc("Missing parameters at findGlobalListValue.");
