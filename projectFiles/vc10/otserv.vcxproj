@@ -77,7 +77,7 @@
       <PreprocessorDefinitions>__USE_OTPCH__;__USE_MYSQL__;__USE_SQLITE__;__OLD_GUILD_SYSTEM__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>otpch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>C:\Users\Pietia\Downloads\moje\msvclibs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
