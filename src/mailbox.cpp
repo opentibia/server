@@ -113,45 +113,39 @@ bool Mailbox::sendItemTo(const std::string& name, uint32_t depotId, Item* item)
 	uint32_t guid;
 	std::string dbname = name;
 	if(!IOPlayer::instance()->getGuidByName(guid, dbname)){
-                return false;
-        }
+		return false;
+	}
 
-        Player* player = g_game.getPlayerByNameEx(name);
-        if(!player){
-                return false;
-        }
-	
-        bool result = false;
-	ReturnValue moveResult;
-        Depot* depot = player->getDepot(depotId, true);
-	        if(depot){
-		moveResult = g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,	item, item->getItemCount(), NULL, 0);
-                if(moveResult == RET_NOERROR)
-                {
-                        if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
-                                g_game.transformItem(item, item->getID() + 1);
-                        }
+	Player* player = g_game.getPlayerByNameEx(name);
+	if(!player){
+		return false;
+	}
 
-                        if(!player->isOffline()){
-                                player->onReceiveMail(depotId);
-                        }
-
-                        result = true;
-                }
-		else if (moveResult == RET_DEPOTISFULL)
+	bool result = false;
+	Depot* depot = player->getDepot(depotId, true);
+	if(depot){
+		if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER,
+			item, item->getItemCount(), NULL, FLAG_NOLIMIT) == RET_NOERROR)
 		{
-			g_game.internalCreatureSay(player, SPEAK_MONSTER_SAY, "Sorry, depot of the player is full.");
-		}
-        }
-	
-        if(player->isOffline() && result == true){
-                IOPlayer::instance()->savePlayer(player);
-                delete player;
-        }
-	
-        return result;
-}
+			if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
+				g_game.transformItem(item, item->getID() + 1);
+			}
 
+			if(!player->isOffline()){
+				player->onReceiveMail(depotId);
+			}
+
+			result = true;
+		}
+	}
+
+	if(player->isOffline()){
+		IOPlayer::instance()->savePlayer(player);
+		delete player;
+	}
+
+	return result;
+}
 
 bool Mailbox::sendItem(Item* item)
 {
