@@ -30,6 +30,7 @@ enum CreatureEventType_t{
 	CREATURE_EVENT_NONE,
 	CREATURE_EVENT_LOGIN,
 	CREATURE_EVENT_LOGOUT,
+	CREATURE_EVENT_SELLHOUSE,
 	CREATURE_EVENT_DIE,
 	CREATURE_EVENT_KILL,
 	CREATURE_EVENT_ADVANCE,
@@ -37,6 +38,7 @@ enum CreatureEventType_t{
 };
 
 class CreatureEvent;
+class House;
 
 class CreatureEvents : public BaseEvents
 {
@@ -47,8 +49,9 @@ public:
 	// global events
 	bool playerLogIn(Player* player);
 	bool playerLogOut(Player* player);
+	bool playerSellHouse(Player* player, House* house);
 
-	CreatureEvent* getEventByName(const std::string& name);
+	CreatureEvent* getEventByName(const std::string& name, bool forceLoaded = true);
 
 protected:
 
@@ -75,13 +78,18 @@ public:
 
 	CreatureEventType_t getEventType() const { return m_type; }
 	const std::string& getName() const { return m_eventName; }
+	bool isLoaded() const { return m_isLoaded; }
+
+	void clearEvent();
+	void copyEvent(CreatureEvent* creatureEvent);
 
 	//scripting
 	bool executeOnLogin(Player* player);
 	bool executeOnLogout(Player* player);
-	void executeOnDie(Creature* creature, Item* corpse);
-	void executeOnKill(Creature* creature, Creature* target, bool lastHit);
-	void executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
+	bool executeOnSellHouse(Player* player, House* house);
+	bool executeOnDie(Creature* creature, Item* corpse);
+	bool executeOnKill(Creature* creature, Creature* target, bool lastHit);
+	bool executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel);
 	bool executeOnLook(Player* player, Thing* target, uint16_t itemId);
 	//
 
@@ -90,6 +98,7 @@ protected:
 
 	std::string m_eventName;
 	CreatureEventType_t m_type;
+	bool m_isLoaded;
 };
 
 
