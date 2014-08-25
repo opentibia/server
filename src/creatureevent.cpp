@@ -40,11 +40,9 @@ CreatureEvents::~CreatureEvents()
 void CreatureEvents::clear()
 {
 	//clear all events
-	CreatureEventList::iterator it = m_creatureEvents.begin();
-	while(it != m_creatureEvents.end()){
-		delete it->second;
-		m_creatureEvents.erase(it);
-		it = m_creatureEvents.begin();
+	CreatureEventList::iterator it;
+	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
+		it->second->clearEvent();
 	}
 
 	//clear lua state
