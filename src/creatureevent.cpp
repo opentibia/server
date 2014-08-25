@@ -22,6 +22,8 @@
 #include "creatureevent.h"
 #include "tools.h"
 #include "player.h"
+#include "house.h"
+
 #include <sstream>
 
 CreatureEvents::CreatureEvents() :
@@ -33,8 +35,9 @@ m_scriptInterface("CreatureScript Interface")
 CreatureEvents::~CreatureEvents()
 {
 	CreatureEventList::iterator it;
-	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it)
+	for(it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it){
 		delete it->second;
+	}
 }
 
 void CreatureEvents::clear()
@@ -70,30 +73,47 @@ Event* CreatureEvents::getEvent(const std::string& nodeName)
 bool CreatureEvents::registerEvent(Event* event, xmlNodePtr p)
 {
 	CreatureEvent* creatureEvent = dynamic_cast<CreatureEvent*>(event);
-	if(!creatureEvent)
+	if(!creatureEvent){
 		return false;
+	}
 
-	switch(creatureEvent->getEventType())
-	{
-		case CREATURE_EVENT_NONE:
-			std::cout << "Error: [CreatureEvents::registerEvent] Trying to register event without type!." << std::endl;
-			return false;
-			break;
-		//events are stored in a std::map
-		default:
+	switch(creatureEvent->getEventType()){
+	case CREATURE_EVENT_NONE:
+		std::cout << "Error: [CreatureEvents::registerEvent] Trying to register event without type!." << std::endl;
+		return false;
+		break;
+	// events are stored in a std::map
+	default:
 		{
-			m_creatureEvents[creatureEvent->getName()] = creatureEvent;
-			return true;
+			CreatureEvent* oldEvent = getEventByName(creatureEvent->getName(), false);
+			if(oldEvent){
+				// if there was an event with the same that is not loaded
+				// (happens when realoading), it is reused
+				if(!oldEvent->isLoaded() &&
+					oldEvent->getEventType() == creatureEvent->getEventType()){
+					oldEvent->copyEvent(creatureEvent);
+				}
+				return false;
+			}
+			else{
+				//if not, register it normally
+				m_creatureEvents[creatureEvent->getName()] = creatureEvent;
+				return true;
+			}
 		}
 	}
 }
 
-CreatureEvent* CreatureEvents::getEventByName(const std::string& name)
+CreatureEvent* CreatureEvents::getEventByName(const std::string& name, bool forceLoaded /*= true*/)
 {
 	CreatureEventList::iterator it = m_creatureEvents.find(name);
-	if(it != m_creatureEvents.end())
+	if(it != m_creatureEvents.end()){
+		// After reloading, a creature can have script that was not
+		// loaded again, if is the case, return NULL
+		if(!forceLoaded || it->second->isLoaded()){
 			return it->second;
-
+		}
+	}
 	return NULL;
 }
 
@@ -125,12 +145,26 @@ bool CreatureEvents::playerLogOut(Player* player)
 	return true;
 }
 
+bool CreatureEvents::playerSellHouse(Player* player, House* house)
+{
+	for(CreatureEventList::iterator it = m_creatureEvents.begin(); it != m_creatureEvents.end(); ++it)
+	{
+		if(it->second->getEventType() == CREATURE_EVENT_SELLHOUSE){
+			if(!it->second->executeOnSellHouse(player, house))
+				return false;
+		}
+	}
+
+	return true;
+}
+
 /////////////////////////////////////
 
 CreatureEvent::CreatureEvent(LuaScriptInterface* _interface) :
 Event(_interface)
 {
 	m_type = CREATURE_EVENT_NONE;
+	m_isLoaded = false;
 }
 
 CreatureEvent::~CreatureEvent()
@@ -154,6 +188,9 @@ bool CreatureEvent::configureEvent(xmlNodePtr p)
 	if(readXMLString(p, "type", str)){
 		if(asLowerCaseString(str) == "login"){
 			m_type = CREATURE_EVENT_LOGIN;
+		}
+		else if(asLowerCaseString(str) == "sellhouse"){
+			m_type = CREATURE_EVENT_SELLHOUSE;
 		}
 		else if(asLowerCaseString(str) == "logout"){
 			m_type = CREATURE_EVENT_LOGOUT;
@@ -179,7 +216,7 @@ bool CreatureEvent::configureEvent(xmlNodePtr p)
 		std::cout << "Error: [CreatureEvent::configureEvent] No type for creature event."  << std::endl;
 		return false;
 	}
-
+	m_isLoaded = true;
 	return true;
 }
 
@@ -205,11 +242,30 @@ std::string CreatureEvent::getScriptEventName()
 	case CREATURE_EVENT_LOOK:
 		return "onLook";
 		break;
+	case CREATURE_EVENT_SELLHOUSE:
+		return "onSellHouse";
+		break;
 	case CREATURE_EVENT_NONE:
 	default:
 		return "";
 		break;
 	}
+}
+
+void CreatureEvent::copyEvent(CreatureEvent* creatureEvent)
+{
+	m_scriptId = creatureEvent->m_scriptId;
+	m_scriptInterface = creatureEvent->m_scriptInterface;
+	m_scripted = creatureEvent->m_scripted;
+	m_isLoaded = creatureEvent->m_isLoaded;
+}
+
+void CreatureEvent::clearEvent()
+{
+	m_scriptId = 0;
+	m_scriptInterface = NULL;
+	m_scripted = false;
+	m_isLoaded = false;
 }
 
 bool CreatureEvent::executeOnLogin(Player* player)
@@ -278,7 +334,41 @@ bool CreatureEvent::executeOnLogout(Player* player)
 	}
 }
 
-void CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
+bool CreatureEvent::executeOnSellHouse(Player* player, House* house)
+{
+	//onLogout(cid, houseID)
+	if(m_scriptInterface->reserveScriptEnv()){
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+
+		#ifdef __DEBUG_LUASCRIPTS__
+		std::stringstream desc;
+		desc << player->getName();
+		env->setEventDesc(desc.str());
+		#endif
+
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(player->getPosition());
+
+		uint32_t cid = env->addThing(player);
+
+		lua_State* L = m_scriptInterface->getLuaState();
+
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		lua_pushnumber(L, house->getId());
+
+		bool result = m_scriptInterface->callFunction(2);
+		m_scriptInterface->releaseScriptEnv();
+
+		return result;
+	}
+	else{
+		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnSellHouse" << std::endl;
+		return 0;
+	}
+}
+
+bool CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 {
 	//onDie(cid, corpse)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -302,15 +392,18 @@ void CreatureEvent::executeOnDie(Creature* creature, Item* corpse)
 		lua_pushnumber(L, cid);
 		lua_pushnumber(L, corpseid);
 
-		m_scriptInterface->callFunction(2, false);
+		bool result = m_scriptInterface->callFunction(2);
 		m_scriptInterface->releaseScriptEnv();
+
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnDie" << std::endl;
+		return 0;
 	}
 }
 
-void CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool lastHit)
+bool CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool lastHit)
 {
 	//onKill(cid, target, lasthit)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -335,15 +428,18 @@ void CreatureEvent::executeOnKill(Creature* creature, Creature* target, bool las
 		lua_pushnumber(L, targetId);
 		lua_pushboolean(L, (lastHit ? true : false) );
 
-		m_scriptInterface->callFunction(3, false);
+		bool result = m_scriptInterface->callFunction(3);
 		m_scriptInterface->releaseScriptEnv();
+
+		return result;
 	}
 	else{
 		std::cout << "[Error] __ENABLE_SERVER_DIAGNOSTIC__Call stack overflow. CreatureEvent::executeOnKill" << std::endl;
+		return 0;
 	}
 }
 
-void CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
+bool CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t oldLevel, uint32_t newLevel)
 {
 	//onAdvance(cid, type, oldlevel, newlevel)
 	if(m_scriptInterface->reserveScriptEnv()){
@@ -368,12 +464,14 @@ void CreatureEvent::executeOnAdvance(Player* player, levelTypes_t type, uint32_t
 		lua_pushnumber(L, oldLevel);
 		lua_pushnumber(L, newLevel);
 
-		m_scriptInterface->callFunction(4, false);
+		bool result = m_scriptInterface->callFunction(4);
 		m_scriptInterface->releaseScriptEnv();
 
+		return result;
 	}
 	else{
 		std::cout << "[Error] Call stack overflow. CreatureEvent::executeOnAdvance" << std::endl;
+		return 0;
 	}
 }
 
@@ -385,7 +483,7 @@ bool CreatureEvent::executeOnLook(Player* player, Thing* target, uint16_t itemId
 
 		#ifdef __DEBUG_LUASCRIPTS__
 		std::stringstream desc;
-		desc << player->getName();
+		desc << creature->getName();
 		env->setEventDesc(desc.str());
 		#endif
 
