@@ -76,6 +76,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg" />
+					<Add library="pthread" />
 					<Add library="mysqlclient" />
 					<Add library="xml2" />
 					<Add library="lua5.1" />
@@ -100,6 +101,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="pthread" />
 					<Add library="mysqlclient" />
 					<Add library="xml2" />
 					<Add library="lua5.1" />
@@ -308,3 +310,4 @@
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
+
