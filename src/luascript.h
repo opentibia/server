@@ -119,7 +119,7 @@ public:
 	DBResult* getResultByID(uint32_t id);
 	uint32_t addResult(DBResult* res);
 	bool removeResult(uint32_t id);
-	
+
 	void addGlobalStorageValue(const uint32_t key, const int32_t value);
 	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
 	bool eraseGlobalStorageValue(const uint32_t key);
@@ -200,8 +200,8 @@ private:
 
 	//result map
 	static uint32_t m_lastResultId;
-	static DBResultMap m_tempResults;	
-	
+	static DBResultMap m_tempResults;
+
 	//for npc scripts
 	Npc* m_curNpc;
 
@@ -558,6 +558,7 @@ protected:
 	static int luaGetPlayerModes(lua_State* L);
 	static int luaDoUpdateGuildWar(lua_State* L);
 	static int luaDoSavePlayer(lua_State *L);
+	static int luaIsClient861(lua_State *L);
 
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);
@@ -758,7 +759,7 @@ protected:
 	static int32_t luaResultGetAllData(lua_State* L);
 	static int32_t luaResultNext(lua_State* L);
 	static int32_t luaResultFree(lua_State* L);
-	
+
 	static int luaGetItemWeaponType(lua_State *L);
 	static int luaGetItemAttack(lua_State *L);
 	static int luaGetItemDefense(lua_State *L);

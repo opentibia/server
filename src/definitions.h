@@ -23,7 +23,12 @@
 
 #define OTSERV_VERSION "0.6.4_SVN"
 #define OTSERV_NAME "OTServ"
-#define OTSERV_CLIENT_VERSION "8.60"
+
+#ifndef __SHOULD_USE_CLIENT861__
+	#define OTSERV_CLIENT_VERSION "8.60"
+#else
+	#define OTSERV_CLIENT_VERSION "8.61"
+#endif
 
 #define CURRENT_SCHEMA_VERSION 24
 

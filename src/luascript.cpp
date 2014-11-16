@@ -2264,6 +2264,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//doSavePlayer(cid)
 	lua_register(m_luaState, "doSavePlayer", LuaScriptInterface::luaDoSavePlayer);
+
+	//isClient861()
+	lua_register(m_luaState, "isClient861", LuaScriptInterface::luaIsClient861);
 }
 
 int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
@@ -10735,13 +10738,26 @@ int LuaScriptInterface::luaDoSavePlayer(lua_State *L)
 	if (player){
 		if (IOPlayer::instance()->savePlayer(player)){
 			lua_pushboolean(L, true);
-			return 1;
-		} else {
+		}
+		else {
 			lua_pushboolean(L, false);
 		}
-	} else {
+	}
+	else {
 		lua_pushboolean(L, false);
 	}
 
-	return 0;
+	return 1;
 }
+
+//isClient861()
+int LuaScriptInterface::luaIsClient861(lua_State *L)
+{
+	#ifndef __SHOULD_USE_CLIENT861__
+	lua_pushboolean(L, false);
+	#else
+	lua_pushboolean(L, true);
+	#endif
+	return 1;
+}
+

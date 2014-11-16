@@ -31,6 +31,8 @@ AC_ARG_ENABLE(guild-wars-reload, [  --enable-guild-wars-reload     enable guild 
 # currently it is enabled by default.
 AC_ARG_ENABLE(old-guild-system, [  --enable-old-guild-system     enable old guild system], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__OLD_GUILD_SYSTEM__"])
 
+# check if we want to use a 8.61 server, instead of the default 8.60
+AC_ARG_ENABLE(861-server, [  --enable-861-server     enable 861 server], [OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__SHOULD_USE_CLIENT861__"])
 
 # check if we want to use otserv.lua instead config.lua
 AC_ARG_ENABLE(otconfig, [  --enable-otconfig      use otserv.lua configuration], [ OPTIONAL_FLAGS="$OPTIONAL_FLAGS -D__LUA_NAME_ALTER__"])

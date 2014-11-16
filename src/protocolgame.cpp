@@ -2146,6 +2146,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 				msg->AddU16(0x0032); // Related to client-side drawing speed
 				msg->AddByte(player->hasFlag(PlayerFlag_CanReportBugs));
 
+				#ifndef __SHOULD_USE_CLIENT861__
 				uint16_t violation = player->getViolationLevel();
 				if(violationReasons[violation] > 0){
 					msg->AddByte(0x0B);
@@ -2158,6 +2159,7 @@ void ProtocolGame::sendAddCreature(const Creature* creature, const Position& pos
 							msg->AddByte(Action_None);
 					}
 				}
+				#endif
 
 				AddMapDescription(msg, pos);
 
