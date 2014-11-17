@@ -796,8 +796,7 @@ bool Monster::canUseSpell(const Position& pos, const Position& targetPos,
 			return false;
 		}
 	}
-
-	if(sb.range != 0 && std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y)) > (int32_t)sb.range){
+	if(sb.range != 0 && std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y)) > (int32_t)getFinalRange(sb.range)){
 		inRange = false;
 		return false;
 	}

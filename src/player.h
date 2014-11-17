@@ -376,7 +376,7 @@ public:
 	virtual void doAttacking(uint32_t interval);
 	virtual bool hasExtraSwing() {return lastAttack > 0 && ((OTSYS_TIME() - lastAttack) >= getAttackSpeed());}
 	int32_t getPureShootRange() const { return pureShootRange; }
-	int32_t getShootRange() const { return std::max(pureShootRange + modifierShootRange, 1); }
+	int32_t getShootRange() const { return getFinalRange(pureShootRange); }
 
 	int32_t getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	static std::string getSkillName(int skillid);

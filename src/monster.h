@@ -125,7 +125,7 @@ public:
 
 	virtual bool hasHiddenHealth() const { return mType->hideHealth; }
 	uint8_t getPureTargetDistance() const { return mType->targetDistance; }
-	uint8_t getGoalTargetDistance() const { return std::max(mType->targetDistance + modifierShootRange, 1); }
+	uint8_t getGoalTargetDistance() const { return getFinalRange(mType->targetDistance); }
 
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);

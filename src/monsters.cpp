@@ -248,7 +248,7 @@ void MonsterType::createLootContainer(Container* parent, const LootBlock& lootbl
 	}
 }
 
-bool MonsterType::getParameter(const std::string key, std::string& value)
+bool MonsterType::getParameter(const std::string key, std::string& value) const
 {
 	ParametersMap::const_iterator it = m_parameters.find(key);
 	if(it != m_parameters.end()){

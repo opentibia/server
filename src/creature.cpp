@@ -867,6 +867,14 @@ Item* Creature::dropCorpse()
 	return corpse;
 }
 
+int8_t Creature::getFinalRange(int8_t range) const
+{
+	if (range <= 1)
+		return 1;
+	else
+		return std::min(std::max(int8_t(range + getModifierShootRange()), int8_t(1)), int8_t(7)); //maximal range is 7
+}
+
 DeathList Creature::getKillers(int32_t assist_count /*= 1*/)
 {
 	DeathList list;

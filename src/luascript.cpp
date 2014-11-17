@@ -1420,8 +1420,17 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerStorageValueByName", LuaScriptInterface::luaGetPlayerStorageValueByName);
 
 	//getTilePzInfo(pos)
-	//1 is pz. 0 no pz.
+	//true is pz. false no pz.
 	lua_register(m_luaState, "getTilePzInfo", LuaScriptInterface::luaGetTilePzInfo);
+
+	//getTilePvPInfo(pos)
+	lua_register(m_luaState, "getTilePvPInfo", LuaScriptInterface::luaGetTilePvPInfo);
+
+	//getItemParent(uid)
+	lua_register(m_luaState, "getItemParent", LuaScriptInterface::luaGetItemParent);
+
+	//doCheckItemSlotAttribute(itemid, attribSlot)
+	lua_register(m_luaState, "doCheckItemSlotAttribute", LuaScriptInterface::luaDoCheckItemSlotAttribute);
 
 	//getTileHouseInfo(pos)
 	//0 no house. != 0 house id
@@ -5212,6 +5221,68 @@ int LuaScriptInterface::luaGetTilePzInfo(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaGetTilePvPInfo(lua_State *L)
+{
+	//getTilePvPInfo(pos)
+	PositionEx pos;
+	popPosition(L, pos);
+
+	Tile *tile = g_game.getMap()->getTile(pos);
+
+	if(tile){
+		lua_pushboolean(L, tile->hasFlag(TILESTATE_PVPZONE));
+		lua_pushboolean(L, tile->hasFlag(TILESTATE_NOPVPZONE));
+		return 2;
+	}
+	else{
+		std::stringstream ss;
+		ss << pos << " " << getErrorDesc(LUA_ERROR_TILE_NOT_FOUND);
+		reportErrorFunc(ss.str().c_str());
+		lua_pushnil(L);
+		return 1;
+	}
+}
+
+int LuaScriptInterface::luaGetItemParent(lua_State *L)
+{
+	//getItemParent(uid)
+	Item *parentItem = NULL;
+	uint32_t uid = popNumber(L);
+	ScriptEnviroment* env = getScriptEnv();
+	Item* item = env->getItemByUID(uid);
+
+	if (item){
+		Cylinder *parent = item->getParent();
+		if (parent){
+			parentItem = parent->getItem();
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_ITEM_NOT_FOUND));
+	}
+
+	if (parentItem){
+		uint32_t newUid = env->addThing(parentItem);
+		pushThing(L, parentItem, newUid);
+	}
+	else{
+		pushThing(L, NULL, 0);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaDoCheckItemSlotAttribute(lua_State *L)
+{
+	//doCheckItemSlotAttribute(itemid, slot)
+	uint16_t slot = popNumber(L);
+	uint16_t itemId = popNumber(L);
+	uint16_t slotP = (1 << (slot - 1));
+	uint16_t attribItem = Item::items[itemId].slot_position;
+	uint16_t res = (attribItem & slotP);
+	lua_pushboolean(L, (res != 0));
+	return 1;
+}
+
 int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 {
 	//getTileHouseInfo(pos)
@@ -6331,17 +6402,19 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
 
 	if(parameters > 1){
 		//has extra parameter with diagonal area information
-
-		uint32_t rowsExtArea;
-		std::list<uint32_t> listExtArea;
-		if(!getArea(L, listExtArea, rowsExtArea)){
-			reportError(__FUNCTION__, "Invalid extended area table.");
-			lua_pushboolean(L, false);
-			return 1;
-		}
-
+		if(lua_type(L, -1) == LUA_TNIL)
+			lua_pop(L, 1);
+		else{
+			uint32_t rowsExtArea;
+			std::list<uint32_t> listExtArea;
+			if(!getArea(L, listExtArea, rowsExtArea)){
+				reportError(__FUNCTION__, "Invalid extended area table.");
+				lua_pushboolean(L, false);
+				return 1;
+			}
 		/*setup all possible rotations*/
 		area->setupExtArea(listExtArea, rowsExtArea);
+		}
 	}
 
 	uint32_t rowsArea = 0;
@@ -9893,8 +9966,10 @@ int LuaScriptInterface::luaReadActualGlobalList(lua_State *L)
 		if (r->read(key, value)) {
 			lua_pushAbstract_lua_t(L, key);
 			lua_pushAbstract_lua_t(L, value);
+			return 2;
 		}
 	}
+	lua_pushnil(L);
 	return 1;
 }
 

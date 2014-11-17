@@ -454,6 +454,8 @@ protected:
 	static int luaGetCreatureModifierShootRange(lua_State *L);
 	static int luaGetItemWieldProperlyInfo(lua_State *L);
 	static int luaGetItemBreakChance(lua_State *L);
+	static int luaGetItemParent(lua_State *L);
+	static int luaDoCheckItemSlotAttribute(lua_State *L);
 
 	static int luaGetThingDefaultDescription(lua_State *L);
 	static int luaGetItemTypeDefaultDescription(lua_State *L);
@@ -465,6 +467,7 @@ protected:
 	static int luaDoSetItemSpecialDescription(lua_State *L);
 
 	//get tile info
+	static int luaGetTilePvPInfo(lua_State *L);
 	static int luaGetTilePzInfo(lua_State *L);
 	static int luaGetTileHouseInfo(lua_State *L);
 	static int luaQueryTileAddThing(lua_State *L);

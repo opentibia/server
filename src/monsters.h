@@ -150,7 +150,7 @@ public:
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
 	std::list<Item*> createLootItem(const LootBlock& lootblock);
 
-	bool getParameter(const std::string key, std::string& value);
+	bool getParameter(const std::string key, std::string& value) const;
 };
 
 class Monsters{

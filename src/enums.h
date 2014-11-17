@@ -180,6 +180,29 @@ enum skills_t {
 	SKILL_LAST = SKILL_FISH
 };
 
+enum slots_t {
+	SLOT_WHEREEVER = 0,
+	SLOT_FIRST = 1,
+	SLOT_HEAD = SLOT_FIRST,
+	SLOT_NECKLACE = 2,
+	SLOT_BACKPACK = 3,
+	SLOT_ARMOR = 4,
+	SLOT_RIGHT = 5,
+	SLOT_LEFT = 6,
+	SLOT_LEGS = 7,
+	SLOT_FEET = 8,
+	SLOT_RING = 9,
+	SLOT_AMMO = 10,
+	SLOT_DEPOT = 11,
+
+	// Special slot, covers two, not a real slot
+	SLOT_HAND = 12,
+	SLOT_TWO_HAND = SLOT_HAND, // alias
+
+	// Last real slot is depot
+	SLOT_LAST = SLOT_DEPOT
+};
+
 enum stats_t {
 	STAT_FIRST = 0,
 	STAT_MAXHITPOINTS = STAT_FIRST,

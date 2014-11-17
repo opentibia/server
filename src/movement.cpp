@@ -452,7 +452,7 @@ uint32_t MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 	int32_t j = tile->__getLastIndex();
 	for(int32_t i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
-		if(thing && (tileItem = thing->getItem()) && (tileItem != item)){
+		if(thing && (tileItem = thing->getItem()) && ((tileItem != item) || isAdd)){
 			moveEvent = getEvent(tileItem, eventType2);
 			if(moveEvent){
 				m_lastCacheItemVector.push_back(tileItem);

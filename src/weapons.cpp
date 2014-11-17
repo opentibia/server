@@ -363,7 +363,7 @@ int32_t Weapon::playerWeaponCheck(Player* player, Creature* target) const
 		trueRange = player->getShootRange();
 	}
 	else{
-		trueRange = range;
+		trueRange = player->getFinalRange(range);
 	}
 
 	if(std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y)) > trueRange){

@@ -408,6 +408,7 @@ Item* Player::getWeapon(bool ignoreAmmu /*= false*/)
 			{
 				const Weapon* weapon = g_weapons->getWeapon(item);
 				if(weapon){
+					pureShootRange = item->getShootRange();
 					return item;
 				}
 
