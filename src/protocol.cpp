@@ -198,7 +198,7 @@ bool Protocol::RSA_decrypt(RSA* rsa, NetworkMessage& msg)
 		return false;
 	}
 
-	if(!rsa->decrypt((char*)(msg.getBuffer() + msg.getReadPos()), 128)){
+	if(!rsa->decrypt((char*)(msg.getBuffer() + msg.getReadPos()))){
 		return false;
 	}
 

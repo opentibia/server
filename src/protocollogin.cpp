@@ -153,10 +153,11 @@ bool ProtocolLogin::parseFirstPacket(NetworkMessage& msg)
 		for(it = account.charList.begin(); it != account.charList.end(); it++){
 			const AccountCharacter& character = *it;
 			output->AddString(character.name);
-			output->AddString(character.world);
+			output->AddString(character.world_name);
 			output->AddU32(character.ip);
 			output->AddU16(character.port);
 		}
+		
 		output->AddU16(IOAccount::getPremiumDaysLeft(account.premiumEnd));
 
 		OutputMessagePool::getInstance()->send(output);

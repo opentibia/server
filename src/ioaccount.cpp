@@ -65,7 +65,7 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 	query.reset();
 	query << "SELECT " <<
 			"`players`.`name` AS `name`, `worlds`.`name` AS `world`, " <<
-			"`worlds`.`port` AS `port`, `worlds`.`ip` AS `ip` " <<
+            "`worlds`.`port` AS `port`, `worlds`.`ip` AS `ip`, `worlds`.`id` AS `world_id`" <<
 		"FROM `players` " <<
 		"LEFT JOIN `worlds` ON `worlds`.`id` = `players`.`world_id` " <<
 		"WHERE `account_id` = " << acc.number;
@@ -73,9 +73,11 @@ Account IOAccount::loadAccount(const std::string& accountName, bool preLoad /* =
 	for(result = db->storeQuery(query); result; result = result->advance()) {
 		AccountCharacter c;
 		c.name = result->getDataString("name");
-		c.world = result->getDataString("world");
+        c.world_name = result->getDataString("world");
+        c.world_id = (uint16_t)result->getDataInt("world_id");
 		c.port = (uint16_t)result->getDataInt("port");
-		c.ip = (uint32_t)result->getDataLong("ip");
+        c.ip = (uint32_t)result->getDataLong("ip");
+
 		acc.charList.push_back(c);
 	}
 

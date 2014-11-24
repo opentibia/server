@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-//
+// Lua script interface
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,34 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+// This is just a helper file to avoid having to type using in all files
+// that uses smart pointers
 
-#ifndef __OTSERV_RSA_H__
-#define __OTSERV_RSA_H__
+#include <boost/shared_ptr.hpp>
 
-#include "definitions.h"
-#include "gmp.h"
-#include <boost/thread.hpp>
-
-class RSA{
-public:
-	RSA();
-	~RSA();
-	void setKey(const char* p, const char* q);
-	bool setKey(const std::string& file);
-	bool decrypt(char* msg);
-	bool encrypt(char* msg);
-
-	int32_t getKeySize();
-	void getPublicKey(char* buffer);
-
-protected:
-
-	bool m_keySet;
-
-	boost::recursive_mutex rsaLock;
-
-	//use only GMP
-	mpz_t m_p, m_q, m_n, m_d, m_e;
-};
-
-#endif
+using boost::shared_ptr;
+using boost::weak_ptr;
+using boost::dynamic_pointer_cast;
+using boost::static_pointer_cast;
+using boost::const_pointer_cast;

@@ -979,7 +979,11 @@ bool IOPlayer::playerExists(std::string name)
 		"SELECT `id` "
 		"FROM `players` "
 		"WHERE `players`.`world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID) << " AND `name`= " << db->escapeString(name);
-	return db->storeQuery(query);
+	
+	if(!(result = db->storeQuery(query)))
+		return false;
+	
+	return true;
 }
 
 bool IOPlayer::isPlayerOnlineByAccount(uint32_t acc)
@@ -1094,5 +1098,7 @@ bool IOPlayer::cleanOnlineInfo()
 	DatabaseDriver* db = DatabaseDriver::instance();
 	DBQuery query;
 	query << "UPDATE `players` SET `online` = 0 WHERE `world_id` = " << g_config.getNumber(ConfigManager::WORLD_ID);
-	return db->executeQuery(query);
+	db->executeQuery(query);
+	
+	return true;
 }

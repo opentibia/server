@@ -19,7 +19,14 @@ function BringPlayer.handler(event)
 	local bplayer = nil
 	local players = getPlayersByNameWildcard(name)
 	if N > #players or N < 1 then
-		event.player:sendNote("No player by that name '" .. name .. "'.")
+
+		local creatures = getCreaturesByName(name)
+
+		if N > #creatures or N < 1 then
+			event.player:sendNote("No player or creature by that name '" .. name .. "'.")
+		else
+			creatures[N]:teleportTo(event.player:getPosition())
+		end
 	else
 		players[N]:teleportTo(event.player:getPosition())
 	end

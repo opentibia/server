@@ -18,74 +18,28 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 #include "otpch.h"
-
 #include "rsa.h"
+
+#include <iostream>
 
 RSA::RSA()
 {
 	m_keySet = false;
 	mpz_init2(m_p, 1024);
 	mpz_init2(m_q, 1024);
+	mpz_init(m_n);
 	mpz_init2(m_d, 1024);
-	mpz_init2(m_u, 1024);
-	mpz_init2(m_dp, 1024);
-	mpz_init2(m_dq, 1024);
-	mpz_init2(m_mod, 1024);
+	mpz_init(m_e);
 }
 
 RSA::~RSA()
 {
 	mpz_clear(m_p);
 	mpz_clear(m_q);
+	mpz_clear(m_n);
 	mpz_clear(m_d);
-	mpz_clear(m_u);
-	mpz_clear(m_dp);
-	mpz_clear(m_dq);
-	mpz_clear(m_mod);
+	mpz_clear(m_e);
 }
-
-/*
-void RSA::setKey(char* p, char* q, char* d)
-{
-	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
-
-	m_p = p;
-	m_q = q;
-	m_d = d;
-
-	m_u = inverse(m_p, m_q);
-  	m_dp = m_d % (m_p-1);
-  	m_dq = m_d % (m_q-1);
-
-	m_keySet = true;
-}
-
-bool RSA::decrypt(char* msg, int32_t size)
-{
-	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
-
-	if(!m_keySet){
-		std::cout << "Failure: [RSA::derypt]. Key not set" << std::endl;
-		return false;
-	}
-
-	Big c = from_binary(size, msg);
-	//chinese remainder theorem
-	Big v1 = std::pow( c % m_p, m_dp, m_p );
-  	Big v2 = std::pow( c % m_q, m_dq, m_q );
-  	Big u2 = ((v2 - v1)*m_u % m_q);
-  	if(u2 < 0){
-		u2 = u2 + m_q;
-	}
-  	Big z = v1 + u2*m_p;
-
-	//Big z = std::pow(c, m_d, m_p*m_q);
-
-	int len = to_binary(z, size, msg, TRUE);
-
-	return true;
-}
-*/
 
 bool RSA::setKey(const std::string& file)
 {
@@ -95,120 +49,114 @@ bool RSA::setKey(const std::string& file)
 		return false;
 	}
 
-	char p[513], q[513], d[513];
-	if (!fgets(p, 513, f) || !fgets(q, 513, f) || !fgets(d, 513, f)) {
+	char p[513], q[513];
+	if(!fgets(p, 513, f) || !fgets(q, 513, f)){
 		fclose(f);
 		return false;
 	}
+	
 	fclose(f);
 
-	setKey(p, q, d);
+	setKey(p, q);
 	return true;
 }
 
-void RSA::setKey(const char* p, const char* q, const char* d)
+void RSA::setKey(const char* p, const char* q)
 {
 	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
 
 	mpz_set_str(m_p, p, 10);
 	mpz_set_str(m_q, q, 10);
-	mpz_set_str(m_d, d, 10);
-
-	mpz_t pm1,qm1;
-	mpz_init2(pm1,520);
-	mpz_init2(qm1,520);
-
-	mpz_sub_ui(pm1, m_p, 1);
-	mpz_sub_ui(qm1, m_q, 1);
-	mpz_invert(m_u, m_p, m_q);
-	mpz_mod(m_dp, m_d, pm1);
-	mpz_mod(m_dq, m_d, qm1);
-
-	mpz_mul(m_mod, m_p, m_q);
-
-	mpz_clear(pm1);
-	mpz_clear(qm1);
+	
+	// e = 65537
+	mpz_set_ui(m_e, 65537);
+	
+	// n = p * q
+	mpz_mul(m_n, m_p, m_q);
+	
+	// TODO, since n is too small we won't be able to decode big numbers.
+	//if(mpz_sizeinbase(m_n, 2) <= 1024){
+	//	std::cout << " WARNING: 2^1023 < n < 2^1024 ";
+	//}
+	
+	// d = e^-1 mod (p - 1)(q - 1)
+	mpz_t p_1, q_1, pq_1;
+	mpz_init2(p_1, 1024);
+	mpz_init2(q_1, 1024);
+	mpz_init2(pq_1, 1024);
+	
+	mpz_sub_ui(p_1, m_p, 1);
+	mpz_sub_ui(q_1, m_q, 1);
+	
+	// pq_1 = (p -1)(q - 1)
+	mpz_mul(pq_1, p_1, q_1);
+	
+	// m_d = m_e^-1 mod (p - 1)(q - 1)
+	mpz_invert(m_d, m_e, pq_1);
+	
+	mpz_clear(p_1);
+	mpz_clear(q_1);
+	mpz_clear(pq_1);
 }
 
-bool RSA::encrypt(char* msg, int32_t size, const char* key)
+bool RSA::encrypt(char* msg)
 {
+	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
+	
 	mpz_t plain, c;
 	mpz_init2(plain, 1024);
 	mpz_init2(c, 1024);
 
-	mpz_t e;
-    mpz_init(e);
-	mpz_set_ui(e,65537);
-
-	mpz_t mod;
-	mpz_init2(mod, 1024);
-	mpz_set_str(mod, key, 10);
-
 	mpz_import(plain, 128, 1, 1, 0, 0, msg);
-	mpz_powm(c, plain, e, mod);
-
+	
+	// c = m^e mod n
+	mpz_powm(c, plain, m_e, m_n);
+	
 	size_t count = (mpz_sizeinbase(c, 2) + 7)/8;
+	
 	memset(msg, 0, 128 - count);
 	mpz_export(&msg[128 - count], NULL, 1, 1, 0, 0, c);
 
 	mpz_clear(c);
 	mpz_clear(plain);
-	mpz_clear(e);
-	mpz_clear(mod);
+
 	return true;
 }
 
-bool RSA::decrypt(char* msg, int32_t size)
+bool RSA::decrypt(char* msg)
 {
 	boost::recursive_mutex::scoped_lock lockClass(rsaLock);
 
-	mpz_t c,v1,v2,u2,tmp;
+	mpz_t c, m;
 	mpz_init2(c, 1024);
-	mpz_init2(v1, 1024);
-	mpz_init2(v2, 1024);
-	mpz_init2(u2, 1024);
-	mpz_init2(tmp, 1024);
+	mpz_init2(m, 1024);
 
 	mpz_import(c, 128, 1, 1, 0, 0, msg);
-
-	mpz_mod(tmp, c, m_p);
-	mpz_powm(v1, tmp, m_dp, m_p);
-	mpz_mod(tmp, c, m_q);
-	mpz_powm(v2, tmp, m_dq, m_q);
-	mpz_sub(u2, v2, v1);
-	mpz_mul(tmp, u2, m_u);
-	mpz_mod(u2, tmp, m_q);
-	if(mpz_cmp_si(u2, 0) < 0){
-		mpz_add(tmp, u2, m_q);
-		mpz_set(u2, tmp);
-	}
-	mpz_mul(tmp, u2, m_p);
-	mpz_set_ui(c, 0);
-	mpz_add(c, v1, tmp);
-
-	size_t count = (mpz_sizeinbase(c, 2) + 7)/8;
+	
+	// m = c^d mod n
+	mpz_powm(m, c, m_d, m_n);
+	
+	size_t count = (mpz_sizeinbase(m, 2) + 7)/8;
+	
 	memset(msg, 0, 128 - count);
-	mpz_export(&msg[128 - count], NULL, 1, 1, 0, 0, c);
+	mpz_export(&msg[128 - count], NULL, 1, 1, 0, 0, m);
 
 	mpz_clear(c);
-	mpz_clear(v1);
-	mpz_clear(v2);
-	mpz_clear(u2);
-	mpz_clear(tmp);
+	mpz_clear(m);
 
 	return true;
 }
 
 int32_t RSA::getKeySize()
 {
-	size_t count = (mpz_sizeinbase(m_mod, 2) + 7)/8;
+	size_t count = (mpz_sizeinbase(m_n, 2) + 7)/8;
 	int32_t a = count/128;
 	return a*128;
 }
 
 void RSA::getPublicKey(char* buffer)
 {
-	size_t count = (mpz_sizeinbase(m_mod, 2) + 7)/8;
+	size_t count = (mpz_sizeinbase(m_n, 2) + 7)/8;
 	memset(buffer, 0, 128 - count);
-	mpz_export(&buffer[128 - count], NULL, 1, 1, 0, 0, m_mod);
+	mpz_export(&buffer[128 - count], NULL, 1, 1, 0, 0, m_n);
 }

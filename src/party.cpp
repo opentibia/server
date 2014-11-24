@@ -110,7 +110,7 @@ bool Party::invitePlayer(Player* player)
 	player->addPartyInvitation(this);
 
 	ss.str("");
-	ss << getLeader()->getName() << " has invited you to " << playerSexAdjectiveString(player->getSex()) << " party.";
+	ss << getLeader()->getName() << " has invited you to " << playerSexAdjectiveString(getLeader()->getSex()) << " party.";
 	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 	return true;
 }

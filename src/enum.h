@@ -328,7 +328,7 @@ public: // Operators
 template <class E, int size_ =  -1 /* Will always cause error when trying to use */>
 class BitEnum : public Enum<E, size_> {
 public:
-	BitEnum() {};
+    BitEnum() {}
 	BitEnum(E e) : Enum<E, size_>(e) {}
 	BitEnum(const Enum<E, size_>& e) : Enum<E, size_>(e) {}
 	BitEnum(const BitEnum<E, size_>& e) : Enum<E, size_>(e.e) {}

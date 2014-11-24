@@ -195,11 +195,20 @@ function NPC:onThinkHandler(event)
 		self.walkRadius > 0 and
 		os.time() - self.lastWalk > self.walkInterval then
 
+		currentPos = self:getPosition()
+		if currentPos ~= nil and
+			(math.abs(currentPos.x - self.masterPos.x) > self.walkRadius or
+			math.abs(currentPos.y - self.masterPos.y) > self.walkRadius) then
+			-- somebody has change our position?
+			self.masterPos = self:getPosition()
+		end
+
 		local doneWalking = false
 		local tries = 0
 
 		local toPos = nil
 		local toDir = NORTH
+
 		while not doneWalking and tries < 3 do
 			-- increase tries
 			tries = tries + 1
@@ -219,11 +228,9 @@ function NPC:onThinkHandler(event)
 				toPos.y = toPos.y + 1
 			end
 
-			if math.abs(toPos.x - self.masterPos.x) > self.walkRadius or
-				math.abs(toPos.y - self.masterPos.y) > self.walkRadius then
-				-- somebody has change our position?
-				self.masterPos = self:getPosition()
-			else
+			if math.abs(toPos.x - self.masterPos.x) <= self.walkRadius and
+				math.abs(toPos.y - self.masterPos.y) <= self.walkRadius then
+				
 				doneWalking = self:walk(Direction(toDir))
 			end
 		end

@@ -3158,6 +3158,7 @@ void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* 
 	}
 
 	bool requireListUpdate = true;
+	
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		const Item* i = (oldParent? oldParent->getItem() : NULL);
 

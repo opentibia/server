@@ -2179,7 +2179,7 @@ Item* Game::findItemOfType(Cylinder* cylinder, uint16_t itemId,
 	bool depthSearch /*= true*/, int32_t subType /*= -1*/)
 {
 	if(cylinder == NULL){
-		return false;
+		return NULL;
 	}
 
 	std::list<Container*> listContainer;
@@ -4146,7 +4146,7 @@ bool Game::playerChangeOutfit(uint32_t playerId, OutfitType outfit)
 
 bool Game::checkReload(Player* player, const std::string& text)
 {
-	if(text.length() > 7 && text.substr(0, 7) == "/reload" && player->hasFlag(PlayerFlag_CanReloadContent)){
+    if(text.length() >= 7 && text.substr(0, 7) == "/reload" && player->hasFlag(PlayerFlag_CanReloadContent)){
 		std::string param = text.substr(7);
 
 		if(param == " monsters" || param == " monster" || param == "m"){

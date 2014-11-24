@@ -18,34 +18,64 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#ifndef __OTSERV_CLASSES_H__
+#define __OTSERV_CLASSES_H__
 
-#ifndef __OTSERV_RSA_H__
-#define __OTSERV_RSA_H__
-
-#include "definitions.h"
-#include "gmp.h"
-#include <boost/thread.hpp>
-
-class RSA{
-public:
-	RSA();
-	~RSA();
-	void setKey(const char* p, const char* q);
-	bool setKey(const std::string& file);
-	bool decrypt(char* msg);
-	bool encrypt(char* msg);
-
-	int32_t getKeySize();
-	void getPublicKey(char* buffer);
-
-protected:
-
-	bool m_keySet;
-
-	boost::recursive_mutex rsaLock;
-
-	//use only GMP
-	mpz_t m_p, m_q, m_n, m_d, m_e;
-};
+class Cylinder;
+class Thing;
+class Game;
+class Map;
+class IOMap;
+class Tile;
+class HouseTile;
+class Player;
+class Actor;
+class Creature;
+class ItemType;
+class Item;
+class Container;
+class Depot;
+class Teleport;
+class TrashHolder;
+class Door;
+class MagicField;
+class BedItem;
+class Town;
+class House;
+class Spawn;
+class RSA;
+class Party;
+class ConditionEffect;
+class Condition;
+class Position;
+class PositionEx;
+class CombatSource;
+class PropStream;
+class PropWriteStream;
+struct Account;
+class Protocol;
+class ProtocolGame;
+class OutputMessage;
+class NetworkMessage;
+class SchedulerTask;
+class Connection;
+class ServiceBase;
+class ServicePort;
+struct LightInfo;
+class CreatureType;
+class InternalCreatureType;
+class ServiceManager;
+class Commands;
+class ChatChannel;
+struct SpellBlock;
+struct OutfitType;
+struct Outfit;
+class Waypoint;
+struct FindPathParams;
+class QTreeLeafNode;
+struct LootBlock;
+struct Quest;
+struct ShopItem;
+class Vocation;
 
 #endif

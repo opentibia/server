@@ -23,7 +23,7 @@
 #include "player.h"
 #include "tools.h"
 
-// Avoid unnecessary includes!
+// Avoid unnecessary includes
 extern void g_gameUnscript(void* v);
 extern void g_gameOnLeaveChannel(Player* player, ChatChannel* channel);
 

@@ -1,3 +1,7 @@
+# Looking for developers
+
+Open Tibia is currently looking for developers. If you want to become one, please send private message to Pietia10 or Iryont on otland.net
+
 # What is this?
 
 OTServ is a free MMORPG emulation, that creates a own gameworld server,
@@ -11,7 +15,7 @@ control.
 
 # How does it work?
 
-This version of OTServ is targeted towards Tibia 8.60 and 8.61.
+This version of OTServ is targeted towards Tibia 8.7.
 
 To connect Tibia client to OTServ you will have to use an IP changer, you can get one here
 http://www.otchanger.net/
@@ -31,20 +35,16 @@ Then you are logged in.
 
 - Project Admins
 
+    - Iryont / iryont
+    - marksamman
     - Remere / hjnilsson
-    - SimOne / xeroc81
-    - Tliff *Inactive*
-    - Spin *Inactive*
-    - Shi'Voc *Inactive*
 
 
 - Active Developers
 
-    - Assassina			OpenTibia
+    - assassina			OpenTibia
     - hackerpotato		OpenTibia
-    - Nostradamus			POT/OpenTibia
-    - rafaelhamdan		OpenTibia
-    - Sim0ne				OpenTibia
+    - kilouco / aseverino	OpenTibia
 
 - Forum Administrators
 
@@ -61,6 +61,12 @@ Then you are logged in.
 
 - Inactive Developers
 
+    - SimOne / xeroc81
+    - Tliff
+    - Spin
+    - Shi'Voc
+    - Nostradamus
+    - rafaelhamdan
     - Acrimon
     - Haktivex
     - Fandoras
@@ -85,7 +91,6 @@ Then you are logged in.
     - Primer
     - j4K3xBl4sT3r
     - Wrzasq
-    - Kilouco
     - nfries88
     - the fike
     - Vitor
@@ -95,7 +100,7 @@ Then you are logged in.
 - Contributors
 
 adakraz, Bennet, Dored, Pietia10, Quintinon, Fusion666, Joffily, Ispiro, slawkens, Umby, Rogier1337, pajlada,
-Fernando Coutinho, Sapphire, Lithium, Proglin, LooS!k, Jason, nicaw, Xidaozu, Talaturen, The Chaos, Junkfood,
+Fernando Coutinho, Sapphire, Lithium, Proglin, LooS!k, Jason, nicaw, Xidaozu, The Chaos, Junkfood,
 Beet Da Brat, honux, Ruly, Steeled Blade, Xera, BurnMc, Cayan, BlackKnight, Thomac, mike2k1, SuperGillis,
 wik, Tijn, _X_Dead_X_, Skulldiggers, NeWsOfTzzz, kijano, Rex, DimiGhost, dark-bart, DeathClaw, Steelberg, Jero,
 TechnoPirate, Mozila, Thax, Ashganek, RicarDog, ZeroCoolz, K-Zodron, gerax, Urmel, Cip, wasabi, Jovial, Yurez,
