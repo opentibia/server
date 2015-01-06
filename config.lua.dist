@@ -142,9 +142,11 @@ max_violation_comment_size = 255
 notations_to_banishment = 3
 warnings_to_final_banishment = 4
 warnings_to_deletion = 5
-banishment_length = 7*86400 --seconds
-final_banishment_length = 30*86400 --seconds
-ip_banishment_length = 86400 --seconds
+
+-- in seconds
+banishment_length = 7*86400 
+final_banishment_length = 30*86400
+ip_banishment_length = 86400
 
 -- Extra experience % per player when sharing experience
 party_exp_mul = 5
