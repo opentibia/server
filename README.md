@@ -1,6 +1,6 @@
 # Looking for developers
 
-Open Tibia is currently looking for developers. If you want to become one, please send private message to Pietia10 or Iryont on otland.net
+Open Tibia is currently looking for developers. If you want to become one, please send an email to iryont@gmail.com
 
 # What is this?
 
