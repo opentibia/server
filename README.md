@@ -17,12 +17,6 @@ control.
 
 This version of OTServ is targeted towards Tibia 8.7.
 
-To connect Tibia client to OTServ you will have to use an IP changer, you can get one here
-http://www.otchanger.net/
-
-Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
-double clicking it.
-
 You have to execute some sql queries from schema.mysql, schema.pgsql or even schema.sqlite.
 And check it out. Once you are done, have a look around in the folders
 and take a look at the config.lua
@@ -45,19 +39,6 @@ Then you are logged in.
     - assassina			OpenTibia
     - hackerpotato		OpenTibia
     - kilouco / aseverino	OpenTibia
-
-- Forum Administrators
-
-    - GriZzm0
-    - Stormer
-    - Mackan
-    - Tythor Zeth
-    - Tliff *Inactive*
-    - Yorick *Inactive*
-    - Pekay *Inactive*
-    - Nuker *Inactive*
-    - verkon *Inactive*
-    - Evo *Inactive*
 
 - Inactive Developers
 
@@ -96,6 +77,17 @@ Then you are logged in.
     - Vitor
     - Decar
     - Torvik
+    - GriZzm0
+    - Stormer
+    - Mackan
+    - Tythor Zeth
+    - Tliff
+    - Yorick
+    - Pekay
+    - Nuker
+    - verkon
+    - Evo
+
 
 - Contributors
 
@@ -109,15 +101,6 @@ Rith, Rizz, Vinny, YobaK, Nexoz, Ferrus
 
 And special thanks to all otfans.net moderators.
 
-# Help
-We always need help. Post on the forum:
-OTFans - http://otfans.net
-	English community, the official site of OpenTibia. Also containing the OTWiki
-
-Need to promote your server? Put it on servers list:
-OTServList - http://www.otservlist.org
-	Official OTServ list, you dont need any other ;).
-
 Note that only websites mentioned in this document are treated as official support of OTServ.
 
 No other websites are officialy affiliated with OTServ.
@@ -126,5 +109,3 @@ No other websites are officialy affiliated with OTServ.
 Yes! There are utilities available as a seperate projects under the opentibia organization
 
 This includes an IP changer, a remote administration tool, an item editor and more.
-
-We have a chat room now as well on #otserv at irc.quakenet.org.
