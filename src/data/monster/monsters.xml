@@ -146,6 +146,7 @@
 	<monster name="Ushuriel" file="Bosses/ushuriel.xml"/>
 	<monster name="Vashresamun" file="Bosses/vashresamun.xml"/>
 	<monster name="Warlord Ruzad" file="Bosses/warlord ruzad.xml"/>
+	<monster name="Yeti" file="Bosses/yeti.xml"/>
 	<monster name="Zugurosh" file="Bosses/zugurosh.xml"/>
 	<monster name="Zulazza The Corruptor" file="Bosses/zulazza the corruptor.xml"/>
 	
