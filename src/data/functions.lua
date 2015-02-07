@@ -242,28 +242,29 @@ function getPlayerLookPos(cid)
 	return getPosByDir(getThingPos(cid), getPlayerLookDir(cid))
 end
 
-function getPosByDir(basePos, dir)
+function getPosByDir(basePos, dir, steps)
+	if steps == nil then steps = 1 end --default value
 	local pos = copyRawTable(basePos)
 	if(dir == NORTH) then
-		pos.y = pos.y-1
+		pos.y = pos.y - steps
 	elseif(dir == SOUTH) then
-		pos.y = pos.y + 1
+		pos.y = pos.y + steps
 	elseif(dir == WEST) then
-		pos.x = pos.x-1
+		pos.x = pos.x - steps
 	elseif(dir == EAST) then
-		pos.x = pos.x+1
+		pos.x = pos.x + steps
 	elseif(dir == NORTHWEST) then
-		pos.y = pos.y-1
-		pos.x = pos.x-1
+		pos.y = pos.y - steps
+		pos.x = pos.x - steps
 	elseif(dir == NORTHEAST) then
-		pos.y = pos.y-1
-		pos.x = pos.x+1
+		pos.y = pos.y - steps
+		pos.x = pos.x + steps
 	elseif(dir == SOUTHWEST) then
-		pos.y = pos.y+1
-		pos.x = pos.x-1
+		pos.y = pos.y + steps
+		pos.x = pos.x - steps
 	elseif(dir == SOUTHEAST) then
-		pos.y = pos.y+1
-		pos.x = pos.x+1
+		pos.y = pos.y + steps
+		pos.x = pos.x + steps
 	end
 	return pos
 end
