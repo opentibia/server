@@ -4,18 +4,30 @@ project(otserv)
 # Additional CMake modules
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(VERSION_MAJOR 0)
-set(VERSION_MINOR 7)
-set(VERSION_MICRO 0)
-set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}")
-
-# Compile with both MySQL and SQLite
-set(CMAKE_CXX_FLAGS             "-D__USE_MYSQL__ -D__USE_SQLITE__")
+# Revscriptsys2
+set(VERSION "0.7.0")
 
 # Make sure the compiler can compile C++11 code
 include(FindCXX11)
 
-# Show all warnings and make them as errors
-#set(CMAKE_CXX_FLAGS             "-Wall -Werror ${CMAKE_CXX_FLAGS}")
+# Options
+option(USE_MYSQL "Use MySQL" OFF)
+option(USE_SQLITE "Use SQLite" OFF)
+option(USE_ODBC "Use ODBC" OFF)
+option(USE_PGSQL "Use PGSQL" OFF)
+option(USE_LUAJIT "Use LuaJIT" OFF)
 
+# Status
+message(STATUS "MySQL: ${USE_MYSQL}")
+message(STATUS "SQLite: ${USE_SQLITE}")
+message(STATUS "ODBC: ${USE_ODBC}")
+message(STATUS "PGSQL: ${USE_PGSQL}")
+message(STATUS "LuaJIT: ${USE_LUAJIT}")
+
+# Make sure at least one database driver is selected
+if(NOT USE_MYSQL AND NOT USE_SQLITE AND NOT USE_ODBC AND NOT USE_PGSQL)
+  message(FATAL_ERROR "At least one database driver has to be selected.")
+endif()
+
+# Sources
 add_subdirectory(src)
