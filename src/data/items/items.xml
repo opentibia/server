@@ -16732,6 +16732,13 @@
 		<attribute key="weaponType" value="sword"/>
 		<attribute key="slotType" value="two-handed"/>
 	</item>
+	<item id="7450" article="a" name="hammer of prophecy">
+		<attribute key="weight" value="11000"/>
+		<attribute key="defense" value="35"/>
+		<attribute key="attack" value="52"/>
+		<attribute key="weaponType" value="club"/>
+		<attribute key="slotType" value="two-handed"/>
+	</item>
 	<item id="7451" article="a" name="shadow sceptre">
 		<attribute key="weight" value="4100"/>
 		<attribute key="defense" value="17"/>
