@@ -111,13 +111,13 @@ Attr_ReadValue Container::readAttr(AttrTypes_t attr, PropStream& propStream)
 	return Item::readAttr(attr, propStream);
 }
 
-bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
+bool Container::unserializeItemNode(FileLoader& f, NodeStruct* node, PropStream& propStream)
 {
 	bool ret = Item::unserializeItemNode(f, node, propStream);
 
 	if(ret){
 		unsigned long type;
-		NODE nodeItem = f.getChildNode(node, type);
+		NodeStruct* nodeItem = f.getChildNode(node, type);
 		while(nodeItem){
 			//load container items
 			if(type == OTBM_ITEM){

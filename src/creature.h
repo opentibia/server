@@ -179,7 +179,7 @@ public:
 	virtual int32_t getMaxMana() const;
 
 	const OutfitType getCurrentOutfit() const;
-	const void setCurrentOutfit(OutfitType outfit);
+	void setCurrentOutfit(OutfitType outfit);
 	const OutfitType getDefaultOutfit() const;
 	bool isInvisible() const;
 	ZoneType getZone() const;
@@ -349,8 +349,8 @@ public:
 	void setCustomValue(const std::string& key, int32_t value);
 	bool eraseCustomValue(const std::string& key);
 	bool getCustomValue(const std::string& key, std::string& value) const;
-	bool getCustomValue(const std::string& key, uint32_t value) const;
-	bool getCustomValue(const std::string& key, int32_t value) const;
+	bool getCustomValue(const std::string& key, uint32_t& value) const;
+	bool getCustomValue(const std::string& key, int32_t& value) const;
 
 	StorageMap::const_iterator getCustomValueIteratorBegin() const;
 	StorageMap::const_iterator getCustomValueIteratorEnd() const;

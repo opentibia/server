@@ -112,11 +112,11 @@ bool FileLoader::openFile(const char* filename, bool write, bool caching /*= fal
 	}
 }
 
-bool FileLoader::parseNode(NODE node)
+bool FileLoader::parseNode(NodeStruct* node)
 {
 	int byte;
 	long pos;
-	NODE currentNode = node;
+	NodeStruct* currentNode = node;
 	while(1){
 		//read node type
 		if(readByte(byte)){
@@ -128,7 +128,7 @@ bool FileLoader::parseNode(NODE node)
 					if(byte == NODE_START){
 						//child node start
 						if(safeTell(pos)){
-							NODE childNode = new NodeStruct();
+							NodeStruct* childNode = new NodeStruct();
 							childNode->start = pos;
 							setPropsSize = true;
 							currentNode->propsSize = pos - currentNode->start - 2;
@@ -155,7 +155,7 @@ bool FileLoader::parseNode(NODE node)
 							if(byte == NODE_START){
 								//starts next node
 								if(safeTell(pos)){
-									NODE nextNode = new NodeStruct();
+									NodeStruct* nextNode = new NodeStruct();
 									nextNode->start = pos;
 									currentNode->next = nextNode;
 									currentNode = nextNode;
@@ -201,7 +201,7 @@ bool FileLoader::parseNode(NODE node)
 	}
 }
 
-const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
+const unsigned char* FileLoader::getProps(const NodeStruct* node, unsigned long &size)
 {
 	if(node){
 		while(node->propsSize >= m_buffer_size){
@@ -244,7 +244,7 @@ const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
 }
 
 
-bool FileLoader::getProps(const NODE node, PropStream &props)
+bool FileLoader::getProps(const NodeStruct* node, PropStream &props)
 {
 	unsigned long size;
 	const unsigned char* a = getProps(node, size);
@@ -280,10 +280,10 @@ void FileLoader::endNode()
 	writeData(&nodeEnd, sizeof(nodeEnd), false);
 }
 
-const NODE FileLoader::getChildNode(const NODE parent, unsigned long &type)
+NodeStruct* FileLoader::getChildNode(const NodeStruct* parent, unsigned long &type)
 {
 	if(parent){
-		NODE child = parent->child;
+		NodeStruct* child = parent->child;
 		if(child){
 			type = child->type;
 		}
@@ -295,17 +295,17 @@ const NODE FileLoader::getChildNode(const NODE parent, unsigned long &type)
 	}
 }
 
-const NODE FileLoader::getNextNode(const NODE prev, unsigned long &type)
+NodeStruct* FileLoader::getNextNode(const NodeStruct* prev, unsigned long &type)
 {
 	if(prev){
-		NODE next = prev->next;
+		NodeStruct* next = prev->next;
 		if(next){
 			type = next->type;
 		}
 		return next;
 	}
 	else{
-		return NO_NODE;
+		return NULL;
 	}
 }
 
@@ -414,7 +414,7 @@ inline bool FileLoader::writeData(void* data, int size, bool unescape)
 	return true;
 }
 */
-inline bool FileLoader::checks(const NODE node)
+inline bool FileLoader::checks(const NodeStruct* node)
 {
 	if(!m_file){
 		m_lastError = ERROR_NOT_OPEN;

@@ -56,10 +56,19 @@ inline int32_t swap_int32(int32_t x)
 
 inline float swap_float32(float x)
 {
-	uint32_t ui = *((uint32_t *)(void *)&x);
-	ui = swap_uint32(ui);
+  union Alias 
+  {
+    float native;
+    uint32_t convert;
+  };
 
-	return *((float *)(void *)&ui);
+  Alias asrc;
+  asrc.native = x;
+    
+  Alias adst;
+  adst.convert = swap_uint32(asrc.convert);
+
+  return adst.native;
 }
 
 void replaceString(std::string& str, const std::string& sought, const std::string& replacement);

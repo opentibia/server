@@ -160,7 +160,7 @@ int Items::loadFromOtb(std::string file)
 	}
 
 	unsigned long type;
-	NODE node = f.getChildNode(NO_NODE, type);
+	NodeStruct* node = f.getChildNode(NULL, type);
 
 	PropStream props;
 	if(f.getProps(node,props)){
@@ -211,7 +211,7 @@ int Items::loadFromOtb(std::string file)
 
 	node = f.getChildNode(node, type);
 
-	while(node != NO_NODE){
+	while(node != NULL){
 		PropStream props;
 		if(!f.getProps(node,props)){
 			return f.getError();

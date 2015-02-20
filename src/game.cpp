@@ -287,7 +287,7 @@ void Game::runWaitingScripts()
 
 bool Game::loadScripts()
 {
-	bool is_reload = false;
+	//bool is_reload = false;
 	// Unload any old
 	if(script_environment || script_system) {
 		// Remove all old event listeners
@@ -304,7 +304,7 @@ bool Game::loadScripts()
 
 		g_scheduler.stopEvent(waitingScriptEvent);
 		waitingScriptEvent = 0;
-		is_reload = true;
+		//is_reload = true;
 	}
 
 	// Load fresh!

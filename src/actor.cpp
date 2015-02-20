@@ -729,7 +729,7 @@ void Actor::doAttacking(uint32_t interval)
 	}
 
 	// TODO: seems "outOfRange" is being unused. Why?
-	bool outOfRange = true;
+	//bool outOfRange = true;
 	bool updateLook = true;
 
 	resetTicks = interval != 0;
@@ -755,10 +755,11 @@ void Actor::doAttacking(uint32_t interval)
 				*/
 			}
 		}
-
+    /*
 		if(inRange){
 			outOfRange = false;
 		}
+    */
 		/*
 		else if(it->isMelee){
 			//melee swing out of reach

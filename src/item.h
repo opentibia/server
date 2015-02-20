@@ -150,7 +150,7 @@ public:
 	//serialization
 	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool unserializeAttr(PropStream& propStream);
-	virtual bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
+	virtual bool unserializeItemNode(FileLoader& f, NodeStruct* node, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
 	virtual bool isPushable() const {return isMoveable();}

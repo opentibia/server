@@ -2006,7 +2006,7 @@ const OutfitType Creature::getCurrentOutfit() const
 	return currentOutfit;
 }
 
-const void Creature::setCurrentOutfit(OutfitType outfit)
+void Creature::setCurrentOutfit(OutfitType outfit)
 {
 	currentOutfit = outfit;
 }
@@ -2170,7 +2170,7 @@ bool Creature::getCustomValue(const std::string& key, std::string& value) const
 	return false;
 }
 
-bool Creature::getCustomValue(const std::string& key, uint32_t value) const
+bool Creature::getCustomValue(const std::string& key, uint32_t& value) const
 {
 	std::string strValue;
 	if(!getCustomValue(key, strValue)){
@@ -2181,7 +2181,7 @@ bool Creature::getCustomValue(const std::string& key, uint32_t value) const
 	return true;
 }
 
-bool Creature::getCustomValue(const std::string& key, int32_t value) const
+bool Creature::getCustomValue(const std::string& key, int32_t& value) const
 {
 	std::string strValue;
 	if(!getCustomValue(key, strValue)){

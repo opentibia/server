@@ -26,11 +26,7 @@
 #include <stdint.h>
 #include "classes.h"
 
-struct NodeStruct;
-
-typedef NodeStruct* NODE;
-
-struct NodeStruct{
+struct NodeStruct {
 	NodeStruct(){
 		start = 0;
 		propsSize = 0;
@@ -78,8 +74,6 @@ private:
 	}
 };
 
-#define NO_NODE 0
-
 enum FILELOADER_ERRORS{
 	ERROR_NONE,
 	ERROR_INVALID_FILE_VERSION,
@@ -101,10 +95,10 @@ public:
 	virtual ~FileLoader();
 
 	bool openFile(const char* filename, bool write, bool caching = false);
-	const unsigned char* getProps(const NODE, unsigned long &size);
-	bool getProps(const NODE, PropStream& props);
-	const NODE getChildNode(const NODE parent, unsigned long &type);
-	const NODE getNextNode(const NODE prev, unsigned long &type);
+	const unsigned char* getProps(const NodeStruct* node, unsigned long &size);
+	bool getProps(const NodeStruct*, PropStream& props);
+	NodeStruct* getChildNode(const NodeStruct* parent, unsigned long &type);
+	NodeStruct* getNextNode(const NodeStruct* prev, unsigned long &type);
 
 	void startNode(unsigned char type);
 	void endNode();
@@ -120,11 +114,11 @@ protected:
 		ESCAPE_CHAR = 0xFD
 	};
 
-	bool parseNode(NODE node);
+	bool parseNode(NodeStruct* node);
 
 	inline bool readByte(int &value);
 	inline bool readBytes(unsigned char* buffer, unsigned int size, long pos);
-	inline bool checks(const NODE node);
+	inline bool checks(const NodeStruct* node);
 	inline bool safeSeek(unsigned long pos);
 	inline bool safeTell(long &pos);
 
@@ -152,7 +146,7 @@ public:
 protected:
 	FILE* m_file;
 	FILELOADER_ERRORS m_lastError;
-	NODE m_root;
+	NodeStruct* m_root;
 	unsigned long m_buffer_size;
 	unsigned char* m_buffer;
 

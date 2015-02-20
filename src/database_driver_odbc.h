@@ -59,7 +59,9 @@ public:
 	virtual bool rollback();
 	virtual bool commit();
 
-	virtual bool executeQuery(const std::string &query);
+	virtual bool executeQuery(const std::string &query) { return false; }; // todo
+  
+  virtual uint64_t getLastInsertedRowID(){ return 0; }; // todo
 
 	virtual std::string escapeString(const std::string &s);
 	virtual std::string escapeBlob(const char* s, uint32_t length);
@@ -81,13 +83,13 @@ class ODBCResult : public DBResult
 
 public:
 	virtual int32_t getDataInt(const std::string &s);
-	virtual uint32_t getDataInt(const std::string &s);
+	virtual uint32_t getDataUInt(const std::string &s);
 	virtual int64_t getDataLong(const std::string &s);
 	virtual std::string getDataString(const std::string &s);
 	virtual const char* getDataStream(const std::string &s, unsigned long &size);
 
 	virtual DBResult_ptr advance();
-	virtual bool empty();o
+	virtual bool empty();
 
 protected:
 	ODBCResult(SQLHSTMT stmt);

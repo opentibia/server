@@ -3157,7 +3157,7 @@ void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* 
 		g_game.onPlayerEquipItem(this, thing->getItem(), SlotType(index), true);
 	}
 
-	bool requireListUpdate = true;
+	//bool requireListUpdate = true;
 	
 	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		const Item* i = (oldParent? oldParent->getItem() : NULL);
@@ -3166,12 +3166,12 @@ void Player::postAddNotification(Creature* actor, Thing* thing, const Cylinder* 
 		// as the list was updated in postRemoveNotification
 		assert(i? i->getContainer() != NULL : true);
 
-		if(i){
-			requireListUpdate = i->getContainer()->getHoldingPlayer() != this;
-		}
-		else{
-			requireListUpdate = oldParent != this;
-		}
+		//if(i){
+		//	requireListUpdate = i->getContainer()->getHoldingPlayer() != this;
+		//}
+		//else{
+		//	requireListUpdate = oldParent != this;
+		//}
 
 		updateInventoryWeight();
 		updateItemsLight();

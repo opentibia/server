@@ -559,7 +559,7 @@ bool Item::unserializeAttr(PropStream& propStream)
 	return true;
 }
 
-bool Item::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
+bool Item::unserializeItemNode(FileLoader& f, NodeStruct* node, PropStream& propStream)
 {
 	return unserializeAttr(propStream);
 }

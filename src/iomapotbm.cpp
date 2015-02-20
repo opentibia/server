@@ -92,7 +92,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	unsigned long type;
 	PropStream propStream;
 
-	NODE root = f.getChildNode((NODE)NULL, type);
+	NodeStruct* root = f.getChildNode(NULL, type);
 
 	if(!f.getProps(root, propStream)){
 		setLastErrorString("Could not read root property.");
@@ -145,7 +145,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	map->mapWidth = root_header->width;
 	map->mapHeight = root_header->height;
 
-	NODE nodeMap = f.getChildNode(root, type);
+	NodeStruct* nodeMap = f.getChildNode(root, type);
 
 	if(type != OTBM_MAP_DATA){
 		setLastErrorString("Could not read data node.");
@@ -197,8 +197,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		}
 	}
 
-	NODE nodeMapData = f.getChildNode(nodeMap, type);
-	while(nodeMapData != NO_NODE){
+	NodeStruct* nodeMapData = f.getChildNode(nodeMap, type);
+	while(nodeMapData != NULL){
 		if(f.getError() != ERROR_NONE){
 			setLastErrorString("Invalid map node.");
 			return false;
@@ -221,8 +221,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 			base_y = area_coord->_y;
 			base_z = area_coord->_z;
 
-			NODE nodeTile = f.getChildNode(nodeMapData, type);
-			while(nodeTile != NO_NODE){
+			NodeStruct* nodeTile = f.getChildNode(nodeMapData, type);
+			while(nodeTile != NULL){
 				if(f.getError() != ERROR_NONE){
 					setLastErrorString("Could not read node data.");
 					return false;
@@ -355,7 +355,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						}
 					}
 
-					NODE nodeItem = f.getChildNode(nodeTile, type);
+					NodeStruct* nodeItem = f.getChildNode(nodeTile, type);
 					while(nodeItem){
 						if(type == OTBM_ITEM){
 
@@ -425,8 +425,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 			}
 		}
 		else if(type == OTBM_TOWNS){
-			NODE nodeTown = f.getChildNode(nodeMapData, type);
-			while(nodeTown != NO_NODE){
+			NodeStruct* nodeTown = f.getChildNode(nodeMapData, type);
+			while(nodeTown != NULL){
 				if(type == OTBM_TOWN){
 					if(!f.getProps(nodeTown, propStream)){
 						setLastErrorString("Could not read town data.");
@@ -474,8 +474,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 			}
 		}
 		else if(type == OTBM_WAYPOINTS && header_version >= 2){
-			NODE nodeWaypoint = f.getChildNode(nodeMapData, type);
-			while(nodeWaypoint != NO_NODE){
+			NodeStruct* nodeWaypoint = f.getChildNode(nodeMapData, type);
+			while(nodeWaypoint != NULL){
 				if(type == OTBM_WAYPOINT){
 					if(!f.getProps(nodeWaypoint, propStream)){
 						setLastErrorString("Could not read waypoint data.");

@@ -366,7 +366,7 @@ const char* ODBCResult::getDataStream(const std::string &s, unsigned long &size)
 	return 0; // Failed
 }
 
-bool ODBCResult::advance()
+DBResult_ptr ODBCResult::advance()
 {
 	SQLRETURN ret = SQLFetch(m_handle);
 	m_rowAvailable = RETURN_SUCCESS(ret);
