@@ -22,8 +22,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # compile flags
-set(WARNS_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-result")
-set(CMAKE_CXX_FLAGS                   "${CMAKE_CXX_FLAGS} ${WARNS_FLAGS}")
+set(WARNING_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-result")
+set(CMAKE_CXX_FLAGS                   "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS}")
 set(CMAKE_CXX_FLAGS_COMPILESPEED      "-O0")
 set(CMAKE_CXX_FLAGS_DEBUG             "-O0 -g")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO    "-O1 -g -fno-omit-frame-pointer")
@@ -32,6 +32,7 @@ set(CMAKE_CXX_FLAGS_PERFORMANCE       "-Ofast -mmmx -msse -msse2")
 
 # check if MinGW
 if(WIN32 AND MINGW)
+    remove_definitions(-D__WINDOWS__ -D_WIN32_WINNT)
     add_definitions(-D__WINDOWS__ -D_WIN32_WINNT=0x0501)
 endif()
 
