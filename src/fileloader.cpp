@@ -359,7 +359,7 @@ inline bool FileLoader::readBytes(unsigned char* buffer, unsigned int size, long
 			m_cache_offset = pos - m_cached_data[i].base;
 
 			//get maximun read block size and calculate remaining bytes
-			reading = std::min(remain, m_cached_data[i].size - m_cache_offset);
+			reading = std::min(remain, (unsigned long)m_cached_data[i].size - m_cache_offset);
 			remain = remain - reading;
 
 			//read it
