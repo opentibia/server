@@ -93,7 +93,7 @@ endif()
 
 # link pthread and dl
 if(UNIX)
-  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-pthread")
+  find_package(Threads)
   target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} dl)
 endif()
 
