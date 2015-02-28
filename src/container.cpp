@@ -879,7 +879,7 @@ void Container::__internalAddThing(Thing* thing)
 
 void Container::__internalAddThing(uint32_t index, Thing* thing)
 {
-#ifdef __DEBUG__MOVESYS__NOTICE
+#ifdef __DEBUG__MOVESYS__
 	std::cout << "[Container::__internalAddThing] index: " << index << std::endl;
 #endif
 
@@ -893,7 +893,7 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 
 	/*
 	if(index < 0 || index >= capacity()){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__internalAddThing] - index is out of range" << std::endl;
 #endif
 		return;

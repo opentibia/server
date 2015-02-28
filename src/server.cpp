@@ -156,7 +156,7 @@ void ServicePort::onAccept(Acceptor_ptr acceptor, boost::asio::ip::tcp::socket* 
 {
 	if(!error){
 		if(m_services.empty()){
-#ifdef __DEBUG_NET__
+#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Error: [ServerPort::accept] No services running!" << std::endl;
 #endif
 			return;
@@ -207,7 +207,7 @@ void ServicePort::onAccept(Acceptor_ptr acceptor, boost::asio::ip::tcp::socket* 
 			}
 		}
 		else{
-			#ifdef __DEBUG_NET__
+			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Error: [ServerPort::onAccept] Operation aborted." << std::endl;
 			#endif
 		}

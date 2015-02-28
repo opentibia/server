@@ -15,6 +15,10 @@
 #include <winerror.h>
 #endif
 
+#ifdef __STATIC__
+#define LIBXML_STATIC
+#endif
+
 //libxml
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>

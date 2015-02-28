@@ -189,13 +189,13 @@ void OutputMessagePool::send(OutputMessage_ptr msg)
 			}
 		}
 		else{
-			#ifdef __DEBUG_NET__
+			#ifdef __DEBUG_NET_DETAIL__
 			std::cout << "Error: [OutputMessagePool::send] NULL connection." << std::endl;
 			#endif
 		}
 	}
 	else{
-		#ifdef __DEBUG_NET__
+		#ifdef __DEBUG_NET_DETAIL__
 		std::cout << "Warning: [OutputMessagePool::send] State != STATE_ALLOCATED_NO_AUTOSEND" << std::endl;
 		#endif
 	}
