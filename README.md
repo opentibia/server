@@ -1,8 +1,4 @@
-# Looking for developers
-
-Open Tibia is currently looking for developers. If you want to become one, please send an email to iryont@gmail.com
-
-# What is this?
+# Open Tibia Server [![Build Status](https://travis-ci.org/opentibia/server.svg?branch=master)](https://travis-ci.org/opentibia/server)
 
 OTServ is a free MMORPG emulation, that creates a own gameworld server,
 based on the CIPSoft's Tibia.
@@ -12,6 +8,10 @@ and is as such NOT backwards-compatible with old distributions like TFS or
 OTServ 0.6.3. This has been done to greatly enhance the scripting system,
 moving to a much more flexible and dynamic system that allows much more
 control.
+
+# Looking for developers
+
+Open Tibia is currently looking for developers. If you want to become one, please send an email to iryont@gmail.com
 
 # How does it work?
 
