@@ -30,268 +30,268 @@ extern ConfigManager g_config;
 
 class InternalCreatureType{
 public:
-	InternalCreatureType();
-	~InternalCreatureType();
+  InternalCreatureType();
+  ~InternalCreatureType();
 
-	void reset();
+  void reset();
 
-	int32_t reference_count;
+  int32_t reference_count;
 
-	std::string name;
-	std::string nameDescription;
-	std::string fileLoaded;
-	uint64_t experience;
+  std::string name;
+  std::string nameDescription;
+  std::string fileLoaded;
+  uint64_t experience;
 
-	int32_t defense;
-	int32_t armor;
+  int32_t defense;
+  int32_t armor;
 
-	bool canPushItems;
-	bool canPushCreatures;
-	uint32_t staticAttackChance;
-	int32_t maxSummons;
-	int32_t targetDistance;
-	int32_t fleeHealth;
-	bool pushable;
-	int32_t base_speed;
-	int32_t health;
-	int32_t health_max;
+  bool canPushItems;
+  bool canPushCreatures;
+  uint32_t staticAttackChance;
+  int32_t maxSummons;
+  int32_t targetDistance;
+  int32_t fleeHealth;
+  bool pushable;
+  int32_t base_speed;
+  int32_t health;
+  int32_t health_max;
 
-	OutfitType outfit;
-	int32_t corpseId;
-	MechanicType mechanicImmunities;
-	CombatType damageImmunities;
-	RaceType race;
-	bool isSummonable;
-	bool isIllusionable;
-	bool isConvinceable;
-	bool isAttackable;
-	bool isHostile;
-	bool isLureable;
+  OutfitType outfit;
+  int32_t corpseId;
+  MechanicType mechanicImmunities;
+  CombatType damageImmunities;
+  RaceType race;
+  bool isSummonable;
+  bool isIllusionable;
+  bool isConvinceable;
+  bool isAttackable;
+  bool isHostile;
+  bool isLureable;
 
-	int32_t lightLevel;
-	int32_t lightColor;
+  int32_t lightLevel;
+  int32_t lightColor;
 
-	uint32_t manaCost;
-	SummonList summonList;
-	LootItems lootItems;
-	ElementMap elementMap;
-	SpellList spellAttackList;
-	SpellList spellDefenseList;
+  uint32_t manaCost;
+  SummonList summonList;
+  LootItems lootItems;
+  ElementMap elementMap;
+  SpellList spellAttackList;
+  SpellList spellDefenseList;
 
-	uint32_t yellChance;
-	uint32_t yellSpeedTicks;
-	VoiceVector voiceVector;
+  uint32_t yellChance;
+  uint32_t yellSpeedTicks;
+  VoiceVector voiceVector;
 
-	int32_t changeTargetSpeed;
-	int32_t changeTargetChance;
+  int32_t changeTargetSpeed;
+  int32_t changeTargetChance;
 
-	void createLoot(Container* corpse);
-	void createLootContainer(Container* parent, const LootBlock& lootblock);
-	Item* createLootItem(const LootBlock& lootblock);
+  void createLoot(Container* corpse);
+  void createLootContainer(Container* parent, const LootBlock& lootblock);
+  Item* createLootItem(const LootBlock& lootblock);
 };
 
 InternalCreatureType::InternalCreatureType() : reference_count(0)
 {
-	reset();
+  reset();
 }
 
 void InternalCreatureType::reset()
 {
-	experience = 0;
+  experience = 0;
 
-	defense = 0;
-	armor = 0;
+  defense = 0;
+  armor = 0;
 
-	canPushItems = false;
-	canPushCreatures = false;
-	staticAttackChance = 95;
-	maxSummons = 0;
-	targetDistance = 1;
-	fleeHealth = 0;
-	pushable = true;
-	base_speed = 200;
-	health = 100;
-	health_max = 100;
+  canPushItems = false;
+  canPushCreatures = false;
+  staticAttackChance = 95;
+  maxSummons = 0;
+  targetDistance = 1;
+  fleeHealth = 0;
+  pushable = true;
+  base_speed = 200;
+  health = 100;
+  health_max = 100;
 
-	outfit.lookHead   = 130; // Default man
-	outfit.lookBody   = 0;
-	outfit.lookLegs   = 0;
-	outfit.lookFeet   = 0;
-	outfit.lookType   = 0;
-	outfit.lookTypeEx = 0;
-	outfit.lookAddons = 0;
-	corpseId = 0;
+  outfit.lookHead   = 130; // Default man
+  outfit.lookBody   = 0;
+  outfit.lookLegs   = 0;
+  outfit.lookFeet   = 0;
+  outfit.lookType   = 0;
+  outfit.lookTypeEx = 0;
+  outfit.lookAddons = 0;
+  corpseId = 0;
 
-	mechanicImmunities = MECHANIC_NONE;
-	damageImmunities = COMBAT_NONE;
-	race = RACE_BLOOD;
-	isSummonable = false;
-	isIllusionable = false;
-	isConvinceable = false;
-	isAttackable = true;
-	isHostile = true;
-	isLureable = false;
+  mechanicImmunities = MECHANIC_NONE;
+  damageImmunities = COMBAT_NONE;
+  race = RACE_BLOOD;
+  isSummonable = false;
+  isIllusionable = false;
+  isConvinceable = false;
+  isAttackable = true;
+  isHostile = true;
+  isLureable = false;
 
-	lightLevel = 0;
-	lightColor = 0;
+  lightLevel = 0;
+  lightColor = 0;
 
-	manaCost = 0;
-	summonList.clear();
-	lootItems.clear();
-	elementMap.clear();
+  manaCost = 0;
+  summonList.clear();
+  lootItems.clear();
+  elementMap.clear();
 
-	spellAttackList.clear();
-	spellDefenseList.clear();
+  spellAttackList.clear();
+  spellDefenseList.clear();
 
-	yellSpeedTicks = 0;
-	yellChance = 0;
-	voiceVector.clear();
+  yellSpeedTicks = 0;
+  yellChance = 0;
+  voiceVector.clear();
 
-	changeTargetSpeed = 0;
-	changeTargetChance = 0;
+  changeTargetSpeed = 0;
+  changeTargetChance = 0;
 
-	//scriptList.clear();
+  //scriptList.clear();
 }
 
 InternalCreatureType::~InternalCreatureType()
 {
-	reset();
+  reset();
 }
 
 void InternalCreatureType::createLoot(Container* corpse)
 {
-	for(LootItems::const_iterator it = lootItems.begin(); it != lootItems.end() && (corpse->capacity() - corpse->size() > 0); it++){
-		Item* tmpItem = createLootItem(*it);
-		if(tmpItem){
-			//check containers
-			if(Container* container = tmpItem->getContainer()){
-				createLootContainer(container, *it);
-				if(container->size() == 0){
-					delete container;
-				}
-				else{
-					corpse->__internalAddThing(tmpItem);
-				}
-			}
-			else{
-				corpse->__internalAddThing(tmpItem);
-			}
-		}
-	}
+  for(LootItems::const_iterator it = lootItems.begin(); it != lootItems.end() && (corpse->capacity() - corpse->size() > 0); it++){
+    Item* tmpItem = createLootItem(*it);
+    if(tmpItem){
+      //check containers
+      if(Container* container = tmpItem->getContainer()){
+        createLootContainer(container, *it);
+        if(container->size() == 0){
+          delete container;
+        }
+        else{
+          corpse->__internalAddThing(tmpItem);
+        }
+      }
+      else{
+        corpse->__internalAddThing(tmpItem);
+      }
+    }
+  }
 }
 
 Item* InternalCreatureType::createLootItem(const LootBlock& lootBlock)
 {
-	Item* tmpItem = NULL;
-	if(Item::items[lootBlock.id].stackable){
-		uint32_t randvalue = CreatureType::getLootChance();
-		if(randvalue < lootBlock.chance){
-			uint32_t n = randvalue % lootBlock.countmax + 1;
-			tmpItem = Item::CreateItem(lootBlock.id, n);
-		}
-	}
-	else{
-		if(CreatureType::getLootChance() < lootBlock.chance){
-			tmpItem = Item::CreateItem(lootBlock.id, 0);
-		}
-	}
+  Item* tmpItem = NULL;
+  if(Item::items[lootBlock.id].stackable){
+    uint32_t randvalue = CreatureType::getLootChance();
+    if(randvalue < lootBlock.chance){
+      uint32_t n = randvalue % lootBlock.countmax + 1;
+      tmpItem = Item::CreateItem(lootBlock.id, n);
+    }
+  }
+  else{
+    if(CreatureType::getLootChance() < lootBlock.chance){
+      tmpItem = Item::CreateItem(lootBlock.id, 0);
+    }
+  }
 
-	if(tmpItem){
-		if(lootBlock.subType != -1){
-			tmpItem->setSubType(lootBlock.subType);
-		}
+  if(tmpItem){
+    if(lootBlock.subType != -1){
+      tmpItem->setSubType(lootBlock.subType);
+    }
 
-		if(lootBlock.actionId != -1){
-			tmpItem->setActionId(lootBlock.actionId);
-		}
+    if(lootBlock.actionId != -1){
+      tmpItem->setActionId(lootBlock.actionId);
+    }
 
-		if(lootBlock.text != ""){
-			tmpItem->setText(lootBlock.text);
-		}
+    if(lootBlock.text != ""){
+      tmpItem->setText(lootBlock.text);
+    }
 
-		return tmpItem;
-	}
+    return tmpItem;
+  }
 
-	return NULL;
+  return NULL;
 }
 
 void InternalCreatureType::createLootContainer(Container* parent, const LootBlock& lootblock)
 {
-	if(parent->size() < parent->capacity()){
-		LootItems::const_iterator it;
-		for(it = lootblock.childLoot.begin(); it != lootblock.childLoot.end(); it++){
-			Item* tmpItem = createLootItem(*it);
-			if(tmpItem){
-				if(Container* container = tmpItem->getContainer()){
-					createLootContainer(container, *it);
-					if(container->size() == 0 && it->dropEmpty == false){
-						delete container;
-					}
-					else{
-						parent->__internalAddThing(container);
-					}
-				}
-				else{
-					parent->__internalAddThing(tmpItem);
-				}
-			}
-		}
-	}
+  if(parent->size() < parent->capacity()){
+    LootItems::const_iterator it;
+    for(it = lootblock.childLoot.begin(); it != lootblock.childLoot.end(); it++){
+      Item* tmpItem = createLootItem(*it);
+      if(tmpItem){
+        if(Container* container = tmpItem->getContainer()){
+          createLootContainer(container, *it);
+          if(container->size() == 0 && it->dropEmpty == false){
+            delete container;
+          }
+          else{
+            parent->__internalAddThing(container);
+          }
+        }
+        else{
+          parent->__internalAddThing(tmpItem);
+        }
+      }
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Creature type implementation
 
 CreatureType::CreatureType(){
-	impl = new InternalCreatureType();
-	impl->reference_count = 1;
+  impl = new InternalCreatureType();
+  impl->reference_count = 1;
 }
 
 CreatureType::CreatureType(const CreatureType& ct){
-	impl = ct.impl;
-	impl->reference_count += 1;
+  impl = ct.impl;
+  impl->reference_count += 1;
 }
 
 CreatureType::~CreatureType(){
-	impl->reference_count -= 1;
-	if(impl->reference_count == 0)
-		delete impl;
+  impl->reference_count -= 1;
+  if(impl->reference_count == 0)
+    delete impl;
 }
 
 uint32_t CreatureType::getLootChance()
 {
-	return random_range(0, MAX_LOOTCHANCE)/g_config.getNumber(ConfigManager::RATE_LOOT);
+  return random_range(0, MAX_LOOTCHANCE)/g_config.getNumber(ConfigManager::RATE_LOOT);
 }
 
 void CreatureType::self_copy(){
-	if(impl->reference_count == 1){
-		// We are the only owner, no need to copy anything
-	}
-	else{
-		// Make a copy of the type, and make us the only owner
-		InternalCreatureType* oimpl = impl;
-		impl = new InternalCreatureType(*oimpl);
-		impl->reference_count = 1;
-		oimpl->reference_count -= 1; // No need to check for deletion, will always be >= 1
-	}
+  if(impl->reference_count == 1){
+    // We are the only owner, no need to copy anything
+  }
+  else{
+    // Make a copy of the type, and make us the only owner
+    InternalCreatureType* oimpl = impl;
+    impl = new InternalCreatureType(*oimpl);
+    impl->reference_count = 1;
+    oimpl->reference_count -= 1; // No need to check for deletion, will always be >= 1
+  }
 }
 
 void CreatureType::createLoot(Container* corpse) const {
 }
 
 #define DEFINE_PROPERTY(proptype, propname) \
-	const proptype& CreatureType::propname() const { \
-		return impl->propname; \
-	} \
-	\
-	proptype& CreatureType::propname() { \
-		return impl->propname; \
-	} \
-	\
-	void CreatureType::propname(const proptype& v){ \
-		self_copy(); \
-		impl->propname = v; \
-	}
+  const proptype& CreatureType::propname() const { \
+    return impl->propname; \
+  } \
+  \
+  proptype& CreatureType::propname() { \
+    return impl->propname; \
+  } \
+  \
+  void CreatureType::propname(const proptype& v){ \
+    self_copy(); \
+    impl->propname = v; \
+  }
 
 DEFINE_PROPERTY(std::string, name)
 DEFINE_PROPERTY(std::string, nameDescription)

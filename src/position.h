@@ -26,40 +26,40 @@
 
 class Position{
 public:
-	Position();
-	Position(int32_t _x, int32_t _y, int32_t _z);
+  Position();
+  Position(int32_t _x, int32_t _y, int32_t _z);
 
-	virtual ~Position();
+  virtual ~Position();
 
-	template<int32_t deltax, int32_t deltay, int32_t deltaz>
-	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
-			std::abs(int32_t(p1.y - p2.y)) > deltay ||
-			std::abs(int32_t(p1.z - p2.z)) > deltaz){
-			return false;
-		}
-		return true;
-	}
+  template<int32_t deltax, int32_t deltay, int32_t deltaz>
+  inline static bool areInRange(const Position& p1, const Position& p2){
+    if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
+      std::abs(int32_t(p1.y - p2.y)) > deltay ||
+      std::abs(int32_t(p1.z - p2.z)) > deltaz){
+      return false;
+    }
+    return true;
+  }
 
-	template<int32_t deltax, int32_t deltay>
-	inline static bool areInRange(const Position& p1, const Position& p2){
-		if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
-			std::abs(int32_t(p1.y - p2.y)) > deltay){
-			return false;
-		}
-		return true;
-	}
+  template<int32_t deltax, int32_t deltay>
+  inline static bool areInRange(const Position& p1, const Position& p2){
+    if(std::abs(int32_t(p1.x - p2.x)) > deltax ||
+      std::abs(int32_t(p1.y - p2.y)) > deltay){
+      return false;
+    }
+    return true;
+  }
 
-	int32_t x;
-	int32_t y;
-	int32_t z;
+  int32_t x;
+  int32_t y;
+  int32_t z;
 
-	bool operator<(const Position& p) const;
-	bool operator>(const Position& p) const;
-	bool operator==(const Position& p) const;
-	bool operator!=(const Position& p) const;
+  bool operator<(const Position& p) const;
+  bool operator>(const Position& p) const;
+  bool operator==(const Position& p) const;
+  bool operator!=(const Position& p) const;
 
-	Position operator-(const Position& p1);
+  Position operator-(const Position& p1);
 };
 
 std::ostream& operator<<(std::ostream&, const Position&);
@@ -67,16 +67,16 @@ std::ostream& operator<<(std::ostream&, const Direction&);
 
 class PositionEx : public Position{
 public:
-	PositionEx(int32_t _x, int32_t _y, int32_t _z, int32_t _stackpos = 0);
-	PositionEx(const Position& p);
-	PositionEx(const PositionEx& p);
-	PositionEx(const Position& p, int32_t _stackpos);
-	virtual ~PositionEx();
+  PositionEx(int32_t _x, int32_t _y, int32_t _z, int32_t _stackpos = 0);
+  PositionEx(const Position& p);
+  PositionEx(const PositionEx& p);
+  PositionEx(const Position& p, int32_t _stackpos);
+  virtual ~PositionEx();
 
-	int32_t stackpos;
+  int32_t stackpos;
 
-	bool operator==(const PositionEx& p) const;
-	bool operator!=(const PositionEx& p) const;
+  bool operator==(const PositionEx& p) const;
+  bool operator!=(const PositionEx& p) const;
 };
 
 #endif

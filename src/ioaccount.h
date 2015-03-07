@@ -26,19 +26,19 @@
 
 class IOAccount {
 public:
-	IOAccount() {}
-	~IOAccount() {}
+  IOAccount() {}
+  ~IOAccount() {}
 
-	static IOAccount* instance(){
-		static IOAccount instance;
-		return &instance;
-	}
+  static IOAccount* instance(){
+    static IOAccount instance;
+    return &instance;
+  }
 
-	Account loadAccount(const std::string& accountName, bool preLoad = false);
-	bool saveAccount(const Account& account);
-	bool getPassword(const std::string& accountName, const std::string& playerName, std::string& password);
-	
-	static uint16_t getPremiumDaysLeft(uint32_t time);
+  Account loadAccount(const std::string& accountName, bool preLoad = false);
+  bool saveAccount(const Account& account);
+  bool getPassword(const std::string& accountName, const std::string& playerName, std::string& password);
+  
+  static uint16_t getPremiumDaysLeft(uint32_t time);
 };
 
 #endif

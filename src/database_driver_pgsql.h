@@ -30,52 +30,52 @@
 class DatabasePgSQL : public DatabaseDriver
 {
 public:
-	DatabasePgSQL();
-	virtual ~DatabasePgSQL();
+  DatabasePgSQL();
+  virtual ~DatabasePgSQL();
 
-	virtual bool getParam(DBParam_t param);
+  virtual bool getParam(DBParam_t param);
 
-	virtual bool beginTransaction();
-	virtual bool rollback();
-	virtual bool commit();
+  virtual bool beginTransaction();
+  virtual bool rollback();
+  virtual bool commit();
 
-	virtual bool executeQuery(const std::string &query);
+  virtual bool executeQuery(const std::string &query);
 
-	virtual uint64_t getLastInsertedRowID();
+  virtual uint64_t getLastInsertedRowID();
 
-	virtual std::string escapeString(const std::string &s);
-	virtual std::string escapeBlob(const char* s, uint32_t length);
+  virtual std::string escapeString(const std::string &s);
+  virtual std::string escapeBlob(const char* s, uint32_t length);
 
 protected:
-	virtual bool internalQuery(const std::string &query);
-	virtual DBResult_ptr internalSelectQuery(const std::string &query);
-	virtual void freeResult(DBResult *res);
+  virtual bool internalQuery(const std::string &query);
+  virtual DBResult_ptr internalSelectQuery(const std::string &query);
+  virtual void freeResult(DBResult *res);
 
-	std::string _parse(const std::string &s);
+  std::string _parse(const std::string &s);
 
-	PGconn* m_handle;
+  PGconn* m_handle;
 };
 
 class PgSQLResult : public DBResult
 {
-	friend class DatabasePgSQL;
+  friend class DatabasePgSQL;
 
 public:
-	virtual int32_t getDataInt(const std::string &s);
-	virtual uint32_t getDataUInt(const std::string &s);
-	virtual int64_t getDataLong(const std::string &s);
-	virtual std::string getDataString(const std::string &s);
-	virtual const char* getDataStream(const std::string &s, unsigned long &size);
+  virtual int32_t getDataInt(const std::string &s);
+  virtual uint32_t getDataUInt(const std::string &s);
+  virtual int64_t getDataLong(const std::string &s);
+  virtual std::string getDataString(const std::string &s);
+  virtual const char* getDataStream(const std::string &s, unsigned long &size);
 
-	virtual DBResult_ptr advance();
-	virtual bool empty();
+  virtual DBResult_ptr advance();
+  virtual bool empty();
 
 protected:
-	PgSQLResult(PGresult* results);
-	virtual ~PgSQLResult();
+  PgSQLResult(PGresult* results);
+  virtual ~PgSQLResult();
 
-	int32_t m_rows, m_cursor;
-	PGresult* m_handle;
+  int32_t m_rows, m_cursor;
+  PGresult* m_handle;
 };
 
 #endif

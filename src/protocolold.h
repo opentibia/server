@@ -29,47 +29,47 @@ class NetworkMessage;
 class ProtocolOld : public Protocol
 {
 public:
-	// static protocol information
-	enum {server_sends_first = false};
-	// Ident is added in subclass
-	enum {use_checksum = false};
+  // static protocol information
+  enum {server_sends_first = false};
+  // Ident is added in subclass
+  enum {use_checksum = false};
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	static uint32_t protocolOldCount;
+  static uint32_t protocolOldCount;
 #endif
 
-	ProtocolOld(Connection_ptr connection);
-	virtual ~ProtocolOld();
+  ProtocolOld(Connection_ptr connection);
+  virtual ~ProtocolOld();
 
-	virtual void onRecvFirstMessage(NetworkMessage& msg);
+  virtual void onRecvFirstMessage(NetworkMessage& msg);
 
 protected:
-	void disconnectClient(uint8_t error, const char* message);
+  void disconnectClient(uint8_t error, const char* message);
 
-	bool parseFirstPacket(NetworkMessage& msg);
+  bool parseFirstPacket(NetworkMessage& msg);
 
-	#ifdef __DEBUG_NET_DETAIL__
-	virtual void deleteProtocolTask();
-	#endif
+  #ifdef __DEBUG_NET_DETAIL__
+  virtual void deleteProtocolTask();
+  #endif
 };
 
 class ProtocolOldLogin : public ProtocolOld
 {
 public:
-	enum {protocol_identifier = 0x01};
+  enum {protocol_identifier = 0x01};
 
-	ProtocolOldLogin(Connection_ptr connection);
+  ProtocolOldLogin(Connection_ptr connection);
 
-	static const char* protocol_name();
+  static const char* protocol_name();
 };
 
 class ProtocolOldGame : public ProtocolOld
 {
 public:
-	enum {protocol_identifier = 0x0A};
-	static const char* protocol_name();
+  enum {protocol_identifier = 0x0A};
+  static const char* protocol_name();
 
-	ProtocolOldGame(Connection_ptr connection);
+  ProtocolOldGame(Connection_ptr connection);
 };
 
 #endif

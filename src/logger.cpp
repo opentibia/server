@@ -26,58 +26,58 @@
 
 Logger::Logger()
 {
-	m_file = fopen("otlog.txt", "a");
-	if(!m_file)
-		m_file = stderr;
+  m_file = fopen("otlog.txt", "a");
+  if(!m_file)
+    m_file = stderr;
 }
 
 Logger::~Logger()
 {
-	if(m_file){
-		fclose(m_file);
-	}
+  if(m_file){
+    fclose(m_file);
+  }
 }
 
 Logger* Logger::getInstance()
 {
-	static Singleton<Logger> instance;
-	return instance.get();
+  static Singleton<Logger> instance;
+  return instance.get();
 }
 
 void Logger::logMessage(const char* channel, eLogType type, int level, std::string message, const char* func)
 {
-	//TODO: decide if should be saved or not depending on channel type and level
-	// if should be save decide where and how
+  //TODO: decide if should be saved or not depending on channel type and level
+  // if should be save decide where and how
 
-	//write timestamp of the event
-	char buffer[32];
-	time_t tmp = time(NULL);
-	formatDate(tmp, buffer);
-	fprintf(m_file, "%s", buffer);
-	//write channel generating the message
-	if(channel){
-		fprintf(m_file, " [%s] ", channel);
-	}
+  //write timestamp of the event
+  char buffer[32];
+  time_t tmp = time(NULL);
+  formatDate(tmp, buffer);
+  fprintf(m_file, "%s", buffer);
+  //write channel generating the message
+  if(channel){
+    fprintf(m_file, " [%s] ", channel);
+  }
 
-	//write message type
-	const char* type_str;
-	switch(type){
-	case LOGTYPE_EVENT:
-		type_str = "event";
-		break;
-	case LOGTYPE_WARNING:
-		type_str = "warning";
-		break;
-	case LOGTYPE_ERROR:
-		type_str = "ERROR";
-		break;
-	default:
-		type_str = "???";
-		break;
-	}
-	fprintf(m_file, " %s:", type_str);
-	//write the message
-	fprintf(m_file, " %s\n", message.c_str());
+  //write message type
+  const char* type_str;
+  switch(type){
+  case LOGTYPE_EVENT:
+    type_str = "event";
+    break;
+  case LOGTYPE_WARNING:
+    type_str = "warning";
+    break;
+  case LOGTYPE_ERROR:
+    type_str = "ERROR";
+    break;
+  default:
+    type_str = "???";
+    break;
+  }
+  fprintf(m_file, " %s:", type_str);
+  //write the message
+  fprintf(m_file, " %s\n", message.c_str());
 
-	fflush(m_file);
+  fflush(m_file);
 }

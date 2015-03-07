@@ -29,50 +29,50 @@
 
 namespace HTTP
 {
-	enum Method
-	{
-		GET,
-		POST
-	};
+  enum Method
+  {
+    GET,
+    POST
+  };
 
-	typedef std::map<std::string, std::string> Headers;
+  typedef std::map<std::string, std::string> Headers;
 
-	class Request
-	{
-	public:
-		Request();
-		
-		Request& url(const std::string& url);
-		Request& method(Method method);
-		Request& header(const std::string& name, const std::string& value);
-		Request& header(const Headers& headers);
-		Request& data(const std::string& data);
+  class Request
+  {
+  public:
+    Request();
+    
+    Request& url(const std::string& url);
+    Request& method(Method method);
+    Request& header(const std::string& name, const std::string& value);
+    Request& header(const Headers& headers);
+    Request& data(const std::string& data);
 
-		// This call will connect to the server with the specfied params and fetch the response
-		Request& fetch();
+    // This call will connect to the server with the specfied params and fetch the response
+    Request& fetch();
 
-		// Used to access response
-		std::string error() const;
-		int responseCode() const;
-		std::string responseMessage() const;
-		std::string responseData() const;
-		Headers responseHeaders() const;
+    // Used to access response
+    std::string error() const;
+    int responseCode() const;
+    std::string responseMessage() const;
+    std::string responseData() const;
+    Headers responseHeaders() const;
 
-	protected:
-		// Request data
-		std::string requestUrl;
-		std::string requestData;
-		Method requestMethod;
-		Headers requestHeaders;
-		std::string payload;
-		
-		// Return data
-		int respCode;
-		std::string respCodeStr;
-		std::string internalError;
-		std::string response;
-		Headers respHeaders;
-	};
+  protected:
+    // Request data
+    std::string requestUrl;
+    std::string requestData;
+    Method requestMethod;
+    Headers requestHeaders;
+    std::string payload;
+    
+    // Return data
+    int respCode;
+    std::string respCodeStr;
+    std::string internalError;
+    std::string response;
+    Headers respHeaders;
+  };
 };
 
 #endif

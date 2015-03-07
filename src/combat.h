@@ -27,63 +27,63 @@
 
 class CombatSource{
 public:
-	CombatSource();
-	CombatSource(Creature* creature, Item* item, bool condition);
-	CombatSource(Creature* creature);
-	CombatSource(Item* item);
-	CombatSource(const CombatSource& rhs);
-	~CombatSource();
+  CombatSource();
+  CombatSource(Creature* creature, Item* item, bool condition);
+  CombatSource(Creature* creature);
+  CombatSource(Item* item);
+  CombatSource(const CombatSource& rhs);
+  ~CombatSource();
 
-	bool isSourceCreature() const;
-	bool isSourceItem() const;
-	bool isSourceCondition() const;
+  bool isSourceCreature() const;
+  bool isSourceItem() const;
+  bool isSourceCondition() const;
 
-	Creature* getSourceCreature() const;
-	Item* getSourceItem() const;
+  Creature* getSourceCreature() const;
+  Item* getSourceItem() const;
 
-	void setSourceCreature(Creature* _creature);
-	void setSourceItem(Item* _item);
-	void setSourceIsCondition(bool b);
+  void setSourceCreature(Creature* _creature);
+  void setSourceItem(Item* _item);
+  void setSourceIsCondition(bool b);
 
 private:
-	Creature* creature;
-	Item* item;
-	bool condition;
+  Creature* creature;
+  Item* item;
+  bool condition;
 };
 
 struct CombatEffect{
-	CombatEffect(bool showEffect) : showEffect(showEffect)
-	{
-		hitEffect = MAGIC_EFFECT_UNK;
-		hitTextColor = TEXTCOLOR_UNK;
-	}
+  CombatEffect(bool showEffect) : showEffect(showEffect)
+  {
+    hitEffect = MAGIC_EFFECT_UNK;
+    hitTextColor = TEXTCOLOR_UNK;
+  }
 
-	CombatEffect() {
-		hitEffect = MAGIC_EFFECT_UNK;
-		hitTextColor = TEXTCOLOR_UNK;
-		showEffect = true;
-	}
+  CombatEffect() {
+    hitEffect = MAGIC_EFFECT_UNK;
+    hitTextColor = TEXTCOLOR_UNK;
+    showEffect = true;
+  }
 
-	MagicEffect hitEffect;
-	TextColor hitTextColor;
-	bool showEffect;
+  MagicEffect hitEffect;
+  TextColor hitTextColor;
+  bool showEffect;
 };
 
 struct CombatParams{
-	CombatParams() {
-		combatType = COMBAT_NONE;
-		blockedByArmor = false;
-		blockedByShield = false;
-		targetCasterOrTopMost = false;
-		aggressive = true;
-	}
+  CombatParams() {
+    combatType = COMBAT_NONE;
+    blockedByArmor = false;
+    blockedByShield = false;
+    targetCasterOrTopMost = false;
+    aggressive = true;
+  }
 
-	CombatType combatType;
-	bool blockedByArmor;
-	bool blockedByShield;
-	bool targetCasterOrTopMost;
-	bool aggressive;
-	CombatEffect effects;
+  CombatType combatType;
+  bool blockedByArmor;
+  bool blockedByShield;
+  bool targetCasterOrTopMost;
+  bool aggressive;
+  CombatEffect effects;
 };
 
 namespace Combat {
@@ -100,11 +100,11 @@ Position getCasterPosition(const Creature* creature, Direction dir);
 
 class MagicField : public Item {
 public:
-	MagicField(uint16_t _type);
-	~MagicField();
+  MagicField(uint16_t _type);
+  ~MagicField();
 
-	virtual MagicField* getMagicField();
-	virtual const MagicField* getMagicField() const;
+  virtual MagicField* getMagicField();
+  virtual const MagicField* getMagicField() const;
 };
 
 #endif

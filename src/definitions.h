@@ -31,47 +31,47 @@
 #define CLIENT_VERSION_STRING "8.70"
 
 #ifdef __USE_SQLITE__
-	#define SINGLE_SQL_DRIVER
+  #define SINGLE_SQL_DRIVER
 #endif
 
 #ifdef __USE_MYSQL__
-	#ifdef SINGLE_SQL_DRIVER
-		#define MULTI_SQL_DRIVERS
-	#else
-		#define SINGLE_SQL_DRIVER
-	#endif
+  #ifdef SINGLE_SQL_DRIVER
+    #define MULTI_SQL_DRIVERS
+  #else
+    #define SINGLE_SQL_DRIVER
+  #endif
 #endif
 
 #ifdef __USE_ODBC__
-	#ifdef SINGLE_SQL_DRIVER
-		#define MULTI_SQL_DRIVERS
-	#else
-		#define SINGLE_SQL_DRIVER
-	#endif
+  #ifdef SINGLE_SQL_DRIVER
+    #define MULTI_SQL_DRIVERS
+  #else
+    #define SINGLE_SQL_DRIVER
+  #endif
 #endif
 
 #ifdef __USE_PGSQL__
-	#ifdef SINGLE_SQL_DRIVER
-		#define MULTI_SQL_DRIVERS
-	#else
-		#define SINGLE_SQL_DRIVER
-	#endif
+  #ifdef SINGLE_SQL_DRIVER
+    #define MULTI_SQL_DRIVERS
+  #else
+    #define SINGLE_SQL_DRIVER
+  #endif
 #endif
 
 //Default sql driver
 #if !defined(SINGLE_SQL_DRIVER) && !defined(MULTI_SQL_DRIVERS)
-	#define SINGLE_SQL_DRIVER
+  #define SINGLE_SQL_DRIVER
 #endif
 
 enum passwordType_t{
-	PASSWORD_TYPE_PLAIN = 0,
-	PASSWORD_TYPE_MD5,
-	PASSWORD_TYPE_SHA1
+  PASSWORD_TYPE_PLAIN = 0,
+  PASSWORD_TYPE_MD5,
+  PASSWORD_TYPE_SHA1
 };
 
 // OpenTibia configuration
 #if !defined(__NO_SKULLSYSTEM__) && !defined(__SKULLSYSTEM__)
-	#define __SKULLSYSTEM__
+  #define __SKULLSYSTEM__
 #endif
 
 #endif

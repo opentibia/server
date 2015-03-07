@@ -26,151 +26,151 @@
 #include "boost_common.h"
 
 namespace Script {
-	class Event;
-	class Environment;
-	class LuaClassType;
-	typedef shared_ptr<LuaClassType> LuaClassType_ptr;
+  class Event;
+  class Environment;
+  class LuaClassType;
+  typedef shared_ptr<LuaClassType> LuaClassType_ptr;
 
-	class Manager : public LuaStateManager {
-	public:
-		Manager(Environment& e);
-		virtual ~Manager();
+  class Manager : public LuaStateManager {
+  public:
+    Manager(Environment& e);
+    virtual ~Manager();
 
-		// Event handling
-		bool dispatchEvent(Event& event);
+    // Event handling
+    bool dispatchEvent(Event& event);
 
-		// Get statistics
-		int32_t eventsDispatched() const;
-		int32_t handlersCalled() const;
-		int32_t eventsDiscarded() const;
-		int32_t functionsCalled() const;
+    // Get statistics
+    int32_t eventsDispatched() const;
+    int32_t handlersCalled() const;
+    int32_t eventsDiscarded() const;
+    int32_t functionsCalled() const;
 
-	protected:
-		// This actually registers functions!
-		// Defined in script functions.cpp
-		void registerFunctions();
-		void registerClasses();
-		void registerMetaMethods();
+  protected:
+    // This actually registers functions!
+    // Defined in script functions.cpp
+    void registerFunctions();
+    void registerClasses();
+    void registerMetaMethods();
 
-	protected:
-		// Internal representation of functions
-		typedef int (LuaState::*CallbackFunctionType)();
+  protected:
+    // Internal representation of functions
+    typedef int (LuaState::*CallbackFunctionType)();
 
-		struct ComposedTypeDeclaration {
-			std::string name;
-			std::string type_name;
-			std::vector<std::string> types;
-			boost::any default_value;
-			int32_t optional_level;
-		};
+    struct ComposedTypeDeclaration {
+      std::string name;
+      std::string type_name;
+      std::vector<std::string> types;
+      boost::any default_value;
+      int32_t optional_level;
+    };
 
-		struct ComposedCallback {
-			CallbackFunctionType func;
-			std::string name;
-			std::vector<ComposedTypeDeclaration> parameters;
-		};
+    struct ComposedCallback {
+      CallbackFunctionType func;
+      std::string name;
+      std::vector<ComposedTypeDeclaration> parameters;
+    };
 
-		typedef shared_ptr<ComposedCallback> ComposedCallback_ptr;
-		typedef std::map<uint32_t, ComposedCallback_ptr> FunctionMap;
+    typedef shared_ptr<ComposedCallback> ComposedCallback_ptr;
+    typedef std::map<uint32_t, ComposedCallback_ptr> FunctionMap;
 
-		std::map<std::string, LuaClassType_ptr> class_list;
-		FunctionMap function_map;
-		uint32_t function_id_counter;
-		int32_t event_nested_level;
+    std::map<std::string, LuaClassType_ptr> class_list;
+    FunctionMap function_map;
+    uint32_t function_id_counter;
+    int32_t event_nested_level;
 
-		// Statistics
-		int32_t events_dispatched;
-		int32_t event_handlers_called;
-		int32_t events_discarded;
-		int32_t functions_called;
+    // Statistics
+    int32_t events_dispatched;
+    int32_t event_handlers_called;
+    int32_t events_discarded;
+    int32_t functions_called;
 
-		// Expose functions/classes to lua
-		void registerClass(const std::string& cname);
-		void registerClass(const std::string& cname, const std::string& parent_class);
+    // Expose functions/classes to lua
+    void registerClass(const std::string& cname);
+    void registerClass(const std::string& cname, const std::string& parent_class);
 
-		void registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc);
-		void registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc);
+    void registerGlobalFunction(const std::string& fdecl, CallbackFunctionType cfunc);
+    void registerMemberFunction(const std::string& cname, const std::string& fdecl, CallbackFunctionType cfunc);
 
-		template <class ET>
-		void registerEnum();
+    template <class ET>
+    void registerEnum();
 
-		// Callback from lua
-		static int luaFunctionCallback(lua_State* L);
-		static int luaCompareClassInstances(lua_State* L);
-		static int luaGetClassInstanceID(lua_State* L);
-		static int luaCreateEnum(lua_State* L);
+    // Callback from lua
+    static int luaFunctionCallback(lua_State* L);
+    static int luaCompareClassInstances(lua_State* L);
+    static int luaGetClassInstanceID(lua_State* L);
+    static int luaCreateEnum(lua_State* L);
 
-		// Parse arguments
-		ComposedCallback_ptr parseFunctionDeclaration(std::string s);
-		void parseWhitespace(std::string& str);
-		std::string parseIdentifier(std::string& s);
-		ComposedTypeDeclaration parseTypeDeclaration(std::string& s);
-		boost::any parseDefaultDefinition(std::string& s);
+    // Parse arguments
+    ComposedCallback_ptr parseFunctionDeclaration(std::string s);
+    void parseWhitespace(std::string& str);
+    std::string parseIdentifier(std::string& s);
+    ComposedTypeDeclaration parseTypeDeclaration(std::string& s);
+    boost::any parseDefaultDefinition(std::string& s);
 
-		friend class LuaClassType;
-		friend class ::LuaThread;
-	};
+    friend class LuaClassType;
+    friend class ::LuaThread;
+  };
 
 
-	class LuaClassType {
-	public:
-		LuaClassType(Manager& manager, std::string name, std::string parent_name = "");
+  class LuaClassType {
+  public:
+    LuaClassType(Manager& manager, std::string name, std::string parent_name = "");
 
-		bool isType(const std::string& type) const;
-	protected:
-		Manager& manager;
-		std::string name;
-		std::vector<std::string> parent_classes;
-	};
+    bool isType(const std::string& type) const;
+  protected:
+    Manager& manager;
+    std::string name;
+    std::vector<std::string> parent_classes;
+  };
 }
 
 // Must be done here since it's a templated function
 template<class ET>
 inline void Script::Manager::registerEnum()
 {
-	registerClass(ET::name(), "Enum");
+  registerClass(ET::name(), "Enum");
 
-	// Push Enum table
-	getGlobal(ET::name()); // index 1
+  // Push Enum table
+  getGlobal(ET::name()); // index 1
 
-	//std::cout << "Global " << ET::name() << " table is " << lua_topointer(state, 1) << std::endl;
-	// Expose members
-	int n = 1;
-	for(typename ET::iterator ei = ET::begin(); ei != ET::end(); ++ei, ++n){
+  //std::cout << "Global " << ET::name() << " table is " << lua_topointer(state, 1) << std::endl;
+  // Expose members
+  int n = 1;
+  for(typename ET::iterator ei = ET::begin(); ei != ET::end(); ++ei, ++n){
 
-		// Push class instance
-		pushClassTableInstance(ET::name()); // index 2
+    // Push class instance
+    pushClassTableInstance(ET::name()); // index 2
 
-		// Table to hold string values
-		newTable(); // index 3
-		// Should iterate over all possible values here
-		std::vector<std::string> stringValues = ei->toStrings();
-		int in = 1;
-		for(std::vector<std::string>::const_iterator str = stringValues.begin(); str != stringValues.end(); ++str, ++in)
-			setField(3, in, *str);
+    // Table to hold string values
+    newTable(); // index 3
+    // Should iterate over all possible values here
+    std::vector<std::string> stringValues = ei->toStrings();
+    int in = 1;
+    for(std::vector<std::string>::const_iterator str = stringValues.begin(); str != stringValues.end(); ++str, ++in)
+      setField(3, in, *str);
 
-		// Save the table
-		setField(2, "__strValues");
+    // Save the table
+    setField(2, "__strValues");
 
-		// set integer converted value
-		setField(2, "__intValue", ei->value());
+    // set integer converted value
+    setField(2, "__intValue", ei->value());
 
-		// Save first pointer to class instance as a global
-		duplicate(2);
-		setGlobal(stringValues.front());
+    // Save first pointer to class instance as a global
+    duplicate(2);
+    setGlobal(stringValues.front());
 
-		//std::cout << "set field of " << lua_topointer(state, 1) << " to " << lua_topointer(state, -1) << " " << typeName(-1) << std::endl;
-		// Other should go into the table for this Enum
-		setField(1, n);
+    //std::cout << "set field of " << lua_topointer(state, 1) << " to " << lua_topointer(state, -1) << " " << typeName(-1) << std::endl;
+    // Other should go into the table for this Enum
+    setField(1, n);
 
-		//std::cout << "stack is " << lua_gettop(state) << std::endl;
-	}
+    //std::cout << "stack is " << lua_gettop(state) << std::endl;
+  }
 
-	// We actually hide the class here in favor of pretty construction of it
-	// Another added bonus is that it's impossible to create new Enum values of this
-	// type from inside lua
-	lua_pushcclosure(state, luaCreateEnum, 1);
-	lua_setglobal(state, ET::name().c_str());
+  // We actually hide the class here in favor of pretty construction of it
+  // Another added bonus is that it's impossible to create new Enum values of this
+  // type from inside lua
+  lua_pushcclosure(state, luaCreateEnum, 1);
+  lua_setglobal(state, ET::name().c_str());
 }
 
 #endif

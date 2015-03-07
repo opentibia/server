@@ -26,32 +26,32 @@
 #include "const.h"
 
 enum DistributionType_t {
-	DISTRO_UNIFORM,
-	DISTRO_SQUARE,
-	DISTRO_NORMAL
+  DISTRO_UNIFORM,
+  DISTRO_SQUARE,
+  DISTRO_NORMAL
 };
 
 inline uint16_t swap_uint16(uint16_t x)
 {
-	return (x & 0xFF00) >> 8 | (x & 0x00FF) << 8;
+  return (x & 0xFF00) >> 8 | (x & 0x00FF) << 8;
 }
 
 inline uint32_t swap_uint32(uint32_t x)
 {
-	return (x & 0xFF000000) >> 24
-		 | (x & 0x00FF0000) >> 8
-		 | (x & 0x0000FF00) << 8
-		 | (x & 0x000000FF) << 24;
+  return (x & 0xFF000000) >> 24
+     | (x & 0x00FF0000) >> 8
+     | (x & 0x0000FF00) << 8
+     | (x & 0x000000FF) << 24;
 }
 
 inline int16_t swap_int16(int16_t x)
 {
-	return (int16_t)swap_uint16((uint16_t)x);
+  return (int16_t)swap_uint16((uint16_t)x);
 }
 
 inline int32_t swap_int32(int32_t x)
 {
-	return (int32_t)swap_uint32((uint32_t)x);
+  return (int32_t)swap_uint32((uint32_t)x);
 }
 
 inline float swap_float32(float x)

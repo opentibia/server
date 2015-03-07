@@ -22,383 +22,377 @@
 #include "fileloader.h"
 
 ItemAttributes::ItemAttributes() :
-	attributes(NULL)
+  attributes(NULL)
 {
 }
 
 ItemAttributes::ItemAttributes(const ItemAttributes& o)
 {
-	if(o.attributes)
-		attributes = new AttributeMap(*o.attributes);
+  if(o.attributes)
+    attributes = new AttributeMap(*o.attributes);
 }
 
 ItemAttributes::~ItemAttributes()
 {
-	delete attributes;
+  delete attributes;
 }
 
 void ItemAttributes::createAttributes()
 {
-	if(!attributes)
-		attributes = new AttributeMap;
+  if(!attributes)
+    attributes = new AttributeMap;
 }
 
 void ItemAttributes::setAttribute(const std::string& key, const std::string& value)
 {
-	createAttributes();
-	(*attributes)[key].set(value);
+  createAttributes();
+  (*attributes)[key].set(value);
 }
 
 void ItemAttributes::setAttribute(const std::string& key, int32_t value)
 {
-	createAttributes();
-	(*attributes)[key].set(value);
+  createAttributes();
+  (*attributes)[key].set(value);
 }
 
 void ItemAttributes::setAttribute(const std::string& key, float value)
 {
-	createAttributes();
-	(*attributes)[key].set(value);
+  createAttributes();
+  (*attributes)[key].set(value);
 }
 
 void ItemAttributes::setAttribute(const std::string& key, bool value)
 {
-	createAttributes();
-	(*attributes)[key].set(value);
+  createAttributes();
+  (*attributes)[key].set(value);
 }
 
 void ItemAttributes::eraseAttribute(const std::string& key)
 {
-	if(!attributes)
-		return;
+  if(!attributes)
+    return;
 
-	AttributeMap::iterator iter = attributes->find(key);
+  AttributeMap::iterator iter = attributes->find(key);
 
-	if(iter != attributes->end())
-		attributes->erase(iter);
+  if(iter != attributes->end())
+    attributes->erase(iter);
 }
 
 const std::string* ItemAttributes::getStringAttribute(const std::string& key) const
 {
-	if(!attributes)
-		return NULL;
+  if(!attributes)
+    return NULL;
 
-	AttributeMap::iterator iter = attributes->find(key);
-	if(iter != attributes->end())
-		return iter->second.getString();
-	return NULL;
+  AttributeMap::iterator iter = attributes->find(key);
+  if(iter != attributes->end())
+    return iter->second.getString();
+  return NULL;
 }
 
 const int32_t* ItemAttributes::getIntegerAttribute(const std::string& key) const
 {
-	if(!attributes)
-		return NULL;
+  if(!attributes)
+    return NULL;
 
-	AttributeMap::iterator iter = attributes->find(key);
-	if(iter != attributes->end())
-		return iter->second.getInteger();
-	return NULL;
+  AttributeMap::iterator iter = attributes->find(key);
+  if(iter != attributes->end())
+    return iter->second.getInteger();
+  return NULL;
 }
 
 const float* ItemAttributes::getFloatAttribute(const std::string& key) const
 {
-	if(!attributes)
-		return NULL;
+  if(!attributes)
+    return NULL;
 
-	AttributeMap::iterator iter = attributes->find(key);
-	if(iter != attributes->end())
-		return iter->second.getFloat();
-	return NULL;
+  AttributeMap::iterator iter = attributes->find(key);
+  if(iter != attributes->end())
+    return iter->second.getFloat();
+  return NULL;
 }
 
 const bool* ItemAttributes::getBooleanAttribute(const std::string& key) const
 {
-	if(!attributes)
-		return NULL;
+  if(!attributes)
+    return NULL;
 
-	AttributeMap::iterator iter = attributes->find(key);
-	if(iter != attributes->end())
-		return iter->second.getBoolean();
-	return NULL;
+  AttributeMap::iterator iter = attributes->find(key);
+  if(iter != attributes->end())
+    return iter->second.getBoolean();
+  return NULL;
 }
 
 boost::any ItemAttributes::getAttribute(const std::string& key) const
 {
-	if(!attributes)
-		return boost::any();
+  if(!attributes)
+    return boost::any();
 
-	AttributeMap::iterator iter = attributes->find(key);
-	if(iter != attributes->end())
-		return iter->second.get();
-	return boost::any();
+  AttributeMap::iterator iter = attributes->find(key);
+  if(iter != attributes->end())
+    return iter->second.get();
+  return boost::any();
 }
 
 bool ItemAttributes::hasStringAttribute(const std::string& key) const
 {
-	return getStringAttribute(key) != NULL;
+  return getStringAttribute(key) != NULL;
 }
 
 bool ItemAttributes::hasIntegerAttribute(const std::string& key) const
 {
-	return getIntegerAttribute(key) != NULL;
+  return getIntegerAttribute(key) != NULL;
 }
 
 bool ItemAttributes::hasFloatAttribute(const std::string& key) const
 {
-	return getFloatAttribute(key) != NULL;
+  return getFloatAttribute(key) != NULL;
 }
 
 bool ItemAttributes::hasBooleanAttribute(const std::string& key) const
 {
-	return getBooleanAttribute(key) != NULL;
+  return getBooleanAttribute(key) != NULL;
 }
 
+// attribute type
+// can hold either int, bool or std::string
+// without using new to allocate them
 
-// Attribute type
-// Can hold either int, bool or std::string
-// Without using new to allocate them
-
-ItemAttribute::ItemAttribute() : type(ItemAttribute::NONE)
+ItemAttribute::ItemAttribute() : m_type(ItemAttribute::NONE)
 {
+
 }
 
-
-ItemAttribute::ItemAttribute(const std::string& str) : type(ItemAttribute::STRING)
+ItemAttribute::ItemAttribute(const std::string& v) : m_type(ItemAttribute::STRING)
 {
-	new(data) std::string(str);
+  m_var.string = new std::string(v);
 }
 
-ItemAttribute::ItemAttribute(int32_t i) : type(ItemAttribute::INTEGER)
+ItemAttribute::ItemAttribute(int32_t v) : m_type(ItemAttribute::INTEGER)
 {
-	*reinterpret_cast<int*>(data) = i;
+  m_var.signedInteger = v;
 }
 
-ItemAttribute::ItemAttribute(float f) : type(ItemAttribute::FLOAT)
+ItemAttribute::ItemAttribute(float v) : m_type(ItemAttribute::FLOAT)
 {
-	*reinterpret_cast<float*>(data) = f;
+  m_var.signedFloat = v;
 }
 
-ItemAttribute::ItemAttribute(bool b)
+ItemAttribute::ItemAttribute(bool v) : m_type(ItemAttribute::BOOLEAN)
 {
-	*reinterpret_cast<bool*>(data) = b;
+  m_var.boolean = v;
 }
 
-ItemAttribute::ItemAttribute(const ItemAttribute& o) : type(ItemAttribute::NONE)
+ItemAttribute::ItemAttribute(const ItemAttribute& o) : m_type(ItemAttribute::NONE)
 {
-	*this = o;
+  *this = o;
 }
 
 ItemAttribute& ItemAttribute::operator=(const ItemAttribute& o)
 {
-	if(&o == this)
-		return *this;
+  if(&o == this)
+    return *this;
 
-	clear();
-	type = o.type;
-	if(type == STRING)
-		new(data) std::string(*reinterpret_cast<const std::string*>(&o.data));
-	else if(type == INTEGER)
-		*reinterpret_cast<int32_t*>(data) = *reinterpret_cast<const int32_t*>(&o.data);
-	else if(type == FLOAT)
-		*reinterpret_cast<float*>(data) = *reinterpret_cast<const float*>(&o.data);
-	else if(type == BOOLEAN)
-		*reinterpret_cast<bool*>(data) = *reinterpret_cast<const bool*>(&o.data);
-	else
-		type = NONE;
+  m_type = o.m_type;
+  m_var = o.m_var;
 
-	return *this;
-
+  return *this;
 }
 
 ItemAttribute::~ItemAttribute()
 {
-	clear();
+  dealloc();
 }
 
-void ItemAttribute::clear()
+void ItemAttribute::dealloc(){
+  if(m_type == ItemAttribute::STRING)
+    delete m_var.string;
+}
+
+void ItemAttribute::set(const std::string& v)
 {
-	if(type == STRING){
-		(reinterpret_cast<std::string*>(&data))->~basic_string();
-		type = NONE;
-	}
+  dealloc();
+  
+  m_type = STRING;
+  m_var.string = new std::string(v);
 }
 
-void ItemAttribute::set(const std::string& str)
+void ItemAttribute::set(int32_t v)
 {
-	clear();
-	type = STRING;
-	new(data) std::string(str);
+  dealloc();
+  
+  m_type = INTEGER;
+  m_var.signedInteger = v;
 }
 
-void ItemAttribute::set(int32_t i)
+void ItemAttribute::set(float v)
 {
-	clear();
-	type = INTEGER;
-	*reinterpret_cast<int32_t*>(&data) = i;
+  dealloc();
+  
+  m_type = FLOAT;
+  m_var.signedFloat = v;
 }
 
-void ItemAttribute::set(float y)
+void ItemAttribute::set(bool v)
 {
-	clear();
-	type = FLOAT;
-	*reinterpret_cast<float*>(&data) = y;
+  dealloc();
+  
+  m_type = BOOLEAN;
+  m_var.boolean = v;
 }
-
-void ItemAttribute::set(bool b)
-{
-	clear();
-	type = BOOLEAN;
-	*reinterpret_cast<bool*>(&data) = b;
-}
-
 
 const std::string* ItemAttribute::getString() const
 {
-	if(type == STRING)
-		return reinterpret_cast<const std::string*>(&data);
-	return NULL;
+  if(m_type == STRING){
+    return m_var.string;
+  }
+  
+  return NULL;
 }
 
 const int32_t* ItemAttribute::getInteger() const
 {
-	if(type == INTEGER)
-		return reinterpret_cast<const int32_t*>(&data);
-	return NULL;
+  if(m_type == INTEGER)
+    return &m_var.signedInteger;
+  
+  return NULL;
 }
 
 const float* ItemAttribute::getFloat() const
 {
-	if(type == FLOAT)
-		return reinterpret_cast<const float*>(&data);
-	return NULL;
+  if(m_type == FLOAT)
+    return &m_var.signedFloat;
+  
+  return NULL;
 }
 
 const bool* ItemAttribute::getBoolean() const
 {
-	if(type == BOOLEAN)
-		return reinterpret_cast<const bool*>(&data);
-	return NULL;
+  if(m_type == BOOLEAN)
+    return &m_var.boolean;
+  
+  return NULL;
 }
 
 boost::any ItemAttribute::get() const
 {
-	switch(type){
-		case STRING:
-			return *reinterpret_cast<const std::string*>(&data);
-		case INTEGER:
-			return *reinterpret_cast<const int*>(&data);
-		case FLOAT:
-			return *reinterpret_cast<const float*>(&data);
-		case BOOLEAN:
-			return *reinterpret_cast<const bool*>(&data);
-		default:
-			break;
-	}
-	return boost::any();
+  switch(m_type){
+    case STRING: return *m_var.string;
+    case INTEGER: return m_var.signedInteger;
+    case FLOAT: return m_var.signedFloat;
+    case BOOLEAN: return m_var.boolean;
+    default: break;
+  }
+  
+  return boost::any();
 }
 
 bool ItemAttributes::unserializeAttributeMap(PropStream& stream)
 {
 
-	uint16_t n;
-	if(stream.GET_USHORT(n)){
-		createAttributes();
+  uint16_t n;
+  if(stream.GET_USHORT(n)){
+    createAttributes();
 
-		std::string key;
-		ItemAttribute attrib;
+    std::string key;
+    ItemAttribute attrib;
 
-		while(n--){
-			if(!stream.GET_STRING(key))
-				return false;
-			if(!attrib.unserialize(stream))
-				return false;
-			(*attributes)[key] = attrib;
-		}
-	}
-	return true;
+    while(n--){
+      if(!stream.GET_STRING(key))
+        return false;
+      if(!attrib.unserialize(stream))
+        return false;
+      (*attributes)[key] = attrib;
+    }
+  }
+  return true;
 }
 
 void ItemAttributes::serializeAttributeMap(PropWriteStream& stream) const
 {
-	// Maximum of 65535 attributes per item
-	stream.ADD_USHORT(std::min((size_t)0xFFFF, attributes->size()));
+  // maximum of 65535 attributes per item
+  stream.ADD_USHORT(std::min((size_t)0xFFFF, attributes->size()));
 
-	AttributeMap::const_iterator attribute = attributes->begin();
-	int i = 0;
-	while(attribute != attributes->end() && i <= 0xFFFF){
-		const std::string& key = attribute->first;
-		if(key.size() > 0xFFFF)
-			stream.ADD_STRING(key.substr(0, 65535));
-		else
-			stream.ADD_STRING(key);
+  AttributeMap::const_iterator attribute = attributes->begin();
+  int i = 0;
+  while(attribute != attributes->end() && i <= 0xFFFF){
+    const std::string& key = attribute->first;
+    if(key.size() > 0xFFFF)
+      stream.ADD_STRING(key.substr(0, 65535));
+    else
+      stream.ADD_STRING(key);
 
-		attribute->second.serialize(stream);
-		++attribute, ++i;
-	}
+    attribute->second.serialize(stream);
+    ++attribute, ++i;
+  }
 }
 
 bool ItemAttribute::unserialize(PropStream& stream)
 {
-	// Read type
-	uint8_t rtype;
-	stream.GET_UCHAR(rtype);
+  // dealloc possible string value
+  dealloc();
+  
+  // read type
+  stream.GET_UCHAR(reinterpret_cast<uint8_t&>(m_type));
+  
+  // do not call here set(...) or any other function depending on m_type which may result in deallocating phantom string !
 
-	// Read contents
-	switch(rtype){
-		case STRING:
-		{
-			std::string str;
-			if(!stream.GET_LSTRING(str))
-				return false;
-			set(str);
-			break;
-		}
-		case INTEGER:
-			uint32_t u32;
-			if(!stream.GET_ULONG(u32))
-				return false;
-			set(*reinterpret_cast<int32_t*>(&u32));
-			break;
-		case FLOAT:
-		{
-			uint32_t u32;
-			if(!stream.GET_ULONG(u32))
-				return false;
-			set(*reinterpret_cast<float*>(&u32));
-			break;
-		}
-		case BOOLEAN:
-		{
-			uint8_t b;
-			if(!stream.GET_UCHAR(b))
-				return false;
-			set(b != 0);
-		}
-		default:
-			break;
-	}
-	return true;
+  // read contents
+  switch(m_type){
+    case STRING: {
+      m_var.string = new std::string;   
+      if(!stream.GET_LSTRING(*m_var.string))
+        return false;
+      
+      break;
+    }
+    
+    case INTEGER: 
+    case FLOAT: {
+      if(!stream.GET_ULONG(m_var.unsignedInteger))
+        return false;
+      
+      break;
+    }
+    
+    case BOOLEAN: {
+      if(!stream.GET_UCHAR(m_var.unsignedChar))
+        return false;
+        
+      break;
+    }
+    
+    default: {
+      m_type = NONE; 
+      break;
+    }
+  }
+  
+  return true;
 }
 
 void ItemAttribute::serialize(PropWriteStream& stream) const
 {
-	// Write type
-	stream.ADD_UCHAR((unsigned char)(type));
+  // write type
+  stream.ADD_UCHAR(static_cast<uint8_t>(m_type));
 
-	// Write contents
-	switch(type){
-		case STRING:
-			stream.ADD_LSTRING(*getString());
-			break;
-		case INTEGER:
-			stream.ADD_ULONG(*(uint32_t*)getInteger());
-			break;
-		case FLOAT:
-			stream.ADD_ULONG(*(uint32_t*)getFloat());
-			break;
-		case BOOLEAN:
-			stream.ADD_UCHAR(*(uint8_t*)getBoolean());
-		default:
-			break;
-	}
+  // write contents
+  switch(m_type){
+    case STRING: {
+      stream.ADD_LSTRING(*m_var.string);
+      break;
+    }
+    
+    case INTEGER:
+    case FLOAT: {
+      stream.ADD_ULONG(m_var.unsignedInteger);
+      break;
+    }
+    
+    case BOOLEAN: {
+      stream.ADD_UCHAR(m_var.unsignedChar);
+      break;
+    }
+    
+    default: break;
+  }
 }

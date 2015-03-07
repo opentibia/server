@@ -27,148 +27,148 @@
 
 WaitingList::~WaitingList()
 {
-	cleanUpList();
+  cleanUpList();
 }
 
 WaitingList* WaitingList::getInstance()
 {
-	static Singleton<WaitingList> waitingList;
-	return waitingList.get();
+  static Singleton<WaitingList> waitingList;
+  return waitingList.get();
 }
 
 WaitListIterator WaitingList::findClient(const Player* player, uint32_t& slot)
 {
-	slot = 1;
-	for(WaitListIterator it = waitList.begin(); it != waitList.end(); ++it){
-		if((*it)->acc == player->getAccountId() && (*it)->ip == player->getIP() &&
-			boost::algorithm::iequals((*it)->name, player->getName())){
-				return it;
-		}
+  slot = 1;
+  for(WaitListIterator it = waitList.begin(); it != waitList.end(); ++it){
+    if((*it)->acc == player->getAccountId() && (*it)->ip == player->getIP() &&
+      boost::algorithm::iequals((*it)->name, player->getName())){
+        return it;
+    }
 
-		++slot;
-	}
+    ++slot;
+  }
 
-	return waitList.end();
+  return waitList.end();
 }
 
 int32_t WaitingList::getTime(int32_t slot)
 {
-	if(slot < 5){
-		return 5;
-	}
-	else if(slot < 10){
-		return 10;
-	}
-	else if(slot < 20){
-		return 20;
-	}
-	else if(slot < 50){
-		return 60;
-	}
-	else{
-		return 120;
-	}
+  if(slot < 5){
+    return 5;
+  }
+  else if(slot < 10){
+    return 10;
+  }
+  else if(slot < 20){
+    return 20;
+  }
+  else if(slot < 50){
+    return 60;
+  }
+  else{
+    return 120;
+  }
 }
 
 int32_t WaitingList::getTimeOut(int32_t slot)
 {
-	//timeout is set to 15 seconds longer than expected retry attempt
-	return getTime(slot) + 15;
+  //timeout is set to 15 seconds longer than expected retry attempt
+  return getTime(slot) + 15;
 }
 
 bool WaitingList::clientLogin(const Player* player)
 {
-	if(player->hasFlag(PlayerFlag_CanAlwaysLogin)){
-		return true;
-	}
+  if(player->hasFlag(PlayerFlag_CanAlwaysLogin)){
+    return true;
+  }
 
-	if(waitList.empty() && Status::instance()->getPlayersOnline() < Status::instance()->getMaxPlayersOnline()){
-		//no waiting list and enough room
-		return true;
-	}
+  if(waitList.empty() && Status::instance()->getPlayersOnline() < Status::instance()->getMaxPlayersOnline()){
+    //no waiting list and enough room
+    return true;
+  }
 
-	cleanUpList();
+  cleanUpList();
 
-	uint32_t slot;
-	WaitListIterator it = findClient(player, slot);
-	if(it != waitList.end()){
-		if((Status::instance()->getPlayersOnline() + slot) <= Status::instance()->getMaxPlayersOnline()){
-			//should be able to login now
+  uint32_t slot;
+  WaitListIterator it = findClient(player, slot);
+  if(it != waitList.end()){
+    if((Status::instance()->getPlayersOnline() + slot) <= Status::instance()->getMaxPlayersOnline()){
+      //should be able to login now
 #ifdef __DEBUG__WATINGLIST__
-			std::cout << "Name: " << (*it)->name << " can now login" << std::endl;
+      std::cout << "Name: " << (*it)->name << " can now login" << std::endl;
 #endif
-			delete *it;
-			waitList.erase(it);
-			return true;
-		}
-		else{
-			//let them wait a bit longer
-			(*it)->timeout = OTSYS_TIME() + getTimeOut(slot) * 1000;
-			return false;
-		}
-	}
+      delete *it;
+      waitList.erase(it);
+      return true;
+    }
+    else{
+      //let them wait a bit longer
+      (*it)->timeout = OTSYS_TIME() + getTimeOut(slot) * 1000;
+      return false;
+    }
+  }
 
-	Wait* wait = new Wait();
+  Wait* wait = new Wait();
 
-	if(player->isPremium()){
-		slot = 1;
-		for(WaitListIterator it = waitList.begin(); it != waitList.end(); ++it){
-			if(!(*it)->premium){
-				waitList.insert(it, wait);
-				break;
-			}
+  if(player->isPremium()){
+    slot = 1;
+    for(WaitListIterator it = waitList.begin(); it != waitList.end(); ++it){
+      if(!(*it)->premium){
+        waitList.insert(it, wait);
+        break;
+      }
 
-			++slot;
-		}
-	}
-	else{
-		waitList.push_back(wait);
-		slot = (uint32_t)waitList.size();
-	}
+      ++slot;
+    }
+  }
+  else{
+    waitList.push_back(wait);
+    slot = (uint32_t)waitList.size();
+  }
 
-	wait->name = player->getName();
-	wait->acc = player->getAccountId();
-	wait->ip = player->getIP();
-	wait->premium = player->isPremium();
-	wait->timeout = OTSYS_TIME() + getTimeOut(slot) * 1000;
+  wait->name = player->getName();
+  wait->acc = player->getAccountId();
+  wait->ip = player->getIP();
+  wait->premium = player->isPremium();
+  wait->timeout = OTSYS_TIME() + getTimeOut(slot) * 1000;
 
 #ifdef __DEBUG__WATINGLIST__
-	std::cout << "Name: " << player->getName() << "(" << waitList.size() + 1 << ")" << " has been added to the waiting list" << std::endl;
+  std::cout << "Name: " << player->getName() << "(" << waitList.size() + 1 << ")" << " has been added to the waiting list" << std::endl;
 #endif
 
-	return false;
+  return false;
 }
 
 int32_t WaitingList::getClientSlot(const Player* player)
 {
-	uint32_t slot;
-	WaitListIterator it = findClient(player, slot);
-	if(it != waitList.end()){
-		return slot;
-	}
+  uint32_t slot;
+  WaitListIterator it = findClient(player, slot);
+  if(it != waitList.end()){
+    return slot;
+  }
 
-	#ifdef __DEBUG__WATINGLIST__
-	std::cout << "WaitingList::getSlot error, trying to find slot for unknown acc: " << player->getAccountId() <<
-	" with ip " << player->getIP() << std::endl;
-	#endif
+  #ifdef __DEBUG__WATINGLIST__
+  std::cout << "WaitingList::getSlot error, trying to find slot for unknown acc: " << player->getAccountId() <<
+  " with ip " << player->getIP() << std::endl;
+  #endif
 
-	return -1;
+  return -1;
 }
 
 void WaitingList::cleanUpList()
 {
-	uint32_t slot = 1;
-	for(WaitListIterator it = waitList.begin(); it != waitList.end();){
-		if((*it)->timeout - OTSYS_TIME() <= 0){
+  uint32_t slot = 1;
+  for(WaitListIterator it = waitList.begin(); it != waitList.end();){
+    if((*it)->timeout - OTSYS_TIME() <= 0){
 #ifdef __DEBUG__WATINGLIST__
-			std::cout << "Name: " << (*it)->name << " has timed out!" << std::endl;
+      std::cout << "Name: " << (*it)->name << " has timed out!" << std::endl;
 #endif
-			delete *it;
-			waitList.erase(it++);
-		}
-		else{
-			++slot;
-			++it;
-		}
-	}
+      delete *it;
+      waitList.erase(it++);
+    }
+    else{
+      ++slot;
+      ++it;
+    }
+  }
 }

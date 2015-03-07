@@ -32,31 +32,31 @@ struct LootBlock;
 
 class CreatureManager{
 public:
-	CreatureManager();
-	~CreatureManager();
+  CreatureManager();
+  ~CreatureManager();
 
-	bool loadFromXml(const std::string& _datadir, bool reloading = false);
-	bool isLoaded() const {return loaded;}
-	bool configureSpells();
-	bool reload();
+  bool loadFromXml(const std::string& _datadir, bool reloading = false);
+  bool isLoaded() const {return loaded;}
+  bool configureSpells();
+  bool reload();
 
-	CreatureType* getMonsterType(const std::string& name);
+  CreatureType* getMonsterType(const std::string& name);
 
-	static uint32_t getLootRandom();
+  static uint32_t getLootRandom();
 
 private:
-	bool deserializeSpell(xmlNodePtr node, SpellBlock& sb);
-	bool loadMonsterType(const std::string& file, const std::string& monster_name, bool reloading = false);
+  bool deserializeSpell(xmlNodePtr node, SpellBlock& sb);
+  bool loadMonsterType(const std::string& file, const std::string& monster_name, bool reloading = false);
 
-	bool loadLootContainer(xmlNodePtr, LootBlock&);
-	bool loadLootItem(xmlNodePtr, LootBlock&);
+  bool loadLootContainer(xmlNodePtr, LootBlock&);
+  bool loadLootItem(xmlNodePtr, LootBlock&);
 
-	typedef std::map<std::string, CreatureType*> TypeMap;
+  typedef std::map<std::string, CreatureType*> TypeMap;
 
-	TypeMap creature_types;
+  TypeMap creature_types;
 
-	bool loaded;
-	std::string datadir;
+  bool loaded;
+  std::string datadir;
 
 };
 

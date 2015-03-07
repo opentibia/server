@@ -33,99 +33,99 @@ uint32_t ProtocolOld::protocolOldCount = 0;
 #ifdef __DEBUG_NET_DETAIL__
 void ProtocolOld::deleteProtocolTask()
 {
-	std::cout << "Deleting ProtocolOld" << std::endl;
-	Protocol::deleteProtocolTask();
+  std::cout << "Deleting ProtocolOld" << std::endl;
+  Protocol::deleteProtocolTask();
 }
 #endif
 
 void ProtocolOld::disconnectClient(uint8_t error, const char* message)
 {
-	OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
-	if(output){
-		TRACK_MESSAGE(output);
-		output->AddByte(error);
-		output->AddString(message);
-		OutputMessagePool::getInstance()->send(output);
-	}
-	getConnection()->closeConnection();
+  OutputMessage_ptr output = OutputMessagePool::getInstance()->getOutputMessage(this, false);
+  if(output){
+    TRACK_MESSAGE(output);
+    output->AddByte(error);
+    output->AddString(message);
+    OutputMessagePool::getInstance()->send(output);
+  }
+  getConnection()->closeConnection();
 }
 
 bool ProtocolOld::parseFirstPacket(NetworkMessage& msg)
 {
-	if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
-		getConnection()->closeConnection();
-		return false;
-	}
+  if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+    getConnection()->closeConnection();
+    return false;
+  }
 
-	/*uint16_t clientos =*/ msg.GetU16();
-	uint16_t version  = msg.GetU16();
-	msg.SkipBytes(12);
+  /*uint16_t clientos =*/ msg.GetU16();
+  uint16_t version  = msg.GetU16();
+  msg.SkipBytes(12);
 
-	if(version <= 760){
-		disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
-	}
+  if(version <= 760){
+    disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
+  }
 
-	if(!RSA_decrypt(msg)){
-		getConnection()->closeConnection();
-		return false;
-	}
+  if(!RSA_decrypt(msg)){
+    getConnection()->closeConnection();
+    return false;
+  }
 
-	uint32_t key[4];
-	key[0] = msg.GetU32();
-	key[1] = msg.GetU32();
-	key[2] = msg.GetU32();
-	key[3] = msg.GetU32();
-	enableXTEAEncryption();
-	setXTEAKey(key);
+  uint32_t key[4];
+  key[0] = msg.GetU32();
+  key[1] = msg.GetU32();
+  key[2] = msg.GetU32();
+  key[3] = msg.GetU32();
+  enableXTEAEncryption();
+  setXTEAKey(key);
 
-	if(version <= 822){
-		disableChecksum();
-	}
+  if(version <= 822){
+    disableChecksum();
+  }
 
-	disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
-	return false;
+  disconnectClient(0x0A, "This server requires client version " CLIENT_VERSION_STRING ".");
+  return false;
 }
 
 ProtocolOld::ProtocolOld(Connection_ptr connection)
-	: Protocol(connection)
+  : Protocol(connection)
 {
-	enableChecksum();
+  enableChecksum();
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	protocolOldCount++;
+  protocolOldCount++;
 #endif
 }
 
 ProtocolOld::~ProtocolOld()
 {
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	protocolOldCount--;
+  protocolOldCount--;
 #endif
 }
 
 void ProtocolOld::onRecvFirstMessage(NetworkMessage& msg)
 {
-	parseFirstPacket(msg);
+  parseFirstPacket(msg);
 }
 
 ProtocolOldLogin::ProtocolOldLogin(Connection_ptr connection)
-	: ProtocolOld(connection)
+  : ProtocolOld(connection)
 {
 
 }
 
 const char* ProtocolOldLogin::protocol_name()
 {
-	return "old login protocol";
+  return "old login protocol";
 }
 
 const char* ProtocolOldGame::protocol_name()
 {
-	return "old gameworld protocol";
+  return "old gameworld protocol";
 }
 
 ProtocolOldGame::ProtocolOldGame(Connection_ptr connection)
-	: ProtocolOld(connection)
+  : ProtocolOld(connection)
 {
 
 }

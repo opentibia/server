@@ -32,58 +32,58 @@ class Player;
 class BedItem : public Item
 {
 public:
-	BedItem(uint16_t id);
-	virtual ~BedItem();
+  BedItem(uint16_t id);
+  virtual ~BedItem();
 
-	virtual BedItem* getBed();
-	virtual const BedItem* getBed() const;
+  virtual BedItem* getBed();
+  virtual const BedItem* getBed() const;
 
-	//serialization
-	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
-	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
+  //serialization
+  virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
+  virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	//override
-	virtual bool canRemove() const;
+  //override
+  virtual bool canRemove() const;
 
-	uint32_t getSleeper() const;
-	void setSleeper(uint32_t guid);
+  uint32_t getSleeper() const;
+  void setSleeper(uint32_t guid);
 
-	time_t getSleepStart() const;
-	void setSleepStart(time_t now);
+  time_t getSleepStart() const;
+  void setSleepStart(time_t now);
 
-	House* getHouse() const;
-	void setHouse(House* h);
+  House* getHouse() const;
+  void setHouse(House* h);
 
-	bool canUse(Player* player);
-	void sleep(Player* player);
-	void wakeUp();
-	BedItem* getNextBedItem();
+  bool canUse(Player* player);
+  void sleep(Player* player);
+  void wakeUp();
+  BedItem* getNextBedItem();
 
 protected:
-	void updateAppearance(const Player* player);
-	void regeneratePlayer(Player* player) const;
-	void internalSetSleeper(const Player* player);
-	void internalRemoveSleeper();
+  void updateAppearance(const Player* player);
+  void regeneratePlayer(Player* player) const;
+  void internalSetSleeper(const Player* player);
+  void internalRemoveSleeper();
 
-	uint32_t sleeperGUID;
-	time_t sleepStart;
-	House* house;
+  uint32_t sleeperGUID;
+  time_t sleepStart;
+  House* house;
 };
 
 class Beds
 {
-	Beds();
+  Beds();
 
 public:
-	~Beds();
+  ~Beds();
 
-	static Beds& instance();
+  static Beds& instance();
 
-	BedItem* getBedBySleeper(uint32_t guid);
-	void setBedSleeper(BedItem* bed, uint32_t guid);
+  BedItem* getBedBySleeper(uint32_t guid);
+  void setBedSleeper(BedItem* bed, uint32_t guid);
 
 private:
-	std::map<uint32_t, BedItem*> BedSleepersMap;
+  std::map<uint32_t, BedItem*> BedSleepersMap;
 };
 
 #endif

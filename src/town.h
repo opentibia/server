@@ -29,19 +29,19 @@
 class Town
 {
 public:
-	Town(uint32_t _townid);
+  Town(uint32_t _townid);
 
-	const Position& getTemplePosition() const;
-	const std::string& getName() const;
+  const Position& getTemplePosition() const;
+  const std::string& getName() const;
 
-	void setTemplePos(const Position& pos);
-	void setName(const std::string& _townName);
-	uint32_t getTownID() const;
+  void setTemplePos(const Position& pos);
+  void setName(const std::string& _townName);
+  uint32_t getTownID() const;
 
 private:
-	uint32_t townid;
-	std::string townName;
-	Position posTemple;
+  uint32_t townid;
+  std::string townName;
+  Position posTemple;
 };
 
 typedef std::map<uint32_t, Town*> TownMap;
@@ -49,18 +49,18 @@ typedef std::map<uint32_t, Town*> TownMap;
 class Towns
 {
 public:
-	static Towns* getInstance();
+  static Towns* getInstance();
 
-	bool addTown(uint32_t _townid, Town* town);
+  bool addTown(uint32_t _townid, Town* town);
 
-	Town* getTown(const std::string& townname);
-	Town* getTown(uint32_t _townid);
+  Town* getTown(const std::string& townname);
+  Town* getTown(uint32_t _townid);
 
-	TownMap::const_iterator getTownBegin() const;
-	TownMap::const_iterator getTownEnd() const;
+  TownMap::const_iterator getTownBegin() const;
+  TownMap::const_iterator getTownEnd() const;
 
 private:
-	TownMap townMap;
+  TownMap townMap;
 };
 
 #endif

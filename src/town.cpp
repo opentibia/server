@@ -24,80 +24,80 @@
 
 Town::Town(uint32_t _townid)
 {
-	townid = _townid;
+  townid = _townid;
 }
 
 const Position& Town::getTemplePosition() const
 {
-	return posTemple;
+  return posTemple;
 }
 
 const std::string& Town::getName() const
 {
-	return townName;
+  return townName;
 }
 
 void Town::setTemplePos(const Position& pos)
 {
-	posTemple = pos;
+  posTemple = pos;
 }
 
 void Town::setName(const std::string& _townName)
 {
-	townName = _townName;
+  townName = _townName;
 }
 
 uint32_t Town::getTownID() const
 {
-	return townid;
+  return townid;
 }
 
 Towns* Towns::getInstance()
 {
-	static Singleton<Towns> instance;
-	return instance.get();
+  static Singleton<Towns> instance;
+  return instance.get();
 }
 
 bool Towns::addTown(uint32_t _townid, Town* town)
 {
-	TownMap::iterator it = townMap.find(_townid);
+  TownMap::iterator it = townMap.find(_townid);
 
-	if(it != townMap.end()){
-		return false;
-	}
+  if(it != townMap.end()){
+    return false;
+  }
 
-	townMap[_townid] = town;
-	return true;
+  townMap[_townid] = town;
+  return true;
 }
 
 Town* Towns::getTown(const std::string& townname)
 {
-	for(TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it){
-		if(boost::algorithm::iequals(it->second->getName(), townname)){
-			return it->second;
-		}
-	}
+  for(TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it){
+    if(boost::algorithm::iequals(it->second->getName(), townname)){
+      return it->second;
+    }
+  }
 
-	return NULL;
+  return NULL;
 }
 
 Town* Towns::getTown(uint32_t _townid)
 {
-	TownMap::iterator it = townMap.find(_townid);
+  TownMap::iterator it = townMap.find(_townid);
 
-	if(it != townMap.end()){
-		return it->second;
-	}
+  if(it != townMap.end()){
+    return it->second;
+  }
 
-	return NULL;
+  return NULL;
 }
 
 TownMap::const_iterator Towns::getTownBegin() const
 {
-	return townMap.begin();
+  return townMap.begin();
 }
 
 TownMap::const_iterator Towns::getTownEnd() const
 {
-	return townMap.end();
+  return townMap.end();
 }

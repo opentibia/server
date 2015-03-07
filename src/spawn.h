@@ -36,76 +36,76 @@ class Actor;
 typedef std::list<Spawn*> SpawnList;
 
 struct spawnBlock_t{
-	CreatureType* mType;
-	Direction direction;
-	Position pos;
-	uint32_t interval;
-	int64_t lastSpawn;
+  CreatureType* mType;
+  Direction direction;
+  Position pos;
+  uint32_t interval;
+  int64_t lastSpawn;
 };
 
 class Spawns{
 public:
-	Spawns();
-	~Spawns();
+  Spawns();
+  ~Spawns();
 
-	static Spawns* getInstance();
+  static Spawns* getInstance();
 
-	bool isInZone(const Position& centerPos, int32_t radius, const Position& pos);
+  bool isInZone(const Position& centerPos, int32_t radius, const Position& pos);
 
-	bool loadFromXml(const std::string& datadir);
-	void startup();
-	void clear();
+  bool loadFromXml(const std::string& datadir);
+  void startup();
+  void clear();
 
-	bool isLoaded() const;
-	bool isStarted() const;
+  bool isLoaded() const;
+  bool isStarted() const;
 
 private:
-	SpawnList spawnList;
+  SpawnList spawnList;
 
-	bool loaded;
-	bool started;
-	std::string filename;
+  bool loaded;
+  bool started;
+  std::string filename;
 };
 
 class Spawn{
 public:
-	Spawn(const Position& pos, int32_t radius);
-	~Spawn();
+  Spawn(const Position& pos, int32_t radius);
+  ~Spawn();
 
-	bool addMonster(const std::string& name, const Position& pos, Direction dir, uint32_t interval);
-	bool addNPC(const std::string& name, const Position& pos, Direction dir);
-	void removeMonster(Actor* monster);
+  bool addMonster(const std::string& name, const Position& pos, Direction dir, uint32_t interval);
+  bool addNPC(const std::string& name, const Position& pos, Direction dir);
+  void removeMonster(Actor* monster);
 
-	uint32_t getInterval() const;
-	void startup();
+  uint32_t getInterval() const;
+  void startup();
 
-	void startSpawnCheck();
-	void stopEvent();
+  void startSpawnCheck();
+  void stopEvent();
 
-	bool isInSpawnZone(const Position& pos);
-	void cleanup();
+  bool isInSpawnZone(const Position& pos);
+  void cleanup();
 
 private:
-	Position centerPos;
-	int32_t radius;
-	int32_t despawnRange;
-	int32_t despawnRadius;
+  Position centerPos;
+  int32_t radius;
+  int32_t despawnRange;
+  int32_t despawnRadius;
 
-	//map of creatures in the spawn
-	typedef std::map<uint32_t, spawnBlock_t> SpawnMap;
-	SpawnMap spawnMap;
+  //map of creatures in the spawn
+  typedef std::map<uint32_t, spawnBlock_t> SpawnMap;
+  SpawnMap spawnMap;
 
-	//map of the spawned creatures
-	typedef std::multimap<uint32_t, Actor*, std::less<uint32_t> > SpawnedMap;
-	typedef SpawnedMap::value_type spawned_pair;
-	SpawnedMap spawnedMap;
+  //map of the spawned creatures
+  typedef std::multimap<uint32_t, Actor*, std::less<uint32_t> > SpawnedMap;
+  typedef SpawnedMap::value_type spawned_pair;
+  SpawnedMap spawnedMap;
 
-	uint32_t interval;
-	uint32_t checkSpawnEvent;
+  uint32_t interval;
+  uint32_t checkSpawnEvent;
 
-	bool findPlayer(const Position& pos);
-	bool spawnMonster(uint32_t spawnId, CreatureType* mType, const Position& pos, Direction dir, bool startup = false);
-	void checkSpawn();
+  bool findPlayer(const Position& pos);
+  bool spawnMonster(uint32_t spawnId, CreatureType* mType, const Position& pos, Direction dir, bool startup = false);
+  void checkSpawn();
 };
 
 #endif

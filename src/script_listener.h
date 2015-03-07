@@ -25,51 +25,51 @@
 #include "enums.h"
 
 namespace Script {
-	class Manager;
+  class Manager;
 
-	///////////////////////////////////////////////////////////////////////////////
-	// Event Listener
+  ///////////////////////////////////////////////////////////////////////////////
+  // Event Listener
 
-	// ListenerType is declared in enums.h
+  // ListenerType is declared in enums.h
 
-	class Listener {
-	public:
-		// Listener MUST be destroyed before the manager
-		Listener(ListenerType type, const boost::any& data, Manager& manager);
-		~Listener();
+  class Listener {
+  public:
+    // Listener MUST be destroyed before the manager
+    Listener(ListenerType type, const boost::any& data, Manager& manager);
+    ~Listener();
 
-		uint32_t getID() const {return ID;}
+    uint32_t getID() const {return ID;}
 
-		std::string getLuaTag() const;
-		const boost::any& getData() const;
+    std::string getLuaTag() const;
+    const boost::any& getData() const;
 
-		bool isActive() const {return active;}
-		void deactivate();
+    bool isActive() const {return active;}
+    void deactivate();
 
-		ListenerType type() const {return type_;}
-		static std::string type2name();
-		static ListenerType name2type();
-	protected:
-		static uint32_t ID_counter;
-		uint32_t ID;
-		bool active;
-		ListenerType type_;
-		std::string datatag;
-		boost::any data;
-		Manager& manager;
-	};
+    ListenerType type() const {return type_;}
+    static std::string type2name();
+    static ListenerType name2type();
+  protected:
+    static uint32_t ID_counter;
+    uint32_t ID;
+    bool active;
+    ListenerType type_;
+    std::string datatag;
+    boost::any data;
+    Manager& manager;
+  };
 
-	typedef boost::shared_ptr<Listener> Listener_ptr;
-	typedef boost::weak_ptr<Listener> Listener_wptr;
-	typedef std::vector<Listener_ptr> ListenerList;
+  typedef boost::shared_ptr<Listener> Listener_ptr;
+  typedef boost::weak_ptr<Listener> Listener_wptr;
+  typedef std::vector<Listener_ptr> ListenerList;
 
-	inline std::string Listener::getLuaTag() const {
-		return datatag;
-	}
+  inline std::string Listener::getLuaTag() const {
+    return datatag;
+  }
 
-	inline const boost::any& Listener::getData() const {
-		return data;
-	}
+  inline const boost::any& Listener::getData() const {
+    return data;
+  }
 }
 
 #endif // __OTSERV_SCRIPT_EVENT_LISTENER_H__

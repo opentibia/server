@@ -28,181 +28,181 @@
 extern void g_gameUnscriptThing(Thing* thing);
 
 Thing::Thing() :
-	parent(NULL),
-	m_refCount(0)
+  parent(NULL),
+  m_refCount(0)
 {
-	//
+  //
 }
 
 Thing::~Thing()
 {
-	//
-	//std::cout << "thing destructor " << this << std::endl;
+  //
+  //std::cout << "thing destructor " << this << std::endl;
 
-	// Kind of ugly to put it here, but what choice is there?
-	g_gameUnscriptThing(this);
+  // Kind of ugly to put it here, but what choice is there?
+  g_gameUnscriptThing(this);
 }
 
 void Thing::addRef()
 {
-	++m_refCount;
+  ++m_refCount;
 }
 
 void Thing::unRef()
 {
-	--m_refCount;
-	if(m_refCount <= 0)
-		delete this;
+  --m_refCount;
+  if(m_refCount <= 0)
+    delete this;
 }
 
 Cylinder* Thing::getParent()
 {
-	return parent;
+  return parent;
 }
 
 const Cylinder* Thing::getParent() const
 {
-	return parent;
+  return parent;
 }
 
 void Thing::setParent(Cylinder* cylinder)
 {
-	parent = cylinder;
+  parent = cylinder;
 }
 
 Cylinder* Thing::getTopParent()
 {
-	//tile
-	if(getParent() == NULL)
-		return dynamic_cast<Cylinder*>(this);
+  //tile
+  if(getParent() == NULL)
+    return dynamic_cast<Cylinder*>(this);
 
-	Cylinder* aux = getParent();
-	Cylinder* prevaux = dynamic_cast<Cylinder*>(this);
+  Cylinder* aux = getParent();
+  Cylinder* prevaux = dynamic_cast<Cylinder*>(this);
 
-	while(aux->getParent() != NULL){
-		prevaux = aux;
-		aux = aux->getParent();
-	}
+  while(aux->getParent() != NULL){
+    prevaux = aux;
+    aux = aux->getParent();
+  }
 
-	if(dynamic_cast<Cylinder*>(prevaux)){
-		return prevaux;
-	}
+  if(dynamic_cast<Cylinder*>(prevaux)){
+    return prevaux;
+  }
 
-	return aux;
+  return aux;
 }
 
 const Cylinder* Thing::getTopParent() const
 {
-	//tile
-	if(getParent() == NULL)
-		return dynamic_cast<const Cylinder*>(this);
+  //tile
+  if(getParent() == NULL)
+    return dynamic_cast<const Cylinder*>(this);
 
-	const Cylinder* aux = getParent();
-	const Cylinder* prevaux = dynamic_cast<const Cylinder*>(this);
+  const Cylinder* aux = getParent();
+  const Cylinder* prevaux = dynamic_cast<const Cylinder*>(this);
 
-	while(aux->getParent() != NULL){
-		prevaux = aux;
-		aux = aux->getParent();
-	}
+  while(aux->getParent() != NULL){
+    prevaux = aux;
+    aux = aux->getParent();
+  }
 
-	if(dynamic_cast<const Cylinder*>(prevaux)){
-		return prevaux;
-	}
+  if(dynamic_cast<const Cylinder*>(prevaux)){
+    return prevaux;
+  }
 
-	return aux;
+  return aux;
 }
 
 Tile* Thing::getParentTile()
 {
-	Cylinder* cylinder = getTopParent();
+  Cylinder* cylinder = getTopParent();
 
-	#ifdef __DEBUG__MOVESYS__
-	if(!cylinder){
-		std::cout << "Failure: [Thing::getParentTile()],  NULL tile" << std::endl;
-		DEBUG_REPORT
-		return &(Tile::null_tile);
-	}
-	#endif
+  #ifdef __DEBUG__MOVESYS__
+  if(!cylinder){
+    std::cout << "Failure: [Thing::getParentTile()],  NULL tile" << std::endl;
+    DEBUG_REPORT
+    return &(Tile::null_tile);
+  }
+  #endif
 
-	//get root cylinder
-	if(cylinder->getParent())
-		cylinder = cylinder->getParent();
+  //get root cylinder
+  if(cylinder->getParent())
+    cylinder = cylinder->getParent();
 
-	return dynamic_cast<Tile*>(cylinder);
+  return dynamic_cast<Tile*>(cylinder);
 }
 
 const Tile* Thing::getParentTile() const
 {
-	const Cylinder* cylinder = getTopParent();
+  const Cylinder* cylinder = getTopParent();
 
-	#ifdef __DEBUG__MOVESYS__
-	if(!cylinder){
-		std::cout << "Failure: [Thing::getParentTile() const],  NULL tile" << std::endl;
-		DEBUG_REPORT
-		return &(Tile::null_tile);
-	}
-	#endif
+  #ifdef __DEBUG__MOVESYS__
+  if(!cylinder){
+    std::cout << "Failure: [Thing::getParentTile() const],  NULL tile" << std::endl;
+    DEBUG_REPORT
+    return &(Tile::null_tile);
+  }
+  #endif
 
-	//get root cylinder
-	if(cylinder->getParent())
-		cylinder = cylinder->getParent();
+  //get root cylinder
+  if(cylinder->getParent())
+    cylinder = cylinder->getParent();
 
-	return dynamic_cast<const Tile*>(cylinder);
+  return dynamic_cast<const Tile*>(cylinder);
 }
 
 Position Thing::getPosition() const
 {
-	const Tile* tile = getParentTile();
-	if(tile){
-		return tile->getPosition();
-	}
-	else{
-		#ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Thing::getPosition],  NULL tile" << std::endl;
-		DEBUG_REPORT
-		#endif
-		return Tile::null_tile.getPosition();
-	}
+  const Tile* tile = getParentTile();
+  if(tile){
+    return tile->getPosition();
+  }
+  else{
+    #ifdef __DEBUG__MOVESYS__
+    std::cout << "Failure: [Thing::getPosition],  NULL tile" << std::endl;
+    DEBUG_REPORT
+    #endif
+    return Tile::null_tile.getPosition();
+  }
 }
 
 Item* Thing::getItem()
 {
-	return NULL;
+  return NULL;
 }
 
 const Item* Thing::getItem() const
 {
-	return NULL;
+  return NULL;
 }
 
 Tile* Thing::getTile()
 {
-	return NULL;
+  return NULL;
 }
 
 const Tile* Thing::getTile() const
 {
-	return NULL;
+  return NULL;
 }
 
 Creature* Thing::getCreature()
 {
-	return NULL;
+  return NULL;
 }
 
 const Creature* Thing::getCreature() const
 {
-	return NULL;
+  return NULL;
 }
 
 bool Thing::isRemoved() const
 {
-	if(parent == NULL)
-		return true;
+  if(parent == NULL)
+    return true;
 
-	const Cylinder* aux = getParent();
-	if(aux->isRemoved())
-		return true;
+  const Cylinder* aux = getParent();
+  if(aux->isRemoved())
+    return true;
 
-	return false;
+  return false;
 }

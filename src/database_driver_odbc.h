@@ -45,61 +45,61 @@
 #include <sqlext.h>
 
 /**
-	@author Bruno R Ferreira <brf_coldf@yahoo.com.br>
+  @author Bruno R Ferreira <brf_coldf@yahoo.com.br>
 */
 class DatabaseODBC : public DatabaseDriver
 {
 public:
-	DatabaseODBC();
-	virtual ~DatabaseODBC();
+  DatabaseODBC();
+  virtual ~DatabaseODBC();
 
-	virtual bool getParam(DBParam_t param);
+  virtual bool getParam(DBParam_t param);
 
-	virtual bool beginTransaction();
-	virtual bool rollback();
-	virtual bool commit();
+  virtual bool beginTransaction();
+  virtual bool rollback();
+  virtual bool commit();
 
-	virtual bool executeQuery(const std::string &query) { return false; }; // todo
+  virtual bool executeQuery(const std::string &query) { return false; }; // todo
   
   virtual uint64_t getLastInsertedRowID(){ return 0; }; // todo
 
-	virtual std::string escapeString(const std::string &s);
-	virtual std::string escapeBlob(const char* s, uint32_t length);
+  virtual std::string escapeString(const std::string &s);
+  virtual std::string escapeBlob(const char* s, uint32_t length);
 
 protected:
-	virtual bool internalQuery(const std::string &query);
-	virtual DBResult_ptr internalSelectQuery(const std::string &query);
-	virtual void freeResult(DBResult *res);
+  virtual bool internalQuery(const std::string &query);
+  virtual DBResult_ptr internalSelectQuery(const std::string &query);
+  virtual void freeResult(DBResult *res);
 
-	std::string _parse(const std::string &s);
+  std::string _parse(const std::string &s);
 
-	SQLHDBC m_handle;
-	SQLHENV m_env;
+  SQLHDBC m_handle;
+  SQLHENV m_env;
 };
 
 class ODBCResult : public DBResult
 {
-	friend class DatabaseODBC;
+  friend class DatabaseODBC;
 
 public:
-	virtual int32_t getDataInt(const std::string &s);
-	virtual uint32_t getDataUInt(const std::string &s);
-	virtual int64_t getDataLong(const std::string &s);
-	virtual std::string getDataString(const std::string &s);
-	virtual const char* getDataStream(const std::string &s, unsigned long &size);
+  virtual int32_t getDataInt(const std::string &s);
+  virtual uint32_t getDataUInt(const std::string &s);
+  virtual int64_t getDataLong(const std::string &s);
+  virtual std::string getDataString(const std::string &s);
+  virtual const char* getDataStream(const std::string &s, unsigned long &size);
 
-	virtual DBResult_ptr advance();
-	virtual bool empty();
+  virtual DBResult_ptr advance();
+  virtual bool empty();
 
 protected:
-	ODBCResult(SQLHSTMT stmt);
-	virtual ~ODBCResult();
+  ODBCResult(SQLHSTMT stmt);
+  virtual ~ODBCResult();
 
-	typedef std::map<const std::string, uint32_t> listNames_t;
-	listNames_t m_listNames;
-	bool m_rowAvailable;
+  typedef std::map<const std::string, uint32_t> listNames_t;
+  listNames_t m_listNames;
+  bool m_rowAvailable;
 
-	SQLHSTMT m_handle;
+  SQLHSTMT m_handle;
 };
 
 #endif

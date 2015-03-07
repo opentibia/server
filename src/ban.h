@@ -26,36 +26,36 @@
 #include "enums.h"
 
 enum BanType_t {
-	BAN_IPADDRESS = 1,
-	BAN_PLAYER = 2,
-	BAN_ACCOUNT = 3,
-	BAN_NOTATION = 4,
-	BAN_STATEMENT = 5
+  BAN_IPADDRESS = 1,
+  BAN_PLAYER = 2,
+  BAN_ACCOUNT = 3,
+  BAN_NOTATION = 4,
+  BAN_STATEMENT = 5
 };
 
 struct Ban {
-	BanType_t type;
-	uint32_t id;
-	uint32_t added;
-	int32_t expires;
-	uint32_t adminId;
-	uint32_t reason;
-	ViolationAction action;
-	std::string comment;
-	std::string statement;
-	std::string value;
-	std::string param;
+  BanType_t type;
+  uint32_t id;
+  uint32_t added;
+  int32_t expires;
+  uint32_t adminId;
+  uint32_t reason;
+  ViolationAction action;
+  std::string comment;
+  std::string statement;
+  std::string value;
+  std::string param;
 };
 
 struct LoginBlock {
-	time_t lastLoginTime;
-	uint32_t numberOfLogins;
+  time_t lastLoginTime;
+  uint32_t numberOfLogins;
 };
 
 struct ConnectBlock {
-	uint64_t startTime;
-	uint64_t blockTime;
-	uint32_t count;
+  uint64_t startTime;
+  uint64_t blockTime;
+  uint32_t count;
 };
 
 typedef std::map<uint32_t, LoginBlock > IpLoginMap;
@@ -64,43 +64,43 @@ typedef std::map<uint32_t, ConnectBlock > IpConnectMap;
 class BanManager {
 public:
     BanManager() {}
-	~BanManager() {}
+  ~BanManager() {}
 
     bool clearTemporaryBans() const;
-	bool acceptConnection(uint32_t clientip);
+  bool acceptConnection(uint32_t clientip);
 
-	bool isIpDisabled(uint32_t clientip);
-	bool isIpBanished(uint32_t clientip, uint32_t mask = 0xFFFFFFFF) const;
-	bool isPlayerBanished(uint32_t guid) const;
-	bool isPlayerBanished(const std::string& name) const;
-	bool isAccountBanished(uint32_t accountId) const;
+  bool isIpDisabled(uint32_t clientip);
+  bool isIpBanished(uint32_t clientip, uint32_t mask = 0xFFFFFFFF) const;
+  bool isPlayerBanished(uint32_t guid) const;
+  bool isPlayerBanished(const std::string& name) const;
+  bool isAccountBanished(uint32_t accountId) const;
 
-	void addLoginAttempt(uint32_t clientip, bool isSuccess);
-	bool addIpBan(uint32_t ip, uint32_t mask, int32_t time, uint32_t adminid, std::string comment) const;
-	bool addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, ViolationAction action) const;
-	bool addPlayerBan(const std::string& name, int32_t time, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, ViolationAction action) const;
-	bool addPlayerStatement(uint32_t playerId, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, ViolationAction action) const;
-	bool addAccountBan(uint32_t account, int32_t time, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, ViolationAction action) const;
-	bool addAccountNotation(uint32_t account, uint32_t adminid, std::string comment,
-		std::string statement, uint32_t reason, ViolationAction action) const;
+  void addLoginAttempt(uint32_t clientip, bool isSuccess);
+  bool addIpBan(uint32_t ip, uint32_t mask, int32_t time, uint32_t adminid, std::string comment) const;
+  bool addPlayerBan(uint32_t playerId, int32_t time, uint32_t adminid, std::string comment,
+    std::string statement, uint32_t reason, ViolationAction action) const;
+  bool addPlayerBan(const std::string& name, int32_t time, uint32_t adminid, std::string comment,
+    std::string statement, uint32_t reason, ViolationAction action) const;
+  bool addPlayerStatement(uint32_t playerId, uint32_t adminid, std::string comment,
+    std::string statement, uint32_t reason, ViolationAction action) const;
+  bool addAccountBan(uint32_t account, int32_t time, uint32_t adminid, std::string comment,
+    std::string statement, uint32_t reason, ViolationAction action) const;
+  bool addAccountNotation(uint32_t account, uint32_t adminid, std::string comment,
+    std::string statement, uint32_t reason, ViolationAction action) const;
 
-	bool removeIpBans(uint32_t ip, uint32_t mask = 0xFFFFFFFF) const;
-	bool removePlayerBans(uint32_t guid) const;
-	bool removePlayerBans(const std::string& name) const;
-	bool removeAccountBans(uint32_t accno) const;
-	bool removeNotations(uint32_t accno) const;
+  bool removeIpBans(uint32_t ip, uint32_t mask = 0xFFFFFFFF) const;
+  bool removePlayerBans(uint32_t guid) const;
+  bool removePlayerBans(const std::string& name) const;
+  bool removeAccountBans(uint32_t accno) const;
+  bool removeNotations(uint32_t accno) const;
 
-	uint32_t getNotationsCount(uint32_t account) const;
-	std::vector<Ban> getBans(BanType_t type);
+  uint32_t getNotationsCount(uint32_t account) const;
+  std::vector<Ban> getBans(BanType_t type);
 protected:
-	mutable boost::recursive_mutex banLock;
+  mutable boost::recursive_mutex banLock;
 
-	IpLoginMap ipLoginMap;
-	IpConnectMap ipConnectMap;
+  IpLoginMap ipLoginMap;
+  IpConnectMap ipConnectMap;
 };
 
 #endif

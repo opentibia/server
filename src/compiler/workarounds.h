@@ -22,57 +22,57 @@
 #define __OTSERV_WORKAROUNDS_H__
 
 /*
-	Unordered set, unordered map and functional hash workarounds.
-	All implementations are inherited to "std" namespace.
+  Unordered set, unordered map and functional hash workarounds.
+  All implementations are inherited to "std" namespace.
 */
 #ifdef __OTSERV_FUNCTIONAL_HASH_WORKAROUND__
-	namespace std {
-		#ifdef _MSC_VER
-			template<typename Key, typename Ty = std::less<Key> >
-			class hash : public __OTSERV_FUNCTIONAL_HASH_WORKAROUND__<Key, Ty> {};
-		#else
-			template<typename Key>
-			class hash : public __OTSERV_FUNCTIONAL_HASH_WORKAROUND__<Key> {};
-		#endif
-	}
+  namespace std {
+    #ifdef _MSC_VER
+      template<typename Key, typename Ty = std::less<Key> >
+      class hash : public __OTSERV_FUNCTIONAL_HASH_WORKAROUND__<Key, Ty> {};
+    #else
+      template<typename Key>
+      class hash : public __OTSERV_FUNCTIONAL_HASH_WORKAROUND__<Key> {};
+    #endif
+  }
 #endif // __OTSERV_FUNCTIONAL_HASH_WORKAROUND__
 
 #ifdef __OTSERV_UNORDERED_MAP_WORKAROUND__
-	namespace std
-	{
-		#ifdef _MSC_VER
-			template<class Key,
-					class Ty,
-					class Hash = std::hash<Key, std::less<Key> >,
-					class Alloc = std::allocator<std::pair<const Key, Ty> > >
-					class unordered_map : public __OTSERV_UNORDERED_MAP_WORKAROUND__<Key, Ty, Hash, Alloc> {};
-		#else
-			template<class Key,
-					class Ty,
-					class Hash = std::hash<Key>,
-					class Pred = std::equal_to<Key>,
-					class Alloc = std::allocator<std::pair<const Key, Ty> > >
-					class unordered_map : public __OTSERV_UNORDERED_MAP_WORKAROUND__<Key, Ty, Hash, Pred, Alloc> {};
-		#endif
-	}
+  namespace std
+  {
+    #ifdef _MSC_VER
+      template<class Key,
+          class Ty,
+          class Hash = std::hash<Key, std::less<Key> >,
+          class Alloc = std::allocator<std::pair<const Key, Ty> > >
+          class unordered_map : public __OTSERV_UNORDERED_MAP_WORKAROUND__<Key, Ty, Hash, Alloc> {};
+    #else
+      template<class Key,
+          class Ty,
+          class Hash = std::hash<Key>,
+          class Pred = std::equal_to<Key>,
+          class Alloc = std::allocator<std::pair<const Key, Ty> > >
+          class unordered_map : public __OTSERV_UNORDERED_MAP_WORKAROUND__<Key, Ty, Hash, Pred, Alloc> {};
+    #endif
+  }
 #endif // __OTSERV_UNORDERED_MAP_WORKAROUND__
 
 #ifdef __OTSERV_UNORDERED_SET_WORKAROUND__
-	namespace std
-	{
-		#ifdef _MSC_VER
-			template<class Key,
-					class Hash = std::hash<Key, std::less<Key> >,
-					class Alloc = std::allocator<Key> >
-					class unordered_set : public __OTSERV_UNORDERED_SET_WORKAROUND__<Key, Hash, Alloc> {};
-		#else
-			template<class Key,
-					class Hash = std::hash<Key>,
-					class Pred = std::equal_to<Key>,
-					class Alloc = std::allocator<Key> >
-					class unordered_set : public __OTSERV_UNORDERED_SET_WORKAROUND__<Key, Hash, Pred, Alloc> {};
-		#endif
-	}
+  namespace std
+  {
+    #ifdef _MSC_VER
+      template<class Key,
+          class Hash = std::hash<Key, std::less<Key> >,
+          class Alloc = std::allocator<Key> >
+          class unordered_set : public __OTSERV_UNORDERED_SET_WORKAROUND__<Key, Hash, Alloc> {};
+    #else
+      template<class Key,
+          class Hash = std::hash<Key>,
+          class Pred = std::equal_to<Key>,
+          class Alloc = std::allocator<Key> >
+          class unordered_set : public __OTSERV_UNORDERED_SET_WORKAROUND__<Key, Hash, Pred, Alloc> {};
+    #endif
+  }
 #endif // __OTSERV_UNORDERED_SET_WORKAROUND__
 
 #endif // __OTSERV_WORKAROUNDS_H__

@@ -37,64 +37,64 @@ typedef boost::shared_ptr<Connection> Connection_ptr;
 class Protocol : boost::noncopyable
 {
 public:
-	Protocol(Connection_ptr connection)
-	{
-		m_connection = connection;
-		m_encryptionEnabled = false;
-		m_checksumEnabled = false;
-		m_rawMessages = false;
-		m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
-		m_refCount = 0;
-	}
+  Protocol(Connection_ptr connection)
+  {
+    m_connection = connection;
+    m_encryptionEnabled = false;
+    m_checksumEnabled = false;
+    m_rawMessages = false;
+    m_key[0] = 0; m_key[1] = 0; m_key[2] = 0; m_key[3] = 0;
+    m_refCount = 0;
+  }
 
-	virtual ~Protocol() {}
+  virtual ~Protocol() {}
 
-	virtual void parsePacket(NetworkMessage& msg){};
+  virtual void parsePacket(NetworkMessage& msg){};
 
-	void onSendMessage(OutputMessage_ptr msg);
-	void onRecvMessage(NetworkMessage& msg);
-	virtual void onRecvFirstMessage(NetworkMessage& msg) = 0;
-	virtual void onConnect() {} // Used by new gameworld to send first packet to client
+  void onSendMessage(OutputMessage_ptr msg);
+  void onRecvMessage(NetworkMessage& msg);
+  virtual void onRecvFirstMessage(NetworkMessage& msg) = 0;
+  virtual void onConnect() {} // Used by new gameworld to send first packet to client
 
-	Connection_ptr getConnection() { return m_connection;}
-	const Connection_ptr getConnection() const { return m_connection;}
-	void setConnection(Connection_ptr connection) { m_connection = connection; }
+  Connection_ptr getConnection() { return m_connection;}
+  const Connection_ptr getConnection() const { return m_connection;}
+  void setConnection(Connection_ptr connection) { m_connection = connection; }
 
-	uint32_t getIP() const;
-	int32_t addRef() {return ++m_refCount;}
-	int32_t unRef() {return --m_refCount;}
+  uint32_t getIP() const;
+  int32_t addRef() {return ++m_refCount;}
+  int32_t unRef() {return --m_refCount;}
 
 protected:
-	//Use this function for autosend messages only
-	OutputMessage_ptr getOutputBuffer();
+  //Use this function for autosend messages only
+  OutputMessage_ptr getOutputBuffer();
 
-	void enableXTEAEncryption() { m_encryptionEnabled = true; }
-	void disableXTEAEncryption() { m_encryptionEnabled = false; }
-	void setXTEAKey(const uint32_t* key){
-		memcpy(&m_key, key, sizeof(uint32_t)*4);
-	}
-	void enableChecksum() { m_checksumEnabled = true; }
-	void disableChecksum() { m_checksumEnabled = false; }
+  void enableXTEAEncryption() { m_encryptionEnabled = true; }
+  void disableXTEAEncryption() { m_encryptionEnabled = false; }
+  void setXTEAKey(const uint32_t* key){
+    memcpy(&m_key, key, sizeof(uint32_t)*4);
+  }
+  void enableChecksum() { m_checksumEnabled = true; }
+  void disableChecksum() { m_checksumEnabled = false; }
 
-	void XTEA_encrypt(OutputMessage& msg);
-	bool XTEA_decrypt(NetworkMessage& msg);
-	bool RSA_decrypt(NetworkMessage& msg);
-	bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
+  void XTEA_encrypt(OutputMessage& msg);
+  bool XTEA_decrypt(NetworkMessage& msg);
+  bool RSA_decrypt(NetworkMessage& msg);
+  bool RSA_decrypt(RSA* rsa, NetworkMessage& msg);
 
-	void setRawMessages(bool value) { m_rawMessages = value; }
+  void setRawMessages(bool value) { m_rawMessages = value; }
 
-	virtual void releaseProtocol();
-	virtual void deleteProtocolTask();
-	friend class Connection;
+  virtual void releaseProtocol();
+  virtual void deleteProtocolTask();
+  friend class Connection;
 private:
 
-	OutputMessage_ptr m_outputBuffer;
-	Connection_ptr m_connection;
-	bool m_encryptionEnabled;
-	bool m_checksumEnabled;
-	bool m_rawMessages;
-	uint32_t m_key[4];
-	uint32_t m_refCount;
+  OutputMessage_ptr m_outputBuffer;
+  Connection_ptr m_connection;
+  bool m_encryptionEnabled;
+  bool m_checksumEnabled;
+  bool m_rawMessages;
+  uint32_t m_key[4];
+  uint32_t m_refCount;
 };
 
 #endif

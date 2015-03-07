@@ -27,59 +27,59 @@
 
 class IOMap{
 public:
-	IOMap() {}
-	virtual ~IOMap() {}
+  IOMap() {}
+  virtual ~IOMap() {}
 
-	/** Get a textual description of what source is used
-	* \return Name of the source
-	*/
-	virtual const char* getSourceDescription() = 0;
+  /** Get a textual description of what source is used
+  * \return Name of the source
+  */
+  virtual const char* getSourceDescription() = 0;
 
-	/** Load the map from a file/database
-	  * \param map pointer to the Map class
-	  * \param identifier is the mapfile/database to open
-	  * \return Returns true if the map was loaded successfully
-	*/
-	virtual bool loadMap(Map* map, const std::string& identifier) = 0;
+  /** Load the map from a file/database
+    * \param map pointer to the Map class
+    * \param identifier is the mapfile/database to open
+    * \return Returns true if the map was loaded successfully
+  */
+  virtual bool loadMap(Map* map, const std::string& identifier) = 0;
 
 
-	/** Load the spawns
-	  * \param map pointer to the Map class
-	  * \return Returns true if the spawns were loaded successfully
-	*/
-	bool loadSpawns(Map* map)
-	{
-		if(map->spawnfile.empty()){
-			return true;
-		}
-		
-		return Spawns::getInstance()->loadFromXml(map->spawnfile);
-	}
+  /** Load the spawns
+    * \param map pointer to the Map class
+    * \return Returns true if the spawns were loaded successfully
+  */
+  bool loadSpawns(Map* map)
+  {
+    if(map->spawnfile.empty()){
+      return true;
+    }
+    
+    return Spawns::getInstance()->loadFromXml(map->spawnfile);
+  }
 
-	/** Load the houses (not house tile-data)
-	  * \param map pointer to the Map class
-	  * \return Returns true if the houses were loaded successfully
-	*/
-	bool loadHouses(Map* map)
-	{
-		if(!map->housefile.empty()){
-			return Houses::getInstance()->loadHousesXML(map->housefile);
-		}
-		return true;
-	}
+  /** Load the houses (not house tile-data)
+    * \param map pointer to the Map class
+    * \return Returns true if the houses were loaded successfully
+  */
+  bool loadHouses(Map* map)
+  {
+    if(!map->housefile.empty()){
+      return Houses::getInstance()->loadHousesXML(map->housefile);
+    }
+    return true;
+  }
 
-	const std::string& getLastErrorString() const
-	{
-		return errorString;
-	}
+  const std::string& getLastErrorString() const
+  {
+    return errorString;
+  }
 
-	void setLastErrorString(const std::string& _errorString)
-	{
-		errorString = _errorString;
-	}
+  void setLastErrorString(const std::string& _errorString)
+  {
+    errorString = _errorString;
+  }
 
 protected:
-	std::string errorString;
+  std::string errorString;
 };
 
 #endif

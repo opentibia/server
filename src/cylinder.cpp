@@ -29,42 +29,42 @@ VirtualCylinder* VirtualCylinder::virtualCylinder = new VirtualCylinder;
 
 int32_t Cylinder::__getIndexOfThing(const Thing* thing) const
 {
-	return -1;
+  return -1;
 }
 
 int32_t Cylinder::__getFirstIndex() const
 {
-	return -1;
+  return -1;
 }
 
 int32_t Cylinder::__getLastIndex() const
 {
-	return -1;
+  return -1;
 }
 
 uint32_t Cylinder::__getItemTypeCount(uint16_t itemId, int32_t subType /*= -1*/) const
 {
-	return 0;
+  return 0;
 }
 
 std::map<uint32_t, uint32_t>& Cylinder::__getAllItemTypeCount(std::map<uint32_t, uint32_t>& countMap) const
 {
-	return countMap;
+  return countMap;
 }
 
 Thing* Cylinder::__getThing(uint32_t index) const
 {
-	return NULL;
+  return NULL;
 }
 
 void Cylinder::__internalAddThing(Thing* thing)
 {
-	//
+  //
 }
 
 void Cylinder::__internalAddThing(uint32_t index, Thing* thing)
 {
-	//
+  //
 }
 
 VirtualCylinder::~VirtualCylinder()
@@ -74,85 +74,85 @@ VirtualCylinder::~VirtualCylinder()
 //cylinder implementations
 Cylinder* VirtualCylinder::getParent()
 {
-	return NULL;
+  return NULL;
 }
 
 bool VirtualCylinder::isRemoved() const
 {
-	return false;
+  return false;
 }
 
 const Cylinder* VirtualCylinder::getParent() const
 {
-	return NULL;
+  return NULL;
 }
 
 Position VirtualCylinder::getPosition() const
 {
-	return Position();
+  return Position();
 }
 
 Tile* VirtualCylinder::getTile()
 {
-	return NULL;
+  return NULL;
 }
 
 const Tile* VirtualCylinder::getTile() const
 {
-	return NULL;
+  return NULL;
 }
 
 Item* VirtualCylinder::getItem()
 {
-	return NULL;
+  return NULL;
 }
 
 const Item* VirtualCylinder::getItem() const
 {
-	return NULL;
+  return NULL;
 }
 
 Creature* VirtualCylinder::getCreature()
 {
-	return NULL;
+  return NULL;
 }
 
 const Creature* VirtualCylinder::getCreature() const
 {
-	return NULL;
+  return NULL;
 }
 
 Tile* VirtualCylinder::getParentTile()
 {
-	return NULL;
+  return NULL;
 }
 
 const Tile* VirtualCylinder::getParentTile() const
 {
-	return NULL;
+  return NULL;
 }
 
 ReturnValue VirtualCylinder::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t flags) const
+  uint32_t flags) const
 {
-	return RET_NOTPOSSIBLE;
+  return RET_NOTPOSSIBLE;
 }
 
 ReturnValue VirtualCylinder::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, uint32_t flags) const
+  uint32_t& maxQueryCount, uint32_t flags) const
 {
-	return RET_NOTPOSSIBLE;
+  return RET_NOTPOSSIBLE;
 }
 
 ReturnValue VirtualCylinder::__queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const
 {
-	return (thing->getParent() == this ? RET_NOERROR : RET_NOTPOSSIBLE);
+  return (thing->getParent() == this ? RET_NOERROR : RET_NOTPOSSIBLE);
 }
 
 Cylinder* VirtualCylinder::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-	uint32_t& flags)
+  uint32_t& flags)
 {
-	return NULL;
+  return NULL;
 }
 
 void VirtualCylinder::__addThing(Creature* actor, Thing* thing)
@@ -185,23 +185,23 @@ void VirtualCylinder::postAddNotification(Creature* actor, Thing* thing, const C
 }
 
 void VirtualCylinder::postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval,
-	cylinderlink_t link /*= LINK_OWNER*/)
+  cylinderlink_t link /*= LINK_OWNER*/)
 {
 
 }
 
 bool VirtualCylinder::isPushable() const
 {
-	return false;
+  return false;
 }
 
 int VirtualCylinder::getThrowRange() const
 {
-	return 1;
+  return 1;
 }
 
 std::string VirtualCylinder::getDescription(int32_t lookDistance) const
 {
-	return "";
+  return "";
 }
 

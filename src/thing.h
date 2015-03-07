@@ -33,43 +33,43 @@ class Item;
 
 class Thing {
 protected:
-	Thing();
+  Thing();
 
 public:
-	virtual ~Thing();
+  virtual ~Thing();
 
-	void addRef();
-	void unRef();
+  void addRef();
+  void unRef();
 
-	virtual std::string getDescription(int32_t lookDistance) const = 0;
+  virtual std::string getDescription(int32_t lookDistance) const = 0;
 
-	Cylinder* getParent();
-	const Cylinder* getParent() const;
+  Cylinder* getParent();
+  const Cylinder* getParent() const;
 
-	virtual void setParent(Cylinder* cylinder);
+  virtual void setParent(Cylinder* cylinder);
 
-	Cylinder* getTopParent(); //returns Tile/Container or a Player
-	const Cylinder* getTopParent() const;
+  Cylinder* getTopParent(); //returns Tile/Container or a Player
+  const Cylinder* getTopParent() const;
 
-	virtual Tile* getParentTile();
-	virtual const Tile* getParentTile() const;
+  virtual Tile* getParentTile();
+  virtual const Tile* getParentTile() const;
 
-	virtual Position getPosition() const;
-	virtual int getThrowRange() const = 0;
-	virtual bool isPushable() const = 0;
+  virtual Position getPosition() const;
+  virtual int getThrowRange() const = 0;
+  virtual bool isPushable() const = 0;
 
-	virtual Item* getItem();
-	virtual const Item* getItem() const;
-	virtual Tile* getTile();
-	virtual const Tile* getTile() const;
-	virtual Creature* getCreature();
-	virtual const Creature* getCreature() const;
+  virtual Item* getItem();
+  virtual const Item* getItem() const;
+  virtual Tile* getTile();
+  virtual const Tile* getTile() const;
+  virtual Creature* getCreature();
+  virtual const Creature* getCreature() const;
 
-	virtual bool isRemoved() const;
+  virtual bool isRemoved() const;
 
 private:
-	Cylinder* parent;
-	int32_t m_refCount;
+  Cylinder* parent;
+  int32_t m_refCount;
 };
 
 #endif //__THING_H__

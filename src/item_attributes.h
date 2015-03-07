@@ -31,79 +31,87 @@ class PropStream;
 class ItemAttribute
 {
 public:
-	ItemAttribute();
-	ItemAttribute(const std::string& str);
-	ItemAttribute(int32_t i);
-	ItemAttribute(float f);
-	ItemAttribute(bool b);
-	ItemAttribute(const ItemAttribute& o);
-	ItemAttribute& operator=(const ItemAttribute& o);
-	~ItemAttribute();
+  ItemAttribute();
+  ItemAttribute(const std::string& v);
+  ItemAttribute(int32_t v);
+  ItemAttribute(float v);
+  ItemAttribute(bool v);
+  ItemAttribute(const ItemAttribute& o);
+  ItemAttribute& operator=(const ItemAttribute& o);
+  ~ItemAttribute();
 
-	void serialize(PropWriteStream& stream) const;
-	bool unserialize(PropStream& stream);
+  void serialize(PropWriteStream& stream) const;
+  bool unserialize(PropStream& stream);
+  
+  void dealloc();
 
-	void clear();
+  void set(const std::string& v);
+  void set(int32_t v);
+  void set(float v);
+  void set(bool v);
 
-	void set(const std::string& str);
-	void set(int32_t i);
-	void set(float f);
-	void set(bool b);
-
-	const std::string* getString() const;
-	const int32_t* getInteger() const;
-	const float* getFloat() const;
-	const bool* getBoolean() const;
-	boost::any get() const;
+  const std::string* getString() const;
+  const int32_t* getInteger() const;
+  const float* getFloat() const;
+  const bool* getBoolean() const;
+  boost::any get() const;
 
 private:
-	enum Type {
-		STRING = 1,
-		INTEGER = 2,
-		FLOAT = 3,
-		BOOLEAN = 4,
-		NONE = 0
-	} type;
-	char data[sizeof(std::string)];
+  enum {
+    STRING = 1,
+    INTEGER = 2,
+    FLOAT = 3,
+    BOOLEAN = 4,
+    NONE = 0
+  } m_type;
+  
+  union {
+    std::string *string;
+    uint8_t unsignedChar;
+    int32_t signedInteger;
+    uint32_t unsignedInteger;
+    float signedFloat;
+    bool boolean;
+  } m_var;
 };
 
 class ItemAttributes
 {
 public:
-	ItemAttributes();
-	ItemAttributes(const ItemAttributes &i);
-	virtual ~ItemAttributes();
+  ItemAttributes();
+  ItemAttributes(const ItemAttributes &i);
+  virtual ~ItemAttributes();
 
-	// Save / load
-	void serializeAttributeMap(PropWriteStream& stream) const;
-	bool unserializeAttributeMap(PropStream& stream);
+  // Save / load
+  void serializeAttributeMap(PropWriteStream& stream) const;
+  bool unserializeAttributeMap(PropStream& stream);
 
 public:
-	void setAttribute(const std::string& key, const std::string& value);
-	void setAttribute(const std::string& key, int32_t value);
-	void setAttribute(const std::string& key, float value);
-	void setAttribute(const std::string& key, bool set);
-	// returns NULL if the attribute is not set
-	const std::string* getStringAttribute(const std::string& key) const;
-	const int32_t* getIntegerAttribute(const std::string& key) const;
-	const float* getFloatAttribute(const std::string& key) const;
-	const bool* getBooleanAttribute(const std::string& key) const;
-	boost::any getAttribute(const std::string& key) const;
-	// Returns true if the attribute (of that type) exists
-	bool hasStringAttribute(const std::string& key) const;
-	bool hasIntegerAttribute(const std::string& key) const;
-	bool hasFloatAttribute(const std::string& key) const;
-	bool hasBooleanAttribute(const std::string& key) const;
+  void setAttribute(const std::string& key, const std::string& value);
+  void setAttribute(const std::string& key, int32_t value);
+  void setAttribute(const std::string& key, float value);
+  void setAttribute(const std::string& key, bool set);
+  // returns NULL if the attribute is not set
+  const std::string* getStringAttribute(const std::string& key) const;
+  const int32_t* getIntegerAttribute(const std::string& key) const;
+  const float* getFloatAttribute(const std::string& key) const;
+  const bool* getBooleanAttribute(const std::string& key) const;
+  boost::any getAttribute(const std::string& key) const;
+  // Returns true if the attribute (of that type) exists
+  bool hasStringAttribute(const std::string& key) const;
+  bool hasIntegerAttribute(const std::string& key) const;
+  bool hasFloatAttribute(const std::string& key) const;
+  bool hasBooleanAttribute(const std::string& key) const;
 
 
-	void eraseAttribute(const std::string& key);
+  void eraseAttribute(const std::string& key);
 
 protected:
 
-	typedef std::map<std::string, ItemAttribute> AttributeMap;
-	AttributeMap* attributes;
+  typedef std::map<std::string, ItemAttribute> AttributeMap;
+  AttributeMap* attributes;
 
-	void createAttributes();
+  void createAttributes();
 };
 
 #endif

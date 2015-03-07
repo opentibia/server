@@ -33,70 +33,70 @@ class Creature;
 class NetworkMessage
 {
 public:
-	enum { header_length = 2 };
-	enum { crypto_length = 4 };
-	enum { xtea_multiple = 8 };
-	enum { max_body_length = NETWORKMESSAGE_MAXSIZE - header_length - crypto_length - xtea_multiple };
+  enum { header_length = 2 };
+  enum { crypto_length = 4 };
+  enum { xtea_multiple = 8 };
+  enum { max_body_length = NETWORKMESSAGE_MAXSIZE - header_length - crypto_length - xtea_multiple };
 
-	// constructor/destructor
-	NetworkMessage();
-	virtual ~NetworkMessage();
+  // constructor/destructor
+  NetworkMessage();
+  virtual ~NetworkMessage();
 
-	// simply read functions for incoming message
-	uint8_t  GetByte();
-	uint16_t GetU16();
-	uint16_t GetSpriteId();
-	uint32_t GetU32();
-	uint32_t PeekU32() const;
-	uint64_t GetU64() const;
-	std::string GetString();
-	std::string GetRaw();
-	Position GetPosition();
+  // simply read functions for incoming message
+  uint8_t  GetByte();
+  uint16_t GetU16();
+  uint16_t GetSpriteId();
+  uint32_t GetU32();
+  uint32_t PeekU32() const;
+  uint64_t GetU64() const;
+  std::string GetString();
+  std::string GetRaw();
+  Position GetPosition();
 
-	// skips count unknown/unused bytes in an incoming message
-	void SkipBytes(int count);
+  // skips count unknown/unused bytes in an incoming message
+  void SkipBytes(int count);
 
-	// simply write functions for outgoing message
-	void AddByte(uint8_t value);
-	void AddU16(uint16_t value);
-	void AddU32(uint32_t value);
-	void AddU64(uint64_t value);
-	void AddBytes(const char* bytes, uint32_t size);
-	void AddPaddingBytes(uint32_t n);
+  // simply write functions for outgoing message
+  void AddByte(uint8_t value);
+  void AddU16(uint16_t value);
+  void AddU32(uint32_t value);
+  void AddU64(uint64_t value);
+  void AddBytes(const char* bytes, uint32_t size);
+  void AddPaddingBytes(uint32_t n);
 
-	void AddString(const std::string &value);
-	void AddString(const char* value);
+  void AddString(const std::string &value);
+  void AddString(const char* value);
 
-	// write functions for complex types
-	void AddPosition(const Position &pos);
-	void AddItem(uint16_t id, uint8_t count);
-	void AddItem(const Item *item);
-	void AddItemId(const Item *item);
-	void AddItemId(uint16_t itemId);
+  // write functions for complex types
+  void AddPosition(const Position &pos);
+  void AddItem(uint16_t id, uint8_t count);
+  void AddItem(const Item *item);
+  void AddItemId(const Item *item);
+  void AddItemId(uint16_t itemId);
 
-	int32_t getMessageLength() const;
-	void setMessageLength(int32_t newSize);
-	int32_t getReadPos() const;
-	void setReadPos(int32_t pos);
+  int32_t getMessageLength() const;
+  void setMessageLength(int32_t newSize);
+  int32_t getReadPos() const;
+  void setReadPos(int32_t pos);
 
-	int32_t decodeHeader();
+  int32_t decodeHeader();
 
-	char* getBuffer();
-	char* getBodyBuffer();
+  char* getBuffer();
+  char* getBodyBuffer();
 
 #ifdef __TRACK_NETWORK__
-	virtual void Track(std::string file, long line, std::string func) {};
-	virtual void clearTrack() {};
+  virtual void Track(std::string file, long line, std::string func) {};
+  virtual void clearTrack() {};
 #endif
 
 protected:
-	void Reset();
-	bool canAdd(uint32_t size) const;
+  void Reset();
+  bool canAdd(uint32_t size) const;
 
-	int32_t m_MsgSize;
-	int32_t m_ReadPos;
+  int32_t m_MsgSize;
+  int32_t m_ReadPos;
 
-	uint8_t m_MsgBuf[NETWORKMESSAGE_MAXSIZE];
+  uint8_t m_MsgBuf[NETWORKMESSAGE_MAXSIZE];
 };
 
 typedef boost::shared_ptr<NetworkMessage> NetworkMessage_ptr;

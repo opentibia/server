@@ -28,11 +28,11 @@
 class Player;
 
 struct Wait{
-	uint32_t acc;
-	uint32_t ip;
-	std::string name;
-	bool premium;
-	int64_t timeout;
+  uint32_t acc;
+  uint32_t ip;
+  std::string name;
+  bool premium;
+  int64_t timeout;
 };
 
 typedef std::list<Wait*> WaitList;
@@ -41,20 +41,20 @@ typedef WaitList::iterator WaitListIterator;
 class WaitingList
 {
 public:
-	~WaitingList();
+  ~WaitingList();
 
-	static WaitingList* getInstance();
+  static WaitingList* getInstance();
 
-	bool clientLogin(const Player* player);
-	int32_t getClientSlot(const Player* player);
-	static int32_t getTime(int32_t slot);
+  bool clientLogin(const Player* player);
+  int32_t getClientSlot(const Player* player);
+  static int32_t getTime(int32_t slot);
 
 protected:
-	WaitList priorityWaitList;
-	WaitList waitList;
+  WaitList priorityWaitList;
+  WaitList waitList;
 
-	int32_t getTimeOut(int32_t slot);
-	WaitListIterator findClient(const Player* player, uint32_t& slot);
-	void cleanUpList();
+  int32_t getTimeOut(int32_t slot);
+  WaitListIterator findClient(const Player* player, uint32_t& slot);
+  void cleanUpList();
 };
 #endif

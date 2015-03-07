@@ -30,54 +30,54 @@
 class ProtocolStatus : public Protocol
 {
 public:
-	// static protocol information
-	enum {server_sends_first = false};
-	enum {protocol_identifier = 0xFF};
-	enum {use_checksum = false};
+  // static protocol information
+  enum {server_sends_first = false};
+  enum {protocol_identifier = 0xFF};
+  enum {use_checksum = false};
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	static uint32_t protocolStatusCount;
+  static uint32_t protocolStatusCount;
 #endif
 
-	ProtocolStatus(Connection_ptr connection);
-	virtual ~ProtocolStatus();
+  ProtocolStatus(Connection_ptr connection);
+  virtual ~ProtocolStatus();
 
-	virtual void onRecvFirstMessage(NetworkMessage& msg);
+  virtual void onRecvFirstMessage(NetworkMessage& msg);
 
-	static const char* protocol_name();
+  static const char* protocol_name();
 
 protected:
-	static std::map<uint32_t, int64_t> ipConnectMap;
+  static std::map<uint32_t, int64_t> ipConnectMap;
 
-	#ifdef __DEBUG_NET_DETAIL__
-	virtual void deleteProtocolTask();
-	#endif
+  #ifdef __DEBUG_NET_DETAIL__
+  virtual void deleteProtocolTask();
+  #endif
 };
 
 class Status : boost::noncopyable {
 public:
-	Status();
+  Status();
 
-	static Status* instance();
+  static Status* instance();
 
-	void addPlayer();
-	void removePlayer();
-	bool hasSlot() const;
+  void addPlayer();
+  void removePlayer();
+  bool hasSlot() const;
 
-	std::string getStatusString() const;
-	void getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const;
+  std::string getStatusString() const;
+  void getInfo(uint32_t requestedInfo, OutputMessage_ptr output, NetworkMessage& msg) const;
 
-	uint32_t getPlayersOnline() const;
-	uint32_t getMaxPlayersOnline() const;
+  uint32_t getPlayersOnline() const;
+  uint32_t getMaxPlayersOnline() const;
 
-	void setMaxPlayersOnline(int max);
+  void setMaxPlayersOnline(int max);
 
-	uint64_t getUpTime() const;
+  uint64_t getUpTime() const;
 
 private:
-	uint64_t m_start;
-	int m_playersmax, m_playersonline, m_playerspeak;
-	std::string m_mapname, m_mapauthor;
+  uint64_t m_start;
+  int m_playersmax, m_playersonline, m_playerspeak;
+  std::string m_mapname, m_mapauthor;
 
 };
 

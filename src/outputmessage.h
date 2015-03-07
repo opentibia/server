@@ -36,89 +36,89 @@ typedef boost::shared_ptr<Connection> Connection_ptr;
 
 class OutputMessage : public NetworkMessage, boost::noncopyable
 {
-	friend class OutputMessagePool;
+  friend class OutputMessagePool;
 
-	OutputMessage();
+  OutputMessage();
 
 public:
-	~OutputMessage();
+  ~OutputMessage();
 
-	char* getOutputBuffer();
-	void writeMessageLength();
-	void addCryptoHeader(bool addChecksum);
+  char* getOutputBuffer();
+  void writeMessageLength();
+  void addCryptoHeader(bool addChecksum);
 
-	enum OutputMessageState{
-		STATE_FREE,
-		STATE_ALLOCATED,
-		STATE_ALLOCATED_NO_AUTOSEND,
-		STATE_WAITING
-	};
+  enum OutputMessageState{
+    STATE_FREE,
+    STATE_ALLOCATED,
+    STATE_ALLOCATED_NO_AUTOSEND,
+    STATE_WAITING
+  };
 
-	Protocol* getProtocol();
-	Connection_ptr getConnection();
-	uint64_t getFrame() const;
+  Protocol* getProtocol();
+  Connection_ptr getConnection();
+  uint64_t getFrame() const;
 
 #ifdef __TRACK_NETWORK__
-	virtual void Track(std::string file, long line, std::string func)
-	{
-		if(last_uses.size() >= 25) {
-			last_uses.pop_front();
-		}
-		std::ostringstream os;
-		os << /*file << ":"*/ "line " << line << " " << func;
-		last_uses.push_back(os.str());
-	}
+  virtual void Track(std::string file, long line, std::string func)
+  {
+    if(last_uses.size() >= 25) {
+      last_uses.pop_front();
+    }
+    std::ostringstream os;
+    os << /*file << ":"*/ "line " << line << " " << func;
+    last_uses.push_back(os.str());
+  }
 
-	virtual void clearTrack()
-	{
-		last_uses.clear();
-	}
+  virtual void clearTrack()
+  {
+    last_uses.clear();
+  }
 
-	void PrintTrace()
-	{
-		int n = 1;
-		for(std::list<std::string>::const_reverse_iterator iter = last_uses.rbegin(); iter != last_uses.rend(); ++iter, ++n) {
-			std::cout << "\t" << n << ".\t" << *iter << std::endl;
-		}
-	}
+  void PrintTrace()
+  {
+    int n = 1;
+    for(std::list<std::string>::const_reverse_iterator iter = last_uses.rbegin(); iter != last_uses.rend(); ++iter, ++n) {
+      std::cout << "\t" << n << ".\t" << *iter << std::endl;
+    }
+  }
 #endif
 
 protected:
 
 #ifdef __TRACK_NETWORK__
-	std::list<std::string> last_uses;
+  std::list<std::string> last_uses;
 #endif
 
-	template <typename T>
-	inline void add_header(T add){
-		if((int32_t)m_outputBufferStart - (int32_t)sizeof(T) < 0){
-			std::cout << "Error: [OutputMessage::add_header] m_outputBufferStart(" << m_outputBufferStart <<
-					") < " << sizeof(T) << std::endl;
-			return;
-		}
-		m_outputBufferStart = m_outputBufferStart - sizeof(T);
-		*(T*)(m_MsgBuf + m_outputBufferStart) = add;
-		//added header size to the message size
-		m_MsgSize = m_MsgSize + sizeof(T);
-	}
+  template <typename T>
+  inline void add_header(T add){
+    if((int32_t)m_outputBufferStart - (int32_t)sizeof(T) < 0){
+      std::cout << "Error: [OutputMessage::add_header] m_outputBufferStart(" << m_outputBufferStart <<
+          ") < " << sizeof(T) << std::endl;
+      return;
+    }
+    m_outputBufferStart = m_outputBufferStart - sizeof(T);
+    *(T*)(m_MsgBuf + m_outputBufferStart) = add;
+    //added header size to the message size
+    m_MsgSize = m_MsgSize + sizeof(T);
+  }
 
-	void freeMessage();
+  void freeMessage();
 
-	void setProtocol(Protocol* protocol);
-	void setConnection(Connection_ptr connection);
+  void setProtocol(Protocol* protocol);
+  void setConnection(Connection_ptr connection);
 
-	void setState(OutputMessageState state);
-	OutputMessageState getState() const;
+  void setState(OutputMessageState state);
+  OutputMessageState getState() const;
 
-	void setFrame(uint64_t frame);
+  void setFrame(uint64_t frame);
 
-	Protocol* m_protocol;
-	Connection_ptr m_connection;
+  Protocol* m_protocol;
+  Connection_ptr m_connection;
 
-	uint32_t m_outputBufferStart;
-	uint64_t m_frame;
+  uint32_t m_outputBufferStart;
+  uint64_t m_frame;
 
-	OutputMessageState m_state;
+  OutputMessageState m_state;
 };
 
 typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
@@ -126,42 +126,42 @@ typedef boost::shared_ptr<OutputMessage> OutputMessage_ptr;
 class OutputMessagePool
 {
 public:
-	OutputMessagePool();
-	~OutputMessagePool();
+  OutputMessagePool();
+  ~OutputMessagePool();
 
-	static OutputMessagePool* getInstance();
+  static OutputMessagePool* getInstance();
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	static uint32_t OutputMessagePoolCount;
+  static uint32_t OutputMessagePoolCount;
 #endif
 
-	void send(OutputMessage_ptr msg);
-	void sendAll();
-	void stop();
-	OutputMessage_ptr getOutputMessage(Protocol* protocol, bool autosend = true);
-	void startExecutionFrame();
+  void send(OutputMessage_ptr msg);
+  void sendAll();
+  void stop();
+  OutputMessage_ptr getOutputMessage(Protocol* protocol, bool autosend = true);
+  void startExecutionFrame();
 
-	size_t getTotalMessageCount() const;
-	size_t getAvailableMessageCount() const;
-	size_t getAutoMessageCount() const;
-	void addToAutoSend(OutputMessage_ptr msg);
+  size_t getTotalMessageCount() const;
+  size_t getAvailableMessageCount() const;
+  size_t getAutoMessageCount() const;
+  void addToAutoSend(OutputMessage_ptr msg);
 
 protected:
 
-	void configureOutputMessage(OutputMessage_ptr msg, Protocol* protocol, bool autosend);
-	void releaseMessage(OutputMessage* msg);
-	void internalReleaseMessage(OutputMessage* msg);
+  void configureOutputMessage(OutputMessage_ptr msg, Protocol* protocol, bool autosend);
+  void releaseMessage(OutputMessage* msg);
+  void internalReleaseMessage(OutputMessage* msg);
 
-	typedef std::list<OutputMessage*> InternalOutputMessageList;
-	typedef std::list<OutputMessage_ptr> OutputMessageMessageList;
+  typedef std::list<OutputMessage*> InternalOutputMessageList;
+  typedef std::list<OutputMessage_ptr> OutputMessageMessageList;
 
-	InternalOutputMessageList m_outputMessages;
-	InternalOutputMessageList m_allOutputMessages;
-	OutputMessageMessageList m_autoSendOutputMessages;
-	OutputMessageMessageList m_toAddQueue;
-	boost::recursive_mutex m_outputPoolLock;
-	uint64_t m_frameTime;
-	bool m_isOpen;
+  InternalOutputMessageList m_outputMessages;
+  InternalOutputMessageList m_allOutputMessages;
+  OutputMessageMessageList m_autoSendOutputMessages;
+  OutputMessageMessageList m_toAddQueue;
+  boost::recursive_mutex m_outputPoolLock;
+  uint64_t m_frameTime;
+  bool m_isOpen;
 };
 
 #ifdef __TRACK_NETWORK__

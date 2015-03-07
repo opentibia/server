@@ -28,24 +28,24 @@
 
 class RSA{
 public:
-	RSA();
-	~RSA();
-	void setKey(const char* p, const char* q);
-	bool setKey(const std::string& file);
-	bool decrypt(char* msg);
-	bool encrypt(char* msg);
+  RSA();
+  ~RSA();
+  void setKey(const char* p, const char* q);
+  bool setKey(const std::string& file);
+  bool decrypt(char* msg);
+  bool encrypt(char* msg);
 
-	int32_t getKeySize();
-	void getPublicKey(char* buffer);
+  int32_t getKeySize();
+  void getPublicKey(char* buffer);
 
 protected:
 
-	bool m_keySet;
+  bool m_keySet;
 
-	boost::recursive_mutex rsaLock;
+  boost::recursive_mutex rsaLock;
 
-	//use only GMP
-	mpz_t m_p, m_q, m_n, m_d, m_e;
+  //use only GMP
+  mpz_t m_p, m_q, m_n, m_d, m_e;
 };
 
 #endif

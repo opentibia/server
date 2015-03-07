@@ -31,24 +31,24 @@
 #endif
 
 #define LOG_MESSAGE(channel, type, level, message) \
-	Logger::getInstance()->logMessage(channel, type, level, message, __OTSERV_PRETTY_FUNCTION__);
+  Logger::getInstance()->logMessage(channel, type, level, message, __OTSERV_PRETTY_FUNCTION__);
 
 enum eLogType {
-	LOGTYPE_EVENT,
-	LOGTYPE_WARNING,
-	LOGTYPE_ERROR
+  LOGTYPE_EVENT,
+  LOGTYPE_WARNING,
+  LOGTYPE_ERROR
 };
 
 class Logger {
 public:
-	Logger();
-	~Logger();
-	static Logger* getInstance();
+  Logger();
+  ~Logger();
+  static Logger* getInstance();
 
-	void logMessage(const char* channel, eLogType type, int level,
-			std::string message, const char* func);
+  void logMessage(const char* channel, eLogType type, int level,
+      std::string message, const char* func);
 private:
-	FILE* m_file;
+  FILE* m_file;
 };
 
 #endif

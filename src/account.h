@@ -27,26 +27,26 @@
 
 struct AccountCharacter
 {
-	AccountCharacter() : ip(0), port(7172) {}
+  AccountCharacter() : ip(0), port(7172) {}
 
-	std::string name;
+  std::string name;
     std::string world_name;
     uint16_t world_id;
-	uint32_t ip;
-	uint16_t port;
+  uint32_t ip;
+  uint16_t port;
 };
 
 struct Account
 {
-	Account() : number(0), premiumEnd(0), warnings(0) {}
-	~Account() {};
+  Account() : number(0), premiumEnd(0), warnings(0) {}
+  ~Account() {};
 
-	std::string name;
-	uint32_t number;
-	std::string password;
-	time_t premiumEnd;
-	uint32_t warnings;
-	std::list<AccountCharacter> charList;
+  std::string name;
+  uint32_t number;
+  std::string password;
+  time_t premiumEnd;
+  uint32_t warnings;
+  std::list<AccountCharacter> charList;
 };
 
 #endif

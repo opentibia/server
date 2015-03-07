@@ -30,55 +30,55 @@
 class DatabaseSQLite : public DatabaseDriver
 {
 public:
-	DatabaseSQLite();
-	virtual ~DatabaseSQLite();
+  DatabaseSQLite();
+  virtual ~DatabaseSQLite();
 
-	virtual bool getParam(DBParam_t param);
+  virtual bool getParam(DBParam_t param);
 
-	virtual bool beginTransaction();
-	virtual bool rollback();
-	virtual bool commit();
+  virtual bool beginTransaction();
+  virtual bool rollback();
+  virtual bool commit();
 
-	virtual uint64_t getLastInsertedRowID();
+  virtual uint64_t getLastInsertedRowID();
 
-	virtual std::string escapeString(const std::string &s);
-	virtual std::string escapeBlob(const char* s, uint32_t length);
+  virtual std::string escapeString(const std::string &s);
+  virtual std::string escapeBlob(const char* s, uint32_t length);
 
 
 protected:
-	virtual bool internalQuery(const std::string &query);
-	virtual DBResult_ptr internalSelectQuery(const std::string &query);
-	virtual void freeResult(DBResult *res);
+  virtual bool internalQuery(const std::string &query);
+  virtual DBResult_ptr internalSelectQuery(const std::string &query);
+  virtual void freeResult(DBResult *res);
 
-	std::string _parse(const std::string &s);
+  std::string _parse(const std::string &s);
 
-	boost::recursive_mutex sqliteLock;
-	sqlite3* m_handle;
+  boost::recursive_mutex sqliteLock;
+  sqlite3* m_handle;
 };
 
 class SQLiteResult : public DBResult
 {
-	friend class DatabaseSQLite;
+  friend class DatabaseSQLite;
 
 public:
-	virtual int32_t getDataInt(const std::string &s);
-	virtual uint32_t getDataUInt(const std::string &s);
-	virtual int64_t getDataLong(const std::string &s);
-	virtual std::string getDataString(const std::string &s);
-	virtual const char* getDataStream(const std::string &s, unsigned long &size);
+  virtual int32_t getDataInt(const std::string &s);
+  virtual uint32_t getDataUInt(const std::string &s);
+  virtual int64_t getDataLong(const std::string &s);
+  virtual std::string getDataString(const std::string &s);
+  virtual const char* getDataStream(const std::string &s, unsigned long &size);
 
-	virtual DBResult_ptr advance();
-	virtual bool empty();
+  virtual DBResult_ptr advance();
+  virtual bool empty();
 
 protected:
-	SQLiteResult(sqlite3_stmt* stmt);
-	virtual ~SQLiteResult();
+  SQLiteResult(sqlite3_stmt* stmt);
+  virtual ~SQLiteResult();
 
-	typedef std::map<const std::string, uint32_t> listNames_t;
-	listNames_t m_listNames;
+  typedef std::map<const std::string, uint32_t> listNames_t;
+  listNames_t m_listNames;
 
-	bool m_rowAvailable;
-	sqlite3_stmt* m_handle;
+  bool m_rowAvailable;
+  sqlite3_stmt* m_handle;
 };
 
 #endif

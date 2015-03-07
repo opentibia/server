@@ -29,52 +29,52 @@
 class Teleport : public Item, public Cylinder
 {
 public:
-	Teleport(uint16_t _type);
-	~Teleport();
+  Teleport(uint16_t _type);
+  ~Teleport();
 
-	virtual Teleport* getTeleport();
-	virtual const Teleport* getTeleport() const;
+  virtual Teleport* getTeleport();
+  virtual const Teleport* getTeleport() const;
 
-	//serialization
-	virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
-	virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
+  //serialization
+  virtual Attr_ReadValue readAttr(AttrTypes_t attr, PropStream& propStream);
+  virtual bool serializeAttr(PropWriteStream& propWriteStream) const;
 
-	void setDestPos(const Position& pos);
-	const Position& getDestPos() const;
+  void setDestPos(const Position& pos);
+  const Position& getDestPos() const;
 
-	//cylinder implementations
-	virtual Cylinder* getParent();
-	virtual const Cylinder* getParent() const;
-	virtual bool isRemoved() const;
-	virtual Position getPosition() const;
-	virtual Tile* getTile();
-	virtual const Tile* getTile() const;
-	virtual Item* getItem();
-	virtual const Item* getItem() const;
-	virtual Creature* getCreature();
-	virtual const Creature* getCreature() const;
-	virtual Tile* getParentTile();
-	virtual const Tile* getParentTile() const;
+  //cylinder implementations
+  virtual Cylinder* getParent();
+  virtual const Cylinder* getParent() const;
+  virtual bool isRemoved() const;
+  virtual Position getPosition() const;
+  virtual Tile* getTile();
+  virtual const Tile* getTile() const;
+  virtual Item* getItem();
+  virtual const Item* getItem() const;
+  virtual Creature* getCreature();
+  virtual const Creature* getCreature() const;
+  virtual Tile* getParentTile();
+  virtual const Tile* getParentTile() const;
 
-	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t flags) const;
-	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount, uint32_t flags) const;
-	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const;
-	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
-		uint32_t& flags);
+  virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
+    uint32_t flags) const;
+  virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+    uint32_t& maxQueryCount, uint32_t flags) const;
+  virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count, uint32_t flags) const;
+  virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+    uint32_t& flags);
 
-	virtual void __addThing(Creature* actor, Thing* thing);
-	virtual void __addThing(Creature* actor, int32_t index, Thing* thing);
-	virtual void __updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count);
-	virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing);
-	virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count);
+  virtual void __addThing(Creature* actor, Thing* thing);
+  virtual void __addThing(Creature* actor, int32_t index, Thing* thing);
+  virtual void __updateThing(Creature* actor, Thing* thing, uint16_t itemId, uint32_t count);
+  virtual void __replaceThing(Creature* actor, uint32_t index, Thing* thing);
+  virtual void __removeThing(Creature* actor, Thing* thing, uint32_t count);
 
-	virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
-	virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
+  virtual void postAddNotification(Creature* actor, Thing* thing, const Cylinder* oldParent, int32_t index, cylinderlink_t link = LINK_OWNER);
+  virtual void postRemoveNotification(Creature* actor, Thing* thing, const Cylinder* newParent, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 private:
-	Position destPos;
+  Position destPos;
 };
 
 #endif

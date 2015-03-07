@@ -29,32 +29,32 @@
 template<typename T>
 class Singleton : boost::noncopyable
 {
-	/// Initialize a resource of type T
-	static void initialize()
-	{
-		m_pointer.reset(new T);
-	}
+  /// Initialize a resource of type T
+  static void initialize()
+  {
+    m_pointer.reset(new T);
+  }
 
 public:
-	/// Initialize the internal instance if still not initialized
-	/// and returns it.
-	///
-	/// @return A pointer to the current instance.
-	///
-	/// @throw Any exception the resource can throw during construction
-	/// or any exception during calling the "new" operator.
-	static T* get()
-	{
-		boost::call_once(m_flag, initialize);
-		return m_pointer.get();
-	}
+  /// Initialize the internal instance if still not initialized
+  /// and returns it.
+  ///
+  /// @return A pointer to the current instance.
+  ///
+  /// @throw Any exception the resource can throw during construction
+  /// or any exception during calling the "new" operator.
+  static T* get()
+  {
+    boost::call_once(m_flag, initialize);
+    return m_pointer.get();
+  }
 
 private:
-	/// A scoped pointer holding the actual resource.
-	static boost::scoped_ptr<T> m_pointer;
+  /// A scoped pointer holding the actual resource.
+  static boost::scoped_ptr<T> m_pointer;
 
-	/// One-time initialization flag
-	static boost::once_flag m_flag;
+  /// One-time initialization flag
+  static boost::once_flag m_flag;
 };
 
 template<typename T>

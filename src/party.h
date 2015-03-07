@@ -32,63 +32,63 @@ typedef std::vector<Player*> PlayerVector;
 class Party
 {
 public:
-	Party(Player* _leader);
-	~Party();
+  Party(Player* _leader);
+  ~Party();
 
-	Player* getLeader() const;
-	void setLeader(Player* _leader);
+  Player* getLeader() const;
+  void setLeader(Player* _leader);
 
-	void disband();
-	bool invitePlayer(Player* player);
-	bool joinParty(Player* player);
-	bool revokeInvitation(Player* player);
-	bool passPartyLeadership(Player* player);
-	bool leaveParty(Player* player);
+  void disband();
+  bool invitePlayer(Player* player);
+  bool joinParty(Player* player);
+  bool revokeInvitation(Player* player);
+  bool passPartyLeadership(Player* player);
+  bool leaveParty(Player* player);
 
-	bool removeInvite(Player* player);
+  bool removeInvite(Player* player);
 
-	bool isPlayerMember(const Player* player) const;
-	bool isPlayerInvited(const Player* player) const;
-	void updateAllPartyIcons();
-	void updatePartyIcons(Player* player);
-	void broadcastPartyMessage(MessageClass msgClass, const std::string& msg, bool sendToInvitations = false);
-	bool disbandParty() const;
-	bool canOpenCorpse(uint32_t ownerId);
+  bool isPlayerMember(const Player* player) const;
+  bool isPlayerInvited(const Player* player) const;
+  void updateAllPartyIcons();
+  void updatePartyIcons(Player* player);
+  void broadcastPartyMessage(MessageClass msgClass, const std::string& msg, bool sendToInvitations = false);
+  bool disbandParty() const;
+  bool canOpenCorpse(uint32_t ownerId);
 
-	void shareExperience(uint64_t experience, bool fromMonster);
-	bool setSharedExperience(Player* player, bool _sharedExpActive);
-	bool isSharedExperienceActive() const;
-	bool isSharedExperienceEnabled() const;
-	bool canUseSharedExperience(const Player* player) const;
-	void updateSharedExperience();
+  void shareExperience(uint64_t experience, bool fromMonster);
+  bool setSharedExperience(Player* player, bool _sharedExpActive);
+  bool isSharedExperienceActive() const;
+  bool isSharedExperienceEnabled() const;
+  bool canUseSharedExperience(const Player* player) const;
+  void updateSharedExperience();
 
-	void addPlayerHealedMember(Player* player, uint32_t points);
-	void addPlayerDamageMonster(Player* player, uint32_t points);
-	void clearPlayerPoints(Player* player);
+  void addPlayerHealedMember(Player* player, uint32_t points);
+  void addPlayerDamageMonster(Player* player, uint32_t points);
+  void clearPlayerPoints(Player* player);
 
-	const PlayerVector& getMemberList() const;
+  const PlayerVector& getMemberList() const;
 
 private:
-	bool sharedExpActive;
-	bool sharedExpEnabled;
+  bool sharedExpActive;
+  bool sharedExpEnabled;
 
-	Player* leader;
-	PlayerVector memberList;
-	PlayerVector inviteList;
+  Player* leader;
+  PlayerVector memberList;
+  PlayerVector inviteList;
 
-	struct CountBlock_t{
-		int32_t totalHeal;
-		int32_t totalDamage;
-		int64_t ticks;
-	};
-	typedef std::map<uint32_t, CountBlock_t> CountMap;
-	CountMap pointMap;
+  struct CountBlock_t{
+    int32_t totalHeal;
+    int32_t totalDamage;
+    int64_t ticks;
+  };
+  typedef std::map<uint32_t, CountBlock_t> CountMap;
+  CountMap pointMap;
 
-	bool canEnableSharedExperience();
-	/*
-	void hasAttackedMonster(Player* player);
-	void hasHealedMember(Player* player);
-	*/
+  bool canEnableSharedExperience();
+  /*
+  void hasAttackedMonster(Player* player);
+  void hasHealedMember(Player* player);
+  */
 };
 
 #endif

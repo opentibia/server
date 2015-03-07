@@ -30,7 +30,7 @@
 #define __OTSERV_FUNCTIONAL_HASH_WORKAROUND__ tr1::hash
 
 /*
-	String to 64 bit integer macro
+  String to 64 bit integer macro
 */
 #define ATOI64 atoll
 

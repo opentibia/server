@@ -91,17 +91,6 @@ else()
   target_link_libraries(${PROJECT_NAME} ${LUA_LIBRARIES})
 endif()
 
-# link pthread and dl
-if(UNIX)
-  find_package(Threads)
-  target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} dl)
-endif()
-
-# link winsock
-if(WIN32)
-  target_link_libraries(${PROJECT_NAME} ws2_32 mswsock)
-endif()
-
 if(USE_MYSQL)
   add_definitions(-D__USE_MYSQL__)
   find_package(MySQL REQUIRED)
@@ -128,6 +117,17 @@ if(USE_PQSQL)
   find_package(PostgreSQL REQUIRED)
   include_directories(${POSTGRESQL_INCLUDE_DIR})
   target_link_libraries(${PROJECT_NAME} ${POSTGRESQL_LIBRARIES})
+endif()
+
+# link pthread and dl
+if(UNIX)
+  find_package(Threads)
+  target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} dl)
+endif()
+
+# link winsock
+if(WIN32)
+  target_link_libraries(${PROJECT_NAME} ws2_32 mswsock)
 endif()
 
 # display build type

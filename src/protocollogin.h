@@ -27,42 +27,42 @@
 class ProtocolLogin : public Protocol
 {
 public:
-	// static protocol information
-	enum {server_sends_first = false};
-	enum {protocol_identifier = 0x01};
-	enum {use_checksum = true};
-	static const char* protocol_name() {return "login protocol";}
+  // static protocol information
+  enum {server_sends_first = false};
+  enum {protocol_identifier = 0x01};
+  enum {use_checksum = true};
+  static const char* protocol_name() {return "login protocol";}
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-	static uint32_t protocolLoginCount;
+  static uint32_t protocolLoginCount;
 #endif
 
-	ProtocolLogin(Connection_ptr connection) : Protocol(connection)
-	{
-		enableChecksum();
+  ProtocolLogin(Connection_ptr connection) : Protocol(connection)
+  {
+    enableChecksum();
 
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-		protocolLoginCount++;
+    protocolLoginCount++;
 #endif
-	}
+  }
 
-	virtual ~ProtocolLogin()
-	{
+  virtual ~ProtocolLogin()
+  {
 #ifdef __ENABLE_SERVER_DIAGNOSTIC__
-		protocolLoginCount--;
+    protocolLoginCount--;
 #endif
-	}
+  }
 
-	virtual void onRecvFirstMessage(NetworkMessage& msg);
-	
+  virtual void onRecvFirstMessage(NetworkMessage& msg);
+  
 protected:
-	void disconnectClient(uint8_t error, const char* message);
-	
-	bool parseFirstPacket(NetworkMessage& msg);
+  void disconnectClient(uint8_t error, const char* message);
+  
+  bool parseFirstPacket(NetworkMessage& msg);
 
-	#ifdef __DEBUG_NET_DETAIL__
-	virtual void deleteProtocolTask();
-	#endif
+  #ifdef __DEBUG_NET_DETAIL__
+  virtual void deleteProtocolTask();
+  #endif
 };
 
 #endif

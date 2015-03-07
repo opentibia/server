@@ -24,41 +24,41 @@
 
 class Waypoint : public boost::enable_shared_from_this<Waypoint> {
 public:
-	Waypoint(const std::string& name, const Position& pos) :
-		name(name), pos(pos) {}
+  Waypoint(const std::string& name, const Position& pos) :
+    name(name), pos(pos) {}
 
-	std::string name;
-	Position pos;
+  std::string name;
+  Position pos;
 };
 
 typedef boost::shared_ptr<Waypoint> Waypoint_ptr;
 
 class Waypoints {
 public:
-	// Does not require either constructor nor destructor
+  // Does not require either constructor nor destructor
 
-	void addWaypoint(Waypoint_ptr wp);
-	Waypoint_ptr getWaypointByName(const std::string& name) const;
+  void addWaypoint(Waypoint_ptr wp);
+  Waypoint_ptr getWaypointByName(const std::string& name) const;
 
 protected:
-	typedef std::map<std::string, Waypoint_ptr> WaypointMap;
-	WaypointMap waypoints;
+  typedef std::map<std::string, Waypoint_ptr> WaypointMap;
+  WaypointMap waypoints;
 };
 
 
 inline void Waypoints::addWaypoint(Waypoint_ptr wp)
 {
-	waypoints.insert(std::make_pair(asUpperCaseString(wp->name), wp));
+  waypoints.insert(std::make_pair(asUpperCaseString(wp->name), wp));
 }
 
 inline Waypoint_ptr Waypoints::getWaypointByName(const std::string& name) const
 {
-	std::string s = asUpperCaseString(name);
-	WaypointMap::const_iterator f = waypoints.find(s);
-	if(f == waypoints.end()) {
-		return Waypoint_ptr();
-	}
-	return f->second;
+  std::string s = asUpperCaseString(name);
+  WaypointMap::const_iterator f = waypoints.find(s);
+  if(f == waypoints.end()) {
+    return Waypoint_ptr();
+  }
+  return f->second;
 }
 
 #endif

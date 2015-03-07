@@ -27,31 +27,31 @@
 
 struct OutfitType
 {
-	OutfitType(){
-		lookHead   = 0;
-		lookBody   = 0;
-		lookLegs   = 0;
-		lookFeet   = 0;
-		lookType   = 0;
-		lookTypeEx = 0;
-		lookAddons = 0;
-	}
+  OutfitType(){
+    lookHead   = 0;
+    lookBody   = 0;
+    lookLegs   = 0;
+    lookFeet   = 0;
+    lookType   = 0;
+    lookTypeEx = 0;
+    lookAddons = 0;
+  }
 
-	uint32_t lookType;
-	uint32_t lookTypeEx;
-	uint32_t lookHead;
-	uint32_t lookBody;
-	uint32_t lookLegs;
-	uint32_t lookFeet;
-	uint32_t lookAddons;
+  uint32_t lookType;
+  uint32_t lookTypeEx;
+  uint32_t lookHead;
+  uint32_t lookBody;
+  uint32_t lookLegs;
+  uint32_t lookFeet;
+  uint32_t lookAddons;
 };
 
 struct Outfit
 {
-	Outfit() : lookType(0), addons(0) {}
-	uint32_t lookType;
-	uint32_t addons;
-	std::string name;
+  Outfit() : lookType(0), addons(0) {}
+  uint32_t lookType;
+  uint32_t addons;
+  std::string name;
 };
 
 typedef std::list<Outfit> OutfitList;
