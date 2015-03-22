@@ -1366,7 +1366,6 @@ double Creature::gainExperience(double baseXP, bool fromMonster, double multipli
 {
 	double gainedXP = 0.0;
 	uint64_t intGainedXP;
-	std::cout << "Creature::gainExperience baseXP: " << baseXP << " multiplier:" << multiplier << " roundUp:" << roundUp << " checkParty" <<checkParty << " this:" << getName() << "\n";
 	if(baseXP > 0){
 		if(getMaster()){
 			double summonsGiveExp = std::max(g_config.getFloat(ConfigManager::SUMMONS_GIVE_EXP), 0.0);
