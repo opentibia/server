@@ -1364,7 +1364,7 @@ double Creature::getGainExperience(double baseXP, bool fromMonster, double multi
 
 double Creature::gainExperience(double baseXP, bool fromMonster, double multiplier, bool roundUp, bool checkParty)
 {
-	double gainedXP;
+	double gainedXP = 0.0;
 	uint64_t intGainedXP;
 	std::cout << "Creature::gainExperience baseXP: " << baseXP << " multiplier:" << multiplier << " roundUp:" << roundUp << " checkParty" <<checkParty << " this:" << getName() << "\n";
 	if(baseXP > 0){
