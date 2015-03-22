@@ -377,20 +377,20 @@ bool Party::setSharedExperience(Player* player, bool _sharedExpActive)
 	return true;
 }
 
-void Party::shareExperience(uint64_t experience, bool fromMonster)
+void Party::shareExperience(double experience, bool fromMonster)
 {
 	double member_factor = g_config.getNumber(ConfigManager::PARTY_MEMBER_EXP_BONUS);
 	double xpgained = (experience + (experience * (member_factor / 100.))) / (memberList.size() + 1);
 
 	if(xpgained < 0)
 		return;
-	uint64_t shareExp = (uint64_t)std::ceil(xpgained);
+	//uint64_t shareExp = (uint64_t)std::ceil(xpgained);
 
 	for(PlayerVector::iterator it = memberList.begin(); it != memberList.end(); ++it){
-		(*it)->onGainSharedExperience(shareExp, fromMonster);
+		(*it)->gainExperience(xpgained, fromMonster, 1.0, true, false);
 	}
 
-	getLeader()->onGainSharedExperience(shareExp, fromMonster);
+	getLeader()->gainExperience(xpgained, fromMonster, 1.0, true, false);
 }
 
 bool Party::canUseSharedExperience(const Player* player) const

@@ -144,7 +144,7 @@ warnings_to_final_banishment = 4
 warnings_to_deletion = 5
 
 -- in seconds
-banishment_length = 7*86400 
+banishment_length = 7*86400
 final_banishment_length = 30*86400
 ip_banishment_length = 86400
 
@@ -174,6 +174,9 @@ rate_skill = 1
 rate_mag = 1
 rate_loot = 1
 rate_spawn = 1
+
+-- how much of the xp won by a summon is given to its master
+summons_give_exp = 0.5
 
 --Displays the skill advanced to when advancing in skills (melee) [default: "no"]
 --Example: "You advanced to sword fighting 17. "
@@ -388,7 +391,7 @@ house_level = 1
 -- PS: This info is going to be shown just if house has no owner
 show_house_prices = false
 
--- max packets per second to elemeniate spamming of packets to server 
+-- max packets per second to elemeniate spamming of packets to server
 -- 0 disabled
 max_packets_per_second = 50
 

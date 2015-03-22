@@ -404,8 +404,8 @@ public:
 	void addInFightTicks(uint32_t ticks, bool pzlock = false);
 	void addDefaultRegeneration(uint32_t addTicks);
 
-	virtual uint64_t getGainedExperience(Creature* attacker) const;
-	void getGainExperience(uint64_t& gainExp, bool fromMonster);
+	virtual double getGainedExperience(Creature* attacker) const;
+	virtual double getGainExperience(double gainExp, bool fromMonster, double multiplier = 1.0) const;
 
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type, bool hadCondition);
@@ -422,8 +422,9 @@ public:
 	virtual void onSummonAttackedCreatureDrainMana(Creature* summon, Creature* target, int32_t points);
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target, bool lastHit);
-	virtual void onGainExperience(uint64_t gainExp, bool fromMonster);
-	virtual void onGainSharedExperience(uint64_t gainExp, bool fromMonster);
+	virtual double gainExperience(double gainExp, bool fromMonster, double multiplier, bool roundUp, bool checkParty);
+	virtual void onGainExperience(uint64_t);
+	//virtual void onGainSharedExperience(double gainExp, bool fromMonster);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);
@@ -714,7 +715,7 @@ public:
 	//stamina
 	void addStamina(int64_t value);
 	void removeStamina(int64_t value) {addStamina(-value);}
-	int32_t getStaminaMinutes();
+	int32_t getStaminaMinutes() const;
 	int32_t getStamina() {return stamina;}
 	int32_t getSpentStamina() {return MAX_STAMINA - stamina;}
 	void setStaminaMinutes(uint32_t value) {addStamina((int64_t)(value * STAMINA_MULTIPLIER));}
@@ -727,7 +728,6 @@ protected:
 	void checkTradeState(const Item* item);
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
-	void gainExperience(uint64_t& gainExp, bool fromMonster);
 	void addExperience(uint64_t exp);
 	void removeExperience(uint64_t exp, bool updateStats = true);
 

@@ -145,6 +145,7 @@ float box_muller(float m, float s);
 
 int random_range(int lowest_number, int highest_number, DistributionType_t type = DISTRO_UNIFORM, float deviation = 0.25);
 
+int64_t roundUpOrDown(double v, bool roundUp);
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
 

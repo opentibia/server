@@ -418,7 +418,7 @@ enum item_t {
 	ITEM_APPLE            = 2674,
 	ITEM_BREAD            = 2689,
 	ITEM_ROLL             = 2690,
-	ITEM_CHEESE           = 2696,
+	ITEM_CHEESE           = 8368,
 
 	ITEM_FULLSPLASH       = 2016,
 	ITEM_SMALLSPLASH      = 2019,

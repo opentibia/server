@@ -1531,7 +1531,7 @@ bool Player::hasShopItemForSale(uint32_t itemId, uint8_t subType)
 	for(std::list<ShopInfo>::const_iterator it = shopItemList.begin(); it != shopItemList.end(); ++it){
 		if(it->itemId == itemId && (*it).buyPrice > 0){
 			const ItemType& iit = Item::items[itemId];
-			
+
 			if(iit.isFluidContainer() || iit.isSplash()){
 				if (it->subType == subType)
 					return true;
@@ -3000,7 +3000,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 
 	bool childIsOwner = ((flags & FLAG_CHILDISOWNER) == FLAG_CHILDISOWNER);
 	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
-	
+
 	if(item->getContainer() && !canAddContainer(item->getContainer()))
 		return RET_NOTPOSSIBLE;
 
@@ -3970,7 +3970,7 @@ void Player::doAttacking(uint32_t interval)
 	}
 }
 
-uint64_t Player::getGainedExperience(Creature* attacker) const
+double Player::getGainedExperience(Creature* attacker) const
 {
 	if(g_game.getWorldType() == WORLD_TYPE_HARDCORE_PVP && g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP) > 0){
 		Player* attackerPlayer = attacker->getPlayer();
@@ -3987,12 +3987,12 @@ uint64_t Player::getGainedExperience(Creature* attacker) const
 				uint32_t b = getLevel();
 				uint64_t c = getExperience();
 
-				uint64_t result = std::max((uint64_t)0, (uint64_t)std::floor(getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c ));
+				double result = std::max(0.0, getDamageRatio(attacker) * std::max((double)0, ((double)(1 - (((double)a / b))))) * 0.05 * c );
 				return result * g_config.getNumber(ConfigManager::RATE_EXPERIENCE_PVP);
 		}
 	}
 
-	return 0;
+	return 0.0;
 }
 
 void Player::onFollowCreature(const Creature* creature)
@@ -4325,74 +4325,69 @@ void Player::onKilledCreature(Creature* target, bool lastHit)
 	Creature::onKilledCreature(target, lastHit);
 }
 
-void Player::gainExperience(uint64_t& gainExp, bool fromMonster)
+double Player::gainExperience(double baseXP, bool fromMonster, double multiplier, bool roundUp, bool checkParty)
 {
-	if(!hasFlag(PlayerFlag_NotGainExperience)){
-		if(gainExp > 0){
-			//soul regeneration
-			if((uint32_t)gainExp >= getLevel()){
-				Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
-				//Soul regeneration rate is defined by the vocation
-				uint32_t vocSoulTicks = vocation->getSoulGainTicks();
-				condition->setParam(CONDITIONPARAM_SOULGAIN, 1);
-				condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
-				addCondition(condition);
-			}
+	if(hasFlag(PlayerFlag_NotGainExperience)){
+		return 0;
+	}
 
-			//check stamina, player rate and other values
-			getGainExperience(gainExp, fromMonster);
-
-			//add experience
-			addExperience(gainExp);
+	if(checkParty){
+		Party* party = getParty();
+		if(party && party->isSharedExperienceActive() && party->isSharedExperienceEnabled()){
+			party->shareExperience(baseXP, fromMonster);
+			//We will get a share of the experience through the sharing mechanism
+			return 0;
 		}
 	}
+
+	double ret = Creature::gainExperience(baseXP, fromMonster, multiplier, roundUp, checkParty);
+	addExperience(roundUpOrDown(ret, false));
+	return ret;
 }
 
-void Player::getGainExperience(uint64_t& gainExp, bool fromMonster)
+void Player::onGainExperience(uint64_t gainExp)
+{
+	//soul regeneration
+	if((gainExp > 0) && gainExp >= uint64_t(getLevel())){
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOUL, 4 * 60 * 1000, 0);
+		//Soul regeneration rate is defined by the vocation
+		uint32_t vocSoulTicks = vocation->getSoulGainTicks();
+		condition->setParam(CONDITIONPARAM_SOULGAIN, 1);
+		condition->setParam(CONDITIONPARAM_SOULTICKS, vocSoulTicks * 1000);
+		addCondition(condition);
+	}
+	Creature::onGainExperience(gainExp);
+}
+
+double Player::getGainExperience(double baseXP, bool fromMonster, double multiplier /* = 1.0 */) const
 {
 	if(fromMonster || g_config.getNumber(ConfigManager::RATES_FOR_PLAYER_KILLING)){
-		gainExp = (uint64_t)std::floor(gainExp * getRateValue(LEVEL_EXPERIENCE));
+		baseXP = baseXP * getRateValue(LEVEL_EXPERIENCE);
 	}
 
 	if(fromMonster){
 		if((isPremium() || !g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_ONLYPREM)) &&
 			stamina > MAX_STAMINA - g_config.getNumber(ConfigManager::STAMINA_EXTRA_EXPERIENCE_DURATION)){
-			gainExp += uint64_t(gainExp * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE));
+			baseXP += baseXP * g_config.getFloat(ConfigManager::STAMINA_EXTRA_EXPERIENCE_RATE);
 		}
 
 		if(!hasFlag(PlayerFlag_HasInfiniteStamina)){
 			if(getStaminaMinutes() <= 0){
-				gainExp = 0;
+				baseXP = 0;
 			}
 			else if(getStaminaMinutes() <= 840){
-				gainExp = gainExp / 2;
+				baseXP = baseXP / 2;
 			}
 		}
 	}
+	return baseXP * multiplier;
 }
 
-void Player::onGainExperience(uint64_t gainExp, bool fromMonster)
+/*void Player::onGainSharedExperience(double gainExp, bool fromMonster)
 {
-	if(hasFlag(PlayerFlag_NotGainExperience)){
-		gainExp = 0;
-	}
-
-	Party* party = getParty();
-	if(party && party->isSharedExperienceActive() && party->isSharedExperienceEnabled()){
-		party->shareExperience(gainExp, fromMonster);
-		//We will get a share of the experience through the sharing mechanism
-		gainExp = 0;
-	}
-
-	gainExperience(gainExp, fromMonster);
-	Creature::onGainExperience(gainExp, fromMonster);
-}
-
-void Player::onGainSharedExperience(uint64_t gainExp, bool fromMonster)
-{
-	gainExperience(gainExp, fromMonster);
-	Creature::onGainSharedExperience(gainExp, fromMonster);
-}
+	double finalGainExp = gainExperience(gainExp, fromMonster, true);
+	Creature::onGainSharedExperience(finalGainExp, fromMonster);
+}*/
 
 bool Player::isImmune(CombatType_t type) const
 {
@@ -4884,7 +4879,7 @@ bool Player::depositMoney(uint32_t amount)
     }
     else
         return false;
- 
+
     return true;
  }
 
@@ -4929,7 +4924,7 @@ void Player::addStamina(int64_t value)
 	stamina = newstamina;
 }
 
-int32_t Player::getStaminaMinutes()
+int32_t Player::getStaminaMinutes() const
 {
 	if(hasFlag(PlayerFlag_HasInfiniteStamina)){
 		return MAX_STAMINA_MINUTES;

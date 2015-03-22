@@ -35,7 +35,7 @@ FOODS = {
 	[2680] = {24, "Yum."}, [2681] = {108, "Yum."}, [2682] = {240, "Yum."}, [2683] = {204, "Munch."},
 	[2684] = {60, "Crunch."}, [2685] = {72, "Munch."}, [2686] = {108, "Crunch."}, [2687] = {24, "Crunch."},
 	[2688] = {24, "Mmmm."}, [2689] = {120, "Crunch."}, [2690] = {72, "Crunch."}, [2691] = {96, "Crunch."},
-	[2695] = {72, "Gulp."}, [2696] = {108, "Smack."}, [2769] = {60, "Crunch."}, [2787] = {108, "Crunch."},
+	[2695] = {72, "Gulp."}, [8368] = {108, "Smack."}, [2769] = {60, "Crunch."}, [2787] = {108, "Crunch."},
 	[2788] = {48, "Crunch."}, [2789] = {264, "Munch."}, [2790] = {360, "Crunch."}, [2791] = {108, "Crunch."},
 	[2792] = {72, "Crunch."}, [2793] = {144, "Crunch."}, [2794] = {36, "Crunch."}, [2795] = {432, "Crunch."},
 	[2796] = {300, "Crunch."}, 	[5097] = {48, "Yum."}, [5678] = {96, "Gulp."}, [6125] = {96, "Mmmm."},
@@ -91,8 +91,8 @@ BREAKABLE_BY_WEAPONS = {
 	[1650] = { remainings = 2253, chance = 20 },
 	[1651] = { remainings = 2253, chance = 20 },
 	[1652] = { remainings = 2253, chance = 20 },
-	[1653] = { remainings = 2253, chance = 20 }, 
-	[3798] = { remainings = 3959, chance = 20 }, 
+	[1653] = { remainings = 2253, chance = 20 },
+	[3798] = { remainings = 3959, chance = 20 },
 	[3799] = { remainings = 3958, chance = 20 },
 }
 
@@ -190,7 +190,7 @@ local function __doTransformHole__(parameters)
 	local newItem = doTransformItem(thing.uid, parameters.oldType)
 	if parameters.oldaid ~= 0 and newItem then
 		doSetItemActionId(thing.uid, parameters.oldaid)
-	end	
+	end
 end
 
 function useShovel(cid, item, frompos, item2, topos)
@@ -244,7 +244,7 @@ local duration = 5 * 60000 -- 5 minutes
 	doDecayItem(item2.uid)
 	return true
 end
-	
+
 
 function usePick(cid, item, fromPosition, itemEx, toPosition)
 
@@ -315,7 +315,7 @@ if (item2.itemid == ITEM_PRE_WHEAT) then
 	elseif (item2.itemid == ITEM_PRE_SUGAR_CANE) then
 		doTransformItem(item2.uid, ITEM_SUGAR_CANE)
 		doCreateItem(ITEM_BUNCH_SUGAR_CANE, 1, topos)
-	else 
+	else
 		return false
 	end
 	doDecayItem(item2.uid)

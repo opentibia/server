@@ -61,7 +61,7 @@ public:
 	bool disbandParty() {return (memberList.empty() && inviteList.empty());}
 	bool canOpenCorpse(uint32_t ownerId);
 
-	void shareExperience(uint64_t experience, bool fromMonster);
+	void shareExperience(double experience, bool fromMonster);
 	bool setSharedExperience(Player* player, bool _sharedExpActive);
 	bool isSharedExperienceActive() const {return sharedExpActive;}
 	bool isSharedExperienceEnabled() const {return sharedExpEnabled;}

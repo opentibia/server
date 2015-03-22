@@ -5514,7 +5514,10 @@
 	<item id="2695" article="an" name="egg" plural="eggs">
 		<attribute key="weight" value="30"/>
 	</item>
-	<item id="2696" name="cheese">
+	<item id="2696" name="scarab cheese">
+		<attribute key="description" value="It smells horrible and should not be in the sun for too long."/>
+		<attribute key="decayTo" value="2235"/>
+		<attribute key="duration" value="1800"/>
 		<attribute key="weight" value="400"/>
 	</item>
 	<item id="2697" article="a" name="snowy dead tree"/>
@@ -19112,8 +19115,7 @@
 	<item id="8111" article="an" name="exploding cookie" plural="exploding cookies">
 		<attribute key="weight" value="10"/>
 	</item>
-	<item id="8112" article="a" name="scarab cheese">
-		<attribute key="description" value="It smells horrible and should not be in the sun for too long."/>
+	<item id="8112" article="a" name="cheese">
 		<attribute key="weight" value="400"/>
 	</item>
 	<item id="8113" editorsuffix=" (Blank)"/>

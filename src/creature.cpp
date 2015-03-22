@@ -1222,9 +1222,9 @@ double Creature::getDamageRatio(Creature* attacker) const
 	return ((double)attackerDamage / totalDamage);
 }
 
-uint64_t Creature::getGainedExperience(Creature* attacker) const
+double Creature::getGainedExperience(Creature* attacker) const
 {
-	return (uint64_t)std::floor(getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE) * attacker->getGainExpMultiplierDueType());
+	return getDamageRatio(attacker) * getLostExperience() * g_config.getNumber(ConfigManager::RATE_EXPERIENCE) * attacker->getGainExpMultiplierDueType();
 }
 
 void Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
@@ -1336,12 +1336,12 @@ void Creature::onTargetCreatureGainHealth(Creature* target, int32_t points)
 void Creature::onAttackedCreatureKilled(Creature* target)
 {
 	if(target != this){
-		uint64_t gainExp = target->getGainedExperience(this);
+		double gainExp = target->getGainedExperience(this);
 		bool fromMonster = true;
 		if(target->getPlayer()){
 			fromMonster = false;
 		}
-		onGainExperience(gainExp, fromMonster);
+		gainExperience(gainExp, fromMonster, 1.0, false, true);
 	}
 }
 
@@ -1355,32 +1355,60 @@ void Creature::onKilledCreature(Creature* target, bool lastHit)
 	this->onKillEvent(target, lastHit);
 }
 
-void Creature::onGainExperience(uint64_t gainExp, bool fromMonster)
+double Creature::getGainExperience(double baseXP, bool fromMonster, double multiplier /* = 1.0 */) const
 {
-	if(gainExp > 0){
+	if(getMaster())
+		return getMaster()->getGainExperience(baseXP, fromMonster, multiplier);
+	return baseXP * multiplier;
+}
+
+double Creature::gainExperience(double baseXP, bool fromMonster, double multiplier, bool roundUp, bool checkParty)
+{
+	double gainedXP;
+	uint64_t intGainedXP;
+	std::cout << "Creature::gainExperience baseXP: " << baseXP << " multiplier:" << multiplier << " roundUp:" << roundUp << " checkParty" <<checkParty << " this:" << getName() << "\n";
+	if(baseXP > 0){
 		if(getMaster()){
-			gainExp = gainExp / 2;
-			getMaster()->onGainExperience(gainExp, fromMonster);
-			//get the real experience gained to show on screen, since player rate counts for their summons
-			if(getMaster()->getPlayer()){
-				getMaster()->getPlayer()->getGainExperience(gainExp, fromMonster);
+			double summonsGiveExp = std::max(g_config.getFloat(ConfigManager::SUMMONS_GIVE_EXP), 0.0);
+			if (summonsGiveExp > 0){
+				double masterGainedXP = getMaster()->gainExperience(baseXP, fromMonster, summonsGiveExp * multiplier, roundUp, checkParty);
+				//get the lost experience gained to show on screen, since player rate counts for their summons
+				gainedXP = (masterGainedXP * (1.0 - summonsGiveExp))/summonsGiveExp;
+			}
+			else{
+				gainedXP = getGainExperience(baseXP, fromMonster, multiplier);
 			}
 		}
-
-		std::stringstream strExp;
-		strExp << gainExp;
-		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
+		else{
+			gainedXP = getGainExperience(baseXP, fromMonster, multiplier);
+		}
+		if(gainedXP > 0){
+			if (roundUp)
+				intGainedXP = (uint64_t) std::ceil(gainedXP);
+			else
+				intGainedXP = (uint64_t) std::floor(gainedXP);
+			onGainExperience(intGainedXP);
+		}
 	}
+	return gainedXP;
 }
 
-void Creature::onGainSharedExperience(uint64_t gainExp, bool fromMonster)
+void Creature::onGainExperience(uint64_t gainExp)
+{
+	std::stringstream strExp;
+	strExp << gainExp;
+	g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
+}
+
+/*void Creature::onGainSharedExperience(double gainExp, bool fromMonster)
 {
 	if(gainExp > 0){
+		uint64_t gainExpAsInt = (uint64_t) std::floor(gainExp);
 		std::stringstream strExp;
-		strExp << gainExp;
+		strExp << gainExpAsInt;
 		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
 	}
-}
+}*/
 
 void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 {

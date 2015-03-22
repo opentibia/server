@@ -184,6 +184,7 @@ public:
 
 	enum float_config_t {
 		STAMINA_EXTRA_EXPERIENCE_RATE,
+		SUMMONS_GIVE_EXP,
 		LAST_FLOAT_CONFIG /* this must be the last one */
 	};
 

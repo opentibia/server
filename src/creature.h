@@ -316,7 +316,8 @@ public:
 	virtual void onDie();
 	virtual void die();
 
-	virtual uint64_t getGainedExperience(Creature* attacker) const;
+	virtual double getGainedExperience(Creature* attacker) const;
+	virtual double getGainExperience(double gainExp, bool fromMonster, double multiplier = 1.0) const;
 	void addDamagePoints(Creature* attacker, int32_t damagePoints);
 	void addHealPoints(Creature* caster, int32_t healthPoints);
 	bool hasBeenAttacked(uint32_t attackerId) const;
@@ -337,8 +338,9 @@ public:
 	virtual void onTargetCreatureGainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target, bool lastHit);
-	virtual void onGainExperience(uint64_t gainExp, bool fromMonster);
-	virtual void onGainSharedExperience(uint64_t gainExp, bool fromMonster);
+	virtual double gainExperience(double gainExp, bool fromMonster, double multiplier, bool roundUp, bool checkParty);
+	virtual void onGainExperience(uint64_t);
+	//virtual void onGainSharedExperience(double gainExp, bool fromMonster);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
 	virtual void onBlockHit(BlockType_t blockType);
 	virtual void onChangeZone(ZoneType_t zone);

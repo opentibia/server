@@ -294,6 +294,16 @@ int random_range(int lowest_number, int highest_number, DistributionType_t type 
 	}
 }
 
+int64_t roundUpOrDown(double v, bool roundUp)
+{
+	int64_t ret;
+	if(roundUp) //round up
+		ret = (int64_t)	std::ceil(v);
+	else //round down
+		ret = (int64_t)	std::floor(v);
+	return ret;
+}
+
 // dump a part of the memory to stderr.
 void hexdump(unsigned char *_data, int _len) {
 	int i;

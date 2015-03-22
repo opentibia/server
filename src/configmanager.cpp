@@ -204,6 +204,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	#endif
 	m_confInteger[HEIGHT_MINIMUM_FOR_IDLE] = getGlobalNumber(L, "height_minimum_for_idle", 3);
 	m_confInteger[EXPERIENCE_STAGES] = getGlobalBoolean(L, "experience_stages", false);
+	m_confFloat[SUMMONS_GIVE_EXP] = getGlobalFloat(L, "summons_give_exp", 0.5);
 	m_confInteger[PUSH_INTERVAL] = getGlobalNumber(L, "push_interval", 2000);
 	m_confInteger[MOVEITEM_TIME] = getGlobalNumber(L, "move_item_interval", 500);
 	m_confInteger[MAX_STACK_SIZE] = getGlobalNumber(L, "max_stack_size", 1000);
@@ -222,7 +223,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[GUILD_WARS_END_ONLY_ON_STARTUP] = getGlobalBoolean(L, "guild_wars_end_only_on_startup", true);
 	m_confInteger[USE_RUNE_LEVEL_REQUIREMENTS] = getGlobalBoolean(L, "use_rune_level_requirements", true);
 	m_confInteger[MAX_PACKETS_PER_SECOND] = getGlobalNumber(L, "max_packets_per_second", 50);
-	
+
 	m_isLoaded = true;
 	return true;
 }
