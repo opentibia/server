@@ -26,7 +26,7 @@ Then you are logged in.
 
 # Fast compiler with Linux
 
-If your desktop is based on linux, do not cry, install docker and then run the following command:
+If your desktop is based on linux, do not cry, install docker (https://docs.docker.com/installation/) and then run the following command:
 ```
 docker run -ti --rm=true -v $(pwd):/opentibia/server opentibia/compiler-server
 ```
