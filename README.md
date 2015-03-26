@@ -26,14 +26,14 @@ Then you are logged in.
 
 # Fast compiler with Linux
 
-If your desktop is based on linux, do not cry, install the docker and then run the following command:
+If your desktop is based on linux, do not cry, install docker and then run the following command:
 ```
 docker run -ti --rm=true -v $(pwd):/opentibia/server opentibia/compiler-server
 ```
 
 success! You compiled this project in a few minutes. :muscle:
 
-OK! But now, how I can run? Very simple, this command is your solution:
+OK! But now, how can I run? Very simple, this command is your solution:
 
 ```
 docker run -ti --rm=true -v $(pwd):/opentibia/server -p 7171:7171 -p 7172:7172 opentibia/run-server
