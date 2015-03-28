@@ -223,6 +223,8 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[GUILD_WARS_END_ONLY_ON_STARTUP] = getGlobalBoolean(L, "guild_wars_end_only_on_startup", true);
 	m_confInteger[USE_RUNE_LEVEL_REQUIREMENTS] = getGlobalBoolean(L, "use_rune_level_requirements", true);
 	m_confInteger[MAX_PACKETS_PER_SECOND] = getGlobalNumber(L, "max_packets_per_second", 50);
+	m_confInteger[STORE_MESSAGES] = getGlobalNumber(L, "store_messages", 0);
+	m_confString[STORE_MESSAGES_PREFERENCE] = getGlobalString(L, "store_messages_preference", "database");
 
 	m_isLoaded = true;
 	return true;
