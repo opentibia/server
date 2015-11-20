@@ -372,16 +372,6 @@ saveclientdebug = true
 -- set to 0 to disable
 statustimeout = 30 * 1000
 
--- save player typed messages to the database
--- default: 0
--- options: 0 - off, 1 - commands only, 2 - all player text
--- Please note this option, when on, may cause some performance issues when a large number of players are online. Please use with caution.
-store_messages = 0
--- preferred storage style when saving player messages
--- default: database
--- options: database, file
-store_messages_preference = "database"
-
 -- accounts password type
 -- options: plain, md5, sha1
 passwordtype = "plain"
@@ -421,3 +411,4 @@ sql_port = 3306
 -- 5432 -- use this port for PgSQL
 sql_user = "root"
 sql_pass = ""
+

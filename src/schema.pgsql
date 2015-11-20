@@ -290,14 +290,6 @@ CREATE TABLE "player_depotitems" (
 	UNIQUE ("player_id", "sid")
 );
 
-CREATE TABLE `player_messages` (
-	`player_name` VARCHAR(255) NOT NULL,
-	`time` INT UNSIGNED NOT NULL,
-	`message_type` INT UNSIGNED NOT NULL DEFAULT 0,
-	`channel` INT NOT NULL DEFAULT -1,
-	`text` TEXT NOT NULL
-);
-
 CREATE TABLE "global_storage" (
 	"key" INT NOT NULL,
 	"value" INT NOT NULL,
@@ -310,7 +302,7 @@ CREATE TABLE "schema_info" (
 	PRIMARY KEY ("name")
 );
 
-INSERT INTO "schema_info" ("name", "value") VALUES ('version', 25);
+INSERT INTO "schema_info" ("name", "value") VALUES ('version', 24);
 
 CREATE FUNCTION "ondelete_accounts"()
 RETURNS TRIGGER

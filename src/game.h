@@ -498,7 +498,6 @@ public:
 	void updateCreatureSkull(Player* player);
 #endif
 
-	void savePlayerText(std::string playerName, SpeakClasses messageType, uint16_t channelId, const std::string& text);
 	void updateCreatureEmblem(Creature* creature);
 	GameState_t getGameState();
 	void setGameState(GameState_t newState);
@@ -612,3 +611,4 @@ protected:
 };
 
 #endif
+

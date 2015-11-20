@@ -30,7 +30,7 @@
 	#define OTSERV_CLIENT_VERSION "8.61"
 #endif
 
-#define CURRENT_SCHEMA_VERSION 25
+#define CURRENT_SCHEMA_VERSION 24
 
 #ifdef __USE_SQLITE__
 	#define SINGLE_SQL_DRIVER
@@ -146,3 +146,4 @@ enum passwordType_t{
 #endif
 
 #endif
+

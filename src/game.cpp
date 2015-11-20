@@ -3545,13 +3545,8 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		return false;
 	}
 
-	uint32_t store_level = g_config.getNumber(ConfigManager::STORE_MESSAGES);
-
 	TalkActionResult_t result = g_talkactions->onPlayerSpeak(player, type, text);
-	if(result == TALKACTION_BREAK) {
-		if (store_level > 0) {
-			savePlayerText(player->getName(), type, channelId, text);
-		}
+	if(result == TALKACTION_BREAK){
 		return true;
 	}
 
@@ -3565,9 +3560,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 		player->removeMessageBuffer();
 	}
 
-	if (store_level > 1) {
-		savePlayerText(player->getName(), type, channelId, text);
-	}
 	switch(type){
 		case SPEAK_SAY:
 			return internalCreatureSay(player, SPEAK_SAY, text);
@@ -3612,24 +3604,6 @@ bool Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type,
 	}
 
 	return false;
-}
-
-void Game::savePlayerText(std::string playerName, SpeakClasses messageType, uint16_t channelId, const std::string& text) {
-	std::string save_preference = g_config.getString(ConfigManager::STORE_MESSAGES_PREFERENCE);
-	if (save_preference == "file") {
-		std::ofstream messages_file;
-		messages_file.open("player_messages.txt", std::ios::app);
-		if(messages_file.good()) {
-			messages_file << std::time(NULL) << ": (" << messageType << " [" << channelId << "]) " << playerName << " - " << text << std::endl;
-			messages_file.close();
-		}
-	}
-	else {
-		Database* db = Database::instance();
-		DBQuery query;
-		query << "INSERT INTO `player_messages` VALUES ('" << playerName << "', " << std::time(NULL) << ", " << messageType << ", " << channelId << ", " << db->escapeString(text) << ");";
-		db->executeQuery(query.str());
-	}
 }
 
 bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
@@ -5063,3 +5037,4 @@ void Game::reloadInfo(reloadTypes_t info)
 			break;
 	}
 }
+

@@ -1,4 +1,4 @@
-﻿CREATE TABLE `groups` (
+CREATE TABLE `groups` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COMMENT 'group name',
 
@@ -331,14 +331,6 @@ CREATE TABLE `player_depotitems` (
 	UNIQUE (`player_id`, `sid`)
 ) ENGINE = InnoDB;
 
-CREATE TABLE `player_messages` (
-	`player_name` VARCHAR(255) NOT NULL,
-	`time` INT UNSIGNED NOT NULL,
-	`message_type` INT UNSIGNED NOT NULL DEFAULT 0,
-	`channel` INT NOT NULL DEFAULT -1,
-	`text` TEXT NOT NULL
-) ENGINE = InnoDB;
-
 CREATE TABLE `market_offers` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`player_id` INT UNSIGNED NOT NULL,
@@ -384,7 +376,7 @@ CREATE TABLE `schema_info` (
 	PRIMARY KEY (`name`)
 ) ENGINE = InnoDB;
 
-INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 25);
+INSERT INTO `schema_info` (`name`, `value`) VALUES ('version', 24);
 
 DELIMITER |
 

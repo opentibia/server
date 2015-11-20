@@ -64,7 +64,6 @@ public:
 		SQL_TYPE,
 		MAP_STORAGE_TYPE,
 		DEATH_MSG,
-		STORE_MESSAGES_PREFERENCE,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 
@@ -180,7 +179,6 @@ public:
 		GUILD_WARS_END_ONLY_ON_STARTUP,
 		USE_RUNE_LEVEL_REQUIREMENTS,
 		MAX_PACKETS_PER_SECOND,
-		STORE_MESSAGES,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 
@@ -218,3 +216,4 @@ private:
 
 
 #endif /* _CONFIG_MANAGER_H */
+
