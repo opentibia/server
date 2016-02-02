@@ -2,7 +2,7 @@
 CREATE TABLE "worlds" (
 	"id" SERIAL PRIMARY KEY,
 	"name" VARCHAR(32) NOT NULL,
-	"ip" INT NOT NULL DEFAULT 0,
+	"ip" BIGINT NOT NULL DEFAULT 0,
 	"port" INT NOT NULL
 );
 CREATE INDEX "worlds_name_index" ON "worlds" USING HASH ("name");
