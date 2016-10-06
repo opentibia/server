@@ -25,19 +25,16 @@ Then you are logged in.
 
 - Project Admins
 
-    - Iryont / iryont
-    - marksamman
-    - Remere / hjnilsson
+    - iryont (inactive)
+    - marksamman (inactive)
+    - Remere / hjnilsson (inactive)
 
-
-- Active Developers
-
-    - assassina			OpenTibia
-    - hackerpotato		OpenTibia
-    - kilouco / aseverino	OpenTibia
 
 - Inactive Developers
 
+    - assassina
+    - hackerpotato
+    - kilouco / aseverino
     - SimOne / xeroc81
     - Tliff
     - Spin
