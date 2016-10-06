@@ -9,10 +9,6 @@ OTServ 0.6.3. This has been done to greatly enhance the scripting system,
 moving to a much more flexible and dynamic system that allows much more
 control.
 
-# Looking for developers
-
-Open Tibia is currently looking for developers. If you want to become one, please send an email to iryont@gmail.com
-
 # How does it work?
 
 This version of OTServ is targeted towards Tibia 8.7.
