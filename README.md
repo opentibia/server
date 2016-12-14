@@ -20,6 +20,20 @@ and take a look at the config.lua
 NEVER ever enter your real acc# and/or password when not connecting to the CIP servers.
 Then you are logged in.
 
+# Fast compiler with Linux
+
+If your desktop is based on linux, do not cry, install docker (https://docs.docker.com/installation/) and then run the following command:
+```
+docker run -ti --rm=true -v $(pwd):/opentibia/server opentibia/compiler-server
+```
+
+success! You compiled this project in a few minutes. :muscle:
+
+OK! But now, how can I run? Very simple, this command is your solution:
+
+```
+docker run -ti --rm=true -v $(pwd):/opentibia/server -p 7171:7171 -p 7172:7172 opentibia/run-server
+```
 
 # Contributors
 
