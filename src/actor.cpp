@@ -515,12 +515,14 @@ BlockType Actor::blockHit(CombatType combatType, const CombatSource& combatSourc
       elementMod = it->second;
     }
 
-    if(elementMod != 0)
-      damage = (int32_t)std::ceil(damage * ((float)(100 - elementMod) / 100));
-      if(damage <= 0){
-        damage = 0;
-        blockType = BLOCK_DEFENSE;
-      }
+    if(elementMod != 0) {
+      damage = (int32_t)std::ceil(damage * ((float)(100 - elementMod) / 100));  
+    }
+
+    if(damage <= 0){
+      damage = 0;
+      blockType = BLOCK_DEFENSE;
+    }
   }
 
   return blockType;
