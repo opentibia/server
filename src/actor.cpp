@@ -515,7 +515,7 @@ BlockType Actor::blockHit(CombatType combatType, const CombatSource& combatSourc
       elementMod = it->second;
     }
 
-    if(elementMod != 0) {
+    if(elementMod != 0){
       damage = (int32_t)std::ceil(damage * ((float)(100 - elementMod) / 100));  
     }
 
