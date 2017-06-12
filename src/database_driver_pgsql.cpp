@@ -137,7 +137,7 @@ uint64_t DatabasePgSQL::getLastInsertedRowID()
   }
 
   // everything went fine
-  uint64_t id = ATOI64( PQgetvalue(res, 0, PQfnumber(res, "last" )));
+  uint64_t id = atoll( PQgetvalue(res, 0, PQfnumber(res, "last" )));
   PQclear(res);
   return id;
 }
@@ -221,7 +221,7 @@ uint32_t PgSQLResult::getDataUInt(const std::string &s)
 
 int64_t PgSQLResult::getDataLong(const std::string &s)
 {
-  return ATOI64( PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) ) );
+  return atoll( PQgetvalue(m_handle, m_cursor, PQfnumber(m_handle, s.c_str() ) ) );
 }
 
 std::string PgSQLResult::getDataString(const std::string &s)
