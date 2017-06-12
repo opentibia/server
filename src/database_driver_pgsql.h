@@ -39,8 +39,6 @@ public:
   virtual bool rollback();
   virtual bool commit();
 
-  virtual bool executeQuery(const std::string &query);
-
   virtual uint64_t getLastInsertedRowID();
 
   virtual std::string escapeString(const std::string &s);
